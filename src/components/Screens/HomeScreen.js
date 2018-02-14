@@ -1,34 +1,47 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Text, Button, Image, Alert } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
+import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text } from 'native-base';
 import { dieRoller } from '../../lib/DieRoller';
 
 export default class HomeScreen extends Component {
 	render() {
 		return (
-			<View style={styles.container}>
+		  <Container style={styles.container}>
+	        <Content>
 				<View style={styles.logo}>
 					<Image source={require('../../../public/hero_logo.png')} />
 				</View>
 				<View style={styles.content}>
 					<Text style={styles.heading}>Random Super</Text>
 					<View style={styles.buttonContainer}>
-		    			<Button title='Randomize!' onPress={() => this.props.navigation.navigate('Hit')} />
+		    			<Button block onPress={() => this.props.navigation.navigate('Hit')}>
+		    				<Text>Randomize!</Text>
+		    			</Button>
 		    		</View>						
 					<Text style={styles.heading}>Die Rollers</Text>
 					<View style={styles.buttonContainer}>
-		    			<Button title='3d6' onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())} />
+		    			<Button block onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
+		    				<Text>3d6</Text>
+		    			</Button>
 		    		</View>
 		    		<View style={styles.buttonContainer}>
-		    			<Button title='Hit' onPress={() => this.props.navigation.navigate('Hit')} />
+		    			<Button block onPress={() => this.props.navigation.navigate('Hit')}>
+		    				<Text>Hit</Text>
+		    			</Button>
 		    		</View>
 			    	<View style={styles.buttonContainer}>
-		    			<Button title='Damage' onPress={() => this.props.navigation.navigate('Damage')} />
+		    			<Button block onPress={() => this.props.navigation.navigate('Damage')}>
+		    				<Text>Damage</Text>
+		    			</Button>
 		    		</View>	
 			    	<View style={styles.buttonContainer}>
-		    			<Button title='Free Form' onPress={() => this.props.navigation.navigate('Free Form')} />
+		    			<Button block onPress={() => this.props.navigation.navigate('Free Form')}>
+		    				<Text>Free Form</Text>
+		    			</Button>
 		    		</View>
 		      	</View>
-			</View>
+	        </Content>
+	      </Container>	
 		);
 	}
 }
@@ -37,8 +50,8 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#3C6591',
-		alignItems: 'center',
 		justifyContent: 'space-around',
+		paddingHorizontal: 15
 	},
 	heading: {
 		fontSize: 30,
@@ -47,14 +60,13 @@ const styles = StyleSheet.create({
 	},
 	logo: {
 		flex: 1,
-		paddingTop: 15
+		paddingVertical: 15,
+		alignSelf: 'center'
 	},
 	content: {
-		flex: 5
+		flex: 10
 	},
 	buttonContainer: {
-		paddingVertical: 5,
-		minWidth: 300,
-		minHeight: 50
+		paddingVertical: 5
 	}
 });
