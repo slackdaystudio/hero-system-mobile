@@ -1,10 +1,37 @@
+const SKILL_CHECK = 1;
+
+const TO_HIT = 2;
+
+const NORMAL_DAMAGE = 3;
+
+const KILLING_DAMAGE = 4;
+	
+const PARTIAL_DIE_PLUS_ONE = 1;
+
+const PARTIAL_DIE_HALF = 2;
+
 class DieRoller {
 	constructor() {
-		this.validLastRollTypes = ['skillCheck', 'toHit', 'normalDamage', 'killingDamage'];
+		this.validLastRollTypes = [
+			SKILL_CHECK, 
+			TO_HIT, 
+			NORMAL_DAMAGE, 
+			KILLING_DAMAGE
+		];
 	}
 	
 	rollCheck() {
-		return this._roll(3, 'skillCheck');
+		return this._roll(3, SKILL_CHECK);
+	}
+	
+	rollAgain(lastResult) {
+		let result = null;
+		
+		if (lastResult.rollType === SKILL_CHECK) {
+			result = this._roll(3, lastResult.rollType, lastResult.partialDieType);
+		}
+		
+		return result;
 	}
 	
 	_roll(dice, rollType, partialDieType) {
@@ -24,9 +51,9 @@ class DieRoller {
 			resultRoll.rolls.push(roll);
 		}
 		
-		if (partialDieType === 'plusOne') {
+		if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
 			resultRoll.total += 1;
-		} else if (partialDieType === 'halfDie') {
+		} else if (partialDieType === PARTIAL_DIE_HALF) {
 			let halfDie = Math.floor(Math.random() * 3) + 1;
 			
 			resultRoll.total += halfDie;
