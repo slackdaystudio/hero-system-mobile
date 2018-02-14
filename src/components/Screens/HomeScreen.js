@@ -1,7 +1,8 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image } from 'react-native';
-import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text } from 'native-base';
+import { Container, Content, Button, Text } from 'native-base';
 import { dieRoller } from '../../lib/DieRoller';
+import styles from '../../Styles';
 
 export default class HomeScreen extends Component {
 	render() {
@@ -45,28 +46,3 @@ export default class HomeScreen extends Component {
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#3C6591',
-		justifyContent: 'space-around',
-		paddingHorizontal: 15
-	},
-	heading: {
-		fontSize: 30,
-		fontWeight: 'bold',
-		color: '#D0D1D3'
-	},
-	logo: {
-		flex: 1,
-		paddingVertical: 15,
-		alignSelf: 'center'
-	},
-	content: {
-		flex: 10
-	},
-	buttonContainer: {
-		paddingVertical: 5
-	}
-});
