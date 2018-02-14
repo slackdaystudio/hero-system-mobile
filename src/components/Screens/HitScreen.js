@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Alert, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Slider from 'react-native-slider';
 import { dieRoller } from '../../lib/DieRoller';
@@ -13,11 +13,7 @@ export default class HitScreen extends Component {
 			value: 0
 		}
 	}
-
-	_onRollClick() {
-		Alert.alert('You rolled ' + dieRoller.rollCheck().total);
-	}
-
+	
 	render() {
 		return (
 			<Container style={styles.container}>
@@ -38,7 +34,7 @@ export default class HitScreen extends Component {
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'
 					/>
-					<Button block onPress={this._onRollClick}>
+					<Button block onPress={() => this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.value))}>
 						<Text>Roll</Text>
 					</Button>
 				</Content>

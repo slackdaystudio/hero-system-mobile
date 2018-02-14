@@ -1,14 +1,14 @@
-const SKILL_CHECK = 1;
+export const SKILL_CHECK = 1;
 
-const TO_HIT = 2;
+export const TO_HIT = 2;
 
-const NORMAL_DAMAGE = 3;
+export const NORMAL_DAMAGE = 3;
 
-const KILLING_DAMAGE = 4;
+export const KILLING_DAMAGE = 4;
 	
-const PARTIAL_DIE_PLUS_ONE = 1;
+export const PARTIAL_DIE_PLUS_ONE = 1;
 
-const PARTIAL_DIE_HALF = 2;
+export const PARTIAL_DIE_HALF = 2;
 
 class DieRoller {
 	constructor() {
@@ -24,11 +24,21 @@ class DieRoller {
 		return this._roll(3, SKILL_CHECK);
 	}
 	
+	rollToHit(cv) {
+		let result = this._roll(3, TO_HIT);
+		result.hitCv = 11 + parseInt(cv, 10) - result.total;
+		result.cv = cv;
+
+		return result;
+	}
+	
 	rollAgain(lastResult) {
 		let result = null;
 		
 		if (lastResult.rollType === SKILL_CHECK) {
 			result = this._roll(3, lastResult.rollType, lastResult.partialDieType);
+		} else if (lastResult.rollType === TO_HIT) {
+			result = this.rollToHit(lastResult.cv, lastResult.rollType, lastResult.partialDieType);
 		}
 		
 		return result;
