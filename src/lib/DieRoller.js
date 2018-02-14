@@ -1,10 +1,10 @@
-export default class DieRoller {
+class DieRoller {
 	constructor() {
 		this.validLastRollTypes = ['skillCheck', 'toHit', 'normalDamage', 'killingDamage'];
 	}
 	
 	rollCheck() {
-		return roll(3, 'skillCheck');
+		return this._roll(3, 'skillCheck');
 	}
 	
 	_roll(dice, rollType, partialDieType) {
@@ -15,7 +15,7 @@ export default class DieRoller {
 			partialDieType: partialDieType || null
 		};
 		let roll = 0;
-		lastRollType = validLastRollTypes.indexOf(rollType) !== -1 ? rollType : lastRollType;
+		lastRollType = this.validLastRollTypes.indexOf(rollType) !== -1 ? rollType : lastRollType;
 		
 		for (let i = 0; i < dice; i++) {
 			roll = Math.floor(Math.random() * 6) + 1;
@@ -36,3 +36,5 @@ export default class DieRoller {
 		return resultRoll;
 	}
 }
+
+export let dieRoller = new DieRoller();
