@@ -5,6 +5,7 @@ import { StackNavigator } from 'react-navigation';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
 import HitScreen from './src/components/Screens/HitScreen';
+import FreeFormScreen from './src/components/Screens/FreeFormScreen';
 
 const RootStack = StackNavigator({
 		Home: {
@@ -15,6 +16,9 @@ const RootStack = StackNavigator({
 		}, 
 		Hit: {
 			screen: HitScreen
+		}, 
+		FreeForm: {
+			screen: FreeFormScreen
 		}
 	}, {
 		initialRouteName: 'Home'

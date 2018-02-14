@@ -16,7 +16,7 @@ export default class ResultScreen extends Component {
 	
 	_reRoll() {
 		this.setState({
-			result: dieRoller.rollAgain(this.state.result)
+			result: dieRoller.rollAgain(this.props.navigation.state.params)
 		});
 	}
 	
@@ -63,6 +63,7 @@ const localStyles = StyleSheet.create({
 	},
 	diceRolled: {
 		fontWeight: 'bold',
-		color: '#D0D1D3'
+		color: '#D0D1D3',
+		alignSelf: 'flex-start'
 	}
 });

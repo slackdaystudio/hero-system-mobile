@@ -6,6 +6,8 @@ export const NORMAL_DAMAGE = 3;
 
 export const KILLING_DAMAGE = 4;
 	
+export const FREE_FORM = 5;
+
 export const PARTIAL_DIE_PLUS_ONE = 1;
 
 export const PARTIAL_DIE_HALF = 2;
@@ -16,7 +18,8 @@ class DieRoller {
 			SKILL_CHECK, 
 			TO_HIT, 
 			NORMAL_DAMAGE, 
-			KILLING_DAMAGE
+			KILLING_DAMAGE,
+			FREE_FORM
 		];
 	}
 	
@@ -32,6 +35,34 @@ class DieRoller {
 		return result;
 	}
 	
+	freeFormRoll(dice, halfDice, pips) {
+		let resultRoll = {
+			rollType: FREE_FORM,
+			total: pips,
+			rolls: [],
+			dice: dice,
+			halfDice: halfDice,
+			pips: pips
+		};
+		let roll = 0;
+		
+		for (let i = 0; i < dice; i++) {
+			roll = Math.floor(Math.random() * 6) + 1;
+			
+			resultRoll.total += roll;
+			resultRoll.rolls.push(roll);
+		}
+		
+		for (let i = 0; i < halfDice; i++) {
+			roll = Math.floor(Math.random() * 3) + 1;
+			
+			resultRoll.total += roll;
+			resultRoll.rolls.push(roll);
+		}
+		//console.dir(resultRoll);
+		return resultRoll;	
+	}
+	
 	rollAgain(lastResult) {
 		let result = null;
 		
@@ -39,6 +70,8 @@ class DieRoller {
 			result = this._roll(3, lastResult.rollType, lastResult.partialDieType);
 		} else if (lastResult.rollType === TO_HIT) {
 			result = this.rollToHit(lastResult.cv, lastResult.rollType, lastResult.partialDieType);
+		} else if (lastResult.rollType === FREE_FORM) {
+			result = this.freeFormRoll(lastResult.dice, lastResult.halfDice, lastResult.pips);
 		}
 		
 		return result;
@@ -52,8 +85,7 @@ class DieRoller {
 			partialDieType: partialDieType || null
 		};
 		let roll = 0;
-		lastRollType = this.validLastRollTypes.indexOf(rollType) !== -1 ? rollType : lastRollType;
-		
+
 		for (let i = 0; i < dice; i++) {
 			roll = Math.floor(Math.random() * 6) + 1;
 			

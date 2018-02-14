@@ -36,7 +36,7 @@ export default class HomeScreen extends Component {
 		    			</Button>
 		    		</View>	
 			    	<View style={styles.buttonContainer}>
-		    			<Button block onPress={() => this.props.navigation.navigate('Free Form')}>
+		    			<Button block onPress={() => this.props.navigation.navigate('FreeForm')}>
 		    				<Text>Free Form</Text>
 		    			</Button>
 		    		</View>
