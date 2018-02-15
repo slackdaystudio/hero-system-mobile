@@ -91,6 +91,8 @@ class DieRoller {
 			result = this._roll(3, lastResult.rollType, lastResult.partialDieType);
 		} else if (lastResult.rollType === TO_HIT) {
 			result = this.rollToHit(lastResult.cv, lastResult.rollType, lastResult.partialDieType);
+		} else if (lastResult.rollType === NORMAL_DAMAGE || lastResult.rollType === KILLING_DAMAGE) {
+			result = this.rollDamage(lastResult.damageForm);
 		} else if (lastResult.rollType === FREE_FORM) {
 			result = this.freeFormRoll(lastResult.dice, lastResult.halfDice, lastResult.pips);
 		}

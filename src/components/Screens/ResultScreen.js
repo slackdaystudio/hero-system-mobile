@@ -53,9 +53,23 @@ export default class ResultScreen extends Component {
 	
 	_renderDamageInfo() {
 		return (
-			<View style={localStyles.lineContainer}>
-				<Text style={[styles.boldGrey, localStyles.alignStart]}>Hit Location: </Text>
-				{this._renderHitLocation()}
+			<View style={{paddingBottom: 20}}>
+				<View style={localStyles.lineContainer}>
+					<Text style={[styles.boldGrey, localStyles.alignStart]}>Hit Location: </Text>
+					{this._renderHitLocation()}
+				</View>
+				<View style={localStyles.lineContainer}>
+					<Text style={[styles.boldGrey, localStyles.alignStart]}>Stun: </Text>
+					{this._renderStun()}
+				</View>	
+				<View style={localStyles.lineContainer}>
+					<Text style={[styles.boldGrey, localStyles.alignStart]}>Body: </Text>
+					<Text style={styles.grey}>{this.state.result.body}</Text>
+				</View>
+				<View style={localStyles.lineContainer}>
+					<Text style={[styles.boldGrey, localStyles.alignStart]}>Knockback: </Text>
+					{this._renderKnockback()}
+				</View>
 			</View>
 		);
 	}
@@ -95,20 +109,7 @@ export default class ResultScreen extends Component {
 							<Text style={[styles.boldGrey, localStyles.alignStart]}>Dice Rolled: </Text>
 							<Text style={styles.grey}>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})</Text>
 						</View>
-						<View style={{paddingBottom: 30}} />
 						{this._renderAdditionalRollInfo()}
-						<View style={localStyles.lineContainer}>
-							<Text style={[styles.boldGrey, localStyles.alignStart]}>Stun: </Text>
-							{this._renderStun()}
-						</View>	
-						<View style={localStyles.lineContainer}>
-							<Text style={[styles.boldGrey, localStyles.alignStart]}>Body: </Text>
-							<Text style={styles.grey}>{this.state.result.body}</Text>
-						</View>
-						<View style={localStyles.lineContainer}>
-							<Text style={[styles.boldGrey, localStyles.alignStart]}>Knockback: </Text>
-							{this._renderKnockback()}
-						</View>
 						<View style={styles.buttonContainer}>
 			    			<Button block onPress={this.reRoll}>
 			    				<Text>Roll Again</Text>
