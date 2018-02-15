@@ -118,31 +118,33 @@ export default class HitScreen extends Component {
 		              <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
 		              <Item label="+½ die" value={PARTIAL_DIE_HALF} />
 		            </Picker>
-		            <View style={localStyles.titleContainer}>
+		            <View style={{paddingBottom: 30}} />
+		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 	              	<Text style={styles.grey}>Is this a killing attack?</Text>
 		              	<View style={{paddingRight: 10}}>
 		              		<CheckBox checked={this.state.killingToggled} onPress={() => this._toggleDamageType()} color='#3da0ff'/>
 		              	</View>		            
 		            </View>	            
 					{this._renderStunMultiplier()}
-		            <View style={localStyles.titleContainer}>
+		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 		              	<Text style={styles.grey}>Use hit locations?</Text>
 		              	<View style={{paddingRight: 10}}>
 		              		<CheckBox checked={this.state.useHitLocations} onPress={() => this._toggleHitLocations()} color='#3da0ff'/>
 		              	</View>
 		            </View>
-		            <View style={localStyles.titleContainer}>
+		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 		              	<Text style={styles.grey}>Are you using a martial maneuver?</Text>
 		              	<View style={{paddingRight: 10}}>
 		              		<CheckBox checked={this.state.isMartialManeuver} onPress={() => this._toggleMartialManeuver()} color='#3da0ff'/>
 		              	</View>
 		            </View>
-		            <View style={localStyles.titleContainer}>
+		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 		              	<Text style={styles.grey}>Is the target flying?</Text>
 		              	<View style={{paddingRight: 10}}>
 		              		<CheckBox checked={this.state.isTargetFlying} onPress={() => this._toggleTargetFlying()} color='#3da0ff'/>
 		              	</View>
 		            </View>
+		            <View style={{paddingBottom: 30}} />
 					<Button block onPress={() => this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state))}>
 						<Text>Roll</Text>
 					</Button>
@@ -156,8 +158,10 @@ const localStyles = StyleSheet.create({
 	titleContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingBottom: 10
+		alignItems: 'center'
+	},
+	checkContainer: {
+		paddingBottom: 20
 	},
 	picker: {
 		color: '#fff'

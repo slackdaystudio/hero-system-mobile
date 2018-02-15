@@ -41,16 +41,14 @@ class DieRoller {
 	
 	rollDamage(damageForm) {
 		let resultRoll = this._roll(damageForm.dice, damageForm.damageType, damageForm.partialDie);
+		let hitLocationRoll = damageForm.useHitLocations ? this._roll(3, HIT_LOCATIONS) : 10;
 		resultRoll.damageForm = damageForm;
 
 		if (damageForm.damageType === KILLING_DAMAGE) {
 			resultRoll.stunMultiplier = damageForm.stunMultiplier;
 		}				
 	
-		if (damageForm.useHitLocations) {
-			resultRoll.hitLocationDetails = this._getHitLocationModifiers(this._roll(3, HIT_LOCATIONS).total);
-		}
-
+		resultRoll.hitLocationDetails = this._getHitLocationModifiers(hitLocationRoll);
 		resultRoll.body = this._calcualteBody(resultRoll);
 		resultRoll.stun = this._calcualteStun(resultRoll);
 		resultRoll.knockback = this._calculateKnockback(resultRoll, damageForm.isTargetFlying, damageForm.isMartialManeuver);

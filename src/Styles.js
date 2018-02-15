@@ -19,5 +19,9 @@ export default StyleSheet.create({
 	},
 	grey: {
 		color: '#D0D1D3'
+	},
+	boldGrey: {
+		color: '#D0D1D3',
+		fontWeight: 'bold'
 	}
 });
