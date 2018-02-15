@@ -8,6 +8,10 @@ export const KILLING_DAMAGE = 4;
 	
 export const FREE_FORM = 5;
 
+export const HIT_LOCATIONS = 6;
+
+export const KNOCKBACK = 7;
+
 export const PARTIAL_DIE_PLUS_ONE = 1;
 
 export const PARTIAL_DIE_HALF = 2;
@@ -35,6 +39,25 @@ class DieRoller {
 		return result;
 	}
 	
+	rollDamage(damageForm) {
+		let resultRoll = this._roll(damageForm.dice, damageForm.damageType, damageForm.partialDie);
+		resultRoll.damageForm = damageForm;
+
+		if (damageForm.damageType === KILLING_DAMAGE) {
+			resultRoll.stunMultiplier = damageForm.stunMultiplier;
+		}				
+	
+		if (damageForm.useHitLocations) {
+			resultRoll.hitLocationDetails = this._getHitLocationModifiers(this._roll(3, HIT_LOCATIONS).total);
+		}
+
+		resultRoll.body = this._calcualteBody(resultRoll);
+		resultRoll.stun = this._calcualteStun(resultRoll);
+		resultRoll.knockback = this._calculateKnockback(resultRoll, damageForm.isTargetFlying, damageForm.isMartialManeuver);
+
+		return resultRoll;
+	}
+	
 	freeFormRoll(dice, halfDice, pips) {
 		let resultRoll = {
 			rollType: FREE_FORM,
@@ -59,7 +82,7 @@ class DieRoller {
 			resultRoll.total += roll;
 			resultRoll.rolls.push(roll);
 		}
-		//console.dir(resultRoll);
+		
 		return resultRoll;	
 	}
 	
@@ -101,8 +124,134 @@ class DieRoller {
 			resultRoll.total += halfDie;
 			resultRoll.rolls.push(halfDie);
 		}				
-		//console.dir(resultRoll);
+		
 		return resultRoll;
+	}
+
+	_calcualteStun(resultRoll) {
+		let stun = 0;
+		
+		if (resultRoll.rollType === KILLING_DAMAGE) {
+			if (resultRoll.hitLocationDetails == null) {
+				stun = resultRoll.total * ((Math.floor(Math.random() * 3) + 1) + parseInt(resultRoll.stunMultiplier));
+			} else {
+				stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier));
+			}
+		} else {
+			stun = resultRoll.total
+		}
+		
+		return stun;
+	}
+	
+	_calcualteBody(resultRoll) {
+		let body = 0;
+	
+		if (resultRoll.rollType === NORMAL_DAMAGE) {
+			for (let roll of resultRoll.rolls) {
+				if (roll >= 2 && roll <= 5) {
+					body += 1;
+				} else if (roll === 6) {
+					body += 2;
+				}
+			}
+		} else if (resultRoll.rollType === KILLING_DAMAGE) {
+			body += resultRoll.total;
+		}
+						
+		return body;
+	}
+	
+	_calculateKnockback(resultRoll, isTargetFlying, isMartialManeuver) {
+		let knockbackDice = 2;
+		
+		if (isMartialManeuver) {
+			knockbackDice++;
+		}
+		
+		if (isTargetFlying) {
+			knockbackDice--;
+		}
+		
+		if (resultRoll.rollType === KILLING_DAMAGE) {
+			knockbackDice++;
+		}
+		
+		return (resultRoll.body - this._roll(knockbackDice, KNOCKBACK).total) * 2;
+	}
+	
+	_getHitLocationModifiers(hitLocationRoll) {				
+		if (hitLocationRoll >= 3 && hitLocationRoll <= 5) {
+			return {
+				location: 'Head',
+				stunX: 5,
+				nStun: 2,
+				bodyX: 2
+			};
+		} else if (hitLocationRoll == 6) {
+			return {
+				location: 'Hands',
+				stunX: 1,
+				nStun: 0.5,
+				bodyX: 0.5
+			};
+		} else if (hitLocationRoll >= 7 && hitLocationRoll <= 8) {
+			return {
+				location: 'Arms',
+				stunX: 2,
+				nStun: 0.5,
+				bodyX: 0.5
+			};
+		} else if (hitLocationRoll == 9) {
+			return {
+				location: 'Shoulders',
+				stunX: 3,
+				nStun: 1,
+				bodyX: 1
+			};
+		} else if (hitLocationRoll >= 10 && hitLocationRoll <= 11) {
+			return {
+				location: 'Chest',
+				stunX: 3,
+				nStun: 1,
+				bodyX: 1
+			};
+		} else if (hitLocationRoll == 12) {
+			return {
+				location: 'Stomach',
+				stunX: 4,
+				nStun: 1.5,
+				bodyX: 1
+			};
+		} else if (hitLocationRoll == 13) {
+			return {
+				location: 'Vitals',
+				stunX: 4,
+				nStun: 1.5,
+				bodyX: 2
+			};
+		} else if (hitLocationRoll == 14) {
+			return {
+				location: 'Thighs',
+				stunX: 2,
+				nStun: 1,
+				bodyX: 1
+			};
+		} else if (hitLocationRoll >= 15 && hitLocationRoll <= 16) {
+			return {
+				location: 'Legs',
+				stunX: 2,
+				nStun: 0.5,
+				bodyX: 0.5
+			};
+		} else {
+			return {
+				location: 'Feet',
+				stunX: 1,
+				nStun: 0.5,
+				bodyX: 0.5
+			};
+		}
 	}
 }
 

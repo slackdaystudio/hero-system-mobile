@@ -12,7 +12,7 @@ export default class HomeScreen extends Component {
 				<View style={styles.logo}>
 					<Image source={require('../../../public/hero_logo.png')} />
 				</View>
-				<View style={styles.content}>
+				<View>
 					<Text style={styles.heading}>Random Super</Text>
 					<View style={styles.buttonContainer}>
 		    			<Button block onPress={() => this.props.navigation.navigate('Hit')}>

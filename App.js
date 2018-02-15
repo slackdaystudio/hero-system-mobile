@@ -5,6 +5,7 @@ import { StackNavigator } from 'react-navigation';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
 import HitScreen from './src/components/Screens/HitScreen';
+import DamageScreen from './src/components/Screens/DamageScreen';
 import FreeFormScreen from './src/components/Screens/FreeFormScreen';
 
 const RootStack = StackNavigator({
@@ -16,6 +17,9 @@ const RootStack = StackNavigator({
 		}, 
 		Hit: {
 			screen: HitScreen
+		}, 
+		Damage: {
+			screen: DamageScreen
 		}, 
 		FreeForm: {
 			screen: FreeFormScreen
