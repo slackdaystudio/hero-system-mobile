@@ -31,6 +31,7 @@ const RootStack = DrawerNavigator({
 		}
 	}, {
 		initialRouteName: 'Home',
+		drawerPosition: 'right',
 		contentComponent: props => <Sidebar {...props} />
 	}
 );
