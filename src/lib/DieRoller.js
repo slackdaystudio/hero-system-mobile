@@ -41,9 +41,9 @@ class DieRoller {
 	
 	rollDamage(damageForm) {
 		let resultRoll = this._roll(damageForm.dice, damageForm.damageType, damageForm.partialDie);
-		let hitLocationRoll = damageForm.useHitLocations ? this._roll(3, HIT_LOCATIONS) : 10;
+		let hitLocationRoll = damageForm.useHitLocations ? this._roll(3, HIT_LOCATIONS).total : 10;
 		resultRoll.damageForm = damageForm;
-
+		
 		if (damageForm.damageType === KILLING_DAMAGE) {
 			resultRoll.stunMultiplier = damageForm.stunMultiplier;
 		}				

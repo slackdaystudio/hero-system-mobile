@@ -38,13 +38,13 @@ export default class ResultScreen extends Component {
 		if (this.state.result.rollType === NORMAL_DAMAGE) {
 			return (
 				<Text style={styles.grey}>
-					{hitLocation.location} (NSTUN: {hitLocation.nStun})
+					{hitLocation.location} (NSTUN: x{hitLocation.nStun})
 				</Text>
 			);
 		} else if (this.state.result.rollType === KILLING_DAMAGE) {
 			return (
 				<Text style={styles.grey}>
-					{hitLocation.location} (STUNx: {hitLocation.stunX}, BODYx: {hitLocation.bodyX})
+					{hitLocation.location} (STUNx: x{hitLocation.stunX}, BODYx: x{hitLocation.bodyX})
 				</Text>
 			);
 		}
