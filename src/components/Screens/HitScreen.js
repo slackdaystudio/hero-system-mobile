@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Slider from 'react-native-slider';
+import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
 import styles from '../../Styles';
 
@@ -17,10 +18,8 @@ export default class HitScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
-				<Content>
-					<View style={styles.logo}>
-						<Image source={require('../../../public/hero_logo.png')} />
-					</View>
+			    <Header />
+				<Content style={styles.content}>
 					<View style={localStyles.titleContainer}>
 						<Text style={styles.grey}>Total OCV/OMCV:</Text>
 						<Text style={styles.grey}>{this.state.value}</Text>
@@ -34,7 +33,7 @@ export default class HitScreen extends Component {
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'
 					/>
-					<Button block onPress={() => this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.value))}>
+					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.value))}>
 						<Text>Roll</Text>
 					</Button>
 				</Content>
@@ -47,7 +46,8 @@ const localStyles = StyleSheet.create({
 	titleContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'center'
+		alignItems: 'center',
+		paddingTop: 10
 	},
 });
 

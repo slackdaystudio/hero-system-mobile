@@ -4,6 +4,7 @@ import { Container, Content, Button, Text, List, ListItem, Left, Body } from 'na
 import RNShakeEvent from 'react-native-shake-event';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import LabelAndContent from '../LabelAndContent/LabelAndContent';
+import Header from '../Header/Header';
 import styles from '../../Styles';
 
 export default class RandomCharacterScreen extends Component {
@@ -61,10 +62,8 @@ export default class RandomCharacterScreen extends Component {
 	render() {
 		return (
 		  <Container style={localStyles.container}>
-	        <Content>
-				<View style={styles.logo}>
-					<Image source={require('../../../public/hero_logo.png')} />
-				</View>
+		  	<Header />
+		  	<Content style={localStyles.content}>
 	        	<ListItem>
 	        		<Left>
 	        			<Text style={styles.boldGrey}>Archtype:</Text>
@@ -161,7 +160,7 @@ export default class RandomCharacterScreen extends Component {
 				<LabelAndContent label='Powers Cost' content={this.state.character.powers.powersCost} />
 				<LabelAndContent label='Disadvantages Cost' content={this.state.character.disadvantages.disadvantagesCost} />
 				<View style={styles.buttonContainer}>
-	    			<Button block onPress={this.reRoll}>
+	    			<Button block style={styles.button} onPress={this.reRoll}>
 	    				<Text>Roll Again</Text>
 	    			</Button>
 	    		</View>
@@ -173,6 +172,9 @@ export default class RandomCharacterScreen extends Component {
 
 const localStyles = StyleSheet.create({
 	container: {
-		backgroundColor: '#3C6591'
+		backgroundColor: '#446B95'
+	},
+	content: {
+		paddingTop: 10
 	}
 });

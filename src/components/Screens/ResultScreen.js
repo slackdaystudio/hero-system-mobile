@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
+import Header from '../Header/Header';
 import { dieRoller, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
 import styles from '../../Styles';
 
@@ -99,10 +100,8 @@ export default class ResultScreen extends Component {
 	render() {	
 		return (
 			<Container style={styles.container}>
-				<Content>
-					<View style={styles.logo}>
-						<Image source={require('../../../public/hero_logo.png')} />
-					</View>
+				<Header />
+				<Content style={styles.content}>
 					<View>
 						<Text style={[styles.grey, localStyles.rollResult]}>{this.state.result.total}</Text>
 						<View style={localStyles.lineContainer}>
@@ -111,7 +110,7 @@ export default class ResultScreen extends Component {
 						</View>
 						{this._renderAdditionalRollInfo()}
 						<View style={styles.buttonContainer}>
-			    			<Button block onPress={this.reRoll}>
+			    			<Button block style={styles.button} onPress={this.reRoll}>
 			    				<Text>Roll Again</Text>
 			    			</Button>
 			    		</View>

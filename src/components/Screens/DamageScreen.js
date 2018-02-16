@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import { StyleSheet, View, Image, Switch } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item, CheckBox } from 'native-base';
 import Slider from 'react-native-slider';
+import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
 import styles from '../../Styles';
 
@@ -87,10 +88,8 @@ export default class HitScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
-				<Content>
-					<View style={styles.logo}>
-						<Image source={require('../../../public/hero_logo.png')} />
-					</View>	
+				<Header />
+				<Content style={styles.content}>
 					<View style={localStyles.titleContainer}>
 						<Text style={styles.grey}>Dice:</Text>
 						<Text style={styles.grey}>{this.state.dice}</Text>
@@ -145,7 +144,7 @@ export default class HitScreen extends Component {
 		              	</View>
 		            </View>
 		            <View style={{paddingBottom: 30}} />
-					<Button block onPress={() => this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state))}>
+					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state))}>
 						<Text>Roll</Text>
 					</Button>
 				</Content>
@@ -158,7 +157,8 @@ const localStyles = StyleSheet.create({
 	titleContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'center'
+		alignItems: 'center',
+		paddingTop: 10
 	},
 	checkContainer: {
 		paddingBottom: 20
