@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image } from 'react-native';
-import { Container, Content, Button, Text } from 'native-base';
+import { Container, Content, Button, Text, List, ListItem, Left, Body } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import LabelAndContent from '../LabelAndContent/LabelAndContent';
@@ -32,13 +32,20 @@ export default class RandomCharacterScreen extends Component {
 			character: randomCharacter.generate()
 		});
 	}
-	
+
 	_renderCharacteristics() {
 		let elements = [];
 		
 		for (let prop in this.state.character.archtype.characteristics) {
 			elements.push(
-				<LabelAndContent key={prop} label={prop.toUpperCase()} content={this.state.character.archtype.characteristics[prop]} />
+				<ListItem key={prop}>
+	        		<Left>
+	        			<Text style={styles.boldGrey}>{this.state.character.archtype.characteristics[prop]}</Text>
+	        		</Left>
+	        		<Body>
+	        			<Text style={styles.grey}>{prop.toUpperCase()}</Text>
+	        		</Body>
+	        	</ListItem>
 			);
 		}
 		
@@ -50,35 +57,103 @@ export default class RandomCharacterScreen extends Component {
 			</View>
 		);
 	}
-			
+		
 	render() {
 		return (
-		  <Container style={styles.container}>
+		  <Container style={localStyles.container}>
 	        <Content>
 				<View style={styles.logo}>
 					<Image source={require('../../../public/hero_logo.png')} />
 				</View>
-				<LabelAndContent label='Archtype' content={this.state.character.archtype.name} />
-				<LabelAndContent label='Gender' content={this.state.character.gender} />
-				<LabelAndContent label='Special FX' content={this.state.character.specialFx} />
-				<LabelAndContent label='Profession' content={this.state.character.skills.profession} />
-				<View style={{paddingBottom: 20}} />
-				<Text style={styles.boldGrey}>Characteristics</Text>
+	        	<ListItem>
+	        		<Left>
+	        			<Text style={styles.boldGrey}>Archtype:</Text>
+	        		</Left>
+	        		<Body>
+	        			<Text style={styles.grey}>{this.state.character.archtype.name}</Text>
+	        		</Body>
+	        	</ListItem>
+	        	<ListItem>
+	        		<Left>
+	        			<Text style={styles.boldGrey}>Gender:</Text>
+	        		</Left>
+	        		<Body>
+	        			<Text style={styles.grey}>{this.state.character.gender}</Text>
+	        		</Body>
+	        	</ListItem>	
+	        	<ListItem>
+	        		<Left>
+	        			<Text style={styles.boldGrey}>Special FX:</Text>
+	        		</Left>
+	        		<Body>
+	        			<Text style={styles.grey}>{this.state.character.specialFx}</Text>
+	        		</Body>
+	        	</ListItem>	
+	        	<ListItem>
+	        		<Left>
+	        			<Text style={styles.boldGrey}>Profession:</Text>
+	        		</Left>
+	        		<Body>
+	        			<Text style={styles.grey}>{this.state.character.skills.profession}</Text>
+	        		</Body>
+	        	</ListItem>
+	        	<View style={{paddingBottom: 20}} />
+	        	<List>
+	        		<ListItem itemDivider style={{backgroundColor: '#3a557f'}}>
+	        			<Text style={styles.boldGrey}>Characteristics</Text>
+	        		</ListItem>
+	        	</List>
 				{this._renderCharacteristics()}
 				<View style={{paddingBottom: 20}} />
-				<Text style={styles.boldGrey}>Powers</Text>
+	        	<List>
+	        		<ListItem itemDivider style={{backgroundColor: '#3a557f'}}>
+	        			<Text style={styles.boldGrey}>Powers</Text>
+	        		</ListItem>
+	        	</List>
 				{this.state.character.powers.powers.map((power, index) => {
-					return <Text key={'power-' + index} style={styles.grey}>{power.cost} - {power.power}</Text>;
+					return (
+						<ListItem key={'power-' + index}>
+			        		<Left>
+			        			<Text style={styles.boldGrey}>{power.cost}</Text>
+			        		</Left>
+			        		<Body>
+			        			<Text style={styles.grey}>{power.power}</Text>
+			        		</Body>
+			        	</ListItem>							
+					);
 				})}
 				<View style={{paddingBottom: 20}} />
-				<Text style={styles.boldGrey}>Skills</Text>
+	        	<List>
+	        		<ListItem itemDivider style={{backgroundColor: '#3a557f'}}>
+	        			<Text style={styles.boldGrey}>Skills</Text>
+	        		</ListItem>
+	        	</List>
 				{this.state.character.skills.skills.map((skill, index) => {
-					return <Text key={'skill-' + index} style={styles.grey}>{skill}</Text>
+					return (
+						<ListItem key={'dkill-' + index}>
+			        		<Body>
+			        			<Text style={styles.grey}>{skill}</Text>
+			        		</Body>
+			        	</ListItem>							
+					);
 				})}
 				<View style={{paddingBottom: 20}} />
-				<Text style={styles.boldGrey}>Disadvantages</Text>
+	        	<List>
+	        		<ListItem itemDivider style={{backgroundColor: '#3a557f'}}>
+	        			<Text style={styles.boldGrey}>Disavantages</Text>
+	        		</ListItem>
+	        	</List>
 				{this.state.character.disadvantages.disadvantages.map((disad, index) => {
-					return <Text key={'disad-' + index} style={styles.grey}>{disad.cost} - {disad.description}</Text>
+					return (
+						<ListItem key={'disad-' + index}>
+			        		<Left>
+			        			<Text style={styles.boldGrey}>{disad.cost}</Text>
+			        		</Left>
+			        		<Body>
+			        			<Text style={styles.grey}>{disad.description}</Text>
+			        		</Body>
+			        	</ListItem>							
+					);
 				})}
 				<View style={{paddingBottom: 20}} />
 				<LabelAndContent label='Characteristics Cost' content={this.state.character.archtype.characteristicsCost} />
@@ -95,3 +170,9 @@ export default class RandomCharacterScreen extends Component {
 		);
 	}
 }
+
+const localStyles = StyleSheet.create({
+	container: {
+		backgroundColor: '#3C6591'
+	}
+});
