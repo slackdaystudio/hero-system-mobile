@@ -1,0 +1,20 @@
+{
+    effects: [
+        'Fire',
+        'Lightning',
+        'Ice',
+        'Water',
+        'Air',
+        'Earth',
+        'Magma',
+        'Psionic',
+        'Light',
+        'Holy',
+        'Demonic',
+        'Chaos',
+        'Plant',
+        'Eldrich',
+        'Nuclear',
+        'Other'
+    ]
+}

@@ -15,7 +15,7 @@ export default class HomeScreen extends Component {
 				<View>
 					<Text style={styles.heading}>Random Super</Text>
 					<View style={styles.buttonContainer}>
-		    			<Button block onPress={() => this.props.navigation.navigate('Hit')}>
+		    			<Button block onPress={() => this.props.navigation.navigate('RandomCharacter')}>
 		    				<Text>Randomize!</Text>
 		    			</Button>
 		    		</View>						
