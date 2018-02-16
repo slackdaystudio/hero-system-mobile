@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, StatusBar } from 'react-native';
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
 
 export default class MyHeader extends Component {
@@ -12,7 +12,7 @@ export default class MyHeader extends Component {
 				</View>
 		  	  </Left>
 	          <Right>
-	            <Button transparent>
+	            <Button transparent onPress={() => this.props.navigation.navigate("DrawerOpen")}>
 	              <Icon name='menu' />
 	            </Button>
 	          </Right>
@@ -24,7 +24,8 @@ export default class MyHeader extends Component {
 const localStyles = StyleSheet.create({
 	header: {
 		backgroundColor: '#3C6591',
-		minHeight: 70
+		minHeight: 70,
+		marginTop: StatusBar.currentHeight
 	},
 	logo: {
 		paddingLeft: 15,

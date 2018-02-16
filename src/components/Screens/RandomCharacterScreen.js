@@ -62,7 +62,7 @@ export default class RandomCharacterScreen extends Component {
 	render() {
 		return (
 		  <Container style={localStyles.container}>
-		  	<Header />
+		  	<Header navigation={this.props.navigation} />
 		  	<Content style={localStyles.content}>
 	        	<ListItem>
 	        		<Left>

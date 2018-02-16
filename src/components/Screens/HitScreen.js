@@ -18,7 +18,7 @@ export default class HitScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
-			    <Header />
+			    <Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
 					<View style={localStyles.titleContainer}>
 						<Text style={styles.grey}>Total OCV/OMCV:</Text>

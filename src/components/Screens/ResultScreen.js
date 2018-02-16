@@ -100,7 +100,7 @@ export default class ResultScreen extends Component {
 	render() {	
 		return (
 			<Container style={styles.container}>
-				<Header />
+				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
 					<View>
 						<Text style={[styles.grey, localStyles.rollResult]}>{this.state.result.total}</Text>

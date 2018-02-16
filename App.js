@@ -1,15 +1,16 @@
 import React, { Component }  from 'react';
 import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import Expo from 'expo';
-import { StackNavigator } from 'react-navigation';
+import { StackNavigator, DrawerNavigator } from 'react-navigation';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
 import HitScreen from './src/components/Screens/HitScreen';
 import DamageScreen from './src/components/Screens/DamageScreen';
 import FreeFormScreen from './src/components/Screens/FreeFormScreen';
+import Sidebar from './src/components/Sidebar/Sidebar';
 
-const RootStack = StackNavigator({
+const RootStack = DrawerNavigator({
 		Home: {
 			screen: HomeScreen,
 		},
@@ -29,7 +30,8 @@ const RootStack = StackNavigator({
 			screen: FreeFormScreen
 		}
 	}, {
-		initialRouteName: 'Home'
+		initialRouteName: 'Home',
+		contentComponent: props => <Sidebar {...props} />
 	}
 );
 
