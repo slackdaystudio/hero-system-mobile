@@ -100,7 +100,7 @@ export default class RandomCharacterScreen extends Component {
 				        		</Body>
 				        	</ListItem>	
 				        	<View style={{paddingBottom: 20}} />
-				        	<Text style={styles.boldGrey}>Point Costs</Text>
+				        	<Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
 				        	<ListItem>
 				        		<Left>
 				        			<Text style={styles.boldGrey}>Characteristics:</Text>
@@ -210,5 +210,9 @@ const localStyles = StyleSheet.create({
 	},
 	tabContent: {
 		backgroundColor: '#3d6594'
+	},
+	pointCostsHeader: {
+		alignSelf: 'center',
+		textDecorationLine: 'underline'
 	}
 });
