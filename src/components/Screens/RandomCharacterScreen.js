@@ -63,7 +63,7 @@ export default class RandomCharacterScreen extends Component {
 		return (
 		  <Container style={localStyles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content style={{backgroundColor: '#3d6594', paddingTop: 10}}>
+		  	<Content style={{backgroundColor: '#375476', paddingTop: 10}}>
 			  	<Tabs tabBarUnderlineStyle={localStyles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="General">
 			  			<ScrollView style={localStyles.tabContent}>
@@ -209,7 +209,7 @@ const localStyles = StyleSheet.create({
 		backgroundColor: '#3da0ff'
 	},
 	tabContent: {
-		backgroundColor: '#3d6594'
+		backgroundColor: '#375476'
 	},
 	pointCostsHeader: {
 		alignSelf: 'center',

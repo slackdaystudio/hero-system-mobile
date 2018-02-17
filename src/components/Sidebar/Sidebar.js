@@ -21,7 +21,6 @@ export default class Sidebar extends Component {
           	<ListItem onPress={() => this.props.navigation.navigate('RandomCharacter')}>
 	      		<Text style={styles.grey}>H.E.R.O.</Text>
 	      	</ListItem> 
-	      	<ListItem itemDivider style={{backgroundColor: '#3a557f'}} />
           	<ListItem onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
 	      		<Text style={styles.grey}>3D6</Text>
 	      	</ListItem> 
@@ -34,7 +33,6 @@ export default class Sidebar extends Component {
           	<ListItem onPress={() => this.props.navigation.navigate('FreeForm')}>
 	      		<Text style={styles.grey}>Free Form</Text>
 	      	</ListItem>	
-	      	<ListItem itemDivider style={{backgroundColor: '#3a557f'}} />
 	      	<ListItem onPress={() => this.props.navigation.navigate('Settings')}>
 	      		<Text style={styles.grey}>Settings</Text>
 	      	</ListItem>	
@@ -48,6 +46,6 @@ export default class Sidebar extends Component {
 const localStyles = StyleSheet.create({
 	container: {
 		marginTop: StatusBar.currentHeight,
-		backgroundColor: '#3d6594'
+		backgroundColor: '#000'
 	}
 });

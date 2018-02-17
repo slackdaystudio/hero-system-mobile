@@ -43,7 +43,7 @@ export default class SettingsScreen extends Component {
 			        			<Text style={styles.boldGrey}>Clear form data?</Text>
 			        		</Left>
 			        		<Right>
-							    <Button onPress={() => this._clearFormData()}>
+							    <Button style={localStyles.button} onPress={() => this._clearFormData()}>
 									<Text>Clear</Text>
 								</Button>
 			        		</Right>
@@ -54,3 +54,11 @@ export default class SettingsScreen extends Component {
 		);
 	}
 }
+
+const localStyles = StyleSheet.create({
+	button: {
+		backgroundColor: '#478f79',
+		justifyContent: 'center',
+		alignSelf: 'center'
+	}
+});
