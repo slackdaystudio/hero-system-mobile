@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Slider from 'react-native-slider';
 import Header from '../Header/Header';
@@ -13,8 +13,22 @@ export default class HitScreen extends Component {
 		this.state = {
 			value: 0
 		}
+		
+		this.saveOcvSliderValue = this._saveOcvSliderValue.bind(this);
 	}
 	
+	componentDidMount() {
+	    AsyncStorage.getItem('ocvSliderValue').then((value) => {
+	        this.setState({value: value ? parseInt(value, 10) : 0});
+	    }).done();
+	}
+	
+	_saveOcvSliderValue(value) {
+		AsyncStorage.setItem('ocvSliderValue', String(value));
+		
+        this.setState({value: value});
+	}
+		
 	render() {
 		return (
 			<Container style={styles.container}>
@@ -28,7 +42,7 @@ export default class HitScreen extends Component {
 						step={1} 
 						minimumValue={-30} 
 						maximumValue={30} 
-						onValueChange={(value) => this.setState({value: value})} 
+						onValueChange={(value) => this.saveOcvSliderValue(value)} 
 						trackStyle={thumbStyles.track}
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'

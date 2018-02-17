@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Slider from 'react-native-slider';
 import Header from '../Header/Header';
@@ -15,6 +15,25 @@ export default class HitScreen extends Component {
 			halfDice: 0,
 			pips: 0
 		}
+		
+		this.setSliderState = this._setSliderState.bind(this);
+	}
+	
+	componentDidMount() {
+	    AsyncStorage.getItem('freeFormState').then((value) => {
+	    	if (value !== undefined) {
+	    		this.setState(JSON.parse(value));
+	    	}
+	    }).done();
+	}
+	
+	_setSliderState(key, value) {
+		let newState = {...this.state};
+		newState[key] = value;
+		
+		AsyncStorage.setItem('freeFormState', JSON.stringify(newState));
+		
+        this.setState(newState);
 	}
 	
 	render() {
@@ -31,7 +50,7 @@ export default class HitScreen extends Component {
 						step={1} 
 						minimumValue={0} 
 						maximumValue={50} 
-						onValueChange={(value) => this.setState({dice: value})} 
+						onValueChange={(value) => this.setSliderState('dice', value)} 
 						trackStyle={thumbStyles.track}
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'
@@ -41,10 +60,11 @@ export default class HitScreen extends Component {
 						<Text style={styles.grey}>{this.state.halfDice}</Text>
 					</View>
 					<Slider 
+						value={this.state.halfDice}
 						step={1} 
 						minimumValue={0} 
 						maximumValue={50} 
-						onValueChange={(value) => this.setState({halfDice: value})} 
+						onValueChange={(value) => this.setSliderState('halfDice', value)} 
 						trackStyle={thumbStyles.track}
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'
@@ -54,10 +74,11 @@ export default class HitScreen extends Component {
 						<Text style={styles.grey}>{this.state.pips}</Text>
 					</View>
 					<Slider 
+						value={this.state.pips}
 						step={1} 
 						minimumValue={0} 
 						maximumValue={100} 
-						onValueChange={(value) => this.setState({pips: value})} 
+						onValueChange={(value) => this.setSliderState('pips', value)} 
 						trackStyle={thumbStyles.track}
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'

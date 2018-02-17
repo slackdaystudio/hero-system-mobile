@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image, Switch } from 'react-native';
+import { StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item, CheckBox } from 'native-base';
 import Slider from 'react-native-slider';
 import Header from '../Header/Header';
@@ -20,44 +20,54 @@ export default class HitScreen extends Component {
 			isMartialManeuver: false,
 			isTargetFlying: false
 		};
+		
+		this.updateState = this._updateState.bind(this);
+		this.toggleDamageType = this._toggleDamageType.bind(this);
+	}
+	
+	componentDidMount() {
+	    AsyncStorage.getItem('damageState').then((value) => {
+	    	if (value !== undefined) {
+	    		this.setState(JSON.parse(value));
+	    	}
+	    }).done();
+	}
+	
+	_updateState(key, value) {
+		let newState = {...this.state};
+		newState[key] = value;
+		
+		AsyncStorage.setItem('damageState', JSON.stringify(newState));
+		
+        this.setState(newState);
 	}
 	
 	_toggleDamageType() {
+		let newState = {...this.state};
+		
 		if (!this.state.killingToggled) {
-			this.setState({
-				killingToggled: true,
-				damageType: KILLING_DAMAGE
-			});
+			newState.killingToggled = true;
+			newState.damageType = KILLING_DAMAGE;
 		} else {
-			this.setState({
-				killingToggled: false,
-				damageType: NORMAL_DAMAGE
-			});
+			newState.killingToggled = false;
+			newState.damageType = NORMAL_DAMAGE;
 		}
+		
+		AsyncStorage.setItem('damageState', JSON.stringify(newState));
+		
+        this.setState(newState);
 	}
 	
 	_toggleHitLocations() {
-		let useHitLocations = !this.state.useHitLocations;
-		
-		this.setState({
-			useHitLocations: useHitLocations,
-		});
+		this.updateState('useHitLocations', !this.state.useHitLocations);
 	}
 
 	_toggleMartialManeuver() {
-		let isMartialManeuver = !this.state.isMartialManeuver;
-		
-		this.setState({
-			isMartialManeuver: isMartialManeuver,
-		});
+		this.updateState('isMartialManeuver', !this.state.isMartialManeuver);
 	}
 
 	_toggleTargetFlying() {
-		let isTargetFlying = !this.state.isTargetFlying;
-		
-		this.setState({
-			isTargetFlying: isTargetFlying,
-		});
+		this.updateState('isTargetFlying', !this.state.isTargetFlying);
 	}
 	
 	_renderStunMultiplier() {
@@ -73,7 +83,7 @@ export default class HitScreen extends Component {
 						step={1} 
 						minimumValue={-10} 
 						maximumValue={10} 
-						onValueChange={(value) => this.setState({stunMultiplier: value})} 
+						onValueChange={(value) => this.updateState('stunMultiplier', value)} 
 						trackStyle={thumbStyles.track}
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'
@@ -99,7 +109,7 @@ export default class HitScreen extends Component {
 						step={1} 
 						minimumValue={0} 
 						maximumValue={50} 
-						onValueChange={(value) => this.setState({dice: value})} 
+						onValueChange={(value) => this.updateState('dice', value)} 
 						trackStyle={thumbStyles.track}
 						thumbStyle={thumbStyles.thumb}
 						minimumTrackTintColor='#3da0ff'
@@ -111,7 +121,7 @@ export default class HitScreen extends Component {
 		              iosHeader="Select one"
 		              mode="dropdown"
 		              selectedValue={this.state.partialDie}
-		              onValueChange={(value) => this.setState({partialDie: value})}
+		              onValueChange={(value) => this.updateState('partialDie', value)}
 		            >
 		              <Item label="No partial die" value="0" />
 		              <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
@@ -121,7 +131,7 @@ export default class HitScreen extends Component {
 		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 	              	<Text style={styles.grey}>Is this a killing attack?</Text>
 		              	<View style={{paddingRight: 10}}>
-		              		<CheckBox checked={this.state.killingToggled} onPress={() => this._toggleDamageType()} color='#3da0ff'/>
+		              		<CheckBox checked={this.state.killingToggled} onPress={() => this.toggleDamageType()} color='#3da0ff'/>
 		              	</View>		            
 		            </View>	            
 					{this._renderStunMultiplier()}
