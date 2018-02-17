@@ -2,12 +2,14 @@ import React, { Component }  from 'react';
 import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import Expo from 'expo';
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
+import { Root } from "native-base";
 import HomeScreen from './src/components/Screens/HomeScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
 import HitScreen from './src/components/Screens/HitScreen';
 import DamageScreen from './src/components/Screens/DamageScreen';
 import FreeFormScreen from './src/components/Screens/FreeFormScreen';
+import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
 
 const RootStack = DrawerNavigator({
@@ -28,6 +30,9 @@ const RootStack = DrawerNavigator({
 		}, 
 		FreeForm: {
 			screen: FreeFormScreen
+		},
+		Settings: {
+			screen: SettingsScreen
 		}
 	}, {
 		initialRouteName: 'Home',
@@ -61,6 +66,10 @@ export default class App extends Component {
 			return <Expo.AppLoading />;
 		}
 
-		return <RootStack />;
+		return (
+			<Root>
+				<RootStack />
+			</Root>	
+		);
 	}
 }
