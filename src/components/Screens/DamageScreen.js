@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item, CheckBox } from 'native-base';
-import Slider from 'react-native-slider';
+import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
 import styles from '../../Styles';
@@ -73,22 +73,14 @@ export default class HitScreen extends Component {
 	_renderStunMultiplier() {
 		if (this.state.killingToggled) {
 			return (
-				<View>	
-					<View style={localStyles.titleContainer}>
-						<Text style={styles.grey}>Stun Multiplier:</Text>
-						<Text style={styles.grey}>{this.state.stunMultiplier}</Text>
-					</View>						
-					<Slider 
-						value={this.state.stunMultiplier}
-						step={1} 
-						minimumValue={-10} 
-						maximumValue={10} 
-						onValueChange={(value) => this.updateState('stunMultiplier', value)} 
-						trackStyle={thumbStyles.track}
-						thumbStyle={thumbStyles.thumb}
-						minimumTrackTintColor='#3da0ff'
-					/>
-				</View>
+				<Slider 
+					label='+/- Stun Multiplier:'
+					value={this.state.stunMultiplier} 
+					step={1} 
+					min={-10} 
+					max={10}
+					onValueChange={this.updateState}
+					valueKey='stunMultiplier' />
 			);
 		}
 		
@@ -100,19 +92,14 @@ export default class HitScreen extends Component {
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
-					<View style={localStyles.titleContainer}>
-						<Text style={styles.grey}>Dice:</Text>
-						<Text style={styles.grey}>{this.state.dice}</Text>
-					</View>
 					<Slider 
-						value={this.state.dice}
+						label='Dice:'
+						value={this.state.dice} 
 						step={1} 
-						minimumValue={0} 
-						maximumValue={50} 
-						onValueChange={(value) => this.updateState('dice', value)} 
-						trackStyle={thumbStyles.track}
-						thumbStyle={thumbStyles.thumb}
-						minimumTrackTintColor='#3da0ff'
+						min={0} 
+						max={50}
+						onValueChange={this.updateState}
+						valueKey='dice'
 					/>
 					<Picker
 					  inlinelabel
@@ -178,20 +165,5 @@ const localStyles = StyleSheet.create({
 	},
 	list: {
 		paddingBottom: 10
-	}
-});
-
-const thumbStyles = StyleSheet.create({
-	track: {
-		height: 16,
-		borderRadius: 10,
-	},
-	thumb: {
-		width: 30,
-		height: 30,
-		borderRadius: 30 / 2,
-		backgroundColor: 'white',
-		borderColor: '#3da0ff',
-		borderWidth: 2,
 	}
 });
