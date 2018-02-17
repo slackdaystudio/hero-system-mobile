@@ -5,7 +5,7 @@ import { Button, Text, Header, Left, Right, Icon } from 'native-base';
 export default class MyHeader extends Component {
 	render() {
 		return (
-			<Header style={localStyles.header}>
+			<Header hasTabs={this.props.hasTabs || false} style={localStyles.header}>
 		  	  <Left>
 				<View style={localStyles.logo}>
 					<Image source={require('../../../public/hero_logo.png')} />
