@@ -4,6 +4,7 @@ import Expo from 'expo';
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
 import { Root } from "native-base";
 import HomeScreen from './src/components/Screens/HomeScreen';
+import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
 import HitScreen from './src/components/Screens/HitScreen';
@@ -15,6 +16,9 @@ import Sidebar from './src/components/Sidebar/Sidebar';
 const RootStack = DrawerNavigator({
 		Home: {
 			screen: HomeScreen,
+		},
+		ViewCharacter: {
+			screen: ViewCharacterScreen
 		},
 		RandomCharacter: {
 			screen: RandomCharacterScreen

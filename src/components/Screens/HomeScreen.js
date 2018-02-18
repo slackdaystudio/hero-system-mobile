@@ -3,15 +3,28 @@ import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
+import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
-export default class HomeScreen extends Component {
+export default class HomeScreen extends Component {	
 	render() {
 		return (
 		  <Container style={styles.container}>
 			<Header navigation={this.props.navigation} />  
 	        <Content style={styles.content}>
 				<View>
+					<Text style={styles.heading}>Character Tools</Text>
+					<Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
+					<View style={styles.buttonContainer}>
+		    			<Button style={styles.button} onPress={() => character.load()}>
+		    				<Text style={styles.buttonText}>Load Character</Text>
+		    			</Button>
+		    		</View>
+					<View style={styles.buttonContainer}>
+		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
+		    				<Text style={styles.buttonText}>View Character</Text>
+		    			</Button>
+		    		</View>	
 					<Text style={styles.heading}>H.E.R.O.</Text>
 					<Text style={styles.grey}>Generate a random character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
 					<View style={styles.buttonContainer}>
