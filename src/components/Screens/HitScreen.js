@@ -35,6 +35,7 @@ export default class HitScreen extends Component {
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
+				    <Text style={styles.heading}>Roll To Hit</Text>
 					<Slider 
 						label='Total OCVOMCV:' 
 						value={this.state.value} 

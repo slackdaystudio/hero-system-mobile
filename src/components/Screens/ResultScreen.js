@@ -102,6 +102,7 @@ export default class ResultScreen extends Component {
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
+				    <Text style={styles.heading}>Roll Result</Text>
 					<View>
 						<Text style={[styles.grey, localStyles.rollResult]}>{this.state.result.total}</Text>
 						<View style={localStyles.lineContainer}>

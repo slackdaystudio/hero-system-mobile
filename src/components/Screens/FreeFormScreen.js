@@ -41,6 +41,7 @@ export default class HitScreen extends Component {
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
+				    <Text style={styles.heading}>Free Form Roll</Text>
 					<Slider 
 						label='Dice:'
 						value={this.state.dice} 
