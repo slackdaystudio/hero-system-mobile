@@ -52,6 +52,8 @@
 		9C2141AB82914128ABF007DB /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D7A325EAC79748C8927C59EC /* SimpleLineIcons.ttf */; };
 		2B958D55305B404B94B62A29 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 785B2F46EF9B4C169E2DFED3 /* Zocial.ttf */; };
 		0C55FFA056CB409BB268FD51 /* libRNDocumentPicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CC39B25E690446089407E695 /* libRNDocumentPicker.a */; };
+		E56BC9DEF7CF4452B832917B /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9390AB4E88104B829CF0CAAA /* libRNSVG.a */; };
+		11992EBD1B8F417C9EF7596E /* libRNSVG-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53046D2D5D141858CE00C3C /* libRNSVG-tvOS.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -321,6 +323,9 @@
 		785B2F46EF9B4C169E2DFED3 /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		21E7DC19E54746778C4370B9 /* RNDocumentPicker.xcodeproj */ = {isa = PBXFileReference; name = "RNDocumentPicker.xcodeproj"; path = "../node_modules/react-native-document-picker/ios/RNDocumentPicker.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		CC39B25E690446089407E695 /* libRNDocumentPicker.a */ = {isa = PBXFileReference; name = "libRNDocumentPicker.a"; path = "libRNDocumentPicker.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		D0FE7B7316B041AA97616B29 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; name = "RNSVG.xcodeproj"; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		9390AB4E88104B829CF0CAAA /* libRNSVG.a */ = {isa = PBXFileReference; name = "libRNSVG.a"; path = "libRNSVG.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		D53046D2D5D141858CE00C3C /* libRNSVG-tvOS.a */ = {isa = PBXFileReference; name = "libRNSVG-tvOS.a"; path = "libRNSVG-tvOS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -353,6 +358,8 @@
 				5EC741D3FA84470C9156C277 /* libRNFS.a in Frameworks */,
 				975F535DF62746CF8D89C146 /* libRNShakeEvent.a in Frameworks */,
 				0C55FFA056CB409BB268FD51 /* libRNDocumentPicker.a in Frameworks */,
+				E56BC9DEF7CF4452B832917B /* libRNSVG.a in Frameworks */,
+				11992EBD1B8F417C9EF7596E /* libRNSVG-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,6 +541,7 @@
 				FAECC556E9C74F10A313D49E /* RNFS.xcodeproj */,
 				ED61283B88A34B7A94564F57 /* RNShakeEvent.xcodeproj */,
 				21E7DC19E54746778C4370B9 /* RNDocumentPicker.xcodeproj */,
+				D0FE7B7316B041AA97616B29 /* RNSVG.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1141,6 +1149,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1148,6 +1158,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-shake-event/ios",
 					"$(SRCROOT)/../node_modules/react-native-document-picker/ios/RNDocumentPicker",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Debug;
@@ -1172,6 +1183,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1179,6 +1192,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-shake-event/ios",
 					"$(SRCROOT)/../node_modules/react-native-document-picker/ios/RNDocumentPicker",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Release;
@@ -1204,6 +1218,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-shake-event/ios",
 					"$(SRCROOT)/../node_modules/react-native-document-picker/ios/RNDocumentPicker",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Debug;
@@ -1228,6 +1243,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-shake-event/ios",
 					"$(SRCROOT)/../node_modules/react-native-document-picker/ios/RNDocumentPicker",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Release;
@@ -1261,6 +1277,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1268,6 +1286,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-shake-event/ios",
 					"$(SRCROOT)/../node_modules/react-native-document-picker/ios/RNDocumentPicker",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Debug;
@@ -1301,6 +1320,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1308,6 +1329,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
 					"$(SRCROOT)/../node_modules/react-native-shake-event/ios",
 					"$(SRCROOT)/../node_modules/react-native-document-picker/ios/RNDocumentPicker",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Release;
@@ -1336,6 +1358,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 			};
 			name = Debug;
@@ -1360,6 +1384,8 @@
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",

@@ -3,6 +3,7 @@ import { AsyncStorage, View } from 'react-native';
 import { Container, Content, Text, List, ListItem, Left, Right, Spinner } from 'native-base';
 import Header from '../Header/Header';
 import { statistics } from '../../lib/Statistics';
+import { chart } from '../../lib/Chart';
 import styles from '../../Styles';
 
 export default class StatisticsScreen extends Component {
@@ -61,6 +62,7 @@ export default class StatisticsScreen extends Component {
 			<Header navigation={this.props.navigation} />
 	        <Content style={styles.content}>
 	            <Text style={styles.heading}>Statistics</Text>
+                {chart.renderDieDistribution(this.state.stats.distributions)}
 	            <List>
                     <ListItem>
                       <Left>

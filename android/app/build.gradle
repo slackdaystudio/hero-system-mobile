@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-svg')
     compile project(':react-native-document-picker')
     compile project(':react-native-shake-event')
     compile project(':react-native-fs')
