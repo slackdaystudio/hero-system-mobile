@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
-import { Container, Content, Button, Text, Picker, Item, CheckBox } from 'native-base';
+import { Container, Content, Button, Text, Picker, Item } from 'native-base';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
@@ -92,6 +92,7 @@ export default class HitScreen extends Component {
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
+				    <Text style={styles.heading}>Roll For Damage</Text>
 					<Slider 
 						label='Dice:'
 						value={this.state.dice} 
@@ -118,26 +119,26 @@ export default class HitScreen extends Component {
 		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 	              	<Text style={styles.grey}>Is this a killing attack?</Text>
 		              	<View style={{paddingRight: 10}}>
-		              		<CheckBox checked={this.state.killingToggled} onPress={() => this.toggleDamageType()} color='#3da0ff'/>
+		              		<Switch value={this.state.killingToggled} onValueChange={() => this.toggleDamageType()} color='#3da0ff'/>
 		              	</View>		            
 		            </View>	            
 					{this._renderStunMultiplier()}
 		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 		              	<Text style={styles.grey}>Use hit locations?</Text>
 		              	<View style={{paddingRight: 10}}>
-		              		<CheckBox checked={this.state.useHitLocations} onPress={() => this._toggleHitLocations()} color='#3da0ff'/>
+		              		<Switch value={this.state.useHitLocations} onValueChange={() => this._toggleHitLocations()} color='#3da0ff'/>
 		              	</View>
 		            </View>
 		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 		              	<Text style={styles.grey}>Are you using a martial maneuver?</Text>
 		              	<View style={{paddingRight: 10}}>
-		              		<CheckBox checked={this.state.isMartialManeuver} onPress={() => this._toggleMartialManeuver()} color='#3da0ff'/>
+		              		<Switch value={this.state.isMartialManeuver} onValueChange={() => this._toggleMartialManeuver()} color='#3da0ff'/>
 		              	</View>
 		            </View>
 		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 		              	<Text style={styles.grey}>Is the target flying?</Text>
 		              	<View style={{paddingRight: 10}}>
-		              		<CheckBox checked={this.state.isTargetFlying} onPress={() => this._toggleTargetFlying()} color='#3da0ff'/>
+		              		<Switch value={this.state.isTargetFlying} onValueChange={() => this._toggleTargetFlying()} color='#3da0ff'/>
 		              	</View>
 		            </View>
 		            <View style={{paddingBottom: 30}} />

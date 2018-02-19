@@ -9,7 +9,7 @@ export default StyleSheet.create({
 		paddingHorizontal: 10
 	},
 	heading: {
-		fontSize: 30,
+		fontSize: 26,
 		fontWeight: 'bold',
 		color: '#D0D1D3'
 	},
