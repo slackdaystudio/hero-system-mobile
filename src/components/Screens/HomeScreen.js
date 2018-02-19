@@ -60,6 +60,13 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
 		    		</View>
+		    		<View>
+                        <View style={styles.buttonContainer}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('Statistics')}>
+                                <Text style={styles.buttonText}>Stats</Text>
+                            </Button>
+                        </View>
+		    		</View>
 		      	</View>
 	        </Content>
 	      </Container>	

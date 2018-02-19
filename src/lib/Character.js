@@ -1,5 +1,5 @@
-import { AsyncStorage, Alert } from 'react-native';
-import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
+import { AsyncStorage } from 'react-native';
+import { DocumentPicker } from 'react-native-document-picker';
 
 class Character {
 	constructor() {

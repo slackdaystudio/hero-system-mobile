@@ -3,6 +3,7 @@ import { StyleSheet, View, AsyncStorage, Alert } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right } from 'native-base';
 import Header from '../Header/Header';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
+import { statistics } from '../../lib/Statistics';
 import styles from '../../Styles';
 
 export default class SettingsScreen extends Component {	
@@ -41,6 +42,17 @@ export default class SettingsScreen extends Component {
         });
 	}
 
+    async _clearStatisticsData() {
+	    await AsyncStorage.removeItem('characterFile');
+	    statistics.init();
+
+        Toast.show({
+            text: 'Statistical data has been cleared',
+            position: 'bottom',
+            buttonText: 'OK'
+        });
+    }
+
 	render() {
 		return (
 			<Container style={styles.container}>
@@ -64,6 +76,16 @@ export default class SettingsScreen extends Component {
 			        		</Left>
 			        		<Right>
 							    <Button style={localStyles.button} onPress={() => this._clearCharacterData()}>
+									<Text>Clear</Text>
+								</Button>
+			        		</Right>
+		        		</ListItem>
+			    		<ListItem>
+					    	<Left>
+			        			<Text style={styles.boldGrey}>Clear statistics?</Text>
+			        		</Left>
+			        		<Right>
+							    <Button style={localStyles.button} onPress={() => this._clearStatisticsData()}>
 									<Text>Clear</Text>
 								</Button>
 			        		</Right>

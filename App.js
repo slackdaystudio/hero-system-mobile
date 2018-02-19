@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, Text, View, Button, Alert } from 'react-native';
+import { AsyncStorage, StyleSheet, Text, View, Button, Alert } from 'react-native';
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
 import { Root } from "native-base";
 import HomeScreen from './src/components/Screens/HomeScreen';
@@ -9,8 +9,10 @@ import ResultScreen from './src/components/Screens/ResultScreen';
 import HitScreen from './src/components/Screens/HitScreen';
 import DamageScreen from './src/components/Screens/DamageScreen';
 import FreeFormScreen from './src/components/Screens/FreeFormScreen';
+import StatisticsScreen from './src/components/Screens/StatisticsScreen';
 import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
+import { statistics } from './src/lib/Statistics';
 
 const RootStack = DrawerNavigator({
 		Home: {
@@ -34,6 +36,9 @@ const RootStack = DrawerNavigator({
 		FreeForm: {
 			screen: FreeFormScreen
 		},
+		Statistics: {
+		    screen: StatisticsScreen
+		},
 		Settings: {
 			screen: SettingsScreen
 		}
@@ -45,18 +50,12 @@ const RootStack = DrawerNavigator({
 );
 
 export default class App extends Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			fontsLoaded: false
-		}
-	}
-	
 	async componentWillMount() {
-		this.setState({
-			fontsLoaded: true
-		});
+		let stats = await AsyncStorage.getItem('statistics');
+
+		if (stats === null) {
+		    statistics.init();
+		}
 	}
 
 	render() {

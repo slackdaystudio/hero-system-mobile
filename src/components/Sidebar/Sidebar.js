@@ -44,6 +44,10 @@ export default class Sidebar extends Component {
 	      		<Text style={styles.grey}>Free Form</Text>
 	      	</ListItem>
 	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
+	      	<ListItem onPress={() => this.props.navigation.navigate('Statistics')}>
+	      		<Text style={styles.grey}>Statistics</Text>
+	      	</ListItem>
+	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
 	      	<ListItem onPress={() => this.props.navigation.navigate('Settings')}>
 	      		<Text style={styles.grey}>Settings</Text>
 	      	</ListItem>	
