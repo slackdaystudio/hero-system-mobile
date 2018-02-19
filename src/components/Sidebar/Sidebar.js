@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { StyleSheet, Image, StatusBar, View } from "react-native";
 import { Container, Content, Text, List, ListItem } from "native-base";
 import { dieRoller } from '../../lib/DieRoller';
+import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
 export default class Sidebar extends Component {
@@ -11,16 +12,25 @@ export default class Sidebar extends Component {
         <Content>
           <List>
         	<ListItem onPress={() => this.props.navigation.navigate('Home')}>
-				<View style={localStyles.logo}>
+				<View>
 					<Image source={require('../../../public/hero_logo.png')} />
 				</View>
 	      	</ListItem>          
           	<ListItem onPress={() => this.props.navigation.navigate('Home')}>
           		<Text style={styles.grey}>Home</Text>
           	</ListItem>
+          	<ListItem itemDivider style={{backgroundColor: '#000'}} />
+          	<ListItem onPress={() => character.load()}>
+	      		<Text style={styles.grey}>Load Character</Text>
+	      	</ListItem>
+          	<ListItem onPress={() => this.props.navigation.navigate('ViewCharacter')}>
+	      		<Text style={styles.grey}>View Character</Text>
+	      	</ListItem>
+          	<ListItem itemDivider style={{backgroundColor: '#000'}} />
           	<ListItem onPress={() => this.props.navigation.navigate('RandomCharacter')}>
 	      		<Text style={styles.grey}>H.E.R.O.</Text>
-	      	</ListItem> 
+	      	</ListItem>
+	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
           	<ListItem onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
 	      		<Text style={styles.grey}>3D6</Text>
 	      	</ListItem> 
@@ -32,7 +42,8 @@ export default class Sidebar extends Component {
 	      	</ListItem>
           	<ListItem onPress={() => this.props.navigation.navigate('FreeForm')}>
 	      		<Text style={styles.grey}>Free Form</Text>
-	      	</ListItem>	
+	      	</ListItem>
+	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
 	      	<ListItem onPress={() => this.props.navigation.navigate('Settings')}>
 	      		<Text style={styles.grey}>Settings</Text>
 	      	</ListItem>	
@@ -45,7 +56,6 @@ export default class Sidebar extends Component {
 
 const localStyles = StyleSheet.create({
 	container: {
-		marginTop: StatusBar.currentHeight,
 		backgroundColor: '#000'
 	}
 });
