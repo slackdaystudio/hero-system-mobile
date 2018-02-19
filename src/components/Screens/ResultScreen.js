@@ -3,6 +3,7 @@ import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
+import { statistics } from '../../lib/Statistics';
 import styles from '../../Styles';
 
 export default class ResultScreen extends Component {
@@ -12,13 +13,17 @@ export default class ResultScreen extends Component {
 		this.state = {
 			result: props.navigation.state.params
 		}
-		
+
+		statistics.add(this.state.result);
+
 		this.reRoll = this._reRoll.bind(this);
 	}
 	
 	_reRoll() {
 		this.setState({
 			result: dieRoller.rollAgain(this.props.navigation.state.params)
+		}, () => {
+		    statistics.add(this.state.result);
 		});
 	}
 	
