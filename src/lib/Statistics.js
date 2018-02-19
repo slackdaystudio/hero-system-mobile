@@ -33,6 +33,14 @@ class Statistics {
                     legs: 0,
                     feet: 0
                 }
+            },
+            distributions: {
+                one: 0,
+                two: 0,
+                three: 0,
+                four: 0,
+                five: 0,
+                six: 0
             }
         }));
     }
@@ -65,6 +73,8 @@ class Statistics {
             stats.totals.skillChecks++;
         }
 
+        this._updateDistributions(resultRoll.rolls, stats.distributions);
+
         await AsyncStorage.setItem('statistics', JSON.stringify(stats));
     }
 
@@ -86,6 +96,33 @@ class Statistics {
         }
 
         return location;
+    }
+
+    _updateDistributions(rolls, distributions) {
+        for (let roll of rolls) {
+            switch(roll) {
+                case 1:
+                    distributions.one++;
+                    break;
+                case 2:
+                    distributions.two++;
+                    break;
+                case 3:
+                    distributions.three++;
+                    break;
+                case 4:
+                    distributions.four++;
+                    break;
+                case 5:
+                    distributions.five++;
+                    break;
+                case 6:
+                    distributions.six++;
+                    break;
+                default:
+                    // do nothing
+            }
+        }
     }
 }
 
