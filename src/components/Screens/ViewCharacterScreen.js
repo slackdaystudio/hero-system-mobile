@@ -45,6 +45,12 @@ export default class ViewCharacterScreen extends Component {
                     });
                 });
 			}
+	    }).catch((error) => {
+            Toast.show({
+                text: 'No character file found',
+                position: 'bottom',
+                buttonText: 'OK'
+            });
 	    }).done();
 	}
 

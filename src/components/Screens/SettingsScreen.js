@@ -30,7 +30,17 @@ export default class SettingsScreen extends Component {
             buttonText: 'OK'
         });
 	}
-	
+
+	async _clearCharacterData() {
+	    await AsyncStorage.removeItem('characterFile');
+
+        Toast.show({
+            text: 'Loaded character has been cleared',
+            position: 'bottom',
+            buttonText: 'OK'
+        });
+	}
+
 	render() {
 		return (
 			<Container style={styles.container}>
@@ -44,6 +54,16 @@ export default class SettingsScreen extends Component {
 			        		</Left>
 			        		<Right>
 							    <Button style={localStyles.button} onPress={() => this._clearFormData()}>
+									<Text>Clear</Text>
+								</Button>
+			        		</Right>
+		        		</ListItem>
+			    		<ListItem>
+					    	<Left>
+			        			<Text style={styles.boldGrey}>Clear loaded character?</Text>
+			        		</Left>
+			        		<Right>
+							    <Button style={localStyles.button} onPress={() => this._clearCharacterData()}>
 									<Text>Clear</Text>
 								</Button>
 			        		</Right>
