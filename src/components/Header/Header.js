@@ -24,8 +24,7 @@ export default class MyHeader extends Component {
 const localStyles = StyleSheet.create({
 	header: {
 		backgroundColor: '#3C6591',
-		minHeight: 70,
-		marginTop: StatusBar.currentHeight
+		minHeight: 70
 	},
 	logo: {
 		paddingLeft: 15,

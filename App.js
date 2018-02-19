@@ -1,6 +1,5 @@
 import React, { Component }  from 'react';
 import { StyleSheet, Text, View, Button, Alert } from 'react-native';
-import Expo from 'expo';
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
 import { Root } from "native-base";
 import HomeScreen from './src/components/Screens/HomeScreen';
@@ -55,21 +54,12 @@ export default class App extends Component {
 	}
 	
 	async componentWillMount() {
-		await Expo.Font.loadAsync({
-			'Roboto': require('native-base/Fonts/Roboto.ttf'),
-			'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
-		});
-
 		this.setState({
 			fontsLoaded: true
 		});
 	}
 
 	render() {
-		if (!this.state.fontsLoaded) {
-			return <Expo.AppLoading />;
-		}
-
 		return (
 			<Root>
 				<RootStack />

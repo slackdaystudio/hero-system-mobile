@@ -1,21 +1,16 @@
 import { AsyncStorage, Alert } from 'react-native';
-import Expo from 'expo';
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 
 class Character {
 	constructor() {
 		this.characterMap = new Map();
 	}
 	
-	load() {
-		let result = Expo.DocumentPicker.getDocumentAsync({}).then((result) => {
-			if (result.type === 'success') {
-				Alert.alert('Success: ' + result.uri);
-				AsyncStorage.setItem('characterFile', JSON.stringify(result));
-			}			
-		}).catch((e) => {
-			Alert.alert(e);
-		});
-	}
+    load() {
+        DocumentPicker.show({filetype: ['text/xml', 'application/xml']},(error,result) => {
+           AsyncStorage.setItem('characterFile', JSON.stringify(result));
+        });
+    }
 }
 
 export let character = new Character();
