@@ -15,16 +15,18 @@ export default class HomeScreen extends Component {
 				<View>
 					<Text style={styles.heading}>Character Tools</Text>
 					<Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
-					<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => character.load()}>
-		    				<Text style={styles.buttonText}>Load Character</Text>
-		    			</Button>
+					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                        <View style={styles.buttonContainer}>
+                            <Button style={styles.button} onPress={() => character.load()}>
+                                <Text style={styles.buttonText}>Load</Text>
+                            </Button>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
+                                <Text style={styles.buttonText}>View</Text>
+                            </Button>
+                        </View>
 		    		</View>
-					<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
-		    				<Text style={styles.buttonText}>View Character</Text>
-		    			</Button>
-		    		</View>	
 					<Text style={styles.heading}>H.E.R.O.</Text>
 					<Text style={styles.grey}>Generate a random character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
 					<View style={styles.buttonContainer}>
@@ -34,25 +36,29 @@ export default class HomeScreen extends Component {
 		    		</View>						
 					<Text style={styles.heading}>Roll 'em</Text>
 					<Text style={styles.grey}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
-					<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
-		    				<Text style={styles.buttonText}>3d6</Text>
-		    			</Button>
+					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                        <View style={styles.buttonContainer}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
+                                <Text style={styles.buttonText}>3d6</Text>
+                            </Button>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('Hit')}>
+                                <Text style={styles.buttonText}>Hit</Text>
+                            </Button>
+                        </View>
 		    		</View>
-		    		<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('Hit')}>
-		    				<Text style={styles.buttonText}>Hit</Text>
-		    			</Button>
-		    		</View>
-			    	<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('Damage')}>
-		    				<Text style={styles.buttonText}>Damage</Text>
-		    			</Button>
-		    		</View>	
-			    	<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('FreeForm')}>
-		    				<Text style={styles.buttonText}>Free Form</Text>
-		    			</Button>
+		    		<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                        <View style={styles.buttonContainer}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('Damage')}>
+                                <Text style={styles.buttonText}>Damage</Text>
+                            </Button>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('FreeForm')}>
+                                <Text style={styles.buttonText}>Free Form</Text>
+                            </Button>
+                        </View>
 		    		</View>
 		      	</View>
 	        </Content>
