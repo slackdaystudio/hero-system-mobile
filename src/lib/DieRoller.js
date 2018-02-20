@@ -28,12 +28,18 @@ class DieRoller {
 	}
 	
 	rollCheck(threshold = null) {
-	    let regex = /^([0-9]+)\-$/;
+	    let regex = /^([0-9]+\-|[0-9]+\-\s\/\s[0-9]+\-)$/;
 	    let result = this._roll(3, SKILL_CHECK);
 	    result.threshold = -1;
 
 	    if (threshold !== null && regex.test(threshold)) {
-            result.threshold = threshold.slice(0, -1);
+	        let rollThreshold = threshold;
+
+	        if (threshold.indexOf('/') !== -1) {
+                rollThreshold = threshold.split(' / ')[1];
+	        }
+
+            result.threshold = rollThreshold.slice(0, -1);
 	    }
 
 		return result;
