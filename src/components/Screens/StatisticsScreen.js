@@ -30,7 +30,7 @@ export default class StatisticsScreen extends Component {
             return <Text style={styles.grey}>-</Text>;
         }
 
-        return <Text style={styles.grey}>{mostFrequentHitLocation.location} ({mostFrequentHitLocation.hits}x)</Text>;
+        return <Text style={styles.grey}>{mostFrequentHitLocation.location}</Text>;
     }
 
     _renderAverageRoll() {
