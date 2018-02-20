@@ -1,9 +1,10 @@
 import React from 'react';
-import { PieChart } from 'react-native-svg-charts'
+import { View } from 'react-native';
+import { PieChart, BarChart, YAxis, XAxis  } from 'react-native-svg-charts'
 import { Circle, G, Line, Text } from 'react-native-svg'
 
 class Chart {
-    renderDieDistribution(distributions) {
+    renderDieDistributionChart(distributions) {
         let pieData = [
             {
                 value: distributions.one,
@@ -78,6 +79,53 @@ class Chart {
                    </G>
                 )}
                />;
+    }
+
+    renderHitLocationsChart(hitLocationStats) {
+        let data = [];
+
+        for (let property in hitLocationStats) {
+            if (hitLocationStats.hasOwnProperty(property)) {
+                data.push(hitLocationStats[property]);
+            }
+        }
+
+        let barData = [
+            {
+                values: data,
+                positive: {
+                    fill: '#668df9',
+                    // other react-native-svg supported props
+                }
+            }
+        ]
+
+        return (
+            <View style={ { height: 250, flexDirection: 'row', backgroundColor: '#FFF', padding: 20 } }>
+                <YAxis
+                  data={data}
+                  contentInset={{top: 20, bottom: 20}}
+                  svg={{
+                      fill: '#000',
+                      fontSize: 10,
+                  }}
+                  formatLabel={ value => value }
+                  style={{paddingLeft: 5}}
+                />
+                <BarChart
+                    style={{flex: 1, marginLeft: 16, backgroundColor: '#FFF'}}
+                    data={barData }
+                    contentInset={{top: 20, bottom: 20}}
+                />
+                <XAxis
+                    style={{ marginHorizontal: -20 }}
+                    data={ data }
+                    formatLabel={ (value, index) => value }
+                    contentInset={{ left: 70, right: 70 }}
+                    svg={{ fontSize: 10 }}
+                />
+            </View>
+        )
     }
 }
 
