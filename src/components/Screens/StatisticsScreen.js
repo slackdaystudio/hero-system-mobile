@@ -61,119 +61,99 @@ export default class StatisticsScreen extends Component {
 		  <Container style={styles.container}>
 			<Header navigation={this.props.navigation} />
 	        <Content style={styles.content}>
-                <Tabs tabBarUnderlineStyle={localStyles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Summary">
-			  			<ScrollView style={localStyles.tabContent}>
-                            {chart.renderDieDistributionChart(this.state.stats.distributions)}
-                            <List>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.diceRolled}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Face Value:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.sum}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Skill Checks:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.skillChecks}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Rolls To Hit:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.hitRolls}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.normalDamage.rolls + this.state.stats.totals.killingDamage.rolls}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Free Form Rolls:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.freeFormRolls}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Stun:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.normalDamage.stun + this.state.stats.totals.killingDamage.stun}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Body:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.normalDamage.body + this.state.stats.totals.killingDamage.body}</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Total Knockback:</Text>
-                                  </Left>
-                                  <Right>
-                                    <Text style={styles.grey}>{this.state.stats.totals.knockback}m</Text>
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Most frequent hit location:</Text>
-                                  </Left>
-                                  <Right>
-                                    {this._renderHitLocationStat()}
-                                  </Right>
-                                </ListItem>
-                                <ListItem>
-                                  <Left>
-                                    <Text style={styles.boldGrey}>Average Roll:</Text>
-                                  </Left>
-                                  <Right>
-                                    {this._renderAverageRoll()}
-                                  </Right>
-                                </ListItem>
-                                <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>*Does not include hit location or knockback rolls</Text>
-                            </List>
-                        </ScrollView>
-                    </Tab>
-                    <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Checks">
-                        <ScrollView style={localStyles.tabContent}>
-
-                        </ScrollView>
-                    </Tab>
-                    <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Hits">
-                        <ScrollView style={localStyles.tabContent}>
-                            {chart.renderHitLocationsChart(this.state.stats.totals.hitLocations)}
-                        </ScrollView>
-                    </Tab>
-                    <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Damage">
-                        <ScrollView style={localStyles.tabContent}>
-
-                        </ScrollView>
-                    </Tab>
-                </Tabs>
+	            <Text style={styles.heading}>Statistics</Text>
+                {chart.renderDieDistributionChart(this.state.stats.distributions)}
+                <List>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.diceRolled}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Face Value:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.sum}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Skill Checks:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.skillChecks}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Rolls To Hit:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.hitRolls}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.normalDamage.rolls + this.state.stats.totals.killingDamage.rolls}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Free Form Rolls:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.freeFormRolls}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Stun:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.normalDamage.stun + this.state.stats.totals.killingDamage.stun}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Body:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.normalDamage.body + this.state.stats.totals.killingDamage.body}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Total Knockback:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.totals.knockback}m</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Most frequent hit location:</Text>
+                      </Left>
+                      <Right>
+                        {this._renderHitLocationStat()}
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Average Roll:</Text>
+                      </Left>
+                      <Right>
+                        {this._renderAverageRoll()}
+                      </Right>
+                    </ListItem>
+                    <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>*Does not include hit location or knockback rolls</Text>
+                </List>
 	        </Content>
 	      </Container>
 		);
