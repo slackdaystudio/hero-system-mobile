@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image, ScrollView, AsyncStorage, Alert } from 'react-native';
+import { StyleSheet, View, Image, ScrollView, AsyncStorage, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Card, CardItem, Spinner } from 'native-base';
 import xml2js from 'react-native-xml2js';
 import { randomCharacter } from '../../lib/RandomCharacter';
@@ -7,6 +7,7 @@ import LabelAndContent from '../LabelAndContent/LabelAndContent';
 import Header from '../Header/Header';
 import RNFS from 'react-native-fs';
 import { character } from '../../lib/Character';
+import { dieRoller } from '../../lib/DieRoller';
 import styles from '../../Styles';
 
 export default class ViewCharacterScreen extends Component {
@@ -15,7 +16,9 @@ export default class ViewCharacterScreen extends Component {
 		
 		this.state = {
 			character: null
-		}
+		};
+
+		this.rollCheck = this._rollCheck.bind(this);
 	}
 	
 	async componentDidMount() {
@@ -54,6 +57,12 @@ export default class ViewCharacterScreen extends Component {
 	    }).done();
 	}
 
+    _rollCheck(threshold) {
+        if (threshold !== '') {
+            this.props.navigation.navigate('Result', dieRoller.rollCheck(threshold))
+        }
+    }
+
 	_renderCharacterics() {
 	    let ignoredCharacterics = ['comeliness'];
 
@@ -71,31 +80,33 @@ export default class ViewCharacterScreen extends Component {
                     }
 
                     return (
-                        <Card key={'characteristic-' + index}>
-                            <CardItem style={{backgroundColor: '#355882'}}>
-                                <View style={{flex: 1, flexDirection: 'column'}}>
-                                    <View style={{flex: 1, flexDirection: 'row'}}>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>{characteristic.name.toUpperCase()}</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{characteristic.total}</Text>
-                                        </Body>
-                                        <Right>
-                                            <Text style={styles.grey}>{characteristic.roll}</Text>
-                                        </Right>
+                        <TouchableHighlight key={'characteristic-' + index} underlayColor='#3da0ff' onLongPress={() => this.rollCheck(characteristic.roll)}>
+                            <Card>
+                                <CardItem style={{backgroundColor: '#355882'}}>
+                                    <View style={{flex: 1, flexDirection: 'column'}}>
+                                        <View style={{flex: 1, flexDirection: 'row'}}>
+                                            <Left>
+                                                <Text style={styles.boldGrey}>{characteristic.name.toUpperCase()}</Text>
+                                            </Left>
+                                            <Body>
+                                                <Text style={styles.grey}>{characteristic.total}</Text>
+                                            </Body>
+                                            <Right>
+                                                <Text style={styles.grey}>{characteristic.roll}</Text>
+                                            </Right>
+                                        </View>
+                                        <View style={{flex: 1, flexDirection: 'row'}}>
+                                            <Left>
+                                                <Text style={styles.grey}>{characteristic.notes}</Text>
+                                            </Left>
+                                            <Right>
+                                                <Text style={styles.grey}>Cost: {characteristic.cost}</Text>
+                                            </Right>
+                                        </View>
                                     </View>
-                                    <View style={{flex: 1, flexDirection: 'row'}}>
-                                        <Left>
-                                            <Text style={styles.grey}>{characteristic.notes}</Text>
-                                        </Left>
-                                        <Right>
-                                            <Text style={styles.grey}>Cost: {characteristic.cost}</Text>
-                                        </Right>
-                                    </View>
-                                </View>
-                            </CardItem>
-                        </Card>
+                                </CardItem>
+                            </Card>
+                        </TouchableHighlight>
                     );
                 })}
             </View>

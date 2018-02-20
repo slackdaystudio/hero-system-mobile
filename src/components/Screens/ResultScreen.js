@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Header from '../Header/Header';
-import { dieRoller, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
+import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import styles from '../../Styles';
 
@@ -79,12 +79,34 @@ export default class ResultScreen extends Component {
 			</View>
 		);
 	}
-	
+
+	_renderSkillCheckInfo() {
+	    let overUnder = this.state.result.threshold - this.state.result.total;
+
+	    if (overUnder >= 0) {
+	        if (overUnder === 0) {
+                return (
+                    <Text style={styles.grey}>You made your check with no points to spare</Text>
+                );
+	        }
+
+            return (
+                <Text style={styles.grey}>You made your check by {overUnder} points</Text>
+            );
+	    }
+
+        return (
+            <Text style={styles.grey}>You <Text style={{color: 'red'}}>failed</Text> your check by {overUnder * -1} points</Text>
+        );
+	}
+
 	_renderAdditionalRollInfo() {
 		if (this.state.result.rollType === TO_HIT) {
 			return this._renderToHitInfo();
 		} else if (this.state.result.rollType === NORMAL_DAMAGE || this.state.result.rollType === KILLING_DAMAGE) {
 			return this._renderDamageInfo();
+		} else if (this.state.result.rollType === SKILL_CHECK && this.state.result.threshold !== -1) {
+		    return this._renderSkillCheckInfo();
 		}
 		
 		return null;

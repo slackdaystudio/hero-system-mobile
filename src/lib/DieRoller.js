@@ -27,8 +27,16 @@ class DieRoller {
 		];
 	}
 	
-	rollCheck() {
-		return this._roll(3, SKILL_CHECK);
+	rollCheck(threshold = null) {
+	    let regex = /^([0-9]+)\-$/;
+	    let result = this._roll(3, SKILL_CHECK);
+	    result.threshold = -1;
+
+	    if (threshold !== null && regex.test(threshold)) {
+            result.threshold = threshold.slice(0, -1);
+	    }
+
+		return result;
 	}
 	
 	rollToHit(cv) {
@@ -88,7 +96,7 @@ class DieRoller {
 		let result = null;
 		
 		if (lastResult.rollType === SKILL_CHECK) {
-			result = this._roll(3, lastResult.rollType, lastResult.partialDieType);
+			result = this.rollCheck(lastResult.threshold + '-');
 		} else if (lastResult.rollType === TO_HIT) {
 			result = this.rollToHit(lastResult.cv, lastResult.rollType, lastResult.partialDieType);
 		} else if (lastResult.rollType === NORMAL_DAMAGE || lastResult.rollType === KILLING_DAMAGE) {
