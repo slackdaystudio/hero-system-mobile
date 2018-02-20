@@ -27,13 +27,6 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
 		    		</View>
-					<Text style={styles.heading}>H.E.R.O.</Text>
-					<Text style={styles.grey}>Generate a random character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
-					<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
-		    				<Text style={styles.buttonText}>H.E.R.O.</Text>
-		    			</Button>
-		    		</View>						
 					<Text style={styles.heading}>Roll 'em</Text>
 					<Text style={styles.grey}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
 					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
@@ -60,12 +53,12 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
 		    		</View>
-		    		<View>
-                        <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('Statistics')}>
-                                <Text style={styles.buttonText}>Stats</Text>
-                            </Button>
-                        </View>
+					<Text style={styles.heading}>H.E.R.O.</Text>
+					<Text style={styles.grey}>Generate a random character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
+					<View style={styles.buttonContainer}>
+		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
+		    				<Text style={styles.buttonText}>H.E.R.O.</Text>
+		    			</Button>
 		    		</View>
 		      	</View>
 	        </Content>
