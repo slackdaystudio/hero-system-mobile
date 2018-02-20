@@ -236,30 +236,35 @@ export default class ViewCharacterScreen extends Component {
 				        			<Text style={styles.grey}>{this.state.character.appearance.hairColor}</Text>
 				        		</Body>
 				        	</ListItem>
-				            <View style={{paddingBottom: 20}} />
                             <ListItem>
-			        			<Text style={styles.boldGrey}>Description: </Text>
-			        			<Text style={styles.grey}>{this.state.character.description}</Text>
+			        			<Text style={styles.grey}>
+			        			    <Text style={styles.boldGrey}>Description: </Text>{this.state.character.description}
+			        			</Text>
 				        	</ListItem>
                             <ListItem>
-			        			<Text style={styles.boldGrey}>Background: </Text>
-			        			<Text style={styles.grey}>{this.state.character.background}</Text>
+                                <Text style={styles.grey}>
+			        			    <Text style={styles.boldGrey}>Background: </Text>{this.state.character.background}
+			        			</Text>
 				        	</ListItem>
                             <ListItem>
-			        			<Text style={styles.boldGrey}>Personality: </Text>
-			        			<Text style={styles.grey}>{this.state.character.personality}</Text>
+			        			<Text style={styles.grey}>
+			        			    <Text style={styles.boldGrey}>Personality: </Text>{this.state.character.personality}
+			        			</Text>
 				        	</ListItem>
                             <ListItem>
-			        			<Text style={styles.boldGrey}>Quote: </Text>
-			        			<Text style={styles.grey}>{this.state.character.quote}</Text>
+			        			<Text style={styles.grey}>
+			        			    <Text style={styles.boldGrey}>Quote: </Text>{this.state.character.quote}
+			        	        </Text>
 				        	</ListItem>
                             <ListItem>
-			        			<Text style={styles.boldGrey}>Tactics: </Text>
-			        			<Text style={styles.grey}>{this.state.character.tactics}</Text>
+			        			<Text style={styles.grey}>
+			        			    <Text style={styles.boldGrey}>Tactics: </Text>{this.state.character.tactics}
+			        			</Text>
 				        	</ListItem>
                             <ListItem>
-			        			<Text style={styles.boldGrey}>Campaign Use: </Text>
-			        			<Text style={styles.grey}>{this.state.character.campaignUse}</Text>
+			        			<Text style={styles.grey}>
+			        			    <Text style={styles.boldGrey}>Campaign Use: </Text>{this.state.character.campaignUse}
+			        			</Text>
 				        	</ListItem>
 				        	<View style={{paddingBottom: 20}} />
                             <ListItem>
