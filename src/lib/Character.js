@@ -11,6 +11,16 @@ class Character {
            AsyncStorage.setItem('characterFile', JSON.stringify(result));
         });
     }
+
+    isSixthEdition(characteristics) {
+        for (let characteristic in characteristics) {
+            if (characteristic.name === 'comeliness' && characteristic.total === '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 export let character = new Character();

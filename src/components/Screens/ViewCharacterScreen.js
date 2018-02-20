@@ -66,11 +66,9 @@ export default class ViewCharacterScreen extends Component {
 	_renderCharacterics() {
 	    let ignoredCharacterics = ['comeliness'];
 
-	    if (this.state.character.characteristics.ocv === undefined) {
+	    if (!character.isSixthEdition(this.state.character.characteristics)) {
 	        ignoredCharacterics = ['ocv', 'dcv', 'omcv', 'dmcv'];
 	    }
-
-        ignoredCharacterics.push('cost');
 
 	    return (
             <View>
