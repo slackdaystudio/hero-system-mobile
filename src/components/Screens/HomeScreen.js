@@ -1,16 +1,17 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, ImageBackground } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
-export default class HomeScreen extends Component {	
+export default class HomeScreen extends Component {
 	render() {
 		return (
 		  <Container style={styles.container}>
-			<Header navigation={this.props.navigation} />  
+			<Header navigation={this.props.navigation} />
+			<ImageBackground source={require('../../../public/background.png')} style={{flex: 1}}>
 	        <Content style={styles.content}>
 				<View>
 					<Text style={styles.heading}>Character Tools</Text>
@@ -62,6 +63,7 @@ export default class HomeScreen extends Component {
 		    		</View>
 		      	</View>
 	        </Content>
+	        </ImageBackground>
 	      </Container>	
 		);
 	}
