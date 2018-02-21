@@ -45,6 +45,14 @@ export default class StatisticsScreen extends Component {
         );
     }
 
+    _renderDieDistributionChart() {
+        if (this.state.stats.sum === 0) {
+                return null;
+        }
+
+        return chart.renderDieDistributionChart(this.state.stats.distributions);
+    }
+
 	render() {
         if (this.state.stats === null) {
             return (
@@ -62,7 +70,7 @@ export default class StatisticsScreen extends Component {
 			<Header navigation={this.props.navigation} />
 	        <Content style={styles.content}>
 	            <Text style={styles.heading}>Statistics</Text>
-                {chart.renderDieDistributionChart(this.state.stats.distributions)}
+                {this._renderDieDistributionChart()}
                 <List>
                     <ListItem>
                       <Left>
@@ -78,6 +86,22 @@ export default class StatisticsScreen extends Component {
                       </Left>
                       <Right>
                         <Text style={styles.grey}>{this.state.stats.sum}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Largest Amount of Dice Rolled:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.largestDieRoll}</Text>
+                      </Right>
+                    </ListItem>
+                    <ListItem>
+                      <Left>
+                        <Text style={styles.boldGrey}>Largest Roll:</Text>
+                      </Left>
+                      <Right>
+                        <Text style={styles.grey}>{this.state.stats.largestSum}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -138,7 +162,7 @@ export default class StatisticsScreen extends Component {
                     </ListItem>
                     <ListItem>
                       <Left>
-                        <Text style={styles.boldGrey}>Most frequent hit location:</Text>
+                        <Text style={styles.boldGrey}>Most Frequent Hit Location:</Text>
                       </Left>
                       <Right>
                         {this._renderHitLocationStat()}

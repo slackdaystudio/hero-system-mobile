@@ -5,6 +5,8 @@ class Statistics {
     async init() {
         await AsyncStorage.setItem('statistics', JSON.stringify({
             sum: 0,
+            largestDieRoll: 0,
+            largestSum: 0,
             totals: {
                 diceRolled: 0,
                 hitRolls: 0,
@@ -48,9 +50,12 @@ class Statistics {
     async add(resultRoll) {
         let stats = await AsyncStorage.getItem('statistics');
         stats = JSON.parse(stats);
+        let total = resultRoll.rolls.reduce((a, b) => a + b, 0);
 
-        stats.sum += resultRoll.rolls.reduce((a, b) => a + b, 0);
+        stats.sum += total;
         stats.totals.diceRolled += resultRoll.rolls.length;
+        stats.largestDieRoll = resultRoll.rolls.length > stats.largestDieRoll ? resultRoll.rolls.length : stats.largestDieRoll;
+        stats.largestSum = total > stats.largestSum ? total : stats.largestSum;
 
         if (resultRoll.rollType === NORMAL_DAMAGE || resultRoll.rollType === KILLING_DAMAGE) {
             if (resultRoll.rollType === NORMAL_DAMAGE) {
