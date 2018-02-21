@@ -63,17 +63,17 @@ export default class ViewCharacterScreen extends Component {
         }
     }
 
-	_renderCharacterics() {
-	    let ignoredCharacterics = ['comeliness'];
+	_renderCharacteristics() {
+	    let ignoredCharacteristics = ['comeliness'];
 
 	    if (!character.isSixthEdition(this.state.character.characteristics)) {
-	        ignoredCharacterics = ['ocv', 'dcv', 'omcv', 'dmcv'];
+	        ignoredCharacteristics = ['ocv', 'dcv', 'omcv', 'dmcv'];
 	    }
 
 	    return (
             <View>
                 {this.state.character.characteristics.characteristic.map((characteristic, index) => {
-                    if (ignoredCharacterics.indexOf(characteristic.name) !== -1) {
+                    if (ignoredCharacteristics.indexOf(characteristic.name) !== -1) {
                         return null;
                     }
 
@@ -303,7 +303,7 @@ export default class ViewCharacterScreen extends Component {
 			  		</Tab>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Characteristics">
 			  		    <ScrollView style={localStyles.tabContent}>
-			  		        {this._renderCharacterics()}
+			  		        {this._renderCharacteristics()}
 			  		    </ScrollView>
 			  		</Tab>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Skills">
