@@ -44,7 +44,7 @@ export default class HitScreen extends Component {
 						max={30}
 						onValueChange={this.updateSliderValue} />
 					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.value))}>
-						<Text>Roll</Text>
+						<Text uppercase={false}>Roll</Text>
 					</Button>
 				</Content>
 			</Container>

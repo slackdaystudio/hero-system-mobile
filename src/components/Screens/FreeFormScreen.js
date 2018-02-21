@@ -67,7 +67,7 @@ export default class HitScreen extends Component {
 						onValueChange={this.setSliderState}
 						valueKey='pips' />
 					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.freeFormRoll(this.state.dice, this.state.halfDice, this.state.pips))}>
-						<Text>Roll</Text>
+						<Text uppercase={false}>Roll</Text>
 					</Button>
 				</Content>
 			</Container>

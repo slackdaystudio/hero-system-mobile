@@ -66,7 +66,7 @@ export default class SettingsScreen extends Component {
 			        		</Left>
 			        		<Right>
 							    <Button style={localStyles.button} onPress={() => this._clearFormData()}>
-									<Text>Clear</Text>
+									<Text uppercase={false}>Clear</Text>
 								</Button>
 			        		</Right>
 		        		</ListItem>
@@ -76,7 +76,7 @@ export default class SettingsScreen extends Component {
 			        		</Left>
 			        		<Right>
 							    <Button style={localStyles.button} onPress={() => this._clearCharacterData()}>
-									<Text>Clear</Text>
+									<Text uppercase={false}>Clear</Text>
 								</Button>
 			        		</Right>
 		        		</ListItem>
@@ -86,7 +86,7 @@ export default class SettingsScreen extends Component {
 			        		</Left>
 			        		<Right>
 							    <Button style={localStyles.button} onPress={() => this._clearStatisticsData()}>
-									<Text>Clear</Text>
+									<Text uppercase={false}>Clear</Text>
 								</Button>
 			        		</Right>
 		        		</ListItem>

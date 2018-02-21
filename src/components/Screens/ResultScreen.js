@@ -139,7 +139,7 @@ export default class ResultScreen extends Component {
 						{this._renderAdditionalRollInfo()}
 						<View style={styles.buttonContainer}>
 			    			<Button block style={styles.button} onPress={this.reRoll}>
-			    				<Text>Roll Again</Text>
+			    				<Text uppercase={false}>Roll Again</Text>
 			    			</Button>
 			    		</View>
 			      	</View>

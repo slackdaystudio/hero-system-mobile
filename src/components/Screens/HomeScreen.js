@@ -19,12 +19,12 @@ export default class HomeScreen extends Component {
 					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => character.load()}>
-                                <Text style={styles.buttonText}>Load</Text>
+                                <Text uppercase={false} style={styles.buttonText}>Load</Text>
                             </Button>
                         </View>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
-                                <Text style={styles.buttonText}>View</Text>
+                                <Text uppercase={false} style={styles.buttonText}>View</Text>
                             </Button>
                         </View>
 		    		</View>
@@ -33,24 +33,24 @@ export default class HomeScreen extends Component {
 					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
-                                <Text style={styles.buttonText}>3d6</Text>
+                                <Text uppercase={false} style={styles.buttonText}>3d6</Text>
                             </Button>
                         </View>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('Hit')}>
-                                <Text style={styles.buttonText}>Hit</Text>
+                                <Text uppercase={false} style={styles.buttonText}>Hit</Text>
                             </Button>
                         </View>
 		    		</View>
 		    		<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('Damage')}>
-                                <Text style={styles.buttonText}>Damage</Text>
+                                <Text uppercase={false} style={styles.buttonText}>Damage</Text>
                             </Button>
                         </View>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('FreeForm')}>
-                                <Text style={styles.buttonText}>Free Form</Text>
+                                <Text uppercase={false} style={styles.buttonText}>Free Form</Text>
                             </Button>
                         </View>
 		    		</View>
@@ -58,7 +58,7 @@ export default class HomeScreen extends Component {
 					<Text style={styles.grey}>Generate a random character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
 					<View style={styles.buttonContainer}>
 		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
-		    				<Text style={styles.buttonText}>H.E.R.O.</Text>
+		    				<Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
 		    			</Button>
 		    		</View>
 		      	</View>

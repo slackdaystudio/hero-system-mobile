@@ -143,7 +143,7 @@ export default class HitScreen extends Component {
 		            </View>
 		            <View style={{paddingBottom: 30}} />
 					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state))}>
-						<Text>Roll</Text>
+						<Text uppercase={false}>Roll</Text>
 					</Button>
 				</Content>
 			</Container>
