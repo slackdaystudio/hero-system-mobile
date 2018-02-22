@@ -14,7 +14,7 @@ export default class HomeScreen extends Component {
 			<ImageBackground source={require('../../../public/background.png')} style={{flex: 1}}>
 	        <Content style={styles.content}>
 				<View>
-					<Text style={styles.heading}>Character Tools</Text>
+					<Text style={styles.heading}>Character</Text>
 					<Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
 					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
@@ -28,7 +28,7 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
 		    		</View>
-					<Text style={styles.heading}>Roll 'em</Text>
+					<Text style={styles.heading}>Rolls</Text>
 					<Text style={styles.grey}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
 					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
@@ -55,7 +55,7 @@ export default class HomeScreen extends Component {
                         </View>
 		    		</View>
 					<Text style={styles.heading}>H.E.R.O.</Text>
-					<Text style={styles.grey}>Generate a random character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
+					<Text style={styles.grey}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
 					<View style={styles.buttonContainer}>
 		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
 		    				<Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
