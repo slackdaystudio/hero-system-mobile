@@ -140,15 +140,6 @@ export default class ViewCharacterScreen extends Component {
 	        );
 	    }
 
-//        return (
-//            <Container style={localStyles.container}>
-//                <Header hasTabs={false} navigation={this.props.navigation} />
-//                <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
-//                    <Text>{JSON.stringify(this.state.character)}</Text>
-//                </Content>
-//            </Container>
-//        );
-
 		return (
 		  <Container style={localStyles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
