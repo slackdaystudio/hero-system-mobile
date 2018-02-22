@@ -1,4 +1,4 @@
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import { DocumentPicker } from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
@@ -27,14 +27,14 @@ class Character {
         });
     }
 
-    isSixthEdition(characteristics) {
-        for (let characteristic in characteristics) {
-            if (characteristic.name === 'comeliness' && characteristic.total === '') {
-                return false;
+    isFifthEdition(characteristics) {
+        for (let characteristic of characteristics) {
+            if (characteristic.name === 'comeliness' && characteristic.total !== '') {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }
 
