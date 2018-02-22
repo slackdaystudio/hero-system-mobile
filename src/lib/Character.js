@@ -7,8 +7,8 @@ import xml2js from 'react-native-xml2js';
 class Character {
     load() {
         DocumentPicker.show({filetype: ['text/xml', 'application/xml']},(error, result) => {
-            if (result.status === 'cancel') {
-
+            if (result === null) {
+                return;
             }
 
             RNFS.readFile(result.uri).then(file => {

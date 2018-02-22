@@ -21,6 +21,18 @@ export default class ViewCharacterScreen extends Component {
 	async componentWillMount() {
 		let character = await AsyncStorage.getItem('character');
 
+        if (character === null) {
+            this.props.navigation.navigate('Home');
+
+            Toast.show({
+                text: 'Please load a character first',
+                position: 'bottom',
+                buttonText: 'OK'
+            });
+
+            return;
+        }
+
 		this.setState({character: JSON.parse(character).character});
 	}
 
