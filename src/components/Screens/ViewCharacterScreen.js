@@ -1,11 +1,8 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, ScrollView, AsyncStorage, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Card, CardItem, Spinner } from 'native-base';
-import xml2js from 'react-native-xml2js';
 import { randomCharacter } from '../../lib/RandomCharacter';
-import LabelAndContent from '../LabelAndContent/LabelAndContent';
 import Header from '../Header/Header';
-import RNFS from 'react-native-fs';
 import { character } from '../../lib/Character';
 import { dieRoller } from '../../lib/DieRoller';
 import styles from '../../Styles';
@@ -21,40 +18,10 @@ export default class ViewCharacterScreen extends Component {
 		this.rollCheck = this._rollCheck.bind(this);
 	}
 	
-	async componentDidMount() {
-		await AsyncStorage.getItem('characterFile').then((characterFile) => {
-			characterFile = JSON.parse(characterFile);
+	async componentWillMount() {
+		let character = await AsyncStorage.getItem('character');
 
-			if (characterFile === null) {
-                Toast.show({
-                    text: 'No character file found',
-                    position: 'bottom',
-                    buttonText: 'OK'
-                });
-
-                return;
-			} else {
-                RNFS.readFile(characterFile.uri).then(file => {
-                    let parser = xml2js.Parser({explicitArray: false});
-
-                    parser.parseString(file, (error, result) => {
-                        this.setState({character: result.character});
-                    });
-                }).catch((error) => {
-                    Toast.show({
-                        text: error.message,
-                        position: 'bottom',
-                        buttonText: 'OK'
-                    });
-                });
-			}
-	    }).catch((error) => {
-            Toast.show({
-                text: 'No character file found',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
-	    }).done();
+		this.setState({character: JSON.parse(character).character});
 	}
 
     _rollCheck(threshold) {
@@ -162,7 +129,7 @@ export default class ViewCharacterScreen extends Component {
     }
 
 	render() {
-	    if (this.state.character === null) {
+	    if (this.state.character === null || this.state.character.characteristics === null || this.state.character.appearance === null) {
 	        return (
                 <Container style={localStyles.container}>
                     <Header hasTabs={false} navigation={this.props.navigation} />
@@ -172,6 +139,15 @@ export default class ViewCharacterScreen extends Component {
 	            </Container>
 	        );
 	    }
+
+//        return (
+//            <Container style={localStyles.container}>
+//                <Header hasTabs={false} navigation={this.props.navigation} />
+//                <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
+//                    <Text>{JSON.stringify(this.state.character)}</Text>
+//                </Content>
+//            </Container>
+//        );
 
 		return (
 		  <Container style={localStyles.container}>
