@@ -18,13 +18,13 @@ export default class HomeScreen extends Component {
 					<Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
 					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => character.load()}>
-                                <Text uppercase={false} style={styles.buttonText}>Load</Text>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
+                                <Text uppercase={false} style={styles.buttonText}>View</Text>
                             </Button>
                         </View>
                         <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
-                                <Text uppercase={false} style={styles.buttonText}>View</Text>
+                            <Button style={styles.button} onPress={() => character.load()}>
+                                <Text uppercase={false} style={styles.buttonText}>Load</Text>
                             </Button>
                         </View>
 		    		</View>

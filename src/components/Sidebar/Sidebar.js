@@ -15,13 +15,6 @@ export default class Sidebar extends Component {
 				<View>
 					<Image source={require('../../../public/hero_logo.png')} />
 				</View>
-	      	</ListItem>          
-          	<ListItem onPress={() => this.props.navigation.navigate('Home')}>
-          		<Text style={styles.grey}>Home</Text>
-          	</ListItem>
-          	<ListItem itemDivider style={{backgroundColor: '#000'}} />
-          	<ListItem onPress={() => character.load()}>
-	      		<Text style={styles.grey}>Load Character</Text>
 	      	</ListItem>
           	<ListItem onPress={() => this.props.navigation.navigate('ViewCharacter')}>
 	      		<Text style={styles.grey}>View Character</Text>

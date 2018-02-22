@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image, StatusBar } from 'react-native';
+import { StyleSheet, View, Image, TouchableHighlight } from 'react-native';
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
 
 export default class MyHeader extends Component {
@@ -8,7 +8,9 @@ export default class MyHeader extends Component {
 			<Header hasTabs={this.props.hasTabs || false} style={localStyles.header}>
 		  	  <Left>
 				<View style={localStyles.logo}>
-					<Image source={require('../../../public/hero_logo.png')} />
+				    <TouchableHighlight onPress={() => this.props.navigation.navigate('Home')}>
+					    <Image source={require('../../../public/hero_logo.png')} />
+					</TouchableHighlight>
 				</View>
 		  	  </Left>
 	          <Right>
