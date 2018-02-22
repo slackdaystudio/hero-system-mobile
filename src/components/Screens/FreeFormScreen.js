@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
+import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -17,6 +18,7 @@ export default class HitScreen extends Component {
 		}
 		
 		this.setSliderState = this._setSliderState.bind(this);
+		this.roll = this._roll.bind(this);
 	}
 	
 	componentDidMount() {
@@ -25,8 +27,20 @@ export default class HitScreen extends Component {
 	    		this.setState(JSON.parse(value));
 	    	}
 	    }).done();
+
+        RNShakeEvent.addEventListener('shake', () => {
+            this.roll();
+        });
 	}
-	
+
+   	componentWillUnmount() {
+   		RNShakeEvent.removeEventListener('shake');
+   	}
+
+    _roll() {
+        this.props.navigation.navigate('Result', dieRoller.freeFormRoll(this.state.dice, this.state.halfDice, this.state.pips));
+    }
+
 	_setSliderState(key, value) {
 		let newState = {...this.state};
 		newState[key] = value;
@@ -66,7 +80,7 @@ export default class HitScreen extends Component {
 						max={100}
 						onValueChange={this.setSliderState}
 						valueKey='pips' />
-					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.freeFormRoll(this.state.dice, this.state.halfDice, this.state.pips))}>
+					<Button block style={styles.button} onPress={this.roll}>
 						<Text uppercase={false}>Roll</Text>
 					</Button>
 				</Content>

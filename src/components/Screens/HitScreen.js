@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
+import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -15,15 +16,27 @@ export default class HitScreen extends Component {
 		}
 		
 		this.updateSliderValue = this._updateSliderValue.bind(this);
+		this.roll = this._roll.bind(this);
 	}
-		
-	
+
 	componentDidMount() {
 	    AsyncStorage.getItem('ocvSliderValue').then((value) => {
 	        this.setState({value: value ? parseInt(value, 10) : 0});
 	    }).done();
+
+        RNShakeEvent.addEventListener('shake', () => {
+            this.roll();
+        });
 	}
-	
+
+   	componentWillUnmount() {
+   		RNShakeEvent.removeEventListener('shake');
+   	}
+
+    _roll() {
+        this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.value));
+    }
+
 	_updateSliderValue(value) {
 		AsyncStorage.setItem('ocvSliderValue', String(value));
 		
@@ -43,7 +56,7 @@ export default class HitScreen extends Component {
 						min={-30} 
 						max={30}
 						onValueChange={this.updateSliderValue} />
-					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.value))}>
+					<Button block style={styles.button} onPress={this.roll}>
 						<Text uppercase={false}>Roll</Text>
 					</Button>
 				</Content>

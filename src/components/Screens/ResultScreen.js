@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
+import RNShakeEvent from 'react-native-shake-event';
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
@@ -18,7 +19,17 @@ export default class ResultScreen extends Component {
 
 		this.reRoll = this._reRoll.bind(this);
 	}
-	
+
+	componentDidMount() {
+        RNShakeEvent.addEventListener('shake', () => {
+            this.reRoll();
+        });
+	}
+
+   	componentWillUnmount() {
+   		RNShakeEvent.removeEventListener('shake');
+   	}
+
 	_reRoll() {
 		this.setState({
 			result: dieRoller.rollAgain(this.props.navigation.state.params)

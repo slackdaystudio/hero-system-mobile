@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item } from 'native-base';
+import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
@@ -23,6 +24,7 @@ export default class HitScreen extends Component {
 		
 		this.updateState = this._updateState.bind(this);
 		this.toggleDamageType = this._toggleDamageType.bind(this);
+		this.roll = this._roll.bind(this);
 	}
 	
 	componentDidMount() {
@@ -31,8 +33,20 @@ export default class HitScreen extends Component {
 	    		this.setState(JSON.parse(value));
 	    	}
 	    }).done();
+
+        RNShakeEvent.addEventListener('shake', () => {
+            this.roll();
+        });
 	}
-	
+
+   	componentWillUnmount() {
+   		RNShakeEvent.removeEventListener('shake');
+   	}
+
+    _roll() {
+        this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state));
+    }
+
 	_updateState(key, value) {
 		let newState = {...this.state};
 		newState[key] = value;
@@ -142,7 +156,7 @@ export default class HitScreen extends Component {
 		              	</View>
 		            </View>
 		            <View style={{paddingBottom: 30}} />
-					<Button block style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state))}>
+					<Button block style={styles.button} onPress={this.roll}>
 						<Text uppercase={false}>Roll</Text>
 					</Button>
 				</Content>
