@@ -1,5 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, ImageBackground } from 'react-native';
+import SplashScreen from 'react-native-splash-screen';
 import { Container, Content, Button, Text } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -7,6 +8,10 @@ import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
 export default class HomeScreen extends Component {
+    componentDidMount() {
+        SplashScreen.hide();
+    }
+
 	render() {
 		return (
 		  <Container style={styles.container}>
