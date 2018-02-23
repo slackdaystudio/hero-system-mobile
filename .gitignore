@@ -14,6 +14,7 @@
 .idea/
 android/.gradle
 android/app/build
+android/app/hero-mobile.keystore
 android/build
 hero-gm-tools.iml
 .DS_Store
