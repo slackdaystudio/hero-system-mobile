@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
+import { Platform, StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
@@ -119,6 +119,7 @@ export default class HitScreen extends Component {
 					<Picker
 					  inlinelabel
 					  label='Test'
+					  style={localStyles.grey}
 					  textStyle={styles.grey}
 		              iosHeader="Select one"
 		              mode="dropdown"
@@ -180,5 +181,12 @@ const localStyles = StyleSheet.create({
 	},
 	list: {
 		paddingBottom: 10
+	},
+	grey: {
+	    ...Platform.select({
+	        android: {
+	            color: '#D0D1D3'
+	        }
+	    })
 	}
 });
