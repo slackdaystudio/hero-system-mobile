@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { AsyncStorage, StyleSheet, Text, View, Button, Alert } from 'react-native';
+import { AsyncStorage, StyleSheet, Text, View, Button, StatusBar } from 'react-native';
 import { DrawerNavigator } from 'react-navigation';
 import { Root } from "native-base";
 import HomeScreen from './src/components/Screens/HomeScreen';
@@ -56,6 +56,8 @@ export default class App extends Component {
 		if (stats === null) {
 		    statistics.init();
 		}
+		
+		StatusBar.setHidden(true);
 	}
 
 	render() {
