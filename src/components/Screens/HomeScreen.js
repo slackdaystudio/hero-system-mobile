@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, ImageBackground } from 'react-native';
+import { Platform, StyleSheet, View, ImageBackground } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -11,7 +11,7 @@ export default class HomeScreen extends Component {
 		return (
 		  <Container style={styles.container}>
 			<Header navigation={this.props.navigation} />
-			<ImageBackground source={require('../../../public/background.png')} style={{flex: 1}}>
+			<ImageBackground source={require('../../../public/background.png')} style={{width: '100%', height: '100%'}}>
 	        <Content style={styles.content}>
 				<View>
 					<Text style={styles.heading}>Character</Text>

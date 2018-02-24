@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image, TouchableHighlight } from 'react-native';
+import { Platform, StyleSheet, View, Image, TouchableHighlight } from 'react-native';
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
 
 export default class MyHeader extends Component {
@@ -15,7 +15,7 @@ export default class MyHeader extends Component {
 		  	  </Left>
 	          <Right>
 	            <Button transparent onPress={() => this.props.navigation.navigate("DrawerOpen")}>
-	              <Icon name='menu' />
+	              <Icon name='menu' style={{color: 'white', paddingBottom: Platform.OS === 'ios' ? 15 : 0}} />
 	            </Button>
 	          </Right>
 	        </Header>	
@@ -26,10 +26,15 @@ export default class MyHeader extends Component {
 const localStyles = StyleSheet.create({
 	header: {
 		backgroundColor: '#3C6591',
-		minHeight: 70
+		minHeight: Platform.OS === 'ios' ? 60 : 70,
 	},
 	logo: {
 		paddingLeft: 15,
-		alignSelf: 'center'
+		alignSelf: 'center',
+		...Platform.select({
+		    ios: {
+			paddingBottom: 20
+		    }
+		})
 	}
 });

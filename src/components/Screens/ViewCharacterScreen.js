@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image, ScrollView, AsyncStorage, Alert, TouchableHighlight } from 'react-native';
+import { Platform, StyleSheet, View, Image, ScrollView, AsyncStorage, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Card, CardItem, Spinner } from 'native-base';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import Header from '../Header/Header';
@@ -164,9 +164,9 @@ export default class ViewCharacterScreen extends Component {
 		return (
 		  <Container style={localStyles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content style={{backgroundColor: '#375476', paddingTop: 10}}>
+		  	<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 10}}>
                 <Tabs tabBarUnderlineStyle={localStyles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="General">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} hctiveTextStyle={{color: '#FFF'}} eading="General">
 			  			<ScrollView style={localStyles.tabContent}>
                             <ListItem>
 				        		<Left>
@@ -289,7 +289,7 @@ export default class ViewCharacterScreen extends Component {
 				        	</ListItem>
 			  			</ScrollView>
 			  		</Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Characteristics">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
 			  		    <ScrollView style={localStyles.tabContent}>
 			  		        {this._renderCharacteristics()}
 			  		    </ScrollView>
@@ -299,27 +299,27 @@ export default class ViewCharacterScreen extends Component {
                             {this._renderText(this.state.character.skills.text, 'Skill')}
                         </ScrollView>
                     </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Perks">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Perks">
                         <ScrollView style={localStyles.tabContent}>
                             {this._renderText(this.state.character.perks.text, 'Perk')}
                         </ScrollView>
                     </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Talents">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Talents">
                         <ScrollView style={localStyles.tabContent}>
                             {this._renderText(this.state.character.talents.text, 'Talent')}
                         </ScrollView>
                     </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Martial Arts">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Martial Arts">
                         <ScrollView style={localStyles.tabContent}>
                             {this._renderText(this.state.character.martialArts.text, 'Maneuver')}
                         </ScrollView>
                     </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Powers">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
                         <ScrollView style={localStyles.tabContent}>
                             {this._renderText(this.state.character.powers.text, 'Power')}
                         </ScrollView>
                     </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Disadvantages">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Disadvantages">
                         <ScrollView style={localStyles.tabContent}>
                             {this._renderText(this.state.character.disadvantages.text, 'Disadvantage')}
                         </ScrollView>
