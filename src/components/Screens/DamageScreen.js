@@ -119,7 +119,7 @@ export default class HitScreen extends Component {
 					<Picker
 					  inlinelabel
 					  label='Test'
-					  style={styles.grey}
+					  textStyle={styles.grey}
 		              iosHeader="Select one"
 		              mode="dropdown"
 		              selectedValue={this.state.partialDie}
