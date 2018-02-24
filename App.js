@@ -26,13 +26,13 @@ const RootStack = DrawerNavigator({
 		},
 		Result: {
 			screen: ResultScreen
-		}, 
+		},
 		Hit: {
 			screen: HitScreen
-		}, 
+		},
 		Damage: {
 			screen: DamageScreen
-		}, 
+		},
 		FreeForm: {
 			screen: FreeFormScreen
 		},
