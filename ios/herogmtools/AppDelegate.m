@@ -18,8 +18,12 @@
 {
   NSURL *jsCodeLocation;
 
+  // Development
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-
+  
+  // Release
+  //jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+  
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"herogmtools"
                                                initialProperties:nil
