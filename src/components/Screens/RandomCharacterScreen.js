@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, ScrollView } from 'react-native';
-import { Container, Content, Button, Text, List, ListItem, Left, Body, Tabs, Tab, ScrollableTab } from 'native-base';
+import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import LabelAndContent from '../LabelAndContent/LabelAndContent';
@@ -146,22 +146,6 @@ export default class RandomCharacterScreen extends Component {
 			  				{this._renderCharacteristics()}
 			  			</ScrollView>
 			  		</Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Powers">
-			  			<ScrollView style={localStyles.tabContent}>
-					  		{this.state.character.powers.powers.map((power, index) => {
-								return (
-									<ListItem key={'power-' + index}>
-						        		<Left>
-						        			<Text style={styles.boldGrey}>{power.cost}</Text>
-						        		</Left>
-						        		<Body>
-						        			<Text style={styles.grey}>{power.power}</Text>
-						        		</Body>
-						        	</ListItem>							
-								);
-							})}
-				  		</ScrollView>
-			  		</Tab>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Skills">
 			  			<ScrollView style={localStyles.tabContent}>
 					  		{this.state.character.skills.skills.map((skill, index) => {
@@ -170,6 +154,22 @@ export default class RandomCharacterScreen extends Component {
 						        		<Body>
 						        			<Text style={styles.grey}>{skill}</Text>
 						        		</Body>
+						        	</ListItem>
+								);
+							})}
+				  		</ScrollView>
+			  		</Tab>
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Powers">
+			  			<ScrollView style={localStyles.tabContent}>
+					  		{this.state.character.powers.powers.map((power, index) => {
+								return (
+									<ListItem key={'power-' + index}>
+						        		<Left>
+						        			<Text style={styles.grey}>{power.power}</Text>
+						        		</Left>
+						        		<Right>
+						        			<Text style={styles.grey}>{power.cost}</Text>
+						        		</Right>
 						        	</ListItem>							
 								);
 							})}
@@ -181,11 +181,11 @@ export default class RandomCharacterScreen extends Component {
 								return (
 									<ListItem key={'disad-' + index}>
 						        		<Left>
-						        			<Text style={styles.boldGrey}>{disad.cost}</Text>
-						        		</Left>
-						        		<Body>
 						        			<Text style={styles.grey}>{disad.description}</Text>
-						        		</Body>
+						        		</Left>
+						        		<Right>
+						        			<Text style={styles.grey}>{disad.cost}</Text>
+						        		</Right>
 						        	</ListItem>							
 								);
 							})}

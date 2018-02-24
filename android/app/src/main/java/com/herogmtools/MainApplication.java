@@ -4,9 +4,9 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.horcrux.svg.SvgPackage;
-import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.jadsonlourenco.RNShakeEvent.RNShakeEventPackage;
 import com.rnfs.RNFSPackage;
+import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -28,9 +28,9 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new SvgPackage(),
-            new ReactNativeDocumentPicker(),
             new RNShakeEventPackage(),
-            new RNFSPackage()
+            new RNFSPackage(),
+            new ReactNativeDocumentPicker()
       );
     }
 
