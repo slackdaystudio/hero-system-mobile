@@ -166,7 +166,7 @@ export default class ViewCharacterScreen extends Component {
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
 		  	<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 10}}>
                 <Tabs tabBarUnderlineStyle={localStyles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} hctiveTextStyle={{color: '#FFF'}} eading="General">
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
 			  			<ScrollView style={localStyles.tabContent}>
                             <ListItem>
 				        		<Left>
