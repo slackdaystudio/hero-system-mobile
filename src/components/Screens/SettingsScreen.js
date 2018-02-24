@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, AsyncStorage, Alert } from 'react-native';
-import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right } from 'native-base';
+import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body } from 'native-base';
 import Header from '../Header/Header';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
@@ -62,33 +62,33 @@ export default class SettingsScreen extends Component {
 			    	<List>
 			    		<ListItem>
 					    	<Left>
-			        			<Text style={styles.boldGrey}>Clear form data?</Text>
+			        			<Text style={styles.boldGrey}>Form data</Text>
 			        		</Left>
-			        		<Right>
+			        		<Body>
 							    <Button style={localStyles.button} onPress={() => this._clearFormData()}>
 									<Text uppercase={false}>Clear</Text>
 								</Button>
-			        		</Right>
+			        		</Body>
 		        		</ListItem>
 			    		<ListItem>
 					    	<Left>
-			        			<Text style={styles.boldGrey}>Clear loaded character?</Text>
+			        			<Text style={styles.boldGrey}>Loaded character</Text>
 			        		</Left>
-			        		<Right>
+			        		<Body>
 							    <Button style={localStyles.button} onPress={() => this._clearCharacterData()}>
 									<Text uppercase={false}>Clear</Text>
 								</Button>
-			        		</Right>
+			        		</Body>
 		        		</ListItem>
 			    		<ListItem>
 					    	<Left>
-			        			<Text style={styles.boldGrey}>Clear statistics?</Text>
+			        			<Text style={styles.boldGrey}>Statistics</Text>
 			        		</Left>
-			        		<Right>
+			        		<Body>
 							    <Button style={localStyles.button} onPress={() => this._clearStatisticsData()}>
 									<Text uppercase={false}>Clear</Text>
 								</Button>
-			        		</Right>
+			        		</Body>
 		        		</ListItem>
 			    	</List>
 				</Content>

@@ -18,7 +18,7 @@ export default StyleSheet.create({
 	},
 	button: {
 		backgroundColor: '#478f79',
-		minWidth: 150,
+		minWidth: 140,
 		justifyContent: 'center',
 		alignSelf: 'center'
 	},

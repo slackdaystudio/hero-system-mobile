@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { AsyncStorage, StyleSheet, Text, View, Button, Alert } from 'react-native';
-import { StackNavigator, DrawerNavigator } from 'react-navigation';
+import { DrawerNavigator } from 'react-navigation';
 import { Root } from "native-base";
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
