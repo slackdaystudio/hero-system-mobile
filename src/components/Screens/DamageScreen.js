@@ -145,7 +145,7 @@ export default class HitScreen extends Component {
 		              	</View>
 		            </View>
 		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-		              	<Text style={styles.grey}>Are you using a martial maneuver?</Text>
+		              	<Text style={styles.grey}>Attack is a martial maneuver?</Text>
 		              	<View style={{paddingRight: 10}}>
 		              		<Switch value={this.state.isMartialManeuver} onValueChange={() => this._toggleMartialManeuver()} color='#3da0ff'/>
 		              	</View>
