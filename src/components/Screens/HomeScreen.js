@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, ImageBackground } from 'react-native';
+import { Platform, StyleSheet, ScrollView, View, ImageBackground } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -11,12 +11,11 @@ export default class HomeScreen extends Component {
 		return (
 		  <Container style={styles.container}>
 			<Header navigation={this.props.navigation} />
-			<ImageBackground source={require('../../../public/background.png')} style={{width: '100%', height: '100%'}}>
-	        <Content style={styles.content}>
-				<View>
-					<Text style={styles.heading}>Character</Text>
-					<Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
-					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}}>
+                <Content style={styles.content}>
+                    <Text style={styles.heading}>Character</Text>
+                    <Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
                                 <Text uppercase={false} style={styles.buttonText}>View</Text>
@@ -27,10 +26,10 @@ export default class HomeScreen extends Component {
                                 <Text uppercase={false} style={styles.buttonText}>Load</Text>
                             </Button>
                         </View>
-		    		</View>
-					<Text style={styles.heading}>Rolls</Text>
-					<Text style={styles.grey}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
-					<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                    </View>
+                    <Text style={styles.heading}>Rolls</Text>
+                    <Text style={styles.grey}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
                                 <Text uppercase={false} style={styles.buttonText}>3d6</Text>
@@ -41,8 +40,8 @@ export default class HomeScreen extends Component {
                                 <Text uppercase={false} style={styles.buttonText}>Hit</Text>
                             </Button>
                         </View>
-		    		</View>
-		    		<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('Damage')}>
                                 <Text uppercase={false} style={styles.buttonText}>Damage</Text>
@@ -53,17 +52,16 @@ export default class HomeScreen extends Component {
                                 <Text uppercase={false} style={styles.buttonText}>Free Form</Text>
                             </Button>
                         </View>
-		    		</View>
-					<Text style={styles.heading}>H.E.R.O.</Text>
-					<Text style={styles.grey}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
-					<View style={styles.buttonContainer}>
-		    			<Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
-		    				<Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
-		    			</Button>
-		    		</View>
-		      	</View>
-	        </Content>
-	        </ImageBackground>
+                    </View>
+                    <Text style={styles.heading}>H.E.R.O.</Text>
+                    <Text style={styles.grey}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
+                    <View style={styles.buttonContainer}>
+                        <Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
+                            <Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
+                        </Button>
+                    </View>
+                </Content>
+            </ImageBackground>
 	      </Container>	
 		);
 	}
