@@ -11,7 +11,8 @@ export default StyleSheet.create({
 	heading: {
 		fontSize: 26,
 		fontWeight: 'bold',
-		color: '#D0D1D3'
+		color: '#D0D1D3',
+		paddingTop: 20
 	},
 	buttonContainer: {
 		paddingVertical: 5
