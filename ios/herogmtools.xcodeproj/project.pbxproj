@@ -864,7 +864,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = GM2P6R5MBL;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.iCloud = {
 								enabled = 1;
@@ -1488,8 +1488,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
@@ -1510,8 +1510,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.diceless.herogmtools;
 				PRODUCT_NAME = herogmtools;
-				PROVISIONING_PROFILE = "c9bb1e35-e2a6-4d82-bfbf-169c646bec23";
-				PROVISIONING_PROFILE_SPECIFIER = "Phil Guinchard - org.diceless.herogmtools";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1523,8 +1523,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
 				HEADER_SEARCH_PATHS = (
@@ -1544,8 +1544,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.diceless.herogmtools;
 				PRODUCT_NAME = herogmtools;
-				PROVISIONING_PROFILE = "c9bb1e35-e2a6-4d82-bfbf-169c646bec23";
-				PROVISIONING_PROFILE_SPECIFIER = "Phil Guinchard - org.diceless.herogmtools";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
