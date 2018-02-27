@@ -7,7 +7,7 @@ export default class MyHeader extends Component {
 	    let {height, width} = Dimensions.get('window');
 
 	    if (Platform.OS === 'ios' && height / width <= 1.6) {
-		    return <View style={{paddingBottom: 30, backgroundColor: '#375476'}} />
+		    return <View style={{paddingBottom: 20, backgroundColor: '#375476'}} />
 	    }
 
 	    return null;
