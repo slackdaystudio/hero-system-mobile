@@ -42,6 +42,16 @@ export default class SettingsScreen extends Component {
         });
 	}
 
+	async _clearHeroData() {
+	    await AsyncStorage.removeItem('hero');
+
+        Toast.show({
+            text: 'H.E.R.O. character has been cleared',
+            position: 'bottom',
+            buttonText: 'OK'
+        });
+	}
+
     async _clearStatisticsData() {
 	    await AsyncStorage.removeItem('characterFile');
 	    statistics.init();
@@ -76,6 +86,16 @@ export default class SettingsScreen extends Component {
 			        		</Left>
 			        		<Body>
 							    <Button style={localStyles.button} onPress={() => this._clearCharacterData()}>
+									<Text uppercase={false}>Clear</Text>
+								</Button>
+			        		</Body>
+		        		</ListItem>
+			    		<ListItem>
+					    	<Left>
+			        			<Text style={styles.boldGrey}>H.E.R.O.</Text>
+			        		</Left>
+			        		<Body>
+							    <Button style={localStyles.button} onPress={() => this._clearHeroData()}>
 									<Text uppercase={false}>Clear</Text>
 								</Button>
 			        		</Body>
