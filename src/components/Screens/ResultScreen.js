@@ -143,10 +143,9 @@ export default class ResultScreen extends Component {
 				    <Text style={styles.heading}>Roll Result</Text>
 					<View>
 						<Text style={[styles.grey, localStyles.rollResult]}>{this.state.result.total}</Text>
-						<View style={localStyles.lineContainer}>
-							<Text style={[styles.boldGrey, localStyles.alignStart]}>Dice Rolled: </Text>
-							<Text style={styles.grey}>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})</Text>
-						</View>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Dice Rolled: </Text>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
+                        </Text>
 						{this._renderAdditionalRollInfo()}
 						<View style={styles.buttonContainer}>
 			    			<Button block style={styles.button} onPress={this.reRoll}>
