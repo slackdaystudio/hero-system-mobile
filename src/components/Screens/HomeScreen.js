@@ -55,7 +55,7 @@ export default class HomeScreen extends Component {
                     </View>
                     <Text style={styles.heading}>H.E.R.O.</Text>
                     <Text style={styles.grey}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
-                    <View style={styles.buttonContainer}>
+                    <View style={[styles.buttonContainer, {paddingBottom: 20}]}>
                         <Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
                             <Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
                         </Button>
