@@ -294,6 +294,16 @@ export default class ViewCharacterScreen extends Component {
 			  		        {this._renderCharacteristics()}
 			  		    </ScrollView>
 			  		</Tab>
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
+                        <ScrollView style={localStyles.tabContent}>
+                            {this._renderText(this.state.character.powers.text, 'Power')}
+                        </ScrollView>
+                    </Tab>
+                    <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Martial Arts">
+                        <ScrollView style={localStyles.tabContent}>
+                            {this._renderText(this.state.character.martialArts.text, 'Maneuver')}
+                        </ScrollView>
+                    </Tab>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Skills">
                         <ScrollView style={localStyles.tabContent}>
                             {this._renderText(this.state.character.skills.text, 'Skill')}
@@ -307,16 +317,6 @@ export default class ViewCharacterScreen extends Component {
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Talents">
                         <ScrollView style={localStyles.tabContent}>
                             {this._renderText(this.state.character.talents.text, 'Talent')}
-                        </ScrollView>
-                    </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Martial Arts">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.martialArts.text, 'Maneuver')}
-                        </ScrollView>
-                    </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.powers.text, 'Power')}
                         </ScrollView>
                     </Tab>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Disadvantages">

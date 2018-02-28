@@ -207,19 +207,6 @@ export default class RandomCharacterScreen extends Component {
 			  				{this._renderCharacteristics()}
 			  			</ScrollView>
 			  		</Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
-			  			<ScrollView style={localStyles.tabContent}>
-					  		{this.state.character.skills.skills.map((skill, index) => {
-								return (
-									<ListItem key={'skill-' + index}>
-						        		<Body>
-						        			<Text style={styles.grey}>{skill}</Text>
-						        		</Body>
-						        	</ListItem>
-								);
-							})}
-				  		</ScrollView>
-			  		</Tab>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
 			  			<ScrollView style={localStyles.tabContent}>
 					  		{this.state.character.powers.powers.map((power, index) => {
@@ -232,6 +219,19 @@ export default class RandomCharacterScreen extends Component {
 						        			<Text style={styles.grey}>{power.cost}</Text>
 						        		</Right>
 						        	</ListItem>							
+								);
+							})}
+				  		</ScrollView>
+			  		</Tab>
+			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
+			  			<ScrollView style={localStyles.tabContent}>
+					  		{this.state.character.skills.skills.map((skill, index) => {
+								return (
+									<ListItem key={'skill-' + index}>
+						        		<Body>
+						        			<Text style={styles.grey}>{skill}</Text>
+						        		</Body>
+						        	</ListItem>
 								);
 							})}
 				  		</ScrollView>
