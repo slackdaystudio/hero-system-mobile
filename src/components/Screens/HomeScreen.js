@@ -31,7 +31,7 @@ export default class HomeScreen extends Component {
                     <Text style={styles.grey}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('Skill')}>
                                 <Text uppercase={false} style={styles.buttonText}>3d6</Text>
                             </Button>
                         </View>

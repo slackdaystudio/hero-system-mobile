@@ -8,6 +8,10 @@ import styles from '../../Styles';
 
 export default class SettingsScreen extends Component {	
 	async _clearFormData() {
+		await AsyncStorage.setItem('skillState', JSON.stringify({
+		    skillCheck: false,
+			value: 8
+		}));
 		await AsyncStorage.setItem('ocvSliderValue', '0');
 		await AsyncStorage.setItem('damageState', JSON.stringify({
 			dice: 12,

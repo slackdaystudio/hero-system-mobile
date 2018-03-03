@@ -6,6 +6,7 @@ import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
+import SkillScreen from './src/components/Screens/SkillScreen';
 import HitScreen from './src/components/Screens/HitScreen';
 import DamageScreen from './src/components/Screens/DamageScreen';
 import FreeFormScreen from './src/components/Screens/FreeFormScreen';
@@ -26,6 +27,9 @@ const RootStack = DrawerNavigator({
 		},
 		Result: {
 			screen: ResultScreen
+		},
+		Skill: {
+			screen: SkillScreen
 		},
 		Hit: {
 			screen: HitScreen

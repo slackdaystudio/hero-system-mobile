@@ -20,7 +20,7 @@ export default class Sidebar extends Component {
 	      		<Text style={styles.grey}>View Character</Text>
 	      	</ListItem>
           	<ListItem itemDivider style={{backgroundColor: '#000'}} />
-          	<ListItem onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck())}>
+          	<ListItem onPress={() => this.props.navigation.navigate('Skill')}>
 	      		<Text style={styles.grey}>3D6</Text>
 	      	</ListItem> 
           	<ListItem onPress={() => this.props.navigation.navigate('Hit')}>

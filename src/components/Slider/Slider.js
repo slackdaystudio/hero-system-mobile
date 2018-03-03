@@ -31,7 +31,8 @@ export default class MySlider extends Component {
 					step={this.props.step} 
 					minimumValue={this.props.min} 
 					maximumValue={this.props.max} 
-					onValueChange={(value) => this.onValueChange(value)} 
+					onValueChange={(value) => this.onValueChange(value)}
+					disabled={this.props.disabled}
 					trackStyle={thumbStyles.track}
 					thumbStyle={thumbStyles.thumb}
 					minimumTrackTintColor='#3da0ff'

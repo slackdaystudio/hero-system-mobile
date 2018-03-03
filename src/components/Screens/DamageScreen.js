@@ -132,7 +132,7 @@ export default class HitScreen extends Component {
 		            </Picker>
 		            <View style={{paddingBottom: 30}} />
 		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-	              	<Text style={styles.grey}>Is this a killing attack?</Text>
+	              	    <Text style={styles.grey}>Is this a killing attack?</Text>
 		              	<View style={{paddingRight: 10}}>
 		              		<Switch value={this.state.killingToggled} onValueChange={() => this.toggleDamageType()} color='#3da0ff'/>
 		              	</View>		            
