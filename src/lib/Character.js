@@ -14,7 +14,7 @@ class Character {
             RNFS.readFile(result.uri, 'ascii').then(file => {
                 let parser = xml2js.Parser({explicitArray: false});
 
-                parser.parseString(this._stripBreakingChars(file), (error, result) => {
+                parser.parseString(file, (error, result) => {
                     AsyncStorage.setItem('character', JSON.stringify(result));
                 });
             }).catch((error) => {
@@ -35,16 +35,6 @@ class Character {
         }
 
         return false;
-    }
-
-    _stripBreakingChars(xml) {
-        // First we replace common breaking characters
-        xml.replace(/(‘|’)/g, "'"); // single smart quotes
-        xml.replace(/(“|”)/g, '"'); // double smart quotes
-        xml.replace(/–/g, '-'); // em dash
-        xml.replace(/…/g, '...'); // triple dot
-
-        return xml;
     }
 }
 
