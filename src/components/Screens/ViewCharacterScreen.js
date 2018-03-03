@@ -157,10 +157,16 @@ export default class ViewCharacterScreen extends Component {
     }
 
     _onSkillCheckLongPress(type, item) {
-        let matches = item.match(/\s[0-9]+\-$/);
+        let matches = item.match(/(\s[0-9]+\-|\([0-9]+\-\))$/);
 
         if (matches !== null) {
-            this.rollCheck(matches[0].trim())
+            let match = matches[0].trim();
+
+            if (match.indexOf('(') !== -1) {
+                match = match.slice(1, -1);
+            }
+
+            this.rollCheck(match);
         }
     }
 
