@@ -87,9 +87,74 @@ export default class ViewCharacterScreen extends Component {
                         </TouchableHighlight>
                     );
                 })}
+                {this._renderMovement()}
             </View>
 	    );
 	}
+
+    _renderUnusualMovement(label, distance) {
+        if (distance === '') {
+            return null;
+        }
+
+        return (
+            <ListItem>
+                <Left>
+                    <Text style={styles.grey}>{label}</Text>
+                </Left>
+                <Body>
+                    <Text style={styles.grey}>{distance}</Text>
+                </Body>
+            </ListItem>
+        );
+    }
+
+    _renderMovement() {
+        return (
+            <List>
+                <ListItem itemDivider style={{backgroundColor: '#375476'}}>
+                    <Body><Text style={styles.boldGrey}>Movement</Text></Body>
+                </ListItem>
+                <ListItem>
+                    <Left>
+                        <Text style={styles.grey}>Running</Text>
+                    </Left>
+                    <Body>
+                        <Text style={styles.grey}>{this.state.character.movement.running}</Text>
+                    </Body>
+                </ListItem>
+                <ListItem>
+                    <Left>
+                        <Text style={styles.grey}>Swimming</Text>
+                    </Left>
+                    <Body>
+                        <Text style={styles.grey}>{this.state.character.movement.swimming}</Text>
+                    </Body>
+                </ListItem>
+                <ListItem>
+                    <Left>
+                        <Text style={styles.grey}>Leaping (H)</Text>
+                    </Left>
+                    <Body>
+                        <Text style={styles.grey}>{this.state.character.movement.leaping.horizontal}</Text>
+                    </Body>
+                </ListItem>
+                <ListItem>
+                    <Left>
+                        <Text style={styles.grey}>Leaping (V)</Text>
+                    </Left>
+                    <Body>
+                        <Text style={styles.grey}>{this.state.character.movement.leaping.vertical}</Text>
+                    </Body>
+                </ListItem>
+                {this._renderUnusualMovement('Flight', this.state.character.movement.flight)}
+                {this._renderUnusualMovement('Gliding', this.state.character.movement.gliding)}
+                {this._renderUnusualMovement('Swinging', this.state.character.movement.swinging)}
+                {this._renderUnusualMovement('Teleportation', this.state.character.movement.teleportation)}
+                {this._renderUnusualMovement('Tunneling', this.state.character.movement.tunneling)}
+            </List>
+        );
+    }
 
     _onSkillCheckLongPress(type, item) {
         let matches = item.match(/\s[0-9]+\-$/);
