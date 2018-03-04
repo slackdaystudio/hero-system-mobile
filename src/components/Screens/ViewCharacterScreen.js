@@ -178,31 +178,35 @@ export default class ViewCharacterScreen extends Component {
         }
 
         return (
-            <List>
-                <ListItem itemDivider style={{backgroundColor: '#375476'}}>
-                    <Left>
-                        <Text style={styles.boldGrey}>{columnHeading}</Text>
-                    </Left>
-                    <Right>
-                        <Text style={styles.boldGrey}>Cost</Text>
-                    </Right>
-                </ListItem>
-                {items.map((item, index) => {
-                    let lineItem = this._spliceItem(item);
-                    let costEndPosition = lineItem[1].indexOf(')');
+            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={columnHeading + 's'}>
+                <ScrollView style={localStyles.tabContent}>
+                <List>
+                    <ListItem itemDivider style={{backgroundColor: '#375476'}}>
+                        <Left>
+                            <Text style={styles.boldGrey}>{columnHeading}</Text>
+                        </Left>
+                        <Right>
+                            <Text style={styles.boldGrey}>Cost</Text>
+                        </Right>
+                    </ListItem>
+                    {items.map((item, index) => {
+                        let lineItem = this._spliceItem(item);
+                        let costEndPosition = lineItem[1].indexOf(')');
 
-                    return (
-                        <ListItem key={'item-' + index} underlayColor='#3da0ff' onLongPress={() => this.onSkillCheckLongPress(columnHeading, lineItem[1].substring(costEndPosition + 1))}>
-                            <Left>
-                                <Text style={styles.grey}>{lineItem[0] + ' ' + lineItem[1].substring(costEndPosition + 1)}</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{lineItem[1].substring(1, costEndPosition)}</Text>
-                            </Right>
-                        </ListItem>
-                    )
-                })}
-            </List>
+                        return (
+                            <ListItem key={'item-' + index} underlayColor='#3da0ff' onLongPress={() => this.onSkillCheckLongPress(columnHeading, lineItem[1].substring(costEndPosition + 1))}>
+                                <Left>
+                                    <Text style={styles.grey}>{lineItem[0] + ' ' + lineItem[1].substring(costEndPosition + 1)}</Text>
+                                </Left>
+                                <Right>
+                                    <Text style={styles.grey}>{lineItem[1].substring(1, costEndPosition)}</Text>
+                                </Right>
+                            </ListItem>
+                        )
+                    })}
+                </List>
+                </ScrollView>
+            </Tab>
         );
     }
 
@@ -365,36 +369,12 @@ export default class ViewCharacterScreen extends Component {
 			  		        {this._renderCharacteristics()}
 			  		    </ScrollView>
 			  		</Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.powers.text, 'Power')}
-                        </ScrollView>
-                    </Tab>
-                    <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Martial Arts">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.martialArts.text, 'Maneuver')}
-                        </ScrollView>
-                    </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} heading="Skills">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.skills.text, 'Skill')}
-                        </ScrollView>
-                    </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Perks">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.perks.text, 'Perk')}
-                        </ScrollView>
-                    </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Talents">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.talents.text, 'Talent')}
-                        </ScrollView>
-                    </Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Disadvantages">
-                        <ScrollView style={localStyles.tabContent}>
-                            {this._renderText(this.state.character.disadvantages.text, 'Disadvantage')}
-                        </ScrollView>
-                    </Tab>
+			  		{this._renderText(this.state.character.powers.text, 'Power')}
+                    {this._renderText(this.state.character.martialArts.text, 'Maneuver')}
+			  		{this._renderText(this.state.character.skills.text, 'Skill')}
+			  		{this._renderText(this.state.character.perks.text, 'Perk')}
+			  		{this._renderText(this.state.character.talents.text, 'Talent')}
+			  		{this._renderText(this.state.character.disadvantages.text, 'Disadvantage')}
 			  	</Tabs>
 		  	</Content>
 	      </Container>	
