@@ -212,6 +212,37 @@ export default class ViewCharacterScreen extends Component {
         }
     }
 
+    _renderEquipment(text) {
+        let items = text.split('|').slice(0, -1);
+
+        if (items.length === 0) {
+            return null;
+        }
+
+        return (
+            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
+                <ScrollView style={localStyles.tabContent}>
+                <List>
+                    <ListItem itemDivider style={{backgroundColor: '#375476'}}>
+                        <Left>
+                            <Text style={styles.boldGrey}>Item</Text>
+                        </Left>
+                    </ListItem>
+                    {items.map((item, index) => {
+                        return (
+                            <ListItem key={'equipment-' + index} underlayColor='#3da0ff'>
+                                <Left>
+                                    <Text style={styles.grey}>{item}</Text>
+                                </Left>
+                            </ListItem>
+                        )
+                    })}
+                </List>
+                </ScrollView>
+            </Tab>
+        );
+    }
+
     _renderText(text, columnHeading) {
         let items = text.split('|').slice(0, -1);
 
@@ -236,7 +267,7 @@ export default class ViewCharacterScreen extends Component {
                         let costEndPosition = lineItem[1].indexOf(')');
 
                         return (
-                            <ListItem key={'item-' + index} underlayColor='#3da0ff' onLongPress={() => this.onSkillCheckLongPress(columnHeading, lineItem[1].substring(costEndPosition + 1))}>
+                            <ListItem key={columnHeading + '-' + index} underlayColor='#3da0ff' onLongPress={() => this.onSkillCheckLongPress(columnHeading, lineItem[1].substring(costEndPosition + 1))}>
                                 <Left>
                                     <Text style={styles.grey}>{lineItem[0] + ' ' + lineItem[1].substring(costEndPosition + 1)}</Text>
                                 </Left>
@@ -478,6 +509,7 @@ export default class ViewCharacterScreen extends Component {
 			  		    </ScrollView>
 			  		</Tab>
 			  		{this._renderText(this.state.character.powers.text, 'Power')}
+			  		{this._renderEquipment(this.state.character.equipment.text)}
                     {this._renderText(this.state.character.martialArts.text, 'Maneuver')}
 			  		{this._renderText(this.state.character.skills.text, 'Skill')}
 			  		{this._renderText(this.state.character.perks.text, 'Perk')}
