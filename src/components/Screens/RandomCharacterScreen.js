@@ -120,7 +120,7 @@ export default class RandomCharacterScreen extends Component {
                                 </ListItem>
                                 <ListItem>
                                     <Left>
-                                        <Text style={styles.boldGrey}>Archtype:</Text>
+                                        <Text style={styles.boldGrey}>Archetype:</Text>
                                     </Left>
                                     <Body>
                                         <Text style={styles.grey}>{this.state.character.archtype.name}</Text>
