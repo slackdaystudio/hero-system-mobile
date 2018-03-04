@@ -36,6 +36,9 @@ export default class Sidebar extends Component {
             <ListItem onPress={() => this.props.navigation.navigate('RandomCharacter')}>
                 <Text style={styles.grey}>H.E.R.O.</Text>
             </ListItem>
+            <ListItem onPress={() => this.props.navigation.navigate('CostCruncher')}>
+                <Text style={styles.grey}>Cruncher</Text>
+            </ListItem>
 	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
 	      	<ListItem onPress={() => this.props.navigation.navigate('Statistics')}>
 	      		<Text style={styles.grey}>Statistics</Text>

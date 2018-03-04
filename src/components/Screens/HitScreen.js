@@ -50,7 +50,7 @@ export default class HitScreen extends Component {
 				<Content style={styles.content}>
 				    <Text style={styles.heading}>Roll To Hit</Text>
 					<Slider 
-						label='Total OCVOMCV:' 
+						label='Total OCV/OMCV:'
 						value={this.state.value} 
 						step={1} 
 						min={-30} 

@@ -10,6 +10,7 @@ import SkillScreen from './src/components/Screens/SkillScreen';
 import HitScreen from './src/components/Screens/HitScreen';
 import DamageScreen from './src/components/Screens/DamageScreen';
 import FreeFormScreen from './src/components/Screens/FreeFormScreen';
+import CostCruncherScreen from './src/components/Screens/CostCruncherScreen';
 import StatisticsScreen from './src/components/Screens/StatisticsScreen';
 import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
@@ -40,6 +41,9 @@ const RootStack = DrawerNavigator({
 		FreeForm: {
 			screen: FreeFormScreen
 		},
+		CostCruncher: {
+            screen: CostCruncherScreen
+        },
 		Statistics: {
 		    screen: StatisticsScreen
 		},

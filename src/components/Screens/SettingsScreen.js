@@ -12,6 +12,11 @@ export default class SettingsScreen extends Component {
 		    skillCheck: false,
 			value: 8
 		}));
+		await AsyncStorage.setItem('costCruncherState', JSON.stringify({
+		    cost: 5,
+			advantages: 0,
+			limitations: 0,
+        }));
 		await AsyncStorage.setItem('ocvSliderValue', '0');
 		await AsyncStorage.setItem('damageState', JSON.stringify({
 			dice: 12,

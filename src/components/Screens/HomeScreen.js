@@ -53,12 +53,19 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
                     </View>
-                    <Text style={styles.heading}>H.E.R.O.</Text>
-                    <Text style={styles.grey}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool.  Great for brainstorming new character ideas or one shot adventures.</Text>
-                    <View style={[styles.buttonContainer, {paddingBottom: 20}]}>
-                        <Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
-                            <Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
-                        </Button>
+                    <Text style={styles.heading}>Tools</Text>
+                    <Text style={styles.grey}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool or use the cruncher to calculate power costs.</Text>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                        <View style={[styles.buttonContainer, {paddingBottom: 20}]}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
+                                <Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
+                            </Button>
+                        </View>
+                        <View style={[styles.buttonContainer, {paddingBottom: 20}]}>
+                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('CostCruncher')}>
+                                <Text uppercase={false} style={styles.buttonText}>Cruncher</Text>
+                            </Button>
+                        </View>
                     </View>
                 </Content>
             </ImageBackground>
