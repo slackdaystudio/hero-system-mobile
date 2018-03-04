@@ -43,6 +43,7 @@ export default class SettingsScreen extends Component {
 
 	async _clearCharacterData() {
 	    await AsyncStorage.removeItem('character');
+	    await AsyncStorage.removeItem('combat');
 
         Toast.show({
             text: 'Loaded character has been cleared',

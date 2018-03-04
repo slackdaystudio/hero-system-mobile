@@ -36,6 +36,22 @@ class Character {
 
         return false;
     }
+
+    getCharacteristic(characteristics, name) {
+        for (let characteristic of characteristics) {
+            if (characteristic.name === name) {
+                let total = characteristic.total;
+
+                if (total.indexOf('/') !== -1) {
+                    total = total.split('/')[1];
+                }
+
+                return total;
+            }
+        }
+
+        return 0;
+    }
 }
 
 export let character = new Character();

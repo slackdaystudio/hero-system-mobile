@@ -1,8 +1,9 @@
 import React, { Component }  from 'react';
 import { Platform, StyleSheet, View, Image, ScrollView, AsyncStorage, Alert, TouchableHighlight } from 'react-native';
-import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Card, CardItem, Spinner } from 'native-base';
+import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Card, CardItem, Spinner, Form, Item, Input, Label } from 'native-base';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import Header from '../Header/Header';
+import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import { dieRoller } from '../../lib/DieRoller';
 import styles from '../../Styles';
@@ -12,17 +13,20 @@ export default class ViewCharacterScreen extends Component {
 		super(props);
 		
 		this.state = {
-			character: null
+			character: null,
+			combat: null
 		};
 
+        this.updateCombatState = this._updateCombatState.bind(this);
+        this.resetCombatState = this._resetCombatState.bind(this);
 		this.rollCheck = this._rollCheck.bind(this);
 		this.onSkillCheckLongPress = this._onSkillCheckLongPress.bind(this);
 	}
 	
 	async componentWillMount() {
-		let character = await AsyncStorage.getItem('character');
+		let loadedCharacter = await AsyncStorage.getItem('character');
 
-        if (character === null) {
+        if (loadedCharacter === null) {
             this.props.navigation.navigate('Home');
 
             Toast.show({
@@ -34,7 +38,45 @@ export default class ViewCharacterScreen extends Component {
             return;
         }
 
-		this.setState({character: JSON.parse(character).character});
+        let characterJson = JSON.parse(loadedCharacter).character;
+
+		this.setState({character: characterJson});
+
+        let combat = await AsyncStorage.getItem('combat');
+
+        if (combat === null) {
+            this.setState({
+                combat: {
+                    stun: character.getCharacteristic(characterJson.characteristics.characteristic, 'stun'),
+                    body: character.getCharacteristic(characterJson.characteristics.characteristic, 'body'),
+                    endurance: character.getCharacteristic(characterJson.characteristics.characteristic, 'endurance')
+                }
+            });
+        } else {
+            this.setState({combat: JSON.parse(combat)});
+        }
+	}
+
+	_updateCombatState(key, value) {
+        if (/^(\-)?[0-9]*$/.test(value) === false) {
+            return;
+        }
+
+		let newState = {...this.state.combat};
+		newState[key] = value;
+
+		AsyncStorage.setItem('combat', JSON.stringify(newState));
+
+        this.setState({combat: newState});
+	}
+
+	_resetCombatState(key) {
+		let newState = {...this.state.combat};
+		newState[key] = character.getCharacteristic(this.state.character.characteristics.characteristic, key);
+
+		AsyncStorage.setItem('combat', JSON.stringify(newState));
+
+        this.setState({combat: newState});
 	}
 
     _rollCheck(threshold) {
@@ -225,7 +267,7 @@ export default class ViewCharacterScreen extends Component {
     }
 
 	render() {
-	    if (this.state.character === null || this.state.character.characteristics === null || this.state.character.appearance === null) {
+	    if (this.state.character === null || this.state.combat === null) {
 	        return (
                 <Container style={localStyles.container}>
                     <Header hasTabs={false} navigation={this.props.navigation} />
@@ -364,6 +406,72 @@ export default class ViewCharacterScreen extends Component {
 				        	</ListItem>
 			  			</ScrollView>
 			  		</Tab>
+                    <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+			  			<ScrollView style={localStyles.tabContent}>
+                            <List>
+                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                                    <View style={{alignSelf: 'center', width: 50}}>
+                                        <Text style={styles.boldGrey}>Stun:</Text>
+                                    </View>
+                                    <View style={{width: 100}}>
+                                        <Item>
+                                        <Input
+                                            style={styles.grey}
+                                            keyboardType='numeric'
+                                            maxLength={3}
+                                            value={this.state.combat.stun.toString()}
+                                            onChangeText={(text) => this.updateCombatState('stun', text)} />
+                                        </Item>
+                                    </View>
+                                    <View>
+                                        <Button style={localStyles.button} onPress={() => this.resetCombatState('stun')}>
+									        <Text uppercase={false}>Reset</Text>
+								        </Button>
+                                    </View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                                    <View style={{alignSelf: 'center', width: 50}}>
+                                        <Text style={styles.boldGrey}>Body:</Text>
+                                    </View>
+                                    <View style={{width: 100}}>
+                                        <Item>
+                                        <Input
+                                            style={styles.grey}
+                                            keyboardType='numeric'
+                                            maxLength={3}
+                                            value={this.state.combat.body.toString()}
+                                            onChangeText={(text) => this.updateCombatState('body', text)} />
+                                        </Item>
+                                    </View>
+                                    <View>
+                                        <Button style={localStyles.button} onPress={() => this.resetCombatState('body')}>
+									        <Text uppercase={false}>Reset</Text>
+								        </Button>
+                                    </View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                                    <View style={{alignSelf: 'center', width: 50}}>
+                                        <Text style={styles.boldGrey}>End:</Text>
+                                    </View>
+                                    <View style={{width: 100}}>
+                                        <Item>
+                                        <Input
+                                            style={styles.grey}
+                                            keyboardType='numeric'
+                                            maxLength={3}
+                                            value={this.state.combat.endurance.toString()}
+                                            onChangeText={(text) => this.updateCombatState('endurance', text)} />
+                                        </Item>
+                                    </View>
+                                    <View>
+                                        <Button style={localStyles.button} onPress={() => this.resetCombatState('endurance')}>
+									        <Text uppercase={false}>Reset</Text>
+								        </Button>
+                                    </View>
+                                </View>
+                            </List>
+			  		    </ScrollView>
+			  		</Tab>
 			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
 			  		    <ScrollView style={localStyles.tabContent}>
 			  		        {this._renderCharacteristics()}
@@ -398,5 +506,9 @@ const localStyles = StyleSheet.create({
 	pointCostsHeader: {
 		alignSelf: 'center',
 		textDecorationLine: 'underline'
-	}
+	},
+    button: {
+        backgroundColor: '#478f79',
+        alignSelf: 'flex-end'
+    }
 });
