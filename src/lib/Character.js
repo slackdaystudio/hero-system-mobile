@@ -42,16 +42,41 @@ class Character {
         return false;
     }
 
-    getCharacteristic(characteristics, name) {
+    getDefenses(character) {
+        let pd = this.getCharacteristic(character.characteristics.characteristic, 'pd', false).notes.split(' ');
+        let ed = this.getCharacteristic(character.characteristics.characteristic, 'ed', false).notes.split(' ');
+
+        return [
+            {
+                label: 'Physical Defense',
+                value: pd[0]
+            }, {
+                label: 'R. Physical Defense',
+                value: (pd.length === 4 ? pd[2].slice(1) : 0)
+            }, {
+                label: 'Energy Defense',
+                value: ed[0]
+            }, {
+                label: 'R. Energy Defense',
+                value: (ed.length === 4 ? ed[2].slice(1) : 0)
+            }
+        ];
+    }
+
+    getCharacteristic(characteristics, name, totalOnly = true) {
         for (let characteristic of characteristics) {
             if (characteristic.name === name) {
-                let total = characteristic.total;
+                if (totalOnly) {
+                    let total = characteristic.total;
 
-                if (total.indexOf('/') !== -1) {
-                    total = total.split('/')[1];
+                    if (total.indexOf('/') !== -1) {
+                        total = total.split('/')[1];
+                    }
+
+                    return total;
                 }
 
-                return total;
+                return characteristic;
             }
         }
 
