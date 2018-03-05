@@ -16,6 +16,11 @@ class Character {
 
                 parser.parseString(file, (error, result) => {
                     AsyncStorage.setItem('character', JSON.stringify(result));
+                    AsyncStorage.setItem('combat', JSON.stringify({
+                        stun: this.getCharacteristic(result.character.characteristics.characteristic, 'stun'),
+                        body: this.getCharacteristic(result.character.characteristics.characteristic, 'body'),
+                        endurance: this.getCharacteristic(result.character.characteristics.characteristic, 'endurance')
+                    }));
                 });
             }).catch((error) => {
                 Toast.show({
