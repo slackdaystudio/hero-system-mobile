@@ -54,13 +54,13 @@ export default class ViewCharacterScreen extends Component {
         );
     }
 
-    _renderTextList(text, columnHeading) {
+    _renderTextList(text, columnHeading, tabTitle = null) {
         if (text === '' || text === undefined || text === null) {
             return null;
         }
 
         return (
-            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={columnHeading + 's'}>
+            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
 			    <ScrollView style={localStyles.tabContent}>
 			        <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
 			    </ScrollView>
@@ -103,7 +103,7 @@ export default class ViewCharacterScreen extends Component {
 			  		</Tab>
                     {this._renderTextList(this.state.character.powers.text, 'Power')}
 			  		{this._renderEquipment(this.state.character.equipment.text)}
-                    {this._renderTextList(this.state.character.martialArts.text, 'Maneuver')}
+                    {this._renderTextList(this.state.character.martialArts.text, 'Maneuver', 'Martial Arts')}
                     {this._renderTextList(this.state.character.skills.text, 'Skill')}
                     {this._renderTextList(this.state.character.talents.text, 'Talent')}
                     {this._renderTextList(this.state.character.perks.text, 'Perk')}
