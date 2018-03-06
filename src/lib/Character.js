@@ -1,35 +1,39 @@
-import { AsyncStorage, Alert } from 'react-native';
+import { Platform, AsyncStorage, Alert } from 'react-native';
 import { Toast } from 'native-base';
-import { DocumentPicker } from 'react-native-document-picker';
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
+import { common } from './Common';
 
 class Character {
     load() {
-        DocumentPicker.show({filetype: ['text/xml', 'application/xml']},(error, result) => {
-            if (result === null) {
-                return;
-            }
-
-            RNFS.readFile(result.uri, 'ascii').then(file => {
-                let parser = xml2js.Parser({explicitArray: false});
-
-                parser.parseString(file, (error, result) => {
-                    AsyncStorage.setItem('character', JSON.stringify(result));
-                    AsyncStorage.setItem('combat', JSON.stringify({
-                        stun: this.getCharacteristic(result.character.characteristics.characteristic, 'stun'),
-                        body: this.getCharacteristic(result.character.characteristics.characteristic, 'body'),
-                        endurance: this.getCharacteristic(result.character.characteristics.characteristic, 'endurance')
-                    }));
-                });
-            }).catch((error) => {
-                Toast.show({
-                    text: error.message,
-                    position: 'bottom',
-                    buttonText: 'OK'
-                });
+        if (common.isIPad()) {
+            DocumentPicker.show({
+                top: 0,
+                left: 0,
+                filetype: ['public.xml']
+            }, (error, uri) => {
+                this._read(uri);
             });
-        });
+        } else {
+            DocumentPicker.show({filetype: [DocumentPickerUtil.allFiles()]},(error, result) => {
+                if (result === null) {
+                    return;
+                }
+
+                if (result.type === 'text/xml' || result.type === 'application/xml') {
+                    this._read(result.uri);
+                } else {
+                    Toast.show({
+                        text: 'Unsupported file type: ' + result.type,
+                        position: 'bottom',
+                        buttonText: 'OK'
+                    });
+
+                    return;
+                }
+            });
+        }
     }
 
     isFifthEdition(characteristics) {
@@ -81,6 +85,27 @@ class Character {
         }
 
         return 0;
+    }
+
+    _read(uri) {
+        RNFS.readFile(uri, 'ascii').then(file => {
+            let parser = xml2js.Parser({explicitArray: false});
+
+            parser.parseString(file, (error, result) => {
+                AsyncStorage.setItem('character', JSON.stringify(result));
+                AsyncStorage.setItem('combat', JSON.stringify({
+                    stun: this.getCharacteristic(result.character.characteristics.characteristic, 'stun'),
+                    body: this.getCharacteristic(result.character.characteristics.characteristic, 'body'),
+                    endurance: this.getCharacteristic(result.character.characteristics.characteristic, 'endurance')
+                }));
+            });
+        }).catch((error) => {
+            Toast.show({
+                text: error.message,
+                position: 'bottom',
+                buttonText: 'OK'
+            });
+        });
     }
 }
 

@@ -1,12 +1,11 @@
 import React, { Component }  from 'react';
-import { Dimensions, Platform, StyleSheet, View, Image, TouchableHighlight } from 'react-native';
+import { Platform, StyleSheet, View, Image, TouchableHighlight } from 'react-native';
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
+import { common } from '../../lib/Common';
 
 export default class MyHeader extends Component {
 	_renderSpacer() {
-	    let {height, width} = Dimensions.get('window');
-
-	    if (Platform.OS === 'ios' && height / width <= 1.6) {
+	    if (common.isIPad()) {
 		    return <View style={{paddingBottom: 20, backgroundColor: '#375476'}} />
 	    }
 
