@@ -86,7 +86,7 @@ export default class ViewCharacterScreen extends Component {
 	render() {
 	    if (this.state.character === null) {
 	        return (
-                <Container style={localStyles.container}>
+                <Container>
                     <Header hasTabs={false} navigation={this.props.navigation} />
                     <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
                         <Spinner color='#D0D1D3' />

@@ -131,8 +131,15 @@ export default class ResultScreen extends Component {
 	
 	_renderKnockback() {
 		let knockback = this.state.result.knockback < 0 ? 0 : this.state.result.knockback;
-		
-		return <Text style={styles.grey}>{knockback}m</Text>;
+		let knockbackText = '';
+
+		if (this.state.result.damageForm.useFifthEdition) {
+		    knockbackText = knockback / 2 + '"';
+		} else {
+		    knockbackText = knockback + 'm';
+		}
+
+		return <Text style={styles.grey}>{knockbackText}</Text>;
 	}
 	
 	render() {	

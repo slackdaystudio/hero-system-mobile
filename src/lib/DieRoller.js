@@ -1,3 +1,6 @@
+import { Alert } from 'react-native';
+import { common } from './Common';
+
 export const SKILL_CHECK = 1;
 
 export const TO_HIT = 2;
@@ -146,10 +149,23 @@ class DieRoller {
 		let stun = 0;
 		
 		if (resultRoll.rollType === KILLING_DAMAGE) {
-			if (resultRoll.hitLocationDetails == null) {
-				stun = resultRoll.total * ((Math.floor(Math.random() * 3) + 1) + parseInt(resultRoll.stunMultiplier));
+			if (resultRoll.damageForm.useHitLocations) {
+                stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier));
 			} else {
-				stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier));
+                let stunModifier = 1;
+
+                if (resultRoll.damageForm.useFifthEdition) {
+                    stunModifier = Math.floor(Math.random() * 6) + 1;
+                    stunModifier--;
+
+                    if (stunModifier === 0) {
+                        stunModifier = 1;
+                    }
+                } else {
+                    stunModifier = Math.floor(Math.random() * 3) + 1;
+                }
+
+                stun = resultRoll.total * (stunModifier + parseInt(resultRoll.stunMultiplier));
 			}
 		} else {
 			stun = resultRoll.total

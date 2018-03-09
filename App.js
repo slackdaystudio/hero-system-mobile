@@ -60,11 +60,10 @@ const RootStack = DrawerNavigator({
 export default class App extends Component {
 	async componentWillMount() {
 		let stats = await AsyncStorage.getItem('statistics');
-
 		if (stats === null) {
 		    statistics.init();
 		}
-		
+
 		StatusBar.setHidden(true);
 	}
 

@@ -1,13 +1,28 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, AsyncStorage, Alert } from 'react-native';
-import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body } from 'native-base';
+import { StyleSheet, View, AsyncStorage, Switch, Alert } from 'react-native';
+import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
 import Header from '../Header/Header';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
-export default class SettingsScreen extends Component {	
-	async _clearFormData() {
+export default class SettingsScreen extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            appSettings: null
+        };
+    }
+
+	async componentDidMount() {
+        let settings = await common.getAppSettings();
+
+        this.setState({appSettings: settings});
+	}
+
+	async _clearFormData(showToast = true) {
 		await AsyncStorage.setItem('skillState', JSON.stringify({
 		    skillCheck: false,
 			value: 8
@@ -33,47 +48,91 @@ export default class SettingsScreen extends Component {
 			halfDice: 0,
 			pips: 0
 		}));
-		
-		Toast.show({
-            text: 'Form data has been cleared',
-            position: 'bottom',
-            buttonText: 'OK'
-        });
+
+		if (showToast) {
+            Toast.show({
+                text: 'Form data has been cleared',
+                position: 'bottom',
+                buttonText: 'OK'
+            });
+		}
 	}
 
-	async _clearCharacterData() {
+	async _clearCharacterData(showToast = true) {
 	    await AsyncStorage.removeItem('character');
 	    await AsyncStorage.removeItem('combat');
 
-        Toast.show({
-            text: 'Loaded character has been cleared',
-            position: 'bottom',
-            buttonText: 'OK'
-        });
+        if (showToast) {
+            Toast.show({
+                text: 'Loaded character has been cleared',
+                position: 'bottom',
+                buttonText: 'OK'
+            });
+        }
 	}
 
-	async _clearHeroData() {
+	async _clearHeroData(showToast = true) {
 	    await AsyncStorage.removeItem('hero');
 
-        Toast.show({
-            text: 'H.E.R.O. character has been cleared',
-            position: 'bottom',
-            buttonText: 'OK'
-        });
+        if (showToast) {
+            Toast.show({
+                text: 'H.E.R.O. character has been cleared',
+                position: 'bottom',
+                buttonText: 'OK'
+            });
+        }
 	}
 
-    async _clearStatisticsData() {
+    async _clearStatisticsData(showToast = true) {
 	    await AsyncStorage.removeItem('characterFile');
 	    statistics.init();
 
+        if (showToast) {
+            Toast.show({
+                text: 'Statistical data has been cleared',
+                position: 'bottom',
+                buttonText: 'OK'
+            });
+        }
+    }
+
+    async _clearAll() {
+        await AsyncStorage.removeItem('appSettings');
+        this.setState({appSettings: common.getAppSettings()});
+
+        await this._clearFormData(false);
+        await this._clearCharacterData(false);
+        await this._clearHeroData(false);
+        await this._clearStatisticsData(false);
+
         Toast.show({
-            text: 'Statistical data has been cleared',
+            text: 'Everything has been cleared',
             position: 'bottom',
             buttonText: 'OK'
         });
     }
 
+    async _toggleFifthEdition() {
+        let newState = {...this.state};
+        newState.appSettings.useFifthEdition = !this.state.appSettings.useFifthEdition;
+
+        await AsyncStorage.setItem('appSettings', JSON.stringify(newState.appSettings));
+
+        this.setState({appSettings: newState.appSettings});
+    }
+
 	render() {
+	    if (this.state.appSettings === null) {
+            return (
+                <Container>
+                    <Header hasTabs={false} navigation={this.props.navigation} />
+                    <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
+                        <Spinner color='#D0D1D3' />
+                    </Content>
+                </Container>
+            );
+	    }
+
 		return (
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
@@ -120,7 +179,20 @@ export default class SettingsScreen extends Component {
 								</Button>
 			        		</Body>
 		        		</ListItem>
+			    		<ListItem>
+					    	<Left>
+			        			<Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
+			        		</Left>
+			        		<Right>
+							    <Switch value={this.state.appSettings.useFifthEdition} onValueChange={() => this._toggleFifthEdition()} color='#3da0ff'/>
+			        		</Right>
+		        		</ListItem>
 			    	</List>
+			    	<View style={{paddingTop: 20}}>
+                        <Button block style={localStyles.button} onPress={() => this._clearAll()}>
+                            <Text uppercase={false}>Clear All</Text>
+                        </Button>
+			    	</View>
 				</Content>
 			</Container>
 		);

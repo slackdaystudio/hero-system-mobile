@@ -19,7 +19,8 @@ export default class HitScreen extends Component {
 			stunMultiplier: 0,
 			useHitLocations: false,
 			isMartialManeuver: false,
-			isTargetFlying: false
+			isTargetFlying: false,
+			useFifthEdition: false
 		};
 		
 		this.updateState = this._updateState.bind(this);
@@ -31,6 +32,12 @@ export default class HitScreen extends Component {
 	    AsyncStorage.getItem('damageState').then((value) => {
 	    	if (value !== undefined) {
 	    		this.setState(JSON.parse(value));
+	    	}
+	    }).done();
+
+	    AsyncStorage.getItem('appSettings').then((value) => {
+	    	if (value !== undefined) {
+	    		this.setState({useFifthEdition: JSON.parse(value).useFifthEdition});
 	    	}
 	    }).done();
 
@@ -83,7 +90,7 @@ export default class HitScreen extends Component {
 	_toggleTargetFlying() {
 		this.updateState('isTargetFlying', !this.state.isTargetFlying);
 	}
-	
+
 	_renderStunMultiplier() {
 		if (this.state.killingToggled) {
 			return (

@@ -1,4 +1,4 @@
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, Platform, AsyncStorage, Alert } from 'react-native';
 
 class Common {
     isIPad() {
@@ -9,6 +9,18 @@ class Common {
 	    }
 
 	    return false;
+    }
+
+    async getAppSettings() {
+        let settings = await AsyncStorage.getItem('appSettings');
+
+        if (settings === null) {
+            return {
+                useFifthEdition: false
+            };
+        }
+
+        return JSON.parse(settings);
     }
 }
 
