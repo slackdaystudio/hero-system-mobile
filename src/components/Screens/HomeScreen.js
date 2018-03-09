@@ -1,12 +1,43 @@
 import React, { Component }  from 'react';
 import { Platform, StyleSheet, ScrollView, View, ImageBackground } from 'react-native';
-import { Container, Content, Button, Text } from 'native-base';
+import { Container, Content, Button, Text, Spinner } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
 export default class HomeScreen extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            characterLoading: false
+        };
+
+        this.startLoad = this._startLoad.bind(this);
+        this.endLoad = this._endLoad.bind(this);
+    }
+
+    _startLoad() {
+        this.setState({characterLoading: true});
+    }
+
+    _endLoad() {
+        this.setState({characterLoading: false});
+    }
+
+    _renderViewCharacterButton() {
+        if (this.state.characterLoading) {
+            return <Spinner color='#D0D1D3' />;
+        }
+
+        return (
+            <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
+                <Text uppercase={false} style={styles.buttonText}>View</Text>
+            </Button>
+        );
+    }
+
 	render() {
 		return (
 		  <Container style={styles.container}>
@@ -17,12 +48,10 @@ export default class HomeScreen extends Component {
                     <Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
-                                <Text uppercase={false} style={styles.buttonText}>View</Text>
-                            </Button>
+                            {this._renderViewCharacterButton()}
                         </View>
                         <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => character.load()}>
+                            <Button style={styles.button} onPress={() => character.load(this.startLoad, this.endLoad)}>
                                 <Text uppercase={false} style={styles.buttonText}>Load</Text>
                             </Button>
                         </View>
