@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import { Text, List, ListItem, Left, Right } from 'native-base';
 import { dieRoller } from '../../lib/DieRoller';
+import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
 export default class TextList extends Component {

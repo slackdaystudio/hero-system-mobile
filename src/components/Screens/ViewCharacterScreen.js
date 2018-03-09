@@ -4,6 +4,7 @@ import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner } from 'na
 import General from '../Character/General';
 import Combat from '../Character/Combat';
 import Characteristics from '../Character/Characteristics';
+import Powers from '../Character/Powers';
 import Movement from '../Character/Movement';
 import TextList from '../Character/TextList';
 import Equipment from '../Character/Equipment';
@@ -39,6 +40,20 @@ export default class ViewCharacterScreen extends Component {
 
 		this.setState({character: characterJson});
 	}
+
+    _renderPowers(powers) {
+        if (powers === '' || powers === undefined || powers === null) {
+            return null;
+        }
+
+        return (
+            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
+                <ScrollView style={localStyles.tabContent}>
+                    <Powers powers={powers} />
+                </ScrollView>
+            </Tab>
+        );
+    }
 
     _renderEquipment(equipment) {
         if (equipment === '' || equipment === undefined || equipment === null) {
@@ -101,7 +116,7 @@ export default class ViewCharacterScreen extends Component {
 			  		        <Movement movement={this.state.character.movement} />
 			  		    </ScrollView>
 			  		</Tab>
-                    {this._renderTextList(this.state.character.powers.text, 'Power')}
+                    {this._renderPowers(this.state.character.powers.text)}
 			  		{this._renderEquipment(this.state.character.equipment.text)}
                     {this._renderTextList(this.state.character.martialArts.text, 'Maneuver', 'Martial Arts')}
                     {this._renderTextList(this.state.character.skills.text, 'Skill')}

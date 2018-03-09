@@ -6,6 +6,10 @@ import xml2js from 'react-native-xml2js';
 import { common } from './Common';
 
 class Character {
+    constructor() {
+        this.activeCostRegex = /\([0-9]+\sActive\sPoints\)/;
+    }
+
     load() {
         if (common.isIPad()) {
             DocumentPicker.show({
@@ -85,6 +89,68 @@ class Character {
         }
 
         return 0;
+    }
+
+    renderPower(power, index, render) {
+        if (power.trim() === '') {
+            return null;
+        }
+
+        let parts = power.split(/\(Total: [0-9]+\sActive\sCost,\s[0-9]+\sReal\sCost\)/);
+
+        if (parts.length === 2) {
+            return render(this._getCompoundPowerText(parts[0] + parts[1]), index);
+        }
+
+        parts = power.split(this.activeCostRegex);
+
+        if (parts.length == 2) {
+            return render(parts[0], index);
+        }
+
+        return render(this._getPower(power), index);
+    }
+
+    _getPower(power) {
+        let powerText = '';
+
+        if (power.indexOf(');') !== -1) {
+            let powerParts = power.substring(0, power.lastIndexOf(');'));
+
+            powerText += powerParts + ')';
+        } else if (power.indexOf(';') !== -1) {
+            let powerParts = power.substring(0, power.lastIndexOf(';'));
+
+            powerText += powerParts;
+        } else {
+            powerText += power;
+        }
+
+        return powerText;
+    }
+
+    _getCompoundPowerText(text) {
+        let powers = text.split(/\(Real\sCost:\s[0-9]+\)/g);
+        let itemText = '';
+        let powerParts = [];
+
+        if (powers.length >= 1) {
+            for (let i = 0; i < powers.length; i++) {
+                powerParts = powers[i].split(this.activeCostRegex);
+
+                if (powerParts.length == 2) {
+                    itemText += powerParts[0];
+                } else {
+                    itemText += this._getPower(powers[i]);
+                }
+
+                if ((i + 1) !== powers.length) {
+                    itemText += ' ';
+                }
+            }
+        }
+
+        return itemText;
     }
 
     _read(uri) {
