@@ -15,6 +15,7 @@ import StatisticsScreen from './src/components/Screens/StatisticsScreen';
 import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
 import { statistics } from './src/lib/Statistics';
+import { common } from './src/lib/Common';
 
 const RootStack = DrawerNavigator({
 		Home: {
@@ -60,9 +61,15 @@ const RootStack = DrawerNavigator({
 export default class App extends Component {
 	async componentWillMount() {
 		let stats = await AsyncStorage.getItem('statistics');
+		let appSettings = await AsyncStorage.getItem('appSettings');
+
 		if (stats === null) {
 		    statistics.init();
 		}
+
+        if (appSettings === null) {
+            await AsyncStorage.setItem('appSettings', JSON.stringify(common.getAppSettings()));
+        }
 
 		StatusBar.setHidden(true);
 	}

@@ -43,7 +43,7 @@ export default class HitScreen extends Component {
 
 	_setSliderState(key, value) {
 		let newState = {...this.state};
-		newState[key] = value;
+		newState[key] = parseInt(value, 10);
 		
 		AsyncStorage.setItem('freeFormState', JSON.stringify(newState));
 		

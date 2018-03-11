@@ -98,7 +98,10 @@ export default class SettingsScreen extends Component {
 
     async _clearAll() {
         await AsyncStorage.removeItem('appSettings');
-        this.setState({appSettings: common.getAppSettings()});
+        let defaultAppSettings = await common.getAppSettings();
+
+        await AsyncStorage.setItem('appSettings', JSON.stringify(defaultAppSettings));
+        this.setState({appSettings: defaultAppSettings});
 
         await this._clearFormData(false);
         await this._clearCharacterData(false);

@@ -1,22 +1,87 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, AsyncStorage } from 'react-native';
-import { Text } from 'native-base';
+import { StyleSheet, View, AsyncStorage, Keyboard, Alert } from 'react-native';
+import { Text, Icon, Input } from 'native-base';
 import Slider from 'react-native-slider';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
 export default class MySlider extends Component {
 	constructor(props) {
 		super(props);
-		
+
+        this.state = {
+            textValue: props.value
+        }
+
+        this.onTextValueChange = this._onTextValueChange.bind(this);
 		this.onValueChange = this._onValueChange.bind(this);
+        this.keyboardDidHide = this._keyboardDidHide.bind(this);
+
+		this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
 	}
-	
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props !== nextProps) {
+            if (this.state.textValue !== '' && this.state.textValue !== '-') {
+                this.setState({textValue: nextProps.value});
+            }
+        }
+    }
+
+    _keyboardDidHide () {
+        if (this.state.textValue !== this.props.value) {
+            this.setState({textValue: this.props.value});
+        }
+    }
+
+    _isFraction() {
+        return this.props.step < 1;
+    }
+
+    _isInputValid(value) {
+        if (value === '' || value === '-') {
+            this.setState({textValue: value}, () => {
+                this.onValueChange(0);
+            });
+
+            return false;
+        }
+
+        if (this._isFraction()) {
+            this.setState({textValue: value});
+
+            if (/^(\-)?[0-9]\.(25|50|75|0)$/.test(value) === false) {
+                return false;
+            }
+        } else {
+            if (/^(\-)?[0-9]*$/.test(value) === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    _onTextValueChange(value) {
+        if (this._isInputValid(value) && value % this.props.step === 0.0) {
+            if (value < this.props.min) {
+                value = this.props.min;
+            } else if (value > this.props.max) {
+                value = this.props.max;
+            }
+
+            this.setState({textValue: value}, () => {
+                this.onValueChange(value);
+            });
+        }
+    }
+
 	_onValueChange(value) {
-		if (typeof this.props.valueKey === 'string') {
-			this.props.onValueChange(this.props.valueKey, value);
-		} else {
-			this.props.onValueChange(value);
-		}
+        if (typeof this.props.valueKey === 'string') {
+            this.props.onValueChange(this.props.valueKey, value);
+        } else {
+            this.props.onValueChange(value);
+        }
 	}
 	
 	render() {
@@ -24,19 +89,28 @@ export default class MySlider extends Component {
 			<View>
 				<View style={localStyles.titleContainer}>
 					<Text style={styles.grey}>{this.props.label}</Text>
-					<Text style={styles.grey}>{this.props.value}</Text>
+                    <View style={{width: (this._isFraction() ? 50: 40)}}>
+                        <Input
+                            style={styles.grey}
+                            keyboardType='numeric'
+                            maxLength={(this._isFraction() ? 5 : 3)}
+                            value={this.state.textValue.toString()}
+                            onChangeText={(value) => this.onTextValueChange(value)} />
+                    </View>
 				</View>
-				<Slider 
-					value={this.props.value} 
-					step={this.props.step} 
-					minimumValue={this.props.min} 
-					maximumValue={this.props.max} 
-					onValueChange={(value) => this.onValueChange(value)}
-					disabled={this.props.disabled}
-					trackStyle={thumbStyles.track}
-					thumbStyle={thumbStyles.thumb}
-					minimumTrackTintColor='#3da0ff'
-				/>
+				<View>
+                    <Slider
+                        value={this.props.value}
+                        step={this.props.step}
+                        minimumValue={this.props.min}
+                        maximumValue={this.props.max}
+                        onValueChange={(value) => this.onValueChange(value)}
+                        disabled={this.props.disabled}
+                        trackStyle={thumbStyles.track}
+                        thumbStyle={thumbStyles.thumb}
+                        minimumTrackTintColor='#3da0ff'
+                    />
+				</View>
 			</View>
 		);
 	}

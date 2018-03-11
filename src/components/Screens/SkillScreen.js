@@ -45,7 +45,7 @@ export default class SkillScreen extends Component {
 
 	_updateSliderValue(value) {
 		let newState = {...this.state};
-		newState.value = value;
+		newState.value = parseInt(value, 10);
 
 		AsyncStorage.setItem('skillState', JSON.stringify(newState));
 

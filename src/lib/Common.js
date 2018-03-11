@@ -11,6 +11,14 @@ class Common {
 	    return false;
     }
 
+    isInt(value) {
+        return Number(value) === value && value % 1 === 0;
+    }
+
+    isFloat(value) {
+        return Number(value) === value && value % 1 !== 0;
+    }
+
     async getAppSettings() {
         let settings = await AsyncStorage.getItem('appSettings');
 

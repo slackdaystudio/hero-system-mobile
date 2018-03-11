@@ -31,6 +31,8 @@ export default class CostCruncherScreen extends Component {
 	        if (/^[0-9]*$/.test(value) === false) {
 	            return;
 	        }
+	    } else if (key === 'advantages' || key === 'limitations') {
+	        value = parseFloat(value);
 	    }
 
 		let newState = {...this.state};

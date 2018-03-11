@@ -40,7 +40,7 @@ export default class HitScreen extends Component {
 	_updateSliderValue(value) {
 		AsyncStorage.setItem('ocvSliderValue', String(value));
 		
-        this.setState({value: value});
+        this.setState({value: parseInt(value, 10)});
 	}
 	
 	render() {

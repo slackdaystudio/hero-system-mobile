@@ -56,8 +56,8 @@ export default class HitScreen extends Component {
 
 	_updateState(key, value) {
 		let newState = {...this.state};
-		newState[key] = value;
-		
+		newState[key] = key === 'dice' || key === 'stunMultiplier' ? parseInt(value, 10) : value;
+
 		AsyncStorage.setItem('damageState', JSON.stringify(newState));
 		
         this.setState(newState);
