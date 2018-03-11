@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, AsyncStorage, Keyboard, Alert } from 'react-native';
-import { Text, Icon, Input } from 'native-base';
+import { Text, Icon, Item, Input } from 'native-base';
 import Slider from 'react-native-slider';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
@@ -90,12 +90,15 @@ export default class MySlider extends Component {
 				<View style={localStyles.titleContainer}>
 					<Text style={styles.grey}>{this.props.label}</Text>
                     <View style={{width: (this._isFraction() ? 50: 40)}}>
-                        <Input
-                            style={styles.grey}
-                            keyboardType='numeric'
-                            maxLength={(this._isFraction() ? 5 : 3)}
-                            value={this.state.textValue.toString()}
-                            onChangeText={(value) => this.onTextValueChange(value)} />
+                        <Item>
+                            <Input
+                                style={styles.grey}
+                                keyboardType='numeric'
+                                maxLength={(this._isFraction() ? 5 : 3)}
+                                value={this.state.textValue.toString()}
+                                onChangeText={(value) => this.onTextValueChange(value)}
+                            />
+                        </Item>
                     </View>
 				</View>
 				<View>
