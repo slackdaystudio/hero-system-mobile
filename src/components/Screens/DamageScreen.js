@@ -5,6 +5,7 @@ import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
 export default class HitScreen extends Component {
@@ -31,7 +32,9 @@ export default class HitScreen extends Component {
 	componentDidMount() {
 	    AsyncStorage.getItem('damageState').then((value) => {
 	    	if (value !== undefined) {
-	    		this.setState(JSON.parse(value));
+	    	    if (common.compare(this.state, JSON.parse(value))) {
+	    	        this.setState(JSON.parse(value));
+	    	    }
 	    	}
 	    }).done();
 

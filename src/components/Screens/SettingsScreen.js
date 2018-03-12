@@ -32,7 +32,11 @@ export default class SettingsScreen extends Component {
 			advantages: 0,
 			limitations: 0,
         }));
-		await AsyncStorage.setItem('ocvSliderValue', '0');
+		await AsyncStorage.setItem('ocvSliderValue', JSON.stringify({
+			ocv: 0,
+			isAutofire: false,
+			targetDcv: 0
+		}));
 		await AsyncStorage.setItem('damageState', JSON.stringify({
 			dice: 12,
 			partialDie: 0,

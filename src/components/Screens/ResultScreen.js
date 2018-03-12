@@ -44,7 +44,15 @@ export default class ResultScreen extends Component {
 		} else if (this.state.result.total === 18) {
 			return <Text style={styles.grey}>You have missed your target</Text>;
 		}
-		
+
+		if (this.state.result.isAutofire) {
+		    if (this.state.result.hits > 0) {
+		        return <Text style={styles.grey}>You can hit your target up to {this.state.result.hits}x</Text>
+		    } else {
+		        return <Text style={styles.grey}>You have missed your target with all of your shots</Text>
+		    }
+		}
+
 		return <Text style={styles.grey}>You can hit a DCV/DMCV of {this.state.result.hitCv} or less</Text>
 	}
 	

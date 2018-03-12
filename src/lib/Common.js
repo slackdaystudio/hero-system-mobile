@@ -11,6 +11,20 @@ class Common {
 	    return false;
     }
 
+    compare(first, second) {
+        if (typeof first !== 'object' || typeof second !== 'object') {
+            return false;
+        }
+
+        for (let prop in first) {
+            if (!second.hasOwnProperty(prop)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     isInt(value) {
         return Number(value) === value && value % 1 === 0;
     }

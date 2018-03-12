@@ -48,10 +48,20 @@ class DieRoller {
 		return result;
 	}
 	
-	rollToHit(cv) {
+	rollToHit(cv, isAutofire, targetDcv) {
 		let result = this._roll(3, TO_HIT);
 		result.hitCv = 11 + parseInt(cv, 10) - result.total;
 		result.cv = cv;
+		result.isAutofire = isAutofire;
+		result.targetDcv = targetDcv;
+
+        if (isAutofire) {
+            result.hits = 0;
+
+            if (result.hitCv - targetDcv >= 0) {
+                result.hits = Math.floor((result.hitCv - targetDcv) / 2) + 1;
+            }
+        }
 
 		return result;
 	}
@@ -107,7 +117,7 @@ class DieRoller {
 		if (lastResult.rollType === SKILL_CHECK) {
 			result = this.rollCheck(lastResult.threshold + '-');
 		} else if (lastResult.rollType === TO_HIT) {
-			result = this.rollToHit(lastResult.cv, lastResult.rollType, lastResult.partialDieType);
+			result = this.rollToHit(lastResult.cv, lastResult.isAutofire, lastResult.targetDcv);
 		} else if (lastResult.rollType === NORMAL_DAMAGE || lastResult.rollType === KILLING_DAMAGE) {
 			result = this.rollDamage(lastResult.damageForm);
 		} else if (lastResult.rollType === FREE_FORM) {
