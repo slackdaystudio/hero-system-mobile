@@ -12,7 +12,7 @@ class Common {
     }
 
     compare(first, second) {
-        if (typeof first !== 'object' || typeof second !== 'object') {
+        if (first === null || typeof first !== 'object' || second === null || typeof second !== 'object') {
             return false;
         }
 
