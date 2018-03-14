@@ -17,15 +17,15 @@ class Character {
                 left: 0,
                 filetype: ['public.xml']
             }, (error, uri) => {
-                this._read(uri, startLoad, endLoad);
+                this._read(uri.uri, startLoad, endLoad);
             });
         } else {
             DocumentPicker.show({filetype: [DocumentPickerUtil.allFiles()]},(error, result) => {
                 if (result === null) {
                     return;
                 }
-
-                if (result.type === 'text/xml' || result.type === 'application/xml') {
+		Alert.alert(JSON.stringify(result));
+                if ((Platform.OS === 'ios' && result.fileName.endsWith('.XML')) || (result.type === 'text/xml' || result.type === 'application/xml')) {
                     this._read(result.uri, startLoad, endLoad);
                 } else {
                     Toast.show({
@@ -155,8 +155,8 @@ class Character {
 
     async _read(uri, startLoad, endLoad) {
         startLoad();
-
-        RNFS.readFile(uri, 'ascii').then(file => {
+	Alert.alert(uri);
+        RNFS.readFile(decodeURI(uri), 'ascii').then(file => {
             let parser = xml2js.Parser({explicitArray: false});
 
             parser.parseString(file, (error, result) => {
