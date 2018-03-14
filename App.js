@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import { AsyncStorage, StyleSheet, Text, View, Button, StatusBar } from 'react-native';
 import { DrawerNavigator } from 'react-navigation';
 import { Root } from "native-base";
+import SplashScreen from 'react-native-splash-screen'
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
@@ -72,6 +73,7 @@ export default class App extends Component {
         }
 
 		StatusBar.setHidden(true);
+        SplashScreen.hide();
 	}
 
 	render() {
