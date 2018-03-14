@@ -24,8 +24,8 @@ class Character {
                 if (result === null) {
                     return;
                 }
-		Alert.alert(JSON.stringify(result));
-                if ((Platform.OS === 'ios' && result.fileName.endsWith('.XML')) || (result.type === 'text/xml' || result.type === 'application/xml')) {
+                
+		if ((Platform.OS === 'ios' && result.fileName.endsWith('.XML')) || (result.type === 'text/xml' || result.type === 'application/xml')) {
                     this._read(result.uri, startLoad, endLoad);
                 } else {
                     Toast.show({
@@ -155,7 +155,7 @@ class Character {
 
     async _read(uri, startLoad, endLoad) {
         startLoad();
-	Alert.alert(uri);
+	
         RNFS.readFile(decodeURI(uri), 'ascii').then(file => {
             let parser = xml2js.Parser({explicitArray: false});
 
