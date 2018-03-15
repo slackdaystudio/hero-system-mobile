@@ -144,6 +144,62 @@ export default class HitScreen extends Component {
                                 </Button>
                             </ScrollView>
                         </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Range Mods">
+                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>0-8</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>0</Text>
+                                    </View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>9-16</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>-2</Text>
+                                    </View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>17-32</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>-4</Text>
+                                    </View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>33-64</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>-6</Text>
+                                    </View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>65-128</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>-8</Text>
+                                    </View>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>129-250</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>-10</Text>
+                                    </View>
+                                </View>
+                            </ScrollView>
+                        </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Hit Locations">
                             <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
