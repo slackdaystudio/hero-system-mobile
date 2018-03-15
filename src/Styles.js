@@ -32,5 +32,17 @@ export default StyleSheet.create({
 	boldGrey: {
 		color: '#D0D1D3',
 		fontWeight: 'bold'
+	},
+	tabInactive: {
+		backgroundColor: '#3a557f'
+	},
+	tabActive: {
+		backgroundColor: '#476ead'
+	},
+	tabBarUnderline: {
+		backgroundColor: '#3da0ff'
+	},
+	tabContent: {
+		backgroundColor: '#375476'
 	}
 });

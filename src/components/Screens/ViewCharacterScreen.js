@@ -47,8 +47,8 @@ export default class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
-                <ScrollView style={localStyles.tabContent}>
+            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
+                <ScrollView style={styles.tabContent}>
                     <Powers powers={powers} />
                 </ScrollView>
             </Tab>
@@ -61,8 +61,8 @@ export default class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
-                <ScrollView style={localStyles.tabContent}>
+            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
+                <ScrollView style={styles.tabContent}>
                     <Equipment equipment={equipment} />
                 </ScrollView>
             </Tab>
@@ -75,8 +75,8 @@ export default class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
-			    <ScrollView style={localStyles.tabContent}>
+            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
+			    <ScrollView style={styles.tabContent}>
 			        <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
 			    </ScrollView>
 			</Tab>
@@ -99,19 +99,19 @@ export default class ViewCharacterScreen extends Component {
 		  <Container style={localStyles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
 		  	<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 10}}>
-                <Tabs tabBarUnderlineStyle={localStyles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-			  			<ScrollView style={localStyles.tabContent}>
+                <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+			  			<ScrollView style={styles.tabContent}>
                             <General character={this.state.character} />
 			  			</ScrollView>
 			  		</Tab>
-                    <Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
-			  			<ScrollView style={localStyles.tabContent}>
+                    <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+			  			<ScrollView style={styles.tabContent}>
                             <Combat character={this.state.character} />
 			  		    </ScrollView>
 			  		</Tab>
-			  		<Tab tabStyle={localStyles.tabInactive} activeTabStyle={localStyles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-			  		    <ScrollView style={localStyles.tabContent}>
+			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+			  		    <ScrollView style={styles.tabContent}>
 			  		        <Characteristics characteristics={this.state.character.characteristics.characteristic} navigation={this.props.navigation} />
 			  		        <Movement movement={this.state.character.movement} />
 			  		    </ScrollView>
@@ -131,18 +131,6 @@ export default class ViewCharacterScreen extends Component {
 }
 
 const localStyles = StyleSheet.create({
-	tabInactive: {
-		backgroundColor: '#3a557f'
-	},
-	tabActive: {
-		backgroundColor: '#476ead'
-	},
-	tabBarUnderline: {
-		backgroundColor: '#3da0ff'
-	},
-	tabContent: {
-		backgroundColor: '#375476'
-	},
 	pointCostsHeader: {
 		alignSelf: 'center',
 		textDecorationLine: 'underline'
