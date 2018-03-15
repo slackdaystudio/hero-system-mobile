@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Switch, AsyncStorage, Alert, ScrollView } from 'react-native';
-import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab } from 'native-base';
+import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -114,37 +114,92 @@ export default class HitScreen extends Component {
                             <ScrollView style={styles.tabContent}>
                                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Location</Text></View>
                                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Roll</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Loc.</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>SX</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>NS</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>BX</Text></View>
                                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Hit</Text></View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Damage</Text></View>
                                     </View>
                                     {hitLocations.map((hitLocation, index) => {
+                                        let stars = [];
+
+                                        for (let i = 0; i < hitLocation.stunX; i++) {
+                                            stars.push(<Icon key={'star-' + index + '-' + i} name='md-star' style={[styles.grey, {fontSize: 14}]} />);
+                                        }
+
                                         return (
                                             <View key={'hit-location-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{hitLocation.roll}</Text>
-                                                </View>
                                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
                                                     <Text style={styles.grey}>{hitLocation.location}</Text>
                                                 </View>
                                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{hitLocation.stunX}</Text>
-                                                </View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{hitLocation.nStun}</Text>
-                                                </View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{hitLocation.bodyX}</Text>
+                                                    <Text style={styles.grey}>{hitLocation.roll}</Text>
                                                 </View>
                                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
                                                     <Text style={styles.grey}>{hitLocation.penalty}</Text>
                                                 </View>
+                                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                                    {stars.map((star, index) => {
+                                                        return star;
+                                                    })}
+                                                </View>
                                             </View>
                                         );
                                     })}
+                                </View>
+                            </ScrollView>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Targeted Shots">
+                            <ScrollView style={styles.tabContent}>
+                                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Targeted Shot</Text></View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Hit</Text></View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>Location</Text></View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>Head Shot</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-4</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>1d6+3</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>High Shot</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-2</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>2d6+1</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>Low Shot</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-2</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>2d6+7 (19=foot)</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>Leg Shot</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-4</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>1d6+12</Text>
+                                        </View>
+                                    </View>
                                 </View>
                             </ScrollView>
                         </Tab>
