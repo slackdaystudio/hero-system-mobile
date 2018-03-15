@@ -14,6 +14,10 @@ export default StyleSheet.create({
 		color: '#D0D1D3',
 		paddingTop: 20
 	},
+	subHeading: {
+		alignSelf: 'center',
+		textDecorationLine: 'underline'
+	},
 	buttonContainer: {
 		paddingVertical: 5
 	},
