@@ -13,7 +13,7 @@ export default class Sidebar extends Component {
           <List>
         	<ListItem onPress={() => this.props.navigation.navigate('Home')}>
 				<View>
-					<Image source={require('../../../public/hero_logo.png')} />
+					<Image source={require('../../../public/hero_mobile_logo.png')} />
 				</View>
 	      	</ListItem>
           	<ListItem onPress={() => this.props.navigation.navigate('ViewCharacter')}>
