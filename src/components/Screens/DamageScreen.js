@@ -201,7 +201,7 @@ export default class DamageScreen extends Component {
                                 {moves.map((move, index) => {
                                     return (
                                         <View key={'move-' + index}>
-                                            <View key={'move-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
+                                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
                                                 <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.name}</Text></View>
                                                 <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.phase}</Text></View>
                                                 <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.ocv}</Text></View>
