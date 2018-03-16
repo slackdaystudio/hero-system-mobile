@@ -47,6 +47,7 @@ export default StyleSheet.create({
 		backgroundColor: '#3da0ff'
 	},
 	tabContent: {
+	    flex: 1,
 		backgroundColor: '#375476'
 	}
 });

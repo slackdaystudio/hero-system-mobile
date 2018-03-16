@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { AsyncStorage, Platform, StyleSheet, View, Image, ScrollView, Alert } from 'react-native';
+import { AsyncStorage, Platform, StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import { randomCharacter } from '../../lib/RandomCharacter';
@@ -97,10 +97,10 @@ export default class RandomCharacterScreen extends Component {
 		return (
 		  <Container style={localStyles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 10}}>
+		  	<Content scrollEnable={false} style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 10}}>
 			  	<Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-			  			<ScrollView style={styles.tabContent}>
+			  			<View style={styles.tabContent}>
 			  			    <List>
                                 <ListItem>
                                     <Left>
@@ -200,15 +200,15 @@ export default class RandomCharacterScreen extends Component {
                                     </Button>
                                 </View>
                             </View>
-			    		</ScrollView>
+			    		</View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-			  			<ScrollView style={styles.tabContent}>
+			  			<View style={styles.tabContent}>
 			  				{this._renderCharacteristics()}
-			  			</ScrollView>
+			  			</View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
-			  			<ScrollView style={styles.tabContent}>
+			  			<View style={styles.tabContent}>
 					  		{this.state.character.powers.powers.map((power, index) => {
 								return (
 									<ListItem key={'power-' + index}>
@@ -221,10 +221,10 @@ export default class RandomCharacterScreen extends Component {
 						        	</ListItem>							
 								);
 							})}
-				  		</ScrollView>
+				  		</View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
-			  			<ScrollView style={styles.tabContent}>
+			  			<View style={styles.tabContent}>
 					  		{this.state.character.skills.skills.map((skill, index) => {
 								return (
 									<ListItem key={'skill-' + index}>
@@ -234,10 +234,10 @@ export default class RandomCharacterScreen extends Component {
 						        	</ListItem>
 								);
 							})}
-				  		</ScrollView>
+				  		</View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Disadvantages">
-			  			<ScrollView style={styles.tabContent}>
+			  			<View style={styles.tabContent}>
 					  		{this.state.character.disadvantages.disadvantages.map((disad, index) => {
 								return (
 									<ListItem key={'disad-' + index}>
@@ -250,7 +250,7 @@ export default class RandomCharacterScreen extends Component {
 						        	</ListItem>							
 								);
 							})}
-				  		</ScrollView>
+				  		</View>
 			  		</Tab>
 			  	</Tabs>
 		  	</Content>

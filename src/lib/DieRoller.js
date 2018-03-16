@@ -71,10 +71,6 @@ class DieRoller {
 		let hitLocationRoll = damageForm.useHitLocations ? this._roll(3, HIT_LOCATIONS).total : 10;
 		resultRoll.damageForm = damageForm;
 
-		if (damageForm.isExplosion) {
-		    resultRoll.rolls.sort((a, b) => a - b).reverse();
-		}
-
 		if (damageForm.damageType === KILLING_DAMAGE) {
 			resultRoll.stunMultiplier = damageForm.stunMultiplier;
 		}				
@@ -84,9 +80,40 @@ class DieRoller {
 		resultRoll.stun = this._calculateStun(resultRoll);
 		resultRoll.knockback = this._calculateKnockback(resultRoll, damageForm.isTargetFlying, damageForm.isMartialManeuver);
 
+		if (damageForm.isExplosion) {
+		    resultRoll.rolls.sort((a, b) => a - b).reverse();
+		    resultRoll.explosion = [{
+		        distance: 0,
+		        stun: resultRoll.stun,
+		        body: resultRoll.body,
+		        knockback: resultRoll.knockback
+		    }];
+
+            let newResultRoll = {...resultRoll};
+            newResultRoll.rolls = resultRoll.rolls.slice();
+
+		    this._buildExplosionTable(resultRoll, newResultRoll);
+		}
+
 		return resultRoll;
 	}
-	
+
+	_buildExplosionTable(resultRoll, newResultRoll) {
+	    newResultRoll.rolls.shift();
+	    newResultRoll.total = newResultRoll.rolls.reduce((a, b) => a + b, 0);
+
+	    resultRoll.explosion.push({
+	        distance: resultRoll.rolls.length - newResultRoll.rolls.length,
+            stun: this._calculateStun(newResultRoll),
+            body: this._calculateBody(newResultRoll),
+            knockback: this._calculateKnockback(newResultRoll)
+	    });
+
+	    if (newResultRoll.rolls.length >= 2) {
+	        this._buildExplosionTable(resultRoll, newResultRoll);
+	    }
+	}
+
 	freeFormRoll(dice, halfDice, pips) {
 		let resultRoll = {
 			rollType: FREE_FORM,

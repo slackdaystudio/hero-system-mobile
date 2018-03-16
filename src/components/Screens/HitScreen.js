@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, Switch, AsyncStorage, Alert, ScrollView, TouchableHighlight } from 'react-native';
+import { Platform, StyleSheet, View, Switch, AsyncStorage, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
@@ -119,10 +119,10 @@ export default class HitScreen extends Component {
 		return (
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
-				<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
+				<Content scrollEnable={false} style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
                     <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
-                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                            <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <Slider
                                     label='Total OCV/OMCV:'
                                     value={this.state.ocv}
@@ -142,10 +142,10 @@ export default class HitScreen extends Component {
                                 <Button block style={styles.button} onPress={this.roll}>
                                     <Text uppercase={false}>Roll</Text>
                                 </Button>
-                            </ScrollView>
+                            </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Range Mods">
-                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                            <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
@@ -198,10 +198,10 @@ export default class HitScreen extends Component {
                                         <Text style={styles.grey}>-10</Text>
                                     </View>
                                 </View>
-                            </ScrollView>
+                            </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Hit Locations">
-                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                            <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
                                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text></View>
@@ -239,10 +239,10 @@ export default class HitScreen extends Component {
                                     })}
                                 </View>
                                 {this._renderLocationDetails()}
-                            </ScrollView>
+                            </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Targeted Shots">
-                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                            <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 5}}>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
                                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text></View>
@@ -294,7 +294,7 @@ export default class HitScreen extends Component {
                                         </View>
                                     </View>
                                 </View>
-                            </ScrollView>
+                            </View>
                         </Tab>
                     </Tabs>
 				</Content>

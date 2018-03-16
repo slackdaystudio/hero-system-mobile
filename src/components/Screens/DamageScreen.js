@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, Image, Switch, AsyncStorage, ScrollView } from 'react-native';
+import { Platform, StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item, Tabs, Tab, ScrollableTab } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
@@ -124,10 +124,10 @@ export default class DamageScreen extends Component {
 		return (
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
-				<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
+				<Content scrollEnable={false} style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
                     <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
-                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                            <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <Slider
                                     label='Dice:'
                                     value={this.state.dice}
@@ -188,10 +188,10 @@ export default class DamageScreen extends Component {
                                     <Text uppercase={false}>Roll</Text>
                                 </Button>
                                 <View style={{paddingBottom: 30}} />
-                            </ScrollView>
+                            </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat Moves">
-                            <ScrollView style={[styles.tabContent, {paddingBottom: 20, paddingHorizontal: 10}]}>
+                            <View style={[styles.tabContent, {paddingBottom: 20, paddingHorizontal: 10}]}>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text></View>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text></View>
@@ -216,7 +216,7 @@ export default class DamageScreen extends Component {
                                         </View>
                                     );
                                 })}
-                            </ScrollView>
+                            </View>
                         </Tab>
                     </Tabs>
 				</Content>

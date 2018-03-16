@@ -77,6 +77,16 @@ export default class ResultScreen extends Component {
 	}
 	
 	_renderDamageInfo() {
+//	    if (this.state.result.damageForm.isExplosion) {
+//	        return (
+//	            <View style={{paddingBottom: 20}}>
+//	                {this.state.result.explosion.map((entry, index) => {
+//	                    return <Text>{JSON.stringify(entry)}</Text>;
+//	                })}
+//	            </View>
+//	        );
+//	    }
+
 		return (
 			<View style={{paddingBottom: 20}}>
 				<View style={localStyles.lineContainer}>

@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, ScrollView, AsyncStorage } from 'react-native';
+import { Platform, StyleSheet, View, ScrollView, AsyncStorage } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner } from 'native-base';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
@@ -48,9 +48,9 @@ export default class ViewCharacterScreen extends Component {
 
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
-                <ScrollView style={styles.tabContent}>
+                <View style={styles.tabContent}>
                     <Powers powers={powers} />
-                </ScrollView>
+                </View>
             </Tab>
         );
     }
@@ -62,9 +62,9 @@ export default class ViewCharacterScreen extends Component {
 
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
-                <ScrollView style={styles.tabContent}>
+                <View style={styles.tabContent}>
                     <Equipment equipment={equipment} />
-                </ScrollView>
+                </View>
             </Tab>
         );
     }
@@ -76,9 +76,9 @@ export default class ViewCharacterScreen extends Component {
 
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
-			    <ScrollView style={styles.tabContent}>
+			    <View style={styles.tabContent}>
 			        <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
-			    </ScrollView>
+			    </View>
 			</Tab>
         );
     }
@@ -98,23 +98,23 @@ export default class ViewCharacterScreen extends Component {
 		return (
 		  <Container style={localStyles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
+		  	<Content scrollEnable={false} style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
                 <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-			  			<ScrollView style={styles.tabContent}>
+			  			<View style={styles.tabContent}>
                             <General character={this.state.character} />
-			  			</ScrollView>
+			  			</View>
 			  		</Tab>
                     <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
-			  			<ScrollView style={styles.tabContent}>
+			  			<View style={styles.tabContent}>
                             <Combat character={this.state.character} />
-			  		    </ScrollView>
+			  		    </View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-			  		    <ScrollView style={styles.tabContent}>
+			  		    <View style={styles.tabContent}>
 			  		        <Characteristics characteristics={this.state.character.characteristics.characteristic} navigation={this.props.navigation} />
 			  		        <Movement movement={this.state.character.movement} />
-			  		    </ScrollView>
+			  		    </View>
 			  		</Tab>
                     {this._renderPowers(this.state.character.powers.text)}
 			  		{this._renderEquipment(this.state.character.equipment.text)}
