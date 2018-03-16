@@ -22,6 +22,7 @@ export default class DamageScreen extends Component {
 			useHitLocations: false,
 			isMartialManeuver: false,
 			isTargetFlying: false,
+			isExplosion: false,
 			useFifthEdition: false
 		};
 		
@@ -34,14 +35,17 @@ export default class DamageScreen extends Component {
 	    AsyncStorage.getItem('damageState').then((value) => {
 	    	if (value !== undefined) {
 	    	    if (common.compare(this.state, JSON.parse(value))) {
-	    	        this.setState(JSON.parse(value));
-	    	    }
-	    	}
-	    }).done();
+	    	        this.setState(JSON.parse(value), () => {
+                        AsyncStorage.getItem('appSettings').then((value) => {
+                            if (value !== undefined) {
+                                let newState = {...this.state};
+                                newState.useFifthEdition = JSON.parse(value).useFifthEdition;
 
-	    AsyncStorage.getItem('appSettings').then((value) => {
-	    	if (value !== undefined) {
-	    		this.setState({useFifthEdition: JSON.parse(value).useFifthEdition});
+                                this.setState(newState);
+                            }
+                        }).done();
+	    	        });
+	    	    }
 	    	}
 	    }).done();
 
@@ -94,6 +98,10 @@ export default class DamageScreen extends Component {
 	_toggleTargetFlying() {
 		this.updateState('isTargetFlying', !this.state.isTargetFlying);
 	}
+
+    _toggleExplosion() {
+        this.updateState('isExplosion', !this.state.isExplosion);
+    }
 
 	_renderStunMultiplier() {
 		if (this.state.killingToggled) {
@@ -151,6 +159,12 @@ export default class DamageScreen extends Component {
                                     </View>
                                 </View>
                                 {this._renderStunMultiplier()}
+                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                    <Text style={styles.grey}>Is this an explosion?</Text>
+                                    <View style={{paddingRight: 10}}>
+                                        <Switch value={this.state.isExplosion} onValueChange={() => this._toggleExplosion()} color='#3da0ff'/>
+                                    </View>
+                                </View>
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                     <Text style={styles.grey}>Use hit locations?</Text>
                                     <View style={{paddingRight: 10}}>

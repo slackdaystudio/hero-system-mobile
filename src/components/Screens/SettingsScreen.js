@@ -46,7 +46,8 @@ export default class SettingsScreen extends Component {
 			stunMultiplier: 0,
 			useHitLocations: false,
 			isMartialManeuver: false,
-			isTargetFlying: false
+			isTargetFlying: false,
+			isExplosion: false
 		}));
 		await AsyncStorage.setItem('freeFormState', JSON.stringify({
 			dice: 1,

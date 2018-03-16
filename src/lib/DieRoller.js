@@ -70,7 +70,11 @@ class DieRoller {
 		let resultRoll = this._roll(damageForm.dice, damageForm.damageType, damageForm.partialDie);
 		let hitLocationRoll = damageForm.useHitLocations ? this._roll(3, HIT_LOCATIONS).total : 10;
 		resultRoll.damageForm = damageForm;
-		
+
+		if (damageForm.isExplosion) {
+		    resultRoll.rolls.sort((a, b) => a - b).reverse();
+		}
+
 		if (damageForm.damageType === KILLING_DAMAGE) {
 			resultRoll.stunMultiplier = damageForm.stunMultiplier;
 		}				
