@@ -1,14 +1,15 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
-import { Container, Content, Button, Text, Picker, Item } from 'native-base';
+import { Platform, StyleSheet, View, Image, Switch, AsyncStorage, ScrollView } from 'react-native';
+import { Container, Content, Button, Text, Picker, Item, Tabs, Tab, ScrollableTab } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
+import moves from '../../../public/moves.json';
 
-export default class HitScreen extends Component {
+export default class DamageScreen extends Component {
 	constructor(props) {
 		super(props);
 
@@ -115,61 +116,94 @@ export default class HitScreen extends Component {
 		return (
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
-				<Content style={styles.content}>
-				    <Text style={styles.heading}>Roll For Damage</Text>
-					<Slider 
-						label='Dice:'
-						value={this.state.dice} 
-						step={1} 
-						min={0} 
-						max={50}
-						onValueChange={this.updateState}
-						valueKey='dice'
-					/>
-					<Picker
-					  inlinelabel
-					  label='Test'
-					  style={localStyles.grey}
-					  textStyle={styles.grey}
-		              iosHeader="Select one"
-		              mode="dropdown"
-		              selectedValue={this.state.partialDie}
-		              onValueChange={(value) => this.updateState('partialDie', value)}
-		            >
-		              <Item label="No partial die" value="0" />
-		              <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-		              <Item label="+½ die" value={PARTIAL_DIE_HALF} />
-		            </Picker>
-		            <View style={{paddingBottom: 30}} />
-		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-	              	    <Text style={styles.grey}>Is this a killing attack?</Text>
-		              	<View style={{paddingRight: 10}}>
-		              		<Switch value={this.state.killingToggled} onValueChange={() => this.toggleDamageType()} color='#3da0ff'/>
-		              	</View>		            
-		            </View>	            
-					{this._renderStunMultiplier()}
-		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-		              	<Text style={styles.grey}>Use hit locations?</Text>
-		              	<View style={{paddingRight: 10}}>
-		              		<Switch value={this.state.useHitLocations} onValueChange={() => this._toggleHitLocations()} color='#3da0ff'/>
-		              	</View>
-		            </View>
-		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-		              	<Text style={styles.grey}>Attack is a martial maneuver?</Text>
-		              	<View style={{paddingRight: 10}}>
-		              		<Switch value={this.state.isMartialManeuver} onValueChange={() => this._toggleMartialManeuver()} color='#3da0ff'/>
-		              	</View>
-		            </View>
-		            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-		              	<Text style={styles.grey}>Is the target flying?</Text>
-		              	<View style={{paddingRight: 10}}>
-		              		<Switch value={this.state.isTargetFlying} onValueChange={() => this._toggleTargetFlying()} color='#3da0ff'/>
-		              	</View>
-		            </View>
-		            <View style={{paddingBottom: 30}} />
-					<Button block style={styles.button} onPress={this.roll}>
-						<Text uppercase={false}>Roll</Text>
-					</Button>
+				<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
+                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
+                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                                <Slider
+                                    label='Dice:'
+                                    value={this.state.dice}
+                                    step={1}
+                                    min={0}
+                                    max={50}
+                                    onValueChange={this.updateState}
+                                    valueKey='dice'
+                                />
+                                <Picker
+                                  inlinelabel
+                                  label='Test'
+                                  style={localStyles.grey}
+                                  textStyle={styles.grey}
+                                  iosHeader="Select one"
+                                  mode="dropdown"
+                                  selectedValue={this.state.partialDie}
+                                  onValueChange={(value) => this.updateState('partialDie', value)}
+                                >
+                                  <Item label="No partial die" value="0" />
+                                  <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
+                                  <Item label="+½ die" value={PARTIAL_DIE_HALF} />
+                                </Picker>
+                                <View style={{paddingBottom: 30}} />
+                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                    <Text style={styles.grey}>Is this a killing attack?</Text>
+                                    <View style={{paddingRight: 10}}>
+                                        <Switch value={this.state.killingToggled} onValueChange={() => this.toggleDamageType()} color='#3da0ff'/>
+                                    </View>
+                                </View>
+                                {this._renderStunMultiplier()}
+                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                    <Text style={styles.grey}>Use hit locations?</Text>
+                                    <View style={{paddingRight: 10}}>
+                                        <Switch value={this.state.useHitLocations} onValueChange={() => this._toggleHitLocations()} color='#3da0ff'/>
+                                    </View>
+                                </View>
+                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                    <Text style={styles.grey}>Attack is a martial maneuver?</Text>
+                                    <View style={{paddingRight: 10}}>
+                                        <Switch value={this.state.isMartialManeuver} onValueChange={() => this._toggleMartialManeuver()} color='#3da0ff'/>
+                                    </View>
+                                </View>
+                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                    <Text style={styles.grey}>Is the target flying?</Text>
+                                    <View style={{paddingRight: 10}}>
+                                        <Switch value={this.state.isTargetFlying} onValueChange={() => this._toggleTargetFlying()} color='#3da0ff'/>
+                                    </View>
+                                </View>
+                                <View style={{paddingBottom: 30}} />
+                                <Button block style={styles.button} onPress={this.roll}>
+                                    <Text uppercase={false}>Roll</Text>
+                                </Button>
+                            </ScrollView>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat Moves">
+                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text></View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text></View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text></View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text></View>
+                                </View>
+                                {moves.map((move, index) => {
+                                    return (
+                                        <View key={'move-' + index}>
+                                            <View key={'move-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.name}</Text></View>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.phase}</Text></View>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.ocv}</Text></View>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.dcv}</Text></View>
+                                            </View>
+                                            <View key={'move-' + index} style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingBottom: 5}}>
+                                                <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}><Text style={styles.grey}></Text></View>
+                                                <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                                                    <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    );
+                                })}
+                            </ScrollView>
+                        </Tab>
+                    </Tabs>
 				</Content>
 			</Container>
 		);

@@ -119,7 +119,7 @@ export default class HitScreen extends Component {
 		return (
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
-				<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 10}}>
+				<Content style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
                     <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
                             <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
