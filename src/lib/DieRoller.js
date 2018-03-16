@@ -80,8 +80,8 @@ class DieRoller {
 		}				
 	
 		resultRoll.hitLocationDetails = this._getHitLocationModifiers(hitLocationRoll);
-		resultRoll.body = this._calcualteBody(resultRoll);
-		resultRoll.stun = this._calcualteStun(resultRoll);
+		resultRoll.body = this._calculateBody(resultRoll);
+		resultRoll.stun = this._calculateStun(resultRoll);
 		resultRoll.knockback = this._calculateKnockback(resultRoll, damageForm.isTargetFlying, damageForm.isMartialManeuver);
 
 		return resultRoll;
@@ -159,7 +159,7 @@ class DieRoller {
 		return resultRoll;
 	}
 
-	_calcualteStun(resultRoll) {
+	_calculateStun(resultRoll) {
 		let stun = 0;
 		
 		if (resultRoll.rollType === KILLING_DAMAGE) {
@@ -188,7 +188,7 @@ class DieRoller {
 		return stun;
 	}
 	
-	_calcualteBody(resultRoll) {
+	_calculateBody(resultRoll) {
 		let body = 0;
 	
 		if (resultRoll.rollType === NORMAL_DAMAGE) {
