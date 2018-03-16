@@ -176,7 +176,7 @@ export default class DamageScreen extends Component {
                             </ScrollView>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat Moves">
-                            <ScrollView style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                            <ScrollView style={[styles.tabContent, {paddingBottom: 20, paddingHorizontal: 10}]}>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text></View>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text></View>
