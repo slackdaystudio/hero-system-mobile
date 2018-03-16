@@ -98,22 +98,6 @@ class DieRoller {
 		return resultRoll;
 	}
 
-	_buildExplosionTable(resultRoll, newResultRoll) {
-	    newResultRoll.rolls.shift();
-	    newResultRoll.total = newResultRoll.rolls.reduce((a, b) => a + b, 0);
-
-	    resultRoll.explosion.push({
-	        distance: resultRoll.rolls.length - newResultRoll.rolls.length,
-            stun: this._calculateStun(newResultRoll),
-            body: this._calculateBody(newResultRoll),
-            knockback: this._calculateKnockback(newResultRoll)
-	    });
-
-	    if (newResultRoll.rolls.length >= 2) {
-	        this._buildExplosionTable(resultRoll, newResultRoll);
-	    }
-	}
-
 	freeFormRoll(dice, halfDice, pips) {
 		let resultRoll = {
 			rollType: FREE_FORM,
@@ -193,20 +177,22 @@ class DieRoller {
 			if (resultRoll.damageForm.useHitLocations) {
                 stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier));
 			} else {
-                let stunModifier = 1;
+			    if (resultRoll.stunModifier === undefined) {
+                    resultRoll.stunModifier = 1;
 
-                if (resultRoll.damageForm.useFifthEdition) {
-                    stunModifier = Math.floor(Math.random() * 6) + 1;
-                    stunModifier--;
+                    if (resultRoll.damageForm.useFifthEdition) {
+                        resultRoll.stunModifier = Math.floor(Math.random() * 6) + 1;
+                        resultRoll.stunModifier--;
 
-                    if (stunModifier === 0) {
-                        stunModifier = 1;
+                        if (stunModifier === 0) {
+                            resultRoll.stunModifier = 1;
+                        }
+                    } else {
+                        resultRoll.stunModifier = Math.floor(Math.random() * 3) + 1;
                     }
-                } else {
-                    stunModifier = Math.floor(Math.random() * 3) + 1;
-                }
+			    }
 
-                stun = resultRoll.total * (stunModifier + parseInt(resultRoll.stunMultiplier));
+                stun = resultRoll.total * (resultRoll.stunModifier + parseInt(resultRoll.stunMultiplier));
 			}
 		} else {
 			stun = resultRoll.total
@@ -234,23 +220,46 @@ class DieRoller {
 	}
 	
 	_calculateKnockback(resultRoll, isTargetFlying, isMartialManeuver) {
-		let knockbackDice = 2;
-		
-		if (isMartialManeuver) {
-			knockbackDice++;
-		}
-		
-		if (isTargetFlying) {
-			knockbackDice--;
-		}
-		
-		if (resultRoll.rollType === KILLING_DAMAGE) {
-			knockbackDice++;
-		}
-		
-		return (resultRoll.body - this._roll(knockbackDice, KNOCKBACK).total) * 2;
+	    if (resultRoll.knockbackRollTotal === undefined) {
+            let knockbackDice = 2;
+
+            if (isMartialManeuver) {
+                knockbackDice++;
+            }
+
+            if (isTargetFlying) {
+                knockbackDice--;
+            }
+
+            if (resultRoll.rollType === KILLING_DAMAGE) {
+                knockbackDice++;
+            }
+
+            resultRoll.knockbackRollTotal = this._roll(knockbackDice, KNOCKBACK).total;
+	    }
+
+		return (resultRoll.body - resultRoll.knockbackRollTotal) * 2;
 	}
-	
+
+	_buildExplosionTable(resultRoll, newResultRoll) {
+	    newResultRoll.rolls.shift();
+	    newResultRoll.total = newResultRoll.rolls.reduce((a, b) => a + b, 0);
+        newResultRoll.stun = this._calculateStun(newResultRoll);
+        newResultRoll.body = this._calculateBody(newResultRoll);
+        newResultRoll.knockback = this._calculateKnockback(newResultRoll);
+
+	    resultRoll.explosion.push({
+	        distance: (resultRoll.rolls.length - newResultRoll.rolls.length) * resultRoll.damageForm.fadeRate * 2,
+            stun: newResultRoll.stun,
+            body: newResultRoll.body,
+            knockback: newResultRoll.knockback
+	    });
+
+	    if (newResultRoll.rolls.length >= 2) {
+	        this._buildExplosionTable(resultRoll, newResultRoll);
+	    }
+	}
+
 	_getHitLocationModifiers(hitLocationRoll) {				
 		if (hitLocationRoll >= 3 && hitLocationRoll <= 5) {
 			return {

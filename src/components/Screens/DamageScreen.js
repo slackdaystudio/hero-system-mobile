@@ -23,6 +23,7 @@ export default class DamageScreen extends Component {
 			isMartialManeuver: false,
 			isTargetFlying: false,
 			isExplosion: false,
+			fadeRate: 1,
 			useFifthEdition: false
 		};
 		
@@ -63,8 +64,9 @@ export default class DamageScreen extends Component {
     }
 
 	_updateState(key, value) {
+	    let intSliders = ['dice', 'stunMultiplier', 'fadeRate'];
 		let newState = {...this.state};
-		newState[key] = key === 'dice' || key === 'stunMultiplier' ? parseInt(value, 10) : value;
+		newState[key] = intSliders.indexOf(key) !== -1 ? parseInt(value, 10) : value;
 
 		AsyncStorage.setItem('damageState', JSON.stringify(newState));
 		
@@ -101,6 +103,23 @@ export default class DamageScreen extends Component {
 
     _toggleExplosion() {
         this.updateState('isExplosion', !this.state.isExplosion);
+    }
+
+    _renderFadeRate() {
+        if (this.state.isExplosion) {
+			return (
+				<Slider
+					label='Fade Rate:'
+					value={this.state.fadeRate}
+					step={1}
+					min={1}
+					max={10}
+					onValueChange={this.updateState}
+					valueKey='fadeRate' />
+			);
+        }
+
+        return null;
     }
 
 	_renderStunMultiplier() {
@@ -165,6 +184,7 @@ export default class DamageScreen extends Component {
                                         <Switch value={this.state.isExplosion} onValueChange={() => this._toggleExplosion()} color='#3da0ff'/>
                                     </View>
                                 </View>
+                                {this._renderFadeRate()}
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                     <Text style={styles.grey}>Use hit locations?</Text>
                                     <View style={{paddingRight: 10}}>

@@ -77,15 +77,28 @@ export default class ResultScreen extends Component {
 	}
 	
 	_renderDamageInfo() {
-//	    if (this.state.result.damageForm.isExplosion) {
-//	        return (
-//	            <View style={{paddingBottom: 20}}>
-//	                {this.state.result.explosion.map((entry, index) => {
-//	                    return <Text>{JSON.stringify(entry)}</Text>;
-//	                })}
-//	            </View>
-//	        );
-//	    }
+	    if (this.state.result.damageForm.isExplosion) {
+	        return (
+	            <View style={{paddingBottom: 20}}>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Distance</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>STUN</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>BODY</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>KB</Text></View>
+                    </View>
+	                {this.state.result.explosion.map((entry, index) => {
+	                    return (
+                            <View key={'exp-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
+                                <View style={{flex: 1, alignSelf: 'flex-end'}}><Text style={styles.grey}>{this._renderDistance(entry.distance)}</Text></View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderStun(entry.stun)}</Text></View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{entry.body}</Text></View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderKnockback(entry.knockback)}</Text></View>
+                            </View>
+	                    );
+	                })}
+	            </View>
+	        );
+	    }
 
 		return (
 			<View style={{paddingBottom: 20}}>
@@ -95,7 +108,7 @@ export default class ResultScreen extends Component {
 				</View>
 				<View style={localStyles.lineContainer}>
 					<Text style={[styles.boldGrey, localStyles.alignStart]}>Stun: </Text>
-					{this._renderStun()}
+					{this._renderStun(this.state.result.stun)}
 				</View>	
 				<View style={localStyles.lineContainer}>
 					<Text style={[styles.boldGrey, localStyles.alignStart]}>Body: </Text>
@@ -103,7 +116,7 @@ export default class ResultScreen extends Component {
 				</View>
 				<View style={localStyles.lineContainer}>
 					<Text style={[styles.boldGrey, localStyles.alignStart]}>Knockback: </Text>
-					{this._renderKnockback()}
+					{this._renderKnockback(this.state.result.knockback)}
 				</View>
 			</View>
 		);
@@ -140,15 +153,27 @@ export default class ResultScreen extends Component {
 		
 		return null;
 	}
-	
-	_renderStun() {
-		let stun = this.state.result.stun < 0 ? 0 : this.state.result.stun;
+
+	_renderDistance(distance) {
+		let distanceText = '';
+
+		if (this.state.result.damageForm.useFifthEdition) {
+		    distanceText = distance / 2 + '"';
+		} else {
+		    distanceText = distance + 'm';
+		}
+
+		return <Text style={styles.grey}>{distanceText}</Text>;
+	}
+
+	_renderStun(stun) {
+		stun = stun < 0 ? 0 : stun;
 		
 		return <Text style={styles.grey}>{stun}</Text>;
 	}
 	
-	_renderKnockback() {
-		let knockback = this.state.result.knockback < 0 ? 0 : this.state.result.knockback;
+	_renderKnockback(knockback) {
+		knockback = knockback < 0 ? 0 : knockback;
 		let knockbackText = '';
 
 		if (this.state.result.damageForm.useFifthEdition) {
