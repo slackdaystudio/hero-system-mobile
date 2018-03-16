@@ -187,6 +187,7 @@ export default class DamageScreen extends Component {
                                 <Button block style={styles.button} onPress={this.roll}>
                                     <Text uppercase={false}>Roll</Text>
                                 </Button>
+                                <View style={{paddingBottom: 30}} />
                             </ScrollView>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat Moves">
