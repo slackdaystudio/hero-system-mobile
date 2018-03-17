@@ -32,13 +32,19 @@ export default class Equipment extends Component {
         this.setState({showFullTexts: showFullTexts});
     }
 
+    _rollDamage(index) {
+        if (character.isAttackPower(this.state.items[index])) {
+            this.props.navigation.navigate('Damage', character.getDamage(this.state.items[index], this.props.strengthDamage));
+        }
+    }
+
     _renderItem(item, index) {
         if (this.state.showFullTexts[index]) {
             item = this.state.items[index];
         }
 
         return (
-            <ListItem key={'equipment-' + index} underlayColor='#3da0ff' onPress={() => this._toggleFullText(index)}>
+            <ListItem key={'equipment-' + index} underlayColor='#3da0ff' onPress={() => this._toggleFullText(index)} onLongPress={() => this._rollDamage(index)}>
                 <Left>
                     <Text style={styles.grey}>{item}</Text>
                 </Left>

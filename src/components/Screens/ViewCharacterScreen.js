@@ -10,6 +10,7 @@ import TextList from '../Character/TextList';
 import Equipment from '../Character/Equipment';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
+import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
 export default class ViewCharacterScreen extends Component {
@@ -49,7 +50,7 @@ export default class ViewCharacterScreen extends Component {
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
                 <View style={styles.tabContent}>
-                    <Powers powers={powers} />
+                    <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.state.character)} />
                 </View>
             </Tab>
         );
@@ -63,7 +64,7 @@ export default class ViewCharacterScreen extends Component {
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
                 <View style={styles.tabContent}>
-                    <Equipment equipment={equipment} />
+                    <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.state.character)}/>
                 </View>
             </Tab>
         );

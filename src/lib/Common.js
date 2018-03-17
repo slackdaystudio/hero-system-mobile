@@ -1,4 +1,5 @@
 import { Dimensions, Platform, AsyncStorage, Alert } from 'react-native';
+import { KILLING_DAMAGE, NORMAL_DAMAGE } from './DieRoller';
 
 class Common {
     isIPad() {
@@ -43,6 +44,39 @@ class Common {
         }
 
         return JSON.parse(settings);
+    }
+
+    initDamageForm(props = null) {
+        if (props === null || props === undefined || props === '') {
+            return {
+                dice: 12,
+                partialDie: 0,
+                killingToggled: false,
+                damageType: NORMAL_DAMAGE,
+                stunMultiplier: 0,
+                useHitLocations: false,
+                isMartialManeuver: false,
+                isTargetFlying: false,
+                isExplosion: false,
+                fadeRate: 1,
+                useFifthEdition: false
+            };
+        }
+
+        return {
+            dice: props.dice || 12,
+            partialDie: props.partialDie || 0,
+            killingToggled: props.killingToggled || false,
+            damageType: props.damageType || NORMAL_DAMAGE,
+            stunMultiplier: props.stunMultiplier || 0,
+            useHitLocations: props.useHitLocations || false,
+            isMartialManeuver: props.isMartialManeuver || false,
+            isTargetFlying: props.isTargetFlying || false,
+            isExplosion: props.isExplosion || false,
+            fadeRate: props.fadeRate || 1,
+            useFifthEdition: false,
+            skipFormLoad: true
+        };
     }
 }
 

@@ -46,6 +46,12 @@ export default class Powers extends Component {
         ];
     }
 
+    _rollDamage(index) {
+        if (character.isAttackPower(this.state.items[index])) {
+            this.props.navigation.navigate('Damage', character.getDamage(this.state.items[index], this.props.strengthDamage));
+        }
+    }
+
     _renderPower(item, index) {
         if (this.state.showFullTexts[index]) {
             item = this.state.items[index];
@@ -55,7 +61,7 @@ export default class Powers extends Component {
         let costEndPosition = lineItem[1].indexOf(')');
 
         return (
-            <ListItem key={'power-' + index} underlayColor='#3da0ff' onPress={() => this._toggleFullText(index)}>
+            <ListItem key={'power-' + index} underlayColor='#3da0ff' onPress={() => this._toggleFullText(index)} onLongPress={() => this._rollDamage(index)}>
                 <Left>
                     <Text style={styles.grey}>{lineItem[0] + ' ' + lineItem[1].substring(costEndPosition + 1)}</Text>
                 </Left>

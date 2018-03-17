@@ -38,17 +38,7 @@ export default class SettingsScreen extends Component {
 			targetDcv: 0,
 			selectedLocation: -1
 		}));
-		await AsyncStorage.setItem('damageState', JSON.stringify({
-			dice: 12,
-			partialDie: 0,
-			killingToggled: false,
-			damageType: NORMAL_DAMAGE,
-			stunMultiplier: 0,
-			useHitLocations: false,
-			isMartialManeuver: false,
-			isTargetFlying: false,
-			isExplosion: false
-		}));
+		await AsyncStorage.setItem('damageState', JSON.stringify(common.initDamageForm()));
 		await AsyncStorage.setItem('freeFormState', JSON.stringify({
 			dice: 1,
 			halfDice: 0,

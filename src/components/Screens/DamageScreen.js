@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, Image, Switch, AsyncStorage } from 'react-native';
+import { Platform, StyleSheet, View, Image, Switch, AsyncStorage, Alert } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item, Tabs, Tab, ScrollableTab } from 'native-base';
 import RNShakeEvent from 'react-native-shake-event';
 import Slider from '../Slider/Slider';
@@ -13,51 +13,52 @@ export default class DamageScreen extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			dice: 12,
-			partialDie: 0,
-			killingToggled: false,
-			damageType: NORMAL_DAMAGE,
-			stunMultiplier: 0,
-			useHitLocations: false,
-			isMartialManeuver: false,
-			isTargetFlying: false,
-			isExplosion: false,
-			fadeRate: 1,
-			useFifthEdition: false
-		};
-		
+		this.state = common.initDamageForm(props.navigation.state.params);
+
+		this.skipFormLoad = props.navigation.state.params !== undefined ? true : false;
+
+        // So the next screen load doesn't reuse it we manually delete the params (bug in React???)
+        delete props.navigation.state.params;
+
 		this.updateState = this._updateState.bind(this);
 		this.toggleDamageType = this._toggleDamageType.bind(this);
 		this.roll = this._roll.bind(this);
 	}
 	
 	componentDidMount() {
-	    AsyncStorage.getItem('damageState').then((value) => {
-	    	if (value !== undefined) {
-	    	    if (common.compare(this.state, JSON.parse(value))) {
-	    	        this.setState(JSON.parse(value), () => {
-                        AsyncStorage.getItem('appSettings').then((value) => {
-                            if (value !== undefined) {
-                                let newState = {...this.state};
-                                newState.useFifthEdition = JSON.parse(value).useFifthEdition;
-
-                                this.setState(newState);
-                            }
-                        }).done();
-	    	        });
-	    	    }
-	    	}
-	    }).done();
-
         RNShakeEvent.addEventListener('shake', () => {
             this.roll();
         });
+
+        if (this.skipFormLoad) {
+            this._setIsFifthEdition();
+        } else {
+            AsyncStorage.getItem('damageState').then((value) => {
+                if (value !== undefined) {
+                    if (common.compare(this.state, JSON.parse(value))) {
+                        this.setState(JSON.parse(value), () => {
+                            this._setIsFifthEdition();
+                        });
+                    }
+                }
+            }).done();
+        }
 	}
 
    	componentWillUnmount() {
    		RNShakeEvent.removeEventListener('shake');
    	}
+
+    _setIsFifthEdition() {
+        AsyncStorage.getItem('appSettings').then((value) => {
+            if (value !== undefined) {
+                let newState = {...this.state};
+                newState.useFifthEdition = JSON.parse(value).useFifthEdition;
+
+                this.setState(newState);
+            }
+        }).done();
+    }
 
     _roll() {
         this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state));
