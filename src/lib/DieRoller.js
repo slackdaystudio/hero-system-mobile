@@ -184,7 +184,7 @@ class DieRoller {
                         resultRoll.stunModifier = Math.floor(Math.random() * 6) + 1;
                         resultRoll.stunModifier--;
 
-                        if (stunModifier === 0) {
+                        if (resultRoll.stunModifier === 0) {
                             resultRoll.stunModifier = 1;
                         }
                     } else {
