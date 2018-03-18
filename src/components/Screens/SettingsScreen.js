@@ -39,11 +39,7 @@ export default class SettingsScreen extends Component {
 			selectedLocation: -1
 		}));
 		await AsyncStorage.setItem('damageState', JSON.stringify(common.initDamageForm()));
-		await AsyncStorage.setItem('freeFormState', JSON.stringify({
-			dice: 1,
-			halfDice: 0,
-			pips: 0
-		}));
+		await AsyncStorage.setItem('freeFormState', JSON.stringify(common.initFreeFormForm()));
 
 		if (showToast) {
             Toast.show({

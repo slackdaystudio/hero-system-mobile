@@ -12,28 +12,31 @@ export default class HitScreen extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			dice: 1,
-			halfDice: 0,
-			pips: 0
-		}
-		
+		this.state = common.initFreeFormForm(props.navigation.state.params);
+
+		this.skipFormLoad = props.navigation.state.params !== undefined ? true : false;
+
+        // So the next screen load doesn't reuse it we manually delete the params (bug in React???)
+        delete props.navigation.state.params;
+
 		this.setSliderState = this._setSliderState.bind(this);
 		this.roll = this._roll.bind(this);
 	}
 	
 	componentDidMount() {
-	    AsyncStorage.getItem('freeFormState').then((value) => {
-	    	if (value !== undefined) {
-	    	    if (common.compare(this.state, JSON.parse(value))) {
-	    	        this.setState(JSON.parse(value));
-	    	    }
-	    	}
-	    }).done();
-
         RNShakeEvent.addEventListener('shake', () => {
             this.roll();
         });
+
+        if (!this.skipFormLoad) {
+            AsyncStorage.getItem('freeFormState').then((value) => {
+                if (value !== undefined) {
+                    if (common.compare(this.state, JSON.parse(value))) {
+                        this.setState(JSON.parse(value));
+                    }
+                }
+            }).done();
+        }
 	}
 
    	componentWillUnmount() {

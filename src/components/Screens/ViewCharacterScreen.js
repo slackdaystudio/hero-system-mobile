@@ -108,7 +108,7 @@ export default class ViewCharacterScreen extends Component {
 			  		</Tab>
                     <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
 			  			<View style={styles.tabContent}>
-                            <Combat character={this.state.character} />
+                            <Combat navigation={this.props.navigation} character={this.state.character} />
 			  		    </View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">

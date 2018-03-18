@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
-import { StyleSheet, AsyncStorage, View } from 'react-native';
-import { Text, List, ListItem, Left, Right, Item, Input, Button, Spinner } from 'native-base';
+import { StyleSheet, AsyncStorage, View, TouchableHighlight } from 'react-native';
+import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Spinner } from 'native-base';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
@@ -77,7 +77,18 @@ export default class Combat extends Component {
         this.setState({combat: combat});
     }
 
+    _rollDamage(strengthDamage) {
+        this.props.navigation.navigate('Damage', character.getDamage(null, strengthDamage));
+    }
+
+    _rollPresenceDamage(presenceDamage) {
+        this.props.navigation.navigate('FreeForm', character.getPresenceAttackDamage(presenceDamage));
+    }
+
     _renderDefenses() {
+        let stunThreshold = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'constitution'), 10);
+        let ego = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'ego'), 10);
+        let presence = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'presence'), 10);
         let defenses = character.getDefenses(this.state.character);
 
         return (
@@ -94,6 +105,56 @@ export default class Combat extends Component {
                         </ListItem>
                     );
                 })}
+                <ListItem>
+                    <Left>
+                        <Text style={styles.boldGrey}>Constitution</Text>
+                    </Left>
+                    <Right>
+                        <Text style={styles.grey}>{stunThreshold}</Text>
+                    </Right>
+                </ListItem>
+                <ListItem>
+                    <Left>
+                        <Text style={styles.boldGrey}>Ego</Text>
+                    </Left>
+                    <Right>
+                        <Text style={styles.grey}>{ego}</Text>
+                    </Right>
+                </ListItem>
+                <ListItem>
+                    <Left>
+                        <Text style={styles.boldGrey}>Presence</Text>
+                    </Left>
+                    <Right>
+                        <Text style={styles.grey}>{presence}</Text>
+                    </Right>
+                </ListItem>
+            </List>
+        );
+    }
+
+    _renderBaseDamage() {
+        let strengthDamage = character.getStrengthDamage(this.state.character);
+        let presenceDamage = character.getPresenceDamage(this.state.character);
+
+        return (
+            <List>
+                <ListItem onLongPress={() => this._rollDamage(strengthDamage)}>
+                    <Left>
+                        <Text style={styles.boldGrey}>Strength</Text>
+                    </Left>
+                    <Right>
+                        <Text style={styles.grey}>{strengthDamage}</Text>
+                    </Right>
+                </ListItem>
+                <ListItem onLongPress={() => this._rollPresenceDamage(presenceDamage)}>
+                    <Left>
+                        <Text style={styles.boldGrey}>Presence</Text>
+                    </Left>
+                    <Right>
+                        <Text style={styles.grey}>{presenceDamage}</Text>
+                    </Right>
+                </ListItem>
             </List>
         );
     }
@@ -105,6 +166,8 @@ export default class Combat extends Component {
 
         return (
             <View>
+                <View style={{paddingBottom: 20}} />
+                <Text style={styles.subHeading}>Health</Text>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
                     <View style={{alignSelf: 'center', width: 50}}>
                         <Text style={styles.boldGrey}>Stun:</Text>
@@ -171,8 +234,11 @@ export default class Combat extends Component {
                     </Button>
                 </View>
                 <View style={{paddingBottom: 20}} />
-                <Text style={[styles.boldGrey, {alignSelf: 'center', textDecorationLine: 'underline'}]}>Defenses</Text>
+                <Text style={styles.subHeading}>Defenses</Text>
                 {this._renderDefenses()}
+                <View style={{paddingBottom: 20}} />
+                <Text style={styles.subHeading}>Base Damage</Text>
+                {this._renderBaseDamage()}
             </View>
         );
     }

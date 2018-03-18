@@ -16,6 +16,7 @@ export default StyleSheet.create({
 	},
 	subHeading: {
 		alignSelf: 'center',
+		fontWeight: 'bold',
 		textDecorationLine: 'underline',
 		color: '#D0D1D3'
 	},

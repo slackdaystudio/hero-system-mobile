@@ -78,6 +78,22 @@ class Common {
             skipFormLoad: true
         };
     }
+
+    initFreeFormForm(props = null) {
+        if (props === null || props === undefined || props === '') {
+            return {
+                dice: 1,
+                halfDice: 0,
+                pips: 0
+            };
+        }
+
+        return {
+            dice: props.dice || 1,
+            halfDice: props.halfDice || 0,
+            pips: props.pips || 0
+        };
+    }
 }
 
 export let common = new Common();

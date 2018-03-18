@@ -62,6 +62,17 @@ class Character {
         return match[0];
     }
 
+    getPresenceDamage(character) {
+        let notes = this.getCharacteristic(character.characteristics.characteristic, 'presence', false).notes;
+        let match = notes.match(/([0-9]+\s1\/)?[0-9]+d6/g);
+
+        if (match.length === 2) {
+            return match[1];
+        }
+
+        return match[0];
+    }
+
     getDefenses(character) {
         let pd = this.getCharacteristic(character.characteristics.characteristic, 'pd', false).notes.split(' ');
         let ed = this.getCharacteristic(character.characteristics.characteristic, 'ed', false).notes.split(' ');
@@ -69,16 +80,16 @@ class Character {
         return [
             {
                 label: 'Physical Defense',
-                value: pd[0]
+                value: this._getDefense(pd[0])
             }, {
                 label: 'R. Physical Defense',
-                value: (pd.length === 4 ? pd[2].slice(1) : 0)
+                value: this._getDefense((pd.length === 4 ? pd[2].slice(1) : 0))
             }, {
                 label: 'Energy Defense',
-                value: ed[0]
+                value: this._getDefense(ed[0])
             }, {
                 label: 'R. Energy Defense',
-                value: (ed.length === 4 ? ed[2].slice(1) : 0)
+                value: this._getDefense((ed.length === 4 ? ed[2].slice(1) : 0))
             }
         ];
     }
@@ -134,8 +145,29 @@ class Character {
         return false;
     }
 
+    getPresenceAttackDamage(presenceDamage) {
+        let damage = common.initFreeFormForm();
+        let damageDice = this._getDamageDice(presenceDamage);
+
+        damage.dice = damageDice.dice;
+        damage.halfDice = damageDice.partialDie === PARTIAL_DIE_HALF ? 1 : 0;
+
+        return damage;
+    }
+
     getDamage(text, strengthDamage) {
         let damage = common.initDamageForm();
+
+        // Base strength damage
+        if (text === null && strengthDamage !== '') {
+            let damageDice = this._getDamageDice(strengthDamage);
+
+            damage.dice = damageDice.dice;
+            damage.partialDie = damageDice.partialDie;
+
+            return damage;
+        }
+
         let hka = this._getHka(text);
 
         if (hka !== null) {
@@ -292,6 +324,16 @@ class Character {
         } else {
             damageForm.partialDie++;
         }
+    }
+
+    _getDefense(defense) {
+        if (defense.indexOf('/')) {
+            let parts = defense.split('/');
+
+            return parts[1];
+        }
+
+        return defense;
     }
 
     _getPower(power) {
