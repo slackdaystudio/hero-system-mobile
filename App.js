@@ -6,6 +6,7 @@ import SplashScreen from 'react-native-splash-screen'
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
+import PdfViewerScreen from './src/components/Screens/PdfViewerScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
 import SkillScreen from './src/components/Screens/SkillScreen';
 import HitScreen from './src/components/Screens/HitScreen';
@@ -27,6 +28,9 @@ const RootStack = DrawerNavigator({
 		},
 		RandomCharacter: {
 			screen: RandomCharacterScreen
+		},
+		PdfViewer: {
+			screen: PdfViewerScreen
 		},
 		Result: {
 			screen: ResultScreen

@@ -29,6 +29,12 @@ export default StyleSheet.create({
 		justifyContent: 'center',
 		alignSelf: 'center'
 	},
+	buttonBig: {
+		backgroundColor: '#478f79',
+		minWidth: 300,
+		justifyContent: 'center',
+		alignSelf: 'center'
+	},
 	buttonText: {
 		color: '#FFF'
 	},

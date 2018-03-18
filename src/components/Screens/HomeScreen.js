@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, ScrollView, View, ImageBackground } from 'react-native';
-import { Container, Content, Button, Text, Spinner } from 'native-base';
+import { Platform, StyleSheet, ScrollView, View, ImageBackground, TouchableHighlight } from 'react-native';
+import { Container, Content, Button, Text, Spinner, Card, CardItem, Body, Icon } from 'native-base';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
@@ -96,6 +96,35 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
                     </View>
+                    <Text style={styles.heading}>Library</Text>
+                    <Text style={styles.grey}>A collection of documents to help new and old players alike.</Text>
+                    <TouchableHighlight onPress={() => this.props.navigation.navigate('PdfViewer', {pdfName: 'Hero2Page.pdf'})}>
+                        <Card style={{borderColor: '#D0D1D3'}}>
+                            <CardItem style={{backgroundColor: '#375476'}}>
+                                <Body>
+                                    <Text style={[styles.boldGrey, {fontSize: 20, textDecorationLine: 'underline'}]}>HERO in 2 Pages</Text>
+                                    <Text style={[styles.grey]}>Everything you need to know to play the HERO System in 2 pages</Text>
+                                    <Text style={[styles.grey, {fontSize: 12, fontStyle: 'italic'}]}>
+                                        <Text style={[styles.boldGrey, {fontSize: 12}]}>Authors: </Text>Bill Keyes, Narf T. Mouse, and Steven S. Long
+                                    </Text>
+                                </Body>
+                            </CardItem>
+                        </Card>
+                    </TouchableHighlight>
+                    <TouchableHighlight onPress={() => this.props.navigation.navigate('PdfViewer', {pdfName: 'Hero Survival Guide.pdf'})}>
+                        <Card style={{borderColor: '#D0D1D3'}}>
+                            <CardItem style={{backgroundColor: '#375476'}}>
+                                <Body>
+                                    <Text style={[styles.boldGrey, {fontSize: 20, textDecorationLine: 'underline'}]}>HERO Survival Guide</Text>
+                                    <Text style={[styles.grey]}>This is a simple sheet offering some ideas on what to do in combat given Hero's vast options.</Text>
+                                    <Text style={[styles.grey, {fontSize: 12, fontStyle: 'italic'}]}>
+                                        <Text style={[styles.boldGrey, {fontSize: 12}]}>Author: </Text>Christopher R. Taylor
+                                    </Text>
+                                </Body>
+                            </CardItem>
+                        </Card>
+                    </TouchableHighlight>
+                    <View style={{paddingBottom: 20}} />
                 </Content>
             </ImageBackground>
 	      </Container>
