@@ -16,7 +16,8 @@ export default StyleSheet.create({
 	},
 	subHeading: {
 		alignSelf: 'center',
-		textDecorationLine: 'underline'
+		textDecorationLine: 'underline',
+		color: '#D0D1D3'
 	},
 	buttonContainer: {
 		paddingVertical: 5
