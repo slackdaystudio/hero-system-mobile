@@ -119,7 +119,7 @@ export default class HitScreen extends Component {
 		return (
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
-				<Content scrollEnable={false} style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
+				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
                     <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
@@ -146,6 +146,7 @@ export default class HitScreen extends Component {
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Range Mods">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
+                                <View>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
@@ -199,6 +200,7 @@ export default class HitScreen extends Component {
                                     </View>
                                 </View>
                             </View>
+                            </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Hit Locations">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
@@ -243,54 +245,56 @@ export default class HitScreen extends Component {
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Targeted Shots">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
-                                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 5}}>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text></View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>Head Shot</Text>
+                                <View>
+                                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 5}}>
+                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text></View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text></View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text></View>
                                         </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-4</Text>
+                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>Head Shot</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>-4</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>1d6+3</Text>
+                                            </View>
                                         </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>1d6+3</Text>
+                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>High Shot</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>-2</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>2d6+1</Text>
+                                            </View>
                                         </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>High Shot</Text>
+                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>Low Shot</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>-2</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>2d6+7 (19=foot)</Text>
+                                            </View>
                                         </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-2</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>2d6+1</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>Low Shot</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-2</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>2d6+7 (19=foot)</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>Leg Shot</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-4</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>1d6+12</Text>
+                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>Leg Shot</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>-4</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={styles.grey}>1d6+12</Text>
+                                            </View>
                                         </View>
                                     </View>
                                 </View>

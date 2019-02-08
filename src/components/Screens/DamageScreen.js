@@ -144,70 +144,72 @@ export default class DamageScreen extends Component {
 		return (
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
-				<Content scrollEnable={false} style={{backgroundColor: '#375476', paddingTop: Platform.OS === 'ios' ? 0 : 20}}>
+				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
                     <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
-                                <Slider
-                                    label='Dice:'
-                                    value={this.state.dice}
-                                    step={1}
-                                    min={0}
-                                    max={50}
-                                    onValueChange={this.updateState}
-                                    valueKey='dice'
-                                />
-                                <Picker
-                                  inlinelabel
-                                  label='Test'
-                                  style={localStyles.grey}
-                                  textStyle={styles.grey}
-                                  iosHeader="Select one"
-                                  mode="dropdown"
-                                  selectedValue={this.state.partialDie}
-                                  onValueChange={(value) => this.updateState('partialDie', value)}
-                                >
-                                  <Item label="No partial die" value="0" />
-                                  <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-                                  <Item label="+½ die" value={PARTIAL_DIE_HALF} />
-                                </Picker>
-                                <View style={{paddingBottom: 30}} />
-                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                    <Text style={styles.grey}>Is this a killing attack?</Text>
-                                    <View style={{paddingRight: 10}}>
-                                        <Switch value={this.state.killingToggled} onValueChange={() => this.toggleDamageType()} color='#3da0ff'/>
+                                <View>
+                                    <Slider
+                                        label='Dice:'
+                                        value={this.state.dice}
+                                        step={1}
+                                        min={0}
+                                        max={50}
+                                        onValueChange={this.updateState}
+                                        valueKey='dice'
+                                    />
+                                    <Picker
+                                      inlinelabel
+                                      label='Test'
+                                      style={localStyles.grey}
+                                      textStyle={styles.grey}
+                                      iosHeader="Select one"
+                                      mode="dropdown"
+                                      selectedValue={this.state.partialDie}
+                                      onValueChange={(value) => this.updateState('partialDie', value)}
+                                    >
+                                      <Item label="No partial die" value="0" />
+                                      <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
+                                      <Item label="+½ die" value={PARTIAL_DIE_HALF} />
+                                    </Picker>
+                                    <View style={{paddingBottom: 30}} />
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Is this a killing attack?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.killingToggled} onValueChange={() => this.toggleDamageType()} color='#3da0ff'/>
+                                        </View>
                                     </View>
-                                </View>
-                                {this._renderStunMultiplier()}
-                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                    <Text style={styles.grey}>Is this an explosion?</Text>
-                                    <View style={{paddingRight: 10}}>
-                                        <Switch value={this.state.isExplosion} onValueChange={() => this._toggleExplosion()} color='#3da0ff'/>
+                                    {this._renderStunMultiplier()}
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Is this an explosion?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.isExplosion} onValueChange={() => this._toggleExplosion()} color='#3da0ff'/>
+                                        </View>
                                     </View>
-                                </View>
-                                {this._renderFadeRate()}
-                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                    <Text style={styles.grey}>Use hit locations?</Text>
-                                    <View style={{paddingRight: 10}}>
-                                        <Switch value={this.state.useHitLocations} onValueChange={() => this._toggleHitLocations()} color='#3da0ff'/>
+                                    {this._renderFadeRate()}
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Use hit locations?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.useHitLocations} onValueChange={() => this._toggleHitLocations()} color='#3da0ff'/>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                    <Text style={styles.grey}>Attack is a martial maneuver?</Text>
-                                    <View style={{paddingRight: 10}}>
-                                        <Switch value={this.state.isMartialManeuver} onValueChange={() => this._toggleMartialManeuver()} color='#3da0ff'/>
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Attack is a martial maneuver?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.isMartialManeuver} onValueChange={() => this._toggleMartialManeuver()} color='#3da0ff'/>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                    <Text style={styles.grey}>Is the target flying?</Text>
-                                    <View style={{paddingRight: 10}}>
-                                        <Switch value={this.state.isTargetFlying} onValueChange={() => this._toggleTargetFlying()} color='#3da0ff'/>
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Is the target flying?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.isTargetFlying} onValueChange={() => this._toggleTargetFlying()} color='#3da0ff'/>
+                                        </View>
                                     </View>
+                                    <View style={{paddingBottom: 30}} />
+                                    <Button block style={styles.button} onPress={this.roll}>
+                                        <Text uppercase={false}>Roll</Text>
+                                    </Button>
                                 </View>
-                                <View style={{paddingBottom: 30}} />
-                                <Button block style={styles.button} onPress={this.roll}>
-                                    <Text uppercase={false}>Roll</Text>
-                                </Button>
                                 <View style={{paddingBottom: 30}} />
                             </View>
                         </Tab>

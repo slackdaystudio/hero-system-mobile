@@ -76,7 +76,6 @@ export default class App extends Component {
             await AsyncStorage.setItem('appSettings', JSON.stringify(common.getAppSettings()));
         }
 
-		StatusBar.setHidden(true);
         SplashScreen.hide();
 	}
 
