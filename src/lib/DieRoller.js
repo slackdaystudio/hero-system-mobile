@@ -78,7 +78,15 @@ class DieRoller {
 		resultRoll.hitLocationDetails = this._getHitLocationModifiers(hitLocationRoll);
 		resultRoll.body = this._calculateBody(resultRoll);
 		resultRoll.stun = this._calculateStun(resultRoll);
-		resultRoll.knockback = this._calculateKnockback(resultRoll, damageForm.isTargetFlying, damageForm.isMartialManeuver);
+		resultRoll.knockback = this._calculateKnockback(
+		    resultRoll,
+		    damageForm.isTargetFlying,
+		    damageForm.isMartialManeuver,
+		    damageForm.isTargetInZeroG,
+		    damageForm.isTargetUnderwater,
+		    damageForm.rollWithPunch,
+		    damageForm.isUsingClinging
+		);
 
 		if (damageForm.isExplosion) {
 		    resultRoll.rolls.sort((a, b) => a - b).reverse();
@@ -219,7 +227,7 @@ class DieRoller {
 		return body;
 	}
 	
-	_calculateKnockback(resultRoll, isTargetFlying, isMartialManeuver) {
+	_calculateKnockback(resultRoll, isTargetFlying, isMartialManeuver, zeroG, underwater, rolledWithPunch, usingClinging) {
 	    if (resultRoll.knockbackRollTotal === undefined) {
             let knockbackDice = 2;
 
@@ -227,7 +235,23 @@ class DieRoller {
                 knockbackDice++;
             }
 
+            if (underwater) {
+                knockbackDice++;
+            }
+
+            if (usingClinging) {
+                knockbackDice++;
+            }
+
             if (isTargetFlying) {
+                knockbackDice--;
+            }
+
+            if (zeroG) {
+                knockbackDice--;
+            }
+
+            if (rolledWithPunch) {
                 knockbackDice--;
             }
 

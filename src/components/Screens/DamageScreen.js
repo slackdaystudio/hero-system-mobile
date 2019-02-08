@@ -102,6 +102,22 @@ export default class DamageScreen extends Component {
 		this.updateState('isTargetFlying', !this.state.isTargetFlying);
 	}
 
+    _toggleIsTargetInZeroG() {
+        this.updateState('isTargetInZeroG', !this.state.isTargetInZeroG);
+    }
+
+    _toggleIsTargetUnderwater() {
+        this.updateState('isTargetUnderwater', !this.state.isTargetUnderwater);
+    }
+
+	_toggleRollWithPunch() {
+		this.updateState('rollWithPunch', !this.state.rollWithPunch);
+	}
+
+    _toggleIsUsingClinging() {
+        this.updateState('isUsingClinging', !this.state.isUsingClinging);
+    }
+
     _toggleExplosion() {
         this.updateState('isExplosion', !this.state.isExplosion);
     }
@@ -200,9 +216,33 @@ export default class DamageScreen extends Component {
                                         </View>
                                     </View>
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Is the target flying?</Text>
+                                        <Text style={styles.grey}>Target is in the air?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch value={this.state.isTargetFlying} onValueChange={() => this._toggleTargetFlying()} color='#3da0ff'/>
+                                        </View>
+                                    </View>
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Target is in zero gravity?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.isTargetInZeroG} onValueChange={() => this._toggleIsTargetInZeroG()} color='#3da0ff'/>
+                                        </View>
+                                    </View>
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Target is underwater?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.isTargetUnderwater} onValueChange={() => this._toggleIsTargetUnderwater()} color='#3da0ff'/>
+                                        </View>
+                                    </View>
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Target rolled with a punch?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.rollWithPunch} onValueChange={() => this._toggleRollWithPunch()} color='#3da0ff'/>
+                                        </View>
+                                    </View>
+                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                                        <Text style={styles.grey}>Target is using clinging?</Text>
+                                        <View style={{paddingRight: 10}}>
+                                            <Switch value={this.state.isUsingClinging} onValueChange={() => this._toggleIsUsingClinging()} color='#3da0ff'/>
                                         </View>
                                     </View>
                                     <View style={{paddingBottom: 30}} />
