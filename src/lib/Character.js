@@ -233,7 +233,7 @@ class Character {
     }
 
     _getEb(text) {
-        let match = text.match(/(Energy\sBlast|EB)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
+        let match = text.match(/(Energy\sBlast|EB|Blast)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
 
         if (match !== null) {
             let damage = common.initDamageForm();
