@@ -137,7 +137,7 @@ class Character {
     isAttackPower(text) {
         if (/(Killing\sAttack\s\-\sHand\-To\-Hand|HKA)/.test(text) ||
             /(Killing\sAttack\s\-\sRanged|RKA)/.test(text) ||
-            /(Energy\sBlast|EB)/.test(text) ||
+            /(Energy\sBlast|EB|Blast)/.test(text) ||
             /(Hand\-To\-Hand\sAttack|HA)/.test(text)) {
             return true;
         }
