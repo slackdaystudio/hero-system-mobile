@@ -22,6 +22,7 @@
     "react": "16.6.3",
     "react-native": "^0.58.4",
     "react-native-document-picker": "^2.2.0",
+    "react-native-iphone-x-helper": "^1.2.0",
     "react-native-pathjs-charts": "0.0.34",
     "react-native-pdf": "^5.0.11",
     "react-native-pie-chart": "^1.0.12",

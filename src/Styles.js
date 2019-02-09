@@ -1,9 +1,14 @@
 import { StyleSheet, Platform } from 'react-native';
+import { ifIphoneX } from 'react-native-iphone-x-helper'
 
 export default StyleSheet.create({
 	container: {
 		backgroundColor: '#375476',
-		paddingTop: (Platform.OS === 'ios' ? 20 : 0)
+        ...ifIphoneX({
+            paddingTop: 50
+        }, {
+            paddingTop: (Platform.OS === 'ios' ? 20 : 0)
+        })
 	},
 	content: {
 		paddingTop: 0,
