@@ -1,10 +1,9 @@
 import { Platform, AsyncStorage, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
-import RNFS from 'react-native-fs';
-import xml2js from 'react-native-xml2js';
 import { common } from './Common';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from './DieRoller';
+import { file } from './File';
 
 class Character {
     constructor() {
@@ -12,33 +11,7 @@ class Character {
     }
 
     load(startLoad, endLoad) {
-        if (common.isIPad()) {
-            DocumentPicker.show({
-                top: 0,
-                left: 0,
-                filetype: ['public.xml']
-            }, (error, uri) => {
-                this._read(uri.uri, startLoad, endLoad);
-            });
-        } else {
-            DocumentPicker.show({filetype: [DocumentPickerUtil.allFiles()]},(error, result) => {
-                if (result === null) {
-                    return;
-                }
-                
-		        if ((Platform.OS === 'ios' && result.fileName.endsWith('.XML')) || (result.type === 'text/xml' || result.type === 'application/xml')) {
-                    this._read(result.uri, startLoad, endLoad);
-                } else {
-                    Toast.show({
-                        text: 'Unsupported file type: ' + result.type,
-                        position: 'bottom',
-                        buttonText: 'OK'
-                    });
-
-                    return;
-                }
-            });
-        }
+        file.loadCharacter(startLoad, endLoad);
     }
 
     isFifthEdition(characteristics) {
@@ -376,39 +349,6 @@ class Character {
         }
 
         return itemText;
-    }
-
-    async _read(uri, startLoad, endLoad) {
-        startLoad();
-	
-        RNFS.readFile(decodeURI(uri), 'ascii').then(file => {
-            let parser = xml2js.Parser({explicitArray: false});
-
-            parser.parseString(file, (error, result) => {
-                AsyncStorage.setItem('character', JSON.stringify(result));
-                AsyncStorage.setItem('combat', JSON.stringify({
-                    stun: this.getCharacteristic(result.character.characteristics.characteristic, 'stun'),
-                    body: this.getCharacteristic(result.character.characteristics.characteristic, 'body'),
-                    endurance: this.getCharacteristic(result.character.characteristics.characteristic, 'endurance')
-                }));
-
-                Toast.show({
-                    text: 'Character successfully loaded',
-                    position: 'bottom',
-                    buttonText: 'OK'
-                });
-
-                endLoad();
-            });
-        }).catch((error) => {
-            Toast.show({
-                text: error.message,
-                position: 'bottom',
-                buttonText: 'OK'
-            });
-
-            endLoad();
-        });
     }
 }
 
