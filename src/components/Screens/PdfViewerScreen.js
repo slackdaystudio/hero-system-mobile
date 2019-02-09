@@ -17,8 +17,8 @@ export default class SkillScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
-				<Header navigation={this.props.navigation} />
-                <View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', marginTop: 25}}>
+				<Header navigation={this.props.navigation}/>
+                <View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center'}}>
                     <Pdf
                         source={{uri:'bundle-assets://' + this.state.pdfName}}
                         onError={(error)=>{

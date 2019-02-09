@@ -3,12 +3,12 @@ package com.herogmtools;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.horcrux.svg.SvgPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.jadsonlourenco.RNShakeEvent.RNShakeEventPackage;
 import org.wonday.pdf.RCTPdfView;
 import com.rnfs.RNFSPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import org.wonday.pdf.RCTPdfView;
 import com.RNFetchBlob.RNFetchBlobPackage;
@@ -37,8 +37,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RCTPdfView(),
             new RNFetchBlobPackage(),
+            new RCTPdfView(),
             new SplashScreenReactPackage(),
             new SvgPackage(),
             new RNShakeEventPackage(),
