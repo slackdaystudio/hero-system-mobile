@@ -259,7 +259,7 @@ class DieRoller {
                 knockbackDice++;
             }
 
-            resultRoll.knockbackRollTotal = this._roll(knockbackDice, KNOCKBACK).total;
+            resultRoll.knockbackRollTotal = knockbackDice <= 0 ? 0 : this._roll(knockbackDice, KNOCKBACK).total;
 	    }
 
 		return (resultRoll.body - resultRoll.knockbackRollTotal) * 2;
