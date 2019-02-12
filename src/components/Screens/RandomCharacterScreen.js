@@ -85,8 +85,8 @@ export default class RandomCharacterScreen extends Component {
 	render() {
 	    if (this.state.character === null) {
             return (
-                <Container style={localStyles.container}>
-                    <Header hasTabs={false} navigation={this.props.navigation} />
+                <Container style={styles.container}>
+                    <Header hasTabs={true} navigation={this.props.navigation} />
                     <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
                         <Spinner color='#D0D1D3' />
                     </Content>
@@ -95,9 +95,9 @@ export default class RandomCharacterScreen extends Component {
 	    }
 
 		return (
-		  <Container style={localStyles.container}>
-		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
+		  <Container style={styles.container}>
+		  	<Header hasTabs={true} navigation={this.props.navigation} />
+				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
 			  	<Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
 			  			<View style={styles.tabContent}>

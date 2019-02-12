@@ -7,7 +7,7 @@ export default class MyHeader extends Component {
 	render() {
 		return (
 			<View>
-                <Header hasTabs={this.props.hasTabs || false} style={localStyles.header}>
+                <Header hasTabs={this.props.hasTabs || false} style={localStyles.header} iosBarStyle="light-content">
                   <Left>
                     <View style={localStyles.logo}>
                         <TouchableHighlight underlayColor='#3da0ff' onPress={() => this.props.navigation.navigate('Home')}>

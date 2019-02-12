@@ -22,7 +22,8 @@ class File {
                     return;
                 }
 
-		        if ((Platform.OS === 'ios' && result.fileName.endsWith('.xml')) || result.type === 'application/xml') {
+
+		        if ((Platform.OS === 'ios' && result.fileName.toLowerCase().endsWith('.xml')) || result.type === 'application/xml') {
                     this._read(result.uri, startLoad, endLoad);
                 } else {
                     Toast.show({
