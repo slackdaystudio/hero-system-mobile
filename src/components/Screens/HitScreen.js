@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { Platform, StyleSheet, View, Switch, AsyncStorage, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
-import RNShakeEvent from 'react-native-shake-event';
+import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -35,13 +35,13 @@ export default class HitScreen extends Component {
 	        }
 	    }).done();
 
-        RNShakeEvent.addEventListener('shake', () => {
+        RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
 	}
 
    	componentWillUnmount() {
-   		RNShakeEvent.removeEventListener('shake');
+   		RNShake.removeEventListener('ShakeEvent');
    	}
 
     _roll() {

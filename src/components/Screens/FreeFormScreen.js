@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image, AsyncStorage } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
-import RNShakeEvent from 'react-native-shake-event';
+import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -24,7 +24,7 @@ export default class HitScreen extends Component {
 	}
 	
 	componentDidMount() {
-        RNShakeEvent.addEventListener('shake', () => {
+        RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
 
@@ -40,7 +40,7 @@ export default class HitScreen extends Component {
 	}
 
    	componentWillUnmount() {
-   		RNShakeEvent.removeEventListener('shake');
+   		RNShake.removeEventListener('ShakeEvent');
    	}
 
     _roll() {

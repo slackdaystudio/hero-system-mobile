@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { Platform, StyleSheet, View, Image, Switch, AsyncStorage, Alert } from 'react-native';
 import { Container, Content, Button, Text, Picker, Item, Tabs, Tab, ScrollableTab } from 'native-base';
-import RNShakeEvent from 'react-native-shake-event';
+import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
@@ -26,7 +26,7 @@ export default class DamageScreen extends Component {
 	}
 	
 	componentDidMount() {
-        RNShakeEvent.addEventListener('shake', () => {
+        RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
 
@@ -46,7 +46,7 @@ export default class DamageScreen extends Component {
 	}
 
    	componentWillUnmount() {
-   		RNShakeEvent.removeEventListener('shake');
+   		RNShake.removeEventListener('ShakeEvent');
    	}
 
     _setIsFifthEdition() {

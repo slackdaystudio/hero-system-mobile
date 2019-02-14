@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { AsyncStorage, Platform, StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
-import RNShakeEvent from 'react-native-shake-event';
+import RNShake from 'react-native-shake';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import LabelAndContent from '../LabelAndContent/LabelAndContent';
 import Header from '../Header/Header';
@@ -21,7 +21,7 @@ export default class RandomCharacterScreen extends Component {
 	}
 
 	componentWillMount() {
-		RNShakeEvent.addEventListener('shake', () => {
+		RNShake.addEventListener('ShakeEvent', () => {
 			this._reRoll();
 		});
 	}
@@ -37,7 +37,7 @@ export default class RandomCharacterScreen extends Component {
 	}
 
 	componentWillUnmount() {
-		RNShakeEvent.removeEventListener('shake');
+		RNShake.removeEventListener('ShakeEvent');
 	}
 
 	_onNameChange(text) {

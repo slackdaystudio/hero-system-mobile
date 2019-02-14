@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
-import RNShakeEvent from 'react-native-shake-event';
+import RNShake from 'react-native-shake';
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
@@ -21,13 +21,13 @@ export default class ResultScreen extends Component {
 	}
 
 	componentDidMount() {
-        RNShakeEvent.addEventListener('shake', () => {
+        RNShake.addEventListener('ShakeEvent', () => {
             this.reRoll();
         });
 	}
 
    	componentWillUnmount() {
-   		RNShakeEvent.removeEventListener('shake');
+   		RNShake.removeEventListener('ShakeEvent');
    	}
 
 	_reRoll() {
