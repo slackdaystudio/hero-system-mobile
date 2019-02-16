@@ -87,9 +87,9 @@ export default class ViewCharacterScreen extends Component {
 	render() {
 	    if (this.state.character === null) {
 	        return (
-                <Container>
+                <Container style={styles.container}>
                     <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
+                    <Content style={{backgroundColor: '#375476'}}>
                         <Spinner color='#D0D1D3' />
                     </Content>
 	            </Container>
@@ -97,7 +97,7 @@ export default class ViewCharacterScreen extends Component {
 	    }
 
 		return (
-		  <Container style={localStyles.container}>
+		  <Container style={styles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
 		  	<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
                 <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
