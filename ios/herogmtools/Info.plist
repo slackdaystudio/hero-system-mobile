@@ -6,6 +6,8 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>HERO System Mobile</string>
+	<key>CFBundleDocumentTypes</key>
+	<array/>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -37,6 +39,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Entypo.ttf</string>
