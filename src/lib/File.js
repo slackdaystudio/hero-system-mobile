@@ -43,14 +43,7 @@ class File {
         startLoad();
 
         try {
-            let filePath = uri;
-
-            if (Platform.OS === 'ios' && !common.isIPad()) {
-                let arr = uri.split('/');
-                const dirs = RNFetchBlob.fs.dirs;
-                filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
-            }
-
+            let filePath = uri.startsWith('file://') ? uri.substring(7) : uri; ;
             let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'utf8');
             let parser = xml2js.Parser({explicitArray: false});
 
