@@ -45,7 +45,7 @@ class File {
         try {
             let filePath = uri.startsWith('file://') ? uri.substring(7) : uri; ;
 
-            if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools\-Inbox/.test(filePath === false)) {
+            if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools\-Inbox/.test(filePath) === false) {
                 let arr = uri.split('/');
                 const dirs = RNFetchBlob.fs.dirs;
                 filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
