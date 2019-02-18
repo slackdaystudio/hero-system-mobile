@@ -43,16 +43,16 @@ class File {
         startLoad();
 
         try {
-	    let filePath = uri;
+            let filePath = uri;
 
-	    if (Platform.OS === 'ios') {
-		let arr = uri.split('/')
-  		const dirs = RNFetchBlob.fs.dirs
-  		filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`
-	    }
-            
- 	    let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'utf8');
-	    let parser = xml2js.Parser({explicitArray: false});
+            if (Platform.OS === 'ios' && !common.isIPad()) {
+                let arr = uri.split('/');
+                const dirs = RNFetchBlob.fs.dirs;
+                filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
+            }
+
+            let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'utf8');
+            let parser = xml2js.Parser({explicitArray: false});
 
             parser.parseString(data, (error, result) => {
                 AsyncStorage.setItem('character', JSON.stringify(result));
