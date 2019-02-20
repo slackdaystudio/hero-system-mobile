@@ -5,7 +5,7 @@ import Slider from 'react-native-slider';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
-export default class MySlider extends Component {
+class MySlider extends Component {
 	constructor(props) {
 		super(props);
 
@@ -108,6 +108,8 @@ export default class MySlider extends Component {
                         minimumValue={this.props.min}
                         maximumValue={this.props.max}
                         onValueChange={(value) => this.onValueChange(value)}
+                        onSlidingStart={() => this.props.toggleTabsLocked(true)}
+                        onSlidingComplete={() => this.props.toggleTabsLocked(false)}
                         disabled={this.props.disabled}
                         trackStyle={thumbStyles.track}
                         thumbStyle={thumbStyles.thumb}
@@ -118,6 +120,10 @@ export default class MySlider extends Component {
 		);
 	}
 }
+
+MySlider.defaultProps = {
+    toggleTabsLocked: () => {}
+};
 
 const localStyles = StyleSheet.create({
 	titleContainer: {
@@ -142,3 +148,5 @@ const thumbStyles = StyleSheet.create({
 		borderWidth: 2,
 	}
 });
+
+export default MySlider;

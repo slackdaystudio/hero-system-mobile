@@ -17,11 +17,13 @@ export default class HitScreen extends Component {
 			ocv: 0,
 			isAutofire: false,
 			targetDcv: 0,
-			selectedLocation: -1
+			selectedLocation: -1,
+			tabsLocked: false
 		}
 
 		this.updateCv = this._updateCv.bind(this);
 		this.toggleAutofire = this._toggleAutofire.bind(this);
+		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
 		this.roll = this._roll.bind(this);
 		this.setLocation = this._setLocation.bind(this);
 	}
@@ -74,6 +76,13 @@ export default class HitScreen extends Component {
         this.setState({selectedLocation: location});
     }
 
+    _toggleTabsLocked(locked) {
+        let newState = {...this.state};
+        newState.tabsLocked = locked;
+
+        this.setState(newState);
+    }
+
     _renderDcvSlider() {
         if (this.state.isAutofire) {
             return (
@@ -84,7 +93,8 @@ export default class HitScreen extends Component {
                     min={-30}
                     max={30}
                     onValueChange={this.updateCv}
-                    valueKey='targetDcv' />
+                    valueKey='targetDcv'
+                    toggleTabsLocked={this.toggleTabsLocked} />
             );
         }
 
@@ -120,7 +130,7 @@ export default class HitScreen extends Component {
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
 				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
-                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <Slider
@@ -131,6 +141,7 @@ export default class HitScreen extends Component {
                                     max={30}
                                     onValueChange={this.updateCv}
                                     valueKey='ocv'
+                                    toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                     <Text style={styles.grey}>Is this an autofire attack?</Text>
