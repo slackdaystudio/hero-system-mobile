@@ -22,6 +22,7 @@ export default class DamageScreen extends Component {
 
 		this.updateState = this._updateState.bind(this);
 		this.toggleDamageType = this._toggleDamageType.bind(this);
+		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
 		this.roll = this._roll.bind(this);
 	}
 	
@@ -122,6 +123,13 @@ export default class DamageScreen extends Component {
         this.updateState('isExplosion', !this.state.isExplosion);
     }
 
+    _toggleTabsLocked(locked) {
+        let newState = {...this.state};
+        newState.tabsLocked = locked;
+
+        this.setState(newState);
+    }
+
     _renderFadeRate() {
         if (this.state.isExplosion) {
 			return (
@@ -132,7 +140,8 @@ export default class DamageScreen extends Component {
 					min={1}
 					max={10}
 					onValueChange={this.updateState}
-					valueKey='fadeRate' />
+					valueKey='fadeRate'
+					toggleTabsLocked={this.toggleTabsLocked} />
 			);
         }
 
@@ -149,7 +158,8 @@ export default class DamageScreen extends Component {
 					min={-10} 
 					max={10}
 					onValueChange={this.updateState}
-					valueKey='stunMultiplier' />
+					valueKey='stunMultiplier'
+					toggleTabsLocked={this.toggleTabsLocked} />
 			);
 		}
 		
@@ -173,6 +183,7 @@ export default class DamageScreen extends Component {
                                         max={50}
                                         onValueChange={this.updateState}
                                         valueKey='dice'
+                                        toggleTabsLocked={this.toggleTabsLocked}
                                     />
                                     <Picker
                                       inlinelabel

@@ -63,7 +63,8 @@ class Common {
                 isUsingClinging: false,
                 isExplosion: false,
                 fadeRate: 1,
-                useFifthEdition: false
+                useFifthEdition: false,
+                tabsLocked: false
             };
         }
 
@@ -82,7 +83,8 @@ class Common {
             isUsingClinging: props.isUsingClinging || false,
             isExplosion: props.isExplosion || false,
             fadeRate: props.fadeRate || 1,
-            useFifthEdition: false,
+            useFifthEdition: props.useFifthEdition || false,
+            tabsLocked: props.tabsLocked || false,
             skipFormLoad: true
         };
     }
