@@ -171,7 +171,7 @@ export default class DamageScreen extends Component {
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
 				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
-                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View>
