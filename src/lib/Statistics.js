@@ -80,7 +80,7 @@ class Statistics {
 
         this._updateDistributions(resultRoll.rolls, stats.distributions);
 
-        await AsyncStorage.setItem('statistics', JSON.stringify(stats));
+        return AsyncStorage.setItem('statistics', JSON.stringify(stats));
     }
 
     getMostFrequentHitLocation(hitLocationStats) {

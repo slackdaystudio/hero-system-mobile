@@ -15,13 +15,7 @@ export default class ResultScreen extends Component {
 			result: props.navigation.state.params
 		}
 
-        if (this.state.result.hasOwnProperty('results')) {
-            for (let i = 0; i < this.state.result.results.length; i++) {
-                statistics.add(this.state.result.results[i]);
-            }
-        } else {
-            statistics.add(this.state.result);
-        }
+        this._updateStatistics();
 
 		this.reRoll = this._reRoll.bind(this);
 	}
@@ -38,17 +32,21 @@ export default class ResultScreen extends Component {
    		this.props.navigation.state.params = null;
    	}
 
+    async _updateStatistics() {
+        if (this.state.result.hasOwnProperty('results')) {
+            for (let i = 0; i < this.state.result.results.length; i++) {
+                await statistics.add(this.state.result.results[i]);
+            }
+        } else {
+            await statistics.add(this.state.result);
+        }
+    }
+
 	_reRoll() {
 		this.setState({
 			result: dieRoller.rollAgain(this.props.navigation.state.params)
 		}, () => {
-            if (this.state.result.hasOwnProperty('results')) {
-                for (let i = 0; i < this.state.result.results.length; i++) {
-                    statistics.add(this.state.result.results[i]);
-                }
-            } else {
-                statistics.add(this.state.result);
-            }
+            this._updateStatistics();
 		});
 	}
 	
