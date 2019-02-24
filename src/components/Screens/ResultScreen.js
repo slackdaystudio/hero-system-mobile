@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
 import Header from '../Header/Header';
@@ -10,12 +10,18 @@ import styles from '../../Styles';
 export default class ResultScreen extends Component {
 	constructor(props) {
 		super(props);
-		
+
 		this.state = {
 			result: props.navigation.state.params
 		}
 
-		statistics.add(this.state.result);
+        if (this.state.result.hasOwnProperty('results')) {
+            for (let i = 0; i < this.state.result.results.length; i++) {
+                statistics.add(this.state.result.results[i]);
+            }
+        } else {
+            statistics.add(this.state.result);
+        }
 
 		this.reRoll = this._reRoll.bind(this);
 	}
@@ -34,26 +40,32 @@ export default class ResultScreen extends Component {
 		this.setState({
 			result: dieRoller.rollAgain(this.props.navigation.state.params)
 		}, () => {
-		    statistics.add(this.state.result);
+            if (this.state.result.hasOwnProperty('results')) {
+                for (let i = 0; i < this.state.result.results.length; i++) {
+                    statistics.add(this.state.result.results[i]);
+                }
+            } else {
+                statistics.add(this.state.result);
+            }
 		});
 	}
 	
-	_renderToHitInfo() {
-		if (this.state.result.total === 3) {
+	_renderToHitInfo(result) {
+		if (result.total === 3) {
 			return <Text style={styles.grey}>You have critically hit your target</Text>;
-		} else if (this.state.result.total === 18) {
+		} else if (result.total === 18) {
 			return <Text style={styles.grey}>You have missed your target</Text>;
 		}
 
-		if (this.state.result.isAutofire) {
-		    if (this.state.result.hits > 0) {
-		        return <Text style={styles.grey}>You can hit your target up to {this.state.result.hits}x</Text>
+		if (result.isAutofire) {
+		    if (result.hits > 0) {
+		        return <Text style={styles.grey}>You can hit your target up to {result.hits}x</Text>
 		    } else {
 		        return <Text style={styles.grey}>You have missed your target with all of your shots</Text>
 		    }
 		}
 
-		return <Text style={styles.grey}>You can hit a DCV/DMCV of {this.state.result.hitCv} or less</Text>
+		return <Text style={styles.grey}>You can hit a DCV/DMCV of {result.hitCv} or less</Text>
 	}
 	
 	_renderHitLocation() {
@@ -76,8 +88,8 @@ export default class ResultScreen extends Component {
 		return <Text />;
 	}
 	
-	_renderDamageInfo() {
-	    if (this.state.result.damageForm.isExplosion) {
+	_renderDamageInfo(result) {
+	    if (result.damageForm.isExplosion) {
 	        return (
 	            <View style={{paddingBottom: 20}}>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
@@ -86,13 +98,13 @@ export default class ResultScreen extends Component {
                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>BODY</Text></View>
                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>KB</Text></View>
                     </View>
-	                {this.state.result.explosion.map((entry, index) => {
+	                {result.explosion.map((entry, index) => {
 	                    return (
                             <View key={'exp-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
-                                <View style={{flex: 1, alignSelf: 'flex-end'}}><Text style={styles.grey}>{this._renderDistance(entry.distance)}</Text></View>
+                                <View style={{flex: 1, alignSelf: 'flex-end'}}><Text style={styles.grey}>{this._renderDistance(entry.distance, result)}</Text></View>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderStun(entry.stun)}</Text></View>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{entry.body}</Text></View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderKnockback(entry.knockback)}</Text></View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderKnockback(entry.knockback, result)}</Text></View>
                             </View>
 	                    );
 	                })}
@@ -108,22 +120,22 @@ export default class ResultScreen extends Component {
 				</View>
 				<View style={localStyles.lineContainer}>
 					<Text style={[styles.boldGrey, localStyles.alignStart]}>Stun: </Text>
-					{this._renderStun(this.state.result.stun)}
+					{this._renderStun(result.stun)}
 				</View>	
 				<View style={localStyles.lineContainer}>
 					<Text style={[styles.boldGrey, localStyles.alignStart]}>Body: </Text>
-					<Text style={styles.grey}>{this.state.result.body}</Text>
+					<Text style={styles.grey}>{result.body}</Text>
 				</View>
 				<View style={localStyles.lineContainer}>
 					<Text style={[styles.boldGrey, localStyles.alignStart]}>Knockback: </Text>
-					{this._renderKnockback(this.state.result.knockback)}
+					{this._renderKnockback(result.knockback, result)}
 				</View>
 			</View>
 		);
 	}
 
-	_renderSkillCheckInfo() {
-	    let overUnder = this.state.result.threshold - this.state.result.total;
+	_renderSkillCheckInfo(result) {
+	    let overUnder = result.threshold - result.total;
 
 	    if (overUnder >= 0) {
 	        if (overUnder === 0) {
@@ -142,22 +154,22 @@ export default class ResultScreen extends Component {
         );
 	}
 
-	_renderAdditionalRollInfo() {
-		if (this.state.result.rollType === TO_HIT) {
-			return this._renderToHitInfo();
-		} else if (this.state.result.rollType === NORMAL_DAMAGE || this.state.result.rollType === KILLING_DAMAGE) {
-			return this._renderDamageInfo();
-		} else if (this.state.result.rollType === SKILL_CHECK && this.state.result.threshold !== -1) {
-		    return this._renderSkillCheckInfo();
+	_renderAdditionalRollInfo(result) {
+		if (result.rollType === TO_HIT) {
+			return this._renderToHitInfo(result);
+		} else if (result.rollType === NORMAL_DAMAGE || result.rollType === KILLING_DAMAGE) {
+			return this._renderDamageInfo(result);
+		} else if (result.rollType === SKILL_CHECK && result.threshold !== -1) {
+		    return this._renderSkillCheckInfo(result);
 		}
 		
 		return null;
 	}
 
-	_renderDistance(distance) {
+	_renderDistance(distance, result) {
 		let distanceText = '';
 
-		if (this.state.result.damageForm.useFifthEdition) {
+		if (result.damageForm.useFifthEdition) {
 		    distanceText = distance / 2 + '"';
 		} else {
 		    distanceText = distance + 'm';
@@ -172,11 +184,11 @@ export default class ResultScreen extends Component {
 		return <Text style={styles.grey}>{stun}</Text>;
 	}
 	
-	_renderKnockback(knockback) {
+	_renderKnockback(knockback, result) {
 		knockback = knockback < 0 ? 0 : knockback;
 		let knockbackText = '';
 
-		if (this.state.result.damageForm.useFifthEdition) {
+		if (result.damageForm.useFifthEdition) {
 		    knockbackText = knockback / 2 + '"';
 		} else {
 		    knockbackText = knockback + 'm';
@@ -184,19 +196,41 @@ export default class ResultScreen extends Component {
 
 		return <Text style={styles.grey}>{knockbackText}</Text>;
 	}
-	
-	render() {	
+
+	_renderRoll() {
+	    if (this.state.result.hasOwnProperty('results')) {
+	        return this.state.result.results.map((result, index) => {
+                return (
+                    <View key={'roll-result-' + index}>
+                        <Text style={[styles.grey, localStyles.rollResult]}>{result.total}</Text>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Dice Rolled: </Text>{result.rolls.length} ({result.rolls.join(', ')})
+                        </Text>
+                        {this._renderAdditionalRollInfo(result)}
+                    </View>
+                );
+	        });
+	    }
+
+	    return (
+            <View>
+                <Text style={[styles.grey, localStyles.rollResult]}>{this.state.result.total}</Text>
+                <Text style={styles.grey}>
+                    <Text style={styles.boldGrey}>Dice Rolled: </Text>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
+                </Text>
+                {this._renderAdditionalRollInfo(this.state.result)}
+            </View>
+	    );
+	}
+
+	render() {
 		return (
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
 				    <Text style={styles.heading}>Roll Result</Text>
 					<View>
-						<Text style={[styles.grey, localStyles.rollResult]}>{this.state.result.total}</Text>
-                        <Text style={styles.grey}>
-                            <Text style={styles.boldGrey}>Dice Rolled: </Text>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
-                        </Text>
-						{this._renderAdditionalRollInfo()}
+						{this._renderRoll()}
 						<View style={styles.buttonContainer}>
 			    			<Button block style={styles.button} onPress={this.reRoll}>
 			    				<Text uppercase={false}>Roll Again</Text>

@@ -34,6 +34,7 @@ export default class SettingsScreen extends Component {
         }));
 		await AsyncStorage.setItem('ocvSliderValue', JSON.stringify({
 			ocv: 0,
+			numberOfRolls: 1,
 			isAutofire: false,
 			targetDcv: 0,
 			selectedLocation: -1

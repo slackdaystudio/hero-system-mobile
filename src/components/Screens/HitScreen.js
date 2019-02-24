@@ -15,6 +15,7 @@ export default class HitScreen extends Component {
 		
 		this.state = {
 			ocv: 0,
+			numberOfRolls: 1,
 			isAutofire: false,
 			targetDcv: 0,
 			selectedLocation: -1,
@@ -22,6 +23,7 @@ export default class HitScreen extends Component {
 		}
 
 		this.updateCv = this._updateCv.bind(this);
+		this.updateNumberOfRolls = this._updateNumberOfRolls.bind(this);
 		this.toggleAutofire = this._toggleAutofire.bind(this);
 		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
 		this.roll = this._roll.bind(this);
@@ -47,7 +49,7 @@ export default class HitScreen extends Component {
    	}
 
     _roll() {
-        this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.ocv, this.state.isAutofire, this.state.targetDcv));
+        this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.ocv, this.state.numberOfRolls, this.state.isAutofire, this.state.targetDcv));
     }
 
 	_updateCv(key, value) {
@@ -58,6 +60,15 @@ export default class HitScreen extends Component {
 
         this.setState(newState);
 	}
+
+    _updateNumberOfRolls(key, value) {
+		let newState = {...this.state};
+		newState[key] = parseInt(value, 10);
+
+		AsyncStorage.setItem('ocvSliderValue', JSON.stringify(newState));
+
+        this.setState(newState);
+    }
 
 	_toggleAutofire() {
 		let newState = {...this.state};
@@ -141,6 +152,16 @@ export default class HitScreen extends Component {
                                     max={30}
                                     onValueChange={this.updateCv}
                                     valueKey='ocv'
+                                    toggleTabsLocked={this.toggleTabsLocked}
+                                />
+                                <Slider
+                                    label='Rolls:'
+                                    value={this.state.numberOfRolls}
+                                    step={1}
+                                    min={1}
+                                    max={20}
+                                    onValueChange={this.updateNumberOfRolls}
+                                    valueKey='numberOfRolls'
                                     toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
