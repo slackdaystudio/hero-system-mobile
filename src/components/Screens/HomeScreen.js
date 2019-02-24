@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import { Platform, StyleSheet, ScrollView, View, ImageBackground, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Spinner, Card, CardItem, Body, Icon } from 'native-base';
 import Header from '../Header/Header';
+import Heading from '../Heading/Heading';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
@@ -44,8 +45,8 @@ export default class HomeScreen extends Component {
 		    <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{ resizeMode: 'cover' }}>
 			    <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
-                    <Text style={styles.heading}>Character</Text>
-                    <Text style={styles.grey}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
+                    <Heading text='Character' />
+                    <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you're on the go.</Text>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             {this._renderViewCharacterButton()}
@@ -56,8 +57,8 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
                     </View>
-                    <Text style={styles.heading}>Rolls</Text>
-                    <Text style={styles.grey}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
+                    <Heading text='Rolls' />
+                    <Text style={[styles.grey, {textAlign: 'center'}]}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('Skill')}>
@@ -82,8 +83,8 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
                     </View>
-                    <Text style={styles.heading}>Tools</Text>
-                    <Text style={styles.grey}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool or use the cruncher to calculate power costs.</Text>
+                    <Heading text='Tools' />
+                    <Text style={[styles.grey, {textAlign: 'center'}]}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool or use the cruncher to calculate power costs.</Text>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={[styles.buttonContainer, {paddingBottom: 20}]}>
                             <Button style={styles.button} onPress={() => this.props.navigation.navigate('RandomCharacter')}>
@@ -96,8 +97,8 @@ export default class HomeScreen extends Component {
                             </Button>
                         </View>
                     </View>
-                    <Text style={styles.heading}>Library</Text>
-                    <Text style={styles.grey}>A collection of documents to help new and old players alike.</Text>
+                    <Heading text='Library' />
+                    <Text style={[styles.grey, {textAlign: 'center'}]}>A collection of documents to help new and old players alike.</Text>
                     <TouchableHighlight onPress={() => this.props.navigation.navigate('PdfViewer', {pdfName: 'Hero2Page.pdf'})}>
                         <Card style={{borderColor: '#D0D1D3'}}>
                             <CardItem style={{backgroundColor: '#375476'}}>

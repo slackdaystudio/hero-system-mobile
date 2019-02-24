@@ -12,13 +12,13 @@ export default StyleSheet.create({
 	},
 	content: {
 		paddingTop: 0,
-		paddingHorizontal: 10
+		paddingHorizontal: 5
 	},
-	heading: {
-		fontSize: 26,
-		fontWeight: 'bold',
+    heading: {
+		fontSize: 32,
 		color: '#D0D1D3',
-		paddingTop: 20
+		paddingTop: 10,
+		alignSelf: 'center'
 	},
 	subHeading: {
 		alignSelf: 'center',
