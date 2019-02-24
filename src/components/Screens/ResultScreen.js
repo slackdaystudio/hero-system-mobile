@@ -34,6 +34,8 @@ export default class ResultScreen extends Component {
 
    	componentWillUnmount() {
    		RNShake.removeEventListener('ShakeEvent');
+
+   		this.props.navigation.state.params = null;
    	}
 
 	_reRoll() {
