@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import { StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
+import AnimateNumber from 'react-native-animate-number'
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
@@ -202,7 +203,7 @@ export default class ResultScreen extends Component {
 	        return this.state.result.results.map((result, index) => {
                 return (
                     <View key={'roll-result-' + index}>
-                        <Text style={[styles.grey, localStyles.rollResult]}>{result.total}</Text>
+                        <Text style={[styles.grey, localStyles.rollResult]}><AnimateNumber value={result.total} formatter={(val) => {return val.toFixed(0)}} interval={1} /></Text>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Dice Rolled: </Text>{result.rolls.length} ({result.rolls.join(', ')})
                         </Text>
@@ -214,7 +215,7 @@ export default class ResultScreen extends Component {
 
 	    return (
             <View>
-                <Text style={[styles.grey, localStyles.rollResult]}>{this.state.result.total}</Text>
+                <Text style={[styles.grey, localStyles.rollResult]}><AnimateNumber value={this.state.result.total} formatter={(val) => {return val.toFixed(0)}} /></Text>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dice Rolled: </Text>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
                 </Text>
@@ -245,7 +246,8 @@ export default class ResultScreen extends Component {
 
 const localStyles = StyleSheet.create({
 	rollResult: {
-		fontSize: 75
+		fontSize: 100,
+		fontWeight: 'bold'
 	},
 	lineContainer: {
 	    flexDirection: 'row',

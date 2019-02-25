@@ -21,6 +21,7 @@
     "native-base": "^2.11.0",
     "react": "16.6.3",
     "react-native": "^0.58.4",
+    "react-native-animate-number": "^0.1.2",
     "react-native-document-picker": "^2.2.0",
     "react-native-iphone-x-helper": "^1.2.0",
     "react-native-pathjs-charts": "0.0.34",
