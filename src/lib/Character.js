@@ -1,5 +1,6 @@
-import { Platform, AsyncStorage, Alert } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import { Toast } from 'native-base';
+import AsyncStorage from '@react-native-community/async-storage';
 import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 import { common } from './Common';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from './DieRoller';

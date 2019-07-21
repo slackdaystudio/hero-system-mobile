@@ -1,4 +1,5 @@
-import { Dimensions, Platform, AsyncStorage, Alert } from 'react-native';
+import { Dimensions, Platform, Alert } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { KILLING_DAMAGE, NORMAL_DAMAGE } from './DieRoller';
 
 class Common {

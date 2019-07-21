@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
-import { AsyncStorage, Platform, StyleSheet, View, Image, Alert } from 'react-native';
+import { Platform, StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
+import AsyncStorage from '@react-native-community/async-storage';
 import RNShake from 'react-native-shake';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import LabelAndContent from '../LabelAndContent/LabelAndContent';
@@ -20,12 +21,6 @@ export default class RandomCharacterScreen extends Component {
 		this.reRoll = this._reRoll.bind(this);
 	}
 
-	componentWillMount() {
-		RNShake.addEventListener('ShakeEvent', () => {
-			this._reRoll();
-		});
-	}
-
 	async componentDidMount() {
 	    let hero = await AsyncStorage.getItem('hero');
 
@@ -34,6 +29,10 @@ export default class RandomCharacterScreen extends Component {
 	    } else {
 	        this.setState({character: JSON.parse(hero)});
 	    }
+
+        RNShake.addEventListener('ShakeEvent', () => {
+            this._reRoll();
+        });
 	}
 
 	componentWillUnmount() {

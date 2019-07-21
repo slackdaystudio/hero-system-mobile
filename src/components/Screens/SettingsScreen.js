@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, AsyncStorage, Switch, Alert } from 'react-native';
+import { StyleSheet, View, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
+import AsyncStorage from '@react-native-community/async-storage';
 import Header from '../Header/Header';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';

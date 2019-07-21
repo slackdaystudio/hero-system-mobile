@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, ScrollView, AsyncStorage } from 'react-native';
+import { Platform, StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner } from 'native-base';
+import AsyncStorage from '@react-native-community/async-storage';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
 import Characteristics from '../Character/Characteristics';
@@ -22,7 +23,7 @@ export default class ViewCharacterScreen extends Component {
 		};
 	}
 	
-	async componentWillMount() {
+	async componentDidMount() {
 		let loadedCharacter = await AsyncStorage.getItem('character');
 
         if (loadedCharacter === null) {

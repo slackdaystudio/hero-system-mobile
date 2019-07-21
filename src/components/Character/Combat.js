@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
-import { StyleSheet, AsyncStorage, View, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, TouchableHighlight } from 'react-native';
 import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Spinner } from 'native-base';
+import AsyncStorage from '@react-native-community/async-storage';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
