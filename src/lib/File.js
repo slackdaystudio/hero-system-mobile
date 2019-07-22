@@ -1,42 +1,41 @@
 import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
-import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
+import DocumentPicker from 'react-native-document-picker';
 import RNFetchBlob from 'rn-fetch-blob'
 import xml2js from 'react-native-xml2js';
 import { common } from './Common';
 import { character } from './Character';
 
 class File {
-    loadCharacter(startLoad, endLoad) {
-        if (common.isIPad()) {
-            DocumentPicker.show({
-                top: 0,
-                left: 0,
-                filetype: ['public.data']
-            }, (error, uri) => {
-                this._read(uri.uri, startLoad, endLoad);
+    async loadCharacter(startLoad, endLoad) {
+        try {
+            const result = await DocumentPicker.pick({
+                type: [DocumentPicker.types.allFiles],
             });
-        } else {
-            DocumentPicker.show({filetype: [DocumentPickerUtil.allFiles()]},(error, result) => {
-                if (result === null) {
-                    return;
-                }
 
+            if (result === null) {
+                return;
+            }
 
-		        if (result.fileName.toLowerCase().endsWith('.xml')) {
-                    this._read(result.uri, startLoad, endLoad);
-                } else {
-                    Toast.show({
-                        text: 'Unsupported file type: ' + result.type,
-                        position: 'bottom',
-                        buttonText: 'OK',
-                        duration: 3000
-                    });
+            if (result.name.toLowerCase().endsWith('.xml')) {
+                this._read(result.uri, startLoad, endLoad);
+            } else {
+                Toast.show({
+                    text: 'Unsupported file type: ' + result.type,
+                    position: 'bottom',
+                    buttonText: 'OK',
+                    duration: 3000
+                });
 
-                    return;
-                }
-            });
+                return;
+            }
+        } catch (error) {
+            const isCancel = await DocumentPicker.isCancel(error);
+
+            if (!isCancel) {
+                Alert.alert(error.message);
+            }
         }
     }
 
@@ -52,7 +51,7 @@ class File {
                 filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
             }
             
-            let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'utf8');
+            let data = await RNFetchBlob.fs.readFile(filePath, 'utf8');
             let parser = xml2js.Parser({explicitArray: false});
 
             parser.parseString(data, (error, result) => {

@@ -22,11 +22,12 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.5.1",
+    "buffer": "^5.2.1",
     "native-base": "^2.12.2",
     "react": "16.8.6",
     "react-native": "^0.60.4",
     "react-native-animate-number": "^0.1.2",
-    "react-native-document-picker": "^2.2.0",
+    "react-native-document-picker": "^3.2.2",
     "react-native-iphone-x-helper": "^1.2.0",
     "react-native-pathjs-charts": "0.0.34",
     "react-native-pdf": "^5.1.3",
