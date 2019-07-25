@@ -57,9 +57,11 @@ PODS:
     - React-cxxreact (= 0.60.4)
     - React-jsi (= 0.60.4)
   - React-jsinspector (0.60.4)
-  - react-native-document-picker (2.2.0):
+  - react-native-document-picker (3.2.2):
     - React
-  - react-native-pdf (5.0.11):
+  - react-native-pdf (5.1.3):
+    - React
+  - react-native-shake (3.3.1):
     - React
   - react-native-splash-screen (3.2.0):
     - React
@@ -87,11 +89,11 @@ PODS:
   - React-RCTWebSocket (0.60.4):
     - React-Core (= 0.60.4)
     - React-fishhook (= 0.60.4)
-  - rn-fetch-blob (0.10.6):
+  - rn-fetch-blob (0.10.16):
     - React-Core
   - RNCAsyncStorage (1.5.1):
     - React
-  - RNSVG (9.2.4):
+  - RNSVG (9.5.3):
     - React
   - yoga (0.60.4.React)
 
@@ -109,6 +111,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
+  - react-native-shake (from `../node_modules/react-native-shake`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -156,6 +159,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
+  react-native-shake:
+    :path: "../node_modules/react-native-shake"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
   React-RCTActionSheet:
@@ -200,8 +205,9 @@ SPEC CHECKSUMS:
   React-jsi: 21d3153b1153fbf6510a92b6b11e33e725cb7432
   React-jsiexecutor: 7549641e48bafae7bfee3f3ea19bf4901639c5de
   React-jsinspector: 73f24a02fa684ed6a2b828ba116874a2191ded88
-  react-native-document-picker: da1c37bbc4ff0896986a70784808a2862d297887
-  react-native-pdf: aa2e3f51c3834cedbdafa743d122ce2974eab3f3
+  react-native-document-picker: 94a07ce0494c559e2ae9fa86621d6c624d810fec
+  react-native-pdf: 4ac64df95050555cce80d69c7e798322e1be4e6b
+  react-native-shake: 1dfc728d7208be26032c0c2d745e994facbf6a70
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   React-RCTActionSheet: 9f71d7ae3e8fb10e08d162cbf14c621349dbfab3
   React-RCTAnimation: 981d8c95b0e30918a9832ccac32af83562a27fae
@@ -213,9 +219,9 @@ SPEC CHECKSUMS:
   React-RCTText: e0f224898b13af9aa036ea7cb3d438daa68c1044
   React-RCTVibration: 0bea40cd51bd089bd591a8f74c86e91fdf2666c5
   React-RCTWebSocket: 163873f4cdd5f1058a9483443404fc3801581cb6
-  rn-fetch-blob: 2b5313836e2dcd6a8f37ca61a10a732cc851819b
+  rn-fetch-blob: 651b8d076b43d0d7aa294a3d9ec16c00aab8bef9
   RNCAsyncStorage: 2808c378f6a70f22f66eeb6c11a8d69f326dd795
-  RNSVG: 6fec2b50e65b4a01ba54155e8e546e0a1eeb16f4
+  RNSVG: 90c76b7cf235654d45e54655b6c189ea4041057c
   yoga: c2c050f6ae6e222534760cc82f559b89214b67e2
 
 PODFILE CHECKSUM: f3802ae4a2bf680f6a5a9ea146edff283968adf4

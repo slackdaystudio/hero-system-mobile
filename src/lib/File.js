@@ -51,7 +51,7 @@ class File {
                 filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
             }
             
-            let data = await RNFetchBlob.fs.readFile(filePath, 'utf8');
+            let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'utf8');
             let parser = xml2js.Parser({explicitArray: false});
 
             parser.parseString(data, (error, result) => {
