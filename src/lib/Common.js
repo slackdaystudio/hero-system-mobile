@@ -51,7 +51,7 @@ class Common {
         if (props === null || props === undefined || props === '') {
             return {
                 dice: 12,
-                partialDie: 0,
+                partialDie: "0",
                 killingToggled: false,
                 damageType: NORMAL_DAMAGE,
                 stunMultiplier: 0,

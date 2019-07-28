@@ -53,7 +53,7 @@ export default class DamageScreen extends Component {
 
     _setIsFifthEdition() {
         AsyncStorage.getItem('appSettings').then((value) => {
-            if (value !== undefined) {
+            if (value !== undefined && value != null) {
                 let newState = {...this.state};
                 newState.useFifthEdition = JSON.parse(value).useFifthEdition;
 
@@ -170,7 +170,7 @@ export default class DamageScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
-				<Header navigation={this.props.navigation} />
+				<Header navigation={this.props.navigation} hasTabs={true} />
 				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
@@ -186,12 +186,10 @@ export default class DamageScreen extends Component {
                                         valueKey='dice'
                                         toggleTabsLocked={this.toggleTabsLocked}
                                     />
+				    <Item>
                                     <Picker
-                                      inlinelabel
-                                      label='Test'
-                                      style={localStyles.grey}
+				      inlinelabel
                                       textStyle={styles.grey}
-                                      iosHeader="Select one"
                                       mode="dropdown"
                                       selectedValue={this.state.partialDie}
                                       onValueChange={(value) => this.updateState('partialDie', value)}
@@ -200,6 +198,7 @@ export default class DamageScreen extends Component {
                                       <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
                                       <Item label="+½ die" value={PARTIAL_DIE_HALF} />
                                     </Picker>
+				    </Item>
                                     <View style={{paddingBottom: 30}} />
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Is this a killing attack?</Text>
