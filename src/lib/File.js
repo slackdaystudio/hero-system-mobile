@@ -6,6 +6,8 @@ import RNFetchBlob from 'rn-fetch-blob'
 import xml2js from 'react-native-xml2js';
 import { common } from './Common';
 import { character } from './Character';
+import { Buffer } from 'buffer';
+import iconv from 'iconv-lite';
 
 class File {
     async loadCharacter(startLoad, endLoad) {
@@ -19,14 +21,15 @@ class File {
             }
 
             if (result.name.toLowerCase().endsWith('.xml')) {
-                this._read(result.uri, startLoad, endLoad);
+                await this._read(result.uri, startLoad, endLoad);
+            } else if (result.name.toLowerCase().endsWith('.hdc')  || result.name.toLowerCase().endsWith('.hdt')) {
+                let hasWritePermission = await this._askForWritePermission();
+
+                if (hasWritePermission) {
+                    await this._read(result.uri, startLoad, endLoad, true);
+                }
             } else {
-                Toast.show({
-                    text: 'Unsupported file type: ' + result.type,
-                    position: 'bottom',
-                    buttonText: 'OK',
-                    duration: 3000
-                });
+                common.toast('Unsupported file type: ' + result.type);
 
                 return;
             }
@@ -34,12 +37,12 @@ class File {
             const isCancel = await DocumentPicker.isCancel(error);
 
             if (!isCancel) {
-                Alert.alert(error.message);
+                common.toast(error.message);
             }
         }
     }
 
-    async _read(uri, startLoad, endLoad) {
+    async _read(uri, startLoad, endLoad, isHdc=false) {
         startLoad();
 
         try {
@@ -50,32 +53,129 @@ class File {
                 const dirs = RNFetchBlob.fs.dirs;
                 filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
             }
-            
-            let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'utf8');
-            let parser = xml2js.Parser({explicitArray: false});
 
-            parser.parseString(data, (error, result) => {
-                AsyncStorage.setItem('character', JSON.stringify(result));
+            let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'base64');
+            let rawXml = this._decode(data);
+
+            if (isHdc) {
+                this._loadHdcCharacter(rawXml);
+            } else {
+                this._loadXmlExportCharacter(rawXml);
+            }
+        } catch (error) {
+            Alert.alert('Read Error: ' + error.message);
+        } finally {
+            endLoad();
+        }
+    }
+
+    _loadXmlExportCharacter(rawXml) {
+        let parser = xml2js.Parser({explicitArray: false});
+
+        parser.parseString(rawXml, (error, result) => {
+            AsyncStorage.setItem('character', JSON.stringify(result)).then(() => {
                 AsyncStorage.setItem('combat', JSON.stringify({
                     stun: character.getCharacteristic(result.character.characteristics.characteristic, 'stun'),
                     body: character.getCharacteristic(result.character.characteristics.characteristic, 'body'),
                     endurance: character.getCharacteristic(result.character.characteristics.characteristic, 'endurance')
-                }));
-
-                Toast.show({
-                    text: 'Character successfully loaded',
-                    position: 'bottom',
-                    buttonText: 'OK',
-                    duration: 3000
+                })).then(() => {
+                    common.toast('Character successfully loaded');
                 });
-
-                endLoad();
             });
-        } catch (error) {
-            Alert.alert(error.message);
-        } finally {
-            endLoad();
+        });
+    }
+
+    _loadHdcCharacter(rawXml) {
+        let parser = xml2js.Parser({
+            explicitArray: false,
+            mergeAttrs: true,
+            emptyTag: null,
+            explicitRoot: false,
+            attrNameProcessors: [
+                (name) => {
+                    return common.toCamelCase(name);
+                }
+            ],
+            attrValueProcessors: [
+                (value) => {
+                    return this._parseXmlValue(value);
+                }
+            ],
+            tagNameProcessors: [
+                (name) => {
+                    return common.toCamelCase(name);
+                }
+            ],
+            valueProcessors: [
+                (value) => {
+                    return this._parseXmlValue(value);
+                }
+            ],
+        });
+
+        parser.parseString(rawXml, (error, result) => {
+            AsyncStorage.setItem('character', JSON.stringify(result)).then(() => {
+                common.toast('Character successfully loaded');
+            });
+            // RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.SDCardDir + '/HEROSystemMobile' + '/temp.json', JSON.stringify(result), 'utf8').then(() => {
+            //     common.toast('Character successfully saved');
+            // }).catch(error => {
+            //     common.toast(error.message);
+            // });
+        });
+    }
+
+    _decode(base64Payload) {
+        let buffer = Buffer.from(base64Payload, 'base64');
+        let decoded = iconv.decode(buffer, 'utf-16');
+
+        if (decoded.substring(0, 5) !== '<?xml') {
+            decoded = iconv.decode(buffer, 'utf-8');
         }
+
+        if (decoded.substring(0, 5) !== '<?xml') {
+            throw 'Unable to decode character payload';
+        }
+
+        return decoded;
+    }
+
+    _parseXmlValue(value) {
+        if (common.isInt(value)) {
+            return parseInt(value, 10);
+        } else if (common.isFloat(value)) {
+            return parseFloat(value);
+        } else if (value === 'true' || value === 'false' || value.toLowerCase() == 'yes' || value.toLowerCase() === 'no') {
+            return value === 'true' || value.toLowerCase() === 'yes' ? true : false;
+        }
+
+        return value.replace(/\r\n\t\t\t\t/gi, '').replace(/\r\n/gi, '\n');
+    }
+
+    async _askForWritePermission() {
+        if (Platform.OS === 'android') {
+            try {
+                let check = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+
+                if (check === PermissionsAndroid.RESULTS.GRANTED) {
+                    return check;
+                }
+
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        'title': 'HERO System Mobile File System Permission',
+                        'message': 'HERO System Mobile needs read/write access to your device to save characters'
+                    }
+                );
+
+                return granted;
+            } catch (error) {
+                common.toast(error.message);
+            }
+        }
+
+        return null;
     }
 }
 

@@ -1,5 +1,7 @@
 import { Dimensions, Platform, Alert } from 'react-native';
+import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
+import camelCase from 'camelcase'
 import { KILLING_DAMAGE, NORMAL_DAMAGE } from './DieRoller';
 
 class Common {
@@ -28,11 +30,15 @@ class Common {
     }
 
     isInt(value) {
-        return Number(value) === value && value % 1 === 0;
+        return !isNaN(value) && value % 1 === 0;
     }
 
     isFloat(value) {
-        return Number(value) === value && value % 1 !== 0;
+        if (!isNaN(value)) {
+    		return (value % 1 !== 0);
+    	}
+
+    	return false;
     }
 
     async getAppSettings() {
@@ -104,6 +110,19 @@ class Common {
             halfDice: props.halfDice || 0,
             pips: props.pips || 0
         };
+    }
+
+    toCamelCase(text) {
+        return camelCase(text);
+    }
+
+    toast(message, buttonText='OK', duration=3000) {
+        Toast.show({
+            text: message,
+            position: 'bottom',
+            buttonText: buttonText,
+            duration: duration
+        });
     }
 }
 

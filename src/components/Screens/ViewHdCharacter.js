@@ -2,13 +2,7 @@ import React, { Component }  from 'react';
 import { Platform, StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
-import General from '../Character/General';
-import Combat from '../Character/Combat';
-import Characteristics from '../Character/Characteristics';
-import Powers from '../Character/Powers';
-import Movement from '../Character/Movement';
-import TextList from '../Character/TextList';
-import Equipment from '../Character/Equipment';
+import General from '../HeroDesignerCharacter/General';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
@@ -43,48 +37,6 @@ export default class ViewCharacterScreen extends Component {
 		this.setState({character: characterJson});
 	}
 
-    _renderPowers(powers) {
-        if (powers === '' || powers === undefined || powers === null) {
-            return null;
-        }
-
-        return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
-                <View style={styles.tabContent}>
-                    <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.state.character)} />
-                </View>
-            </Tab>
-        );
-    }
-
-    _renderEquipment(equipment) {
-        if (equipment === '' || equipment === undefined || equipment === null) {
-            return null;
-        }
-
-        return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
-                <View style={styles.tabContent}>
-                    <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.state.character)}/>
-                </View>
-            </Tab>
-        );
-    }
-
-    _renderTextList(text, columnHeading, tabTitle = null) {
-        if (text === '' || text === undefined || text === null) {
-            return null;
-        }
-
-        return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
-			    <View style={styles.tabContent}>
-			        <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
-			    </View>
-			</Tab>
-        );
-    }
-
 	render() {
 	    if (this.state.character === null) {
 	        return (
@@ -104,7 +56,7 @@ export default class ViewCharacterScreen extends Component {
                 <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#375476'}} />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
 			  			<View style={styles.tabContent}>
-                            <General character={this.state.character} />
+                            <General character={this.state.character.characterInfo} />
 			  			</View>
 			  		</Tab>
 			  	</Tabs>
