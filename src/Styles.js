@@ -26,6 +26,15 @@ export default StyleSheet.create({
 		textDecorationLine: 'underline',
 		color: '#D0D1D3'
 	},
+	hdSubHeading: {
+		fontSize: 22,
+		fontWeight: 'bold',
+		paddingTop: 10,
+		color: '#D0D1D3',
+		borderBottomColor: '#D0D1D3',
+		borderBottomWidth: 2,
+		width: '100%'
+	},
 	buttonContainer: {
 		paddingVertical: 5
 	},
