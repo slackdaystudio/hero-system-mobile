@@ -5,12 +5,14 @@ import DocumentPicker from 'react-native-document-picker';
 import RNFetchBlob from 'rn-fetch-blob'
 import xml2js from 'react-native-xml2js';
 import { common } from './Common';
-import { character } from './Character';
+import { character as characterLib } from './Character';
 import { Buffer } from 'buffer';
 import iconv from 'iconv-lite';
 
 class File {
     async loadCharacter(startLoad, endLoad) {
+        let character = null;
+
         try {
             const result = await DocumentPicker.pick({
                 type: [DocumentPicker.types.allFiles],
@@ -21,18 +23,20 @@ class File {
             }
 
             if (result.name.toLowerCase().endsWith('.xml')) {
-                await this._read(result.uri, startLoad, endLoad);
+                character = await this._read(result.uri, startLoad, endLoad);
             } else if (result.name.toLowerCase().endsWith('.hdc')  || result.name.toLowerCase().endsWith('.hdt')) {
                 let hasWritePermission = await this._askForWritePermission();
 
                 if (hasWritePermission) {
-                    await this._read(result.uri, startLoad, endLoad, true);
+                    character = await this._read(result.uri, startLoad, endLoad, true);
                 }
             } else {
                 common.toast('Unsupported file type: ' + result.type);
 
                 return;
             }
+
+            return character;
         } catch (error) {
             const isCancel = await DocumentPicker.isCancel(error);
 
@@ -44,6 +48,7 @@ class File {
 
     async _read(uri, startLoad, endLoad, isHdc=false) {
         startLoad();
+        let character = null;
 
         try {
             let filePath = uri.startsWith('file://') ? uri.substring(7) : uri; ;
@@ -58,34 +63,39 @@ class File {
             let rawXml = this._decode(data);
 
             if (isHdc) {
-                this._loadHdcCharacter(rawXml);
+                character = await this._loadHdcCharacter(rawXml);
             } else {
-                this._loadXmlExportCharacter(rawXml);
+                character = await this._loadXmlExportCharacter(rawXml);
             }
         } catch (error) {
             Alert.alert('Read Error: ' + error.message);
         } finally {
             endLoad();
+            return character;
         }
     }
 
-    _loadXmlExportCharacter(rawXml) {
+    async _loadXmlExportCharacter(rawXml) {
         let parser = xml2js.Parser({explicitArray: false});
+        let character = null;
 
         parser.parseString(rawXml, (error, result) => {
-            AsyncStorage.setItem('character', JSON.stringify(result)).then(() => {
-                AsyncStorage.setItem('combat', JSON.stringify({
-                    stun: character.getCharacteristic(result.character.characteristics.characteristic, 'stun'),
-                    body: character.getCharacteristic(result.character.characteristics.characteristic, 'body'),
-                    endurance: character.getCharacteristic(result.character.characteristics.characteristic, 'endurance')
-                })).then(() => {
-                    common.toast('Character successfully loaded');
-                });
-            });
+            character = result;
         });
+
+        await AsyncStorage.setItem('character', JSON.stringify(character));
+        await AsyncStorage.setItem('combat', JSON.stringify({
+            stun: characterLib.getCharacteristic(character.character.characteristics.characteristic, 'stun'),
+            body: characterLib.getCharacteristic(character.character.characteristics.characteristic, 'body'),
+            endurance: characterLib.getCharacteristic(character.character.characteristics.characteristic, 'endurance')
+        }));
+
+        common.toast('Character successfully loaded');
+
+        return character.character;
     }
 
-    _loadHdcCharacter(rawXml) {
+    async _loadHdcCharacter(rawXml) {
         let parser = xml2js.Parser({
             explicitArray: false,
             mergeAttrs: true,
@@ -112,17 +122,17 @@ class File {
                 }
             ],
         });
+        let character = null;
 
         parser.parseString(rawXml, (error, result) => {
-            AsyncStorage.setItem('character', JSON.stringify(result)).then(() => {
-                common.toast('Character successfully loaded');
-            });
-            // RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.SDCardDir + '/HEROSystemMobile' + '/temp.json', JSON.stringify(result), 'utf8').then(() => {
-            //     common.toast('Character successfully saved');
-            // }).catch(error => {
-            //     common.toast(error.message);
-            // });
+            character = result;
         });
+
+        await AsyncStorage.setItem('character', JSON.stringify(character));
+
+        common.toast('Character successfully loaded');
+
+        return character;
     }
 
     _decode(base64Payload) {

@@ -1,13 +1,16 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
 import { Platform, StyleSheet, ScrollView, View, ImageBackground, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Spinner, Card, CardItem, Body, Icon } from 'native-base';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
+import { setCharacter } from '../../reducers/character';
 
-export default class HomeScreen extends Component {
+class HomeScreen extends Component {
     constructor(props) {
         super(props);
 
@@ -17,6 +20,7 @@ export default class HomeScreen extends Component {
 
         this.startLoad = this._startLoad.bind(this);
         this.endLoad = this._endLoad.bind(this);
+        this.onLoadPress = this._onLoadPress.bind(this);
     }
 
     _startLoad() {
@@ -27,13 +31,33 @@ export default class HomeScreen extends Component {
         this.setState({characterLoading: false});
     }
 
+    _loadCharacter() {
+        character.load(this.startLoad, this.endLoad).then(char => {
+            this.props.setCharacter(char);
+        });
+    }
+
+    _onLoadPress() {
+        if (common.isEmptyObject(this.props.character)) {
+            common.toast('Please load a character first');
+        } else {
+            let screen = 'ViewCharacter';
+
+            if (character.isHeroDesignerCharacter(this.props.character)) {
+                screen = 'ViewHdCharacter';
+            }
+
+            this.props.navigation.navigate(screen);
+        }
+    }
+
     _renderViewCharacterButton() {
         if (this.state.characterLoading) {
             return <Spinner color='#D0D1D3' />;
         }
 
         return (
-            <Button style={styles.button} onPress={() => this.props.navigation.navigate('ViewCharacter')}>
+            <Button style={styles.button} onPress={() => this.onLoadPress()}>
                 <Text uppercase={false} style={styles.buttonText}>View</Text>
             </Button>
         );
@@ -52,7 +76,7 @@ export default class HomeScreen extends Component {
                             {this._renderViewCharacterButton()}
                         </View>
                         <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => character.load(this.startLoad, this.endLoad)}>
+                            <Button style={styles.button} onPress={() => this._loadCharacter()}>
                                 <Text uppercase={false} style={styles.buttonText}>Load</Text>
                             </Button>
                         </View>
@@ -117,7 +141,7 @@ export default class HomeScreen extends Component {
                             <CardItem style={{backgroundColor: '#375476'}}>
                                 <Body>
                                     <Text style={[styles.boldGrey, {fontSize: 20, textDecorationLine: 'underline'}]}>HERO Survival Guide</Text>
-                                    <Text style={[styles.grey]}>This is a simple sheet offering some ideas on what to do in combat given Hero's vast options.</Text>
+                                    <Text style={[styles.grey]}>This is a simple sheet offering some ideas on what to do in combat given Hero&quot;s vast options.</Text>
                                     <Text style={[styles.grey, {fontSize: 12, fontStyle: 'italic'}]}>
                                         <Text style={[styles.boldGrey, {fontSize: 12}]}>Author: </Text>Christopher R. Taylor
                                     </Text>
@@ -132,3 +156,15 @@ export default class HomeScreen extends Component {
 		);
 	}
 }
+
+const mapStateToProps = state => {
+    return {
+        character: state.character
+    };
+}
+
+const mapDispatchToProps = {
+    setCharacter
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

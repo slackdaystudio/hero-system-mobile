@@ -1,10 +1,14 @@
 import React, { Component }  from 'react';
 import { AsyncStorage, StyleSheet, Text, View, Button, StatusBar } from 'react-native';
 import { DrawerNavigator } from 'react-navigation';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
 import { Root } from "native-base";
 import SplashScreen from 'react-native-splash-screen'
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
+import ViewHdCharacterScreen from './src/components/Screens/ViewHdCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import PdfViewerScreen from './src/components/Screens/PdfViewerScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
@@ -18,6 +22,7 @@ import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
 import { statistics } from './src/lib/Statistics';
 import { common } from './src/lib/Common';
+import reducer from './src/reducers/index';
 
 const RootStack = DrawerNavigator({
 		Home: {
@@ -25,6 +30,9 @@ const RootStack = DrawerNavigator({
 		},
 		ViewCharacter: {
 			screen: ViewCharacterScreen
+		},
+		ViewHdCharacter: {
+			screen: ViewHdCharacterScreen
 		},
 		RandomCharacter: {
 			screen: RandomCharacterScreen
@@ -63,6 +71,8 @@ const RootStack = DrawerNavigator({
 	}
 );
 
+const store = createStore(reducer, applyMiddleware(thunk));
+
 export default class App extends Component {
 	async componentWillMount() {
 		let stats = await AsyncStorage.getItem('statistics');
@@ -81,9 +91,11 @@ export default class App extends Component {
 
 	render() {
 		return (
-			<Root>
-				<RootStack />
-			</Root>	
+			<Provider store={store}>
+				<Root>
+					<RootStack />
+				</Root>
+			</Provider>
 		);
 	}
 }

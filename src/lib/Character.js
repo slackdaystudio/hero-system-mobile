@@ -12,7 +12,11 @@ class Character {
     }
 
     load(startLoad, endLoad) {
-        file.loadCharacter(startLoad, endLoad);
+        return file.loadCharacter(startLoad, endLoad);
+    }
+
+    isHeroDesignerCharacter(character) {
+        return character.hasOwnProperty('version');
     }
 
     isFifthEdition(characteristics) {

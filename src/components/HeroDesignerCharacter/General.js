@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { Text, List, ListItem, Left, Body } from 'native-base';
 import styles from '../../Styles';
@@ -98,7 +99,6 @@ export default class General extends Component {
                     </Text>
                 </ListItem>
                 <View style={{paddingBottom: 20}} />
-                </ListItem>
             </List>
         );
     }

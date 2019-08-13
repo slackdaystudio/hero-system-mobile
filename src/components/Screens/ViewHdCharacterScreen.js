@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, ScrollView } from 'react-native';
-import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner } from 'native-base';
+import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import General from '../HeroDesignerCharacter/General';
 import Header from '../Header/Header';
@@ -8,46 +9,11 @@ import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
-export default class ViewCharacterScreen extends Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			character: null
-		};
-	}
-
-	async componentDidMount() {
-		let loadedCharacter = await AsyncStorage.getItem('character');
-
-        if (loadedCharacter === null) {
-            this.props.navigation.navigate('Home');
-
-            Toast.show({
-                text: 'Please load a character first',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
-
-            return;
-        }
-
-        let characterJson = JSON.parse(loadedCharacter).character;
-
-		this.setState({character: characterJson});
-	}
-
+class ViewHdCharacterScreen extends Component {
 	render() {
-	    if (this.state.character === null) {
-	        return (
-                <Container style={styles.container}>
-                    <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476'}}>
-                        <Spinner color='#D0D1D3' />
-                    </Content>
-	            </Container>
-	        );
-	    }
+		if (character === null) {
+			return null;
+		}
 
 		return (
 		  <Container style={styles.container}>
@@ -56,7 +22,7 @@ export default class ViewCharacterScreen extends Component {
                 <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#375476'}} />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
 			  			<View style={styles.tabContent}>
-                            <General character={this.state.character.characterInfo} />
+                            <General characterInfo={this.props.character.characterInfo} />
 			  			</View>
 			  		</Tab>
 			  	</Tabs>
@@ -76,3 +42,13 @@ const localStyles = StyleSheet.create({
         alignSelf: 'flex-end'
     }
 });
+
+const mapStateToProps = state => {
+    return {
+        character: state.character
+    };
+}
+
+const mapDispatchToProps = {}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ViewHdCharacterScreen);
