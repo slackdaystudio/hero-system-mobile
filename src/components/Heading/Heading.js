@@ -7,7 +7,7 @@ import styles from '../../Styles';
 export default class Heading extends Component {
 	render() {
 		return (
-            <View style={{flex: 1, maxHeight: 53}}>
+            <View style={{flex: 1, maxHeight: 53, paddingBottom: 10}}>
                 <Text style={styles.heading}>{this.props.text}</Text>
             </View>
 		);

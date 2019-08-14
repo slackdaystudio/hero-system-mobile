@@ -18,8 +18,8 @@ class ViewHdCharacterScreen extends Component {
 		return (
 		  <Container style={styles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
-                <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#375476'}} />}>
+		  	<Content scrollEnable={false} style={styles.content}>
+                <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
 			  			<View style={styles.tabContent}>
                             <General characterInfo={this.props.character.characterInfo} />
