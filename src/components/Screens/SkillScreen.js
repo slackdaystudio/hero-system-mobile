@@ -95,7 +95,7 @@ export default class SkillScreen extends Component {
 		            </View>
 					{this._renderSlider()}
 					<View style={styles.buttonContainer}>
-                        <Button block style={styles.button} onPress={this.roll}>
+                        <Button block style={styles.button}  onPress={this.roll}>
                             <Text uppercase={false}>Roll</Text>
                         </Button>
 					</View>

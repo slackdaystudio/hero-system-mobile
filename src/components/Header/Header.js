@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, Image, TouchableHighlight } from 'react-native';
+import { Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
 import { common } from '../../lib/Common';
 
@@ -7,7 +7,7 @@ export default class MyHeader extends Component {
 	render() {
 		return (
 			<View>
-                <Header hasTabs={this.props.hasTabs || false} style={localStyles.header} iosBarStyle="light-content">
+                <Header hasTabs={this.props.hasTabs || false} style={localStyles.header}>
                   <Left>
                     <View style={localStyles.logo}>
                         <TouchableHighlight underlayColor='#3da0ff' onPress={() => this.props.navigation.navigate('Home')}>
@@ -21,6 +21,7 @@ export default class MyHeader extends Component {
                     </Button>
                   </Right>
                 </Header>
+				<StatusBar backgroundColor='#000' barStyle='light-content' />
 		    </View>
 		);
 	}
@@ -28,7 +29,7 @@ export default class MyHeader extends Component {
 
 const localStyles = StyleSheet.create({
 	header: {
-		backgroundColor: '#3C6591',
+		backgroundColor: '#000',
 		height: Platform.OS === 'ios' ? 60 : 70,
 	},
 	logo: {

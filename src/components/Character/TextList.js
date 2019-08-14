@@ -55,7 +55,7 @@ export default class TextList extends Component {
 
         return (
             <List>
-                <ListItem itemDivider style={{backgroundColor: '#375476'}}>
+                <ListItem itemDivider style={{backgroundColor: '#1b1d1f'}}>
                     <Left>
                         <Text style={styles.boldGrey}>{this.props.columnHeading}</Text>
                     </Left>

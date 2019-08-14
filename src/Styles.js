@@ -3,7 +3,7 @@ import { ifIphoneX } from 'react-native-iphone-x-helper'
 
 export default StyleSheet.create({
 	container: {
-		backgroundColor: '#375476',
+		backgroundColor: '#1b1d1f',
         ...ifIphoneX({
             paddingTop: 50
         }, {
@@ -12,26 +12,35 @@ export default StyleSheet.create({
 	},
 	content: {
 		paddingTop: 0,
-		paddingHorizontal: 5
+		paddingHorizontal: 0
 	},
     heading: {
-		fontSize: 32,
-		color: '#D0D1D3',
-		paddingTop: 10,
-		alignSelf: 'center'
+		fontSize: 24,
+		fontFamily: 'Arial, Roboto',
+		fontWeight: 'bold',
+		color: '#f0f0f0',
+		paddingVertical: 5,
+		textAlign: 'center',
+		backgroundColor: '#121212',
+		width: '100%',
+		borderColor: '#303030',
+		borderBottomWidth: 1,
+		borderTopWidth: 1,
+		textTransform: 'uppercase',
+		letterSpacing: 8
 	},
 	subHeading: {
 		alignSelf: 'center',
 		fontWeight: 'bold',
 		textDecorationLine: 'underline',
-		color: '#D0D1D3'
+		color: '#f0f0f0'
 	},
 	hdSubHeading: {
 		fontSize: 22,
 		fontWeight: 'bold',
 		paddingTop: 10,
-		color: '#D0D1D3',
-		borderBottomColor: '#D0D1D3',
+		color: '#f0f0f0',
+		borderBottomColor: '#f0f0f0',
 		borderBottomWidth: 2,
 		width: '100%'
 	},
@@ -39,7 +48,7 @@ export default StyleSheet.create({
 		paddingVertical: 5
 	},
 	button: {
-		backgroundColor: '#478f79',
+		backgroundColor: '#14354d',
 		minWidth: 140,
 		justifyContent: 'center',
 		alignSelf: 'center'
@@ -51,26 +60,26 @@ export default StyleSheet.create({
 		alignSelf: 'center'
 	},
 	buttonText: {
-		color: '#FFF'
+		color: '#f0f0f0'
 	},
 	grey: {
-		color: '#D0D1D3'
+		color: '#f0f0f0'
 	},
 	boldGrey: {
-		color: '#D0D1D3',
+		color: '#f0f0f0',
 		fontWeight: 'bold'
 	},
 	tabInactive: {
-		backgroundColor: '#3a557f'
+		backgroundColor: '#000'
 	},
 	tabActive: {
-		backgroundColor: '#476ead'
+		backgroundColor: '#000'
 	},
 	tabBarUnderline: {
-		backgroundColor: '#3da0ff'
+		backgroundColor: '#f0f0f0'
 	},
 	tabContent: {
 	    flex: 1,
-		backgroundColor: '#375476'
+		backgroundColor: '#1b1d1f'
 	}
 });

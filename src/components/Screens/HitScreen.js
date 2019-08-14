@@ -172,7 +172,7 @@ export default class HitScreen extends Component {
                                     </View>
                                 </View>
                                 {this._renderDcvSlider()}
-                                <Button block style={styles.button} onPress={this.roll}>
+                                <Button block style={styles.button}  onPress={this.roll}>
                                     <Text uppercase={false}>Roll</Text>
                                 </Button>
                             </View>

@@ -184,8 +184,8 @@ export default class Combat extends Component {
                         </Item>
                     </View>
                     <View>
-                        <Button style={localStyles.button} onPress={() => this.resetCombatState('stun')}>
-                            <Text uppercase={false}>Reset</Text>
+                        <Button style={styles.button} onPress={() => this.resetCombatState('stun')}>
+                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
                         </Button>
                     </View>
                 </View>
@@ -204,8 +204,8 @@ export default class Combat extends Component {
                         </Item>
                     </View>
                     <View>
-                        <Button style={localStyles.button} onPress={() => this.resetCombatState('body')}>
-                            <Text uppercase={false}>Reset</Text>
+                        <Button style={styles.button} onPress={() => this.resetCombatState('body')}>
+                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
                         </Button>
                     </View>
                 </View>
@@ -224,14 +224,14 @@ export default class Combat extends Component {
                         </Item>
                     </View>
                     <View>
-                        <Button style={localStyles.button} onPress={() => this.resetCombatState('endurance')}>
-                            <Text uppercase={false}>Reset</Text>
+                        <Button style={styles.button} onPress={() => this.resetCombatState('endurance')}>
+                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
                         </Button>
                     </View>
                 </View>
                 <View style={[styles.buttonContainer, {alignSelf: 'center', paddingTop: 10}]}>
                     <Button style={[styles.button, {minWidth: 160}]} onPress={() => this.takeRecovery()}>
-                        <Text uppercase={false}>Recovery</Text>
+                        <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
                     </Button>
                 </View>
                 <View style={{paddingBottom: 20}} />
@@ -244,10 +244,3 @@ export default class Combat extends Component {
         );
     }
 }
-
-const localStyles = StyleSheet.create({
-    button: {
-        backgroundColor: '#478f79',
-        alignSelf: 'flex-end'
-    }
-});

@@ -257,7 +257,7 @@ export default class DamageScreen extends Component {
                                         </View>
                                     </View>
                                     <View style={{paddingBottom: 30}} />
-                                    <Button block style={styles.button} onPress={this.roll}>
+                                    <Button block style={styles.button}  onPress={this.roll}>
                                         <Text uppercase={false}>Roll</Text>
                                     </Button>
                                 </View>

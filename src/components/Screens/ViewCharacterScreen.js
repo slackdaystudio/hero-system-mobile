@@ -64,7 +64,7 @@ class ViewCharacterScreen extends Component {
 	        return (
                 <Container style={styles.container}>
                     <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476'}}>
+                    <Content style={{backgroundColor: '#1b1d1f'}}>
                         <Spinner color='#D0D1D3' />
                     </Content>
 	            </Container>
@@ -74,7 +74,7 @@ class ViewCharacterScreen extends Component {
 		return (
 		  <Container style={styles.container}>
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
+		  	<Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
                 <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
 			  			<View style={styles.tabContent}>
@@ -110,11 +110,7 @@ const localStyles = StyleSheet.create({
 	pointCostsHeader: {
 		alignSelf: 'center',
 		textDecorationLine: 'underline'
-	},
-    button: {
-        backgroundColor: '#478f79',
-        alignSelf: 'flex-end'
-    }
+	}
 });
 
 const mapStateToProps = state => {

@@ -189,12 +189,12 @@ export default class RandomCharacterScreen extends Component {
                             <View style={{paddingBottom: 20}} />
                             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
                                 <View style={styles.buttonContainer}>
-                                    <Button style={styles.button} onPress={() => this.save()}>
+                                    <Button style={styles.button}  onPress={() => this.save()}>
                                         <Text uppercase={false} style={styles.buttonText}>Save</Text>
                                     </Button>
                                 </View>
                                 <View style={styles.buttonContainer}>
-                                    <Button block style={styles.button} onPress={this.reRoll}>
+                                    <Button block style={styles.button}  onPress={this.reRoll}>
                                         <Text uppercase={false}>Roll Again</Text>
                                     </Button>
                                 </View>

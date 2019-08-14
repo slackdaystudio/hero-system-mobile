@@ -25,6 +25,11 @@ class ViewHdCharacterScreen extends Component {
                             <General characterInfo={this.props.character.characterInfo} />
 			  			</View>
 			  		</Tab>
+					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+						<View style={styles.tabContent}>
+							<General characterInfo={this.props.character.characteristics} />
+						</View>
+					</Tab>
 			  	</Tabs>
 		  	</Content>
 	      </Container>

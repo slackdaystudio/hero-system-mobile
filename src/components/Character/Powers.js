@@ -79,7 +79,7 @@ export default class Powers extends Component {
 
         return (
             <List>
-                <ListItem itemDivider style={{backgroundColor: '#375476'}}>
+                <ListItem itemDivider style={{backgroundColor: '#1b1d1f'}}>
                     <Left>
                         <Text style={styles.boldGrey}>Power</Text>
                     </Left>

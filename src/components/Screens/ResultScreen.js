@@ -233,7 +233,7 @@ export default class ResultScreen extends Component {
 					<View>
 						{this._renderRoll()}
 						<View style={styles.buttonContainer}>
-			    			<Button block style={styles.button} onPress={this.reRoll}>
+			    			<Button block style={styles.button}  onPress={this.reRoll}>
 			    				<Text uppercase={false}>Roll Again</Text>
 			    			</Button>
 			    		</View>

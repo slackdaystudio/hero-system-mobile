@@ -19,34 +19,34 @@ export default class Sidebar extends Component {
           	<ListItem onPress={() => this.props.navigation.navigate('ViewCharacter')}>
 	      		<Text style={styles.grey}>View Character</Text>
 	      	</ListItem>
-          	<ListItem itemDivider style={{backgroundColor: '#000'}} />
+          	<ListItem itemDivider style={{backgroundColor: '#242424'}} />
           	<ListItem onPress={() => this.props.navigation.navigate('Skill')}>
 	      		<Text style={styles.grey}>3D6</Text>
-	      	</ListItem> 
+	      	</ListItem>
           	<ListItem onPress={() => this.props.navigation.navigate('Hit')}>
 	      		<Text style={styles.grey}>Hit</Text>
-	      	</ListItem>	      	
+	      	</ListItem>
           	<ListItem onPress={() => this.props.navigation.navigate('Damage')}>
 	      		<Text style={styles.grey}>Damage</Text>
 	      	</ListItem>
           	<ListItem onPress={() => this.props.navigation.navigate('FreeForm')}>
 	      		<Text style={styles.grey}>Free Form</Text>
 	      	</ListItem>
-	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
+	      	<ListItem itemDivider style={{backgroundColor: '#242424'}} />
             <ListItem onPress={() => this.props.navigation.navigate('RandomCharacter')}>
                 <Text style={styles.grey}>H.E.R.O.</Text>
             </ListItem>
             <ListItem onPress={() => this.props.navigation.navigate('CostCruncher')}>
                 <Text style={styles.grey}>Cruncher</Text>
             </ListItem>
-	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
+	      	<ListItem itemDivider style={{backgroundColor: '#242424'}} />
 	      	<ListItem onPress={() => this.props.navigation.navigate('Statistics')}>
 	      		<Text style={styles.grey}>Statistics</Text>
 	      	</ListItem>
-	      	<ListItem itemDivider style={{backgroundColor: '#000'}} />
+	      	<ListItem itemDivider style={{backgroundColor: '#242424'}} />
 	      	<ListItem onPress={() => this.props.navigation.navigate('Settings')}>
 	      		<Text style={styles.grey}>Settings</Text>
-	      	</ListItem>	
+	      	</ListItem>
           </List>
         </Content>
       </Container>
@@ -56,6 +56,6 @@ export default class Sidebar extends Component {
 
 const localStyles = StyleSheet.create({
 	container: {
-		backgroundColor: '#000'
+		backgroundColor: '#242424'
 	}
 });
