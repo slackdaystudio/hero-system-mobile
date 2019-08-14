@@ -123,7 +123,7 @@ export default class SettingsScreen extends Component {
             return (
                 <Container>
                     <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
+                    <Content style={styles.content}>
                         <Spinner color='#D0D1D3' />
                     </Content>
                 </Container>
@@ -141,8 +141,8 @@ export default class SettingsScreen extends Component {
 			        			<Text style={styles.boldGrey}>Form data</Text>
 			        		</Left>
 			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearFormData()}>
-									<Text uppercase={false}>Clear</Text>
+							    <Button style={styles.button} onPress={() => this._clearFormData()}>
+									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
 								</Button>
 			        		</Body>
 		        		</ListItem>
@@ -151,8 +151,8 @@ export default class SettingsScreen extends Component {
 			        			<Text style={styles.boldGrey}>Loaded character</Text>
 			        		</Left>
 			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearCharacterData()}>
-									<Text uppercase={false}>Clear</Text>
+							    <Button style={styles.button} onPress={() => this._clearCharacterData()}>
+									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
 								</Button>
 			        		</Body>
 		        		</ListItem>
@@ -161,8 +161,8 @@ export default class SettingsScreen extends Component {
 			        			<Text style={styles.boldGrey}>H.E.R.O.</Text>
 			        		</Left>
 			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearHeroData()}>
-									<Text uppercase={false}>Clear</Text>
+							    <Button style={styles.button} onPress={() => this._clearHeroData()}>
+									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
 								</Button>
 			        		</Body>
 		        		</ListItem>
@@ -171,8 +171,8 @@ export default class SettingsScreen extends Component {
 			        			<Text style={styles.boldGrey}>Statistics</Text>
 			        		</Left>
 			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearStatisticsData()}>
-									<Text uppercase={false}>Clear</Text>
+							    <Button style={styles.button} onPress={() => this._clearStatisticsData()}>
+									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
 								</Button>
 			        		</Body>
 		        		</ListItem>
@@ -181,13 +181,20 @@ export default class SettingsScreen extends Component {
 			        			<Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
 			        		</Left>
 			        		<Right>
-							    <Switch value={this.state.appSettings.useFifthEdition} onValueChange={() => this._toggleFifthEdition()} color='#3da0ff'/>
+							    <Switch
+                                    value={this.state.appSettings.useFifthEdition}
+                                    onValueChange={() => this._toggleFifthEdition()}
+                                    minimumTrackTintColor='#14354d'
+                                    maximumTrackTintColor='#14354d'
+                                    thumbTintColor='#14354d'
+                                    onTintColor="#01121E"
+                                />
 			        		</Right>
 		        		</ListItem>
 			    	</List>
 			    	<View style={{paddingTop: 20}}>
-                        <Button block style={localStyles.button} onPress={() => this._clearAll()}>
-                            <Text uppercase={false}>Clear All</Text>
+                        <Button block style={styles.button} onPress={() => this._clearAll()}>
+                            <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
                         </Button>
 			    	</View>
 				</Content>
@@ -195,11 +202,3 @@ export default class SettingsScreen extends Component {
 		);
 	}
 }
-
-const localStyles = StyleSheet.create({
-	button: {
-		backgroundColor: '#478f79',
-		justifyContent: 'center',
-		alignSelf: 'center'
-	}
-});

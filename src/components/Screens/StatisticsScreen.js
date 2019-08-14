@@ -59,7 +59,7 @@ export default class StatisticsScreen extends Component {
             return (
                 <Container style={styles.container}>
                     <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
+                    <Content style={styles.content}>
                         <Spinner color='#D0D1D3' />
                     </Content>
                 </Container>

@@ -69,6 +69,7 @@ export default class SkillScreen extends Component {
         if (this.state.skillCheck) {
             return (
                 <Slider
+					style={styles.switchStyle}
                     label='Skill Level:'
                     value={this.state.value}
                     step={1}
@@ -90,7 +91,14 @@ export default class SkillScreen extends Component {
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
 	              	    <Text style={styles.grey}>Is skill check?</Text>
 		              	<View style={{paddingRight: 10}}>
-		              		<Switch value={this.state.skillCheck} onValueChange={() => this.toggleCheck()} color='#3da0ff'/>
+		              		<Switch
+								value={this.state.skillCheck}
+								onValueChange={() => this.toggleCheck()}
+								minimumTrackTintColor='#14354d'
+								maximumTrackTintColor='#14354d'
+								thumbTintColor='#14354d'
+								onTintColor="#01121E"
+							/>
 		              	</View>
 		            </View>
 					{this._renderSlider()}

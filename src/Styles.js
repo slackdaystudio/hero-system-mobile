@@ -54,7 +54,7 @@ export default StyleSheet.create({
 		alignSelf: 'center'
 	},
 	buttonBig: {
-		backgroundColor: '#478f79',
+		backgroundColor: '#14354d',
 		minWidth: 300,
 		justifyContent: 'center',
 		alignSelf: 'center'

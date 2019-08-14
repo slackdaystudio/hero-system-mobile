@@ -13,7 +13,7 @@ import hitLocations from '../../../public/hitLocations.json';
 export default class HitScreen extends Component {
 	constructor(props) {
 		super(props);
-		
+
 		this.state = {
 			ocv: 0,
 			numberOfRolls: 1,
@@ -141,7 +141,7 @@ export default class HitScreen extends Component {
 		return (
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
-				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
+				<Content scrollEnable={false}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
@@ -168,7 +168,15 @@ export default class HitScreen extends Component {
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                     <Text style={styles.grey}>Is this an autofire attack?</Text>
                                     <View style={{paddingRight: 10}}>
-                                        <Switch value={this.state.isAutofire} onValueChange={() => this.toggleAutofire()} color='#3da0ff'/>
+                                        <Switch
+											value={this.state.isAutofire}
+											onValueChange={() => this.toggleAutofire()}
+											color='#3da0ff'
+											minimumTrackTintColor='#14354d'
+											maximumTrackTintColor='#14354d'
+											thumbTintColor='#14354d'
+											onTintColor="#01121E"
+										/>
                                     </View>
                                 </View>
                                 {this._renderDcvSlider()}

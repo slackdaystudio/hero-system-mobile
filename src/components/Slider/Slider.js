@@ -84,7 +84,7 @@ class MySlider extends Component {
             this.props.onValueChange(value);
         }
 	}
-	
+
 	render() {
 		return (
 			<View>
@@ -114,7 +114,7 @@ class MySlider extends Component {
                         disabled={this.props.disabled}
                         trackStyle={thumbStyles.track}
                         thumbStyle={thumbStyles.thumb}
-                        minimumTrackTintColor='#3da0ff'
+                        minimumTrackTintColor='#14354d'
                     />
 				</View>
 			</View>
@@ -139,13 +139,16 @@ const thumbStyles = StyleSheet.create({
 	track: {
 		height: 16,
 		borderRadius: 10,
+		backgroundColor: '#01121E',
+		borderColor: '#062134',
+		borderWidth: 1
 	},
 	thumb: {
 		width: 30,
 		height: 30,
 		borderRadius: 30 / 2,
-		backgroundColor: 'white',
-		borderColor: '#3da0ff',
+		backgroundColor: '#14354d',
+		borderColor: '#062134',
 		borderWidth: 2,
 	}
 });

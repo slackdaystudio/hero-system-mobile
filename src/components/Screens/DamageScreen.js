@@ -26,7 +26,7 @@ export default class DamageScreen extends Component {
 		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
 		this.roll = this._roll.bind(this);
 	}
-	
+
 	componentDidMount() {
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
@@ -72,13 +72,13 @@ export default class DamageScreen extends Component {
 		newState[key] = intSliders.indexOf(key) !== -1 ? parseInt(value, 10) : value;
 
 		AsyncStorage.setItem('damageState', JSON.stringify(newState));
-		
+
         this.setState(newState);
 	}
-	
+
 	_toggleDamageType() {
 		let newState = {...this.state};
-		
+
 		if (!this.state.killingToggled) {
 			newState.killingToggled = true;
 			newState.damageType = KILLING_DAMAGE;
@@ -86,12 +86,12 @@ export default class DamageScreen extends Component {
 			newState.killingToggled = false;
 			newState.damageType = NORMAL_DAMAGE;
 		}
-		
+
 		AsyncStorage.setItem('damageState', JSON.stringify(newState));
-		
+
         this.setState(newState);
 	}
-	
+
 	_toggleHitLocations() {
 		this.updateState('useHitLocations', !this.state.useHitLocations);
 	}
@@ -152,27 +152,27 @@ export default class DamageScreen extends Component {
 	_renderStunMultiplier() {
 		if (this.state.killingToggled) {
 			return (
-				<Slider 
+				<Slider
 					label='+/- Stun Multiplier:'
-					value={this.state.stunMultiplier} 
-					step={1} 
-					min={-10} 
+					value={this.state.stunMultiplier}
+					step={1}
+					min={-10}
 					max={10}
 					onValueChange={this.updateState}
 					valueKey='stunMultiplier'
 					toggleTabsLocked={this.toggleTabsLocked} />
 			);
 		}
-		
+
 		return null;
 	}
-	
+
 	render() {
 		return (
 			<Container style={styles.container}>
 				<Header navigation={this.props.navigation} hasTabs={true} />
-				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
-                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+				<Content scrollEnable={false}>
+                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View>
@@ -186,74 +186,139 @@ export default class DamageScreen extends Component {
                                         valueKey='dice'
                                         toggleTabsLocked={this.toggleTabsLocked}
                                     />
-				    <Item>
-                                    <Picker
-				      inlinelabel
-                                      textStyle={styles.grey}
-                                      mode="dropdown"
-                                      selectedValue={this.state.partialDie}
-                                      onValueChange={(value) => this.updateState('partialDie', value)}
-                                    >
-                                      <Item label="No partial die" value="0" />
-                                      <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-                                      <Item label="+½ die" value={PARTIAL_DIE_HALF} />
-                                    </Picker>
-				    </Item>
+				    				<Item>
+	                                    <Picker 
+	                                      mode="dropdown"
+	                                      selectedValue={this.state.partialDie}
+	                                      onValueChange={(value) => this.updateState('partialDie', value)}
+										  itemStyle={{color: '#fff'}}
+										  itemTextStyle={{color: 'fff'}}
+										  textStyle={{ color: "#fff" }}
+	                                    >
+	                                      <Item label="No partial die" value="0" />
+	                                      <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
+	                                      <Item label="+½ die" value={PARTIAL_DIE_HALF} />
+	                                    </Picker>
+					    			</Item>
                                     <View style={{paddingBottom: 30}} />
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Is this a killing attack?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.killingToggled} onValueChange={() => this.toggleDamageType()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.killingToggled}
+												onValueChange={() => this.toggleDamageType()}
+												color='#3da0ff'
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     {this._renderStunMultiplier()}
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Is this an explosion?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.isExplosion} onValueChange={() => this._toggleExplosion()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.isExplosion}
+												onValueChange={() => this._toggleExplosion()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     {this._renderFadeRate()}
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Use hit locations?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.useHitLocations} onValueChange={() => this._toggleHitLocations()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.useHitLocations}
+												onValueChange={() => this._toggleHitLocations()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Attack is a martial maneuver?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.isMartialManeuver} onValueChange={() => this._toggleMartialManeuver()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.isMartialManeuver}
+												onValueChange={() => this._toggleMartialManeuver()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Target is in the air?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.isTargetFlying} onValueChange={() => this._toggleTargetFlying()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.isTargetFlying}
+												onValueChange={() => this._toggleTargetFlying()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Target is in zero gravity?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.isTargetInZeroG} onValueChange={() => this._toggleIsTargetInZeroG()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.isTargetInZeroG}
+												onValueChange={() => this._toggleIsTargetInZeroG()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Target is underwater?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.isTargetUnderwater} onValueChange={() => this._toggleIsTargetUnderwater()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.isTargetUnderwater}
+												onValueChange={() => this._toggleIsTargetUnderwater()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Target rolled with a punch?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.rollWithPunch} onValueChange={() => this._toggleRollWithPunch()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.rollWithPunch}
+												onValueChange={() => this._toggleRollWithPunch()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Target is using clinging?</Text>
                                         <View style={{paddingRight: 10}}>
-                                            <Switch value={this.state.isUsingClinging} onValueChange={() => this._toggleIsUsingClinging()} color='#3da0ff'/>
+                                            <Switch
+												value={this.state.isUsingClinging}
+												onValueChange={() => this._toggleIsUsingClinging()}
+												minimumTrackTintColor='#14354d'
+												maximumTrackTintColor='#14354d'
+												thumbTintColor='#14354d'
+												onTintColor="#01121E"
+											/>
                                         </View>
                                     </View>
                                     <View style={{paddingBottom: 30}} />
