@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, Image, Switch, Alert } from 'react-native';
-import { Container, Content, Button, Text, Picker, Item, Tabs, Tab, ScrollableTab } from 'native-base';
+import { Platform, StyleSheet, View, Image, Picker, Switch, Alert } from 'react-native';
+import { Container, Content, Button, Text, Item, Tabs, Tab, ScrollableTab } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
@@ -186,20 +186,15 @@ export default class DamageScreen extends Component {
                                         valueKey='dice'
                                         toggleTabsLocked={this.toggleTabsLocked}
                                     />
-				    				<Item>
-	                                    <Picker 
-	                                      mode="dropdown"
-	                                      selectedValue={this.state.partialDie}
-	                                      onValueChange={(value) => this.updateState('partialDie', value)}
-										  itemStyle={{color: '#fff'}}
-										  itemTextStyle={{color: 'fff'}}
-										  textStyle={{ color: "#fff" }}
-	                                    >
-	                                      <Item label="No partial die" value="0" />
-	                                      <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-	                                      <Item label="+½ die" value={PARTIAL_DIE_HALF} />
-	                                    </Picker>
-					    			</Item>
+                                    <Picker
+                                      selectedValue={this.state.partialDie}
+                                      onValueChange={(value) => this.updateState('partialDie', value)}
+									  style={{color: '#f0f0f0', height: 30, width: 200}}
+                                    >
+                                      <Picker.Item label="No partial die" value="0" />
+                                      <Picker.Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
+                                      <Picker.Item label="+½ die" value={PARTIAL_DIE_HALF} />
+                                    </Picker>
                                     <View style={{paddingBottom: 30}} />
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Is this a killing attack?</Text>
