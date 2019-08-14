@@ -58,7 +58,7 @@ export default class RandomCharacterScreen extends Component {
 
 	_renderCharacteristics() {
 		let elements = [];
-		
+
 		for (let prop in this.state.character.archtype.characteristics) {
 			elements.push(
 				<ListItem key={prop}>
@@ -71,7 +71,7 @@ export default class RandomCharacterScreen extends Component {
 	        	</ListItem>
 			);
 		}
-		
+
 		return (
 			<View>
 				{elements.map((element, index) => {
@@ -80,13 +80,13 @@ export default class RandomCharacterScreen extends Component {
 			</View>
 		);
 	}
-		
+
 	render() {
 	    if (this.state.character === null) {
             return (
                 <Container style={styles.container}>
                     <Header hasTabs={true} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
+                    <Content style={styles.content}>
                         <Spinner color='#D0D1D3' />
                     </Content>
 	            </Container>
@@ -217,7 +217,7 @@ export default class RandomCharacterScreen extends Component {
 						        		<Right>
 						        			<Text style={styles.grey}>{power.cost}</Text>
 						        		</Right>
-						        	</ListItem>							
+						        	</ListItem>
 								);
 							})}
 				  		</View>
@@ -246,14 +246,14 @@ export default class RandomCharacterScreen extends Component {
 						        		<Right>
 						        			<Text style={styles.grey}>{disad.cost}</Text>
 						        		</Right>
-						        	</ListItem>							
+						        	</ListItem>
 								);
 							})}
 				  		</View>
 			  		</Tab>
 			  	</Tabs>
 		  	</Content>
-	      </Container>	
+	      </Container>
 		);
 	}
 }

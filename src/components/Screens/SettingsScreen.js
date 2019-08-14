@@ -121,7 +121,7 @@ export default class SettingsScreen extends Component {
 	render() {
 	    if (this.state.appSettings === null) {
             return (
-                <Container>
+                <Container style={styles.container}>
                     <Header hasTabs={false} navigation={this.props.navigation} />
                     <Content style={styles.content}>
                         <Spinner color='#D0D1D3' />
