@@ -19,7 +19,8 @@ export default class CircleText extends Component {
                 height: size,
                 borderRadius: size / 2,
                 borderWidth: borderWidth,
-                borderColor: '#303030'
+                borderColor: '#303030',
+                marginTop: 2
             }}>
                 <Text style = {{
                     textAlign: 'center',
@@ -28,7 +29,7 @@ export default class CircleText extends Component {
                     fontSize: fontSize - 2 * borderWidth,
                     lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
                     paddingTop: 3,
-                    fontWeight: 'normal',
+                    fontWeight: 'bold',
                     color: '#F3EDE9'
                 }}>
                     {this.props.title}

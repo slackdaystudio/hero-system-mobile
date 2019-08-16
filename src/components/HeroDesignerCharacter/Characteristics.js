@@ -63,11 +63,23 @@ export default class Characteristics extends Component {
     _renderDefinition(characteristic) {
         if (this.state.characteristicsShow[characteristic.shortName]) {
             return (
-                <CardItem style={styles.cardItem}>
-                    <Body>
-                        <Text style={styles.grey}>{characteristic.definition}</Text>
-                    </Body>
-                </CardItem>
+                <Fragment>
+                    <CardItem style={styles.cardItem}>
+                        <Body>
+                            <Text style={styles.grey}>{characteristic.definition}</Text>
+                        </Body>
+                    </CardItem>
+                    <CardItem style={styles.cardItem} footer>
+                        <Body style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                            <Text style={styles.grey}>
+                                <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
+                            </Text>
+                            <Text style={styles.grey}>
+                                <Text style={styles.boldGrey}>    Cost:</Text> {characteristic.cost}
+                            </Text>
+                        </Body>
+                    </CardItem>
+                </Fragment>
             );
         }
 
@@ -81,7 +93,7 @@ export default class Characteristics extends Component {
                 {this.props.characteristics.map((characteristic, index) => {
                     return (
                         <Card style={styles.card} key={'characteristic-' + index}>
-                            <CardItem style={[styles.cardItem, {paddingBottom: 0}]} header>
+                            <CardItem style={styles.cardItem}>
                                 <Body>
                                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                                         <CircleText title={characteristic.value} fontSize={22} size={45} />
@@ -98,22 +110,12 @@ export default class Characteristics extends Component {
                                     <Icon
                                         type='FontAwesome'
                                         name={this.state.characteristicsButtonsShow[characteristic.shortName]}
-                                        style={{paddingLeft: 10, fontSize: 25, color: '#303030'}}
+                                        style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
                                         onPress={() => this._toggleDefinitionShow(characteristic.shortName)}
                                     />
                                 </Right>
                             </CardItem>
                             {this._renderDefinition(characteristic)}
-                            <CardItem style={styles.cardItem} footer>
-                                <Body style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                                    <Text style={styles.grey}>
-                                        <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
-                                    </Text>
-                                    <Text style={styles.grey}>
-                                        <Text style={styles.boldGrey}>    Cost:</Text> {characteristic.cost}
-                                    </Text>
-                                </Body>
-                            </CardItem>
                         </Card>
                     );
                 })}
