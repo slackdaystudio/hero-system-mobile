@@ -44,7 +44,7 @@ class HomeScreen extends Component {
             let screen = 'ViewCharacter';
 
             if (character.isHeroDesignerCharacter(this.props.character)) {
-                screen = 'ViewHdCharacter';
+                screen = 'ViewHeroDesignerCharacter';
             }
 
             this.props.navigation.navigate(screen);
@@ -70,7 +70,7 @@ class HomeScreen extends Component {
 			    <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Heading text='Character' />
-                    <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you&quot;re on the go.</Text>
+                    <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you&apos;re on the go.</Text>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         <View style={styles.buttonContainer}>
                             {this._renderViewCharacterButton()}

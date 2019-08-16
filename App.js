@@ -8,7 +8,7 @@ import { Root } from "native-base";
 import SplashScreen from 'react-native-splash-screen'
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
-import ViewHdCharacterScreen from './src/components/Screens/ViewHdCharacterScreen';
+import ViewHeroDesignerCharacterScreen from './src/components/Screens/ViewHeroDesignerCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import PdfViewerScreen from './src/components/Screens/PdfViewerScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
@@ -31,8 +31,8 @@ const RootStack = DrawerNavigator({
 		ViewCharacter: {
 			screen: ViewCharacterScreen
 		},
-		ViewHdCharacter: {
-			screen: ViewHdCharacterScreen
+		ViewHeroDesignerCharacter: {
+			screen: ViewHeroDesignerCharacterScreen
 		},
 		RandomCharacter: {
 			screen: RandomCharacterScreen

@@ -18,7 +18,7 @@ export default StyleSheet.create({
 		fontSize: 24,
 		fontFamily: 'Arial, Roboto',
 		fontWeight: 'bold',
-		color: '#f0f0f0',
+		color: '#F3EDE9',
 		paddingVertical: 5,
 		textAlign: 'center',
 		backgroundColor: '#121212',
@@ -33,14 +33,14 @@ export default StyleSheet.create({
 		alignSelf: 'center',
 		fontWeight: 'bold',
 		textDecorationLine: 'underline',
-		color: '#f0f0f0'
+		color: '#F3EDE9'
 	},
 	hdSubHeading: {
 		fontSize: 22,
 		fontWeight: 'bold',
 		paddingTop: 10,
-		color: '#f0f0f0',
-		borderBottomColor: '#f0f0f0',
+		color: '#F3EDE9',
+		borderBottomColor: '#F3EDE9',
 		borderBottomWidth: 2,
 		width: '100%'
 	},
@@ -60,13 +60,13 @@ export default StyleSheet.create({
 		alignSelf: 'center'
 	},
 	buttonText: {
-		color: '#f0f0f0'
+		color: '#F3EDE9'
 	},
 	grey: {
-		color: '#f0f0f0'
+		color: '#F3EDE9'
 	},
 	boldGrey: {
-		color: '#f0f0f0',
+		color: '#F3EDE9',
 		fontWeight: 'bold'
 	},
 	tabInactive: {
@@ -76,10 +76,21 @@ export default StyleSheet.create({
 		backgroundColor: '#000'
 	},
 	tabBarUnderline: {
-		backgroundColor: '#f0f0f0'
+		backgroundColor: '#F3EDE9'
 	},
 	tabContent: {
 	    flex: 1,
 		backgroundColor: '#1b1d1f'
+	},
+	card: {
+		backgroundColor: '#1b1d1f'
+	},
+	cardItem: {
+		backgroundColor: '#121212'
+	},
+	cardTitle: {
+		fontSize: 24,
+		fontWeight: 'bold',
+		color: '#F3EDE9'
 	}
 });

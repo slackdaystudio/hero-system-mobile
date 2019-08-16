@@ -6,6 +6,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import xml2js from 'react-native-xml2js';
 import { common } from './Common';
 import { character as characterLib } from './Character';
+import { heroDesignerCharacter } from './HeroDesignerCharacter';
 import { Buffer } from 'buffer';
 import iconv from 'iconv-lite';
 
@@ -27,9 +28,9 @@ class File {
             } else if (result.name.toLowerCase().endsWith('.hdc')  || result.name.toLowerCase().endsWith('.hdt')) {
                 let hasWritePermission = await this._askForWritePermission();
 
-                if (hasWritePermission) {
+                // if (hasWritePermission) {
                     character = await this._read(result.uri, startLoad, endLoad, true);
-                }
+                // }
             } else {
                 common.toast('Unsupported file type: ' + result.type);
 
@@ -125,7 +126,7 @@ class File {
         let character = null;
 
         parser.parseString(rawXml, (error, result) => {
-            character = result;
+            character = heroDesignerCharacter.getCharacter(result);
         });
 
         await AsyncStorage.setItem('character', JSON.stringify(character));
