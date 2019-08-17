@@ -66,7 +66,7 @@ class HeroDesignerCharacter {
         };
 
         this._populateMovementAndCharacteristics(character, heroDesignerCharacter.characteristics, template);
-//        this._populateSkills(character, heroDesignerCharacter.powers, template);
+        this._populateSkills(character, heroDesignerCharacter.skills, template);
 //        this._populatePerks(character, heroDesignerCharacter.powers, template);
 //        this._populateTalents(character, heroDesignerCharacter.powers, template);
 //        this._populateMartialArts(character, heroDesignerCharacter.powers, template);
@@ -142,6 +142,10 @@ class HeroDesignerCharacter {
         }
 
         return templateCharacteristic.adder.lvlval * templateCharacteristic.adder.lvlmultiplier
+    }
+
+    _populateSkills(character, skills, template) {
+
     }
 
     _getTemplate(template) {

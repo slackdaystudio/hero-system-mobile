@@ -56,6 +56,16 @@ export default class Characteristics extends Component {
         this.setState(newState);
     }
 
+    _getSpeed() {
+        for (let characteristic of this.props.characteristics) {
+            if (characteristic.shortName.toLowerCase() === 'spd') {
+                return characteristic.value;
+            }
+        }
+
+        return 0;
+    }
+
     _renderDefinition(characteristic) {
         if (this.state.characteristicsShow[characteristic.shortName]) {
             return (
@@ -86,10 +96,22 @@ export default class Characteristics extends Component {
 
     _renderNonCombatMovement(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
+            let speed = this._getSpeed();
+            let combatKph = characteristic.value * speed * 5 * 60 / 1000;
+            let nonCombatKph = characteristic.value * characteristic.ncm * speed * 5 * 60 / 1000;
+
             return (
-                <Text style={[styles.grey, {paddingBottom: 10}]}>
-                    <Text style={styles.boldGrey}>NCM:</Text> {characteristic.value * characteristic.ncm}m (x{characteristic.ncm})
-                </Text>
+                <View style={{flex: 1, paddingBottom: 10}}>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>NCM:</Text> {characteristic.value * characteristic.ncm}m (x{characteristic.ncm})
+                    </Text>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>Max Combat:</Text> {combatKph.toFixed(1)} km/h
+                    </Text>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>Max Non-Combat:</Text> {nonCombatKph.toFixed(1)} km/h
+                    </Text>
+                </View>
             );
         }
 
