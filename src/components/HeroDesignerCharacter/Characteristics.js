@@ -1,22 +1,24 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight } from 'react-native';
+import { View, TouchableHighlight, Alert } from 'react-native';
 import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
+import { TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
 import styles from '../../Styles';
 
 export default class Characteristics extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        characteristics: PropTypes.array.isRequired
+        characteristics: PropTypes.array.isRequired,
+        movement: PropTypes.array.isRequired
     }
 
     constructor(props) {
         super(props);
 
-        const displayOptions =  this._initCharacteristicsShow(props.characteristics);
+        const displayOptions =  this._initCharacteristicsShow(props.characteristics, props.movement);
 
         this.state = {
             characteristicsShow: displayOptions.characteristicsShow,
@@ -24,7 +26,7 @@ export default class Characteristics extends Component {
         }
     }
 
-    _initCharacteristicsShow(characteristics) {
+    _initCharacteristicsShow(characteristics, movement) {
         let characteristicsShow = {};
         let characteristicsButtonsShow = {};
 
@@ -33,6 +35,12 @@ export default class Characteristics extends Component {
             characteristicsShow[characteristic.shortName] = false;
             characteristicsButtonsShow[characteristic.shortName] = 'plus-circle';
         });
+
+        movement.map((move, index) => {
+            characteristicsShow[move.shortName] = false;
+            characteristicsButtonsShow[move.shortName] = 'plus-circle';
+        });
+
 
         return {
             characteristicsShow: characteristicsShow,
@@ -48,24 +56,13 @@ export default class Characteristics extends Component {
         this.setState(newState);
     }
 
-    _renderMovementHeader(name) {
-        if (name === 'running') {
-            return (
-                <View style={{paddingTop: 20}}>
-                    <Heading text='Characteristics' />
-                </View>
-            );
-        }
-
-        return null;
-    }
-
     _renderDefinition(characteristic) {
         if (this.state.characteristicsShow[characteristic.shortName]) {
             return (
                 <Fragment>
                     <CardItem style={styles.cardItem}>
                         <Body>
+                            {this._renderNonCombatMovement(characteristic)}
                             <Text style={styles.grey}>{characteristic.definition}</Text>
                         </Body>
                     </CardItem>
@@ -74,8 +71,9 @@ export default class Characteristics extends Component {
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
                             </Text>
+                            <View style={{width: 20, alignItems: 'center'}}><Text style={styles.grey}>&bull;</Text></View>
                             <Text style={styles.grey}>
-                                <Text style={styles.boldGrey}>    Cost:</Text> {characteristic.cost}
+                                <Text style={styles.boldGrey}>Cost:</Text> {characteristic.cost}
                             </Text>
                         </Body>
                     </CardItem>
@@ -86,17 +84,36 @@ export default class Characteristics extends Component {
         return null;
     }
 
-    render() {
+    _renderNonCombatMovement(characteristic) {
+        if (characteristic.type === TYPE_MOVEMENT) {
+            return (
+                <Text style={[styles.grey, {paddingBottom: 10}]}>
+                    <Text style={styles.boldGrey}>NCM:</Text> {characteristic.value * characteristic.ncm}m (x{characteristic.ncm})
+                </Text>
+            );
+        }
+
+        return null;
+    }
+
+    _renderStat(characteristic) {
+        if (characteristic.type === TYPE_MOVEMENT) {
+            return <CircleText title={characteristic.value + 'm'} fontSize={22} size={60} />
+        }
+
+        return <CircleText title={characteristic.value} fontSize={22} size={50} />
+    }
+
+    _renderCharacteristics(characteristics) {
         return (
-            <View>
-                <Heading text='Characteristics' />
-                {this.props.characteristics.map((characteristic, index) => {
+            <Fragment>
+                {characteristics.map((characteristic, index) => {
                     return (
                         <Card style={styles.card} key={'characteristic-' + index}>
                             <CardItem style={styles.cardItem}>
                                 <Body>
                                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-                                        <CircleText title={characteristic.value} fontSize={22} size={45} />
+                                        {this._renderStat(characteristic)}
                                         <Text style={[styles.cardTitle, {paddingLeft: 10}]}>{characteristic.name}</Text>
                                     </View>
                                 </Body>
@@ -119,6 +136,18 @@ export default class Characteristics extends Component {
                         </Card>
                     );
                 })}
+            </Fragment>
+        );
+    }
+
+    render() {
+        return (
+            <View>
+                <Heading text='Characteristics' />
+                {this._renderCharacteristics(this.props.characteristics)}
+                <View style={{paddingTop: 20}} />
+                <Heading text='Movement' />
+                {this._renderCharacteristics(this.props.movement)}
             </View>
         );
     }

@@ -14,7 +14,11 @@ import superheroic from '../../public/HERODesigner/Superheroic.json';
 import superheroicSixth from '../../public/HERODesigner/Superheroic6E.json';
 import { common } from './Common';
 
-export const MISSING_CHARACTERISTIC_DESCRIPTIONS = {
+export const TYPE_CHARACTERISTIC = 1;
+
+export const TYPE_MOVEMENT = 2;
+
+const MISSING_CHARACTERISTIC_DESCRIPTIONS = {
     "ocv": "Offensive Combat Value represents a character’s general accuracy in combat.",
     "dcv": "Defensive Combat Value represents how difficult it is to hit a character in combat.",
     "omcv": "Offensive Mental Combat Value represents a character’s general accuracy in Mental Combat.",
@@ -48,22 +52,35 @@ const BASE_MOVEMENT_MODES = {
     "leaping": "Leaping"
 }
 
-const SKLILL_ROLL_BASE = 9;
+const SKILL_ROLL_BASE = 9;
 
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
         const template = this._getTemplate(heroDesignerCharacter.template);
 
-        return {
+        character =  {
             version: heroDesignerCharacter.version,
             characterInfo: heroDesignerCharacter.characterInfo,
-            characteristics: this._getCharacteristics(heroDesignerCharacter.characteristics, template)
+            characteristics: [],
+            movement: []
         };
+
+        this._populateMovementAndCharacteristics(character, heroDesignerCharacter.characteristics, template);
+//        this._populateSkills(character, heroDesignerCharacter.powers, template);
+//        this._populatePerks(character, heroDesignerCharacter.powers, template);
+//        this._populateTalents(character, heroDesignerCharacter.powers, template);
+//        this._populateMartialArts(character, heroDesignerCharacter.powers, template);
+//        this._populatePowers(character, heroDesignerCharacter.powers, template);
+//        this._populateDisadvantages(character, heroDesignerCharacter.powers, template);
+//        this._populateEquipment(character, heroDesignerCharacter.powers, template);
+
+        return character;
     }
 
-    _getCharacteristics(characteristics, template) {
-        let formattedCharacteristics = [];
+    _populateMovementAndCharacteristics(character, characteristics, template) {
         let templateCharacteristic = null;
+        let formattedCharacteristic = null;
+        let type = null;
         let name = null;
         let definition = null;
         let value = 0;
@@ -71,12 +88,9 @@ class HeroDesignerCharacter {
         let roll = null;
 
         for (let [key, characteristic] of Object.entries(characteristics)) {
-            if (Object.keys(BASE_MOVEMENT_MODES).includes(key.toLowerCase())) {
-                continue;
-            }
-
+            type = CHARACTERISTIC_NAMES.hasOwnProperty(key.toLowerCase()) ? TYPE_CHARACTERISTIC : TYPE_MOVEMENT;
             templateCharacteristic = template.characteristics[key.toLowerCase()];
-            name = CHARACTERISTIC_NAMES[key.toLowerCase()];
+            name = type === TYPE_CHARACTERISTIC ? CHARACTERISTIC_NAMES[key.toLowerCase()] : BASE_MOVEMENT_MODES[key.toLowerCase()];
             definition = templateCharacteristic.definition;
             roll = null;
 
@@ -89,25 +103,45 @@ class HeroDesignerCharacter {
             }
 
             if (templateCharacteristic.base === 10 && name.toLowerCase() !== 'body') {
-                roll = Math.round(value / 5) + SKLILL_ROLL_BASE;
+                roll = Math.round(value / 5) + SKILL_ROLL_BASE;
             }
 
             if (definition === null && Object.keys(MISSING_CHARACTERISTIC_DESCRIPTIONS).includes(key.toLowerCase())) {
                 definition = MISSING_CHARACTERISTIC_DESCRIPTIONS[key.toLowerCase()];
             }
 
-            formattedCharacteristics.push({
+            formattedCharacteristic = {
+                type: type,
                 name: name,
                 shortName: characteristic.alias,
                 value: value,
                 cost: cost,
                 base: templateCharacteristic.base,
                 definition: definition,
-                roll: roll === null ? null : `${roll}-`
-            });
+                roll: roll === null ? null : `${roll}-`,
+                ncm: null
+            };
+
+            if (type === TYPE_MOVEMENT) {
+                formattedCharacteristic.ncm = this._getCharacteristicNcm(templateCharacteristic);
+
+                character.movement.push(formattedCharacteristic);
+            } else {
+                formattedCharacteristic.roll = roll === null ? null : `${roll}-`;
+
+                character.characteristics.push(formattedCharacteristic);
+            }
+        }
+    }
+
+    _getCharacteristicNcm(templateCharacteristic) {
+        if (Array.isArray(templateCharacteristic.adder)) {
+            let adder = templateCharacteristic.adder.filter(adder => adder.xmlid === 'IMPROVEDNONCOMBAT')[0];
+
+            return adder.lvlval * adder.lvlmultiplier;
         }
 
-        return formattedCharacteristics;
+        return templateCharacteristic.adder.lvlval * templateCharacteristic.adder.lvlmultiplier
     }
 
     _getTemplate(template) {
