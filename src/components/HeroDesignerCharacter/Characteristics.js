@@ -68,12 +68,18 @@ export default class Characteristics extends Component {
 
     _renderDefinition(characteristic) {
         if (this.state.characteristicsShow[characteristic.shortName]) {
+            let definition = characteristic.definition;
+
+            if (characteristic.type === TYPE_MOVEMENT) {
+                definition = `${definition.split('.').shift()}.`;
+            }
+
             return (
                 <Fragment>
                     <CardItem style={styles.cardItem}>
                         <Body>
                             {this._renderNonCombatMovement(characteristic)}
-                            <Text style={styles.grey}>{characteristic.definition}</Text>
+                            <Text style={styles.grey}>{definition}</Text>
                         </Body>
                     </CardItem>
                     <CardItem style={styles.cardItem} footer>
