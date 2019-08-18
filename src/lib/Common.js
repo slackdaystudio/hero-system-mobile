@@ -1,7 +1,8 @@
 import { Dimensions, Platform, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
-import camelCase from 'camelcase'
+import camelCase from 'camelcase';
+import snakeCase from 'snake-case';
 import { KILLING_DAMAGE, NORMAL_DAMAGE } from './DieRoller';
 
 class Common {
@@ -122,6 +123,14 @@ class Common {
 
     toCamelCase(text) {
         return camelCase(text);
+    }
+
+    toSnakeCase(text) {
+        return snakeCase(text);
+    }
+
+    capitalize(word) {
+        return word.toLowerCase().charAt(0).toUpperCase() + word.slice(1);
     }
 
     toast(message, buttonText='OK', duration=3000) {

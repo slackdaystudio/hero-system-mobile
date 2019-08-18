@@ -18,6 +18,8 @@ export const TYPE_CHARACTERISTIC = 1;
 
 export const TYPE_MOVEMENT = 2;
 
+export const GENERIC_OBJECT =  'GENERIC_OBJECT';
+
 const MISSING_CHARACTERISTIC_DESCRIPTIONS = {
     "ocv": "Offensive Combat Value represents a character’s general accuracy in combat.",
     "dcv": "Defensive Combat Value represents how difficult it is to hit a character in combat.",
@@ -54,6 +56,10 @@ const BASE_MOVEMENT_MODES = {
 
 const SKILL_ROLL_BASE = 9;
 
+const SKILL_FAMILIARITY_BASE = 8;
+
+const SKILL_PROFICIENCY_BASE = 10;
+
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
         const template = this._getTemplate(heroDesignerCharacter.template);
@@ -62,10 +68,12 @@ class HeroDesignerCharacter {
             version: heroDesignerCharacter.version,
             characterInfo: heroDesignerCharacter.characterInfo,
             characteristics: [],
-            movement: []
+            movement: [],
+            skills: []
         };
 
         this._populateMovementAndCharacteristics(character, heroDesignerCharacter.characteristics, template);
+        this._populateLists(character, 'skills');
         this._populateSkills(character, heroDesignerCharacter.skills, template);
 //        this._populatePerks(character, heroDesignerCharacter.powers, template);
 //        this._populateTalents(character, heroDesignerCharacter.powers, template);
@@ -144,8 +152,131 @@ class HeroDesignerCharacter {
         return templateCharacteristic.adder.lvlval * templateCharacteristic.adder.lvlmultiplier
     }
 
-    _populateSkills(character, skills, template) {
+    _populateLists(character, key) {
+        if (character[key].hasOwnProperty('list')) {
+            if (Array.isArray(character[key].list)) {
+                for (let listEntry of character[key].list) {
+                    character[key].push(this._createList(listEntry));
+                }
+            } else {
+                character[key].push(this._createList(character[key].list));
+            }
+        }
+    }
 
+    _createList(item) {
+        let listEntry = {
+            type: GENERIC_OBJECT,
+            id: item.id,
+            alias: item.alias,
+            position: item.position
+        };
+
+        listEntry[key] = [];
+
+        return listEntry;
+    }
+
+    _getLists(data) {
+        let lists = [];
+
+        if (data.hasOwnProperty('list')) {
+            if (typeof data.list === 'string') {
+                lists.push(data.list);
+            } else {
+                lists = lists.concat(data.list);
+            }
+        }
+
+        return lists;
+    }
+
+    _populateSkills(character, skills, template) {
+        let characterSkill = null;
+        let roll = null;
+        let type = null;
+        let cost = null;
+        let templateSkill = null;
+        let basecost = null;
+        let skillLevelCost = null;
+
+        skills.skill = skills.skill.concat(this._getLists(skills));
+        skills.skill.sort((a, b) => a.position > b.position);
+
+        for (let [key, skill] of Object.entries(skills.skill)) {
+            if (skill.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                character.skills.push({
+                    type: 'list',
+                    id: skill.id,
+                    alias: skill.alias,
+                    name: skill.name || '',
+                    position: skill.position,
+                    notes: skill.notes,
+                    skills: [],
+                    modifier: skill.modifier
+                });
+                continue;
+            }
+
+            if (skill.proficiency) {
+                roll = SKILL_PROFICIENCY_BASE;
+                type = 'proficiency';
+                cost = 2;
+            } else if (skill.familiarity || skill.everyman) {
+                roll = SKILL_FAMILIARITY_BASE
+                type = skill.familiarity ? 'familiarity' : 'everyman';
+                cost = skill.familiarity ? 1 : 0;
+            } else {
+                templateSkill = template.skills.skill.filter(s => {
+                    if (s.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                        return false;
+                    }
+
+                    return s.xmlid.toLowerCase() === skill.xmlid.toLowerCase();
+                }).shift();
+
+                roll = parseInt(character.characteristics.filter(c => c.shortName.toLowerCase() === skill.characteristic.toLowerCase()).shift().roll.slice(0, -1), 10);
+
+                roll = `${roll + skill.levels}-`;
+                type = 'full';
+
+                if (Array.isArray(templateSkill.characteristicChoice.item)) {
+                    for (let item of templateSkill.characteristicChoice.item) {
+                        if (item.characteristic.toLowerCase() === skill.characteristic.toLowerCase()) {
+                            basecost = item.basecost;
+                            skillLevelCost = item.lvlcost;
+                        }
+                    }
+                } else {
+                    basecost = templateSkill.characteristicChoice.item.basecost;
+                    skillLevelCost = templateSkill.characteristicChoice.item.lvlcost;
+                }
+
+                cost = basecost + (skill.levels * skillLevelCost);
+            }
+
+            characterSkill = {
+                type: type,
+                id: skill.id,
+                parentId: skill.parentid || undefined,
+                alias: skill.alias,
+                name: skill.name || '',
+                input: skill.input || '',
+                characteristic: skill.characteristic,
+                roll: roll,
+                cost: cost,
+                position: skill.position,
+                definition: templateSkill.definition,
+                notes: skill.notes,
+                modifier: skill.modifier
+            };
+
+            if (skill.hasOwnProperty('parentid')) {
+                character.skills.filter(s => s.id === skill.parentid).shift().skills.push(characterSkill);
+            } else {
+                character.skills.push(characterSkill);
+            }
+        }
     }
 
     _getTemplate(template) {
@@ -216,7 +347,32 @@ class HeroDesignerCharacter {
             }
         }
 
+        this._normalizeData(finalTemplate.skills, 'skill');
+
         return finalTemplate;
+    }
+
+    _normalizeData(data, listKey) {
+        let xmlid = null;
+        let normalizedEntries = [];
+
+        for (let [key, item] of Object.entries(data)) {
+            if (!Array.isArray(data[key]) && !item.hasOwnProperty('xmlid')) {
+                item.xmlid = common.toSnakeCase(key).toUpperCase();
+
+                normalizedEntries.push(item);
+            }
+        }
+
+        data[listKey] = data[listKey].concat(normalizedEntries);
+
+        for (let toBeDeleted of normalizedEntries) {
+            let key = common.toCamelCase(toBeDeleted.xmlid.toLowerCase());
+
+            if (data.hasOwnProperty(key)) {
+                delete data[key];
+            }
+        }
     }
 }
 

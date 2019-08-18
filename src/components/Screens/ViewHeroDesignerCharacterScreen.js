@@ -6,6 +6,7 @@ import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } fr
 import AsyncStorage from '@react-native-community/async-storage';
 import General from '../HeroDesignerCharacter/General';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
+import Skills from '../HeroDesignerCharacter/Skills';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
@@ -34,6 +35,11 @@ class ViewHeroDesignerCharacterScreen extends Component {
 					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
 						<View style={styles.tabContent}>
 							<Characteristics navigation={this.props.navigation} characteristics={this.props.character.characteristics} movement={this.props.character.movement} />
+						</View>
+					</Tab>
+					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
+						<View style={styles.tabContent}>
+							<Skills navigation={this.props.navigation} skills={this.props.character.skills} />
 						</View>
 					</Tab>
 			  	</Tabs>
