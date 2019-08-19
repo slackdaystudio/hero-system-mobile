@@ -20,6 +20,10 @@ export const TYPE_MOVEMENT = 2;
 
 export const GENERIC_OBJECT =  'GENERIC_OBJECT';
 
+export const TYPE_ADVANTAGES = 0;
+
+export const TYPE_LIMITATIONS = 1;
+
 const MISSING_CHARACTERISTIC_DESCRIPTIONS = {
     "ocv": "Offensive Combat Value represents a character’s general accuracy in combat.",
     "dcv": "Defensive Combat Value represents how difficult it is to hit a character in combat.",
@@ -156,20 +160,23 @@ class HeroDesignerCharacter {
         if (character[key].hasOwnProperty('list')) {
             if (Array.isArray(character[key].list)) {
                 for (let listEntry of character[key].list) {
-                    character[key].push(this._createList(listEntry));
+                    character[key].push(this._createList(listEntry, key));
                 }
             } else {
-                character[key].push(this._createList(character[key].list));
+                character[key].push(this._createList(character[key].list, key));
             }
         }
     }
 
-    _createList(item) {
+    _createList(item, key) {
         let listEntry = {
             type: GENERIC_OBJECT,
             id: item.id,
             alias: item.alias,
-            position: item.position
+            name: item.name || '',
+            position: item.position,
+            notes: item.notes || '',
+            modifier: item.modifier
         };
 
         listEntry[key] = [];
@@ -201,7 +208,7 @@ class HeroDesignerCharacter {
         let skillLevelCost = null;
 
         skills.skill = skills.skill.concat(this._getLists(skills));
-        skills.skill.sort((a, b) => a.position > b.position);
+        skills.skill.sort((a, b) => parseInt(a.position, 10) > parseInt(b.position, 10));
 
         for (let [key, skill] of Object.entries(skills.skill)) {
             if (skill.xmlid.toUpperCase() === GENERIC_OBJECT) {

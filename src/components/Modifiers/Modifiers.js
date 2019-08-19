@@ -2,6 +2,8 @@ import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { View, Alert } from 'react-native';
 import { Text } from 'native-base';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter'
+import { modifierCalculator } from '../../lib/ModifierCalculator';
 import styles from '../../Styles';
 
 export const TYPE_ADVANTAGES = 0;
@@ -50,7 +52,7 @@ export default class Modifiers extends Component {
     }
 
     _renderBaseCost(baseCost) {
-        let cost = baseCost < 0 ? '-' : '+';
+        let cost = baseCost < 0 ? '' : '+';
 
         cost += Math.trunc(baseCost) === 0 ? '' : Math.trunc(baseCost);
 
@@ -69,12 +71,16 @@ export default class Modifiers extends Component {
                 break;
         }
 
+        if (baseCost < 0 && !cost.startsWith('-')) {
+            cost = `-${cost}`;
+        }
+
         return cost;
     }
 
     _renderModifier(modifier, adders=[]) {
         let mod = modifier.alias;
-        let adderBasecosts = 0;
+        let totalModifiers = modifierCalculator.getTotalModifiers(modifier);
 
         if (modifier.hasOwnProperty('optionAlias')) {
             mod += `, ${modifier.optionAlias}`;
@@ -83,24 +89,28 @@ export default class Modifiers extends Component {
         if (modifier.hasOwnProperty('adder')) {
             if (Array.isArray(modifier.adder)) {
                 for (let adder of modifier.adder) {
-                    adders.push(adder.alias);
-                    adderBasecosts += adder.basecost || 0;
+                    adders.push(adder.alias + (adder.optionAlias === undefined ? '' : ` ${adder.optionAlias}`));
                 }
             } else {
-                adders.push(modifier.adder.alias);
-                adderBasecosts += adder.basecost || 0;
+                adders.push(modifier.adder.alias + (modifier.adder.optionAlias === undefined ? '' : ` ${modifier.adder.optionAlias}`));
             }
         }
 
         if (modifier.hasOwnProperty('modifier')) {
-            // TODO
+            if (Array.isArray(modifier.modifier)) {
+                for (let m of modifier.modifier) {
+                    mod += `, ${m.alias}`;
+                }
+            } else {
+                mod += `, ${modifier.modifier.alias}`;
+            }
         }
 
         if (adders.length > 0) {
-            mod += ` (${adders.join()})`;
+            mod += ` (${adders.join(', ')})`;
         }
 
-        mod += `, ${this._renderBaseCost(modifier.basecost + adderBasecosts)}`;
+        mod += `, ${this._renderBaseCost(totalModifiers)}`;
 
         return mod;
     }
@@ -115,7 +125,16 @@ export default class Modifiers extends Component {
                 <View style={{flex: 1}}>
                     <Text style={styles.boldGrey}>{this.props.type === TYPE_LIMITATIONS ? 'Limitations' : 'Advantages'}</Text>
                     {this.modifiers.map((modifier, index) => {
-                        return <Text style={styles.grey}> &bull; {modifier}</Text>;
+                        return (
+                            <View style={{flex: 1, flexDirection: 'row'}}>
+                                <View>
+                                    <Text style={styles.grey}> &bull; </Text>
+                                </View>
+                                <View>
+                                    <Text style={styles.grey}>{modifier}</Text>
+                                </View>
+                            </View>
+                        );
                     })}
                 </View>
             );

@@ -28,9 +28,9 @@ class File {
             } else if (result.name.toLowerCase().endsWith('.hdc')  || result.name.toLowerCase().endsWith('.hdt')) {
                 let hasWritePermission = await this._askForWritePermission();
 
-                // if (hasWritePermission) {
+                if (hasWritePermission) {
                     character = await this._read(result.uri, startLoad, endLoad, true);
-                // }
+                }
             } else {
                 common.toast('Unsupported file type: ' + result.type);
 
@@ -69,7 +69,7 @@ class File {
                 character = await this._loadXmlExportCharacter(rawXml);
             }
         } catch (error) {
-            Alert.alert('Read Error: ' + error.message);
+            common.toast('Read Error: ' + error.message);
         } finally {
             endLoad();
             return character;
