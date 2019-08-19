@@ -79,7 +79,7 @@ export default class Modifiers extends Component {
     }
 
     _renderModifier(modifier, adders=[]) {
-        let mod = modifier.alias;
+        let mod = modifier.alias + (modifier.levels > 0 ? ` x${modifier.levels}` : '');
         let totalModifiers = modifierCalculator.getTotalModifiers(modifier);
 
         if (modifier.hasOwnProperty('optionAlias')) {

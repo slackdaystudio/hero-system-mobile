@@ -27,7 +27,9 @@ class ModifierCalculator {
             return this._handleDoT(modifier);
         }
 
-        let totalModifiers = this._getAdderTotal(modifier.basecost, modifier.modifier, modifier);
+        let basecost = modifier.basecost + (modifier.levels > 0 ? modifier.lvlcost * modifier.levels : 0);
+
+        let totalModifiers = this._getAdderTotal(basecost, modifier.modifier, modifier);
 
         if (modifier.hasOwnProperty('adder')) {
             if (Array.isArray(modifier.adder)) {

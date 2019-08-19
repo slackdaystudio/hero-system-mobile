@@ -24,6 +24,14 @@ export const TYPE_ADVANTAGES = 0;
 
 export const TYPE_LIMITATIONS = 1;
 
+export const SKILL_ENHANCERS = [
+    'SCIENTIST',
+    'JACK_OF_ALL_TRADES',
+    'LINGUIST',
+    'SCHOLAR',
+    'TRAVELER'
+]
+
 const MISSING_CHARACTERISTIC_DESCRIPTIONS = {
     "ocv": "Offensive Combat Value represents a character’s general accuracy in combat.",
     "dcv": "Defensive Combat Value represents how difficult it is to hit a character in combat.",
@@ -70,6 +78,7 @@ class HeroDesignerCharacter {
 
         character =  {
             version: heroDesignerCharacter.version,
+            template: template,
             characterInfo: heroDesignerCharacter.characterInfo,
             characteristics: [],
             movement: [],
@@ -171,6 +180,7 @@ class HeroDesignerCharacter {
     _createList(item, key) {
         let listEntry = {
             type: GENERIC_OBJECT,
+            xmlId: item.xmlid,
             id: item.id,
             alias: item.alias,
             name: item.name || '',
@@ -208,12 +218,20 @@ class HeroDesignerCharacter {
         let skillLevelCost = null;
 
         skills.skill = skills.skill.concat(this._getLists(skills));
-        skills.skill.sort((a, b) => parseInt(a.position, 10) > parseInt(b.position, 10));
+
+        for (let skillEnhancer of SKILL_ENHANCERS) {
+            if (skills.hasOwnProperty(common.toCamelCase(skillEnhancer))) {
+                skills.skill.push(skills[common.toCamelCase(skillEnhancer)]);
+            }
+        }
+
+        skills.skill.sort((a, b) => a.position > b.position);
 
         for (let [key, skill] of Object.entries(skills.skill)) {
-            if (skill.xmlid.toUpperCase() === GENERIC_OBJECT) {
+            if (skill.xmlid.toUpperCase() === GENERIC_OBJECT || SKILL_ENHANCERS.includes(skill.xmlid.toUpperCase())) {
                 character.skills.push({
                     type: 'list',
+                    xmlId: skill.xmlid,
                     id: skill.id,
                     alias: skill.alias,
                     name: skill.name || '',
@@ -262,8 +280,11 @@ class HeroDesignerCharacter {
                 cost = basecost + (skill.levels * skillLevelCost);
             }
 
+            this._addLevelCost(skill.modifier, template)
+
             characterSkill = {
                 type: type,
+                xmlId: skill.xmlid,
                 id: skill.id,
                 parentId: skill.parentid || undefined,
                 alias: skill.alias,
@@ -282,6 +303,25 @@ class HeroDesignerCharacter {
                 character.skills.filter(s => s.id === skill.parentid).shift().skills.push(characterSkill);
             } else {
                 character.skills.push(characterSkill);
+            }
+        }
+    }
+
+    _addLevelCost(modifier, template) {
+        if (modifier === undefined || modifier === null) {
+            return;
+        }
+
+        if (Array.isArray(modifier)) {
+            for (let mod of modifier) {
+                this._addLevelCost(mod, template);
+            }
+        } else {
+            for (let mod of template.modifiers.modifier) {
+                if (mod.xmlid.toUpperCase() === modifier.xmlid.toUpperCase()) {
+                    modifier.lvlcost = mod.lvlcost || null;
+                    break;
+                }
             }
         }
     }

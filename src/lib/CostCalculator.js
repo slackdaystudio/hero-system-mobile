@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import { modifierCalculator } from './ModifierCalculator';
 import { common } from './Common';
+import { SKILL_ENHANCERS } from './HeroDesignerCharacter';
 
 class CostCalculator {
     getActiveCost(item, parent=undefined) {
@@ -15,6 +16,10 @@ class CostCalculator {
         let modifiers = modifierCalculator.getItemTotalModifiers(item).concat(modifierCalculator.getItemTotalModifiers(parent));
         let limitations = modifiers.filter(m => m < 0) || [0];
         let realCost = this.getActiveCost(item, parent) / (1 - limitations.reduce((a, b) => a + b, 0));
+
+        if (parent !== undefined && SKILL_ENHANCERS.includes(parent.xmlId.toUpperCase())) {
+            realCost = realCost - 1 === 0 ? 1 : realCost - 1;
+        }
 
         return this.roundInPlayersFavor(realCost);
     }
