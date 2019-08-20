@@ -82,13 +82,15 @@ class HeroDesignerCharacter {
             characterInfo: heroDesignerCharacter.characterInfo,
             characteristics: [],
             movement: [],
-            skills: []
+            skills: [],
+            perks: []
         };
 
         this._populateMovementAndCharacteristics(character, heroDesignerCharacter.characteristics, template);
         this._populateLists(character, 'skills');
         this._populateSkills(character, heroDesignerCharacter.skills, template);
-//        this._populatePerks(character, heroDesignerCharacter.powers, template);
+//        this._populateLists(character, 'perks');
+//        this._populatePerks(character, heroDesignerCharacter.perks, template);
 //        this._populateTalents(character, heroDesignerCharacter.powers, template);
 //        this._populateMartialArts(character, heroDesignerCharacter.powers, template);
 //        this._populatePowers(character, heroDesignerCharacter.powers, template);
@@ -208,14 +210,13 @@ class HeroDesignerCharacter {
         return lists;
     }
 
+    _create
+
     _populateSkills(character, skills, template) {
         let characterSkill = null;
         let roll = null;
         let type = null;
-        let cost = null;
         let templateSkill = null;
-        let basecost = null;
-        let skillLevelCost = null;
 
         skills.skill = skills.skill.concat(this._getLists(skills));
 
@@ -245,12 +246,8 @@ class HeroDesignerCharacter {
 
             if (skill.proficiency) {
                 roll = SKILL_PROFICIENCY_BASE;
-                type = 'proficiency';
-                cost = 2;
             } else if (skill.familiarity || skill.everyman) {
                 roll = SKILL_FAMILIARITY_BASE
-                type = skill.familiarity ? 'familiarity' : 'everyman';
-                cost = skill.familiarity ? 1 : 0;
             } else {
                 templateSkill = template.skills.skill.filter(s => {
                     if (s.xmlid.toUpperCase() === GENERIC_OBJECT) {
@@ -263,63 +260,94 @@ class HeroDesignerCharacter {
                 roll = parseInt(character.characteristics.filter(c => c.shortName.toLowerCase() === skill.characteristic.toLowerCase()).shift().roll.slice(0, -1), 10);
 
                 roll = `${roll + skill.levels}-`;
-                type = 'full';
-
-                if (Array.isArray(templateSkill.characteristicChoice.item)) {
-                    for (let item of templateSkill.characteristicChoice.item) {
-                        if (item.characteristic.toLowerCase() === skill.characteristic.toLowerCase()) {
-                            basecost = item.basecost;
-                            skillLevelCost = item.lvlcost;
-                        }
-                    }
-                } else {
-                    basecost = templateSkill.characteristicChoice.item.basecost;
-                    skillLevelCost = templateSkill.characteristicChoice.item.lvlcost;
-                }
-
-                cost = basecost + (skill.levels * skillLevelCost);
             }
 
-            this._addLevelCost(skill.modifier, template)
+            this._addModifierLevelCost(skill.modifier, template);
 
-            characterSkill = {
-                type: type,
-                xmlId: skill.xmlid,
-                id: skill.id,
-                parentId: skill.parentid || undefined,
-                alias: skill.alias,
-                name: skill.name || '',
-                input: skill.input || '',
-                characteristic: skill.characteristic,
-                roll: roll,
-                cost: cost,
-                position: skill.position,
-                definition: templateSkill.definition,
-                notes: skill.notes,
-                modifier: skill.modifier
-            };
+            skill.type = 'skill';
+            skill.template = templateSkill;
+            skill.roll = roll;
 
             if (skill.hasOwnProperty('parentid')) {
-                character.skills.filter(s => s.id === skill.parentid).shift().skills.push(characterSkill);
+                character.skills.filter(s => s.id === skill.parentid).shift().skills.push(skill);
             } else {
-                character.skills.push(characterSkill);
+                character.skills.push(skill);
             }
         }
     }
 
-    _addLevelCost(modifier, template) {
+    _populatePerks(character, perks, template) {
+        let characterPerk = null;
+
+        perks.perk = perks.perk.concat(this._getLists(perks));
+        perks.perk.sort((a, b) => a.position > b.position);
+
+        for (let [key, perk] of Object.entries(perks.perk)) {
+            if (perk.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                perk.type = 'list';
+
+                character.perks.push(perk);
+
+                continue;
+            }
+
+            templatePerk = template.perks.perk.filter(p => {
+                if (p.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                    return false;
+                }
+
+                return p.xmlid.toLowerCase() === perk.xmlid.toLowerCase();
+            }).shift();
+
+            this._addModifierLevelCost(perk.modifier, template);
+
+            characterPerk = {
+                type: type,
+                xmlId: perk.xmlid,
+                id: perk.id,
+                parentId: perk.parentid || undefined,
+                alias: perk.alias,
+                name: perk.name || '',
+                input: perk.input || '',
+                position: perk.position,
+                notes: perk.notes,
+                modifier: perk.modifier
+            };
+
+            this._addTemplateKeyValues(['definition', 'lvlcost', 'lvlval', 'multipliercost', 'multipliervalue']);
+
+            if (perk.hasOwnProperty('parentid')) {
+                character.perks.filter(p => p.id === perk.parentid).shift().perks.push(characterPerk);
+            } else {
+                character.perks.push(characterPerk);
+            }
+        }
+    }
+
+    _addTemplateKeyValues(names, item, templateItem) {
+        for (let name of names) {
+            if (templateItem.hasOwnProperty(name)) {
+                item[name] = templateItem[name];
+            }
+        }
+    }
+
+    _addModifierLevelCost(modifier, template) {
         if (modifier === undefined || modifier === null) {
             return;
         }
 
         if (Array.isArray(modifier)) {
             for (let mod of modifier) {
-                this._addLevelCost(mod, template);
+                this._addModifierLevelCost(mod, template);
             }
         } else {
             for (let mod of template.modifiers.modifier) {
                 if (mod.xmlid.toUpperCase() === modifier.xmlid.toUpperCase()) {
-                    modifier.lvlcost = mod.lvlcost || null;
+                    if (mod.hasOwnProperty('lvlcost')) {
+                        modifier.lvlcost = mod.lvlcost;
+                    }
+
                     break;
                 }
             }

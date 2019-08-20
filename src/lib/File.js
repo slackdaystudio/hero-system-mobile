@@ -152,7 +152,9 @@ class File {
     }
 
     _parseXmlValue(value) {
-        if (common.isInt(value)) {
+        if (value.trim() === '' || value === null || value === undefined) {
+            return null;
+        } else if (common.isInt(value)) {
             return parseInt(value, 10);
         } else if (common.isFloat(value)) {
             return parseFloat(value);

@@ -17,16 +17,8 @@ export default class Costs extends Component {
     }
 
     render() {
-        if (!this.props.item.hasOwnProperty('cost') || this.props.item.cost === 0) {
-            return null;
-        }
-
         return (
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Cost:</Text> {this.props.item.cost}
-                </Text>
-                <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Real:</Text> {costCalculator.getRealCost(this.props.item, this.props.parent)}
                 </Text>

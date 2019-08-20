@@ -81,7 +81,7 @@ export default class Skills extends Component {
                 <Fragment>
                     <CardItem style={styles.cardItem}>
                         <Body>
-                            <Text style={styles.grey}>{skill.definition}</Text>
+                            <Text style={styles.grey}>{skill.template.definition}</Text>
                         </Body>
                     </CardItem>
                     <CardItem style={styles.cardItem}>
@@ -101,9 +101,9 @@ export default class Skills extends Component {
     }
 
     _renderSkillLabel(skill) {
-        let name = skill.name === '' ? '' : skill.name;
-        let label = skill.name === '' ? skill.alias : ` (${skill.alias})`;
-        let input = skill.input === '' || skill.input === undefined ? '' : `: ${skill.input}`;
+        let name = skill.name === null || skill.name === '' ? '' : skill.name;
+        let label = skill.name === null || skill.name === '' ? skill.alias : ` (${skill.alias})`;
+        let input = skill.input === null || skill.input === undefined ? '' : `: ${skill.input}`;
 
         return (
             <Text style={styles.grey}>
