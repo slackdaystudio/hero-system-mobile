@@ -83,15 +83,17 @@ class HeroDesignerCharacter {
             characteristics: [],
             movement: [],
             skills: [],
-            perks: []
+            perks: [],
+            talents: []
         };
 
         this._populateMovementAndCharacteristics(character, heroDesignerCharacter.characteristics, template);
         this._populateLists(character, 'skills');
         this._populateSkills(character, heroDesignerCharacter.skills, template);
-//        this._populateLists(character, 'perks');
-//        this._populatePerks(character, heroDesignerCharacter.perks, template);
-//        this._populateTalents(character, heroDesignerCharacter.powers, template);
+        this._populateLists(character, 'perks');
+        this._populatePerks(character, heroDesignerCharacter.perks, template);
+        this._populateLists(character, 'talents');
+        this._populateTalents(character, heroDesignerCharacter.talents, template);
 //        this._populateMartialArts(character, heroDesignerCharacter.powers, template);
 //        this._populatePowers(character, heroDesignerCharacter.powers, template);
 //        this._populateDisadvantages(character, heroDesignerCharacter.powers, template);
@@ -210,8 +212,6 @@ class HeroDesignerCharacter {
         return lists;
     }
 
-    _create
-
     _populateSkills(character, skills, template) {
         let characterSkill = null;
         let roll = null;
@@ -262,7 +262,7 @@ class HeroDesignerCharacter {
                 roll = `${roll + skill.levels}-`;
             }
 
-            this._addModifierLevelCost(skill.modifier, template);
+            this._addModifierTemplate(skill.modifier, template);
 
             skill.type = 'skill';
             skill.template = templateSkill;
@@ -299,55 +299,68 @@ class HeroDesignerCharacter {
                 return p.xmlid.toLowerCase() === perk.xmlid.toLowerCase();
             }).shift();
 
-            this._addModifierLevelCost(perk.modifier, template);
+            this._addModifierTemplate(perk.modifier, template);
 
-            characterPerk = {
-                type: type,
-                xmlId: perk.xmlid,
-                id: perk.id,
-                parentId: perk.parentid || undefined,
-                alias: perk.alias,
-                name: perk.name || '',
-                input: perk.input || '',
-                position: perk.position,
-                notes: perk.notes,
-                modifier: perk.modifier
-            };
-
-            this._addTemplateKeyValues(['definition', 'lvlcost', 'lvlval', 'multipliercost', 'multipliervalue']);
+            perk.type = 'perk';
+            perk.template = templatePerk;
 
             if (perk.hasOwnProperty('parentid')) {
-                character.perks.filter(p => p.id === perk.parentid).shift().perks.push(characterPerk);
+                character.perks.filter(p => p.id === perk.parentid).shift().perks.push(perk);
             } else {
-                character.perks.push(characterPerk);
+                character.perks.push(perk);
             }
         }
     }
 
-    _addTemplateKeyValues(names, item, templateItem) {
-        for (let name of names) {
-            if (templateItem.hasOwnProperty(name)) {
-                item[name] = templateItem[name];
+    _populateTalents(character, talents, template) {
+        let characterPerk = null;
+
+        talents.talent = talents.talent.concat(this._getLists(talents));
+        talents.talent.sort((a, b) => a.position > b.position);
+
+        for (let [key, talent] of Object.entries(talents.talent)) {
+            if (talent.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                talent.type = 'list';
+
+                character.talents.push(talent);
+
+                continue;
+            }
+
+            templatePerk = template.talents.talent.filter(p => {
+                if (p.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                    return false;
+                }
+
+                return p.xmlid.toLowerCase() === talent.xmlid.toLowerCase();
+            }).shift();
+
+            this._addModifierTemplate(talent.modifier, template);
+
+            talent.type = 'talent';
+            talent.template = templatePerk;
+
+            if (talent.hasOwnProperty('parentid')) {
+                character.talents.filter(p => p.id === talent.parentid).shift().talents.push(talent);
+            } else {
+                character.talents.push(talent);
             }
         }
     }
 
-    _addModifierLevelCost(modifier, template) {
+    _addModifierTemplate(modifier, template) {
         if (modifier === undefined || modifier === null) {
             return;
         }
 
         if (Array.isArray(modifier)) {
             for (let mod of modifier) {
-                this._addModifierLevelCost(mod, template);
+                this._addModifierTemplate(mod, template);
             }
         } else {
             for (let mod of template.modifiers.modifier) {
                 if (mod.xmlid.toUpperCase() === modifier.xmlid.toUpperCase()) {
-                    if (mod.hasOwnProperty('lvlcost')) {
-                        modifier.lvlcost = mod.lvlcost;
-                    }
-
+                    modifier.template = mod;
                     break;
                 }
             }
@@ -423,6 +436,8 @@ class HeroDesignerCharacter {
         }
 
         this._normalizeData(finalTemplate.skills, 'skill');
+        this._normalizeData(finalTemplate.perks, 'perk');
+        this._normalizeData(finalTemplate.talents, 'talent');
 
         return finalTemplate;
     }

@@ -36,6 +36,18 @@ export default class Skill extends CharacterTrait {
         return `${name}${label}${input}`;
     }
 
+    definition() {
+        return this.characterTrait.definition();
+    }
+
+    advantages() {
+        return this.characterTrait.advantages();
+    }
+
+    limitations() {
+        return this.characterTrait.limitations();
+    }
+
     _getSkillCost() {
         let cost = this.characterTrait.cost();
 
