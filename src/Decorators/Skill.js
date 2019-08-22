@@ -1,5 +1,4 @@
 import CharacterTrait from './CharacterTrait';
-import { SKILL_ENHANCERS } from '../lib/HeroDesignerCharacter';
 
 export default class Skill extends CharacterTrait {
     constructor(characterTrait) {
@@ -11,11 +10,6 @@ export default class Skill extends CharacterTrait {
 
     cost() {
         let cost = this.skillCost;
-
-        if (this.characterTrait.parentTrait !== undefined &&
-            SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlId.toUpperCase())) {
-            cost = cost - 1 === 0 ? 1 : cost - 1;
-        }
 
         return cost;
     }

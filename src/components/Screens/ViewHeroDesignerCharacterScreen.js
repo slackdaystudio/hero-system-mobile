@@ -56,7 +56,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
     _getParent(item, items) {
         let parent = undefined;
 
-        if (item.parentid === undefined) {
+        if (item.parentid === undefined || items === undefined) {
             return parent;
         }
 

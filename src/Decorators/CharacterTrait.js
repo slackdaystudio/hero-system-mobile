@@ -1,3 +1,5 @@
+import { Alert } from 'react-native';
+
 export default class CharacterTrait {
     constructor(trait, parentTrait=undefined) {
         this.trait = trait;

@@ -139,7 +139,7 @@ export default class Traits extends Component {
         return (
             <Fragment>
                 {items.map((item, index) => {
-                    let decoratedTrait = this.props.decorateTrait(item, items);
+                    let decoratedTrait = this.props.decorateTrait(item, this.props.items);
 
                     if (item.hasOwnProperty(this.props.itemName)) {
                         return (

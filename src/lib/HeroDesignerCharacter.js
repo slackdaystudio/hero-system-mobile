@@ -29,7 +29,8 @@ export const SKILL_ENHANCERS = [
     'JACK_OF_ALL_TRADES',
     'LINGUIST',
     'SCHOLAR',
-    'TRAVELER'
+    'TRAVELER',
+    'WELL_CONNECTED'
 ]
 
 const MISSING_CHARACTERISTIC_DESCRIPTIONS = {
@@ -184,7 +185,7 @@ class HeroDesignerCharacter {
     _createList(item, key) {
         let listEntry = {
             type: GENERIC_OBJECT,
-            xmlId: item.xmlid,
+            xmlid: item.xmlid,
             id: item.id,
             alias: item.alias,
             name: item.name || '',
@@ -230,17 +231,11 @@ class HeroDesignerCharacter {
 
         for (let [key, skill] of Object.entries(skills.skill)) {
             if (skill.xmlid.toUpperCase() === GENERIC_OBJECT || SKILL_ENHANCERS.includes(skill.xmlid.toUpperCase())) {
-                character.skills.push({
-                    type: 'list',
-                    xmlId: skill.xmlid,
-                    id: skill.id,
-                    alias: skill.alias,
-                    name: skill.name || '',
-                    position: skill.position,
-                    notes: skill.notes,
-                    skills: [],
-                    modifier: skill.modifier
-                });
+                skill.type = 'list';
+                skill.skills = [];
+
+                character.skills.push(skill);
+
                 continue;
             }
 
@@ -280,11 +275,19 @@ class HeroDesignerCharacter {
         let characterPerk = null;
 
         perks.perk = perks.perk.concat(this._getLists(perks));
+
+        for (let skillEnhancer of SKILL_ENHANCERS) {
+            if (perks.hasOwnProperty(common.toCamelCase(skillEnhancer))) {
+                perks.perk.push(perks[common.toCamelCase(skillEnhancer)]);
+            }
+        }
+
         perks.perk.sort((a, b) => a.position > b.position);
 
         for (let [key, perk] of Object.entries(perks.perk)) {
-            if (perk.xmlid.toUpperCase() === GENERIC_OBJECT) {
+            if (perk.xmlid.toUpperCase() === GENERIC_OBJECT || SKILL_ENHANCERS.includes(perk.xmlid.toUpperCase())) {
                 perk.type = 'list';
+                perk.perks = [];
 
                 character.perks.push(perk);
 
