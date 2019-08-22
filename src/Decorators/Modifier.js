@@ -24,12 +24,9 @@ export default class Modifier extends CharacterTrait {
     realCost() {
         let realCost = this._roundInPlayersFavor(this.activeCost() / (1 - this.limitations().reduce((a, b) => a + b.cost, 0)));
 
-        Alert.alert(JSON.stringify(this.characterTrait.parentTrait));
-
         if (this.characterTrait.parentTrait !== undefined &&
             SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlid.toUpperCase())) {
             realCost = realCost - 1 === 0 ? 1 : realCost - 1;
-
         }
 
         return this._roundInPlayersFavor(realCost);
