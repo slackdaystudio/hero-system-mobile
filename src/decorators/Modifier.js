@@ -26,10 +26,10 @@ export default class Modifier extends CharacterTrait {
 
         if (this.characterTrait.parentTrait !== undefined &&
             SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlid.toUpperCase())) {
-            realCost = realCost - 1 === 0 ? 1 : realCost - 1;
+            realCost = realCost - 1 <= 0 ? 1 : realCost - 1;
         }
 
-        return this._roundInPlayersFavor(realCost);
+        return realCost;
     }
 
     label() {

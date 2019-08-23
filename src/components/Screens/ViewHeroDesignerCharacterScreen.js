@@ -4,10 +4,10 @@ import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
-import CharacterTrait from '../../Decorators/CharacterTrait';
-import Skill from '../../Decorators/Skill';
-import BaseCost from '../../Decorators/BaseCost';
-import Modifier from '../../Decorators/Modifier';
+import CharacterTrait from '../../decorators/CharacterTrait';
+import Skill from '../../decorators/Skill';
+import BaseCost from '../../decorators/BaseCost';
+import Modifier from '../../decorators/Modifier';
 import General from '../HeroDesignerCharacter/General';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
 import Traits from '../HeroDesignerCharacter/Traits';
@@ -27,6 +27,8 @@ class ViewHeroDesignerCharacterScreen extends Component {
         this.skillDecorator = this._skillDecorator.bind(this);
         this.perkDecorator = this._perkDecorator.bind(this);
         this.talentDecorator = this._talentDecorator.bind(this);
+        this.martialArtsDecorator = this._martialArtsDecorator.bind(this);
+        this.powersDecorator = this._powersDecorator.bind(this);
     }
 
     _skillDecorator(skill, skills) {
@@ -47,6 +49,22 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
     _talentDecorator(talent, talents) {
         let decorated = new CharacterTrait(talent, this._getParent(talent, talents));
+        decorated = new BaseCost(decorated);
+        decorated = new Modifier(decorated);
+
+        return decorated;
+    }
+
+    _martialArtsDecorator(maneuver, martialArts) {
+        let decorated = new CharacterTrait(maneuver, this._getParent(maneuver, martialArts));
+        decorated = new BaseCost(decorated);
+        decorated = new Modifier(decorated);
+
+        return decorated;
+    }
+
+    _powersDecorator(power, powers) {
+        let decorated = new CharacterTrait(power, this._getParent(power, powers));
         decorated = new BaseCost(decorated);
         decorated = new Modifier(decorated);
 
@@ -120,6 +138,28 @@ class ViewHeroDesignerCharacterScreen extends Component {
 							    itemName='talents'
 							    items={this.props.character.talents}
 							    decorateTrait={this.talentDecorator}
+							/>
+						</View>
+					</Tab>
+					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Martial Arts">
+						<View style={styles.tabContent}>
+							<Traits
+							    navigation={this.props.navigation}
+							    headingText='Martial Arts'
+							    itemName='maneuver'
+							    items={this.props.character.martialArts}
+							    decorateTrait={this.martialArtsDecorator}
+							/>
+						</View>
+					</Tab>
+					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
+						<View style={styles.tabContent}>
+							<Traits
+							    navigation={this.props.navigation}
+							    headingText='Powers'
+							    itemName='powers'
+							    items={this.props.character.powers}
+							    decorateTrait={this.powersDecorator}
 							/>
 						</View>
 					</Tab>

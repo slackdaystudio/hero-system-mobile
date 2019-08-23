@@ -133,7 +133,7 @@ class Common {
         return word.toLowerCase().charAt(0).toUpperCase() + word.slice(1);
     }
 
-    toast(message, buttonText='OK', duration=3000) {
+    toast(message, buttonText='OK', duration=30000) {
         Toast.show({
             text: message,
             position: 'bottom',
