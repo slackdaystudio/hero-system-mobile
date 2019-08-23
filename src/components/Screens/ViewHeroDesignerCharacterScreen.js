@@ -29,6 +29,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
         this.talentDecorator = this._talentDecorator.bind(this);
         this.martialArtsDecorator = this._martialArtsDecorator.bind(this);
         this.powersDecorator = this._powersDecorator.bind(this);
+        this.complicationsDecorator = this._complicationsDecorator.bind(this);
     }
 
     _skillDecorator(skill, skills) {
@@ -65,6 +66,14 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
     _powersDecorator(power, powers) {
         let decorated = new CharacterTrait(power, this._getParent(power, powers));
+        decorated = new BaseCost(decorated);
+        decorated = new Modifier(decorated);
+
+        return decorated;
+    }
+
+    _complicationsDecorator(complication, complications) {
+        let decorated = new CharacterTrait(complication, this._getParent(complication, complications));
         decorated = new BaseCost(decorated);
         decorated = new Modifier(decorated);
 
@@ -160,6 +169,17 @@ class ViewHeroDesignerCharacterScreen extends Component {
 							    itemName='powers'
 							    items={this.props.character.powers}
 							    decorateTrait={this.powersDecorator}
+							/>
+						</View>
+					</Tab>
+					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Complications">
+						<View style={styles.tabContent}>
+							<Traits
+							    navigation={this.props.navigation}
+							    headingText='Complications'
+							    itemName='disadvantages'
+							    items={this.props.character.disadvantages}
+							    decorateTrait={this.complicationsDecorator}
 							/>
 						</View>
 					</Tab>
