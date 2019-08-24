@@ -466,7 +466,7 @@ class HeroDesignerCharacter {
     _normalizeCharacterPower(heroDesignerCharacter, power) {
         if (Array.isArray(power)) {
             for (let p of power) {
-                this,_normalizeCharacterPower(heroDesignerCharacter, power);
+                this._normalizeCharacterPower(heroDesignerCharacter, power);
             }
         } else {
             if (!power.hasOwnProperty('xmlid')) {

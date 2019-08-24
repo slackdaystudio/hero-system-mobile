@@ -42,6 +42,34 @@ export default class BaseCost extends CharacterTrait {
         return cost;
     }
 
+    activeCost() {
+        return this.characterTrait.activeCost();
+    }
+
+    realCost() {
+        return this.characterTrait.realCost();
+    }
+
+    label() {
+        return this.characterTrait.label();
+    }
+
+    attributes() {
+        return this.characterTrait.attributes();
+    }
+
+    definition() {
+        return this.characterTrait.definition();
+    }
+
+    advantages() {
+        return this.characterTrait.advantages();
+    }
+
+    limitations() {
+        return this.characterTrait.limitations();
+    }
+
     _getLevelCost(adder) {
 //        if (this.characterTrait.trait.hasOwnProperty('option')) {
 //            return

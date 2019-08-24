@@ -19,7 +19,25 @@ export default class CharacterTrait {
     }
 
     label() {
-        return this.trait.alias;
+        let name = this.trait.name === null || this.trait.name === '' ? '' : this.trait.name;
+        let label = this.trait.name === null || this.trait.name === '' ? this.trait.alias : ` (${this.trait.alias})`;
+        let input = this.trait.input === null || this.trait.input === undefined ? '' : `: ${this.trait.input}`;
+
+        return `${name}${label}${input}`;
+    }
+
+    attributes() {
+        let attributes = [];
+
+        if (this.trait.hasOwnProperty('adder')) {
+            this._addAttribute(this.trait.adder, attributes);
+        }
+
+        if (this.trait.hasOwnProperty('modifier')) {
+            this._addAttribute(this.trait.modifier, attributes);
+        }
+
+        return attributes;
     }
 
     definition() {
@@ -32,5 +50,26 @@ export default class CharacterTrait {
 
     limitations() {
         return null;
+    }
+
+    _addAttribute(attribute, attributes) {
+        if (Array.isArray(attribute)) {
+            for (let a of attribute) {
+                this._addAttribute(a, attributes)
+            }
+        } else {
+            if (!attribute.hasOwnProperty('template')) {
+                let value = attribute.optionAlias || '';
+
+                if (value !== '' && (value.startsWith('(') && !value.endsWith(')'))) {
+                    value = value.substr(1);
+                }
+
+                attributes.push({
+                    label: attribute.alias,
+                    value: value
+                });
+            }
+        }
     }
 }

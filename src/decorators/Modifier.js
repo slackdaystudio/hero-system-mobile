@@ -36,6 +36,10 @@ export default class Modifier extends CharacterTrait {
         return this.characterTrait.label();
     }
 
+    attributes() {
+        return this.characterTrait.attributes();
+    }
+
     definition() {
         return this.characterTrait.definition();
     }

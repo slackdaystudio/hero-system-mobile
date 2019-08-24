@@ -83,12 +83,42 @@ export default class Traits extends Component {
         return null;
     }
 
+    _renderAttributes(item) {
+        if (item.attributes().length > 0) {
+            const sortedAttributes = item.attributes().sort((a, b) => a.value < b.value);
+
+            return (
+                <Fragment>
+                    {sortedAttributes.map((attribute, index) => {
+                        let labelStyle = attribute.value !== '' ? styles.boldGrey : styles.grey;
+                        let separator = attribute.value !== '' ? ': ' : '';
+
+                        return (
+                            <View style={{flex: 1, flexDirection: 'row'}}>
+                                <View>
+                                    <Text style={labelStyle}>{attribute.label}{separator}</Text>
+                                </View>
+                                <View>
+                                    <Text style={styles.grey}>{attribute.value}</Text>
+                                </View>
+                            </View>
+                        );
+                    })}
+                    <View style={{paddingBottom: 20}} />
+                </Fragment>
+            );
+        }
+
+        return null;
+    }
+
     _renderDefinition(item) {
         if (this.state.itemShow[item.trait.id]) {
             return (
                 <Fragment>
                     <CardItem style={styles.cardItem}>
                         <Body>
+                            {this._renderAttributes(item)}
                             <Text style={styles.grey}>{item.definition()}</Text>
                         </Body>
                     </CardItem>

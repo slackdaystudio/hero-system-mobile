@@ -23,11 +23,11 @@ export default class Skill extends CharacterTrait {
     }
 
     label() {
-        let name = this.characterTrait.trait.name === null || this.characterTrait.trait.name === '' ? '' : this.characterTrait.trait.name;
-        let label = this.characterTrait.trait.name === null || this.characterTrait.trait.name === '' ? this.characterTrait.label() : ` (${this.characterTrait.label()})`;
-        let input = this.characterTrait.trait.input === null || this.characterTrait.trait.input === undefined ? '' : `: ${this.characterTrait.trait.input}`;
+        return this.characterTrait.label();
+    }
 
-        return `${name}${label}${input}`;
+    attributes() {
+        return this.characterTrait.attributes();
     }
 
     definition() {
