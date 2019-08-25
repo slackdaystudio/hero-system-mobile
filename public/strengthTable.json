@@ -1,0 +1,122 @@
+{
+  "0": {
+    "lift": 0,
+    "example": null
+  },
+  "1": {
+    "lift": 8,
+    "example": "Most HTH Combat weapons, most guns, shotput"
+  },
+  "2": {
+    "lift": 16,
+    "example": "Tavern bench"
+  },
+  "3": {
+    "lift": 25,
+    "example": "Full suitcase, TV set, bicycle"
+  },
+  "4": {
+    "lift": 38,
+    "example": "Small refrigerator, plate armor"
+  },
+  "5": {
+    "lift": 50,
+    "example": "Adolescent human, recliner"
+  },
+  "8": {
+    "lift": 75,
+    "example": "Brass bed, washing machine"
+  },
+  "10": {
+    "lift": 100,
+    "example": "Adult human"
+  },
+  "13": {
+    "lift": 150,
+    "example": "Refrigerator"
+  },
+  "15": {
+    "lift": 200,
+    "example": "Two men, piano, motorcycle, boar"
+  },
+  "18": {
+    "lift": 300,
+    "example": "Medium floor safe"
+  },
+  "20": {
+    "lift": 400,
+    "example": "Chariot, grizzly bear"
+  },
+  "23": {
+    "lift": 600,
+    "example": "Sailboat, cow, horse"
+  },
+  "25": {
+    "lift": 800,
+    "example": "Sportscar, horse and rider"
+  },
+  "28": {
+    "lift": 1200,
+    "example": "Medium missile"
+  },
+  "30": {
+    "lift": 1600,
+    "example": "Small car, large missile"
+  },
+  "35": {
+    "lift": 3200,
+    "example": "Truck, limousine"
+  },
+  "40": {
+    "lift": 6400,
+    "example": "Small jet, large elephant"
+  },
+  "45": {
+    "lift": 12500,
+    "example": "Jetfighter, subway car"
+  },
+  "50": {
+    "lift": 25000,
+    "example": "Frigate, small standing stone"
+  },
+  "55": {
+    "lift": 50000,
+    "example": "Bulldozer, main battle tank"
+  },
+  "60": {
+    "lift": 100000,
+    "example": "Space Shuttle, blue whale"
+  },
+  "65": {
+    "lift": 200000,
+    "example": "Statue of Liberty"
+  },
+  "70": {
+    "lift": 400000,
+    "example": "Trawler, large starship"
+  },
+  "75": {
+    "lift": 800000,
+    "example": "Drilling rig"
+  },
+  "80": {
+    "lift": 1600000,
+    "example": "Small bridge"
+  },
+  "85": {
+    "lift": 3200000,
+    "example": "Freighter (loaded)"
+  },
+  "90": {
+    "lift": 6400000,
+    "example": "Destroyer (unloaded)"
+  },
+  "95": {
+    "lift": 12500000,
+    "example": "Temple"
+  },
+  "100": {
+    "lift": 25000000,
+    "example": "Large bridge, castle"
+  }
+}

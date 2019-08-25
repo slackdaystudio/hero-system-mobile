@@ -5,8 +5,11 @@ import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
+import { common } from '../../lib/Common';
 import { TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
 import styles from '../../Styles';
+import strengthTable from '../../../public/strengthTable.json';
+
 
 export default class Characteristics extends Component {
     static propTypes = {
@@ -79,6 +82,7 @@ export default class Characteristics extends Component {
                     <CardItem style={styles.cardItem}>
                         <Body>
                             {this._renderNonCombatMovement(characteristic)}
+                            {this._renderStrength(characteristic)}
                             <Text style={styles.grey}>{definition}</Text>
                         </Body>
                     </CardItem>
@@ -122,6 +126,109 @@ export default class Characteristics extends Component {
         }
 
         return null;
+    }
+
+    _renderStrength(characteristic) {
+        if (characteristic.shortName === 'STR') {
+            let step = null;
+            let lift = '0.0 kg'
+
+            for (let key of Object.keys(strengthTable)) {
+                if (characteristic.value === parseInt(key, 10)) {
+                    step = strengthTable[characteristic.value.toString()];
+                    lift = step.lift;
+                    break;
+                }
+            }
+
+            if (step === null) {
+                if (characteristic.value < 0) {
+                    step = strengthTable['0'];
+                } else if (characteristic.value > 100) {
+                    step = strengthTable['100'];
+                    lift = step.lift;
+
+                    let doublings = (characteristic.value - 100) / 5;
+
+                    for (let i = 0; i < Math.trunc(doublings); i++) {
+                        lift *= 2;
+                    }
+
+                    if (common.isFloat(doublings) && (doublings % 1).toFixed(1) !== '0.0') {
+                        lift += lift / 5 * (parseFloat(doublings % 1).toFixed(1) * 10 / 2);
+                    }
+                } else {
+                    let previousKey = null;
+                    let previousEntry = null;
+
+                    for (let [key, entry] of Object.entries(strengthTable)) {
+                        if (characteristic.value < parseInt(key, 10)) {
+                            step = previousEntry;
+                            lift = previousEntry.lift;
+
+                            let divisor = key - previousKey;
+                            let remainder = parseFloat(((characteristic.value / divisor) % 1).toFixed(1));
+
+                            if (remainder === 0.0) {
+                                lift += (entry.lift - lift) / divisor * (remainder + 1);
+                            } else {
+                                lift += (entry.lift - lift) / divisor * (parseFloat(remainder % 1).toFixed(1) * 10 / 2);
+                            }
+
+                            break;
+                        }
+
+                        previousKey = key;
+                        previousEntry = entry;
+                    }
+                }
+            }
+
+            return (
+                 <View style={{flex: 1, paddingBottom: 10}}>
+                     <Text style={styles.grey}>
+                         <Text style={styles.boldGrey}>Damage:</Text> {this._renderStrengthDamage(characteristic.value)}
+                     </Text>
+                     <Text style={styles.grey}>
+                         <Text style={styles.boldGrey}>Lift:</Text> {this._renderLift(lift)}
+                     </Text>
+                     <Text style={styles.grey}>
+                         <Text style={styles.boldGrey}>Example:</Text> {step.example}
+                     </Text>
+                 </View>
+            );
+        }
+
+        return null;
+    }
+
+    _renderStrengthDamage(strength) {
+        let damage = strength / 5;
+        let fractionalPart = parseFloat((damage % 1).toFixed(1));
+
+        if (fractionalPart > 0.0) {
+            if (fractionalPart >= 0.6) {
+                damage = `${Math.trunc(damage)}½`;
+            } else {
+                damage = Math.trunc(damage);
+            }
+        }
+
+        return `${damage}d6`;
+    }
+
+    _renderLift(lift) {
+        if (lift >= 1000000000000) {
+            return `${Math.round(lift / 1000000000000 * 10) / 10} Gigatonnes`;
+        } else if (lift >= 1000000000) {
+            return `${Math.round(lift / 1000000000 * 10) / 10} Megatonnes`;
+        } else if (lift >= 1000000) {
+            return `${Math.round(lift / 1000000 * 10) / 10} Kilotonnes`;
+        } else if (lift >= 1000.0) {
+            return `${Math.round(lift / 1000 * 10) / 10} Tonnes`;
+        } else {
+            return `${Math.round(lift * 10) / 10} kg`;
+        }
     }
 
     _renderStat(characteristic) {
