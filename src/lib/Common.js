@@ -50,6 +50,14 @@ class Common {
     	return false;
     }
 
+    getMultiplications(total, step=2) {
+        return Math.ceil(Math.log(total) / Math.log(step));
+    }
+
+    getMultiplierCost(total, step, cost) {
+        return this.getMultiplications(total, step) * cost;
+    }
+
     async getAppSettings() {
         let settings = await AsyncStorage.getItem('appSettings');
 

@@ -6,6 +6,7 @@ import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
 import { TYPE_MOVEMENT, GENERIC_OBJECT } from '../../lib/HeroDesignerCharacter';
+import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';
 import styles from '../../Styles';
 
 export default class Traits extends Component {
@@ -13,8 +14,7 @@ export default class Traits extends Component {
         navigation: PropTypes.object.isRequired,
         headingText: PropTypes.string.isRequired,
         itemName: PropTypes.string.isRequired,
-        items: PropTypes.array.isRequired,
-        decorateTrait: PropTypes.func.isRequired
+        items: PropTypes.array.isRequired
     }
 
     constructor(props) {
@@ -31,7 +31,6 @@ export default class Traits extends Component {
     _initItemShow(items) {
         let itemShow = {};
         let itemButtonShow = {};
-
 
         items.map((item, index) => {
             if (item.hasOwnProperty(this.props.itemName)) {
@@ -169,9 +168,9 @@ export default class Traits extends Component {
         return (
             <Fragment>
                 {items.map((item, index) => {
-                    let decoratedTrait = this.props.decorateTrait(item, this.props.items);
+                    let decoratedTrait = characterTraitDecorator.decorate(item, this.props.items);
 
-                    if (item.hasOwnProperty(this.props.itemName)) {
+                    if (decoratedTrait.trait.hasOwnProperty(this.props.itemName)) {
                         return (
                             <Fragment>
                                 <Card style={styles.card} key={'item-' + item.position}>

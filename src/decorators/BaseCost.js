@@ -11,14 +11,6 @@ export default class BaseCost extends CharacterTrait {
     cost() {
         let cost = this.characterTrait.trait.basecost;
 
-        if (this.characterTrait.trait.hasOwnProperty('basepoints')) {
-            cost += Math.round(this.characterTrait.trait.basepoints / this.characterTrait.trait.template.lvlval);
-
-            if (this.characterTrait.trait.number > 1) {
-                cost += (this.characterTrait.trait.number - 1) * this.characterTrait.trait.template.multipliercost;
-            }
-        }
-
         if (this.characterTrait.trait.levels > 0) {
             let levelCost = this.characterTrait.trait.template.hasOwnProperty('lvlcost') ? this.characterTrait.trait.template.lvlcost : this._getLevelCost(this.characterTrait.trait.adder);
 
@@ -107,7 +99,7 @@ export default class BaseCost extends CharacterTrait {
                 adderTotal += this._addAdder(a);
             }
         } else {
-            adderTotal += adder.required ? 0 : adder.basecost;
+            adderTotal += adder.required ? 0 : adder.basecost + (adder.levels / adder.lvlval * adder.lvlcost);
         }
 
         return adderTotal;
@@ -118,10 +110,16 @@ export default class BaseCost extends CharacterTrait {
 
         if (Array.isArray(modifier)) {
             for (let m of modifier) {
-                this._getModifierMultiplier(m);
+                modifierTotal += this._getModifierMultiplier(m);
             }
         } else {
-            modifierTotal = modifier.multiplier ? modifier.basecost + 1 : 1;
+            if (modifier.multiplier) {
+                if (modifier.number > 1) {
+                    for (let i = 0; i < modifier.number; i++) {
+                        modifierTotal += modifier.template.multipliercost;
+                    }
+                }
+            }
         }
 
         return modifierTotal;

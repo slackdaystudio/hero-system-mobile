@@ -4,10 +4,6 @@ import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
-import CharacterTrait from '../../decorators/CharacterTrait';
-import Skill from '../../decorators/Skill';
-import BaseCost from '../../decorators/BaseCost';
-import Modifier from '../../decorators/Modifier';
 import General from '../HeroDesignerCharacter/General';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
 import Traits from '../HeroDesignerCharacter/Traits';
@@ -21,80 +17,29 @@ class ViewHeroDesignerCharacterScreen extends Component {
 		character: PropTypes.object.isRequired
 	}
 
-    constructor(props) {
-        super(props);
-
-        this.skillDecorator = this._skillDecorator.bind(this);
-        this.perkDecorator = this._perkDecorator.bind(this);
-        this.talentDecorator = this._talentDecorator.bind(this);
-        this.martialArtsDecorator = this._martialArtsDecorator.bind(this);
-        this.powersDecorator = this._powersDecorator.bind(this);
-        this.complicationsDecorator = this._complicationsDecorator.bind(this);
-    }
-
-    _skillDecorator(skill, skills) {
-        let decorated = new CharacterTrait(skill, this._getParent(skill, skills));
-        decorated = new Skill(decorated);
-        decorated = new Modifier(decorated);
-
-        return decorated;
-    }
-
-    _perkDecorator(perk, perks) {
-        let decorated = new CharacterTrait(perk, this._getParent(perk, perks));
-        decorated = new BaseCost(decorated);
-        decorated = new Modifier(decorated);
-
-        return decorated;
-    }
-
-    _talentDecorator(talent, talents) {
-        let decorated = new CharacterTrait(talent, this._getParent(talent, talents));
-        decorated = new BaseCost(decorated);
-        decorated = new Modifier(decorated);
-
-        return decorated;
-    }
-
-    _martialArtsDecorator(maneuver, martialArts) {
-        let decorated = new CharacterTrait(maneuver, this._getParent(maneuver, martialArts));
-        decorated = new BaseCost(decorated);
-        decorated = new Modifier(decorated);
-
-        return decorated;
-    }
-
-    _powersDecorator(power, powers) {
-        let decorated = new CharacterTrait(power, this._getParent(power, powers));
-        decorated = new BaseCost(decorated);
-        decorated = new Modifier(decorated);
-
-        return decorated;
-    }
-
-    _complicationsDecorator(complication, complications) {
-        let decorated = new CharacterTrait(complication, this._getParent(complication, complications));
-        decorated = new BaseCost(decorated);
-        decorated = new Modifier(decorated);
-
-        return decorated;
-    }
-
-    _getParent(item, items) {
-        let parent = undefined;
-
-        if (item.parentid === undefined || items === undefined) {
-            return parent;
+    _renderTab(title, itemName, items) {
+        if (items === undefined || items === null || items.length <= 0) {
+            return null;
         }
 
-        for (let i of items) {
-            if (i.id === item.parentid) {
-                parent = i;
-                break;
-            }
-        }
-
-        return parent;
+        return (
+            <Tab
+                tabStyle={styles.tabInactive}
+                activeTabStyle={styles.tabActive}
+                textStyle={styles.grey}
+                activeTextStyle={{color: '#FFF'}}
+                heading={title}
+            >
+                <View style={styles.tabContent}>
+                    <Traits
+                        navigation={this.props.navigation}
+                        headingText={title}
+                        itemName={itemName}
+                        items={items}
+                    />
+                </View>
+            </Tab>
+        );
     }
 
 	render() {
@@ -117,72 +62,12 @@ class ViewHeroDesignerCharacterScreen extends Component {
 							<Characteristics navigation={this.props.navigation} characteristics={this.props.character.characteristics} movement={this.props.character.movement} />
 						</View>
 					</Tab>
-					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
-						<View style={styles.tabContent}>
-							<Traits
-							    navigation={this.props.navigation}
-							    headingText='Skills'
-							    itemName='skills'
-							    items={this.props.character.skills}
-							    decorateTrait={this.skillDecorator}
-							/>
-						</View>
-					</Tab>
-					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Perks">
-						<View style={styles.tabContent}>
-							<Traits
-							    navigation={this.props.navigation}
-							    headingText='Perks'
-							    itemName='perks'
-							    items={this.props.character.perks}
-							    decorateTrait={this.perkDecorator}
-							/>
-						</View>
-					</Tab>
-					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Talents">
-						<View style={styles.tabContent}>
-							<Traits
-							    navigation={this.props.navigation}
-							    headingText='Talents'
-							    itemName='talents'
-							    items={this.props.character.talents}
-							    decorateTrait={this.talentDecorator}
-							/>
-						</View>
-					</Tab>
-					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Martial Arts">
-						<View style={styles.tabContent}>
-							<Traits
-							    navigation={this.props.navigation}
-							    headingText='Martial Arts'
-							    itemName='maneuver'
-							    items={this.props.character.martialArts}
-							    decorateTrait={this.martialArtsDecorator}
-							/>
-						</View>
-					</Tab>
-					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
-						<View style={styles.tabContent}>
-							<Traits
-							    navigation={this.props.navigation}
-							    headingText='Powers'
-							    itemName='powers'
-							    items={this.props.character.powers}
-							    decorateTrait={this.powersDecorator}
-							/>
-						</View>
-					</Tab>
-					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Complications">
-						<View style={styles.tabContent}>
-							<Traits
-							    navigation={this.props.navigation}
-							    headingText='Complications'
-							    itemName='disadvantages'
-							    items={this.props.character.disadvantages}
-							    decorateTrait={this.complicationsDecorator}
-							/>
-						</View>
-					</Tab>
+                    {this._renderTab('Skills', 'skills', this.props.character.skills)}
+                    {this._renderTab('Perks', 'perks', this.props.character.perks)}
+                    {this._renderTab('Talents', 'talents', this.props.character.talents)}
+                    {this._renderTab('Martial Arts', 'maneuver', this.props.character.martialArts)}
+                    {this._renderTab('Powers', 'powers', this.props.character.powers)}
+                    {this._renderTab('Complications', 'disadvantages', this.props.character.disadvantages)}
 			  	</Tabs>
 		  	</Content>
 	      </Container>
