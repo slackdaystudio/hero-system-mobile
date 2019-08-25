@@ -150,13 +150,13 @@ export default class Traits extends Component {
     }
 
     _renderRoll(item) {
-        if (item.trait.hasOwnProperty('roll')) {
+        if (item.roll() !== null) {
             return (
                <TouchableHighlight
                     underlayColor='#121212'
-                    onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(item.trait.roll))}
+                    onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(item.roll()))}
                 >
-                    <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.trait.roll}</Text>
+                    <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.roll()}</Text>
                 </TouchableHighlight>
             );
         }

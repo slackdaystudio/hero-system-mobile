@@ -5,44 +5,9 @@ export default class Skill extends CharacterTrait {
         super(characterTrait.trait, characterTrait.parentTrait);
 
         this.characterTrait = characterTrait;
-        this.skillCost = this._getSkillCost();
     }
 
     cost() {
-        let cost = this.skillCost;
-
-        return cost;
-    }
-
-    activeCost() {
-        return this.cost();
-    }
-
-    realCost() {
-        return this.cost();
-    }
-
-    label() {
-        return this.characterTrait.label();
-    }
-
-    attributes() {
-        return this.characterTrait.attributes();
-    }
-
-    definition() {
-        return this.characterTrait.definition();
-    }
-
-    advantages() {
-        return this.characterTrait.advantages();
-    }
-
-    limitations() {
-        return this.characterTrait.limitations();
-    }
-
-    _getSkillCost() {
         let cost = this.characterTrait.cost();
 
         if (this.characterTrait.trait.type === 'list') {
@@ -73,5 +38,41 @@ export default class Skill extends CharacterTrait {
         }
 
         return cost;
+    }
+
+    costMultiplier() {
+        return this.characterTrait.costMultiplier();
+    }
+
+    activeCost() {
+        return this.cost();
+    }
+
+    realCost() {
+        return this.cost();
+    }
+
+    label() {
+        return this.characterTrait.label();
+    }
+
+    attributes() {
+        return this.characterTrait.attributes();
+    }
+
+    definition() {
+        return this.characterTrait.definition();
+    }
+
+    roll() {
+        return this.characterTrait.trait.roll;
+    }
+
+    advantages() {
+        return this.characterTrait.advantages();
+    }
+
+    limitations() {
+        return this.characterTrait.limitations();
     }
 }

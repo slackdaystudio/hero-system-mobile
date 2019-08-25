@@ -9,16 +9,22 @@ export default class BaseCost extends CharacterTrait {
     }
 
     cost() {
-        let cost = this.characterTrait.trait.basecost;
+        let cost = this.characterTrait.cost();
 
         if (this.characterTrait.trait.levels > 0) {
-            let levelCost = this.characterTrait.trait.template.hasOwnProperty('lvlcost') ? this.characterTrait.trait.template.lvlcost : this._getLevelCost(this.characterTrait.trait.adder);
+            let levelCost = 0;
+
+            if (this.characterTrait.trait.template.hasOwnProperty('lvlcost')) {
+                levelCost = this.characterTrait.trait.template.lvlcost;
+            } else if (this.characterTrait.trait.hasOwnProperty('adder')) {
+                levelCost += this._getLevelCost(this.characterTrait.trait.adder)
+            }
 
             if (this.characterTrait.trait.template.hasOwnProperty('mincost')) {
                 levelCost = levelCost < this.characterTrait.trait.template.mincost ? this.characterTrait.trait.template.mincost : levelCost;
             }
 
-            if (this.characterTrait.trait.template.lvlval != 0) {
+            if (this.characterTrait.trait.template.hasOwnProperty('lvlval') && this.characterTrait.trait.template.lvlval !== 0) {
                 cost += this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * levelCost;
             }
         }
@@ -27,11 +33,11 @@ export default class BaseCost extends CharacterTrait {
             cost += this._addAdder(this.characterTrait.trait.adder);
         }
 
-        if (this.characterTrait.trait.hasOwnProperty('modifier')) {
-            cost *= this._getModifierMultiplier(this.characterTrait.trait.modifier);
-        }
-
         return cost;
+    }
+
+    costMultiplier() {
+        return this.characterTrait.costMultiplier();
     }
 
     activeCost() {
@@ -52,6 +58,10 @@ export default class BaseCost extends CharacterTrait {
 
     definition() {
         return this.characterTrait.definition();
+    }
+
+    roll() {
+        return null;
     }
 
     advantages() {
@@ -94,34 +104,22 @@ export default class BaseCost extends CharacterTrait {
     _addAdder(adder) {
         let adderTotal = 0;
 
+        if (adder === undefined || adder === null) {
+            return adderTotal;
+        }
+
         if (Array.isArray(adder)) {
             for (let a of adder) {
                 adderTotal += this._addAdder(a);
             }
         } else {
-            adderTotal += adder.required ? 0 : adder.basecost + (adder.levels / adder.lvlval * adder.lvlcost);
+            if (adder.levels > 0) {
+                adderTotal += adder.basecost + (adder.levels / adder.lvlval * adder.lvlcost);
+            } else {
+                adderTotal += adder.basecost;
+            }
         }
 
         return adderTotal;
-    }
-
-    _getModifierMultiplier(modifier) {
-        let modifierTotal = 0;
-
-        if (Array.isArray(modifier)) {
-            for (let m of modifier) {
-                modifierTotal += this._getModifierMultiplier(m);
-            }
-        } else {
-            if (modifier.multiplier) {
-                if (modifier.number > 1) {
-                    for (let i = 0; i < modifier.number; i++) {
-                        modifierTotal += modifier.template.multipliercost;
-                    }
-                }
-            }
-        }
-
-        return modifierTotal;
     }
 }

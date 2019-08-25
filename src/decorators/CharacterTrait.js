@@ -10,6 +10,10 @@ export default class CharacterTrait {
         return this.trait.basecost || 0;
     }
 
+    costMultiplier() {
+        return 1;
+    }
+
     activeCost() {
         return this.trait.basecost || 0;
     }
@@ -42,6 +46,10 @@ export default class CharacterTrait {
 
     definition() {
         return this.trait.template.definition;
+    }
+
+    roll() {
+        return null;
     }
 
     advantages() {

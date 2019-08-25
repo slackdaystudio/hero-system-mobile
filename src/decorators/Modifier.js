@@ -15,6 +15,10 @@ export default class Modifier extends CharacterTrait {
         return this.characterTrait.cost();
     }
 
+    costMultiplier() {
+        return this.characterTrait.costMultiplier();
+    }
+
     activeCost() {
         let activeCost = this.cost() * (1 + this.advantages().reduce((a, b) => a + b.cost, 0));
 
@@ -42,6 +46,10 @@ export default class Modifier extends CharacterTrait {
 
     definition() {
         return this.characterTrait.definition();
+    }
+
+    roll() {
+        return this.characterTrait.roll();
     }
 
     advantages() {

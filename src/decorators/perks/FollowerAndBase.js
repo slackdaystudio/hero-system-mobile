@@ -25,6 +25,10 @@ export default class FollowerAndBase extends CharacterTrait {
         return cost;
     }
 
+    costMultiplier() {
+        return this.characterTrait.costMultiplier();
+    }
+
     activeCost() {
         return this.characterTrait.activeCost();
     }
@@ -60,6 +64,10 @@ export default class FollowerAndBase extends CharacterTrait {
 
     definition() {
         return this.characterTrait.definition();
+    }
+
+    roll() {
+        return this.characterTrait.roll();
     }
 
     advantages() {
