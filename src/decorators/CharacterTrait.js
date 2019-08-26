@@ -33,6 +33,13 @@ export default class CharacterTrait {
     attributes() {
         let attributes = [];
 
+        if (this.trait.hasOwnProperty('optionAlias')) {
+            attributes.push({
+                label: this.trait.optionAlias,
+                value: ''
+            });
+        }
+
         if (this.trait.hasOwnProperty('adder')) {
             this._addAttribute(this.trait.adder, attributes);
         }

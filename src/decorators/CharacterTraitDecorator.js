@@ -4,6 +4,7 @@ import CharacterTrait from './CharacterTrait';
 import Modifier from './Modifier';
 import Skill from './Skill';
 import { perkDecorator } from './perks/PerkDecorator';
+import { talentDecorator } from './talents/TalentDecorator';
 
 class CharacterTraitDecorator {
     decorate(item, items) {
@@ -24,6 +25,8 @@ class CharacterTraitDecorator {
     _decorateItem(decorated) {
         if (decorated.trait.type === 'perk' || decorated.trait.hasOwnProperty('perks')) {
             decorated = perkDecorator.decorate(decorated);
+        } else if (decorated.trait.type === 'talent' || decorated.trait.hasOwnProperty('talents')) {
+            decorated = talentDecorator.decorate(decorated);
         }
 
         return decorated;

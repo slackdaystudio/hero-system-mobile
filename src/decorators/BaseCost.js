@@ -14,7 +14,14 @@ export default class BaseCost extends CharacterTrait {
         if (this.characterTrait.trait.levels > 0) {
             let levelCost = 0;
 
-            if (this.characterTrait.trait.template.hasOwnProperty('lvlcost')) {
+            if (this.characterTrait.trait.hasOwnProperty('option')) {
+                for (let option of this.characterTrait.trait.template.option) {
+                    if (option.xmlid.toUpperCase() === this.characterTrait.trait.option.toUpperCase()) {
+                        levelCost = option.lvlcost || this.characterTrait.trait.lvlcost;
+                        break;
+                    }
+                }
+            } else if (this.characterTrait.trait.template.hasOwnProperty('lvlcost')) {
                 levelCost = this.characterTrait.trait.template.lvlcost;
             } else if (this.characterTrait.trait.hasOwnProperty('adder')) {
                 levelCost += this._getLevelCost(this.characterTrait.trait.adder)
@@ -73,10 +80,6 @@ export default class BaseCost extends CharacterTrait {
     }
 
     _getLevelCost(adder) {
-//        if (this.characterTrait.trait.hasOwnProperty('option')) {
-//            return
-//        }
-
         let levelCost = 0;
 
         if (adder === null || adder === undefined) {
