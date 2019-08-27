@@ -107,7 +107,7 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.skills, 'skills', 'skill', 'skills', this._skillsPreInsert);
         this._populateTrait(character, template, heroDesignerCharacter.perks, 'perks', 'perk', 'perks');
         this._populateTrait(character, template, heroDesignerCharacter.talents, 'talents', 'talent', 'talents');
-        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'martialArts');
+        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
