@@ -3,6 +3,7 @@ import BaseCost from './BaseCost';
 import CharacterTrait from './CharacterTrait';
 import Modifier from './Modifier';
 import Skill from './Skill';
+import Maneuver from './Maneuver';
 import { perkDecorator } from './perks/PerkDecorator';
 import { talentDecorator } from './talents/TalentDecorator';
 
@@ -14,6 +15,10 @@ class CharacterTraitDecorator {
             decorated = new Skill(decorated);
         } else {
             decorated = new BaseCost(decorated);
+        }
+
+        if (decorated.trait.type === 'maneuver' || decorated.trait.hasOwnProperty('maneuver')) {
+            decorated = new Maneuver(decorated);
         }
 
         decorated = this._decorateItem(decorated);

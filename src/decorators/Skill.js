@@ -18,6 +18,8 @@ export default class Skill extends CharacterTrait {
             cost = 2;
         } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman) {
             cost = this.characterTrait.trait.familiarity ? 1 : 0;
+        } else if (this.characterTrait.trait.hasOwnProperty('adder')) {
+            cost += this._totalAdders(this.characterTrait.trait.adder);
         } else {
             let basecost = 0;
             let skillLevelCost = 0;
@@ -74,5 +76,27 @@ export default class Skill extends CharacterTrait {
 
     limitations() {
         return this.characterTrait.limitations();
+    }
+
+    _totalAdders(adder) {
+        let total = 0;
+
+        if (Array.isArray(adder)) {
+            for (let a of adder) {
+                total += a.basecost;
+
+                if (a.hasOwnProperty('adder')) {
+                    total += this._totalAdders(a.adder);
+                }
+            }
+        } else {
+            total += adder.basecost;
+
+            if (adder.hasOwnProperty('adder')) {
+                total += this._totalAdders(adder.adder);
+            }
+        }
+
+        return total;
     }
 }

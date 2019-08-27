@@ -111,6 +111,21 @@ export default class Traits extends Component {
         return null;
     }
 
+    _renderAdvantagesAndLimitations(item) {
+        if (item.advantages().length > 0 || item.limitations().length > 0) {
+            return (
+                <CardItem style={styles.cardItem}>
+                    <Body>
+                        {this._renderModifiers('Advantages', item.advantages())}
+                        {this._renderModifiers('Limitations', item.limitations())}
+                    </Body>
+                </CardItem>
+            );
+        }
+
+        return null;
+    }
+
     _renderDefinition(item) {
         if (this.state.itemShow[item.trait.id]) {
             return (
@@ -121,12 +136,7 @@ export default class Traits extends Component {
                             <Text style={styles.grey}>{item.definition()}</Text>
                         </Body>
                     </CardItem>
-                    <CardItem style={styles.cardItem}>
-                        <Body>
-                            {this._renderModifiers('Advantages', item.advantages())}
-                            {this._renderModifiers('Limitations', item.limitations())}
-                        </Body>
-                    </CardItem>
+                    {this._renderAdvantagesAndLimitations(item)}
                     <CardItem style={styles.cardItem} footer>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                             <Text style={styles.grey}>

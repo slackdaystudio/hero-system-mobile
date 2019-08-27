@@ -121,8 +121,27 @@ export default class BaseCost extends CharacterTrait {
             } else {
                 adderTotal += adder.basecost;
             }
+
+            if (adder.hasOwnProperty('adder')) {
+                adderTotal += this._addSubAdder(adder.adder)
+            }
         }
 
         return adderTotal;
+    }
+
+    _addSubAdder(subAdder) {
+        let subTotal = 0;
+
+        if (Array.isArray(subAdder)) {
+            for (let s of subAdder) {
+                subTotal += this._addSubAdder(s);
+            }
+        } else {
+            subTotal += subAdder.basecost;
+        }
+
+
+        return subTotal;
     }
 }

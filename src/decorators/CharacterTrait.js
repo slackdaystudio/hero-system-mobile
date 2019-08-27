@@ -52,7 +52,7 @@ export default class CharacterTrait {
     }
 
     definition() {
-        return this.trait.template.definition;
+        return this.trait.template.definition || '';
     }
 
     roll() {
@@ -78,6 +78,20 @@ export default class CharacterTrait {
 
                 if (value !== '' && (value.startsWith('(') && !value.endsWith(')'))) {
                     value = value.substr(1);
+                }
+
+                if (attribute.hasOwnProperty('adder')) {
+                    let adders = [];
+
+                    if (Array.isArray(attribute.adder)) {
+                        for (let adder of attribute.adder) {
+                            adders.push(adder.alias);
+                        }
+                    } else {
+                        adders.push(attribute.adder.alias);
+                    }
+
+                    value += adders.join(', ');
                 }
 
                 attributes.push({

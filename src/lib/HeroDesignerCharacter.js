@@ -107,24 +107,29 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.skills, 'skills', 'skill', 'skills', this._skillsPreInsert);
         this._populateTrait(character, template, heroDesignerCharacter.perks, 'perks', 'perk', 'perks');
         this._populateTrait(character, template, heroDesignerCharacter.talents, 'talents', 'talent', 'talents');
-        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
+        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'martialArts');
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
 
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
 
     _skillsPreInsert(character, template, skill) {
+        let roll = null;
+
         if (skill.proficiency) {
             roll = SKILL_PROFICIENCY_BASE;
         } else if (skill.familiarity || skill.everyman) {
             roll = SKILL_FAMILIARITY_BASE
-        } else {
+        } else if (!skill.hasOwnProperty('adder') && skill.hasOwnProperty('characteristic')) {
             roll = parseInt(character.characteristics.filter(c => c.shortName.toLowerCase() === skill.characteristic.toLowerCase()).shift().roll.slice(0, -1), 10);
+        }
 
+        if (roll !== null) {
             skill.roll = `${roll + skill.levels}-`;
         }
     }
@@ -333,63 +338,52 @@ class HeroDesignerCharacter {
     }
 
     _normalizeTemplateData(template) {
-        let normalizedEntries = [];
+        let normalizedEntries;
 
         for (let [listKey, subListKey] of Object.entries(CHARACTER_TRAITS)) {
+            normalizedEntries = [];
+
             if (listKey === 'powers') {
                 this._normalizeTemplatePowers(template);
                 continue;
             }
 
             for (let [key, item] of Object.entries(template[listKey])) {
-                if (Array.isArray(template[listKey][key])) {
-                    for (let item of template[listKey][key]) {
-                        if (!item.hasOwnProperty('xmlid') || item.xmlid.toUpperCase() === 'MANEUVER') {
-                            item.xmlid = common.toSnakeCase(item['display']).toUpperCase();
-                        }
+                if (Array.isArray(item)) {
+                    for (let i of item) {
+                        this._normalizeTemplateItem(normalizedEntries, key, i);
                     }
-                } else if (!Array.isArray(template[listKey][key]) && !item.hasOwnProperty('xmlid')) {
-                    item.xmlid = common.toSnakeCase(key).toUpperCase();
+                } else {
+                    if (!item.hasOwnProperty('xmlid')) {
+                        item.xmlid = common.toSnakeCase(key).toUpperCase();
+                    }
 
                     normalizedEntries.push(item);
+
+                    delete template[listKey][key];
                 }
             }
 
             template[listKey][subListKey] = template[listKey][subListKey].concat(normalizedEntries);
-
-            for (let toBeDeleted of normalizedEntries) {
-                let key = common.toCamelCase(toBeDeleted.xmlid.toUpperCase());
-
-                if (template[listKey].hasOwnProperty(key)) {
-                    delete template[listKey][key];
-                }
-            }
         }
     }
 
-    _normalizeTemplateDataItem(template, item, listKey, key, normalizedEntries) {
-        if (Array.isArray(template[listKey][key])) {
-            for (let i of template[listKey][key]) {
-                this._normalizeCharacterDataItem(template, i, listKey, key, normalizedEntries);
+
+    _normalizeTemplateItem(normalizedEntries, key, item) {
+        if (Array.isArray(item)) {
+            for (let i of item) {
+                this._normalizeTemplateItem(normalizedEntries, key, i);
             }
         } else {
-            let normalized = false;
-
             if (!item.hasOwnProperty('xmlid')) {
-                item.xmlid = common.toSnakeCase(key).toUpperCase();
-
-                normalized = true;
+                if (key === 'maneuver') {
+                    item.xmlid = common.toSnakeCase(item.display).toUpperCase();
+                } else {
+                    item.xmlid = key.toUpperCase();
+                }
             }
 
-            if (item.xmlid === 'MANEUVER') {
-                item.xmlid = common.toSnakeCase(item['display']).toUpperCase();
-
-                normalized = true;
-            }
-
-            if (normalized) {
-                normalizedEntries.push(item);
-            }
+            normalizedEntries.push(item);
         }
     }
 
@@ -418,7 +412,7 @@ class HeroDesignerCharacter {
             }
         } else {
             if (!power.hasOwnProperty('xmlid')) {
-                power.xmlid =key.toUpperCase();
+                power.xmlid = key.toUpperCase();
             }
 
             template.powers.power.push(power);
@@ -426,9 +420,9 @@ class HeroDesignerCharacter {
     }
 
     _normalizeCharacterData(heroDesignerCharacter) {
-        for (let listKey of Object.keys(CHARACTER_TRAITS)) {
-            if (listKey === 'powers') {
-                this._normalizeCharacterPowers(heroDesignerCharacter);
+        for (let [listKey, subListKey] of Object.entries(CHARACTER_TRAITS)) {
+            if (listKey === 'powers' || listKey === 'martialArts') {
+                this._normalizeCharacterItems(heroDesignerCharacter, listKey.toLowerCase(), subListKey);
 
                 continue;
             }
@@ -447,33 +441,35 @@ class HeroDesignerCharacter {
                 this._normalizeCharacterDataItem(heroDesignerCharacter, i);
             }
         } else {
-            if (!item.hasOwnProperty('xmlid') || item.xmlid.toUpperCase() === 'MANEUVER') {
+            if (!item.hasOwnProperty('xmlid')) {
                 item.xmlid = common.toSnakeCase(item.display).toUpperCase();
             }
         }
     }
 
-    _normalizeCharacterPowers(heroDesignerCharacter) {
-        for (let [key, power] of Object.entries(heroDesignerCharacter.powers)) {
-            if (key !== 'power') {
-                this._normalizeCharacterPower(heroDesignerCharacter, power);
+    _normalizeCharacterItems(heroDesignerCharacter, listKey, subListKey) {
+        for (let [key, item] of Object.entries(heroDesignerCharacter[listKey])) {
+            if (key !== subListKey) {
+                this._normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey);
 
-                delete heroDesignerCharacter.powers[key];
+                delete heroDesignerCharacter[listKey][key];
+            } else if (key.toUpperCase() === 'MANEUVER') {
+                for (let i of item) {
+                    if (i.xmlid.toUpperCase() === 'MANEUVER') {
+                        i.xmlid = common.toSnakeCase(i.alias).toUpperCase()
+                    }
+                }
             }
         }
     }
 
-    _normalizeCharacterPower(heroDesignerCharacter, power) {
-        if (Array.isArray(power)) {
-            for (let p of power) {
-                this._normalizeCharacterPower(heroDesignerCharacter, power);
+    _normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey) {
+        if (Array.isArray(item)) {
+            for (let i of item) {
+                this._normalizeCharacterPower(heroDesignerCharacter, item, listKey, subListKey);
             }
         } else {
-            if (!power.hasOwnProperty('xmlid')) {
-                power.xmlid = key.toUpperCase();
-            }
-
-            heroDesignerCharacter.powers.power.push(power);
+            heroDesignerCharacter[listKey][subListKey].push(item);
         }
     }
 
