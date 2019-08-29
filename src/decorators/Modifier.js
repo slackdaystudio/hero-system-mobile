@@ -71,9 +71,9 @@ export default class Modifier extends CharacterTrait {
         if (trait.hasOwnProperty('modifier') && trait.modifier !== undefined) {
             if (Array.isArray(trait.modifier)) {
                 for (let modifier of trait.modifier) {
-                    if (modifier.hasOwnProperty('multiplier') && !modifier.hasOwnProperty('template')) {
-                        continue;
-                    }
+//                    if (modifier.hasOwnProperty('multiplier') && !modifier.hasOwnProperty('template')) {
+//                        continue;
+//                    }
 
                     modifierCost = this._getTotalModifiers(modifier);
 
@@ -83,9 +83,9 @@ export default class Modifier extends CharacterTrait {
                     });
                 }
             } else {
-                if (trait.modifier.hasOwnProperty('multiplier') && !trait.modifier.hasOwnProperty('template')) {
-                    return totalModifiers;
-                }
+//                if (trait.modifier.hasOwnProperty('multiplier') && !trait.modifier.hasOwnProperty('template')) {
+//                    return totalModifiers;
+//                }
 
                 modifierCost = this._getTotalModifiers(trait.modifier);
 
@@ -141,7 +141,11 @@ export default class Modifier extends CharacterTrait {
             return this._handleDoT(modifier);
         }
 
-        let basecost = modifier.basecost + (modifier.levels > 0 ? modifier.template.lvlcost * modifier.levels : 0);
+        let basecost = modifier.basecost;
+
+        if (modifier.hasOwnProperty('template') && modifier.template.hasOwnProperty('lvlcost') && modifier.levels > 0) {
+            basecost += modifier.template.lvlcost * modifier.levels;
+        }
 
         let totalModifiers = this._getAdderTotal(basecost, modifier.modifier, modifier);
 

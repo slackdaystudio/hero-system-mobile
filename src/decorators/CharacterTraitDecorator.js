@@ -6,6 +6,7 @@ import Skill from './Skill';
 import Maneuver from './Maneuver';
 import { perkDecorator } from './perks/PerkDecorator';
 import { talentDecorator } from './talents/TalentDecorator';
+import { powerDecorator } from './powers/PowerDecorator';
 
 class CharacterTraitDecorator {
     decorate(item, items) {
@@ -32,6 +33,8 @@ class CharacterTraitDecorator {
             decorated = perkDecorator.decorate(decorated);
         } else if (decorated.trait.type === 'talent' || decorated.trait.hasOwnProperty('talents')) {
             decorated = talentDecorator.decorate(decorated);
+        } else if (decorated.trait.type === 'power' || decorated.trait.hasOwnProperty('powers')) {
+            decorated = powerDecorator.decorate(decorated);
         }
 
         return decorated;

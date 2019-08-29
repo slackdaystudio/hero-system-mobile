@@ -162,7 +162,7 @@ export default class Traits extends Component {
     _renderRoll(item) {
         if (item.roll() !== null) {
             return (
-               <TouchableHighlight
+                <TouchableHighlight
                     underlayColor='#121212'
                     onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(item.roll()))}
                 >

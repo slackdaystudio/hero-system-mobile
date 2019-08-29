@@ -55,7 +55,29 @@ class Common {
     }
 
     getMultiplierCost(total, step, cost) {
+        if (step === 1) {
+            return total / step * cost;
+        }
+
         return this.getMultiplications(total, step) * cost;
+    }
+
+    totalAdders(adder) {
+        let total = 0;
+
+        if (adder === undefined || adder === null) {
+            return total;
+        }
+
+        if (Array.isArray(adder)) {
+            for (let a of adder) {
+                total += this.totalAdders(a);
+            }
+        } else {
+            total += adder.basecost;
+        }
+
+        return total;
     }
 
     async getAppSettings() {

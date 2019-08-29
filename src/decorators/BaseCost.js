@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
+import { common } from '../lib/Common';
 
 export default class BaseCost extends CharacterTrait {
     constructor(characterTrait) {
@@ -14,7 +15,7 @@ export default class BaseCost extends CharacterTrait {
         if (this.characterTrait.trait.levels > 0) {
             let levelCost = 0;
 
-            if (this.characterTrait.trait.hasOwnProperty('option')) {
+            if (this.characterTrait.trait.hasOwnProperty('option') && this.characterTrait.trait.template.hasOwnProperty('option')) {
                 for (let option of this.characterTrait.trait.template.option) {
                     if (option.xmlid.toUpperCase() === this.characterTrait.trait.option.toUpperCase()) {
                         levelCost = option.lvlcost || this.characterTrait.trait.lvlcost;
@@ -32,7 +33,11 @@ export default class BaseCost extends CharacterTrait {
             }
 
             if (this.characterTrait.trait.template.hasOwnProperty('lvlval') && this.characterTrait.trait.template.lvlval !== 0) {
-                cost += this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * levelCost;
+                cost += common.getMultiplierCost(
+                    this.characterTrait.trait.levels,
+                    this.characterTrait.trait.template.lvlval,
+                    levelCost
+                );
             }
         }
 
@@ -40,7 +45,7 @@ export default class BaseCost extends CharacterTrait {
             cost += this._addAdder(this.characterTrait.trait.adder);
         }
 
-        return cost;
+        return Math.round(cost);
     }
 
     costMultiplier() {
@@ -117,7 +122,11 @@ export default class BaseCost extends CharacterTrait {
             }
         } else {
             if (adder.levels > 0) {
-                adderTotal += adder.basecost + (adder.levels / adder.lvlval * adder.lvlcost);
+                adderTotal += common.getMultiplierCost(
+                    adder.levels,
+                    adder.lvlval,
+                    adder.lvlcost
+                );
             } else {
                 adderTotal += adder.basecost;
             }
