@@ -9,6 +9,7 @@ import Entangle from './Entangle';
 import ExtraLimbs from './ExtraLimbs';
 import FlashDefense from './FlashDefense';
 import Ftl from './Ftl';
+import HandToHandAttack from './HandToHandAttack';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
@@ -47,6 +48,10 @@ const FLIGHT = 'FLIGHT';
 
 const FTL = 'FTL';
 
+const HANDTOHANDATTACK = 'HANDTOHANDATTACK';
+
+const HEALING = 'HEALING';
+
 class PowerDecorator {
     decorate(decorated) {
         switch (decorated.trait.xmlid.toUpperCase()) {
@@ -58,6 +63,7 @@ class PowerDecorator {
             case DISPEL:
             case DRAIN:
             case FLASH:
+            case HEALING:
                 decorated = new EffectRoll(decorated);
                 break;
             case BARRIER:
@@ -92,6 +98,9 @@ class PowerDecorator {
                 break;
             case FLIGHT:
                 decorated = new Movement(decorated);
+                break;
+            case HANDTOHANDATTACK:
+                decorated = new HandToHandAttack(decorated);
                 break;
             default:
                 // do nothing
