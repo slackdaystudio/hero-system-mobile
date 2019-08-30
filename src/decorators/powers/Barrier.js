@@ -16,8 +16,14 @@ export default class Barrier extends CharacterTrait {
         cost += this.calculateDefenseCost(this.characterTrait.trait.edlevels);
         cost += this.calculateDefenseCost(this.characterTrait.trait.mdlevels);
         cost += this.calculateDefenseCost(this.characterTrait.trait.powdlevels);
+        cost += this.characterTrait.trait.lengthlevels;
+        cost += this.characterTrait.trait.heightlevels;
+        cost += this.characterTrait.trait.bodylevels;
+        cost += this.characterTrait.trait.widthlevels * 4 / this.characterTrait.trait.template.costperinch;
 
-        return cost;
+        cost += common.totalAdders(this.characterTrait.trait.adder);
+
+        return Math.round(cost);
     }
 
     costMultiplier() {

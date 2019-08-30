@@ -80,6 +80,24 @@ class Common {
         return total;
     }
 
+    toMap(objects, mapKey) {
+        let map = new Map();
+
+        if (Array.isArray(objects)) {
+            for (let object of objects) {
+                if (object.hasOwnProperty(mapKey)) {
+                    map.set(object[mapKey], object);
+                }
+            }
+        } else {
+            if (objects !== null && objects.hasOwnProperty(mapKey)) {
+                map.set(objects[mapKey], objects);
+            }
+        }
+
+        return map;
+    }
+
     async getAppSettings() {
         let settings = await AsyncStorage.getItem('appSettings');
 
