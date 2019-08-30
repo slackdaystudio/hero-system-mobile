@@ -1,12 +1,12 @@
 import { Alert } from 'react-native';
-import CharacterTrait from './CharacterTrait';
+import CharacterTrait from '../CharacterTrait';
+import { common } from '../../lib/Common';
 
-export default class ExtraAttributes extends CharacterTrait {
-    constructor(characterTrait, extraAttributes) {
+export default class FlashDefense extends CharacterTrait {
+    constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
         this.characterTrait = characterTrait;
-        this.extraAttributes = extraAttributes;
     }
 
     cost() {
@@ -32,12 +32,10 @@ export default class ExtraAttributes extends CharacterTrait {
     attributes() {
         let attributes = this.characterTrait.attributes();
 
-        for (let attribute of this.extraAttributes) {
-            attributes.push({
-                label: attribute.label,
-                value: attribute.value
-            });
-        }
+        attributes.push({
+            label: 'Points',
+            value: this.characterTrait.trait.levels
+        });
 
         return attributes;
     }

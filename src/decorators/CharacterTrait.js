@@ -1,9 +1,12 @@
 import { Alert } from 'react-native';
+import { common } from '../lib/Common';
 
 export default class CharacterTrait {
-    constructor(trait, parentTrait=undefined) {
-        this.trait = trait;
-        this.parentTrait = parentTrait;
+    constructor(item, listKey, getCharacter) {
+        this.trait = item;
+        this.parentTrait = this._getParent(this.trait, listKey, getCharacter);
+        this.getCharacter = getCharacter;
+        this.listKey = listKey;
     }
 
     cost() {
@@ -100,5 +103,24 @@ export default class CharacterTrait {
                 });
             }
         }
+    }
+
+    _getParent(item, listKey, getCharacter) {
+        let parent = undefined;
+
+        if (item.parentid === undefined) {
+            return parent;
+        }
+
+        let character = getCharacter();
+
+        for (let i of character[listKey]) {
+            if (i.id === item.parentid) {
+                parent = i;
+                break;
+            }
+        }
+
+        return parent;
     }
 }

@@ -9,8 +9,8 @@ import { talentDecorator } from './talents/TalentDecorator';
 import { powerDecorator } from './powers/PowerDecorator';
 
 class CharacterTraitDecorator {
-    decorate(item, items) {
-        let decorated = new CharacterTrait(item, this._getParent(item, items));
+    decorate(item, listKey, getCharacter) {
+        let decorated = new CharacterTrait(item, listKey, getCharacter);
 
         if (decorated.trait.type === 'skill' || decorated.trait.hasOwnProperty('skills')) {
             decorated = new Skill(decorated);
@@ -38,23 +38,6 @@ class CharacterTraitDecorator {
         }
 
         return decorated;
-    }
-
-    _getParent(item, items) {
-        let parent = undefined;
-
-        if (item.parentid === undefined || items === undefined) {
-            return parent;
-        }
-
-        for (let i of items) {
-            if (i.id === item.parentid) {
-                parent = i;
-                break;
-            }
-        }
-
-        return parent;
     }
 }
 

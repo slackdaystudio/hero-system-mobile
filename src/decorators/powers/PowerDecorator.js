@@ -7,8 +7,11 @@ import Duplication from './Duplication';
 import EnduranceReserve from './EnduranceReserve';
 import Entangle from './Entangle';
 import ExtraLimbs from './ExtraLimbs';
+import FlashDefense from './FlashDefense';
+import Ftl from './Ftl';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
+import Movement from '../Movement';
 
 const ABSORPTION = 'ABSORPTION';
 
@@ -28,13 +31,21 @@ const DISPEL = 'DISPEL';
 
 const DRAIN = 'DRAIN';
 
+const DUPLICATION = 'DUPLICATION';
+
 const ENDURANCERESERVE = 'ENDURANCERESERVE';
 
 const ENTANGLE = 'ENTANGLE';
 
 const EXTRALIMBS = 'EXTRALIMBS';
 
-const DUPLICATION = 'DUPLICATION';
+const FLASH = 'FLASH';
+
+const FLASHDEFENSE = 'FLASHDEFENSE';
+
+const FLIGHT = 'FLIGHT';
+
+const FTL = 'FTL';
 
 class PowerDecorator {
     decorate(decorated) {
@@ -46,6 +57,7 @@ class PowerDecorator {
             case BLAST:
             case DISPEL:
             case DRAIN:
+            case FLASH:
                 decorated = new EffectRoll(decorated);
                 break;
             case BARRIER:
@@ -71,6 +83,15 @@ class PowerDecorator {
                 break;
             case EXTRALIMBS:
                 decorated = new ExtraLimbs(decorated);
+                break;
+            case FTL:
+                decorated = new Ftl(decorated);
+                break;
+            case FLASHDEFENSE:
+                decorated = new FlashDefense(decorated);
+                break;
+            case FLIGHT:
+                decorated = new Movement(decorated);
                 break;
             default:
                 // do nothing

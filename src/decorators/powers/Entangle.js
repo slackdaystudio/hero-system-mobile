@@ -4,11 +4,11 @@ import { common } from '../../lib/Common';
 
 export default class Entangle extends CharacterTrait {
     constructor(characterTrait) {
-        super(characterTrait.trait, characterTrait.parentTrait);
+        super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
         this.characterTrait = characterTrait;
-        this.modifierMap = common.toMap(this.characterTrait.trait.modifier, 'xmlid');
-        this.adderMap = common.toMap(this.characterTrait.trait.adder, 'xmlid');
+        this.modifierMap = common.toMap(this.characterTrait.trait.modifier);
+        this.adderMap = common.toMap(this.characterTrait.trait.adder);
     }
 
     cost() {

@@ -17,8 +17,10 @@ class ViewHeroDesignerCharacterScreen extends Component {
 		character: PropTypes.object.isRequired
 	}
 
-    _renderTab(title, itemName, items) {
-        if (items === undefined || items === null || items.length <= 0) {
+    _renderTab(title, listKey) {
+        if (this.props.character[listKey] === undefined ||
+            this.props.character[listKey] === null ||
+            this.props.character[listKey].length <= 0) {
             return null;
         }
 
@@ -34,8 +36,8 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     <Traits
                         navigation={this.props.navigation}
                         headingText={title}
-                        itemName={itemName}
-                        items={items}
+                        character={this.props.character}
+                        listKey={listKey}
                     />
                 </View>
             </Tab>
@@ -62,12 +64,12 @@ class ViewHeroDesignerCharacterScreen extends Component {
 							<Characteristics navigation={this.props.navigation} characteristics={this.props.character.characteristics} movement={this.props.character.movement} />
 						</View>
 					</Tab>
-                    {this._renderTab('Skills', 'skills', this.props.character.skills)}
-                    {this._renderTab('Perks', 'perks', this.props.character.perks)}
-                    {this._renderTab('Talents', 'talents', this.props.character.talents)}
-                    {this._renderTab('Martial Arts', 'maneuver', this.props.character.martialArts)}
-                    {this._renderTab('Powers', 'powers', this.props.character.powers)}
-                    {this._renderTab('Complications', 'disadvantages', this.props.character.disadvantages)}
+                    {this._renderTab('Skills', 'skills')}
+                    {this._renderTab('Perks', 'perks')}
+                    {this._renderTab('Talents', 'talents')}
+                    {this._renderTab('Martial Arts', 'maneuver')}
+                    {this._renderTab('Powers', 'powers')}
+                    {this._renderTab('Complications', 'disadvantages')}
 			  	</Tabs>
 		  	</Content>
 	      </Container>

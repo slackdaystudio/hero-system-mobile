@@ -5,7 +5,7 @@ import { SKILL_ENHANCERS } from '../lib/HeroDesignerCharacter';
 
 export default class Modifier extends CharacterTrait {
     constructor(characterTrait) {
-        super(characterTrait.trait, characterTrait.parentTrait);
+        super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
         this.characterTrait = characterTrait;
         this.modifiers = this._getItemTotalModifiers(this.characterTrait.trait).concat(this._getItemTotalModifiers(this.characterTrait.parentTrait));
@@ -22,11 +22,11 @@ export default class Modifier extends CharacterTrait {
     activeCost() {
         let activeCost = this.cost() * (1 + this.advantages().reduce((a, b) => a + b.cost, 0));
 
-        return this._roundInPlayersFavor(activeCost);
+        return common.roundInPlayersFavor(activeCost);
     }
 
     realCost() {
-        let realCost = this._roundInPlayersFavor(this.activeCost() / (1 - this.limitations().reduce((a, b) => a + b.cost, 0)));
+        let realCost = common.roundInPlayersFavor(this.activeCost() / (1 - this.limitations().reduce((a, b) => a + b.cost, 0)));
 
         if (this.characterTrait.parentTrait !== undefined &&
             SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlid.toUpperCase())) {
@@ -220,20 +220,6 @@ export default class Modifier extends CharacterTrait {
         }
 
         return null;
-    }
-
-    _roundInPlayersFavor(toBeRounded) {
-        let rounded = toBeRounded;
-
-        if (common.isFloat(toBeRounded)) {
-            if ((toBeRounded % 1).toFixed(1) === '0.5') {
-                rounded = Math.trunc(toBeRounded);
-            } else {
-                rounded = Math.round(toBeRounded);
-            }
-        }
-
-        return rounded;
     }
 
     _formatCost(cost) {

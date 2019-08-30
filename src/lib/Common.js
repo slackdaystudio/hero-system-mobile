@@ -80,8 +80,12 @@ class Common {
         return total;
     }
 
-    toMap(objects, mapKey) {
+    toMap(objects, mapKey='xmlid') {
         let map = new Map();
+
+        if (objects === undefined || objects === null) {
+            return map;
+        }
 
         if (Array.isArray(objects)) {
             for (let object of objects) {
@@ -96,6 +100,20 @@ class Common {
         }
 
         return map;
+    }
+
+    roundInPlayersFavor(toBeRounded) {
+        let rounded = toBeRounded;
+
+        if (common.isFloat(toBeRounded)) {
+            if ((toBeRounded % 1).toFixed(1) === '0.5') {
+                rounded = Math.trunc(toBeRounded);
+            } else {
+                rounded = Math.round(toBeRounded);
+            }
+        }
+
+        return rounded;
     }
 
     async getAppSettings() {

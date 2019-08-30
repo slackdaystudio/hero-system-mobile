@@ -13,19 +13,21 @@ export default class Traits extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         headingText: PropTypes.string.isRequired,
-        itemName: PropTypes.string.isRequired,
-        items: PropTypes.array.isRequired
+        character: PropTypes.object.isRequired,
+        listKey: PropTypes.string.isRequired
     }
 
     constructor(props) {
         super(props);
 
-        const displayOptions =  this._initItemShow(props.items);
+        const displayOptions =  this._initItemShow(props.character[props.listKey]);
 
         this.state = {
             itemShow: displayOptions.itemShow,
             itemButtonShow: displayOptions.itemButtonShow
         }
+
+        this.getCharacter = this._getCharacter.bind(this);
     }
 
     _initItemShow(items) {
@@ -33,8 +35,8 @@ export default class Traits extends Component {
         let itemButtonShow = {};
 
         items.map((item, index) => {
-            if (item.hasOwnProperty(this.props.itemName)) {
-                for (let s of item[this.props.itemName]) {
+            if (item.hasOwnProperty(this.props.listKey)) {
+                for (let s of item[this.props.listKey]) {
                     itemShow[s.id] = false;
                     itemButtonShow[s.id] = 'plus-circle';
                 }
@@ -48,6 +50,10 @@ export default class Traits extends Component {
             itemShow: itemShow,
             itemButtonShow: itemButtonShow
         };
+    }
+
+    _getCharacter() {
+        return this.props.character;
     }
 
     _toggleDefinitionShow(name) {
@@ -84,11 +90,11 @@ export default class Traits extends Component {
 
     _renderAttributes(item) {
         if (item.attributes().length > 0) {
-            const sortedAttributes = item.attributes().sort((a, b) => a.value < b.value);
+//            const sortedAttributes = item.attributes().sort((a, b) => a.value < b.value);
 
             return (
                 <Fragment>
-                    {sortedAttributes.map((attribute, index) => {
+                    {item.attributes().map((attribute, index) => {
                         let labelStyle = attribute.value !== '' ? styles.boldGrey : styles.grey;
                         let separator = attribute.value !== '' ? ': ' : '';
 
@@ -178,9 +184,9 @@ export default class Traits extends Component {
         return (
             <Fragment>
                 {items.map((item, index) => {
-                    let decoratedTrait = characterTraitDecorator.decorate(item, this.props.items);
+                    let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
 
-                    if (decoratedTrait.trait.hasOwnProperty(this.props.itemName)) {
+                    if (decoratedTrait.trait.hasOwnProperty(this.props.listKey)) {
                         return (
                             <Fragment>
                                 <Card style={styles.card} key={'item-' + item.position}>
@@ -190,7 +196,7 @@ export default class Traits extends Component {
                                         </View>
                                     </CardItem>
                                 </Card>
-                                {this._renderTraits(decoratedTrait.trait[this.props.itemName], true)}
+                                {this._renderTraits(decoratedTrait.trait[this.props.listKey], true)}
                             </Fragment>
                         );
                     }
@@ -223,7 +229,7 @@ export default class Traits extends Component {
         return (
             <View>
                 <Heading text={this.props.headingText} />
-                {this._renderTraits(this.props.items)}
+                {this._renderTraits(this.props.character[this.props.listKey])}
                 <View style={{paddingTop: 20}} />
             </View>
         );

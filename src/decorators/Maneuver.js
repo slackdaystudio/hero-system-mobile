@@ -3,7 +3,7 @@ import CharacterTrait from './CharacterTrait';
 
 export default class Maneuver extends CharacterTrait {
     constructor(characterTrait) {
-        super(characterTrait.trait, characterTrait.parentTrait);
+        super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
         this.characterTrait = characterTrait;
     }
