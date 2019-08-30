@@ -17,7 +17,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 		character: PropTypes.object.isRequired
 	}
 
-    _renderTab(title, listKey) {
+    _renderTab(title, listKey, subListKey) {
         if (this.props.character[listKey] === undefined ||
             this.props.character[listKey] === null ||
             this.props.character[listKey].length <= 0) {
@@ -38,6 +38,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         headingText={title}
                         character={this.props.character}
                         listKey={listKey}
+                        subListKey={subListKey}
                     />
                 </View>
             </Tab>
@@ -64,12 +65,12 @@ class ViewHeroDesignerCharacterScreen extends Component {
 							<Characteristics navigation={this.props.navigation} characteristics={this.props.character.characteristics} movement={this.props.character.movement} />
 						</View>
 					</Tab>
-                    {this._renderTab('Skills', 'skills')}
-                    {this._renderTab('Perks', 'perks')}
-                    {this._renderTab('Talents', 'talents')}
-                    {this._renderTab('Martial Arts', 'maneuver')}
-                    {this._renderTab('Powers', 'powers')}
-                    {this._renderTab('Complications', 'disadvantages')}
+                    {this._renderTab('Skills', 'skills', 'skills')}
+                    {this._renderTab('Perks', 'perks', 'perks')}
+                    {this._renderTab('Talents', 'talents', 'talents')}
+                    {this._renderTab('Martial Arts', 'martialArts', 'maneuver')}
+                    {this._renderTab('Powers', 'powers', 'powers')}
+                    {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
 			  	</Tabs>
 		  	</Content>
 	      </Container>

@@ -14,7 +14,8 @@ export default class Traits extends Component {
         navigation: PropTypes.object.isRequired,
         headingText: PropTypes.string.isRequired,
         character: PropTypes.object.isRequired,
-        listKey: PropTypes.string.isRequired
+        listKey: PropTypes.string.isRequired,
+        subListKey: PropTypes.string.isRequired
     }
 
     constructor(props) {
@@ -35,8 +36,8 @@ export default class Traits extends Component {
         let itemButtonShow = {};
 
         items.map((item, index) => {
-            if (item.hasOwnProperty(this.props.listKey)) {
-                for (let s of item[this.props.listKey]) {
+            if (item.hasOwnProperty(this.props.subListKey)) {
+                for (let s of item[this.props.subListKey]) {
                     itemShow[s.id] = false;
                     itemButtonShow[s.id] = 'plus-circle';
                 }
@@ -90,8 +91,6 @@ export default class Traits extends Component {
 
     _renderAttributes(item) {
         if (item.attributes().length > 0) {
-//            const sortedAttributes = item.attributes().sort((a, b) => a.value < b.value);
-
             return (
                 <Fragment>
                     {item.attributes().map((attribute, index) => {
@@ -186,7 +185,7 @@ export default class Traits extends Component {
                 {items.map((item, index) => {
                     let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
 
-                    if (decoratedTrait.trait.hasOwnProperty(this.props.listKey)) {
+                    if (decoratedTrait.trait.hasOwnProperty(this.props.subListKey) && decoratedTrait.trait[this.props.subListKey].length > 0) {
                         return (
                             <Fragment>
                                 <Card style={styles.card} key={'item-' + item.position}>
@@ -196,7 +195,7 @@ export default class Traits extends Component {
                                         </View>
                                     </CardItem>
                                 </Card>
-                                {this._renderTraits(decoratedTrait.trait[this.props.listKey], true)}
+                                {this._renderTraits(decoratedTrait.trait[this.props.subListKey], true)}
                             </Fragment>
                         );
                     }
