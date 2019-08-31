@@ -13,6 +13,7 @@ import HandToHandAttack from './HandToHandAttack';
 import KnockbackResistance from './KnockbackResistance';
 import Leaping from './Leaping';
 import MultiForm from './MultiForm';
+import Possession from './Possession';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
@@ -76,6 +77,10 @@ const MINDSCAN = 'MINDSCAN';
 
 const MULTIFORM = 'MULTIFORM';
 
+const POSSESSION = 'POSSESSION';
+
+const POWERDEFENSE = 'POWERDEFENSE';
+
 const RKA = 'RKA';
 
 class PowerDecorator {
@@ -127,6 +132,7 @@ class PowerDecorator {
                 break;
             case FLASHDEFENSE:
             case MENTALDEFENSE:
+            case POWERDEFENSE:
                 decorated = new UnusualDefense(decorated);
                 break;
             case FLIGHT:
@@ -147,6 +153,9 @@ class PowerDecorator {
                 break;
             case MULTIFORM:
                 decorated = new MultiForm(decorated);
+                break;
+            case POSSESSION:
+                decorated = new Possession(decorated);
                 break;
             default:
                 // do nothing
