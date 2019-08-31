@@ -55,7 +55,11 @@ export default class Skill extends CharacterTrait {
     }
 
     label() {
-        return this.characterTrait.label();
+        let name = this.trait.name === null || this.trait.name === '' ? '' : this.trait.name;
+        let label = this.trait.name === null || this.trait.name === '' ? this.trait.alias : ` (${this.trait.alias})`;
+        let input = this.trait.input === null || this.trait.input === undefined ? '' : `: ${this.trait.input}`;
+
+        return `${name}${label}${input}`;
     }
 
     attributes() {

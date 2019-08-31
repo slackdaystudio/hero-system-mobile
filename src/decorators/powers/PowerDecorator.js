@@ -9,7 +9,9 @@ import Entangle from './Entangle';
 import ExtraLimbs from './ExtraLimbs';
 import FlashDefense from './FlashDefense';
 import Ftl from './Ftl';
+import HandKillingAttack from './HandKillingAttack';
 import HandToHandAttack from './HandToHandAttack';
+import KnockbackResistance from './KnockbackResistance';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
@@ -48,9 +50,15 @@ const FLIGHT = 'FLIGHT';
 
 const FTL = 'FTL';
 
+const HKA = 'HKA';
+
 const HANDTOHANDATTACK = 'HANDTOHANDATTACK';
 
 const HEALING = 'HEALING';
+
+const KBRESISTANCE = 'KBRESISTANCE';
+
+const RKA = 'RKA';
 
 class PowerDecorator {
     decorate(decorated) {
@@ -64,6 +72,7 @@ class PowerDecorator {
             case DRAIN:
             case FLASH:
             case HEALING:
+            case RKA:
                 decorated = new EffectRoll(decorated);
                 break;
             case BARRIER:
@@ -99,8 +108,14 @@ class PowerDecorator {
             case FLIGHT:
                 decorated = new Movement(decorated);
                 break;
+            case HKA:
+                decorated = new HandKillingAttack(decorated);
+                break;
             case HANDTOHANDATTACK:
                 decorated = new HandToHandAttack(decorated);
+                break;
+            case KBRESISTANCE:
+                decorated = new KnockbackResistance(decorated);
                 break;
             default:
                 // do nothing

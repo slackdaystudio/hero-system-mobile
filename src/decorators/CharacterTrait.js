@@ -26,20 +26,34 @@ export default class CharacterTrait {
     }
 
     label() {
-        let name = this.trait.name === null || this.trait.name === '' ? '' : this.trait.name;
-        let label = this.trait.name === null || this.trait.name === '' ? this.trait.alias : ` (${this.trait.alias})`;
-        let input = this.trait.input === null || this.trait.input === undefined ? '' : `: ${this.trait.input}`;
+        if (this.trait.name !== null) {
+            return this.trait.name;
+        }
 
-        return `${name}${label}${input}`;
+        return this.trait.alias;
     }
 
     attributes() {
         let attributes = [];
 
+        if (this.trait.hasOwnProperty('name') && this.trait.name !== null) {
+            attributes.push({
+                label: 'Name',
+                value: this.trait.alias
+            });
+        }
+
+        if (this.trait.hasOwnProperty('input') && this.trait.input !== null) {
+            attributes.push({
+                label: 'Input',
+                value: this.trait.input
+            });
+        }
+
         if (this.trait.hasOwnProperty('optionAlias')) {
             attributes.push({
-                label: this.trait.optionAlias,
-                value: ''
+                label: 'Option',
+                value: this.trait.optionAlias
             });
         }
 

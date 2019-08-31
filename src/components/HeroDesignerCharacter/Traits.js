@@ -204,16 +204,20 @@ export default class Traits extends Component {
                         <Card style={[styles.card, {width: (indentCard ? '94%' : '99%'), alignSelf: 'flex-end'}]} key={'item-' + item.position}>
                             <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center'}]} header>
                                 <View style={{flex: 5, alignSelf: 'center'}}>
-                                    <Text style={styles.grey}>{decoratedTrait.label()}</Text>
+                                    <Text style={styles.boldGrey}>{decoratedTrait.label()}</Text>
                                 </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                                    {this._renderRoll(decoratedTrait)}
-                                    <Icon
-                                        type='FontAwesome'
-                                        name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                                        style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
-                                        onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
-                                    />
+                                <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                                    <View style={{flex: 4, alignItems: 'flex-end'}}>
+                                        {this._renderRoll(decoratedTrait)}
+                                    </View>
+                                    <View style={{flex: 1}}>
+                                        <Icon
+                                            type='FontAwesome'
+                                            name={this.state.itemButtonShow[decoratedTrait.trait.id]}
+                                            style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
+                                            onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
+                                        />
+                                    </View>
                                 </View>
                             </CardItem>
                             {this._renderDefinition(decoratedTrait)}

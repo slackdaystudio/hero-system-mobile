@@ -1,7 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
+import { common } from '../lib/Common';
 
-export default class ExtraAttributes extends CharacterTrait {
+export default class EffectRoll extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -37,15 +38,18 @@ export default class ExtraAttributes extends CharacterTrait {
     }
 
     roll() {
+        const baseDice = this.characterTrait.trait.levels;
         const partialDie = this._getPartialDie(this.characterTrait.trait.adder);
 
-        if (partialDie === null) {
-            return `${this.characterTrait.trait.levels}d6`;
+        if (partialDie === '½') {
+            return `${baseDice}${partialDie}d6`
         } else if (partialDie === '1') {
-            return `${this.characterTrait.trait.levels}d6+${partialDie}`
+            return `${baseDice}d6+${partialDie}`
+        } else if (partialDie === '-1') {
+            return `${baseDice + 1}d6${partialDie}`
         }
 
-        return `${this.characterTrait.trait.levels}${partialDie}d6`;
+        return `${baseDice}d6`;
     }
 
     advantages() {
@@ -76,6 +80,8 @@ export default class ExtraAttributes extends CharacterTrait {
                 partialDie = '½';
             } else if (adder.xmlid.toUpperCase() === 'PLUSONEPIP') {
                 partialDie = '1';
+            } else if (adder.xmlid.toUpperCase() === 'MINUSONEPIP') {
+                partialDie = '-1';
             }
         }
 

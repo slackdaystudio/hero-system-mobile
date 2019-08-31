@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
 
-export default class HandToHandAttack extends CharacterTrait {
+export default class HandKillingAttack extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -45,33 +45,27 @@ export default class HandToHandAttack extends CharacterTrait {
     }
 
     roll() {
-        let character = this.characterTrait.getCharacter();
+        let character = this.getCharacter();
         let characteristicsMap = common.toMap(character.characteristics, 'shortName');
         let adderMap = common.toMap(this.characterTrait.trait.adder);
-        let dice = this.characterTrait.trait.levels;
-        let partialDie = 0;
-
-        dice += characteristicsMap.get('STR').value / 5;
-
-        if ((dice % 1).toFixed() !== '0.0') {
-            partialDie = 2;
-            dice = Math.trunc(dice);
-        }
+        let dice = '';
+        let damageClasses = (Math.floor(characteristicsMap.get('STR').value / 5)) + this.characterTrait.trait.levels * 3;
 
         if (adderMap.has('PLUSONEPIP')) {
-            partialDie += 1;
-        } else if (adderMap.has('PLUSONEHALFDIE')) {
-            partialDie += 2;
+            damageClasses += 1;
+        } else if (adderMap.has('PLUSONEHALFDIE') || adderMap.has('MINUSONEPIP')) {
+            damageClasses += 2;
         }
 
-        if (partialDie === 1) {
-            return `${dice}d6+1`;
-        } else if (partialDie === 2) {
-            return `${dice}½d6`;
-        } else if (partialDie === 3) {
-            return `${dice + 1}d6`;
-        } else if (partialDie === 4) {
-            return `${dice + 1}d6+1`;
+        dice = damageClasses / 3;
+
+        switch ((dice % 1).toFixed(1)) {
+            case '0.3':
+                return `${Math.trunc(dice)}d6+1`;
+            case '0.6':
+                return `${Math.trunc(dice)}½d6`;
+            default:
+                // do nothing
         }
 
         return `${dice}d6`;
