@@ -45,7 +45,7 @@ export default class CharacterTrait {
 
         if (this.trait.hasOwnProperty('input') && this.trait.input !== null) {
             attributes.push({
-                label: 'Input',
+                label: this.trait.template.inputlabel || 'Input',
                 value: this.trait.input
             });
         }

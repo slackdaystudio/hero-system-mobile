@@ -7,15 +7,16 @@ import Duplication from './Duplication';
 import EnduranceReserve from './EnduranceReserve';
 import Entangle from './Entangle';
 import ExtraLimbs from './ExtraLimbs';
-import FlashDefense from './FlashDefense';
 import Ftl from './Ftl';
 import HandKillingAttack from './HandKillingAttack';
 import HandToHandAttack from './HandToHandAttack';
 import KnockbackResistance from './KnockbackResistance';
 import Leaping from './Leaping';
+import MultiForm from './MultiForm';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
+import UnusualDefense from '../UnusualDefense';
 
 const ABSORPTION = 'ABSORPTION';
 
@@ -36,6 +37,8 @@ const DISPEL = 'DISPEL';
 const DRAIN = 'DRAIN';
 
 const DUPLICATION = 'DUPLICATION';
+
+const EGOATTACK = 'EGOATTACK';
 
 const ENDURANCERESERVE = 'ENDURANCERESERVE';
 
@@ -63,6 +66,16 @@ const LEAPING = 'LEAPING';
 
 const LUCK = 'LUCK';
 
+const MENTALDEFENSE = 'MENTALDEFENSE';
+
+const MENTALILLUSIONS = 'MENTALILLUSIONS';
+
+const MINDCONTROL = 'MINDCONTROL';
+
+const MINDSCAN = 'MINDSCAN';
+
+const MULTIFORM = 'MULTIFORM';
+
 const RKA = 'RKA';
 
 class PowerDecorator {
@@ -75,9 +88,13 @@ class PowerDecorator {
             case BLAST:
             case DISPEL:
             case DRAIN:
+            case EGOATTACK:
             case FLASH:
             case HEALING:
             case LUCK:
+            case MENTALILLUSIONS:
+            case MINDCONTROL:
+            case MINDSCAN:
             case RKA:
                 decorated = new EffectRoll(decorated);
                 break;
@@ -109,7 +126,8 @@ class PowerDecorator {
                 decorated = new Ftl(decorated);
                 break;
             case FLASHDEFENSE:
-                decorated = new FlashDefense(decorated);
+            case MENTALDEFENSE:
+                decorated = new UnusualDefense(decorated);
                 break;
             case FLIGHT:
                 decorated = new Movement(decorated);
@@ -126,6 +144,9 @@ class PowerDecorator {
             case LEAPING:
                 decorated = new Leaping(decorated);
                 decorated = new Movement(decorated);
+                break;
+            case MULTIFORM:
+                decorated = new MultiForm(decorated);
                 break;
             default:
                 // do nothing

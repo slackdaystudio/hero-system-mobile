@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
 
-export default class FlashDefense extends CharacterTrait {
+export default class MultiForm extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -10,7 +10,11 @@ export default class FlashDefense extends CharacterTrait {
     }
 
     cost() {
-        return this.characterTrait.cost();
+        let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+
+        cost += this._addAdder(this.characterTrait.trait.adder);
+
+        return Math.ceil(cost);
     }
 
     costMultiplier() {
@@ -33,7 +37,7 @@ export default class FlashDefense extends CharacterTrait {
         let attributes = this.characterTrait.attributes();
 
         attributes.push({
-            label: 'Points',
+            label: 'Max Character Points',
             value: this.characterTrait.trait.levels
         });
 
@@ -54,5 +58,27 @@ export default class FlashDefense extends CharacterTrait {
 
     limitations() {
         return this.characterTrait.limitations();
+    }
+
+    _addAdder(adder) {
+        let cost = 0;
+
+        if (adder === undefined || adder === null) {
+            return cost;
+        }
+
+        if (Array.isArray(adder)) {
+            for (let a of adder) {
+                cost += this._addAdder(a);
+            }
+        } else {
+            cost += adder.basecost;
+
+            if (adder.levels > 0) {
+                cost = adder.levels / adder.lvlval * adder.lvlcost;
+            }
+        }
+
+        return cost;
     }
 }

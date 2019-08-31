@@ -388,6 +388,8 @@ class HeroDesignerCharacter {
     }
 
     _normalizeTemplatePowers(template) {
+        const blacklisted = ['sensegroup', 'sense']; // For some reason these are listed in powers
+
         template.powers.power = [];
         template.characteristics.running.xmlid = 'RUNNING';
         template.powers.power.push(template.characteristics.running);
@@ -397,6 +399,10 @@ class HeroDesignerCharacter {
         template.powers.power.push(template.characteristics.leaping);
 
         for (let [key, power] of Object.entries(template.powers)) {
+            if (blacklisted.includes(key)) {
+                continue;
+            }
+
             if (key !== 'power') {
                 this._normalizeTemplatePower(template, key, power);
 
@@ -466,7 +472,7 @@ class HeroDesignerCharacter {
     _normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey) {
         if (Array.isArray(item)) {
             for (let i of item) {
-                this._normalizeCharacterPower(heroDesignerCharacter, item, listKey, subListKey);
+                this._normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey);
             }
         } else {
             heroDesignerCharacter[listKey][subListKey].push(item);
