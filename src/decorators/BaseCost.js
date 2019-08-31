@@ -41,9 +41,7 @@ export default class BaseCost extends CharacterTrait {
             }
         }
 
-        if (this.characterTrait.trait.hasOwnProperty('adder')) {
-            cost += this._addAdder(this.characterTrait.trait.adder);
-        }
+        cost += this._addAdder(this.characterTrait.trait.adder);
 
         return Math.round(cost);
     }

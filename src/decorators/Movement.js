@@ -33,27 +33,27 @@ export default class Movement extends CharacterTrait {
 
     attributes() {
         let attributes = this.characterTrait.attributes();
+        let baseMove = this.characterTrait.trait.levels + this._getBaseMove();
         let ncm = this._getNcm();
-        let character = this.characterTrait.getCharacter();
 
         attributes.push({
             label: 'Combat Move',
-            value: `${this.characterTrait.trait.levels}m`
+            value: `${baseMove}m`
         });
 
         attributes.push({
             label: 'Non-Combat Move',
-            value: `${this.characterTrait.trait.levels * ncm}m (x${ncm})`
+            value: `${baseMove * ncm}m`
         });
 
         attributes.push({
             label: 'Max Combat',
-            value: `${(this.characterTrait.trait.levels * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`
+            value: `${(baseMove * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`
         });
 
         attributes.push({
             label: 'Max Non-Combat',
-            value: `${(this.characterTrait.trait.levels * ncm * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`
+            value: `${(baseMove * ncm * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`
         });
 
         return attributes;
@@ -75,11 +75,27 @@ export default class Movement extends CharacterTrait {
         return this.characterTrait.limitations();
     }
 
+    _getBaseMove() {
+        let character = this.characterTrait.getCharacter();
+        let movementMap = common.toMap(character.movement, 'shortName');
+        let baseMove = 0;
+
+        if (this.characterTrait.trait.xmlid.toUpperCase() === 'LEAPING') {
+            baseMove += movementMap.get('Leaping').value;
+        } else if (this.characterTrait.trait.xmlid.toUpperCase() === 'RUNNING') {
+            baseMove += movementMap.get('Running').value;
+        } else if (this.characterTrait.trait.xmlid.toUpperCase() === 'SWIMMING') {
+            baseMove += movementMap.get('Swimming').value;
+        }
+
+        return baseMove;
+    }
+
     _getNcm() {
         let ncm = 2;
 
         if (this.adderMap.has('IMPROVEDNONCOMBAT')) {
-            ncm = adderMap.get('IMPROVEDNONCOMBAT').lvlval * 2;
+            ncm **= this.adderMap.get('IMPROVEDNONCOMBAT').levels + 1;
         }
 
         return ncm;

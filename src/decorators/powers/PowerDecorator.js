@@ -12,6 +12,7 @@ import Ftl from './Ftl';
 import HandKillingAttack from './HandKillingAttack';
 import HandToHandAttack from './HandToHandAttack';
 import KnockbackResistance from './KnockbackResistance';
+import Leaping from './Leaping';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
@@ -58,6 +59,10 @@ const HEALING = 'HEALING';
 
 const KBRESISTANCE = 'KBRESISTANCE';
 
+const LEAPING = 'LEAPING';
+
+const LUCK = 'LUCK';
+
 const RKA = 'RKA';
 
 class PowerDecorator {
@@ -72,6 +77,7 @@ class PowerDecorator {
             case DRAIN:
             case FLASH:
             case HEALING:
+            case LUCK:
             case RKA:
                 decorated = new EffectRoll(decorated);
                 break;
@@ -116,6 +122,10 @@ class PowerDecorator {
                 break;
             case KBRESISTANCE:
                 decorated = new KnockbackResistance(decorated);
+                break;
+            case LEAPING:
+                decorated = new Leaping(decorated);
+                decorated = new Movement(decorated);
                 break;
             default:
                 // do nothing
