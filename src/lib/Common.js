@@ -75,6 +75,10 @@ class Common {
             }
         } else {
             total += adder.basecost;
+
+            if (adder.levels > 0) {
+                total += Math.round(adder.levels / adder.lvlval * adder.lvlcost);
+            }
         }
 
         return total;

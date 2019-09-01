@@ -14,6 +14,9 @@ import KnockbackResistance from './KnockbackResistance';
 import Leaping from './Leaping';
 import MultiForm from './MultiForm';
 import Possession from './Possession';
+import Reflection from './Reflection';
+import Regeneration from './Regeneration';
+import ResistantProtection from './ResistantProtection';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
@@ -53,6 +56,8 @@ const FLASHDEFENSE = 'FLASHDEFENSE';
 
 const FLIGHT = 'FLIGHT';
 
+const FORCEFIELD = 'FORCEFIELD';
+
 const FTL = 'FTL';
 
 const HKA = 'HKA';
@@ -81,7 +86,13 @@ const POSSESSION = 'POSSESSION';
 
 const POWERDEFENSE = 'POWERDEFENSE';
 
+const REFLECTION = 'REFLECTION';
+
+const REGENERATION = 'REGENERATION';
+
 const RKA = 'RKA';
+
+const RUNNING = 'RUNNING';
 
 class PowerDecorator {
     decorate(decorated) {
@@ -136,7 +147,11 @@ class PowerDecorator {
                 decorated = new UnusualDefense(decorated);
                 break;
             case FLIGHT:
+            case RUNNING:
                 decorated = new Movement(decorated);
+                break;
+            case FORCEFIELD:
+                decorated = new ResistantProtection(decorated);
                 break;
             case HKA:
                 decorated = new HandKillingAttack(decorated);
@@ -156,6 +171,12 @@ class PowerDecorator {
                 break;
             case POSSESSION:
                 decorated = new Possession(decorated);
+                break;
+            case REFLECTION:
+                decorated = new Reflection(decorated);
+                break;
+            case REGENERATION:
+                decorated = new Regeneration(decorated);
                 break;
             default:
                 // do nothing

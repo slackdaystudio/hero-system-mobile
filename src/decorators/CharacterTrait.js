@@ -52,7 +52,7 @@ export default class CharacterTrait {
 
         if (this.trait.hasOwnProperty('optionAlias')) {
             attributes.push({
-                label: 'Option',
+                label: this.trait.template.optionlabel || 'Option',
                 value: this.trait.optionAlias
             });
         }
@@ -113,7 +113,7 @@ export default class CharacterTrait {
 
                 attributes.push({
                     label: attribute.alias,
-                    value: value
+                    value: value + (attribute.levels > 0 ? ` (${attribute.levels} levels)` : '')
                 });
             }
         }

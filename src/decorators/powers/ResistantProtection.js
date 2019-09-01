@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
 
-export default class Barrier extends CharacterTrait {
+export default class ResistantProtection extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -12,38 +12,11 @@ export default class Barrier extends CharacterTrait {
     cost() {
         let cost = this.characterTrait.trait.basecost;
 
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.pdlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.edlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.mdlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.powdlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.characterTrait.trait.lengthlevels;
-        cost += this.characterTrait.trait.heightlevels;
-        cost += this.characterTrait.trait.bodylevels;
-        cost += this.characterTrait.trait.widthlevels * 4 / this.characterTrait.trait.template.costperinch;
+        cost += Math.ceil(this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost;
 
         cost += common.totalAdders(this.characterTrait.trait.adder);
 
-        return Math.round(cost);
+        return cost;
     }
 
     costMultiplier() {
@@ -63,7 +36,7 @@ export default class Barrier extends CharacterTrait {
     }
 
     attributes() {
-        let attributes =  this.characterTrait.attributes();
+        let attributes = this.characterTrait.attributes();
 
         if (this.characterTrait.trait.pdlevels > 0) {
             attributes.push({
@@ -93,17 +66,6 @@ export default class Barrier extends CharacterTrait {
             });
         }
 
-        attributes.push({
-            label: 'Body',
-            value: this.characterTrait.trait.bodylevels
-        });
-
-        attributes.push({
-            label: 'Dimensions',
-            value: `${this.characterTrait.trait.lengthlevels + 1}m x ${this.characterTrait.trait.widthlevels + 0.5}m x ${this.characterTrait.trait.heightlevels + 1}m`
-        });
-
-
         return attributes;
     }
 
@@ -123,20 +85,16 @@ export default class Barrier extends CharacterTrait {
         return this.characterTrait.limitations();
     }
 
-    calculateDefenseCost(levels, levelValue, levelCost) {
+    calculateDefenseCost(levels) {
         cost = 0;
 
-        if (levels === 0) {
-            return cost;
-        }
-
         if (levels === 1) {
-            cost += levelCost;
+            cost += this.characterTrait.trait.template.lvlcost;
         } else if (levels > 1) {
             cost += common.getMultiplierCost(
                 levels,
-                levelValue,
-                levelCost
+                this.characterTrait.trait.template.lvlval,
+                this.characterTrait.trait.template.lvlcost
             );
         }
 
