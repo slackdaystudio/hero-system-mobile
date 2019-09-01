@@ -211,6 +211,14 @@ class Common {
             duration: duration
         });
     }
+
+    toKg(lbs) {
+        return Math.round(lbs * 0.453592, 1);
+    }
+
+    toCm(inches) {
+        return Math.round(inches * 2.54, 1);
+    }
 }
 
 export let common = new Common();

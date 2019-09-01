@@ -1,7 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
+import { common } from '../../lib/Common';
 
-export default class DamageNegation extends CharacterTrait {
+export default class Summon extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -9,7 +10,11 @@ export default class DamageNegation extends CharacterTrait {
     }
 
     cost() {
-        return this.characterTrait.cost();
+        let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+
+        cost += common.totalAdders(this.characterTrait.trait.adder);
+
+        return Math.ceil(cost);
     }
 
     costMultiplier() {
@@ -29,16 +34,12 @@ export default class DamageNegation extends CharacterTrait {
     }
 
     attributes() {
-        let attributes = [];
+        let attributes = this.characterTrait.attributes();
 
-        for (let adder of this.characterTrait.trait.adder) {
-            if (adder.levels > 0) {
-                attributes.push({
-                    label: `-${adder.levels} ${adder.alias}`,
-                    value: ''
-                });
-            }
-        }
+        attributes.push({
+            label: 'Points',
+            value: `${this.characterTrait.trait.levels}`
+        });
 
         return attributes;
     }
@@ -57,5 +58,16 @@ export default class DamageNegation extends CharacterTrait {
 
     limitations() {
         return this.characterTrait.limitations();
+    }
+
+    _getNonCombatDistance() {
+        let nonCombatDistance = 2;
+        let adderMap = common.toMap(this.characterTrait.trait.adder);
+
+        if (adderMap.has('NONCOMBAT')) {
+            nonCombatDistance **= adderMap.get('NONCOMBAT').levels + 1;
+        }
+
+        return nonCombatDistance;
     }
 }

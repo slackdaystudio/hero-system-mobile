@@ -17,6 +17,9 @@ import Possession from './Possession';
 import Reflection from './Reflection';
 import Regeneration from './Regeneration';
 import ResistantProtection from './ResistantProtection';
+import Shrinking from './Shrinking';
+import Stretching from './Stretching';
+import Summon from './Summon';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
@@ -94,6 +97,16 @@ const RKA = 'RKA';
 
 const RUNNING = 'RUNNING';
 
+const SHRINKING = 'SHRINKING';
+
+const STRETCHING = 'STRETCHING';
+
+const SUMMON = 'SUMMON';
+
+const SWIMMING = 'SWIMMING';
+
+const SWINGING = 'SWINGING';
+
 class PowerDecorator {
     decorate(decorated) {
         switch (decorated.trait.xmlid.toUpperCase()) {
@@ -148,6 +161,8 @@ class PowerDecorator {
                 break;
             case FLIGHT:
             case RUNNING:
+            case SWIMMING:
+            case SWINGING:
                 decorated = new Movement(decorated);
                 break;
             case FORCEFIELD:
@@ -177,6 +192,15 @@ class PowerDecorator {
                 break;
             case REGENERATION:
                 decorated = new Regeneration(decorated);
+                break;
+            case SHRINKING:
+                decorated = new Shrinking(decorated);
+                break;
+            case STRETCHING:
+                decorated = new Stretching(decorated);
+                break;
+            case SUMMON:
+                decorated = new Summon(decorated);
                 break;
             default:
                 // do nothing

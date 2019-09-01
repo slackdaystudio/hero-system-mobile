@@ -1,7 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
+import { common } from '../../lib/Common';
 
-export default class DamageNegation extends CharacterTrait {
+export default class Stretching extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -29,16 +30,17 @@ export default class DamageNegation extends CharacterTrait {
     }
 
     attributes() {
-        let attributes = [];
+        let attributes = this.characterTrait.attributes();
 
-        for (let adder of this.characterTrait.trait.adder) {
-            if (adder.levels > 0) {
-                attributes.push({
-                    label: `-${adder.levels} ${adder.alias}`,
-                    value: ''
-                });
-            }
-        }
+        attributes.push({
+            label: 'Distance',
+            value: `${this.characterTrait.trait.levels}m`
+        });
+
+        attributes.push({
+            label: 'Non-Combat Distance',
+            value: `${this.characterTrait.trait.levels * this._getNonCombatDistance()}m`
+        });
 
         return attributes;
     }
@@ -57,5 +59,16 @@ export default class DamageNegation extends CharacterTrait {
 
     limitations() {
         return this.characterTrait.limitations();
+    }
+
+    _getNonCombatDistance() {
+        let nonCombatDistance = 2;
+        let adderMap = common.toMap(this.characterTrait.trait.adder);
+
+        if (adderMap.has('NONCOMBAT')) {
+            nonCombatDistance **= adderMap.get('NONCOMBAT').levels + 1;
+        }
+
+        return nonCombatDistance;
     }
 }

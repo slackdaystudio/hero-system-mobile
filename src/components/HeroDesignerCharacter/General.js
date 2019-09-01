@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { Text, List, ListItem, Left, Body } from 'native-base';
 import Heading from '../Heading/Heading';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
 export default class General extends Component {
@@ -30,11 +31,11 @@ export default class General extends Component {
                 <Heading text='Traits' />
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <Text style={[styles.boldGrey, {flex: 1}]}>Height:</Text>
-                    <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.height}</Text>
+                    <Text style={[styles.grey, {flex: 3}]}>{common.toCm(this.props.characterInfo.height)} cm</Text>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <Text style={[styles.boldGrey, {flex: 1}]}>Weight:</Text>
-                    <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.weight}</Text>
+                    <Text style={[styles.grey, {flex: 3}]}>{common.toKg(this.props.characterInfo.weight)} kg</Text>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <Text style={[styles.boldGrey, {flex: 1}]}>Eye Color:</Text>
