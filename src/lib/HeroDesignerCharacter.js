@@ -84,6 +84,7 @@ const SKILL_PROFICIENCY_BASE = 10;
 
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdChar.json', JSON.stringify(heroDesignerCharacter));
         const template = this._getTemplate(heroDesignerCharacter.template);
 
         let character = {
@@ -101,7 +102,6 @@ class HeroDesignerCharacter {
 
         this._normalizeCharacterData(heroDesignerCharacter);
         this._normalizeTemplateData(template);
-        this._populateLists(character);
 
         this._populateMovementAndCharacteristics(character, heroDesignerCharacter.characteristics, template);
         this._populateTrait(character, template, heroDesignerCharacter.skills, 'skills', 'skill', 'skills', this._skillsPreInsert);
@@ -116,6 +116,28 @@ class HeroDesignerCharacter {
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
+    }
+
+    isCharacteristic(item) {
+        return Object.keys(CHARACTERISTIC_NAMES).includes(item.xmlid.toLowerCase());
+    }
+
+    isMultipowerItem(item, character) {
+        if (item.hasOwnProperty('parentid') && character.powers.length > 0) {
+            let powersMap = common.toMap(character.powers, 'id');
+
+            if (powersMap.has(item.parentid)) {
+                return powersMap.get(item.parentid).originalType === 'multipower';
+            }
+        }
+
+        return false;
+    }
+
+    getCharacteristicFullName(abbreviation) {
+        abbreviation = abbreviation.toLowerCase();
+
+        return CHARACTERISTIC_NAMES.hasOwnProperty(abbreviation) ? CHARACTERISTIC_NAMES[abbreviation] : '';
     }
 
     _skillsPreInsert(character, template, skill) {
@@ -222,13 +244,7 @@ class HeroDesignerCharacter {
                 continue;
             }
 
-            templateTrait = template[traitKey][traitSubKey].filter(t => {
-                if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
-                    return false;
-                }
-
-                return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
-            }).shift();
+            templateTrait = this._getTemplateTrait(value, template, traitKey, traitSubKey);
 
             this._addModifierTemplate(value.modifier, template);
 
@@ -245,6 +261,45 @@ class HeroDesignerCharacter {
                 character[traitKey].push(value);
             }
         }
+    }
+
+    _getTemplateTrait(value, template, traitKey, traitSubKey) {
+        let templateTrait = null;
+
+        if (traitKey === 'powers') {
+            for (let key of Object.keys(template.characteristics)) {
+                if (value.xmlid.toLowerCase() === key.toLowerCase()) {
+                    templateTrait = template.characteristics[key];
+                    break;
+                }
+            }
+
+            if (templateTrait === null) {
+                for (let [key, subKey] of Object.entries(CHARACTER_TRAITS)) {
+                    templateTrait = template[key][subKey].filter(t => {
+                        if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                            return false;
+                        }
+
+                        return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
+                    }).shift();
+
+                    if (templateTrait !== undefined) {
+                        break;
+                    }
+                }
+            }
+        } else {
+            templateTrait = template[traitKey][traitSubKey].filter(t => {
+                if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                    return false;
+                }
+
+                return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
+            }).shift();
+        }
+
+        return templateTrait;
     }
 
     _addModifierTemplate(modifier, template) {
@@ -435,28 +490,30 @@ class HeroDesignerCharacter {
 
             if (heroDesignerCharacter.hasOwnProperty(listKey.toLowerCase())) {
                 for (let [key, item] of Object.entries(heroDesignerCharacter[listKey.toLowerCase()])) {
-                    this._normalizeCharacterDataItem(heroDesignerCharacter, item);
+                    this._normalizeCharacterDataItem(heroDesignerCharacter, item, key);
                 }
             }
         }
     }
 
-    _normalizeCharacterDataItem(heroDesignerCharacter, item) {
+    _normalizeCharacterDataItem(heroDesignerCharacter, item, key) {
         if (Array.isArray(item)) {
             for (let i of item) {
-                this._normalizeCharacterDataItem(heroDesignerCharacter, i);
+                this._normalizeCharacterDataItem(heroDesignerCharacter, i, key);
             }
         } else {
             if (!item.hasOwnProperty('xmlid')) {
                 item.xmlid = common.toSnakeCase(item.display).toUpperCase();
             }
+
+            item.originalType = key;
         }
     }
 
     _normalizeCharacterItems(heroDesignerCharacter, listKey, subListKey) {
         for (let [key, item] of Object.entries(heroDesignerCharacter[listKey])) {
             if (key !== subListKey) {
-                this._normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey);
+                this._normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey, key);
 
                 delete heroDesignerCharacter[listKey][key];
             } else if (key.toUpperCase() === 'MANEUVER') {
@@ -469,45 +526,16 @@ class HeroDesignerCharacter {
         }
     }
 
-    _normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey) {
+    _normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey, originalType) {
         if (Array.isArray(item)) {
             for (let i of item) {
-                this._normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey);
+                this._normalizeCharacterItem(heroDesignerCharacter, i, listKey, subListKey, originalType);
             }
         } else {
+            item.originalType = originalType;
+
             heroDesignerCharacter[listKey][subListKey].push(item);
         }
-    }
-
-    _populateLists(character) {
-        for (let listKey of Object.keys(CHARACTER_TRAITS)) {
-            if (character[listKey].hasOwnProperty('list')) {
-                if (Array.isArray(character[listKey].list)) {
-                    for (let listEntry of character[listKey].list) {
-                        character[key].push(this._createList(listEntry, listKey));
-                    }
-                } else {
-                    character[key].push(this._createList(character[listKey].list, key));
-                }
-            }
-        }
-    }
-
-    _createList(item, key) {
-        let listEntry = {
-            type: GENERIC_OBJECT,
-            xmlid: item.xmlid,
-            id: item.id,
-            alias: item.alias,
-            name: item.name || '',
-            position: item.position,
-            notes: item.notes || '',
-            modifier: item.modifier
-        };
-
-        listEntry[key] = [];
-
-        return listEntry;
     }
 
     _getLists(data) {

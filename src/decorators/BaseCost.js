@@ -33,11 +33,6 @@ export default class BaseCost extends CharacterTrait {
             }
 
             if (this.characterTrait.trait.template.hasOwnProperty('lvlval') && this.characterTrait.trait.template.lvlval !== 0) {
-//                cost += common.getMultiplierCost(
-//                    this.characterTrait.trait.levels,
-//                    this.characterTrait.trait.template.lvlval,
-//                    levelCost
-//                );
                 cost += this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * levelCost;
             }
         }

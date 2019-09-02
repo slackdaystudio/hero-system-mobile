@@ -1,8 +1,9 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 
-export default class Summon extends CharacterTrait {
+export default class Characteristic extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -30,18 +31,11 @@ export default class Summon extends CharacterTrait {
     }
 
     label() {
-        return this.characterTrait.label();
+        return `${heroDesignerCharacter.getCharacteristicFullName(this.characterTrait.trait.xmlid)}: +${this.characterTrait.trait.levels}`;
     }
 
     attributes() {
-        let attributes = this.characterTrait.attributes();
-
-        attributes.push({
-            label: 'Points',
-            value: `${this.characterTrait.trait.levels}`
-        });
-
-        return attributes;
+        return this.characterTrait.attributes();
     }
 
     definition() {

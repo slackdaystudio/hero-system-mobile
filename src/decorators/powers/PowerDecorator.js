@@ -1,5 +1,6 @@
 import Absorption from './Absorption';
 import Barrier from './Barrier';
+import Characteristic from './Characteristic';
 import Clinging from './Clinging';
 import DamageNegation from './DamageNegation';
 import DensityIncrease from './DensityIncrease';
@@ -20,10 +21,13 @@ import ResistantProtection from './ResistantProtection';
 import Shrinking from './Shrinking';
 import Stretching from './Stretching';
 import Summon from './Summon';
+import Telekinesis from './Telekinesis';
+import AffectsTotals from '../AffectsTotals'
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
 import UnusualDefense from '../UnusualDefense';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 
 const ABSORPTION = 'ABSORPTION';
 
@@ -107,6 +111,16 @@ const SWIMMING = 'SWIMMING';
 
 const SWINGING = 'SWINGING';
 
+const TELEKINESIS = 'TELEKINESIS';
+
+const TELEPATHY = 'TELEPATHY';
+
+const TELEPORTATION = 'TELEPORTATION';
+
+const TRANSFORM = 'TRANSFORM';
+
+const TUNNELING = 'TUNNELING';
+
 class PowerDecorator {
     decorate(decorated) {
         switch (decorated.trait.xmlid.toUpperCase()) {
@@ -125,6 +139,8 @@ class PowerDecorator {
             case MINDCONTROL:
             case MINDSCAN:
             case RKA:
+            case TELEPATHY:
+            case TRANSFORM:
                 decorated = new EffectRoll(decorated);
                 break;
             case BARRIER:
@@ -138,6 +154,7 @@ class PowerDecorator {
                 break;
             case DENSITYINCREASE:
                 decorated = new DensityIncrease(decorated);
+                decorated = new AffectsTotals(decorated);
                 break;
             case DUPLICATION:
                 decorated = new Duplication(decorated);
@@ -160,13 +177,14 @@ class PowerDecorator {
                 decorated = new UnusualDefense(decorated);
                 break;
             case FLIGHT:
-            case RUNNING:
-            case SWIMMING:
             case SWINGING:
+            case TELEPORTATION:
+            case TUNNELING:
                 decorated = new Movement(decorated);
                 break;
             case FORCEFIELD:
                 decorated = new ResistantProtection(decorated);
+                decorated = new AffectsTotals(decorated);
                 break;
             case HKA:
                 decorated = new HandKillingAttack(decorated);
@@ -180,6 +198,7 @@ class PowerDecorator {
             case LEAPING:
                 decorated = new Leaping(decorated);
                 decorated = new Movement(decorated);
+                decorated = new AffectsTotals(decorated);
                 break;
             case MULTIFORM:
                 decorated = new MultiForm(decorated);
@@ -193,6 +212,10 @@ class PowerDecorator {
             case REGENERATION:
                 decorated = new Regeneration(decorated);
                 break;
+            case RUNNING:
+            case SWIMMING:
+                decorated = new AffectsTotals(decorated);
+                break;
             case SHRINKING:
                 decorated = new Shrinking(decorated);
                 break;
@@ -202,8 +225,14 @@ class PowerDecorator {
             case SUMMON:
                 decorated = new Summon(decorated);
                 break;
+            case TELEKINESIS:
+                decorated = new Telekinesis(decorated);
+                break;
             default:
-                // do nothing
+                if (heroDesignerCharacter.isCharacteristic(decorated.trait)) {
+                    decorated = new Characteristic(decorated);
+                    decorated = new AffectsTotals(decorated);
+                }
         }
 
         return decorated;

@@ -1,8 +1,9 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 
-export default class Summon extends CharacterTrait {
+export default class MultipowerItem extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -10,11 +11,7 @@ export default class Summon extends CharacterTrait {
     }
 
     cost() {
-        let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
-
-        cost += common.totalAdders(this.characterTrait.trait.adder);
-
-        return Math.ceil(cost);
+        return this.characterTrait.cost();
     }
 
     costMultiplier() {
@@ -26,7 +23,7 @@ export default class Summon extends CharacterTrait {
     }
 
     realCost() {
-        return this.characterTrait.realCost();
+        return common.roundInPlayersFavor(this.characterTrait.realCost() / 10);
     }
 
     label() {
@@ -34,14 +31,7 @@ export default class Summon extends CharacterTrait {
     }
 
     attributes() {
-        let attributes = this.characterTrait.attributes();
-
-        attributes.push({
-            label: 'Points',
-            value: `${this.characterTrait.trait.levels}`
-        });
-
-        return attributes;
+        return this.characterTrait.attributes();
     }
 
     definition() {

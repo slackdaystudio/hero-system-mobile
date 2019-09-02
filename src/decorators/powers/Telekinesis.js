@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
 
-export default class Summon extends CharacterTrait {
+export default class Telekinesis extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -10,7 +10,7 @@ export default class Summon extends CharacterTrait {
     }
 
     cost() {
-        let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        let cost = Math.ceil(this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost;
 
         cost += common.totalAdders(this.characterTrait.trait.adder);
 
@@ -37,7 +37,7 @@ export default class Summon extends CharacterTrait {
         let attributes = this.characterTrait.attributes();
 
         attributes.push({
-            label: 'Points',
+            label: 'Strength',
             value: `${this.characterTrait.trait.levels}`
         });
 

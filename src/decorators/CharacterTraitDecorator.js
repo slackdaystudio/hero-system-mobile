@@ -4,9 +4,11 @@ import CharacterTrait from './CharacterTrait';
 import Modifier from './Modifier';
 import Skill from './Skill';
 import Maneuver from './Maneuver';
+import MultipowerItem from './powers/MultipowerItem';
 import { perkDecorator } from './perks/PerkDecorator';
 import { talentDecorator } from './talents/TalentDecorator';
 import { powerDecorator } from './powers/PowerDecorator';
+import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
 
 class CharacterTraitDecorator {
     decorate(item, listKey, getCharacter) {
@@ -24,6 +26,10 @@ class CharacterTraitDecorator {
 
         decorated = this._decorateItem(decorated);
         decorated = new Modifier(decorated);
+
+        if (heroDesignerCharacter.isMultipowerItem(decorated.trait, decorated.getCharacter())) {
+            decorated = new MultipowerItem(decorated);
+        }
 
         return decorated;
     }
