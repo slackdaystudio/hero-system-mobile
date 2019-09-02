@@ -36,14 +36,14 @@ export default class Traits extends Component {
         let itemButtonShow = {};
 
         items.map((item, index) => {
+            itemShow[item.id] = false;
+            itemButtonShow[item.id] = 'plus-circle';
+
             if (item.hasOwnProperty(this.props.subListKey)) {
                 for (let s of item[this.props.subListKey]) {
                     itemShow[s.id] = false;
                     itemButtonShow[s.id] = 'plus-circle';
                 }
-            } else {
-                itemShow[item.id] = false;
-                itemButtonShow[item.id] = 'plus-circle';
             }
         });
 
@@ -98,14 +98,10 @@ export default class Traits extends Component {
                         let separator = attribute.value !== '' ? ': ' : '';
 
                         return (
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View>
-                                    <Text style={labelStyle}>{attribute.label}{separator}</Text>
-                                </View>
-                                <View>
-                                    <Text style={styles.grey}>{attribute.value}</Text>
-                                </View>
-                            </View>
+                            <Text>
+                                <Text style={labelStyle}>{attribute.label}{separator}</Text>
+                                <Text style={styles.grey}>{attribute.value}</Text>
+                            </Text>
                         );
                     })}
                     <View style={{paddingBottom: 20}} />
@@ -132,15 +128,25 @@ export default class Traits extends Component {
     }
 
     _renderDefinition(item) {
+        if (item.definition() !== '' || item.attributes().length > 0) {
+            return (
+                <CardItem style={styles.cardItem}>
+                    <Body>
+                        {this._renderAttributes(item)}
+                        <Text style={styles.grey}>{item.definition()}</Text>
+                    </Body>
+                </CardItem>
+            );
+        }
+
+        return null;
+    }
+
+    _renderItemDetails(item) {
         if (this.state.itemShow[item.trait.id]) {
             return (
                 <Fragment>
-                    <CardItem style={styles.cardItem}>
-                        <Body>
-                            {this._renderAttributes(item)}
-                            <Text style={styles.grey}>{item.definition()}</Text>
-                        </Body>
-                    </CardItem>
+                    {this._renderDefinition(item)}
                     {this._renderAdvantagesAndLimitations(item)}
                     <CardItem style={styles.cardItem} footer>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
@@ -179,48 +185,85 @@ export default class Traits extends Component {
         return null;
     }
 
-    _renderTraits(items, indentCard=false) {
+    _renderTraitList(decoratedTrait) {
+        return (
+            <Card style={[styles.card, {paddingBottom: 0}]} key={'item-' + decoratedTrait.trait.position}>
+                <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'}]} header>
+                    <View style={{flex: 5, alignSelf: 'center'}}>
+                        <Text style={[styles.boldGrey, {fontSize: 18}]}>{decoratedTrait.label()}</Text>
+                    </View>
+                    <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                        <View style={{flex: 4, alignItems: 'flex-end'}}>
+                            {this._renderRoll(decoratedTrait)}
+                        </View>
+                        <View style={{flex: 1}}>
+                            <Icon
+                                type='FontAwesome'
+                                name={this.state.itemButtonShow[decoratedTrait.trait.id]}
+                                style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
+                                onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
+                            />
+                        </View>
+                    </View>
+                </CardItem>
+                {this._renderItemDetails(decoratedTrait)}
+                <View style={{backgroundColor: '#0e0e0f', paddingTop: 20}} />
+                {decoratedTrait.trait[this.props.subListKey].map((item, index) => {
+                    let decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
+
+                    return (
+                        <Fragment>
+                            <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: 5, paddingBottom: 5}]} header>
+                                {this._renderTrait(decoratedSubTrait, true)}
+                            </CardItem>
+                            {this._renderItemDetails(decoratedSubTrait)}
+                        </Fragment>
+                    );
+                })}
+                <View style={{backgroundColor: '#0e0e0f', paddingBottom: 20}} />
+            </Card>
+        );
+    }
+
+    _renderTrait(decoratedTrait, isListItem=false) {
+        return (
+            <Fragment>
+                <View style={{flex: 5, alignSelf: 'center'}}>
+                    <Text style={[styles.boldGrey, {fontSize: (isListItem ? 16 : 18)}]}>{isListItem ? ' ‣ ' : ''}{decoratedTrait.label()}</Text>
+                </View>
+                <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={{flex: 4, alignItems: 'flex-end'}}>
+                        {this._renderRoll(decoratedTrait)}
+                    </View>
+                    <View style={{flex: 1}}>
+                        <Icon
+                            type='FontAwesome'
+                            name={this.state.itemButtonShow[decoratedTrait.trait.id]}
+                            style={{paddingLeft: 10, fontSize: (isListItem ? 20 : 25), color: '#14354d'}}
+                            onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
+                        />
+                    </View>
+                </View>
+            </Fragment>
+        );
+    }
+
+    _renderTraits(items, indentItem=false) {
         return (
             <Fragment>
                 {items.map((item, index) => {
                     let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
 
                     if (decoratedTrait.trait.hasOwnProperty(this.props.subListKey) && decoratedTrait.trait[this.props.subListKey].length > 0) {
-                        return (
-                            <Fragment>
-                                <Card style={styles.card} key={'item-' + item.position}>
-                                    <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center'}]} header>
-                                        <View style={{flex: 5, alignSelf: 'center'}}>
-                                            <Text style={styles.grey}>{decoratedTrait.label()}</Text>
-                                        </View>
-                                    </CardItem>
-                                </Card>
-                                {this._renderTraits(decoratedTrait.trait[this.props.subListKey], true)}
-                            </Fragment>
-                        );
+                        return this._renderTraitList(decoratedTrait);
                     }
 
                     return (
-                        <Card style={[styles.card, {width: (indentCard ? '94%' : '99%'), alignSelf: 'flex-end'}]} key={'item-' + item.position}>
-                            <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center'}]} header>
-                                <View style={{flex: 5, alignSelf: 'center'}}>
-                                    <Text style={styles.boldGrey}>{decoratedTrait.label()}</Text>
-                                </View>
-                                <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                                    <View style={{flex: 4, alignItems: 'flex-end'}}>
-                                        {this._renderRoll(decoratedTrait)}
-                                    </View>
-                                    <View style={{flex: 1}}>
-                                        <Icon
-                                            type='FontAwesome'
-                                            name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                                            style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
-                                            onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
-                                        />
-                                    </View>
-                                </View>
+                        <Card style={styles.card} key={'item-' + decoratedTrait.trait.position}>
+                            <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'}]} header>
+                                {this._renderTrait(decoratedTrait)}
                             </CardItem>
-                            {this._renderDefinition(decoratedTrait)}
+                            {this._renderItemDetails(decoratedTrait)}
                         </Card>
                     );
                 })}

@@ -60,13 +60,13 @@ export default StyleSheet.create({
 		alignSelf: 'center'
 	},
 	buttonText: {
-		color: '#F3EDE9'
+		color: '#e8e8e8'
 	},
 	grey: {
-		color: '#F3EDE9'
+		color: '#e8e8e8'
 	},
 	boldGrey: {
-		color: '#F3EDE9',
+		color: '#e8e8e8',
 		fontWeight: 'bold'
 	},
 	tabInactive: {
@@ -86,11 +86,12 @@ export default StyleSheet.create({
 		backgroundColor: '#1b1d1f'
 	},
 	cardItem: {
-		backgroundColor: '#121212'
+		backgroundColor: '#0e0e0f'
 	},
 	cardTitle: {
-		fontSize: 24,
+		fontSize: 18,
 		fontWeight: 'bold',
-		color: '#F3EDE9'
+		color: '#e8e8e8',
+		backgroundColor: '#121212'
 	}
 });

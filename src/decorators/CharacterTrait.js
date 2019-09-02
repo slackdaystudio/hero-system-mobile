@@ -69,7 +69,11 @@ export default class CharacterTrait {
     }
 
     definition() {
-        return this.trait.template.definition || '';
+        if (this.trait.hasOwnProperty('template')) {
+            return this.trait.template.definition || '';
+        }
+
+        return '';
     }
 
     roll() {
@@ -93,7 +97,7 @@ export default class CharacterTrait {
             if (!attribute.hasOwnProperty('template')) {
                 let value = attribute.optionAlias || '';
 
-                if (value !== '' && (value.startsWith('(') && !value.endsWith(')'))) {
+                if (typeof value === 'string' && value !== '' && (value.startsWith('(') && !value.endsWith(')'))) {
                     value = value.substr(1);
                 }
 

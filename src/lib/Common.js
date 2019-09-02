@@ -110,7 +110,7 @@ class Common {
         let rounded = toBeRounded;
 
         if (common.isFloat(toBeRounded)) {
-            if ((toBeRounded % 1).toFixed(1) === '0.5') {
+            if (/0\.5[0-9]/.test((toBeRounded % 1).toFixed(2))) {
                 rounded = Math.trunc(toBeRounded);
             } else {
                 rounded = Math.round(toBeRounded);
