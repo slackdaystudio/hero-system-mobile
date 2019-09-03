@@ -27,7 +27,10 @@ import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
 import UnusualDefense from '../UnusualDefense';
+import Skill from '../Skill';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import { talentDecorator } from '../talents/TalentDecorator';
+import { perkDecorator } from '../perks/PerkDecorator';
 
 const ABSORPTION = 'ABSORPTION';
 
@@ -232,6 +235,12 @@ class PowerDecorator {
                 if (heroDesignerCharacter.isCharacteristic(decorated.trait)) {
                     decorated = new Characteristic(decorated);
                     decorated = new AffectsTotals(decorated);
+                } else if (decorated.trait.originalType === 'talent') {
+                    decorated = talentDecorator.decorate(decorated);
+                } else if (decorated.trait.originalType === 'perk') {
+                    decorated = perkDecorator.decorate(decorated);
+                } else if (decorated.trait.originalType === 'skill') {
+                    decorated = new Skill(decorated);
                 }
         }
 
