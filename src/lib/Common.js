@@ -98,7 +98,7 @@ class Common {
                 }
             }
         } else {
-            if (objects !== null && objects.hasOwnProperty(mapKey)) {
+            if (objects.hasOwnProperty(mapKey)) {
                 map.set(objects[mapKey], objects);
             }
         }

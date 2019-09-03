@@ -14,19 +14,20 @@ import strengthTable from '../../../public/strengthTable.json';
 export default class Characteristics extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        characteristics: PropTypes.array.isRequired,
-        movement: PropTypes.array.isRequired
+        character: PropTypes.object.isRequired
     }
 
     constructor(props) {
         super(props);
 
-        const displayOptions =  this._initCharacteristicsShow(props.characteristics, props.movement);
+        const displayOptions =  this._initCharacteristicsShow(props.character.characteristics, props.character.movement);
 
         this.state = {
             characteristicsShow: displayOptions.characteristicsShow,
             characteristicsButtonsShow: displayOptions.characteristicsButtonsShow
         }
+
+        this.powersMap = common.toMap(props.character.powers);
     }
 
     _initCharacteristicsShow(characteristics, movement) {
@@ -60,7 +61,7 @@ export default class Characteristics extends Component {
     }
 
     _getSpeed() {
-        for (let characteristic of this.props.characteristics) {
+        for (let characteristic of this.props.character.characteristics) {
             if (characteristic.shortName.toLowerCase() === 'spd') {
                 return characteristic.value;
             }
@@ -107,13 +108,28 @@ export default class Characteristics extends Component {
     _renderNonCombatMovement(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
             let speed = this._getSpeed();
-            let combatKph = characteristic.value * speed * 5 * 60 / 1000;
-            let nonCombatKph = characteristic.value * characteristic.ncm * speed * 5 * 60 / 1000;
+            let meters = characteristic.value;
+            let ncm = 2;
+            let power = null;
+
+            if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
+                power = this.powersMap.get(characteristic.shortName.toUpperCase());
+                meters += power.levels;
+
+                let adderMap = common.toMap(power.adder);
+
+                if (adderMap.has('IMPROVEDNONCOMBAT')) {
+                    ncm **= adderMap.get('IMPROVEDNONCOMBAT').levels + 1;
+                }
+            }
+
+            let combatKph = meters * speed * 5 * 60 / 1000;
+            let nonCombatKph = meters * ncm * speed * 5 * 60 / 1000;
 
             return (
                 <View style={{flex: 1, paddingBottom: 10}}>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>NCM:</Text> {characteristic.value * characteristic.ncm}m (x{characteristic.ncm})
+                        <Text style={styles.boldGrey}>NCM:</Text> {meters * ncm}m (x{ncm})
                     </Text>
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>Max Combat:</Text> {combatKph.toFixed(1)} km/h
@@ -233,7 +249,13 @@ export default class Characteristics extends Component {
 
     _renderStat(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            return <CircleText title={characteristic.value + 'm'} fontSize={22} size={60} />
+            let meters = characteristic.value;
+
+            if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
+                meters += this.powersMap.get(characteristic.shortName.toUpperCase()).levels;
+            }
+
+            return <CircleText title={meters + 'm'} fontSize={22} size={60} />
         }
 
         return <CircleText title={characteristic.value} fontSize={22} size={50} />
@@ -279,10 +301,10 @@ export default class Characteristics extends Component {
         return (
             <View>
                 <Heading text='Characteristics' />
-                {this._renderCharacteristics(this.props.characteristics)}
+                {this._renderCharacteristics(this.props.character.characteristics)}
                 <View style={{paddingTop: 20}} />
                 <Heading text='Movement' />
-                {this._renderCharacteristics(this.props.movement)}
+                {this._renderCharacteristics(this.props.character.movement)}
             </View>
         );
     }

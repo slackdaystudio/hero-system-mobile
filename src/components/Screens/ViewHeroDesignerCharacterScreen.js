@@ -62,7 +62,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 			  		</Tab>
 					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
 						<View style={styles.tabContent}>
-							<Characteristics navigation={this.props.navigation} characteristics={this.props.character.characteristics} movement={this.props.character.movement} />
+							<Characteristics navigation={this.props.navigation} character={this.props.character} />
 						</View>
 					</Tab>
                     {this._renderTab('Skills', 'skills', 'skills')}
