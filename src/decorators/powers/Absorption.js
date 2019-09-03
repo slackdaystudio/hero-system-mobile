@@ -9,7 +9,7 @@ export default class Absorption extends CharacterTrait {
     }
 
     cost() {
-        return this.characterTrait.trait.basecost;
+        return this.characterTrait.cost();
     }
 
     costMultiplier() {

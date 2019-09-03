@@ -75,7 +75,7 @@ export default class Modifier extends CharacterTrait {
 //                        continue;
 //                    }
 
-                    modifierCost = this._getTotalModifiers(modifier);
+                    modifierCost = this._getTotalModifiers(modifier, trait);
 
                     totalModifiers.push({
                         label: this._getModifierLabel(modifier, modifierCost),
@@ -87,7 +87,7 @@ export default class Modifier extends CharacterTrait {
 //                    return totalModifiers;
 //                }
 
-                modifierCost = this._getTotalModifiers(trait.modifier);
+                modifierCost = this._getTotalModifiers(trait.modifier, trait);
 
                 totalModifiers.push({
                     label: this._getModifierLabel(trait.modifier, modifierCost),
@@ -135,7 +135,7 @@ export default class Modifier extends CharacterTrait {
         return label;
     }
 
-    _getTotalModifiers(modifier) {
+    _getTotalModifiers(modifier, trait) {
         // Damage Over Time is funky and an exception to the norm
         if (modifier.xmlid.toUpperCase() === 'DAMAGEOVERTIME') {
             return this._handleDoT(modifier);
@@ -143,8 +143,28 @@ export default class Modifier extends CharacterTrait {
 
         let basecost = modifier.basecost;
 
-        if (modifier.hasOwnProperty('template') && modifier.template.hasOwnProperty('lvlcost') && modifier.levels > 0) {
-            basecost += modifier.template.lvlcost * modifier.levels;
+        if (modifier.levels > 0) {
+            if (modifier.hasOwnProperty('template') && modifier.template.hasOwnProperty('lvlcost')) {
+                basecost += modifier.template.lvlcost / modifier.template.lvlval * modifier.levels;
+            } else if (trait.hasOwnProperty('template') && trait.template.hasOwnProperty('modifier')) {
+                let templateModifier = null;
+
+                if (Array.isArray(trait.template.modifier)) {
+                    for (let m of trait.template.modifier) {
+                        if (m.xmlid.toUpperCase() === modifier.xmlid.toUpperCase()) {
+                            templateModifier = m;
+                            break;
+                        }
+                    }
+                } else if (trait.template.modifier.xmlid.toUpperCase() === modifier.xmlid.toUpperCase()) {
+                    templateModifier = trait.template.modifier;
+                }
+
+                if (templateModifier !== null) {
+                    basecost += templateModifier.lvlcost / templateModifier.lvlval * modifier.levels;
+                }
+            }
+
         }
 
         let totalModifiers = this._getAdderTotal(basecost, modifier.modifier, modifier);
