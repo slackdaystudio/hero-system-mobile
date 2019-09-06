@@ -5,6 +5,7 @@ import Modifier from './Modifier';
 import Skill from './Skill';
 import Maneuver from './Maneuver';
 import MultipowerItem from './powers/MultipowerItem';
+import { skillDecorator } from './skills/SkillDecorator';
 import { perkDecorator } from './perks/PerkDecorator';
 import { talentDecorator } from './talents/TalentDecorator';
 import { powerDecorator } from './powers/PowerDecorator';
@@ -35,7 +36,9 @@ class CharacterTraitDecorator {
     }
 
     _decorateItem(decorated) {
-        if (decorated.trait.type === 'perk' || decorated.trait.hasOwnProperty('perks')) {
+        if (decorated.trait.type === 'skill' || decorated.trait.hasOwnProperty('skills')) {
+            decorated = skillDecorator.decorate(decorated);
+        } else if (decorated.trait.type === 'perk' || decorated.trait.hasOwnProperty('perks')) {
             decorated = perkDecorator.decorate(decorated);
         } else if (decorated.trait.type === 'talent' || decorated.trait.hasOwnProperty('talents')) {
             decorated = talentDecorator.decorate(decorated);

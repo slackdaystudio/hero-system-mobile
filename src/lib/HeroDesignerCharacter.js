@@ -14,6 +14,7 @@ import superheroic from '../../public/HERODesigner/Superheroic.json';
 import superheroicSixth from '../../public/HERODesigner/Superheroic6E.json';
 import RNFetchBlob from 'rn-fetch-blob'
 import { common } from './Common';
+import { SKILL_ROLL_BASE } from '../decorators/skills/Roll';
 
 export const TYPE_CHARACTERISTIC = 1;
 
@@ -76,12 +77,6 @@ const CHARACTER_TRAITS = {
     "powers": "power"
 };
 
-const SKILL_ROLL_BASE = 9;
-
-const SKILL_FAMILIARITY_BASE = 8;
-
-const SKILL_PROFICIENCY_BASE = 10;
-
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdChar.json', JSON.stringify(heroDesignerCharacter));
@@ -104,7 +99,7 @@ class HeroDesignerCharacter {
         this._normalizeTemplateData(template);
 
         this._populateMovementAndCharacteristics(character, heroDesignerCharacter.characteristics, template);
-        this._populateTrait(character, template, heroDesignerCharacter.skills, 'skills', 'skill', 'skills', this._skillsPreInsert);
+        this._populateTrait(character, template, heroDesignerCharacter.skills, 'skills', 'skill', 'skills');
         this._populateTrait(character, template, heroDesignerCharacter.perks, 'perks', 'perk', 'perks');
         this._populateTrait(character, template, heroDesignerCharacter.talents, 'talents', 'talent', 'talents');
         this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
@@ -138,22 +133,6 @@ class HeroDesignerCharacter {
         abbreviation = abbreviation.toLowerCase();
 
         return CHARACTERISTIC_NAMES.hasOwnProperty(abbreviation) ? CHARACTERISTIC_NAMES[abbreviation] : '';
-    }
-
-    _skillsPreInsert(character, template, skill) {
-        let roll = null;
-
-        if (skill.proficiency) {
-            roll = SKILL_PROFICIENCY_BASE;
-        } else if (skill.familiarity || skill.everyman) {
-            roll = SKILL_FAMILIARITY_BASE
-        } else if (!skill.hasOwnProperty('adder') && skill.hasOwnProperty('characteristic')) {
-            roll = parseInt(character.characteristics.filter(c => c.shortName.toLowerCase() === skill.characteristic.toLowerCase()).shift().roll.slice(0, -1), 10);
-        }
-
-        if (roll !== null) {
-            skill.roll = `${roll + skill.levels}-`;
-        }
     }
 
     _populateMovementAndCharacteristics(character, characteristics, template) {
@@ -223,7 +202,7 @@ class HeroDesignerCharacter {
         return templateCharacteristic.adder.lvlval * templateCharacteristic.adder.lvlmultiplier
     }
 
-    _populateTrait(character, template, trait, traitKey, traitSubKey, characterSubTrait, preInsert=null) {
+    _populateTrait(character, template, trait, traitKey, traitSubKey, characterSubTrait) {
         trait[traitSubKey] = trait[traitSubKey].concat(this._getLists(trait));
 
         for (let skillEnhancer of SKILL_ENHANCERS) {
@@ -250,10 +229,6 @@ class HeroDesignerCharacter {
 
             value.type = traitSubKey;
             value.template = templateTrait;
-
-            if (typeof preInsert === 'function') {
-                preInsert(character, template, value);
-            }
 
             if (value.hasOwnProperty('parentid')) {
                 character[traitKey].filter(t => t.id === value.parentid).shift()[characterSubTrait].push(value);
