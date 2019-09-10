@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
-import CharacterTrait from '../CharacterTrait';
+import CharacterTrait from './CharacterTrait';
 
-export default class AnimalHandler extends CharacterTrait {
+export default class SkillWithAdders extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 

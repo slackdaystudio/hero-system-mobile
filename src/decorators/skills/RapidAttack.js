@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 
-export default class AutofireSkills extends CharacterTrait {
+export default class RapidAttack extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -9,18 +9,24 @@ export default class AutofireSkills extends CharacterTrait {
     }
 
     cost() {
-        let levelCost = 0;
-        let levelValue = 0;
+        let cost = 10;
 
-        for (let option of this.characterTrait.trait.template.option) {
-            if (option.xmlid.toUpperCase() === this.characterTrait.trait.optionid.toUpperCase()) {
-                levelCost = option.lvlcost;
-                levelValue = option.lvlval;
-                break;
+        if (this.characterTrait.trait.hasOwnProperty('modifier')) {
+            if (Array.isArray(this.characterTrait.trait.modifier)) {
+                for (let modifier of this.characterTrait.trait.modifier) {
+                    if (modifier.xmlid.toUpperCase() === 'HTHONLY' || modifier.xmlid.toUpperCase() === 'RANGEDONLY') {
+                        cost--;
+                        break;
+                    }
+                }
+            } else {
+                if (modifier.xmlid.toUpperCase() === 'HTHONLY' || modifier.xmlid.toUpperCase() === 'RANGEDONLY') {
+                    cost--;
+                }
             }
         }
 
-        return this.characterTrait.trait.levels / levelValue * levelCost;
+        return cost;
     }
 
     costMultiplier() {

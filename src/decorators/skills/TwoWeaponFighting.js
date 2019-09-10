@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 
-export default class DefensiveManeuver extends CharacterTrait {
+export default class TwoWeaponFighting extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -9,16 +9,7 @@ export default class DefensiveManeuver extends CharacterTrait {
     }
 
     cost() {
-        let cost = 0;
-
-        for (let option of this.characterTrait.trait.template.option) {
-            if (option.xmlid.toUpperCase() === this.characterTrait.trait.optionid.toUpperCase()) {
-                cost = option.basecost;
-                break;
-            }
-        }
-
-        return cost;
+        return 10;
     }
 
     costMultiplier() {

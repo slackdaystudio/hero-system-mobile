@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
-import CharacterTrait from '../CharacterTrait';
+import CharacterTrait from './CharacterTrait';
 
-export default class DefensiveManeuver extends CharacterTrait {
+export default class SkillLevels extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -9,16 +9,18 @@ export default class DefensiveManeuver extends CharacterTrait {
     }
 
     cost() {
-        let cost = 0;
+        let levelCost = 0;
+        let levelValue = 0;
 
         for (let option of this.characterTrait.trait.template.option) {
             if (option.xmlid.toUpperCase() === this.characterTrait.trait.optionid.toUpperCase()) {
-                cost = option.basecost;
+                levelCost = option.lvlcost;
+                levelValue = option.lvlval;
                 break;
             }
         }
 
-        return cost;
+        return this.characterTrait.trait.levels / levelValue * levelCost;
     }
 
     costMultiplier() {
@@ -38,7 +40,14 @@ export default class DefensiveManeuver extends CharacterTrait {
     }
 
     attributes() {
-        return this.characterTrait.attributes();
+        let attributes = this.characterTrait.attributes();
+
+        attributes.push({
+            label: 'Total Levels',
+            value: this.characterTrait.trait.levels
+        });
+
+        return attributes;
     }
 
     definition() {

@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 
-export default class DefensiveManeuver extends CharacterTrait {
+export default class TransportFamiliarity extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -9,13 +9,10 @@ export default class DefensiveManeuver extends CharacterTrait {
     }
 
     cost() {
-        let cost = 0;
+        let cost = 1;
 
-        for (let option of this.characterTrait.trait.template.option) {
-            if (option.xmlid.toUpperCase() === this.characterTrait.trait.optionid.toUpperCase()) {
-                cost = option.basecost;
-                break;
-            }
+        if (this.characterTrait.trait.hasOwnProperty('adder')) {
+            cost = this._totalAdders(this.characterTrait.trait.adder);
         }
 
         return cost;
@@ -55,5 +52,31 @@ export default class DefensiveManeuver extends CharacterTrait {
 
     limitations() {
         return this.characterTrait.limitations();
+    }
+
+    _totalAdders(adder) {
+        let cost = 0;
+
+        if (Array.isArray(adder)) {
+            for (let a of adder) {
+                cost += this._totalAdder(a);
+            }
+        } else {
+            cost += this._totalAdder(adder);
+        }
+
+        return cost;
+    }
+
+    _totalAdder(adder) {
+        let cost = 0;
+
+        if (adder.hasOwnProperty('adder')) {
+            cost += this._totalAdders(adder.adder);
+        } else {
+            cost += adder.basecost;
+        }
+
+        return cost;
     }
 }
