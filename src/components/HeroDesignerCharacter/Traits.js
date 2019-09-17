@@ -99,7 +99,7 @@ export default class Traits extends Component {
         } else if (roll.type === FREE_FORM) {
             let freeFormForm = common.initFreeFormForm();
             let dice = common.toDice(roll.roll);
-            Alert.alert(JSON.stringify(dice));
+
             freeFormForm.dice = dice.full;
 
             switch (dice.partial) {
