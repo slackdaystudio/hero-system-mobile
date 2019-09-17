@@ -3,10 +3,11 @@ import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
 
 export default class EffectRoll extends CharacterTrait {
-    constructor(characterTrait) {
+    constructor(characterTrait, rollType) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
         this.characterTrait = characterTrait;
+        this.rollType = rollType;
     }
 
     cost() {
@@ -40,16 +41,20 @@ export default class EffectRoll extends CharacterTrait {
     roll() {
         const baseDice = this.characterTrait.trait.levels;
         const partialDie = this._getPartialDie(this.characterTrait.trait.adder);
+        let roll = `${baseDice}d6`;
 
         if (partialDie === '½') {
-            return `${baseDice}${partialDie}d6`
+            roll = `${baseDice}${partialDie}d6`
         } else if (partialDie === '1') {
-            return `${baseDice}d6+${partialDie}`
+            roll = `${baseDice}d6+${partialDie}`
         } else if (partialDie === '-1') {
-            return `${baseDice + 1}d6${partialDie}`
+            roll = `${baseDice + 1}d6${partialDie}`
         }
 
-        return `${baseDice}d6`;
+        return {
+            roll: roll,
+            type: this.rollType
+        }
     }
 
     advantages() {

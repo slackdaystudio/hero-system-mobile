@@ -3,7 +3,13 @@ import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import camelCase from 'camelcase';
 import snakeCase from 'snake-case';
-import { KILLING_DAMAGE, NORMAL_DAMAGE } from './DieRoller';
+import {
+    KILLING_DAMAGE,
+    NORMAL_DAMAGE,
+    PARTIAL_DIE_PLUS_ONE,
+    PARTIAL_DIE_HALF,
+    PARTIAL_DIE_MINUS_ONE
+} from './DieRoller';
 
 class Common {
     isIPad() {
@@ -187,7 +193,8 @@ class Common {
         return {
             dice: props.dice || 1,
             halfDice: props.halfDice || 0,
-            pips: props.pips || 0
+            pips: props.pips || 0,
+            skipFormLoad: true
         };
     }
 
@@ -218,6 +225,35 @@ class Common {
 
     toCm(inches) {
         return Math.round(inches * 2.54, 1);
+    }
+
+    toDice(dieCode) {
+        let dice = {
+            full: 0,
+            partial: 0
+        }
+
+        if (typeof dieCode !== 'string') {
+            return dice;
+        }
+
+        let dieParts = dieCode.split('d');
+
+        if (dieParts[0].endsWith('½')) {
+            dice.partial = PARTIAL_DIE_HALF;
+        } else if (dieParts[1].endsWith('+1')) {
+            dice.partial = PARTIAL_DIE_PLUS_ONE;
+        } else if (dieParts[1].endsWith('-1')) {
+            dice.partial = PARTIAL_DIE_MINUS_ONE;
+        }
+
+        if (dieParts[0].endsWith('½')) {
+            dice.full = parseInt(dieParts[0].substring(0, dieParts[0].length - 1), 10) || 0;
+        } else {
+            dice.full = parseInt(dieParts[0], 10) || 0;
+        }
+
+        return dice;
     }
 }
 

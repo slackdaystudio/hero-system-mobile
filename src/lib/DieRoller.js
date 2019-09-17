@@ -19,6 +19,8 @@ export const PARTIAL_DIE_PLUS_ONE = 1;
 
 export const PARTIAL_DIE_HALF = 2;
 
+export const PARTIAL_DIE_MINUS_ONE = 3;
+
 class DieRoller {
 	constructor() {
 		this.validLastRollTypes = [
@@ -181,6 +183,8 @@ class DieRoller {
 		
 		if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
 			resultRoll.total += 1;
+		} else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
+		    resultRoll.total -= 1;
 		} else if (partialDieType === PARTIAL_DIE_HALF) {
 			let halfDie = Math.floor(Math.random() * 3) + 1;
 			

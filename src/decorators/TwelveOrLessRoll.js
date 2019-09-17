@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
+import { SKILL_CHECK } from '../lib/DieRoller';
 
 export default class TwelveOrLessRoll extends CharacterTrait {
     constructor(characterTrait) {
@@ -37,7 +38,10 @@ export default class TwelveOrLessRoll extends CharacterTrait {
     }
 
     roll() {
-        return `${12 + this.characterTrait.trait.levels}-`;
+        return {
+            roll: `${12 + this.characterTrait.trait.levels}-`,
+            type: SKILL_CHECK
+        }
     }
 
     advantages() {

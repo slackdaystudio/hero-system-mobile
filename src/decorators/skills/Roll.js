@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
+import { SKILL_CHECK } from '../../lib/DieRoller';
 
 export const SKILL_ROLL_BASE = 9;
 
@@ -63,7 +64,10 @@ export default class Roll extends CharacterTrait {
             roll = `${roll + this.characterTrait.trait.levels}-`;
         }
 
-        return roll;
+        return {
+            roll: roll,
+            type: SKILL_CHECK
+        }
     }
 
     advantages() {

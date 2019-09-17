@@ -31,6 +31,7 @@ import Skill from '../Skill';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 import { talentDecorator } from '../talents/TalentDecorator';
 import { perkDecorator } from '../perks/PerkDecorator';
+import { NORMAL_DAMAGE, KILLING_DAMAGE, FREE_FORM } from '../../lib/DieRoller';
 
 const ABSORPTION = 'ABSORPTION';
 
@@ -130,21 +131,25 @@ class PowerDecorator {
             case ABSORPTION:
                 decorated = new Absorption(decorated);
                 break;
-            case AID:
             case BLAST:
+            case EGOATTACK:
+                decorated = new EffectRoll(decorated, NORMAL_DAMAGE);
+                break;
+            case TRANSFORM:
+            case RKA:
+                decorated = new EffectRoll(decorated, KILLING_DAMAGE);
+                break;
+            case AID:
             case DISPEL:
             case DRAIN:
-            case EGOATTACK:
             case FLASH:
             case HEALING:
             case LUCK:
             case MENTALILLUSIONS:
             case MINDCONTROL:
             case MINDSCAN:
-            case RKA:
             case TELEPATHY:
-            case TRANSFORM:
-                decorated = new EffectRoll(decorated);
+                decorated = new EffectRoll(decorated, FREE_FORM);
                 break;
             case BARRIER:
                 decorated = new Barrier(decorated);

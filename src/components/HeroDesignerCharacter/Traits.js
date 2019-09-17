@@ -7,6 +7,16 @@ import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
 import { TYPE_MOVEMENT, GENERIC_OBJECT } from '../../lib/HeroDesignerCharacter';
 import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';
+import {
+    SKILL_CHECK,
+    NORMAL_DAMAGE,
+    KILLING_DAMAGE,
+    FREE_FORM,
+    PARTIAL_DIE_PLUS_ONE,
+    PARTIAL_DIE_HALF,
+    PARTIAL_DIE_MINUS_ONE
+} from '../../lib/DieRoller';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
 export default class Traits extends Component {
@@ -63,6 +73,51 @@ export default class Traits extends Component {
         newState.itemButtonShow[name] = newState.itemButtonShow[name] === 'plus-circle' ? 'minus-circle' : 'plus-circle';
 
         this.setState(newState);
+    }
+
+    _roll(roll) {
+        if (roll.type === SKILL_CHECK) {
+            this.props.navigation.navigate('Result', dieRoller.rollCheck(roll.roll));
+        } else if (roll.type === NORMAL_DAMAGE) {
+            let damageForm = common.initDamageForm();
+            let dice = common.toDice(roll.roll);
+
+            damageForm.dice = dice.full;
+            damageForm.partialDie = dice.partial
+
+            this.props.navigation.navigate('Damage', damageForm);
+        } else if (roll.type === KILLING_DAMAGE) {
+            let damageForm = common.initDamageForm();
+            let dice = common.toDice(roll.roll);
+
+            damageForm.dice = dice.full;
+            damageForm.partialDie = dice.partial
+            damageForm.killingToggled = true;
+            damageForm.damageType = KILLING_DAMAGE;
+
+            this.props.navigation.navigate('Damage', damageForm);
+        } else if (roll.type === FREE_FORM) {
+            let freeFormForm = common.initFreeFormForm();
+            let dice = common.toDice(roll.roll);
+            Alert.alert(JSON.stringify(dice));
+            freeFormForm.dice = dice.full;
+
+            switch (dice.partial) {
+                case PARTIAL_DIE_HALF:
+                    freeFormForm.halfDice = 1;
+                    break;
+                case PARTIAL_DIE_PLUS_ONE:
+                    freeFormForm.pips = 1;
+                    break;
+                case PARTIAL_DIE_MINUS_ONE:
+                    freeFormForm.pips -1;
+                    break;
+                default:
+                    // do nothing
+            }
+
+            this.props.navigation.navigate('Result', dieRoller.freeFormRoll(freeFormForm.dice, freeFormForm.halfDice, freeFormForm.pips));
+        }
     }
 
     _renderModifiers(label, modifiers) {
@@ -171,13 +226,13 @@ export default class Traits extends Component {
     }
 
     _renderRoll(item) {
-        if (item.roll() !== null) {
+        if (item.roll() !== null && item.roll() !== undefined) {
             return (
                 <TouchableHighlight
                     underlayColor='#121212'
-                    onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(item.roll()))}
+                    onPress={() => this._roll(item.roll())}
                 >
-                    <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.roll()}</Text>
+                    <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.roll().roll}</Text>
                 </TouchableHighlight>
             );
         }

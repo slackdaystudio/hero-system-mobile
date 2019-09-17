@@ -83,8 +83,8 @@ export default class HitScreen extends Component {
 						label='Pips:'
 						value={this.state.pips} 
 						step={1} 
-						min={0} 
-						max={100}
+						min={-50}
+						max={50}
 						onValueChange={this.setSliderState}
 						valueKey='pips' />
 					<Button block style={styles.button}  onPress={this.roll}>

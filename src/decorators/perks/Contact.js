@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
+import { SKILL_CHECK } from '../../lib/DieRoller';
 
 export default class Contact extends CharacterTrait {
     constructor(characterTrait) {
@@ -44,7 +45,10 @@ export default class Contact extends CharacterTrait {
             levels = this.characterTrait.trait.levels - 2;
         }
 
-        return `${baseRoll + levels}-`;
+        return {
+            roll: `${baseRoll + levels}-`,
+            type: SKILL_CHECK
+        }
     }
 
     advantages() {

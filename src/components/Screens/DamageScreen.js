@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
-import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from '../../lib/DieRoller';
+import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import moves from '../../../public/moves.json';
@@ -194,6 +194,7 @@ export default class DamageScreen extends Component {
                                       <Picker.Item label="No partial die" value="0" />
                                       <Picker.Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
                                       <Picker.Item label="+½ die" value={PARTIAL_DIE_HALF} />
+                                      <Picker.Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
                                     </Picker>
                                     <View style={{paddingBottom: 30}} />
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
