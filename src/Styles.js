@@ -16,7 +16,7 @@ export default StyleSheet.create({
 	},
     heading: {
 		fontSize: 24,
-		fontFamily: 'Arial, Roboto',
+		fontFamily: 'Roboto',
 		fontWeight: 'bold',
 		color: '#F3EDE9',
 		paddingVertical: 5,
