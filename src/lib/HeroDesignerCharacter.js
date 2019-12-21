@@ -102,7 +102,7 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.skills, 'skills', 'skill', 'skills');
         this._populateTrait(character, template, heroDesignerCharacter.perks, 'perks', 'perk', 'perks');
         this._populateTrait(character, template, heroDesignerCharacter.talents, 'talents', 'talent', 'talents');
-        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
+//        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
@@ -203,6 +203,10 @@ class HeroDesignerCharacter {
     }
 
     _populateTrait(character, template, trait, traitKey, traitSubKey, characterSubTrait) {
+        if (!Array.isArray(trait[traitSubKey])) {
+            return;
+        }
+
         trait[traitSubKey] = trait[traitSubKey].concat(this._getLists(trait));
 
         for (let skillEnhancer of SKILL_ENHANCERS) {
@@ -486,6 +490,10 @@ class HeroDesignerCharacter {
     }
 
     _normalizeCharacterItems(heroDesignerCharacter, listKey, subListKey) {
+        if (heroDesignerCharacter[listKey] === null || heroDesignerCharacter[listKey] === undefined) {
+            return;
+        }
+
         for (let [key, item] of Object.entries(heroDesignerCharacter[listKey])) {
             if (key !== subListKey) {
                 this._normalizeCharacterItem(heroDesignerCharacter, item, listKey, subListKey, key);
