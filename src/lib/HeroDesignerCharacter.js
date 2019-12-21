@@ -102,13 +102,13 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.skills, 'skills', 'skill', 'skills');
         this._populateTrait(character, template, heroDesignerCharacter.perks, 'perks', 'perk', 'perks');
         this._populateTrait(character, template, heroDesignerCharacter.talents, 'talents', 'talent', 'talents');
-//        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
+        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
 
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
@@ -203,7 +203,7 @@ class HeroDesignerCharacter {
     }
 
     _populateTrait(character, template, trait, traitKey, traitSubKey, characterSubTrait) {
-        if (!Array.isArray(trait[traitSubKey])) {
+        if (trait === null || !Array.isArray(trait[traitSubKey])) {
             return;
         }
 
@@ -221,6 +221,10 @@ class HeroDesignerCharacter {
             if (value.xmlid.toUpperCase() === GENERIC_OBJECT || SKILL_ENHANCERS.includes(value.xmlid.toUpperCase())) {
                 value.type = 'list';
                 value[characterSubTrait] = [];
+
+                if (value.originalType.toUpperCase() === 'VPP') {
+                    value.template = this._buildVppTemplate(value, template);
+                }
 
                 character[traitKey].push(value);
 
@@ -534,6 +538,28 @@ class HeroDesignerCharacter {
 
         return lists;
     }
+
+   _buildVppTemplate(power, template) {
+       let mods = [];
+       let adds = [{
+           'xmlid': 'CONTROLCOST',
+           'basecost': power.adder.baseCost,
+           'levels': power.adder.levels,
+           'lvlcost': power.adder.lvlcost,
+           'lvlval': power.adder.lvlval
+        }];
+
+       for (let modifier of template.modifiers.modifier) {
+           if (modifier.hasOwnProperty('type') && modifier.type.toUpperCase() === 'VPP') {
+               mods.push(modifier);
+           }
+       }
+
+       return {
+          modifier: mods,
+          adder: adds
+       };
+   }
 }
 
 export let heroDesignerCharacter = new HeroDesignerCharacter();

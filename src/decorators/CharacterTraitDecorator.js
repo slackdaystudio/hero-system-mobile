@@ -4,6 +4,7 @@ import CharacterTrait from './CharacterTrait';
 import Modifier from './Modifier';
 import Skill from './Skill';
 import Maneuver from './Maneuver';
+import VariablePowerPool from './VariablePowerPool';
 import MultipowerItem from './powers/MultipowerItem';
 import { skillDecorator } from './skills/SkillDecorator';
 import { perkDecorator } from './perks/PerkDecorator';
@@ -30,6 +31,8 @@ class CharacterTraitDecorator {
 
         if (heroDesignerCharacter.isMultipowerItem(decorated.trait, decorated.getCharacter())) {
             decorated = new MultipowerItem(decorated);
+        } else if (decorated.trait.hasOwnProperty('originalType') && decorated.trait.originalType.toUpperCase() === 'VPP') {
+            decorated = new VariablePowerPool(decorated);
         }
 
         return decorated;
