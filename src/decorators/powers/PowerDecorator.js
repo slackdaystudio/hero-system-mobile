@@ -172,6 +172,7 @@ class PowerDecorator {
                 break;
             case ENTANGLE:
                 decorated = new Entangle(decorated);
+                decorated = new EffectRoll(decorated, FREE_FORM);
                 break;
             case EXTRALIMBS:
                 decorated = new ExtraLimbs(decorated);
