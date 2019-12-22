@@ -6,6 +6,7 @@ import Skill from './Skill';
 import Maneuver from './Maneuver';
 import VariablePowerPool from './VariablePowerPool';
 import MultipowerItem from './powers/MultipowerItem';
+import NakedModifier from './NakedModifier';
 import { skillDecorator } from './skills/SkillDecorator';
 import { perkDecorator } from './perks/PerkDecorator';
 import { talentDecorator } from './talents/TalentDecorator';
@@ -33,6 +34,8 @@ class CharacterTraitDecorator {
             decorated = new MultipowerItem(decorated);
         } else if (decorated.trait.hasOwnProperty('originalType') && decorated.trait.originalType.toUpperCase() === 'VPP') {
             decorated = new VariablePowerPool(decorated);
+        } else if (decorated.trait.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
+            decorated = new NakedModifier(decorated);
         }
 
         return decorated;
