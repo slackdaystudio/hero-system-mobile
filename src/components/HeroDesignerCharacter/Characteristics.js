@@ -32,13 +32,6 @@ export default class Characteristics extends Component {
         this.powersMap = common.toMap(common.flatten(props.character.powers, 'powers'));
     }
 
-//	async componentDidMount() {
-//        let newState = {...this.state};
-//        newState.secondaryCharacteristicToggle = await common.getSecondaryCharacteristicToggle();
-//
-//        this.setState(newState);
-//	}
-
     _initCharacteristicsShow(characteristics, movement) {
         let characteristicsShow = {};
         let characteristicsButtonsShow = {};
@@ -95,6 +88,22 @@ export default class Characteristics extends Component {
         return value;
     }
 
+    _getMovementTotal(characteristic) {
+        let meters = characteristic.value;
+
+        if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
+            let movementMode = this.powersMap.get(characteristic.shortName.toUpperCase());
+
+            if (movementMode.affectsPrimary && movementMode.affectsTotal) {
+                meters += movementMode.levels;
+            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && this.state.secondaryCharacteristicToggle) {
+                meters += movementMode.levels;
+            }
+        }
+
+        return meters;
+    }
+
     _getRollTotal(characteristic) {
         if (characteristic.roll === null) {
             return;
@@ -141,18 +150,20 @@ export default class Characteristics extends Component {
     _renderNonCombatMovement(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
             let speed = this._getSpeed();
-            let meters = characteristic.value;
+            let meters = this._getMovementTotal(characteristic);
             let ncm = 2;
             let power = null;
 
             if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
-                power = this.powersMap.get(characteristic.shortName.toUpperCase());
-                meters += power.levels;
+                movementMode = this.powersMap.get(characteristic.shortName.toUpperCase());
 
-                let adderMap = common.toMap(power.adder);
+                if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
+                    (!movementMode.affectsPrimary && movementMode.affectsTotal && this.state.secondaryCharacteristicToggle)) {
+                    let adderMap = common.toMap(movementMode.adder);
 
-                if (adderMap.has('IMPROVEDNONCOMBAT')) {
-                    ncm **= adderMap.get('IMPROVEDNONCOMBAT').levels + 1;
+                    if (adderMap.has('IMPROVEDNONCOMBAT')) {
+                        ncm **= adderMap.get('IMPROVEDNONCOMBAT').levels + 1;
+                    }
                 }
             }
 
@@ -283,13 +294,7 @@ export default class Characteristics extends Component {
 
     _renderStat(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            let meters = characteristic.value;
-
-            if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
-                meters += this.powersMap.get(characteristic.shortName.toUpperCase()).levels;
-            }
-
-            return <CircleText title={meters + 'm'} fontSize={22} size={60} />
+            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} />
         }
 
         return <CircleText title={this._getCharacteristicTotal(characteristic)} fontSize={22} size={50} />
@@ -339,7 +344,7 @@ export default class Characteristics extends Component {
     }
 
     _renderSecondaryCharacteristicToggle() {
-        if (heroDesignerCharacter.hasSecondaryCharacteristics(this.props.character.powers)) {
+        if (heroDesignerCharacter.hasSecondaryCharacteristics(common.flatten(this.props.character.powers, 'powers'))) {
             return (
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 20}}>
                     <View>
