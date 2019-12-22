@@ -1,12 +1,13 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight, Alert } from 'react-native';
+import { View, TouchableHighlight, Alert, Switch } from 'react-native';
 import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
-import { TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
+import { heroDesignerCharacter, TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
+import { SKILL_ROLL_BASE } from '../../decorators/skills/Roll';
 import styles from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
 
@@ -24,11 +25,19 @@ export default class Characteristics extends Component {
 
         this.state = {
             characteristicsShow: displayOptions.characteristicsShow,
-            characteristicsButtonsShow: displayOptions.characteristicsButtonsShow
+            characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
+            secondaryCharacteristicToggle: true
         }
 
-        this.powersMap = common.toMap(props.character.powers);
+        this.powersMap = common.toMap(common.flatten(props.character.powers, 'powers'));
     }
+
+//	async componentDidMount() {
+//        let newState = {...this.state};
+//        newState.secondaryCharacteristicToggle = await common.getSecondaryCharacteristicToggle();
+//
+//        this.setState(newState);
+//	}
 
     _initCharacteristicsShow(characteristics, movement) {
         let characteristicsShow = {};
@@ -63,11 +72,35 @@ export default class Characteristics extends Component {
     _getSpeed() {
         for (let characteristic of this.props.character.characteristics) {
             if (characteristic.shortName.toLowerCase() === 'spd') {
-                return characteristic.value;
+                return this._getCharacteristicTotal(characteristic);
             }
         }
 
         return 0;
+    }
+
+    _getCharacteristicTotal(characteristic) {
+        let value = characteristic.value;
+
+        if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
+            let char = this.powersMap.get(characteristic.shortName.toUpperCase());
+
+            if (char.affectsPrimary && char.affectsTotal) {
+                value += char.levels;
+            } else if (!char.affectsPrimary && char.affectsTotal && this.state.secondaryCharacteristicToggle) {
+                value += char.levels;
+            }
+        }
+
+        return value;
+    }
+
+    _getRollTotal(characteristic) {
+        if (characteristic.roll === null) {
+            return;
+        }
+
+        return `${Math.round(this._getCharacteristicTotal(characteristic) / 5) + SKILL_ROLL_BASE}-`;
     }
 
     _renderDefinition(characteristic) {
@@ -147,24 +180,25 @@ export default class Characteristics extends Component {
     _renderStrength(characteristic) {
         if (characteristic.shortName === 'STR') {
             let step = null;
-            let lift = '0.0 kg'
+            let lift = '0.0 kg';
+            let totalStrength = this._getCharacteristicTotal(characteristic);
 
             for (let key of Object.keys(strengthTable)) {
-                if (characteristic.value === parseInt(key, 10)) {
-                    step = strengthTable[characteristic.value.toString()];
+                if (totalStrength === parseInt(key, 10)) {
+                    step = strengthTable[totalStrength.toString()];
                     lift = step.lift;
                     break;
                 }
             }
 
             if (step === null) {
-                if (characteristic.value < 0) {
+                if (totalStrength < 0) {
                     step = strengthTable['0'];
-                } else if (characteristic.value > 100) {
+                } else if (totalStrength > 100) {
                     step = strengthTable['100'];
                     lift = step.lift;
 
-                    let doublings = (characteristic.value - 100) / 5;
+                    let doublings = (totalStrength - 100) / 5;
 
                     for (let i = 0; i < Math.trunc(doublings); i++) {
                         lift *= 2;
@@ -178,12 +212,12 @@ export default class Characteristics extends Component {
                     let previousEntry = null;
 
                     for (let [key, entry] of Object.entries(strengthTable)) {
-                        if (characteristic.value < parseInt(key, 10)) {
+                        if (totalStrength < parseInt(key, 10)) {
                             step = previousEntry;
                             lift = previousEntry.lift;
 
                             let divisor = key - previousKey;
-                            let remainder = parseFloat(((characteristic.value / divisor) % 1).toFixed(1));
+                            let remainder = parseFloat(((totalStrength / divisor) % 1).toFixed(1));
 
                             if (remainder === 0.0) {
                                 lift += (entry.lift - lift) / divisor * (remainder + 1);
@@ -203,7 +237,7 @@ export default class Characteristics extends Component {
             return (
                  <View style={{flex: 1, paddingBottom: 10}}>
                      <Text style={styles.grey}>
-                         <Text style={styles.boldGrey}>Damage:</Text> {this._renderStrengthDamage(characteristic.value)}
+                         <Text style={styles.boldGrey}>Damage:</Text> {this._renderStrengthDamage(totalStrength)}
                      </Text>
                      <Text style={styles.grey}>
                          <Text style={styles.boldGrey}>Lift:</Text> {this._renderLift(lift)}
@@ -258,7 +292,7 @@ export default class Characteristics extends Component {
             return <CircleText title={meters + 'm'} fontSize={22} size={60} />
         }
 
-        return <CircleText title={characteristic.value} fontSize={22} size={50} />
+        return <CircleText title={this._getCharacteristicTotal(characteristic)} fontSize={22} size={50} />
     }
 
     _renderCharacteristics(characteristics) {
@@ -277,9 +311,9 @@ export default class Characteristics extends Component {
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                     <TouchableHighlight
                                         underlayColor='#121212'
-                                        onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(characteristic.roll))}
+                                        onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(this._getRollTotal(characteristic)))}
                                     >
-                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{characteristic.roll}</Text>
+                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{this._getRollTotal(characteristic)}</Text>
                                     </TouchableHighlight>
                                     <Icon
                                         type='FontAwesome'
@@ -297,10 +331,42 @@ export default class Characteristics extends Component {
         );
     }
 
+    _toggleSecondaryCharacteristics() {
+        let newState = {...this.state};
+        newState.secondaryCharacteristicToggle = !newState.secondaryCharacteristicToggle;
+
+        this.setState(newState);
+    }
+
+    _renderSecondaryCharacteristicToggle() {
+        if (heroDesignerCharacter.hasSecondaryCharacteristics(this.props.character.powers)) {
+            return (
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 20}}>
+                    <View>
+                        <Text style={styles.boldGrey}>Include Secondary Characteristics?</Text>
+                    </View>
+                    <View>
+                        <Switch
+                            value={this.state.secondaryCharacteristicToggle}
+                            onValueChange={() => this._toggleSecondaryCharacteristics()}
+                            minimumTrackTintColor='#14354d'
+                            maximumTrackTintColor='#14354d'
+                            thumbTintColor='#14354d'
+                            onTintColor="#01121E"
+                        />
+                    </View>
+                </View>
+            );
+        }
+
+        return null;
+    }
+
     render() {
         return (
             <View>
                 <Heading text='Characteristics' />
+                {this._renderSecondaryCharacteristicToggle()}
                 {this._renderCharacteristics(this.props.character.characteristics)}
                 <View style={{paddingTop: 20}} />
                 <Heading text='Movement' />

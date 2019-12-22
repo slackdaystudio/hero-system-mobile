@@ -107,8 +107,8 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
 
-        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
@@ -119,7 +119,7 @@ class HeroDesignerCharacter {
 
     isMultipowerItem(item, character) {
         if (item.hasOwnProperty('parentid') && character.powers.length > 0) {
-            let powersMap = common.toMap(character.powers, 'id');
+            let powersMap = common.toMap(common.flatten(character.powers, 'powers'), 'id');
 
             if (powersMap.has(item.parentid)) {
                 return powersMap.get(item.parentid).originalType === 'multipower';
@@ -133,6 +133,16 @@ class HeroDesignerCharacter {
         abbreviation = abbreviation.toLowerCase();
 
         return CHARACTERISTIC_NAMES.hasOwnProperty(abbreviation) ? CHARACTERISTIC_NAMES[abbreviation] : '';
+    }
+
+    hasSecondaryCharacteristics(powers) {
+        for (let power of powers) {
+            if (!power.affectsPrimary && power.affectsTotal) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     _populateMovementAndCharacteristics(character, characteristics, template) {

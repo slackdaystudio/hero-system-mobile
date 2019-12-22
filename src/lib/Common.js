@@ -90,6 +90,20 @@ class Common {
         return total;
     }
 
+    flatten(items, key) {
+        let flattened = [];
+
+        for (let item of items) {
+            if (item.type === 'list' && item.hasOwnProperty(key)) {
+                flattened = flattened.concat(this.flatten(item[key], key));
+            } else {
+                flattened.push(item);
+            }
+        }
+
+        return flattened;
+    }
+
     toMap(objects, mapKey='xmlid') {
         let map = new Map();
 
@@ -137,6 +151,10 @@ class Common {
 
         return JSON.parse(settings);
     }
+
+//    async getSecondaryCharacteristicToggle() {
+//        let toggle = await AsyncStorage.getItem('hasSecondaryCharacteristic');
+//    }
 
     initDamageForm(props = null) {
         if (props === null || props === undefined || props === '') {
