@@ -107,8 +107,8 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
 
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
@@ -239,6 +239,8 @@ class HeroDesignerCharacter {
                 character[traitKey].push(value);
 
                 continue;
+            } else if (value.xmlid.toUpperCase() === 'COMPOUNDPOWER') {
+                this._getCompoundPowers(value, template, traitKey, traitSubKey);
             }
 
             templateTrait = this._getTemplateTrait(value, template, traitKey, traitSubKey);
@@ -253,6 +255,22 @@ class HeroDesignerCharacter {
             } else {
                 character[traitKey].push(value);
             }
+        }
+    }
+
+    _getCompoundPowers(compoundPower, template, traitKey, traitSubKey) {
+        compoundPower.powers = compoundPower.power;
+
+        delete compoundPower.power;
+
+        for (let power of compoundPower.powers) {
+            templateTrait = this._getTemplateTrait(power, template, traitKey, traitSubKey);
+
+            this._addModifierTemplate(power.modifier, template);
+
+            power.type = traitSubKey;
+            power.template = templateTrait;
+            power.parentid = compoundPower.id;
         }
     }
 

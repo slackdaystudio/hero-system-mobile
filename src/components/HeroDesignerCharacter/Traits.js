@@ -199,6 +199,10 @@ export default class Traits extends Component {
 
     _renderItemDetails(item) {
         if (this.state.itemShow[item.trait.id]) {
+            if (item.trait.xmlid.toUpperCase() === 'COMPOUNDPOWER') {
+                return this._renderCompoundPowerDetails(item);
+            }
+
             return (
                 <Fragment>
                     {this._renderDefinition(item)}
@@ -219,6 +223,74 @@ export default class Traits extends Component {
                         </View>
                     </CardItem>
                 </Fragment>
+            );
+        }
+
+        return null;
+    }
+
+    _renderCompoundPowerDetails(item) {
+        return (
+            <Fragment>
+                {this._renderDefinition(item)}
+                {this._renderAdvantagesAndLimitations(item)}
+                <CardItem style={styles.cardItem} footer>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
+                        </Text>
+                        <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Active:</Text> {item.activeCost()}
+                        </Text>
+                        <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
+                        </Text>
+                    </View>
+                </CardItem>
+                {item.powers.map((power, index) => {
+                    return (
+                        <Fragment>
+                            <View style={{flex: 1, alignSelf: 'center'}}>
+                                <Text style={styles.boldGrey}>{power.label()}</Text>
+                            </View>
+                            {this._renderCompoundPowerRoll(power)}
+                            {this._renderDefinition(power)}
+                            {this._renderAdvantagesAndLimitations(power)}
+                            <CardItem style={styles.cardItem} footer>
+                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                                    <Text style={styles.grey}>
+                                        <Text style={styles.boldGrey}>Base:</Text> {power.cost()}
+                                    </Text>
+                                    <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                                    <Text style={styles.grey}>
+                                        <Text style={styles.boldGrey}>Active:</Text> {power.activeCost()}
+                                    </Text>
+                                    <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                                    <Text style={styles.grey}>
+                                        <Text style={styles.boldGrey}>Real:</Text> {power.realCost()}
+                                    </Text>
+                                </View>
+                            </CardItem>
+                        </Fragment>
+                    );
+                })}
+            </Fragment>
+        );
+    }
+
+    _renderCompoundPowerRoll(power) {
+        if (power.roll() !== null && power.roll() !== undefined) {
+            return (
+                <CardItem style={styles.cardItem}>
+                <TouchableHighlight
+                    underlayColor='#121212'
+                    onPress={() => this._roll(power.roll())}
+                >
+                    <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
+                </TouchableHighlight>
+                </CardItem>
             );
         }
 
@@ -309,7 +381,9 @@ export default class Traits extends Component {
                 {items.map((item, index) => {
                     let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
 
-                    if (decoratedTrait.trait.hasOwnProperty(this.props.subListKey) && decoratedTrait.trait[this.props.subListKey].length > 0) {
+                    if (decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
+                        decoratedTrait.trait.hasOwnProperty(this.props.subListKey) &&
+                        decoratedTrait.trait[this.props.subListKey].length > 0) {
                         return this._renderTraitList(decoratedTrait);
                     }
 
