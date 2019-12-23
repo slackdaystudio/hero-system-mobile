@@ -107,8 +107,8 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
 
-        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
@@ -499,7 +499,7 @@ class HeroDesignerCharacter {
                 continue;
             }
 
-            if (heroDesignerCharacter.hasOwnProperty(listKey.toLowerCase())) {
+            if (heroDesignerCharacter.hasOwnProperty(listKey.toLowerCase()) && heroDesignerCharacter[listKey] !== null) {
                 for (let [key, item] of Object.entries(heroDesignerCharacter[listKey.toLowerCase()])) {
                     this._normalizeCharacterDataItem(heroDesignerCharacter, item, key);
                 }
