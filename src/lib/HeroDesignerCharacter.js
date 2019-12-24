@@ -107,8 +107,8 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
 
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
@@ -119,7 +119,7 @@ class HeroDesignerCharacter {
 
     isMultipowerItem(item, character) {
         if (item.hasOwnProperty('parentid') && character.powers.length > 0) {
-            let powersMap = common.toMap(common.flatten(character.powers, 'powers'), 'id');
+            let powersMap = common.toMap(character.powers, 'id');
 
             if (powersMap.has(item.parentid)) {
                 return powersMap.get(item.parentid).originalType === 'multipower';
@@ -456,6 +456,7 @@ class HeroDesignerCharacter {
     _normalizeTemplatePowers(template) {
         const blacklisted = ['sensegroup', 'sense']; // For some reason these are listed in powers
 
+        template.senses = {};
         template.powers.power = [];
         template.characteristics.running.xmlid = 'RUNNING';
         template.powers.power.push(template.characteristics.running);
@@ -466,6 +467,7 @@ class HeroDesignerCharacter {
 
         for (let [key, power] of Object.entries(template.powers)) {
             if (blacklisted.includes(key)) {
+//                template.senses[key] = power;  // Uncomment to generate the senses.json file
                 continue;
             }
 

@@ -1,0 +1,76 @@
+{
+  "sensegroup": [{
+      "xmlid": "HEARINGGROUP",
+      "display": "Hearing Group",
+      "provides": ["RANGE", "MAKEASENSE"]
+    }, {
+      "xmlid": "MENTALGROUP",
+      "display": "Mental Group",
+      "provides": "RANGE"
+    }, {
+      "xmlid": "RADIOGROUP",
+      "display": "Radio Group",
+      "provides": ["RANGE", "MAKEASENSE"]
+    }, {
+      "xmlid": "SIGHTGROUP",
+      "display": "Sight Group",
+      "provides": ["RANGE", "MAKEASENSE", "TARGETINGSENSE"]
+    }, {
+      "xmlid": "SMELLGROUP",
+      "display": "Smell/Taste Group",
+      "provides": "MAKEASENSE"
+    }, {
+      "xmlid": "TOUCHGROUP",
+      "display": "Touch Group",
+      "provides": "MAKEASENSE"
+    }
+  ],
+  "sense": [{
+      "xmlid": "NORMALHEARING",
+      "included": true,
+      "sensegroup": "HEARINGGROUP",
+      "display": "Normal Hearing",
+      "provides": ["INCREASEDARC240", "INCREASEDARC360"]
+    }, {
+      "xmlid": "NORMALSIGHT",
+      "included": true,
+      "sensegroup": "SIGHTGROUP",
+      "display": "Normal Sight"
+    }, {
+      "xmlid": "NORMALSMELL",
+      "included": true,
+      "sensegroup": "SMELLGROUP",
+      "display": "Normal Smell",
+      "provides": ["RANGE", "INCREASEDARC240", "INCREASEDARC360"]
+    }, {
+      "xmlid": "NORMALTASTE",
+      "included": true,
+      "sensegroup": "SMELLGROUP",
+      "display": "Normal Taste"
+    }, {
+      "xmlid": "NORMALTOUCH",
+      "included": true,
+      "sensegroup": "TOUCHGROUP",
+      "display": "Normal Touch"
+    }, {
+      "xmlid": "DANGER_SENSE",
+      "included": false,
+      "sensegroup": "UNUSUALGROUP",
+      "display": "Danger Sense",
+      "provides": ["RANGE", "INCREASEDARC240", "INCREASEDARC360"]
+    }, {
+      "xmlid": "COMBAT_SENSE",
+      "included": false,
+      "sensegroup": "UNUSUALGROUP",
+      "display": "Combat Sense",
+      "provides": ["TARGETINGSENSE", "RANGE", "INCREASEDARC240", "INCREASEDARC360"]
+    }, {
+      "xmlid": "MINDSCAN",
+      "included": false,
+      "allowsensemodifiers": false,
+      "sensegroup": "MENTALGROUP",
+      "display": "Mind Scan",
+      "provides": ["RANGE", "INCREASEDARC240", "INCREASEDARC360", "TARGETINGSENSE", "DISCRIMINATORY"]
+    }
+  ]
+}

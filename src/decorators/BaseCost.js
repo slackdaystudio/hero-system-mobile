@@ -92,10 +92,12 @@ export default class BaseCost extends CharacterTrait {
         } else {
             let templateAdders = this.characterTrait.trait.template.adder;
 
-            for (let ta of templateAdders) {
-                if (ta.required && ta.xmlid.toUpperCase() === adder.xmlid.toUpperCase()) {
-                    levelCost += adder.basecost;
-                    break;
+            if (Array.isArray(templateAdders)) {
+                for (let ta of templateAdders) {
+                    if (ta.required && ta.xmlid.toUpperCase() === adder.xmlid.toUpperCase()) {
+                        levelCost += adder.basecost;
+                        break;
+                    }
                 }
             }
         }

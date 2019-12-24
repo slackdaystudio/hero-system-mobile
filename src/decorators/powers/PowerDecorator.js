@@ -2,10 +2,13 @@ import Absorption from './Absorption';
 import Barrier from './Barrier';
 import Characteristic from './Characteristic';
 import Clinging from './Clinging';
+import Concealed from './Concealed';
 import DamageNegation from './DamageNegation';
 import DensityIncrease from './DensityIncrease';
+import Detect from './Detect';
 import Duplication from './Duplication';
 import EnduranceReserve from './EnduranceReserve';
+import EnhancedPerception from './EnhancedPerception';
 import Entangle from './Entangle';
 import ExtraLimbs from './ExtraLimbs';
 import Ftl from './Ftl';
@@ -22,7 +25,10 @@ import Shrinking from './Shrinking';
 import Stretching from './Stretching';
 import Summon from './Summon';
 import Telekinesis from './Telekinesis';
-import AffectsTotals from '../AffectsTotals'
+import Telescopic from './Telescopic';
+import SenseAffectingPower from './SenseAffectingPower';
+import MagnifiedSense from './MagnifiedSense';
+import AffectsTotals from '../AffectsTotals';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
@@ -43,9 +49,13 @@ const BLAST = 'ENERGYBLAST';
 
 const CLINGING = 'CLINGING';
 
+const CONCEALED = 'CONCEALED';
+
 const DAMAGENEGATION = 'DAMAGENEGATION';
 
 const DENSITYINCREASE = 'DENSITYINCREASE';
+
+const DETECT = 'DETECT';
 
 const DISPEL = 'DISPEL';
 
@@ -56,6 +66,8 @@ const DUPLICATION = 'DUPLICATION';
 const EGOATTACK = 'EGOATTACK';
 
 const ENDURANCERESERVE = 'ENDURANCERESERVE';
+
+const ENHANCEDPERCEPTION = 'ENHANCEDPERCEPTION';
 
 const ENTANGLE = 'ENTANGLE';
 
@@ -87,6 +99,8 @@ const MENTALDEFENSE = 'MENTALDEFENSE';
 
 const MENTALILLUSIONS = 'MENTALILLUSIONS';
 
+const MICROSCOPIC = 'MICROSCOPIC';
+
 const MINDCONTROL = 'MINDCONTROL';
 
 const MINDSCAN = 'MINDSCAN';
@@ -96,6 +110,8 @@ const MULTIFORM = 'MULTIFORM';
 const POSSESSION = 'POSSESSION';
 
 const POWERDEFENSE = 'POWERDEFENSE';
+
+const RAPID = 'RAPID';
 
 const REFLECTION = 'REFLECTION';
 
@@ -120,6 +136,8 @@ const TELEKINESIS = 'TELEKINESIS';
 const TELEPATHY = 'TELEPATHY';
 
 const TELEPORTATION = 'TELEPORTATION';
+
+const TELESCOPIC = 'TELESCOPIC';
 
 const TRANSFORM = 'TRANSFORM';
 
@@ -157,6 +175,10 @@ class PowerDecorator {
             case CLINGING:
                 decorated = new Clinging(decorated);
                 break;
+            case CONCEALED:
+                decorated = new Concealed(decorated);
+                decorated = new SenseAffectingPower(decorated);
+                break;
             case DAMAGENEGATION:
                 decorated = new DamageNegation(decorated);
                 break;
@@ -164,11 +186,18 @@ class PowerDecorator {
                 decorated = new DensityIncrease(decorated);
                 decorated = new AffectsTotals(decorated);
                 break;
+            case DETECT:
+                decorated = new Detect(decorated);
+                break;
             case DUPLICATION:
                 decorated = new Duplication(decorated);
                 break;
             case ENDURANCERESERVE:
                 decorated = new EnduranceReserve(decorated);
+                break;
+            case ENHANCEDPERCEPTION:
+                decorated = new EnhancedPerception(decorated);
+                decorated = new SenseAffectingPower(decorated);
                 break;
             case ENTANGLE:
                 decorated = new Entangle(decorated);
@@ -209,6 +238,11 @@ class PowerDecorator {
                 decorated = new Movement(decorated);
                 decorated = new AffectsTotals(decorated);
                 break;
+            case MICROSCOPIC:
+            case RAPID:
+                decorated = new SenseAffectingPower(decorated);
+                decorated = new MagnifiedSense(decorated);
+                break;
             case MULTIFORM:
                 decorated = new MultiForm(decorated);
                 break;
@@ -236,6 +270,10 @@ class PowerDecorator {
                 break;
             case TELEKINESIS:
                 decorated = new Telekinesis(decorated);
+                break;
+            case TELESCOPIC:
+                decorated = new Telescopic(decorated);
+                decorated = new SenseAffectingPower(decorated);
                 break;
             default:
                 if (heroDesignerCharacter.isCharacteristic(decorated.trait)) {

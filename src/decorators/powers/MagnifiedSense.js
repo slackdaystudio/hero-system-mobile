@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
-import CharacterTrait from './CharacterTrait';
+import CharacterTrait from '../CharacterTrait';
 
-export default class AffectsTotals extends CharacterTrait {
+export default class MagnifiedSense extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
@@ -31,17 +31,10 @@ export default class AffectsTotals extends CharacterTrait {
     attributes() {
         let attributes = this.characterTrait.attributes();
 
-        if (this.characterTrait.trait.affectsTotal) {
-            attributes.push({
-                label: `Added to ${this.characterTrait.trait.affectsPrimary ? 'Primary' : 'Secondary'}`,
-                value: ''
-            });
-        } else {
-            attributes.push({
-                label: 'Not added to totals',
-                value: ''
-            });
-        }
+        attributes.push({
+            label: `x${this.characterTrait.trait.template.lvlpower ** this.characterTrait.trait.levels}`,
+            value: ''
+        });
 
         return attributes;
     }
@@ -51,7 +44,7 @@ export default class AffectsTotals extends CharacterTrait {
     }
 
     roll() {
-        return this.characterTrait.roll();
+        return this.characterTrait.advantages();
     }
 
     advantages() {
