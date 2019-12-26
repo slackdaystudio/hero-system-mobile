@@ -11,6 +11,7 @@ import EnduranceReserve from './EnduranceReserve';
 import EnhancedPerception from './EnhancedPerception';
 import Entangle from './Entangle';
 import ExtraLimbs from './ExtraLimbs';
+import Flash from './Flash';
 import Ftl from './Ftl';
 import HandKillingAttack from './HandKillingAttack';
 import HandToHandAttack from './HandToHandAttack';
@@ -160,7 +161,6 @@ class PowerDecorator {
             case AID:
             case DISPEL:
             case DRAIN:
-            case FLASH:
             case HEALING:
             case LUCK:
             case MENTALILLUSIONS:
@@ -206,6 +206,10 @@ class PowerDecorator {
             case EXTRALIMBS:
                 decorated = new ExtraLimbs(decorated);
                 break;
+            case FLASH:
+                 decorated = new EffectRoll(decorated, FREE_FORM);
+                 decorated = new Flash(decorated);
+                 break;
             case FTL:
                 decorated = new Ftl(decorated);
                 break;
