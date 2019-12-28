@@ -213,8 +213,10 @@ class HeroDesignerCharacter {
     }
 
     _populateTrait(character, template, trait, traitKey, traitSubKey, characterSubTrait) {
-        if (trait === null || !Array.isArray(trait[traitSubKey])) {
+        if (trait === null) {
             return;
+        } else if (!Array.isArray(trait[traitSubKey])) {
+            trait[traitSubKey] = [trait[traitSubKey]];
         }
 
         trait[traitSubKey] = trait[traitSubKey].concat(this._getLists(trait));

@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import BaseCost from './BaseCost';
 import CharacterTrait from './CharacterTrait';
-import Modifier from './Modifier';
+import ModifierCalculator from './ModifierCalculator';
 import Skill from './Skill';
 import Maneuver from './Maneuver';
 import VariablePowerPool from './VariablePowerPool';
@@ -29,7 +29,15 @@ class CharacterTraitDecorator {
         }
 
         decorated = this._decorateItem(decorated);
-        decorated = new Modifier(decorated);
+        decorated = new ModifierCalculator(decorated);
+
+        if (decorated.constructor.name === 'Aoe') {
+            let advantages = [];
+
+            for (let advantage of decorated.advantages) {
+                advantages.push(advantage.cost());
+            }
+        }
 
         if (heroDesignerCharacter.isMultipowerItem(decorated.trait, decorated.getCharacter())) {
             decorated = new MultipowerItem(decorated);

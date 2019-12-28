@@ -152,9 +152,6 @@ class Common {
         return JSON.parse(settings);
     }
 
-//    async getSecondaryCharacteristicToggle() {
-//        let toggle = await AsyncStorage.getItem('hasSecondaryCharacteristic');
-//    }
 
     initDamageForm(props = null) {
         if (props === null || props === undefined || props === '') {
