@@ -60,10 +60,10 @@ export default class Modifier {
         if (this.modifier.hasOwnProperty('adder')) {
             if (Array.isArray(this.modifier.adder)) {
                 for (let adder of this.modifier.adder) {
-                    adders.push(adder.alias + (adder.optionAlias === undefined ? '' : ` ${adder.optionAlias}`));
+                    adders.push(this._getAdderLabel(adder));
                 }
             } else {
-                adders.push(this.modifier.adder.alias + (this.modifier.adder.optionAlias === undefined ? '' : ` ${this.modifier.adder.optionAlias}`));
+                adders.push(this._getAdderLabel(this.modifier.adder));
             }
         }
 
@@ -111,6 +111,18 @@ export default class Modifier {
         }
 
         return formattedCost;
+    }
+
+    _getAdderLabel(adder) {
+        let label = '';
+
+        if (adder.hasOwnProperty('levels') && adder.levels > 0) {
+            label += `x${adder.levels} `;
+        }
+
+        label += `${adder.alias}${adder.optionAlias === undefined ? '' : adder.optionAlias}`;
+
+        return label;
     }
 
     _getAdderTotal(cost, subModifier, modifier) {
