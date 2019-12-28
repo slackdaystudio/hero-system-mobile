@@ -18,9 +18,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 	}
 
     _renderTab(title, listKey, subListKey) {
-        if (this.props.character[listKey] === undefined ||
-            this.props.character[listKey] === null ||
-            this.props.character[listKey].length <= 0) {
+        if (this.props.character[listKey].length === 0) {
             return null;
         }
 
