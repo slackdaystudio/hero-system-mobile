@@ -151,10 +151,6 @@ class HeroDesignerCharacter {
          let value = characteristic.value;
          let showSecondary = store.getState().character.showSecondary;
 
-            if (characteristic.shortName === 'DEX') {
-                Alert.alert('Found DEX: ' + showSecondary.toString());
-            }
-
          if (powersMap.has(characteristic.shortName.toUpperCase())) {
              let char = powersMap.get(characteristic.shortName.toUpperCase());
 
