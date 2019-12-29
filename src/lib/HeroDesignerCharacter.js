@@ -1,4 +1,5 @@
 import { Alert } from 'react-native';
+import { connect } from 'react-redux';
 import ai from '../../public/HERODesigner/AI.json';
 import aiSixth from '../../public/HERODesigner/AI6E.json';
 import automaton from '../../public/HERODesigner/Automaton.json';
@@ -15,6 +16,7 @@ import superheroicSixth from '../../public/HERODesigner/Superheroic6E.json';
 import RNFetchBlob from 'rn-fetch-blob'
 import { common } from './Common';
 import { SKILL_ROLL_BASE } from '../decorators/skills/Roll';
+import { store } from '../../App';
 
 export const TYPE_CHARACTERISTIC = 1;
 
@@ -143,6 +145,70 @@ class HeroDesignerCharacter {
         }
 
         return false;
+    }
+
+    getCharacteristicTotal(characteristic, powersMap) {
+         let value = characteristic.value;
+         let showSecondary = store.getState().character.showSecondary;
+
+            if (characteristic.shortName === 'DEX') {
+                Alert.alert('Found DEX: ' + showSecondary.toString());
+            }
+
+         if (powersMap.has(characteristic.shortName.toUpperCase())) {
+             let char = powersMap.get(characteristic.shortName.toUpperCase());
+
+             if ((char.affectsPrimary && char.affectsTotal) || (!char.affectsPrimary && char.affectsTotal && showSecondary)) {
+                 value += char.levels;
+             }
+         }
+
+         if (powersMap.has('DENSITYINCREASE')) {
+             let densityIncrease = powersMap.get('DENSITYINCREASE');
+
+             if ((densityIncrease.affectsPrimary && densityIncrease.affectsTotal) ||
+                 (!densityIncrease.affectsPrimary && densityIncrease.affectsTotal && showSecondary)) {
+                 switch (characteristic.shortName.toUpperCase()) {
+                     case 'STR':
+                         value += densityIncrease.levels * 5;
+                         break;
+                     case 'PD':
+                     case 'ED':
+                         value += densityIncrease.levels;
+                         break;
+                     default:
+                         // Do nothing
+                 }
+             }
+         }
+
+         if (powersMap.has('FORCEFIELD')) {
+             let resistantDefence = powersMap.get('FORCEFIELD')
+
+             if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                 (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
+                 switch (characteristic.shortName.toUpperCase()) {
+                     case 'PD':
+                         value += resistantDefence.pdlevels;
+                         break;
+                     case 'ED':
+                         value += resistantDefence.edlevels;
+                         break;
+                     default:
+                         // Do nothing
+                 }
+             }
+         }
+
+         return value;
+    }
+
+    getRollTotal(characteristic, powersMap) {
+        if (characteristic.roll === null) {
+            return;
+        }
+
+        return `${Math.round(this.getCharacteristicTotal(characteristic, powersMap) / 5) + SKILL_ROLL_BASE}-`;
     }
 
     _populateMovementAndCharacteristics(character, characteristics, template) {

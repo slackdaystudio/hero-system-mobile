@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { AsyncStorage, StyleSheet, Text, View, Button, StatusBar } from 'react-native';
+import { AsyncStorage, StyleSheet, Text, View, Button, StatusBar, Alert } from 'react-native';
 import { DrawerNavigator } from 'react-navigation';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
@@ -23,6 +23,8 @@ import Sidebar from './src/components/Sidebar/Sidebar';
 import { statistics } from './src/lib/Statistics';
 import { common } from './src/lib/Common';
 import reducer from './src/reducers/index';
+import { GET_SHOW_SECONDARY } from './src/reducers/character';
+import { heroDesignerCharacter } from './src/lib/HeroDesignerCharacter';
 
 const RootStack = DrawerNavigator({
 		Home: {
@@ -71,7 +73,7 @@ const RootStack = DrawerNavigator({
 	}
 );
 
-const store = createStore(reducer, applyMiddleware(thunk));
+export const store = createStore(reducer, applyMiddleware(thunk));
 
 export default class App extends Component {
 	async componentWillMount() {

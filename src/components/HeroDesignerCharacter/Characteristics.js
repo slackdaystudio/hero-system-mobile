@@ -1,4 +1,5 @@
 import React, { Component, Fragment }  from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { View, TouchableHighlight, Alert, Switch } from 'react-native';
 import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
@@ -6,16 +7,19 @@ import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
+import { setShowSecondary } from '../../reducers/character';
 import { heroDesignerCharacter, TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
 import { SKILL_ROLL_BASE } from '../../decorators/skills/Roll';
 import styles from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
 
 
-export default class Characteristics extends Component {
+class Characteristics extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        character: PropTypes.object.isRequired
+        character: PropTypes.object.isRequired,
+        showSecondary: PropTypes.bool.isRequired,
+        setShowSecondary: PropTypes.func.isRequired
     }
 
     constructor(props) {
@@ -25,8 +29,7 @@ export default class Characteristics extends Component {
 
         this.state = {
             characteristicsShow: displayOptions.characteristicsShow,
-            characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
-            secondaryCharacteristicToggle: true
+            characteristicsButtonsShow: displayOptions.characteristicsButtonsShow
         }
 
         this.powersMap = common.toMap(common.flatten(props.character.powers, 'powers'));
@@ -65,27 +68,11 @@ export default class Characteristics extends Component {
     _getSpeed() {
         for (let characteristic of this.props.character.characteristics) {
             if (characteristic.shortName.toLowerCase() === 'spd') {
-                return this._getCharacteristicTotal(characteristic);
+                return heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap);
             }
         }
 
         return 0;
-    }
-
-    _getCharacteristicTotal(characteristic) {
-        let value = characteristic.value;
-
-        if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
-            let char = this.powersMap.get(characteristic.shortName.toUpperCase());
-
-            if (char.affectsPrimary && char.affectsTotal) {
-                value += char.levels;
-            } else if (!char.affectsPrimary && char.affectsTotal && this.state.secondaryCharacteristicToggle) {
-                value += char.levels;
-            }
-        }
-
-        return value;
     }
 
     _getMovementTotal(characteristic) {
@@ -96,20 +83,12 @@ export default class Characteristics extends Component {
 
             if (movementMode.affectsPrimary && movementMode.affectsTotal) {
                 meters += movementMode.levels;
-            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && this.state.secondaryCharacteristicToggle) {
+            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary) {
                 meters += movementMode.levels;
             }
         }
 
         return meters;
-    }
-
-    _getRollTotal(characteristic) {
-        if (characteristic.roll === null) {
-            return;
-        }
-
-        return `${Math.round(this._getCharacteristicTotal(characteristic) / 5) + SKILL_ROLL_BASE}-`;
     }
 
     _renderDefinition(characteristic) {
@@ -158,7 +137,7 @@ export default class Characteristics extends Component {
                 movementMode = this.powersMap.get(characteristic.shortName.toUpperCase());
 
                 if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
-                    (!movementMode.affectsPrimary && movementMode.affectsTotal && this.state.secondaryCharacteristicToggle)) {
+                    (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary)) {
                     let adderMap = common.toMap(movementMode.adder);
 
                     if (adderMap.has('IMPROVEDNONCOMBAT')) {
@@ -192,7 +171,7 @@ export default class Characteristics extends Component {
         if (characteristic.shortName === 'STR') {
             let step = null;
             let lift = '0.0 kg';
-            let totalStrength = this._getCharacteristicTotal(characteristic);
+            let totalStrength = heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap);
 
             for (let key of Object.keys(strengthTable)) {
                 if (totalStrength === parseInt(key, 10)) {
@@ -297,7 +276,7 @@ export default class Characteristics extends Component {
             return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} />
         }
 
-        return <CircleText title={this._getCharacteristicTotal(characteristic)} fontSize={22} size={50} />
+        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap)} fontSize={22} size={50} />
     }
 
     _renderCharacteristics(characteristics) {
@@ -316,9 +295,9 @@ export default class Characteristics extends Component {
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                     <TouchableHighlight
                                         underlayColor='#121212'
-                                        onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(this._getRollTotal(characteristic)))}
+                                        onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.powersMap)))}
                                     >
-                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{this._getRollTotal(characteristic)}</Text>
+                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.powersMap)}</Text>
                                     </TouchableHighlight>
                                     <Icon
                                         type='FontAwesome'
@@ -337,10 +316,7 @@ export default class Characteristics extends Component {
     }
 
     _toggleSecondaryCharacteristics() {
-        let newState = {...this.state};
-        newState.secondaryCharacteristicToggle = !newState.secondaryCharacteristicToggle;
-
-        this.setState(newState);
+        this.props.setShowSecondary(!this.props.showSecondary);
     }
 
     _renderSecondaryCharacteristicToggle() {
@@ -352,7 +328,7 @@ export default class Characteristics extends Component {
                     </View>
                     <View>
                         <Switch
-                            value={this.state.secondaryCharacteristicToggle}
+                            value={this.props.showSecondary}
                             onValueChange={() => this._toggleSecondaryCharacteristics()}
                             minimumTrackTintColor='#14354d'
                             maximumTrackTintColor='#14354d'
@@ -380,3 +356,15 @@ export default class Characteristics extends Component {
         );
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        showSecondary: state.character.showSecondary
+    };
+}
+
+const mapDispatchToProps = {
+    setShowSecondary
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Characteristics);

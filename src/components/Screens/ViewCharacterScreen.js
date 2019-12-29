@@ -115,7 +115,7 @@ const localStyles = StyleSheet.create({
 
 const mapStateToProps = state => {
     return {
-        character: state.character
+        character: state.character.character
     };
 }
 

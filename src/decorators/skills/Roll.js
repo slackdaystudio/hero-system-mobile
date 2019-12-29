@@ -1,6 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { SKILL_CHECK } from '../../lib/DieRoller';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import { common } from '../../lib/Common';
 
 export const SKILL_ROLL_BASE = 9;
 
@@ -57,7 +59,10 @@ export default class Roll extends CharacterTrait {
                 roll = SKILL_GENERAL_CHARACTERISTIC;
             }
         } else if (this.characterTrait.trait.hasOwnProperty('characteristic')) {
-            roll = parseInt(this.characterTrait.getCharacter().characteristics.filter(c => c.shortName.toLowerCase() === this.characterTrait.trait.characteristic.toLowerCase()).shift().roll.slice(0, -1), 10);
+            let powersMap = common.toMap(common.flatten(this.characterTrait.getCharacter().powers, 'powers'));
+            let characteristic = this.characterTrait.getCharacter().characteristics.filter(c => c.shortName.toLowerCase() === this.characterTrait.trait.characteristic.toLowerCase()).shift();
+
+            roll = parseInt(heroDesignerCharacter.getRollTotal(characteristic, powersMap).slice(0, -1), 10);
         }
 
         if (roll !== null) {

@@ -8,7 +8,7 @@ import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
-import { setCharacter } from '../../reducers/character';
+import { setCharacter, setShowSecondary } from '../../reducers/character';
 
 class HomeScreen extends Component {
     constructor(props) {
@@ -33,6 +33,7 @@ class HomeScreen extends Component {
 
     _loadCharacter() {
         character.load(this.startLoad, this.endLoad).then(char => {
+            this.props.setShowSecondary(true);
             this.props.setCharacter(char);
         });
     }
@@ -133,12 +134,13 @@ class HomeScreen extends Component {
 
 const mapStateToProps = state => {
     return {
-        character: state.character
+        character: state.character.character
     };
 }
 
 const mapDispatchToProps = {
-    setCharacter
+    setCharacter,
+    setShowSecondary
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
