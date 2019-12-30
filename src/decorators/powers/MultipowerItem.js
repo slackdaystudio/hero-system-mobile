@@ -23,7 +23,9 @@ export default class MultipowerItem extends CharacterTrait {
     }
 
     realCost() {
-        return common.roundInPlayersFavor(this.characterTrait.realCost() / 10);
+        let divisor = this.characterTrait.ultraSlot ? 5 : 10;
+
+        return common.roundInPlayersFavor(this.characterTrait.realCost() / divisor);
     }
 
     label() {
@@ -31,7 +33,14 @@ export default class MultipowerItem extends CharacterTrait {
     }
 
     attributes() {
-        return this.characterTrait.attributes();
+        let attributes = this.characterTrait.attributes();
+
+        attributes.push({
+            label: 'Slot Type',
+            value: this.characterTrait.ultraSlot ? 'Variable' : 'Fixed'
+        });
+
+        return attributes;
     }
 
     definition() {
