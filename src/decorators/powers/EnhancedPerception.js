@@ -1,6 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { SKILL_CHECK } from '../../lib/DieRoller';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import { common } from '../../lib/Common';
 
 export default class EnhancedPerception extends CharacterTrait {
     constructor(characterTrait) {
@@ -46,11 +48,15 @@ export default class EnhancedPerception extends CharacterTrait {
 
     roll() {
         let characteristics = this.characterTrait.getCharacter().characteristics;
+        let powersMap = common.toMap(common.flatten(this.characterTrait.getCharacter().powers, 'powers'));
         let base = 0;
 
         for (let characteristic of characteristics) {
             if (characteristic.shortName === 'INT') {
-                base += parseInt(characteristic.roll.substring(0, (characteristic.roll.length - 1)), 10);
+                let totalRoll = heroDesignerCharacter.getRollTotal(characteristic, powersMap);
+
+                base += parseInt(totalRoll.substring(0, (totalRoll.length - 1)), 10);
+
                 break;
             }
         }

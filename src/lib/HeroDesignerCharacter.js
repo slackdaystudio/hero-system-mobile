@@ -104,7 +104,7 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
-//        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
+//        this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'equipment', 'equipment');
 
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
 
