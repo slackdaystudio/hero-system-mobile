@@ -20,6 +20,13 @@ export default class Skill extends CharacterTrait {
             cost = 2;
         } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman) {
             cost = this.characterTrait.trait.familiarity ? 1 : 0;
+        } else if (this.characterTrait.trait.xmlid.toUpperCase() === 'LANGUAGES') {
+            for (let option of this.characterTrait.trait.template.option) {
+                if (option.xmlid.toUpperCase() === this.characterTrait.trait.optionid.toUpperCase()) {
+                    cost = option.basecost;
+                    break;
+                }
+            }
         } else {
             cost = this._getCostByCharacteristic();
         }
