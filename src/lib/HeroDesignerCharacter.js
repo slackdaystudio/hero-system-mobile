@@ -80,7 +80,7 @@ class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdChar.json', JSON.stringify(heroDesignerCharacter));
         const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+
         let character = {
             version: heroDesignerCharacter.version,
             characterInfo: heroDesignerCharacter.characterInfo,
@@ -107,6 +107,7 @@ class HeroDesignerCharacter {
 //        this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'equipment', 'equipment');
 
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
@@ -317,18 +318,54 @@ class HeroDesignerCharacter {
     }
 
     _getCompoundPowers(compoundPower, template, traitKey, traitSubKey) {
-        compoundPower.powers = compoundPower.power;
+        let powersMap = common.toMap(template.powers.power);
 
-        delete compoundPower.power;
+        if (compoundPower.hasOwnProperty('power')) {
+            compoundPower.powers = compoundPower.power;
 
-        for (let power of compoundPower.powers) {
-            templateTrait = this._getTemplateTrait(power, template, traitKey, traitSubKey);
+            delete compoundPower.power;
+        } else {
+            compoundPower.powers = [];
+        }
 
-            this._addModifierTemplate(power.modifier, template);
+        for (let [key, value] of Object.entries(compoundPower)) {
+            if (key === 'powers' || value === null || value === undefined) {
+                continue;
+            }
 
-            power.type = traitSubKey;
-            power.template = templateTrait;
-            power.parentid = compoundPower.id;
+            if (value.constructor === Object) {
+                if (powersMap.has(key) || Object.keys(CHARACTERISTIC_NAMES).includes(key)) {
+                    compoundPower.powers.push(value);
+
+                    delete compoundPower[key];
+                }
+            }
+        }
+
+        this._getCompoundPower(compoundPower, template, traitKey, traitSubKey);
+    }
+
+    _getCompoundPower(compoundPower, template, traitKey, traitSubKey) {
+        let templateTrait = null;
+
+        if (Array.isArray(compoundPower.powers)) {
+            for (let power of compoundPower.powers) {
+                templateTrait = this._getTemplateTrait(power, template, traitKey, traitSubKey);
+
+                this._addModifierTemplate(power.modifier, template);
+
+                power.type = traitSubKey;
+                power.template = templateTrait;
+                power.parentid = compoundPower.id;
+            }
+        } else {
+            templateTrait = this._getTemplateTrait(compoundPower.powers, template, traitKey, traitSubKey);
+
+            this._addModifierTemplate(compoundPower.powers.modifier, template);
+
+            compoundPower.powers.type = traitSubKey;
+            compoundPower.powers.template = templateTrait;
+            compoundPower.powers.parentid = compoundPower.id;
         }
     }
 
@@ -454,7 +491,7 @@ class HeroDesignerCharacter {
 
         for (let [key, power] of Object.entries(template.powers)) {
             if (blacklisted.includes(key)) {
-//                template.senses[key] = power;  // Uncomment to generate the senses.json file
+                // template.senses[key] = power;  // Uncomment to generate the senses.json file
                 continue;
             }
 

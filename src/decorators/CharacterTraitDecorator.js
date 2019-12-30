@@ -39,14 +39,16 @@ class CharacterTraitDecorator {
             }
         }
 
+        if (decorated.trait.xmlid.toUpperCase() === 'COMPOUNDPOWER') {
+            decorated = new CompoundPower(decorated, this);
+        } else if (decorated.trait.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
+            decorated = new NakedModifier(decorated);
+        }
+
         if (heroDesignerCharacter.isMultipowerItem(decorated.trait, decorated.getCharacter())) {
             decorated = new MultipowerItem(decorated);
         } else if (decorated.trait.hasOwnProperty('originalType') && decorated.trait.originalType.toUpperCase() === 'VPP') {
             decorated = new VariablePowerPool(decorated);
-        } else if (decorated.trait.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
-            decorated = new NakedModifier(decorated);
-        } else if (decorated.trait.xmlid.toUpperCase() === 'COMPOUNDPOWER') {
-            decorated = new CompoundPower(decorated, this);
         }
 
         return decorated;

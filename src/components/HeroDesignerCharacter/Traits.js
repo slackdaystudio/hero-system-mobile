@@ -50,9 +50,14 @@ export default class Traits extends Component {
             itemButtonShow[item.id] = 'plus-circle';
 
             if (item.hasOwnProperty(this.props.subListKey)) {
-                for (let s of item[this.props.subListKey]) {
-                    itemShow[s.id] = false;
-                    itemButtonShow[s.id] = 'plus-circle';
+                if (Array.isArray(item[this.props.subListKey])) {
+                    for (let s of item[this.props.subListKey]) {
+                        itemShow[s.id] = false;
+                        itemButtonShow[s.id] = 'plus-circle';
+                    }
+                } else {
+                    itemShow[item[this.props.subListKey].id] = false;
+                    itemButtonShow[item[this.props.subListKey].id] = 'plus-circle';
                 }
             }
         });
@@ -230,6 +235,14 @@ export default class Traits extends Component {
     }
 
     _renderCompoundPowerDetails(item) {
+        let powers = [];
+
+        if (item.hasOwnProperty('powers')) {
+            powers = item.powers;
+        } else {
+            powers = item.characterTrait.powers;
+        }
+
         return (
             <Fragment>
                 {this._renderDefinition(item)}
@@ -249,7 +262,7 @@ export default class Traits extends Component {
                         </Text>
                     </View>
                 </CardItem>
-                {item.powers.map((power, index) => {
+                {powers.map((power, index) => {
                     return (
                         <Fragment>
                             <View style={{flex: 1, alignSelf: 'center'}}>
