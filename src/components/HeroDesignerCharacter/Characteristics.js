@@ -283,13 +283,15 @@ class Characteristics extends Component {
         return (
             <Fragment>
                 {characteristics.map((characteristic, index) => {
+                    let name = characteristic.name.toLowerCase().startsWith('custom') ? characteristic.shortName : characteristic.name;
+
                     return (
                         <Card style={styles.card} key={'characteristic-' + index}>
                             <CardItem style={styles.cardItem}>
                                 <Body>
                                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                                         {this._renderStat(characteristic)}
-                                        <Text style={[styles.cardTitle, {paddingLeft: 10}]}>{characteristic.name}</Text>
+                                        <Text style={[styles.cardTitle, {paddingLeft: 10}]}>{name}</Text>
                                     </View>
                                 </Body>
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>

@@ -1,20 +1,7 @@
 import { Alert } from 'react-native';
-import { connect } from 'react-redux';
-import ai from '../../public/HERODesigner/AI.json';
-import aiSixth from '../../public/HERODesigner/AI6E.json';
-import automaton from '../../public/HERODesigner/Automaton.json';
-import automatonSixth from '../../public/HERODesigner/Automaton6E.json';
-import computer from '../../public/HERODesigner/Computer.json';
-import computerSixth from '../../public/HERODesigner/Computer6E.json';
-import heroic from '../../public/HERODesigner/Heroic.json';
-import heroicSixth from '../../public/HERODesigner/Heroic6E.json';
-import main from '../../public/HERODesigner/Main.json';
-import mainSixth from '../../public/HERODesigner/Main6E.json';
-import normal from '../../public/HERODesigner/Normal.json';
-import superheroic from '../../public/HERODesigner/Superheroic.json';
-import superheroicSixth from '../../public/HERODesigner/Superheroic6E.json';
 import RNFetchBlob from 'rn-fetch-blob'
 import { common } from './Common';
+import { heroDesignerTemplate } from './HeroDesignerTemplate';
 import { SKILL_ROLL_BASE } from '../decorators/skills/Roll';
 import { store } from '../../App';
 
@@ -62,7 +49,17 @@ const CHARACTERISTIC_NAMES = {
     "rec": "Recovery",
     "end": "Endurance",
     "body": "Body",
-    "stun": "Stun"
+    "stun": "Stun",
+    "custom1": "Custom1",
+    "custom2": "Custom2",
+    "custom3": "Custom3",
+    "custom4": "Custom4",
+    "custom5": "Custom5",
+    "custom6": "Custom6",
+    "custom7": "Custom7",
+    "custom8": "Custom8",
+    "custom9": "Custom9",
+    "custom10": "Custom10",
 };
 
 const BASE_MOVEMENT_MODES = {
@@ -82,8 +79,8 @@ const CHARACTER_TRAITS = {
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdChar.json', JSON.stringify(heroDesignerCharacter));
-        const template = this._getTemplate(heroDesignerCharacter.template);
-
+        const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
+//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
         let character = {
             version: heroDesignerCharacter.version,
             characterInfo: heroDesignerCharacter.characterInfo,
@@ -110,7 +107,6 @@ class HeroDesignerCharacter {
 //        this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuvers');
 
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-//        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
 
         return character;
     }
@@ -200,11 +196,11 @@ class HeroDesignerCharacter {
     }
 
     getRollTotal(characteristic, powersMap) {
-        if (characteristic.roll === null) {
-            return;
+        if (characteristic.roll) {
+            return `${Math.round(this.getCharacteristicTotal(characteristic, powersMap) / 5) + SKILL_ROLL_BASE}-`;
         }
 
-        return `${Math.round(this.getCharacteristicTotal(characteristic, powersMap) / 5) + SKILL_ROLL_BASE}-`;
+        return null;
     }
 
     _populateMovementAndCharacteristics(character, characteristics, template) {
@@ -222,18 +218,18 @@ class HeroDesignerCharacter {
             templateCharacteristic = template.characteristics[key.toLowerCase()];
             name = type === TYPE_CHARACTERISTIC ? CHARACTERISTIC_NAMES[key.toLowerCase()] : BASE_MOVEMENT_MODES[key.toLowerCase()];
             definition = templateCharacteristic.definition;
-            roll = null;
+            roll = false;
 
             if (templateCharacteristic.lvlval > 1) {
                 value = characteristic.levels + templateCharacteristic.base;
                 cost = Math.round((value - templateCharacteristic.base) / templateCharacteristic.lvlval);
             } else {
                 value = characteristic.levels * templateCharacteristic.lvlval + templateCharacteristic.base;
-                cost = templateCharacteristic.lvlcost * characteristic.levels
+                cost = templateCharacteristic.lvlcost * characteristic.levels;
             }
 
             if (templateCharacteristic.base === 10 && name.toLowerCase() !== 'body') {
-                roll = Math.round(value / 5) + SKILL_ROLL_BASE;
+                roll = true;
             }
 
             if (definition === null && Object.keys(MISSING_CHARACTERISTIC_DESCRIPTIONS).includes(key.toLowerCase())) {
@@ -248,7 +244,7 @@ class HeroDesignerCharacter {
                 cost: cost,
                 base: templateCharacteristic.base,
                 definition: definition,
-                roll: roll === null ? null : `${roll}-`,
+                roll: roll,
                 ncm: null
             };
 
@@ -257,8 +253,6 @@ class HeroDesignerCharacter {
 
                 character.movement.push(formattedCharacteristic);
             } else {
-                formattedCharacteristic.roll = roll === null ? null : `${roll}-`;
-
                 character.characteristics.push(formattedCharacteristic);
             }
         }
@@ -396,77 +390,6 @@ class HeroDesignerCharacter {
         }
     }
 
-    _getTemplate(template) {
-        let characterTemplate = null;
-
-        if (typeof template === 'string') {
-            let baseTemplate = template.endsWith('6E.hdt') ? mainSixth : main;
-            let subTemplate = null;
-
-            switch (template) {
-                case 'builtIn.AI.hdt':
-                    subTemplate = ai;
-                    break;
-                case 'builtIn.AI6E.hdt':
-                    subTemplate = aiSixth;
-                    break;
-                case 'builtIn.Automaton.hdt':
-                    subTemplate = automaton;
-                    break;
-                case 'builtIn.Automaton6E.hdt':
-                    subTemplate = automatonSixth;
-                    break;
-                case 'builtIn.Computer.hdt':
-                    subTemplate = computer;
-                    break;
-                case 'builtIn.Computer6E.hdt':
-                    subTemplate = computerSixth;
-                    break;
-                case 'builtIn.Heroic.hdt':
-                    subTemplate = heroic;
-                    break;
-                case 'builtIn.Heroic6E.hdt':
-                    subTemplate = heroicSixth;
-                    break;
-                case 'builtIn.Normal.hdt':
-                    subTemplate = normal;
-                    break;
-                case 'builtIn.Superheroic.hdt':
-                    subTemplate = superheroic;
-                    break;
-                case 'builtIn.Superheroic6E.hdt':
-                    subTemplate = superheroicSixth;
-                    break;
-                default:
-                    // do nothing
-            }
-
-            return subTemplate === null ? baseTemplate : this._finalizeTemplate(baseTemplate, subTemplate);
-        }
-
-        common.toast('Custom templates are currently not supported');
-
-        return null;
-    }
-
-    _finalizeTemplate(baseTemplate, subTemplate) {
-        let finalTemplate = baseTemplate;
-
-        if (subTemplate.characteristics !== null) {
-            if (subTemplate.characteristics.remove) {
-                if (Array.isArray(subTemplate.characteristics.remove)) {
-                    for (let characteristic of subTemplate.characteristics.remove) {
-                        delete finalTemplate.characteristics[characteristic];
-                    }
-                } else {
-                    delete finalTemplate.characteristics[subTemplate.characteristics.remove];
-                }
-            }
-        }
-
-        return finalTemplate;
-    }
-
     _normalizeTemplateData(template) {
         let normalizedEntries;
 
@@ -598,9 +521,15 @@ class HeroDesignerCharacter {
 
                 delete heroDesignerCharacter[listKey][key];
             } else if (key.toUpperCase() === 'MANEUVER') {
-                for (let i of item) {
-                    if (i.xmlid.toUpperCase() === 'MANEUVER') {
-                        i.xmlid = common.toSnakeCase(i.alias).toUpperCase()
+                if (Array.isArray(item)) {
+                    for (let i of item) {
+                        if (i.xmlid.toUpperCase() === 'MANEUVER') {
+                            i.xmlid = common.toSnakeCase(i.alias).toUpperCase()
+                        }
+                    }
+                } else {
+                    if (item.xmlid.toUpperCase() === 'MANEUVER') {
+                        item.xmlid = common.toSnakeCase(item.alias).toUpperCase()
                     }
                 }
             }

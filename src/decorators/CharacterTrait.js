@@ -69,7 +69,7 @@ export default class CharacterTrait {
     }
 
     definition() {
-        if (this.trait.hasOwnProperty('template')) {
+        if (this.trait.template !== undefined) {
             return this.trait.template.definition || '';
         }
 
