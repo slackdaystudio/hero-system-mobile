@@ -73,7 +73,8 @@ const CHARACTER_TRAITS = {
     "perks": "perk",
     "talents": "talent",
     "martialArts": "maneuver",
-    "powers": "power"
+    "powers": "power",
+    "equipment": "powers"
 };
 
 class HeroDesignerCharacter {
@@ -91,6 +92,7 @@ class HeroDesignerCharacter {
             talents: [],
             martialArts: [],
             powers: [],
+            equipment: [],
             disadvantages: []
         };
 
@@ -104,7 +106,7 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
-//        this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'equipment', 'equipment');
+        this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'powers', 'powers');
 
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
 //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
@@ -372,7 +374,7 @@ class HeroDesignerCharacter {
     _getTemplateTrait(value, template, traitKey, traitSubKey) {
         let templateTrait = null;
 
-        if (traitKey === 'powers') {
+        if (traitKey === 'powers' || traitKey === 'equipment') {
             for (let key of Object.keys(template.characteristics)) {
                 if (value.xmlid.toLowerCase() === key.toLowerCase()) {
                     templateTrait = template.characteristics[key];
@@ -382,6 +384,11 @@ class HeroDesignerCharacter {
 
             if (templateTrait === null) {
                 for (let [key, subKey] of Object.entries(CHARACTER_TRAITS)) {
+                    if (key === 'equipment') {
+                        key = 'powers';
+                        subKey = 'power';
+                    }
+
                     templateTrait = template[key][subKey].filter(t => {
                         if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
                             return false;
@@ -435,6 +442,8 @@ class HeroDesignerCharacter {
 
             if (listKey === 'powers') {
                 this._normalizeTemplatePowers(template);
+                continue;
+            } if (listKey === 'equipment') {
                 continue;
             }
 
@@ -519,7 +528,7 @@ class HeroDesignerCharacter {
 
     _normalizeCharacterData(heroDesignerCharacter) {
         for (let [listKey, subListKey] of Object.entries(CHARACTER_TRAITS)) {
-            if (listKey === 'powers' || listKey === 'martialArts') {
+            if (listKey === 'powers' || listKey === 'martialArts' || listKey === 'equipment') {
                 this._normalizeCharacterItems(heroDesignerCharacter, listKey.toLowerCase(), subListKey);
 
                 continue;
@@ -581,7 +590,15 @@ class HeroDesignerCharacter {
         } else {
             item.originalType = originalType;
 
-            heroDesignerCharacter[listKey][subListKey].push(item);
+            if (listKey === 'equipment') {
+                if (!heroDesignerCharacter[listKey].hasOwnProperty('powers')) {
+                    heroDesignerCharacter[listKey].powers = [];
+                }
+
+                heroDesignerCharacter[listKey]['powers'].push(item);
+            } else {
+                heroDesignerCharacter[listKey][subListKey].push(item);
+            }
         }
     }
 
