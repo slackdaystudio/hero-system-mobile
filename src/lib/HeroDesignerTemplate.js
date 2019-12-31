@@ -14,9 +14,10 @@ import superheroic from '../../public/HERODesigner/Superheroic.json';
 import superheroicSixth from '../../public/HERODesigner/Superheroic6E.json';
 import { common } from './Common';
 
+import RNFetchBlob from 'rn-fetch-blob'
+
 class HeroDesignerTemplate {
     getTemplate(template) {
-        let characterTemplate = null;
         let baseTemplate = null;
         let subTemplate = null;
 
@@ -69,7 +70,7 @@ class HeroDesignerTemplate {
     }
 
     _finalizeTemplate(baseTemplate, subTemplate) {
-        let finalTemplate = baseTemplate;
+        let finalTemplate = JSON.parse(JSON.stringify(baseTemplate));
 
         finalTemplate = this._finalizeCharacteristics(finalTemplate, subTemplate);
         finalTemplate = this._finalizeItems(finalTemplate, subTemplate, 'skills', 'skill');

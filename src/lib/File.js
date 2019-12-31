@@ -25,7 +25,7 @@ class File {
 
             if (result.name.toLowerCase().endsWith('.xml')) {
                 character = await this._read(result.uri, startLoad, endLoad);
-            } else if (result.name.toLowerCase().endsWith('.hdc')  || result.name.toLowerCase().endsWith('.hdt')) {
+            } else if (result.name.toLowerCase().endsWith('.hdc')) {
                 let hasWritePermission = await this._askForWritePermission();
 
                 if (hasWritePermission) {
@@ -129,7 +129,7 @@ class File {
             character = heroDesignerCharacter.getCharacter(result);
         });
 
-        await AsyncStorage.setItem('character', JSON.stringify(character));
+//        await AsyncStorage.setItem('character', JSON.stringify(character));
 
         common.toast('Character successfully loaded');
 
