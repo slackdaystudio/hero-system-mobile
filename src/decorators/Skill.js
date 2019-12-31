@@ -18,7 +18,7 @@ export default class Skill extends CharacterTrait {
             cost = this.characterTrait.trait.levels * 2;
         } else if (this.characterTrait.trait.proficiency) {
             cost = 2;
-        } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman) {
+        } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman || this.characterTrait.trait.nativeTongue) {
             cost = this.characterTrait.trait.familiarity ? 1 : 0;
         } else if (this.characterTrait.trait.xmlid.toUpperCase() === 'LANGUAGES') {
             for (let option of this.characterTrait.trait.template.option) {
