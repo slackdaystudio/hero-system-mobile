@@ -67,7 +67,7 @@ export default class Maneuver extends CharacterTrait {
                 if (this.characterTrait.trait.useweapon) {
                     attributes.push({
                         label: 'Effect',
-                        value: this.characterTrait.trait.weaponeffect.replace('[WEAPONDC]', `+${this.characterTrait.trait.dc} DC`)
+                        value: this.characterTrait.trait.weaponeffect.replace('[WEAPONDC]', `+${this._getKillingDc()} DC`)
                     });
                 } else {
                     attributes.push({
@@ -140,5 +140,17 @@ export default class Maneuver extends CharacterTrait {
         }
 
         return partialDie ? `${dice}½d6` : `${dice}d6`;
+    }
+
+    _getKillingDc() {
+         let character = this.characterTrait.getCharacter();
+         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'martialArts'));
+         let dice = this.characterTrait.trait.dc;
+
+         if (martialArtsMap.has('EXTRADC')) {
+             dice += martialArtsMap.get('EXTRADC').levels;
+         }
+
+         return dice;
     }
 }
