@@ -68,7 +68,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     {this._renderTab('Talents', 'talents', 'talents')}
                     {this._renderTab('Martial Arts', 'martialArts', 'maneuver')}
                     {this._renderTab('Powers', 'powers', 'powers')}
-                    {this._renderTab('Equipment', 'equipment', 'equipment')}
+                    {this._renderTab('Equipment', 'equipment', 'power')}
                     {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
 			  	</Tabs>
 		  	</Content>

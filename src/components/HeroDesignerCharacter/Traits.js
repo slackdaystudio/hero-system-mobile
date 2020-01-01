@@ -204,7 +204,7 @@ export default class Traits extends Component {
 
     _renderItemDetails(item) {
         if (this.state.itemShow[item.trait.id]) {
-            if (item.trait.xmlid.toUpperCase() === 'COMPOUNDPOWER') {
+            if (item.trait.xmlid === 'COMPOUNDPOWER') {
                 return this._renderCompoundPowerDetails(item);
             }
 
@@ -237,10 +237,15 @@ export default class Traits extends Component {
     _renderCompoundPowerDetails(item) {
         let powers = [];
 
-        if (item.hasOwnProperty('powers')) {
+        // The "powers" field is only available if the last decorator was the CompoundPowerDecorator
+        // so we have to check here and decorate them manually if the last decorator is not the
+        // CompoundPowerDecorator
+        if (item.constructor.name === 'CompoundPower') {
             powers = item.powers;
         } else {
-            powers = item.characterTrait.powers;
+            for (let power of item.characterTrait.powers) {
+                powers.push(characterTraitDecorator.decorate(power.trait, this.props.subListKey, item.characterTrait.getCharacter));
+            }
         }
 
         return (

@@ -31,14 +31,6 @@ class CharacterTraitDecorator {
         decorated = this._decorateItem(decorated);
         decorated = new ModifierCalculator(decorated);
 
-        if (decorated.constructor.name === 'Aoe') {
-            let advantages = [];
-
-            for (let advantage of decorated.advantages) {
-                advantages.push(advantage.cost());
-            }
-        }
-
         if (decorated.trait.xmlid.toUpperCase() === 'COMPOUNDPOWER') {
             decorated = new CompoundPower(decorated, this);
         } else if (decorated.trait.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
@@ -61,7 +53,7 @@ class CharacterTraitDecorator {
             decorated = perkDecorator.decorate(decorated);
         } else if (decorated.trait.type === 'talent' || decorated.trait.hasOwnProperty('talents')) {
             decorated = talentDecorator.decorate(decorated);
-        } else if (decorated.trait.type === 'power' || decorated.trait.hasOwnProperty('powers')) {
+        } else if (decorated.trait.type === 'power' || decorated.trait.type === 'powers' || decorated.trait.hasOwnProperty('powers')) {
             decorated = powerDecorator.decorate(decorated);
         }
 
