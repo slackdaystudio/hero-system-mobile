@@ -50,15 +50,20 @@ export default class HandKillingAttack extends CharacterTrait {
         let character = this.getCharacter();
         let characteristicsMap = common.toMap(character.characteristics, 'shortName');
         let adderMap = common.toMap(this.characterTrait.trait.adder);
+        let modifierMap = common.toMap(this.characterTrait.trait.modifier);
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
         let dice = '';
         let roll = {
             roll: '',
             type: KILLING_DAMAGE
         };
-        let damageClasses = (Math.floor(heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5)) + this.characterTrait.trait.levels * 3;
+        let damageClasses = this.characterTrait.trait.levels * 3;
         let partialDie = false;
         let remainder = 0;
+
+        if (!modifierMap.has('STRMINIMUM')) {
+            damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5);
+        }
 
         if (adderMap.has('PLUSONEPIP')) {
             damageClasses += 1;
