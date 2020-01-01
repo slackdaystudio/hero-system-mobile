@@ -1,6 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import { KILLING_DAMAGE } from '../../lib/DieRoller';
 
 export default class HandKillingAttack extends CharacterTrait {
     constructor(characterTrait) {
@@ -33,8 +35,8 @@ export default class HandKillingAttack extends CharacterTrait {
         let attributes = this.characterTrait.attributes();
 
         attributes.push({
-            label: this._getDice(),
-            value: ''
+            label: 'Dice',
+            value: this._getDice()
         });
 
         return attributes;
@@ -49,7 +51,13 @@ export default class HandKillingAttack extends CharacterTrait {
         let characteristicsMap = common.toMap(character.characteristics, 'shortName');
         let adderMap = common.toMap(this.characterTrait.trait.adder);
         let dice = '';
+        let roll = {
+            roll: '',
+            type: KILLING_DAMAGE
+        };
         let damageClasses = (Math.floor(characteristicsMap.get('STR').value / 5)) + this.characterTrait.trait.levels * 3;
+        let partialDie = false;
+        let remainder = 0;
 
         if (adderMap.has('PLUSONEPIP')) {
             damageClasses += 1;
@@ -58,17 +66,23 @@ export default class HandKillingAttack extends CharacterTrait {
         }
 
         dice = damageClasses / 3;
+        remainder = parseFloat((dice % 1).toFixed(1));
 
-        switch ((dice % 1).toFixed(1)) {
-            case '0.3':
-                return `${Math.trunc(dice)}d6+1`;
-            case '0.6':
-                return `${Math.trunc(dice)}½d6`;
-            default:
-                // do nothing
+        if (remainder > 0.0) {
+            if (remainder >= 0.3 && remainder <= 0.5) {
+                roll.roll = `${Math.trunc(dice)}d6+1`;
+            } else if (remainder >= 0.6) {
+                if (adderMap.has('MINUSONEPIP')) {
+                    roll.roll = `${Math.trunc(dice) + 1}d6-1`;
+                } else {
+                    roll.roll = `${Math.trunc(dice)}½d6`;
+                }
+            }
+        } else {
+            roll.roll = `${dice}d6`;
         }
 
-        return `${dice}d6`;
+        return roll;
     }
 
     advantages() {
@@ -83,10 +97,12 @@ export default class HandKillingAttack extends CharacterTrait {
         let dice = `+${this.characterTrait.trait.levels}`;
         let adderMap = common.toMap(this.characterTrait.trait.adder);
 
-        if (adderMap.has()) {
+        if (adderMap.has('PLUSONEHALFDIE')) {
             dice += '½d6';
-        } else if (adderMap.has()) {
+        } else if (adderMap.has('PLUSONEPIP')) {
             dice += 'd6+1';
+        } else if (adderMap.has('MINUSONEPIP')) {
+            dice += 'd6-1';
         } else {
             dice += 'd6';
         }
