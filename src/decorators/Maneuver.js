@@ -1,5 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
+import { common } from '../lib/Common';
+import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
+import { NORMAL_DAMAGE } from '../lib/DieRoller';
 
 export default class Maneuver extends CharacterTrait {
     constructor(characterTrait) {
@@ -60,10 +63,24 @@ export default class Maneuver extends CharacterTrait {
         }
 
         if (this.characterTrait.trait.hasOwnProperty('effect')) {
-            attributes.push({
-                label: 'Effect',
-                value: this.characterTrait.trait.effect.replace('[WEAPONDC]', `+${this.characterTrait.trait.dc} DC`)
-            });
+            if (this.characterTrait.trait.category === 'Hand To Hand') {
+                if (this.characterTrait.trait.useweapon) {
+                    attributes.push({
+                        label: 'Effect',
+                        value: this.characterTrait.trait.weaponeffect.replace('[WEAPONDC]', `+${this.characterTrait.trait.dc} DC`)
+                    });
+                } else {
+                    attributes.push({
+                        label: 'Effect',
+                        value: this.characterTrait.trait.effect.replace('[NORMALDC]', this._getNormalDamage())
+                    });
+                }
+            } else {
+                attributes.push({
+                    label: 'Effect',
+                    value: this.characterTrait.trait.effect.replace('[WEAPONDC]', `+${this._getNormalDamage().slice(0, -2)} DC`)
+                });
+            }
         }
 
         return attributes;
@@ -74,6 +91,15 @@ export default class Maneuver extends CharacterTrait {
     }
 
     roll() {
+        if (this.characterTrait.trait.hasOwnProperty('effect')) {
+            if (this.characterTrait.trait.category === 'Hand To Hand' && !this.characterTrait.trait.useweapon) {
+                return {
+                    roll: this._getNormalDamage(),
+                    type: NORMAL_DAMAGE
+                }
+            }
+        }
+
         return this.characterTrait.roll();
     }
 
@@ -83,5 +109,36 @@ export default class Maneuver extends CharacterTrait {
 
     limitations() {
         return this.characterTrait.limitations();
+    }
+
+    _getNormalDamage() {
+        let character = this.characterTrait.getCharacter();
+        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'martialArts'));
+        let dice = this.characterTrait.trait.dc;
+        let partialDie = false;
+
+        if (this.characterTrait.trait.addstr) {
+            let characteristicsMap = common.toMap(character.characteristics, 'shortName');
+            let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
+
+            dice += heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5;
+        }
+
+        if (this.characterTrait.trait.template.category === 'Hand To Hand') {
+            if (martialArtsMap.has('EXTRADC')) {
+                dice += martialArtsMap.get('EXTRADC').levels;
+            }
+        } else {
+            if (martialArtsMap.has('RANGEDDC')) {
+                dice += martialArtsMap.get('RANGEDDC').levels;
+            }
+        }
+
+        if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
+            partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.6 ? true : false;
+            dice = Math.trunc(dice);
+        }
+
+        return partialDie ? `${dice}½d6` : `${dice}d6`;
     }
 }
