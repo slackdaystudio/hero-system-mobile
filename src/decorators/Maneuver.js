@@ -44,21 +44,21 @@ export default class Maneuver extends CharacterTrait {
         if (this.characterTrait.trait.hasOwnProperty('ocv')) {
             attributes.push({
                 label: 'OCV',
-                value: this.characterTrait.trait.ocv
+                value: `${this.characterTrait.trait.ocv < 0 ? '' : '+'}${this.characterTrait.trait.ocv}`
             });
         }
 
         if (this.characterTrait.trait.hasOwnProperty('dcv')) {
             attributes.push({
                 label: 'DCV',
-                value: this.characterTrait.trait.dcv
+                value: `${this.characterTrait.trait.dcv < 0 ? '' : '+'}${this.characterTrait.trait.dcv}`
             });
         }
 
         if (this.characterTrait.trait.hasOwnProperty('range')) {
             attributes.push({
                 label: 'Range',
-                value: `+${this.characterTrait.trait.range}`
+                value: `${this.characterTrait.trait.range < 0 ? '' : '+'}${this.characterTrait.trait.range}`
             });
         }
 
