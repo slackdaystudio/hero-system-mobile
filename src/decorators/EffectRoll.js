@@ -44,17 +44,17 @@ export default class EffectRoll extends CharacterTrait {
         let roll = `${baseDice}d6`;
 
         if (partialDie === '½') {
-            roll = `${baseDice}${partialDie}d6`
+            roll = `${baseDice}${partialDie}d6`;
         } else if (partialDie === '1') {
-            roll = `${baseDice}d6+${partialDie}`
+            roll = `${baseDice}d6+${partialDie}`;
         } else if (partialDie === '-1') {
-            roll = `${baseDice + 1}d6${partialDie}`
+            roll = `${baseDice + 1}d6${partialDie}`;
         }
 
         return {
             roll: roll,
             type: this.rollType
-        }
+        };
     }
 
     advantages() {

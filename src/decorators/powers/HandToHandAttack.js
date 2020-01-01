@@ -1,6 +1,8 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 
 export default class HandToHandAttack extends CharacterTrait {
     constructor(characterTrait) {
@@ -33,8 +35,8 @@ export default class HandToHandAttack extends CharacterTrait {
         let attributes = this.characterTrait.attributes();
 
         attributes.push({
-            label: this._getDice(),
-            value: ''
+            label: 'Dice',
+            value: this._getDice()
         });
 
         return attributes;
@@ -48,33 +50,30 @@ export default class HandToHandAttack extends CharacterTrait {
         let character = this.characterTrait.getCharacter();
         let characteristicsMap = common.toMap(character.characteristics, 'shortName');
         let adderMap = common.toMap(this.characterTrait.trait.adder);
+        let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
         let dice = this.characterTrait.trait.levels;
-        let partialDie = 0;
+        let roll = {
+            roll: '',
+            type: NORMAL_DAMAGE
+        };
+        let partialDie = false;
 
-        dice += characteristicsMap.get('STR').value / 5;
+        dice += heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5;
 
-        if ((dice % 1).toFixed() !== '0.0') {
-            partialDie = 2;
+        if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
+            partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.6 ? true : false;
             dice = Math.trunc(dice);
         }
 
         if (adderMap.has('PLUSONEPIP')) {
-            partialDie += 1;
+            roll.roll = partialDie ? `${dice + 1}d6` : `${dice}d6+1`;
         } else if (adderMap.has('PLUSONEHALFDIE')) {
-            partialDie += 2;
+            roll.roll = partialDie ? `${dice + 1}d6` : `${dice}½d6`;
+        } else {
+            roll.roll = `${dice}d6`;
         }
 
-        if (partialDie === 1) {
-            return `${dice}d6+1`;
-        } else if (partialDie === 2) {
-            return `${dice}½d6`;
-        } else if (partialDie === 3) {
-            return `${dice + 1}d6`;
-        } else if (partialDie === 4) {
-            return `${dice + 1}d6+1`;
-        }
-
-        return `${dice}d6`;
+        return roll;
     }
 
     advantages() {
@@ -89,9 +88,9 @@ export default class HandToHandAttack extends CharacterTrait {
         let dice = `+${this.characterTrait.trait.levels}`;
         let adderMap = common.toMap(this.characterTrait.trait.adder);
 
-        if (adderMap.has()) {
+        if (adderMap.has('PLUSONEHALFDIE')) {
             dice += '½d6';
-        } else if (adderMap.has()) {
+        } else if (adderMap.has('PLUSONEPIP')) {
             dice += 'd6+1';
         } else {
             dice += 'd6';
