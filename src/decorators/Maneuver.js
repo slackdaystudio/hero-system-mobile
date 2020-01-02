@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
 import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
-import { NORMAL_DAMAGE } from '../lib/DieRoller';
+import { NORMAL_DAMAGE, KILLING_DAMAGE } from '../lib/DieRoller';
 
 export default class Maneuver extends CharacterTrait {
     constructor(characterTrait) {
@@ -91,9 +91,17 @@ export default class Maneuver extends CharacterTrait {
     roll() {
         if (this.characterTrait.trait.hasOwnProperty('effect')) {
             if (this.characterTrait.trait.template.doesdamage && this.characterTrait.trait.category === 'Hand To Hand' && !this.characterTrait.trait.useweapon) {
-                return {
-                    roll: this._getNormalDamage(),
-                    type: NORMAL_DAMAGE
+
+                if (this.characterTrait.trait.effect.indexOf('[KILLINGDC]') > -1) {
+                    return {
+                        roll: this._getUnarmedKillingDamage(),
+                        type: KILLING_DAMAGE
+                    }
+                } else {
+                    return {
+                        roll: this._getNormalDamage(),
+                        type: NORMAL_DAMAGE
+                    }
                 }
             }
         }
@@ -123,6 +131,10 @@ export default class Maneuver extends CharacterTrait {
             attribute.value = effect.replace('[NORMALDC]', this._getNormalDamage());
         }
 
+        if (effect.indexOf('[KILLINGDC]') > -1) {
+            attribute.value = effect.replace('[KILLINGDC]', `HKA ${this._getUnarmedKillingDamage()}`);
+        }
+
         if (effect.indexOf('[STRDC]') > -1) {
             attribute.value = effect.replace('[STRDC]', `${this._getStrengthDc()} STR`)
         }
@@ -132,7 +144,7 @@ export default class Maneuver extends CharacterTrait {
 
     _getNormalDamage() {
         let character = this.characterTrait.getCharacter();
-        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'martialArts'));
+        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
         let dice = this.characterTrait.trait.dc;
         let partialDie = false;
 
@@ -161,9 +173,42 @@ export default class Maneuver extends CharacterTrait {
         return partialDie ? `${dice}½d6` : `${dice}d6`;
     }
 
+    _getUnarmedKillingDamage() {
+        let character = this.getCharacter();
+        let characteristicsMap = common.toMap(character.characteristics, 'shortName');
+        let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
+        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
+        let dice = '';
+        let damageClasses = this.characterTrait.trait.dc;
+        let partialDie = false;
+        let remainder = 0;
+        let damageString = '';
+
+        damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5);
+
+         if (martialArtsMap.has('EXTRADC')) {
+             damageClasses += martialArtsMap.get('EXTRADC').levels;
+         }
+
+        dice = damageClasses / 3;
+        remainder = parseFloat((dice % 1).toFixed(1));
+
+        if (remainder > 0.0) {
+            if (remainder >= 0.3 && remainder <= 0.5) {
+                damageString = `${Math.trunc(dice)}d6+1`;
+            } else if (remainder >= 0.6) {
+                damageString = `${Math.trunc(dice)}½d6`;
+            }
+        } else {
+            damageString = `${dice}d6`;
+        }
+
+        return damageString;
+    }
+
     _getKillingDc() {
          let character = this.characterTrait.getCharacter();
-         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'martialArts'));
+         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
          let dice = this.characterTrait.trait.dc;
 
          if (martialArtsMap.has('EXTRADC')) {
@@ -175,7 +220,7 @@ export default class Maneuver extends CharacterTrait {
 
     _getStrengthDc() {
         let character = this.characterTrait.getCharacter();
-        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'martialArts'));
+        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
         let strength = this.characterTrait.trait.dc * 5;
 
         if (this.characterTrait.trait.addstr) {
