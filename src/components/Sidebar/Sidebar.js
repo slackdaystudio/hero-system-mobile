@@ -1,11 +1,27 @@
 import React, { Component } from "react";
+import { connect } from 'react-redux';
 import { StyleSheet, Image, StatusBar, View } from "react-native";
 import { Container, Content, Text, List, ListItem } from "native-base";
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
-export default class Sidebar extends Component {
+class Sidebar extends Component {
+  _onLoadPress() {
+      if (common.isEmptyObject(this.props.character)) {
+        common.toast('Please load a character first');
+      } else {
+        let screen = 'ViewCharacter';
+
+        if (character.isHeroDesignerCharacter(this.props.character)) {
+            screen = 'ViewHeroDesignerCharacter';
+        }
+
+        this.props.navigation.navigate(screen);
+      }
+    }
+
   render() {
     return (
       <Container style={localStyles.container}>
@@ -16,7 +32,7 @@ export default class Sidebar extends Component {
 					<Image source={require('../../../public/hero_mobile_logo.png')} />
 				</View>
 	      	</ListItem>
-          	<ListItem onPress={() => this.props.navigation.navigate('ViewCharacter')}>
+          	<ListItem onPress={() => this._onLoadPress()}>
 	      		<Text style={styles.grey}>View Character</Text>
 	      	</ListItem>
           	<ListItem itemDivider style={{backgroundColor: '#242424'}} />
@@ -59,3 +75,13 @@ const localStyles = StyleSheet.create({
 		backgroundColor: '#242424'
 	}
 });
+
+const mapStateToProps = state => {
+    return {
+        character: state.character.character
+    };
+}
+
+const mapDispatchToProps = {}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);
