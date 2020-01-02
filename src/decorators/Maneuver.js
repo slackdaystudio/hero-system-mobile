@@ -65,30 +65,12 @@ export default class Maneuver extends CharacterTrait {
         if (this.characterTrait.trait.hasOwnProperty('effect')) {
             if (this.characterTrait.trait.category === 'Hand To Hand') {
                 if (this.characterTrait.trait.useweapon) {
-                    attributes.push({
-                        label: 'Effect',
-                        value: this.characterTrait.trait.weaponeffect.replace('[WEAPONDC]', `+${this._getKillingDc()} DC`)
-                    });
+                    attributes.push(this._performEffectInterpolation(this.characterTrait.trait.weaponeffect));
                 } else {
-                    if (this.characterTrait.trait.effect.indexOf('[NORMALDC]') > -1) {
-                        attributes.push({
-                            label: 'Effect',
-                            value: this.characterTrait.trait.effect.replace('[NORMALDC]', this._getNormalDamage())
-                        });
-                    }
-
-                    if (this.characterTrait.trait.effect.indexOf('[STRDC]') > -1) {
-                        attributes.push({
-                            label: 'Effect',
-                            value: this.characterTrait.trait.effect.replace('[STRDC]', `${this._getStrengthDc()} STR`)
-                        });
-                    }
+                    attributes.push(this._performEffectInterpolation(this.characterTrait.trait.effect));
                 }
             } else {
-                attributes.push({
-                    label: 'Effect',
-                    value: this.characterTrait.trait.effect.replace('[WEAPONDC]', `+${this._getKillingDc()} DC`)
-                });
+                attributes.push(this._performEffectInterpolation(this.characterTrait.trait.effect));
             }
         }
 
@@ -120,6 +102,27 @@ export default class Maneuver extends CharacterTrait {
         return this.characterTrait.limitations();
     }
 
+    _performEffectInterpolation(effect) {
+        let attribute = {
+            label: 'Effect',
+            value: effect
+        }
+
+        if (effect.indexOf('[WEAPONDC]') > -1) {
+            attribute.value = effect.replace('[WEAPONDC]', `+${this._getKillingDc()} DC`);
+        }
+
+        if (effect.indexOf('[NORMALDC]') > -1) {
+            attribute.value = effect.replace('[NORMALDC]', this._getNormalDamage());
+        }
+
+        if (effect.indexOf('[STRDC]') > -1) {
+            attribute.value = effect.replace('[STRDC]', `${this._getStrengthDc()} STR`)
+        }
+
+        return attribute;
+    }
+
     _getNormalDamage() {
         let character = this.characterTrait.getCharacter();
         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'martialArts'));
@@ -133,7 +136,7 @@ export default class Maneuver extends CharacterTrait {
             dice += heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5;
         }
 
-        if (this.characterTrait.trait.template.category === 'Hand To Hand') {
+        if (this.characterTrait.trait.category === 'Hand To Hand') {
             if (martialArtsMap.has('EXTRADC')) {
                 dice += martialArtsMap.get('EXTRADC').levels;
             }
@@ -167,7 +170,6 @@ export default class Maneuver extends CharacterTrait {
         let character = this.characterTrait.getCharacter();
         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'martialArts'));
         let strength = this.characterTrait.trait.dc * 5;
-        let partialDie = false;
 
         if (this.characterTrait.trait.addstr) {
             let characteristicsMap = common.toMap(character.characteristics, 'shortName');
@@ -176,7 +178,7 @@ export default class Maneuver extends CharacterTrait {
             strength += heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap);
         }
 
-        if (this.characterTrait.trait.template.category === 'Hand To Hand') {
+        if (this.characterTrait.trait.category === 'Hand To Hand') {
             if (martialArtsMap.has('EXTRADC')) {
                 strength += martialArtsMap.get('EXTRADC').levels * 5;
             }
