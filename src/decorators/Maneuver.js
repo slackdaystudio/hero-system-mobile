@@ -34,6 +34,13 @@ export default class Maneuver extends CharacterTrait {
     attributes() {
         let attributes = this.characterTrait.attributes();
 
+        if (this.characterTrait.trait.hasOwnProperty('category') && this.characterTrait.trait.category === 'Hand To Hand') {
+            attributes.push({
+                label: 'Type',
+                value: this.characterTrait.trait.useweapon ? 'Weapon' : 'Empty Hand'
+            });
+        }
+
         if (this.characterTrait.trait.hasOwnProperty('phase')) {
             attributes.push({
                 label: 'Phase',
