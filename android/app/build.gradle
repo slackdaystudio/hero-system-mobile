@@ -130,8 +130,8 @@ android {
         applicationId "com.herogmtools"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
-        versionName "1.2.10-beta4"
+        versionCode 20
+        versionName "1.2.11-beta5"
     }
     signingConfigs {
         release {
