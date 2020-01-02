@@ -570,12 +570,12 @@ class HeroDesignerCharacter {
                 if (Array.isArray(item)) {
                     for (let i of item) {
                         if (i.xmlid.toUpperCase() === 'MANEUVER') {
-                            i.xmlid = common.toSnakeCase(i.alias).toUpperCase()
+                            i.xmlid = common.toSnakeCase(i.display).toUpperCase()
                         }
                     }
                 } else {
                     if (item.xmlid.toUpperCase() === 'MANEUVER') {
-                        item.xmlid = common.toSnakeCase(item.alias).toUpperCase()
+                        item.xmlid = common.toSnakeCase(item.display).toUpperCase()
                     }
                 }
             }

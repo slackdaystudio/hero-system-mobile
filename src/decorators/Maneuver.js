@@ -83,7 +83,7 @@ export default class Maneuver extends CharacterTrait {
 
     roll() {
         if (this.characterTrait.trait.hasOwnProperty('effect')) {
-            if (this.characterTrait.trait.category === 'Hand To Hand' && !this.characterTrait.trait.useweapon) {
+            if (this.characterTrait.trait.template.doesdamage && this.characterTrait.trait.category === 'Hand To Hand' && !this.characterTrait.trait.useweapon) {
                 return {
                     roll: this._getNormalDamage(),
                     type: NORMAL_DAMAGE
