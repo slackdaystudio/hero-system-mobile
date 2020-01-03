@@ -135,6 +135,10 @@ export default class Maneuver extends CharacterTrait {
             attribute.value = effect.replace('[KILLINGDC]', `HKA ${this._getUnarmedKillingDamage()}`);
         }
 
+        if (effect.indexOf('[WEAPONKILLINGDC]') > -1) {
+            attribute.value = effect.replace('[WEAPONKILLINGDC]', `HKA ${this._getKillingDc()} DC`);
+        }
+
         if (effect.indexOf('[STRDC]') > -1) {
             attribute.value = effect.replace('[STRDC]', `${this._getStrengthDc()} STR`)
         }
