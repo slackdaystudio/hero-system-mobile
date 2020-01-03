@@ -7,8 +7,13 @@ import Heading from '../Heading/Heading';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
+import { persistence } from '../../lib/Persistence';
 import styles from '../../Styles';
-import { setCharacter, setShowSecondary } from '../../reducers/character';
+import { initializeApplicationSettings } from '../../reducers/settings';
+import { initializeStatistics } from '../../reducers/statistics';
+import { initializeCharacter, setCharacter, setShowSecondary } from '../../reducers/character';
+
+import AsyncStorage from '@react-native-community/async-storage';
 
 class HomeScreen extends Component {
     constructor(props) {
@@ -21,6 +26,12 @@ class HomeScreen extends Component {
         this.startLoad = this._startLoad.bind(this);
         this.endLoad = this._endLoad.bind(this);
         this.onLoadPress = this._onLoadPress.bind(this);
+    }
+
+    async componentDidMount() {
+        await this.props.initializeApplicationSettings();
+		await this.props.initializeStatistics();
+		await this.props.initializeCharacter();
     }
 
     _startLoad() {
@@ -58,7 +69,7 @@ class HomeScreen extends Component {
         }
 
         return (
-            <Button style={styles.button}  onPress={() => this.onLoadPress()}>
+            <Button style={styles.button} onPress={() => this.onLoadPress()}>
                 <Text uppercase={false} style={styles.buttonText}>View</Text>
             </Button>
         );
@@ -139,6 +150,9 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
+    initializeApplicationSettings,
+    initializeStatistics,
+    initializeCharacter,
     setCharacter,
     setShowSecondary
 }

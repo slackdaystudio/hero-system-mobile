@@ -140,41 +140,6 @@ class Common {
         return rounded;
     }
 
-    async setShowSecondaryCharacteristics(show=true) {
-        try {
-            await AsyncStorage.setItem('showSecondaryCharacteristics', show.toString());
-        } catch (error) {
-            this.toast('Unable to update the value of show secondary characteristics');
-        }
-
-        return show;
-    }
-
-    async getShowSecondaryCharacteristics() {
-        let value = true;
-
-        try {
-            value = await AsyncStorage.getItem('showSecondaryCharacteristics') === 'true';
-        } catch (error) {
-            this.toast('Unable to retrieve the value of show secondary characteristics');
-        }
-
-        return value;
-    }
-
-    async getAppSettings() {
-        let settings = await AsyncStorage.getItem('appSettings');
-
-        if (settings === null) {
-            return {
-                useFifthEdition: false
-            };
-        }
-
-        return JSON.parse(settings);
-    }
-
-
     initDamageForm(props = null) {
         if (props === null || props === undefined || props === '') {
             return {

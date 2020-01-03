@@ -3,51 +3,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, FREE_FORM, SKILL_CHECK } from './DieRoller';
 
 class Statistics {
-    async init() {
-        await AsyncStorage.setItem('statistics', JSON.stringify({
-            sum: 0,
-            largestDieRoll: 0,
-            largestSum: 0,
-            totals: {
-                diceRolled: 0,
-                hitRolls: 0,
-                skillChecks: 0,
-                freeFormRolls: 0,
-                normalDamage: {
-                    rolls: 0,
-                    stun: 0,
-                    body: 0
-                },
-                killingDamage: {
-                    rolls: 0,
-                    stun: 0,
-                    body: 0
-                },
-                knockback: 0,
-                hitLocations: {
-                    head: 0,
-                    hands: 0,
-                    arms: 0,
-                    shoulders: 0,
-                    chest: 0,
-                    stomach: 0,
-                    vitals: 0,
-                    thighs: 0,
-                    legs: 0,
-                    feet: 0
-                }
-            },
-            distributions: {
-                one: 0,
-                two: 0,
-                three: 0,
-                four: 0,
-                five: 0,
-                six: 0
-            }
-        }));
-    }
-
     async add(resultRoll) {
         let stats = await AsyncStorage.getItem('statistics');
         stats = JSON.parse(stats);

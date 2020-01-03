@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, Image, Picker, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Item, Tabs, Tab, ScrollableTab } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -9,20 +10,17 @@ import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import moves from '../../../public/moves.json';
+import { updateFormValue } from '../../reducers/forms';
 
-export default class DamageScreen extends Component {
+class DamageScreen extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = common.initDamageForm(props.navigation.state.params);
+		this.state = {
+			tabsLocked: false
+		};
 
-		this.skipFormLoad = props.navigation.state.params !== undefined ? true : false;
-
-        // So the next screen load doesn't reuse it we manually delete the params (bug in React???)
-        delete props.navigation.state.params;
-
-		this.updateState = this._updateState.bind(this);
-		this.toggleDamageType = this._toggleDamageType.bind(this);
+        this.updateFormValue = this._updateFormValue.bind(this);
 		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
 		this.roll = this._roll.bind(this);
 	}
@@ -31,97 +29,25 @@ export default class DamageScreen extends Component {
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
-
-        if (this.skipFormLoad) {
-            this._setIsFifthEdition();
-        } else {
-            AsyncStorage.getItem('damageState').then((value) => {
-                if (value !== undefined) {
-                    if (common.compare(this.state, JSON.parse(value))) {
-                        this.setState(JSON.parse(value), () => {
-                            this._setIsFifthEdition();
-                        });
-                    }
-                }
-            }).done();
-        }
 	}
 
    	componentWillUnmount() {
    		RNShake.removeEventListener('ShakeEvent');
    	}
 
-    _setIsFifthEdition() {
-        AsyncStorage.getItem('appSettings').then((value) => {
-            if (value !== undefined && value != null) {
-                let newState = {...this.state};
-                newState.useFifthEdition = JSON.parse(value).useFifthEdition;
-
-                this.setState(newState);
-            }
-        }).done();
-    }
-
     _roll() {
-        this.props.navigation.navigate('Result', dieRoller.rollDamage(this.state));
+        this.props.navigation.navigate('Result', dieRoller.rollDamage(this.props.damageForm));
     }
 
-	_updateState(key, value) {
-	    let intSliders = ['dice', 'stunMultiplier', 'fadeRate'];
-		let newState = {...this.state};
-		newState[key] = intSliders.indexOf(key) !== -1 ? parseInt(value, 10) : value;
+    _updateFormValue(key, value) {
+		if (key === 'killingToggled' && value) {
+		    this.props.updateFormValue('damage', 'killingToggled', value);
+            this.props.updateFormValue('damage', 'damageType', value ? KILLING_DAMAGE : NORMAL_DAMAGE);
+        } else {
+		    value = ['dice', 'stunMultiplier', 'fadeRate'].includes(key) ? parseInt(value) : value;
 
-		AsyncStorage.setItem('damageState', JSON.stringify(newState));
-
-        this.setState(newState);
-	}
-
-	_toggleDamageType() {
-		let newState = {...this.state};
-
-		if (!this.state.killingToggled) {
-			newState.killingToggled = true;
-			newState.damageType = KILLING_DAMAGE;
-		} else {
-			newState.killingToggled = false;
-			newState.damageType = NORMAL_DAMAGE;
+		    this.props.updateFormValue('damage', key, value);
 		}
-
-		AsyncStorage.setItem('damageState', JSON.stringify(newState));
-
-        this.setState(newState);
-	}
-
-	_toggleHitLocations() {
-		this.updateState('useHitLocations', !this.state.useHitLocations);
-	}
-
-	_toggleMartialManeuver() {
-		this.updateState('isMartialManeuver', !this.state.isMartialManeuver);
-	}
-
-	_toggleTargetFlying() {
-		this.updateState('isTargetFlying', !this.state.isTargetFlying);
-	}
-
-    _toggleIsTargetInZeroG() {
-        this.updateState('isTargetInZeroG', !this.state.isTargetInZeroG);
-    }
-
-    _toggleIsTargetUnderwater() {
-        this.updateState('isTargetUnderwater', !this.state.isTargetUnderwater);
-    }
-
-	_toggleRollWithPunch() {
-		this.updateState('rollWithPunch', !this.state.rollWithPunch);
-	}
-
-    _toggleIsUsingClinging() {
-        this.updateState('isUsingClinging', !this.state.isUsingClinging);
-    }
-
-    _toggleExplosion() {
-        this.updateState('isExplosion', !this.state.isExplosion);
     }
 
     _toggleTabsLocked(locked) {
@@ -132,15 +58,15 @@ export default class DamageScreen extends Component {
     }
 
     _renderFadeRate() {
-        if (this.state.isExplosion) {
+        if (this.props.damageForm.isExplosion) {
 			return (
 				<Slider
 					label='Fade Rate:'
-					value={this.state.fadeRate}
+					value={this.props.damageForm.fadeRate}
 					step={1}
 					min={1}
 					max={10}
-					onValueChange={this.updateState}
+					onValueChange={this.updateFormValue}
 					valueKey='fadeRate'
 					toggleTabsLocked={this.toggleTabsLocked} />
 			);
@@ -150,15 +76,15 @@ export default class DamageScreen extends Component {
     }
 
 	_renderStunMultiplier() {
-		if (this.state.killingToggled) {
+		if (this.props.damageForm.killingToggled) {
 			return (
 				<Slider
 					label='+/- Stun Multiplier:'
-					value={this.state.stunMultiplier}
+					value={this.props.damageForm.stunMultiplier}
 					step={1}
 					min={-10}
 					max={10}
-					onValueChange={this.updateState}
+					onValueChange={this.updateFormValue}
 					valueKey='stunMultiplier'
 					toggleTabsLocked={this.toggleTabsLocked} />
 			);
@@ -178,17 +104,17 @@ export default class DamageScreen extends Component {
                                 <View>
                                     <Slider
                                         label='Dice:'
-                                        value={this.state.dice}
+                                        value={this.props.damageForm.dice}
                                         step={1}
                                         min={0}
                                         max={50}
-                                        onValueChange={this.updateState}
+                                        onValueChange={this.updateFormValue}
                                         valueKey='dice'
                                         toggleTabsLocked={this.toggleTabsLocked}
                                     />
                                     <Picker
-                                      selectedValue={this.state.partialDie}
-                                      onValueChange={(value) => this.updateState('partialDie', value)}
+                                      selectedValue={this.props.damageForm.partialDie}
+                                      onValueChange={(value) => this.updateFormValue('partialDie', value)}
 									  style={{color: '#f0f0f0', height: 30, width: 200}}
                                     >
                                       <Picker.Item label="No partial die" value="0" />
@@ -201,8 +127,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Is this a killing attack?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.killingToggled}
-												onValueChange={() => this.toggleDamageType()}
+												value={this.props.damageForm.killingToggled}
+												onValueChange={() => this.updateFormValue('killingToggled', !this.props.damageForm.killingToggled)}
 												color='#3da0ff'
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
@@ -216,8 +142,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Is this an explosion?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.isExplosion}
-												onValueChange={() => this._toggleExplosion()}
+												value={this.props.damageForm.isExplosion}
+												onValueChange={() => this.updateFormValue('isExplosion', !this.props.damageForm.isExplosion)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -230,8 +156,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Use hit locations?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.useHitLocations}
-												onValueChange={() => this._toggleHitLocations()}
+												value={this.props.damageForm.useHitLocations}
+												onValueChange={() => this.updateFormValue('useHitLocations', !this.props.damageForm.useHitLocations)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -243,8 +169,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Attack is a martial maneuver?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.isMartialManeuver}
-												onValueChange={() => this._toggleMartialManeuver()}
+												value={this.props.damageForm.isMartialManeuver}
+												onValueChange={() => this.updateFormValue('isMartialManeuver', !this.props.damageForm.isMartialManeuver)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -256,8 +182,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Target is in the air?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.isTargetFlying}
-												onValueChange={() => this._toggleTargetFlying()}
+												value={this.props.damageForm.isTargetFlying}
+												onValueChange={() => this.updateFormValue('isTargetFlying', !this.props.damageForm.isTargetFlying)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -269,8 +195,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Target is in zero gravity?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.isTargetInZeroG}
-												onValueChange={() => this._toggleIsTargetInZeroG()}
+												value={this.props.damageForm.isTargetInZeroG}
+												onValueChange={() => this.updateFormValue('isTargetInZeroG', !this.props.damageForm.isTargetInZeroG)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -282,8 +208,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Target is underwater?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.isTargetUnderwater}
-												onValueChange={() => this._toggleIsTargetUnderwater()}
+												value={this.props.damageForm.isTargetUnderwater}
+												onValueChange={() => this.updateFormValue('isTargetUnderwater', !this.props.damageForm.isTargetUnderwater)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -295,8 +221,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Target rolled with a punch?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.rollWithPunch}
-												onValueChange={() => this._toggleRollWithPunch()}
+												value={this.props.damageForm.rollWithPunch}
+												onValueChange={() => this.updateFormValue('rollWithPunch', !this.props.damageForm.rollWithPunch)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -308,8 +234,8 @@ export default class DamageScreen extends Component {
                                         <Text style={styles.grey}>Target is using clinging?</Text>
                                         <View style={{paddingRight: 10}}>
                                             <Switch
-												value={this.state.isUsingClinging}
-												onValueChange={() => this._toggleIsUsingClinging()}
+												value={this.props.damageForm.isUsingClinging}
+												onValueChange={() => this.updateFormValue('isUsingClinging', !this.props.damageForm.isUsingClinging)}
 												minimumTrackTintColor='#14354d'
 												maximumTrackTintColor='#14354d'
 												thumbTintColor='#14354d'
@@ -384,3 +310,15 @@ const localStyles = StyleSheet.create({
 	    })
 	}
 });
+
+const mapStateToProps = state => {
+    return {
+        damageForm: state.forms.damage
+    };
+}
+
+const mapDispatchToProps = {
+    updateFormValue
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DamageScreen);

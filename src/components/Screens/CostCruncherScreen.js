@@ -1,33 +1,21 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
 import { StyleSheet, View } from 'react-native';
 import { Container, Content, Button, Text, Form, Item, Label, Input } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import styles from '../../Styles';
+import { updateFormValue } from '../../reducers/forms';
 
-export default class CostCruncherScreen extends Component {
+class CostCruncherScreen extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-		    cost: 5,
-			advantages: 0,
-			limitations: 0,
-		};
-
-		this.updateState = this._updateState.bind(this);
+		this.updateFormValue = this._updateFormValue.bind(this);
 	}
 
-	componentDidMount() {
-	    AsyncStorage.getItem('costCruncherState').then((state) => {
-	        if (state !== undefined) {
-                this.setState(JSON.parse(state));
-	        }
-	    }).done();
-	}
-
-	_updateState(key, value) {
+	_updateFormValue(key, value) {
 	    if (key === 'cost') {
 	        if (/^[0-9]*$/.test(value) === false) {
 	            return;
@@ -36,24 +24,19 @@ export default class CostCruncherScreen extends Component {
 	        value = parseFloat(value);
 	    }
 
-		let newState = {...this.state};
-		newState[key] = value;
-
-		AsyncStorage.setItem('costCruncherState', JSON.stringify(newState));
-
-        this.setState(newState);
+		this.props.updateFormValue('costCruncher', key, value);
 	}
 
     _renderActiveCost() {
         return (
             <Text style={[styles.grey, {fontSize: 75}]}>
-                {Math.round(this.state.cost * (1 + this.state.advantages))}
+                {Math.round(this.props.costCruncherForm.cost * (1 + this.props.costCruncherForm.advantages))}
             </Text>
         );
     }
 
     _renderRealCost() {
-        let cost = Math.round(this.state.cost * (1 + this.state.advantages) / (1 + Math.abs(this.state.limitations)));
+        let cost = Math.round(this.props.costCruncherForm.cost * (1 + this.props.costCruncherForm.advantages) / (1 + Math.abs(this.props.costCruncherForm.limitations)));
 
         return <Text style={[styles.grey, {fontSize: 75}]}>{cost}</Text>;
     }
@@ -80,28 +63,40 @@ export default class CostCruncherScreen extends Component {
                                 style={styles.grey}
                                 keyboardType='numeric'
                                 maxLength={3}
-                                value={this.state.cost.toString()}
-                                onChangeText={(text) => this.updateState('cost', text)} />
+                                value={this.props.costCruncherForm.cost.toString()}
+                                onChangeText={(text) => this.updateFormValue('cost', text)} />
 			      	    </Item>
 					</Form>
 					<Slider
 						label='Advantages:'
-						value={this.state.advantages}
+						value={this.props.costCruncherForm.advantages}
 						step={0.25}
 						min={0}
 						max={5}
-						onValueChange={this.updateState}
+						onValueChange={this.updateFormValue}
 						valueKey='advantages' />
                     <Slider
 						label='Limitations:'
-						value={this.state.limitations}
+						value={this.props.costCruncherForm.limitations}
 						step={0.25}
 						min={-5}
 						max={0}
-						onValueChange={this.updateState}
+						onValueChange={this.updateFormValue}
 						valueKey='limitations' />
 				</Content>
 			</Container>
 		);
 	}
 }
+
+const mapStateToProps = state => {
+    return {
+        costCruncherForm: state.forms.costCruncher
+    };
+}
+
+const mapDispatchToProps = {
+    updateFormValue
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CostCruncherScreen);

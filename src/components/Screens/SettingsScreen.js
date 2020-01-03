@@ -6,6 +6,7 @@ import Header from '../Header/Header';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import { common } from '../../lib/Common';
+import { persistence } from '../../lib/Persistence';
 import styles from '../../Styles';
 
 export default class SettingsScreen extends Component {
@@ -18,7 +19,7 @@ export default class SettingsScreen extends Component {
     }
 
 	async componentDidMount() {
-        let settings = await common.getAppSettings();
+        let settings = await persistence.initializeApplicationSettings();
 
         this.setState({appSettings: settings});
 	}
@@ -92,7 +93,7 @@ export default class SettingsScreen extends Component {
 
     async _clearAll() {
         await AsyncStorage.removeItem('appSettings');
-        let defaultAppSettings = await common.getAppSettings();
+        let defaultAppSettings = await persistence.initializeApplicationSettings();
 
         await AsyncStorage.setItem('appSettings', JSON.stringify(defaultAppSettings));
         this.setState({appSettings: defaultAppSettings});

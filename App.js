@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import { AsyncStorage, StyleSheet, Text, View, Button, StatusBar, Alert } from 'react-native';
+import { StyleSheet, Text, View, Button, StatusBar, Alert } from 'react-native';
 import { DrawerNavigator } from 'react-navigation';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
@@ -21,10 +21,10 @@ import StatisticsScreen from './src/components/Screens/StatisticsScreen';
 import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
 import { statistics } from './src/lib/Statistics';
+import { heroDesignerCharacter } from './src/lib/HeroDesignerCharacter';
 import { common } from './src/lib/Common';
 import reducer from './src/reducers/index';
 import { GET_SHOW_SECONDARY } from './src/reducers/character';
-import { heroDesignerCharacter } from './src/lib/HeroDesignerCharacter';
 
 const RootStack = DrawerNavigator({
 		Home: {
@@ -76,18 +76,7 @@ const RootStack = DrawerNavigator({
 export const store = createStore(reducer, applyMiddleware(thunk));
 
 export default class App extends Component {
-	async componentWillMount() {
-		let stats = await AsyncStorage.getItem('statistics');
-		let appSettings = await AsyncStorage.getItem('appSettings');
-
-		if (stats === null) {
-		    statistics.init();
-		}
-
-        if (appSettings === null) {
-            await AsyncStorage.setItem('appSettings', JSON.stringify(common.getAppSettings()));
-        }
-
+	componentWillMount() {
         SplashScreen.hide();
 	}
 

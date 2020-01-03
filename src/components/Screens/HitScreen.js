@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -9,37 +10,23 @@ import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import hitLocations from '../../../public/hitLocations.json';
+import { updateFormValue } from '../../reducers/forms';
 
-export default class HitScreen extends Component {
+class HitScreen extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			ocv: 0,
-			numberOfRolls: 1,
-			isAutofire: false,
-			targetDcv: 0,
-			selectedLocation: -1,
 			tabsLocked: false
-		}
+		};
 
-		this.updateCv = this._updateCv.bind(this);
-		this.updateNumberOfRolls = this._updateNumberOfRolls.bind(this);
-		this.toggleAutofire = this._toggleAutofire.bind(this);
+		this.updateFormValue = this._updateFormValue.bind(this);
 		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
 		this.roll = this._roll.bind(this);
 		this.setLocation = this._setLocation.bind(this);
 	}
 
 	componentDidMount() {
-	    AsyncStorage.getItem('ocvSliderValue').then((ocvSliderValue) => {
-	        if (ocvSliderValue !== undefined) {
-	            if (common.compare(this.state, JSON.parse(ocvSliderValue))) {
-	                this.setState(JSON.parse(ocvSliderValue));
-	            }
-	        }
-	    }).done();
-
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
@@ -50,38 +37,19 @@ export default class HitScreen extends Component {
    	}
 
     _roll() {
-        this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.ocv, this.state.numberOfRolls, this.state.isAutofire, this.state.targetDcv));
+        this.props.navigation.navigate('Result', dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv));
     }
 
-	_updateCv(key, value) {
-		let newState = {...this.state};
-		newState[key] = parseInt(value, 10);
+	_updateFormValue(key, value) {
+	    if (key === 'numberOfRolls') {
+	        value = parseInt(value, 10);
+	    }
 
-		AsyncStorage.setItem('ocvSliderValue', JSON.stringify(newState));
-
-        this.setState(newState);
-	}
-
-    _updateNumberOfRolls(key, value) {
-		let newState = {...this.state};
-		newState[key] = parseInt(value, 10);
-
-		AsyncStorage.setItem('ocvSliderValue', JSON.stringify(newState));
-
-        this.setState(newState);
-    }
-
-	_toggleAutofire() {
-		let newState = {...this.state};
-		newState.isAutofire = !this.state.isAutofire;
-
-		AsyncStorage.setItem('ocvSliderValue', JSON.stringify(newState));
-
-        this.setState(newState);
+		this.props.updateFormValue('hit', key, value);
 	}
 
     _setLocation(location) {
-        if (this.state.selectedLocation === location) {
+        if (this.props.hitForm.selectedLocation === location) {
             location = -1;
         }
 
@@ -96,15 +64,15 @@ export default class HitScreen extends Component {
     }
 
     _renderDcvSlider() {
-        if (this.state.isAutofire) {
+        if (this.props.hitForm.isAutofire) {
             return (
                 <Slider
                     label='Target DCV/DMCV:'
-                    value={this.state.targetDcv}
+                    value={this.props.hitForm.targetDcv}
                     step={1}
                     min={-30}
                     max={30}
-                    onValueChange={this.updateCv}
+                    onValueChange={this.updateFormValue}
                     valueKey='targetDcv'
                     toggleTabsLocked={this.toggleTabsLocked} />
             );
@@ -114,7 +82,7 @@ export default class HitScreen extends Component {
     }
 
     _renderLocationDetails() {
-        if (this.state.selectedLocation === -1) {
+        if (this.props.hitForm.selectedLocation === -1) {
             return null;
         }
 
@@ -128,9 +96,9 @@ export default class HitScreen extends Component {
                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>BODYx</Text></View>
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: 10}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.state.selectedLocation].stunX}</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.state.selectedLocation].nStun}</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.state.selectedLocation].bodyX}</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].stunX}</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].nStun}</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].bodyX}</Text></View>
                     </View>
                 </View>
             </View>
@@ -147,21 +115,21 @@ export default class HitScreen extends Component {
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <Slider
                                     label='Total OCV/OMCV:'
-                                    value={this.state.ocv}
+                                    value={this.props.hitForm.ocv}
                                     step={1}
                                     min={-30}
                                     max={30}
-                                    onValueChange={this.updateCv}
+                                    onValueChange={this.updateFormValue}
                                     valueKey='ocv'
                                     toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <Slider
                                     label='Rolls:'
-                                    value={this.state.numberOfRolls}
+                                    value={this.props.hitForm.numberOfRolls}
                                     step={1}
                                     min={1}
                                     max={20}
-                                    onValueChange={this.updateNumberOfRolls}
+                                    onValueChange={this.updateFormValue}
                                     valueKey='numberOfRolls'
                                     toggleTabsLocked={this.toggleTabsLocked}
                                 />
@@ -169,8 +137,8 @@ export default class HitScreen extends Component {
                                     <Text style={styles.grey}>Is this an autofire attack?</Text>
                                     <View style={{paddingRight: 10}}>
                                         <Switch
-											value={this.state.isAutofire}
-											onValueChange={() => this.toggleAutofire()}
+											value={this.props.hitForm.isAutofire}
+											onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
 											color='#3da0ff'
 											minimumTrackTintColor='#14354d'
 											maximumTrackTintColor='#14354d'
@@ -359,3 +327,15 @@ const localStyles = StyleSheet.create({
 		paddingBottom: 20
 	}
 });
+
+const mapStateToProps = state => {
+    return {
+        hitForm: state.forms.hit
+    };
+}
+
+const mapDispatchToProps = {
+    updateFormValue
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HitScreen);
