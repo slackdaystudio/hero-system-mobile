@@ -30,13 +30,6 @@ export function setCharacter(character) {
     };
 }
 
-export function getCharacter(xml) {
-    return {
-        type: GET_CHARACTER,
-        payload: xml
-    };
-}
-
 export function initializeCharacter() {
     return async (dispatch) => {
         persistence.getCharacter().then(char => {
@@ -68,13 +61,13 @@ export default function character(state = initialState, action) {
     let newState = null
 
     switch (action.type) {
-        case GET_CHARACTER:
-            newState = {...state};
-            newState.character = heroDesignerCharacter.getCharacter(action.payload);
-
-            return newState;
         case SET_CHARACTER:
-            newState = {...state};
+            newState = {
+                ...state,
+                character: {
+                    ...state.character
+                }
+            };
             newState.character = action.payload;
             
             return newState;
@@ -83,12 +76,22 @@ export default function character(state = initialState, action) {
                 return state;
             }
 
-            newState = {...state};
+            newState = {
+                ...state,
+                character: {
+                    ...state.character
+                }
+            };
             newState.character = action.payload;
 
             return newState;
         case SET_SHOW_SECONDARY:
-            newState = {...state};
+            newState = {
+                ...state,
+                showSecondary: {
+                    ...state.showSecondary
+                }
+            };
             newState.showSecondary = action.payload;
 
             return newState;

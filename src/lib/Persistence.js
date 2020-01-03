@@ -22,6 +22,8 @@ class Persistence {
         } catch (error) {
             common.toast('Unable to persist character');
         }
+
+        return character;
     }
 
     async setShowSecondaryCharacteristics(show=true) {
