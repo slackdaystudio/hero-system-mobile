@@ -15,6 +15,7 @@ import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
+import { updateForm } from '../../reducers/forms';
 
 class ViewCharacterScreen extends Component {
     _renderPowers(powers) {
@@ -25,7 +26,7 @@ class ViewCharacterScreen extends Component {
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
                 <View style={styles.tabContent}>
-                    <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.props.character)} />
+                    <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
                 </View>
             </Tab>
         );
@@ -39,7 +40,7 @@ class ViewCharacterScreen extends Component {
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
                 <View style={styles.tabContent}>
-                    <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.props.character)}/>
+                    <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
                 </View>
             </Tab>
         );
@@ -83,7 +84,7 @@ class ViewCharacterScreen extends Component {
 			  		</Tab>
                     <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
 			  			<View style={styles.tabContent}>
-                            <Combat navigation={this.props.navigation} character={this.props.character} />
+                            <Combat navigation={this.props.navigation} character={this.props.character} updateForm={this.props.updateForm} />
 			  		    </View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
@@ -119,6 +120,8 @@ const mapStateToProps = state => {
     };
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = {
+    updateForm
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewCharacterScreen);

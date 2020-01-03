@@ -48,7 +48,9 @@ export default class Powers extends Component {
 
     _rollDamage(index) {
         if (character.isAttackPower(this.state.items[index])) {
-            this.props.navigation.navigate('Damage', character.getDamage(this.state.items[index], this.props.strengthDamage));
+            this.props.updateForm('damage', character.getDamage(this.state.items[index], this.props.strengthDamage));
+
+            this.props.navigation.navigate('Damage');
         }
     }
 

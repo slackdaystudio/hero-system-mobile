@@ -25,7 +25,8 @@ export default class Traits extends Component {
         headingText: PropTypes.string.isRequired,
         character: PropTypes.object.isRequired,
         listKey: PropTypes.string.isRequired,
-        subListKey: PropTypes.string.isRequired
+        subListKey: PropTypes.string.isRequired,
+        updateForm: PropTypes.func.isRequired
     }
 
     constructor(props) {
@@ -84,44 +85,45 @@ export default class Traits extends Component {
         if (roll.type === SKILL_CHECK) {
             this.props.navigation.navigate('Result', dieRoller.rollCheck(roll.roll));
         } else if (roll.type === NORMAL_DAMAGE) {
-            let damageForm = common.initDamageForm();
             let dice = common.toDice(roll.roll);
 
-            damageForm.dice = dice.full;
-            damageForm.partialDie = dice.partial
+            this.props.updateForm('damage', {
+                dice: dice.full,
+                partialDie: dice.partial
+            });
 
-            this.props.navigation.navigate('Damage', damageForm);
+            this.props.navigation.navigate('Damage');
         } else if (roll.type === KILLING_DAMAGE) {
-            let damageForm = common.initDamageForm();
             let dice = common.toDice(roll.roll);
 
-            damageForm.dice = dice.full;
-            damageForm.partialDie = dice.partial
-            damageForm.killingToggled = true;
-            damageForm.damageType = KILLING_DAMAGE;
+            this.props.updateForm('damage', {
+                dice: dice.full,
+                partialDie: dice.partial,
+                killingToggled: true,
+                damageType: KILLING_DAMAGE
+            });
 
-            this.props.navigation.navigate('Damage', damageForm);
+            this.props.navigation.navigate('Damage');
         } else if (roll.type === FREE_FORM) {
-            let freeFormForm = common.initFreeFormForm();
             let dice = common.toDice(roll.roll);
-
-            freeFormForm.dice = dice.full;
+            let halfDice = 0;
+            let pips = 0;
 
             switch (dice.partial) {
                 case PARTIAL_DIE_HALF:
-                    freeFormForm.halfDice = 1;
+                    halfDice = 1;
                     break;
                 case PARTIAL_DIE_PLUS_ONE:
-                    freeFormForm.pips = 1;
+                    pips = 1;
                     break;
                 case PARTIAL_DIE_MINUS_ONE:
-                    freeFormForm.pips -1;
+                    pips -1;
                     break;
                 default:
                     // do nothing
             }
 
-            this.props.navigation.navigate('Result', dieRoller.freeFormRoll(freeFormForm.dice, freeFormForm.halfDice, freeFormForm.pips));
+            this.props.navigation.navigate('Result', dieRoller.freeFormRoll(dice.full, halfDice, pips));
         }
     }
 

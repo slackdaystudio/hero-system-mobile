@@ -5,6 +5,7 @@ import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker
 import { common } from './Common';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from './DieRoller';
 import { file } from './File';
+import { store } from '../../App';
 
 class Character {
     constructor() {
@@ -124,7 +125,7 @@ class Character {
     }
 
     getPresenceAttackDamage(presenceDamage) {
-        let damage = common.initFreeFormForm();
+        let damage = {};
         let damageDice = this._getDamageDice(presenceDamage);
 
         damage.dice = damageDice.dice;
@@ -134,7 +135,7 @@ class Character {
     }
 
     getDamage(text, strengthDamage) {
-        let damage = common.initDamageForm();
+        let damage = {};
 
         // Base strength damage
         if (text === null && strengthDamage !== '') {
@@ -177,7 +178,7 @@ class Character {
         let match = text.match(/(Killing\sAttack\s\-\sHand\-To\-Hand|HKA)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?(\sw\/STR)?\)/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageDice = this._getDamageDice(match[0].slice(match[0].indexOf('(') + 1, match[0].lastIndexOf(' w/STR)')));
 
             damage.dice = damageDice.dice;
@@ -195,7 +196,7 @@ class Character {
         let match = text.match(/(Killing\sAttack\s\-\sRanged|RKA)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageParts = match[0].split(' ');
             let damageDice = this._getDamageDice(damageParts[(damageParts.length - 1)]);
 
@@ -214,7 +215,7 @@ class Character {
         let match = text.match(/(Energy\sBlast|EB|Blast)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageParts = match[0].split(' ');
             let damageDice = this._getDamageDice(damageParts[(damageParts.length - 1)]);
 
@@ -233,7 +234,7 @@ class Character {
         let match = text.match(/(Hand\-To\-Hand\sAttack|HA)\s\+([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageParts = match[0].slice(match[0].indexOf('+') + 1);
             let damageDice = this._getDamageDice(damageParts);
 

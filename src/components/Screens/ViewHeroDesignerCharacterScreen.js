@@ -11,6 +11,7 @@ import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
+import { updateForm } from '../../reducers/forms';
 
 class ViewHeroDesignerCharacterScreen extends Component {
 	static propTypes = {
@@ -37,6 +38,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         character={this.props.character}
                         listKey={listKey}
                         subListKey={subListKey}
+                        updateForm={this.props.updateForm}
                     />
                 </View>
             </Tab>
@@ -94,6 +96,8 @@ const mapStateToProps = state => {
     };
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = {
+    updateForm
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);
