@@ -2,7 +2,6 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { StyleSheet, View, Image, Switch } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -42,15 +41,6 @@ class SkillScreen extends Component {
 
         this.props.updateFormValue('skill', key, value)
     }
-
-	_toggleCheck() {
-		let newState = {...this.props.skillForm};
-		newState.skillCheck = !this.props.skillForm.skillCheck;
-
-		AsyncStorage.setItem('skillState', JSON.stringify(newState));
-
-        this.setState(newState);
-	}
 
     _renderSlider() {
         if (this.props.skillForm.skillCheck) {

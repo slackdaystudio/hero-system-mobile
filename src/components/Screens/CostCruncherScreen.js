@@ -2,7 +2,6 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { StyleSheet, View } from 'react-native';
 import { Container, Content, Button, Text, Form, Item, Label, Input } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import styles from '../../Styles';

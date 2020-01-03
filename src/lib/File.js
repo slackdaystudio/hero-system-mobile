@@ -1,6 +1,5 @@
 import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import { Toast } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import DocumentPicker from 'react-native-document-picker';
 import RNFetchBlob from 'rn-fetch-blob'
 import xml2js from 'react-native-xml2js';
@@ -72,23 +71,20 @@ class File {
             common.toast('Read Error: ' + error.message);
         } finally {
             endLoad();
-            return character;
         }
+
+
+        return character;
     }
 
     async _loadXmlExportCharacter(rawXml) {
         let parser = xml2js.Parser({explicitArray: false});
-        let character = null;
+        let character = await new Promise((resolve, reject) => parser.parseString(rawXml, (error, result) => {
+            if (error) {
+                reject(error);
+            }
 
-        parser.parseString(rawXml, (error, result) => {
-            character = result;
-        });
-
-        await AsyncStorage.setItem('character', JSON.stringify(character));
-        await AsyncStorage.setItem('combat', JSON.stringify({
-            stun: characterLib.getCharacteristic(character.character.characteristics.characteristic, 'stun'),
-            body: characterLib.getCharacteristic(character.character.characteristics.characteristic, 'body'),
-            endurance: characterLib.getCharacteristic(character.character.characteristics.characteristic, 'endurance')
+            resolve(result);
         }));
 
         common.toast('Character successfully loaded');
@@ -128,8 +124,6 @@ class File {
         parser.parseString(rawXml, (error, result) => {
             character = heroDesignerCharacter.getCharacter(result);
         });
-
-//        await AsyncStorage.setItem('character', JSON.stringify(character));
 
         common.toast('Character successfully loaded');
 

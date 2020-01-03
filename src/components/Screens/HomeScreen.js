@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { Platform, StyleSheet, ScrollView, View, ImageBackground, TouchableHighlight } from 'react-native';
+import { Alert, Platform, StyleSheet, ScrollView, View, ImageBackground, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Spinner, Card, CardItem, Body, Icon } from 'native-base';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
@@ -12,8 +12,8 @@ import styles from '../../Styles';
 import { initializeApplicationSettings } from '../../reducers/settings';
 import { initializeStatistics } from '../../reducers/statistics';
 import { initializeCharacter, setCharacter, setShowSecondary } from '../../reducers/character';
-
-import AsyncStorage from '@react-native-community/async-storage';
+import { initializeRandomHero } from '../../reducers/randomHero';
+import { initializeCombatDetails } from '../../reducers/combat';
 
 class HomeScreen extends Component {
     constructor(props) {
@@ -32,6 +32,8 @@ class HomeScreen extends Component {
         await this.props.initializeApplicationSettings();
 		await this.props.initializeStatistics();
 		await this.props.initializeCharacter();
+		await this.props.initializeRandomHero();
+		await this.props.initializeCombatDetails();
     }
 
     _startLoad() {
@@ -46,6 +48,10 @@ class HomeScreen extends Component {
         character.load(this.startLoad, this.endLoad).then(char => {
             this.props.setShowSecondary(true);
             this.props.setCharacter(char);
+
+            if (!character.isHeroDesignerCharacter(char)) {
+                this.props.setCombatDetails(char);
+            }
         });
     }
 
@@ -153,6 +159,8 @@ const mapDispatchToProps = {
     initializeApplicationSettings,
     initializeStatistics,
     initializeCharacter,
+    initializeCombatDetails,
+    initializeRandomHero,
     setCharacter,
     setShowSecondary
 }

@@ -2,6 +2,7 @@ import { Dimensions, Platform, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import { common } from './Common';
+import { character as libCharacter } from './Character';
 
 class Persistence {
     async getCharacter() {
@@ -24,6 +25,67 @@ class Persistence {
         }
 
         return character;
+    }
+
+    async initializeCombatDetails() {
+        let combatDetails = null;
+
+        try {
+            combatDetails = await AsyncStorage.getItem('combat');
+        } catch (error) {
+            common.toast('Unable to retrieve persisted combat details');
+        }
+
+        return combatDetails === null ? null : JSON.parse(combatDetails);
+    }
+
+    async setCombatDetails(character) {
+        let combatDetails = {
+            stun: libCharacter.getCharacteristic(character.characteristics.characteristic, 'stun'),
+            body: libCharacter.getCharacteristic(character.characteristics.characteristic, 'body'),
+            endurance: libCharacter.getCharacteristic(character.characteristics.characteristic, 'endurance')
+        };
+
+        try {
+            await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
+        } catch(error) {
+            common.toast('Unable to generate combat details');
+        }
+
+        return combatDetails;
+    }
+
+    async setSparseCombatDetails(sparseCombatDetails) {
+        let combatDetails = null;
+
+        try {
+            combatDetails = await AsyncStorage.getItem('combat');
+
+            if (combatDetails !== null) {
+                combatDetails = JSON.parse(combatDetails);
+
+                for (let [key, value] of Object.entries(sparseCombatDetails)) {
+                    if (combatDetails.hasOwnProperty(key)) {
+                        combatDetails[key] = value;
+                    }
+                }
+
+                await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
+            }
+        } catch (error) {
+            common.toast('Unable to update combat detail')
+        }
+
+        return combatDetails;
+    }
+
+    async clearCharacter() {
+        try {
+            await AsyncStorage.removeItem('character');
+            await AsyncStorage.removeItem('combat');
+        } catch (error) {
+            common.toast('Unable to clear persisted character');
+        }
     }
 
     async setShowSecondaryCharacteristics(show=true) {
@@ -58,8 +120,18 @@ class Persistence {
         return settings;
     }
 
+    async setUseFifthEditionRules(fifth) {
+        try {
+            await AsyncStorage.setItem('appSettings', JSON.stringify({useFifthEdition: fifth}));
+        } catch (error) {
+            common.toast('Unable to set the value for the setting to use fifth edition rules');
+        }
+
+        return fifth;
+    }
+
     async initializeStatistics() {
-        let character = null;
+        let statistics = null;
 
         try {
             statistics = await AsyncStorage.getItem('statistics');
@@ -74,6 +146,79 @@ class Persistence {
         }
 
         return statistics;
+    }
+
+    async setStatistics(statistics) {
+        try {
+            await AsyncStorage.setItem('statistics', JSON.stringify(statistics));
+        } catch (error) {
+            common.toast('Unable to persist statistics');
+        }
+
+        return fifth;
+    }
+
+    async clearStatistics() {
+        let reinitializedStatistics = null;
+
+        try {
+            await AsyncStorage.removeItem('statistics');
+            reinitializedStatistics = await this._initializeStatistics();
+        } catch (error) {
+            common.toast('Unable to clear persisted statistics');
+        }
+
+        return reinitializedStatistics;
+    }
+
+    async initializeRandomHero() {
+        let randomHero = null;
+
+        try {
+            randomHero = await AsyncStorage.getItem('hero');
+        } catch (error) {
+            common.toast('Unable to retrieve persisted H.E.R.O.');
+        }
+
+        return randomHero === null ? null : JSON.parse(randomHero);
+    }
+
+    async setRandomHero(character) {
+        try {
+            await AsyncStorage.setItem('hero', JSON.stringify(character));
+        } catch (error) {
+            common.toast('Unable to persist H.E.R.O.');
+        }
+
+        return character;
+    }
+
+    async setRandomHeroName(name) {
+        let randomHero = null;
+
+        try {
+            randomHero = await AsyncStorage.getItem('hero');
+
+            if (randomHero !== null) {
+                randomHero = JSON.parse(randomHero);
+
+                randomHero.name = name;
+
+                await AsyncStorage.setItem('hero', JSON.stringify(randomHero));
+            }
+        } catch (error) {
+            common.toast('Unable to retrieve persisted H.E.R.O.');
+        }
+
+        return randomHero;
+    }
+
+    async clearRandomHero() {
+        try {
+            await AsyncStorage.removeItem('hero');
+        } catch (error) {
+            common.toast('Unable to clear persisted H.E.R.O.');
+        }
     }
 
     async _initializeStatistics() {

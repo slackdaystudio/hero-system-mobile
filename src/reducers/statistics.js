@@ -23,6 +23,17 @@ export function initializeStatistics() {
     };
 }
 
+export function clearStatistics() {
+    return async (dispatch) => {
+        persistence.clearStatistics().then((stats) => {
+            dispatch({
+                type: INITIALIZE_STATISTICS,
+                payload: stats
+            });
+        });
+    };
+}
+
 initialState = {};
 
 export default function statistics(state = initialState, action) {

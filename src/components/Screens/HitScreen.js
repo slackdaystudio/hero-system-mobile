@@ -2,7 +2,6 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';

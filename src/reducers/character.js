@@ -15,6 +15,8 @@ export const INITIALIZE_CHARACTER = 'INITIALIZE_CHARACTER';
 
 export const SET_SHOW_SECONDARY = 'SET_SHOW_SECONDARY';
 
+export const CLEAR_CHARACTER = 'CLEAR_CHARACTER';
+
 //////////////////////////////
 // ACTIONS                  //
 //////////////////////////////
@@ -47,6 +49,17 @@ export function setShowSecondary(show) {
             dispatch({
                 type: SET_SHOW_SECONDARY,
                 payload: value
+            });
+        });
+    };
+}
+
+export function clearCharacter() {
+    return async (dispatch) => {
+        persistence.clearCharacter().then(() => {
+            dispatch({
+                type: CLEAR_CHARACTER,
+                payload: null
             });
         });
     };
@@ -93,6 +106,17 @@ export default function character(state = initialState, action) {
                 }
             };
             newState.showSecondary = action.payload;
+
+            return newState;
+        case CLEAR_CHARACTER:
+            newState = {
+                ...state,
+                character: {
+                    ...state.character
+                }
+            };
+
+            newState.character = null;
 
             return newState;
         default:

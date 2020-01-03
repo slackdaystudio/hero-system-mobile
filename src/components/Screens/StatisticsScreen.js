@@ -1,31 +1,19 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Text, List, ListItem, Left, Right, Spinner, Tabs, Tab, ScrollableTab } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import Header from '../Header/Header';
 import { statistics } from '../../lib/Statistics';
 import { chart } from '../../lib/Chart';
 import styles from '../../Styles';
 
-export default class StatisticsScreen extends Component {
+class StatisticsScreen extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            stats: null
-        }
-    }
-
-    async componentDidMount() {
-        let stats = await AsyncStorage.getItem('statistics');
-
-        this.setState({
-            stats: JSON.parse(stats)
-        })
     }
 
     _renderHitLocationStat() {
-        let mostFrequentHitLocation = statistics.getMostFrequentHitLocation(this.state.stats.totals.hitLocations);
+        let mostFrequentHitLocation = statistics.getMostFrequentHitLocation(this.props.statistics.totals.hitLocations);
 
         if (mostFrequentHitLocation.location === '') {
             return <Text style={styles.grey}>-</Text>;
@@ -35,27 +23,27 @@ export default class StatisticsScreen extends Component {
     }
 
     _renderAverageRoll() {
-        if (this.state.stats.totals.diceRolled === 0) {
+        if (this.props.statistics.totals.diceRolled === 0) {
             return <Text style={styles.grey}>-</Text>;
         }
 
         return (
             <Text style={styles.grey}>
-                {(this.state.stats.sum / this.state.stats.totals.diceRolled).toFixed(1)}
+                {(this.props.statistics.sum / this.props.statistics.totals.diceRolled).toFixed(1)}
             </Text>
         );
     }
 
     _renderDieDistributionChart() {
-        if (this.state.stats.sum === 0) {
+        if (this.props.statistics.sum === 0) {
                 return null;
         }
 
-        return chart.renderDieDistributionChart(this.state.stats.distributions);
+        return chart.renderDieDistributionChart(this.props.statistics.distributions);
     }
 
 	render() {
-        if (this.state.stats === null) {
+        if (this.props.statistics === null) {
             return (
                 <Container style={styles.container}>
                     <Header hasTabs={false} navigation={this.props.navigation} />
@@ -78,7 +66,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.diceRolled}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.diceRolled}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -86,7 +74,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Face Value:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.sum}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.sum}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -94,7 +82,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Largest Amount of Dice Rolled:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.largestDieRoll}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.largestDieRoll}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -102,7 +90,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Largest Roll:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.largestSum}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.largestSum}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -110,7 +98,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Skill Checks:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.skillChecks}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.skillChecks}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -118,7 +106,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Rolls To Hit:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.hitRolls}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.hitRolls}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -126,7 +114,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.normalDamage.rolls + this.state.stats.totals.killingDamage.rolls}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.normalDamage.rolls + this.props.statistics.totals.killingDamage.rolls}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -134,7 +122,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Free Form Rolls:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.freeFormRolls}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.freeFormRolls}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -142,7 +130,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Stun:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.normalDamage.stun + this.state.stats.totals.killingDamage.stun}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.normalDamage.stun + this.props.statistics.totals.killingDamage.stun}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -150,7 +138,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Body:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.normalDamage.body + this.state.stats.totals.killingDamage.body}</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.normalDamage.body + this.props.statistics.totals.killingDamage.body}</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -158,7 +146,7 @@ export default class StatisticsScreen extends Component {
                         <Text style={styles.boldGrey}>Total Knockback:</Text>
                       </Left>
                       <Right>
-                        <Text style={styles.grey}>{this.state.stats.totals.knockback}m</Text>
+                        <Text style={styles.grey}>{this.props.statistics.totals.knockback}m</Text>
                       </Right>
                     </ListItem>
                     <ListItem>
@@ -203,3 +191,13 @@ const localStyles = StyleSheet.create({
 		textDecorationLine: 'underline'
 	}
 });
+
+const mapStateToProps = state => {
+    return {
+        statistics: state.statistics
+    };
+}
+
+const mapDispatchToProps = {}
+
+export default connect(mapStateToProps, mapDispatchToProps)(StatisticsScreen);

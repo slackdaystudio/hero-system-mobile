@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import General from '../HeroDesignerCharacter/General';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
 import Traits from '../HeroDesignerCharacter/Traits';

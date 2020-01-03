@@ -9,6 +9,8 @@ import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
 
 export const INITIALIZE_SETTINGS = 'INITIALIZE_SETTINGS';
 
+export const USE_FIFTH_EDITION_RULES = 'USE_FIFTH_EDITION_RULES';
+
 //////////////////////////////
 // ACTIONS                  //
 //////////////////////////////
@@ -24,6 +26,17 @@ export function initializeApplicationSettings() {
     };
 }
 
+export function setUseFifthEditionRules(fifth) {
+    return async (dispatch) => {
+        persistence.setUseFifthEditionRules(fifth).then(useFifth => {
+            dispatch({
+                type: USE_FIFTH_EDITION_RULES,
+                payload: useFifth
+            });
+        });
+    };
+}
+
 initialState = {};
 
 export default function settings(state = initialState, action) {
@@ -33,6 +46,17 @@ export default function settings(state = initialState, action) {
         case INITIALIZE_SETTINGS:
             newState = {...state};
             newState = action.payload;
+
+            return newState;
+        case USE_FIFTH_EDITION_RULES:
+            newState = {
+                ...state,
+                useFifthEdition: {
+                    ...state.useFifthEdition
+                }
+            };
+
+            newState.useFifthEdition = action.payload;
 
             return newState;
         default:

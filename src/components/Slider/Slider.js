@@ -1,7 +1,6 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, Keyboard, Alert } from 'react-native';
 import { Text, Icon, Item, Input } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import Slider from 'react-native-slider';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';

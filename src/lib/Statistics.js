@@ -1,11 +1,10 @@
 import { Alert } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, FREE_FORM, SKILL_CHECK } from './DieRoller';
+import { persistence } from './Persistence';
 
 class Statistics {
     async add(resultRoll) {
-        let stats = await AsyncStorage.getItem('statistics');
-        stats = JSON.parse(stats);
+        let stats = await persistence.initializeStatistics();
         let total = resultRoll.rolls.reduce((a, b) => a + b, 0);
 
         stats.sum += total;
@@ -36,7 +35,7 @@ class Statistics {
 
         this._updateDistributions(resultRoll.rolls, stats.distributions);
 
-        return AsyncStorage.setItem('statistics', JSON.stringify(stats));
+        return persistence.setStatistics(stats);
     }
 
     getMostFrequentHitLocation(hitLocationStats) {

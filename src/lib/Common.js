@@ -1,6 +1,5 @@
 import { Dimensions, Platform, Alert } from 'react-native';
 import { Toast } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import camelCase from 'camelcase';
 import snakeCase from 'snake-case';
 import {

@@ -1,15 +1,20 @@
 import React, { Component }  from 'react';
+import { connect } from 'react-redux';
 import { StyleSheet, View, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import Header from '../Header/Header';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import { common } from '../../lib/Common';
 import { persistence } from '../../lib/Persistence';
 import styles from '../../Styles';
+import { resetForm } from '../../reducers/forms';
+import { clearCharacter } from '../../reducers/character';
+import { clearRandomHero } from '../../reducers/randomHero';
+import { initializeApplicationSettings, setUseFifthEditionRules } from '../../reducers/settings';
+import { clearStatistics } from '../../reducers/statistics';
 
-export default class SettingsScreen extends Component {
+class SettingsScreen extends Component {
     constructor(props) {
         super(props);
 
@@ -18,119 +23,53 @@ export default class SettingsScreen extends Component {
         };
     }
 
-	async componentDidMount() {
-        let settings = await persistence.initializeApplicationSettings();
-
-        this.setState({appSettings: settings});
-	}
-
-	async _clearFormData(showToast = true) {
-		await AsyncStorage.setItem('skillState', JSON.stringify({
-		    skillCheck: false,
-			value: 8
-		}));
-		await AsyncStorage.setItem('costCruncherState', JSON.stringify({
-		    cost: 5,
-			advantages: 0,
-			limitations: 0,
-        }));
-		await AsyncStorage.setItem('ocvSliderValue', JSON.stringify({
-			ocv: 0,
-			numberOfRolls: 1,
-			isAutofire: false,
-			targetDcv: 0,
-			selectedLocation: -1
-		}));
-		await AsyncStorage.setItem('damageState', JSON.stringify(common.initDamageForm()));
-		await AsyncStorage.setItem('freeFormState', JSON.stringify(common.initFreeFormForm()));
+	_clearFormData(showToast = true) {
+		this.props.resetForm('skill');
+		this.props.resetForm('hit');
+		this.props.resetForm('damage');
+		this.props.resetForm('freeForm');
+		this.props.resetForm('costCruncher');
 
 		if (showToast) {
-            Toast.show({
-                text: 'Form data has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+		    common.toast('Form data has been cleared');
 		}
 	}
 
-	async _clearCharacterData(showToast = true) {
-	    await AsyncStorage.removeItem('character');
-	    await AsyncStorage.removeItem('combat');
+	_clearCharacterData(showToast = true) {
+        this.props.clearCharacter();
 
         if (showToast) {
-            Toast.show({
-                text: 'Loaded character has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+            common.toast('Loaded character has been cleared');
         }
 	}
 
 	async _clearHeroData(showToast = true) {
-	    await AsyncStorage.removeItem('hero');
+	    this.props.clearRandomHero();
 
         if (showToast) {
-            Toast.show({
-                text: 'H.E.R.O. character has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+            common.toast('H.E.R.O. character has been cleared');
         }
 	}
 
     async _clearStatisticsData(showToast = true) {
-	    await AsyncStorage.removeItem('characterFile');
-	    statistics.init();
+	    this.props.clearStatistics();
 
         if (showToast) {
-            Toast.show({
-                text: 'Statistical data has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+            common.toast('Statistical data has been cleared');
         }
     }
 
     async _clearAll() {
-        await AsyncStorage.removeItem('appSettings');
-        let defaultAppSettings = await persistence.initializeApplicationSettings();
+        this.props.initializeApplicationSettings();
+        this._clearFormData(false);
+        this._clearCharacterData(false);
+        this._clearHeroData(false);
+        this._clearStatisticsData(false);
 
-        await AsyncStorage.setItem('appSettings', JSON.stringify(defaultAppSettings));
-        this.setState({appSettings: defaultAppSettings});
-
-        await this._clearFormData(false);
-        await this._clearCharacterData(false);
-        await this._clearHeroData(false);
-        await this._clearStatisticsData(false);
-
-        Toast.show({
-            text: 'Everything has been cleared',
-            position: 'bottom',
-            buttonText: 'OK'
-        });
-    }
-
-    async _toggleFifthEdition() {
-        let newState = {...this.state};
-        newState.appSettings.useFifthEdition = !this.state.appSettings.useFifthEdition;
-
-        await AsyncStorage.setItem('appSettings', JSON.stringify(newState.appSettings));
-
-        this.setState({appSettings: newState.appSettings});
+        common.toast('Everything has been cleared');
     }
 
 	render() {
-	    if (this.state.appSettings === null) {
-            return (
-                <Container style={styles.container}>
-                    <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={styles.content}>
-                        <Spinner color='#D0D1D3' />
-                    </Content>
-                </Container>
-            );
-	    }
-
 		return (
 			<Container style={styles.container}>
 			    <Header navigation={this.props.navigation} />
@@ -183,8 +122,8 @@ export default class SettingsScreen extends Component {
 			        		</Left>
 			        		<Right>
 							    <Switch
-                                    value={this.state.appSettings.useFifthEdition}
-                                    onValueChange={() => this._toggleFifthEdition()}
+                                    value={this.props.useFifthEdition}
+                                    onValueChange={() => this.props.setUseFifthEditionRules(!this.props.useFifthEdition)}
                                     minimumTrackTintColor='#14354d'
                                     maximumTrackTintColor='#14354d'
                                     thumbTintColor='#14354d'
@@ -203,3 +142,21 @@ export default class SettingsScreen extends Component {
 		);
 	}
 }
+
+const mapStateToProps = state => {
+    return {
+        forms: state.forms,
+        useFifthEdition: state.settings.useFifthEdition
+    };
+}
+
+const mapDispatchToProps = {
+    initializeApplicationSettings,
+    setUseFifthEditionRules,
+    resetForm,
+    clearCharacter,
+    clearRandomHero,
+    clearStatistics
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen);

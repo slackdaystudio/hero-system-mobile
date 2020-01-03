@@ -2,7 +2,6 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { Platform, StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
 import Characteristics from '../Character/Characteristics';
@@ -16,6 +15,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
+import { setSparseCombatDetails } from '../../reducers/combat';
 
 class ViewCharacterScreen extends Component {
     _renderPowers(powers) {
@@ -84,7 +84,13 @@ class ViewCharacterScreen extends Component {
 			  		</Tab>
                     <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
 			  			<View style={styles.tabContent}>
-                            <Combat navigation={this.props.navigation} character={this.props.character} updateForm={this.props.updateForm} />
+                            <Combat
+                                navigation={this.props.navigation}
+                                character={this.props.character}
+                                combatDetails={this.props.combatDetails}
+                                updateForm={this.props.updateForm}
+                                setSparseCombatDetails={this.props.setSparseCombatDetails}
+                            />
 			  		    </View>
 			  		</Tab>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
@@ -116,12 +122,14 @@ const localStyles = StyleSheet.create({
 
 const mapStateToProps = state => {
     return {
-        character: state.character.character
+        character: state.character.character,
+        combatDetails: state.combat
     };
 }
 
 const mapDispatchToProps = {
-    updateForm
+    updateForm,
+    setSparseCombatDetails
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewCharacterScreen);
