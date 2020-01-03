@@ -16,7 +16,7 @@ export default class MyHeader extends Component {
                     </View>
                   </Left>
                   <Right>
-                    <Button transparent underlayColor='#000' onPress={() => this.props.navigation.navigate("DrawerOpen")}>
+                    <Button transparent underlayColor='#000' onPress={() => this.props.navigation.toggleDrawer()}>
                       <Icon name='menu' style={{color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
                     </Button>
                   </Right>

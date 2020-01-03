@@ -16,22 +16,23 @@ import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
 
 const AppNavigator = createDrawerNavigator({
-		Home: HomeScreen,
-		ViewCharacter: ViewCharacterScreen,
-		ViewHeroDesignerCharacter: ViewHeroDesignerCharacterScreen,
-		RandomCharacter: RandomCharacterScreen,
-		Result: ResultScreen,
-		Skill: SkillScreen,
-		Hit: HitScreen,
-		Damage: DamageScreen,
-		FreeForm: FreeFormScreen,
-		CostCruncher: CostCruncherScreen,
-		Statistics: StatisticsScreen,
-		Settings: SettingsScreen
+    Home: HomeScreen,
+    ViewCharacter: ViewCharacterScreen,
+    ViewHeroDesignerCharacter: ViewHeroDesignerCharacterScreen,
+    RandomCharacter: RandomCharacterScreen,
+    Result: ResultScreen,
+    Skill: SkillScreen,
+    Hit: HitScreen,
+    Damage: DamageScreen,
+    FreeForm: FreeFormScreen,
+    CostCruncher: CostCruncherScreen,
+    Statistics: StatisticsScreen,
+    Settings: SettingsScreen
 }, {
     initialRouteName: 'Home',
     drawerPosition: 'right',
-    contentComponent: Sidebar
+    contentComponent: Sidebar,
+    drawerWidth: 250
 });
 
 export default createAppContainer(AppNavigator);
