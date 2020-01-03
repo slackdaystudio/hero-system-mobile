@@ -13,7 +13,7 @@ import { initializeApplicationSettings } from '../../reducers/settings';
 import { initializeStatistics } from '../../reducers/statistics';
 import { initializeCharacter, setCharacter, setShowSecondary } from '../../reducers/character';
 import { initializeRandomHero } from '../../reducers/randomHero';
-import { initializeCombatDetails } from '../../reducers/combat';
+import { initializeCombatDetails, setCombatDetails } from '../../reducers/combat';
 
 class HomeScreen extends Component {
     constructor(props) {
@@ -162,7 +162,8 @@ const mapDispatchToProps = {
     initializeCombatDetails,
     initializeRandomHero,
     setCharacter,
-    setShowSecondary
+    setShowSecondary,
+    setCombatDetails
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

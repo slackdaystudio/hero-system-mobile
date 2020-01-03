@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
+import { BackHandler,Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
 import General from '../HeroDesignerCharacter/General';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
@@ -16,6 +16,14 @@ class ViewHeroDesignerCharacterScreen extends Component {
 	static propTypes = {
 		character: PropTypes.object.isRequired
 	}
+
+    componentDidMount() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
+
+            return true;
+        });
+    }
 
     _renderTab(title, listKey, subListKey) {
         if (this.props.character[listKey].length === 0) {
@@ -45,7 +53,9 @@ class ViewHeroDesignerCharacterScreen extends Component {
     }
 
 	render() {
-		if (character === null) {
+	    // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
+	    // guards against a error
+		if (!character.isHeroDesignerCharacter(this.props.character)) {
 			return null;
 		}
 

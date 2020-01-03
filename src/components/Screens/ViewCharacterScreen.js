@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { Platform, StyleSheet, View, ScrollView } from 'react-native';
+import { BackHandler,Platform, StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
@@ -18,6 +18,14 @@ import { updateForm } from '../../reducers/forms';
 import { setSparseCombatDetails } from '../../reducers/combat';
 
 class ViewCharacterScreen extends Component {
+    componentDidMount() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
+
+            return true;
+        });
+    }
+
     _renderPowers(powers) {
         if (powers === '' || powers === undefined || powers === null) {
             return null;
@@ -61,15 +69,10 @@ class ViewCharacterScreen extends Component {
     }
 
 	render() {
-	    if (common.isEmptyObject(this.props.character)) {
-	        return (
-                <Container style={styles.container}>
-                    <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#1b1d1f'}}>
-                        <Spinner color='#D0D1D3' />
-                    </Content>
-	            </Container>
-	        );
+	    // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
+	    // guards against a error
+	    if (character.isHeroDesignerCharacter(this.props.character)) {
+	        return null;
 	    }
 
 		return (
