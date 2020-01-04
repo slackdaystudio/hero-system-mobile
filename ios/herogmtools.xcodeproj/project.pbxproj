@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* herogmtoolsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* herogmtoolsTests.m */; };
 		103F7D77CE7741EBB8DD3B9B /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 547C0730AF6F42E7B8907B92 /* Zocial.ttf */; };
+		1262BC473529263FA7EFA881 /* libPods-herogmtools-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2021D2897B692D2FE3C3D8DD /* libPods-herogmtools-tvOSTests.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -20,19 +21,16 @@
 		319876A75DE8479EB7D55624 /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39D88B968A064378903A3D21 /* rubicon-icon-font.ttf */; };
 		32FD3A167B7644A1A7E64CA3 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0601FBFDFDDF473CAB427FA2 /* SimpleLineIcons.ttf */; };
 		3CB4141F7FEC4710A0A71A61 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 032F7BA2B145448BA32559A4 /* Ionicons.ttf */; };
+		40799C8C497BEC04872475FA /* libPods-herogmtools-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CDE97FBA40BA3880844C9A4 /* libPods-herogmtools-tvOS.a */; };
 		5069CA3FEC4141AE9B9AFBBC /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30235C9D7C704C7DAB9DE089 /* Entypo.ttf */; };
 		62EE979F47374B98B7BE7276 /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 87C59F7F7F0E499CAB455D14 /* Foundation.ttf */; };
 		6A75C6990E7F49F18C934B54 /* Roboto_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AABF05B4C2FF4D49AB1C5046 /* Roboto_medium.ttf */; };
+		6D85011114073777A869D7A4 /* libPods-herogmtoolsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3EAABE6FA029388E1C8987A /* libPods-herogmtoolsTests.a */; };
 		74FFE52DECFF4E59BA23DCC0 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30C7D698B4C94501A0EE994B /* EvilIcons.ttf */; };
 		82FC0DA23C064D1EB6C109D8 /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB0A7146301A4C179A539474 /* Roboto.ttf */; };
-		8805129E22E5021F00BB571D /* Hero2Page.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8805129C22E5021F00BB571D /* Hero2Page.pdf */; };
-		8805129F22E5021F00BB571D /* Hero Survival Guide.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8805129D22E5021F00BB571D /* Hero Survival Guide.pdf */; };
-		8BD0A974F8143030DF49E56F /* libPods-herogmtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DABBF62D570BD8529A66A8B /* libPods-herogmtools.a */; };
-		8C8741996B6B263BB38DA3D3 /* libPods-herogmtools-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E5ABFC4BEF2BF83DB8A12F4 /* libPods-herogmtools-tvOSTests.a */; };
+		9B8ACB20B407589FBA73E766 /* libPods-herogmtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CF6C9BF2DBEB4CB4777C2EE /* libPods-herogmtools.a */; };
 		A97B10E5E96D4A538A48F2FD /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA78EEC83CBA4126A6B62A4B /* Octicons.ttf */; };
-		AC96B4B1468780436E67C7D9 /* libPods-herogmtoolsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A913F36AF8187A908B41562 /* libPods-herogmtoolsTests.a */; };
 		AE96D6E114EA4D62BCBB5E4F /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65CC709197BC4A0F8B59DE19 /* MaterialIcons.ttf */; };
-		CC6B86030B4939D74B316F9E /* libPods-herogmtools-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3FC35F12C19BC9F85DECFC2 /* libPods-herogmtools-tvOS.a */; };
 		D00BAE095B6E43DEA03B8771 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF0F5EED43C048A2928059D0 /* FontAwesome.ttf */; };
 		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		ED2971652150620600B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED2971642150620600B7C4FE /* JavaScriptCore.framework */; };
@@ -62,42 +60,40 @@
 		00E356F21AD99517003FC87E /* herogmtoolsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = herogmtoolsTests.m; sourceTree = "<group>"; };
 		032F7BA2B145448BA32559A4 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		0601FBFDFDDF473CAB427FA2 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
-		06BED041DE98760566D63F4E /* Pods-herogmtools.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.release.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* herogmtools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = herogmtools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = herogmtools/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = herogmtools/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = herogmtools/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = herogmtools/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = herogmtools/main.m; sourceTree = "<group>"; };
+		161643D276515AF67C953BDF /* Pods-herogmtools.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.debug.xcconfig"; sourceTree = "<group>"; };
+		2021D2897B692D2FE3C3D8DD /* libPods-herogmtools-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		20C0C869C74A7D31A71B25B1 /* Pods-herogmtools-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOS/Pods-herogmtools-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		2CF6C9BF2DBEB4CB4777C2EE /* libPods-herogmtools.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E47B1E0B4A5D006451C7 /* herogmtools-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "herogmtools-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* herogmtools-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "herogmtools-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		30235C9D7C704C7DAB9DE089 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/native-base/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		30C7D698B4C94501A0EE994B /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
+		35547A820F53A698C23E1ADE /* Pods-herogmtoolsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtoolsTests.debug.xcconfig"; path = "Target Support Files/Pods-herogmtoolsTests/Pods-herogmtoolsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		39D88B968A064378903A3D21 /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
-		41466E02DA0D775D979C3957 /* Pods-herogmtools-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOS.release.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOS/Pods-herogmtools-tvOS.release.xcconfig"; sourceTree = "<group>"; };
-		4E5ABFC4BEF2BF83DB8A12F4 /* libPods-herogmtools-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CDE97FBA40BA3880844C9A4 /* libPods-herogmtools-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		547C0730AF6F42E7B8907B92 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
-		5A07E2E8687049C8FD3D52E2 /* Pods-herogmtools-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOSTests/Pods-herogmtools-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
-		5A913F36AF8187A908B41562 /* libPods-herogmtoolsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtoolsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		60703DC47E55C7918CFC596C /* Pods-herogmtools-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOSTests/Pods-herogmtools-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		65CC709197BC4A0F8B59DE19 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
-		6BA8D65239178C4F35895901 /* Pods-herogmtools-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOS/Pods-herogmtools-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
-		6DABBF62D570BD8529A66A8B /* libPods-herogmtools.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		760093DB18B1F82DBC5647BC /* Pods-herogmtoolsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtoolsTests.release.xcconfig"; path = "Target Support Files/Pods-herogmtoolsTests/Pods-herogmtoolsTests.release.xcconfig"; sourceTree = "<group>"; };
 		87C59F7F7F0E499CAB455D14 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
-		8805129C22E5021F00BB571D /* Hero2Page.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Hero2Page.pdf; path = ../android/app/src/main/assets/Hero2Page.pdf; sourceTree = "<group>"; };
-		8805129D22E5021F00BB571D /* Hero Survival Guide.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "Hero Survival Guide.pdf"; path = "../android/app/src/main/assets/Hero Survival Guide.pdf"; sourceTree = "<group>"; };
 		88E0EDE32212595C00EAE0BE /* herogmtools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = herogmtools.entitlements; path = herogmtools/herogmtools.entitlements; sourceTree = "<group>"; };
-		9075A3F5FF1B9CE2E9B32ACA /* Pods-herogmtools.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.debug.xcconfig"; sourceTree = "<group>"; };
-		A3FC35F12C19BC9F85DECFC2 /* libPods-herogmtools-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A41A93F4220801E6BEFF4BDE /* Pods-herogmtoolsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtoolsTests.debug.xcconfig"; path = "Target Support Files/Pods-herogmtoolsTests/Pods-herogmtoolsTests.debug.xcconfig"; sourceTree = "<group>"; };
+		9E511FCBC399239A93EA5757 /* Pods-herogmtools-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOSTests/Pods-herogmtools-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
+		A1F093C196F25F2B20D28A54 /* Pods-herogmtools.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.release.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.release.xcconfig"; sourceTree = "<group>"; };
+		A3EAABE6FA029388E1C8987A /* libPods-herogmtoolsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtoolsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AABF05B4C2FF4D49AB1C5046 /* Roboto_medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto_medium.ttf; path = "../node_modules/native-base/Fonts/Roboto_medium.ttf"; sourceTree = "<group>"; };
 		AB0A7146301A4C179A539474 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
 		BF0F5EED43C048A2928059D0 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
+		CCEFA84D75BFEAD35ED1BDEB /* Pods-herogmtoolsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtoolsTests.release.xcconfig"; path = "Target Support Files/Pods-herogmtoolsTests/Pods-herogmtoolsTests.release.xcconfig"; sourceTree = "<group>"; };
 		EA78EEC83CBA4126A6B62A4B /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		EF5EBB9C5643A98565501B22 /* Pods-herogmtools-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOS.release.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOS/Pods-herogmtools-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		F198F0437C7A8A1C0DF6D23F /* Pods-herogmtools-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools-tvOSTests/Pods-herogmtools-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,7 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC96B4B1468780436E67C7D9 /* libPods-herogmtoolsTests.a in Frameworks */,
+				6D85011114073777A869D7A4 /* libPods-herogmtoolsTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,7 +110,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
-				8BD0A974F8143030DF49E56F /* libPods-herogmtools.a in Frameworks */,
+				9B8ACB20B407589FBA73E766 /* libPods-herogmtools.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,7 +120,7 @@
 			files = (
 				ED2971652150620600B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				2D16E6881FA4F8E400B85C8A /* libReact.a in Frameworks */,
-				CC6B86030B4939D74B316F9E /* libPods-herogmtools-tvOS.a in Frameworks */,
+				40799C8C497BEC04872475FA /* libPods-herogmtools-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,7 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C8741996B6B263BB38DA3D3 /* libPods-herogmtools-tvOSTests.a in Frameworks */,
+				1262BC473529263FA7EFA881 /* libPods-herogmtools-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,10 +172,10 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
-				6DABBF62D570BD8529A66A8B /* libPods-herogmtools.a */,
-				A3FC35F12C19BC9F85DECFC2 /* libPods-herogmtools-tvOS.a */,
-				4E5ABFC4BEF2BF83DB8A12F4 /* libPods-herogmtools-tvOSTests.a */,
-				5A913F36AF8187A908B41562 /* libPods-herogmtoolsTests.a */,
+				2CF6C9BF2DBEB4CB4777C2EE /* libPods-herogmtools.a */,
+				3CDE97FBA40BA3880844C9A4 /* libPods-herogmtools-tvOS.a */,
+				2021D2897B692D2FE3C3D8DD /* libPods-herogmtools-tvOSTests.a */,
+				A3EAABE6FA029388E1C8987A /* libPods-herogmtoolsTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -187,14 +183,14 @@
 		3E25AF80E96BABBBA241FD29 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				9075A3F5FF1B9CE2E9B32ACA /* Pods-herogmtools.debug.xcconfig */,
-				06BED041DE98760566D63F4E /* Pods-herogmtools.release.xcconfig */,
-				6BA8D65239178C4F35895901 /* Pods-herogmtools-tvOS.debug.xcconfig */,
-				41466E02DA0D775D979C3957 /* Pods-herogmtools-tvOS.release.xcconfig */,
-				5A07E2E8687049C8FD3D52E2 /* Pods-herogmtools-tvOSTests.debug.xcconfig */,
-				60703DC47E55C7918CFC596C /* Pods-herogmtools-tvOSTests.release.xcconfig */,
-				A41A93F4220801E6BEFF4BDE /* Pods-herogmtoolsTests.debug.xcconfig */,
-				760093DB18B1F82DBC5647BC /* Pods-herogmtoolsTests.release.xcconfig */,
+				161643D276515AF67C953BDF /* Pods-herogmtools.debug.xcconfig */,
+				A1F093C196F25F2B20D28A54 /* Pods-herogmtools.release.xcconfig */,
+				20C0C869C74A7D31A71B25B1 /* Pods-herogmtools-tvOS.debug.xcconfig */,
+				EF5EBB9C5643A98565501B22 /* Pods-herogmtools-tvOS.release.xcconfig */,
+				F198F0437C7A8A1C0DF6D23F /* Pods-herogmtools-tvOSTests.debug.xcconfig */,
+				9E511FCBC399239A93EA5757 /* Pods-herogmtools-tvOSTests.release.xcconfig */,
+				35547A820F53A698C23E1ADE /* Pods-herogmtoolsTests.debug.xcconfig */,
+				CCEFA84D75BFEAD35ED1BDEB /* Pods-herogmtoolsTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -202,8 +198,6 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				8805129D22E5021F00BB571D /* Hero Survival Guide.pdf */,
-				8805129C22E5021F00BB571D /* Hero2Page.pdf */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -269,7 +263,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "herogmtoolsTests" */;
 			buildPhases = (
-				80B0A12E7E9B0416CFBD5D7F /* [CP] Check Pods Manifest.lock */,
+				8239B8AC65AA9160213C27F1 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -288,7 +282,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "herogmtools" */;
 			buildPhases = (
-				321A1BFF94E7A0C1861E9527 /* [CP] Check Pods Manifest.lock */,
+				0EE11554075F2AD60C09C1E9 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
@@ -307,7 +301,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "herogmtools-tvOS" */;
 			buildPhases = (
-				3CABA8DDEE9E6A95FBB04524 /* [CP] Check Pods Manifest.lock */,
+				2C63AF8EF83D606F111A8FFD /* [CP] Check Pods Manifest.lock */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
 				2D02E4781E0B4A5D006451C7 /* Frameworks */,
 				2D02E4791E0B4A5D006451C7 /* Resources */,
@@ -326,7 +320,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "herogmtools-tvOSTests" */;
 			buildPhases = (
-				1E61503482EAE5F8FBDB6FBA /* [CP] Check Pods Manifest.lock */,
+				542A9E13ED2BD9C5ED54E50C /* [CP] Check Pods Manifest.lock */,
 				2D02E48C1E0B4A5D006451C7 /* Sources */,
 				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
 				2D02E48E1E0B4A5D006451C7 /* Resources */,
@@ -412,9 +406,7 @@
 				5069CA3FEC4141AE9B9AFBBC /* Entypo.ttf in Resources */,
 				74FFE52DECFF4E59BA23DCC0 /* EvilIcons.ttf in Resources */,
 				D00BAE095B6E43DEA03B8771 /* FontAwesome.ttf in Resources */,
-				8805129E22E5021F00BB571D /* Hero2Page.pdf in Resources */,
 				62EE979F47374B98B7BE7276 /* Foundation.ttf in Resources */,
-				8805129F22E5021F00BB571D /* Hero Survival Guide.pdf in Resources */,
 				3CB4141F7FEC4710A0A71A61 /* Ionicons.ttf in Resources */,
 				AE96D6E114EA4D62BCBB5E4F /* MaterialIcons.ttf in Resources */,
 				A97B10E5E96D4A538A48F2FD /* Octicons.ttf in Resources */,
@@ -458,43 +450,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		1E61503482EAE5F8FBDB6FBA /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-herogmtools-tvOSTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native Code And Images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		321A1BFF94E7A0C1861E9527 /* [CP] Check Pods Manifest.lock */ = {
+		0EE11554075F2AD60C09C1E9 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -516,7 +472,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3CABA8DDEE9E6A95FBB04524 /* [CP] Check Pods Manifest.lock */ = {
+		2C63AF8EF83D606F111A8FFD /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -538,7 +494,43 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		80B0A12E7E9B0416CFBD5D7F /* [CP] Check Pods Manifest.lock */ = {
+		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle React Native Code And Images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		542A9E13ED2BD9C5ED54E50C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-herogmtools-tvOSTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8239B8AC65AA9160213C27F1 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -615,7 +607,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A41A93F4220801E6BEFF4BDE /* Pods-herogmtoolsTests.debug.xcconfig */;
+			baseConfigurationReference = 35547A820F53A698C23E1ADE /* Pods-herogmtoolsTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -639,7 +631,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 760093DB18B1F82DBC5647BC /* Pods-herogmtoolsTests.release.xcconfig */;
+			baseConfigurationReference = CCEFA84D75BFEAD35ED1BDEB /* Pods-herogmtoolsTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -660,20 +652,20 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9075A3F5FF1B9CE2E9B32ACA /* Pods-herogmtools.debug.xcconfig */;
+			baseConfigurationReference = 161643D276515AF67C953BDF /* Pods-herogmtools.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = herogmtools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.2.11;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -688,19 +680,19 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 06BED041DE98760566D63F4E /* Pods-herogmtools.release.xcconfig */;
+			baseConfigurationReference = A1F093C196F25F2B20D28A54 /* Pods-herogmtools.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = herogmtools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.2.11;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -715,7 +707,7 @@
 		};
 		2D02E4971E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6BA8D65239178C4F35895901 /* Pods-herogmtools-tvOS.debug.xcconfig */;
+			baseConfigurationReference = 20C0C869C74A7D31A71B25B1 /* Pods-herogmtools-tvOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -744,7 +736,7 @@
 		};
 		2D02E4981E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 41466E02DA0D775D979C3957 /* Pods-herogmtools-tvOS.release.xcconfig */;
+			baseConfigurationReference = EF5EBB9C5643A98565501B22 /* Pods-herogmtools-tvOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -773,7 +765,7 @@
 		};
 		2D02E4991E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5A07E2E8687049C8FD3D52E2 /* Pods-herogmtools-tvOSTests.debug.xcconfig */;
+			baseConfigurationReference = F198F0437C7A8A1C0DF6D23F /* Pods-herogmtools-tvOSTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -801,7 +793,7 @@
 		};
 		2D02E49A1E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 60703DC47E55C7918CFC596C /* Pods-herogmtools-tvOSTests.release.xcconfig */;
+			baseConfigurationReference = 9E511FCBC399239A93EA5757 /* Pods-herogmtools-tvOSTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
