@@ -51,6 +51,10 @@ class HomeScreen extends Component {
 
     _loadCharacter() {
         character.load(this.startLoad, this.endLoad).then(char => {
+            if (char === null || char === undefined) {
+                return;
+            }
+
             this.props.setShowSecondary(true);
             this.props.setCharacter(char);
 
