@@ -50,7 +50,7 @@ export default class Powers extends Component {
         if (character.isAttackPower(this.state.items[index])) {
             this.props.updateForm('damage', character.getDamage(this.state.items[index], this.props.strengthDamage));
 
-            this.props.navigation.navigate('Damage');
+            this.props.navigation.navigate('Damage', {from: 'ViewCharacter'});
         }
     }
 

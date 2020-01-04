@@ -37,9 +37,9 @@ export function setUseFifthEditionRules(fifth) {
     };
 }
 
-initialState = {};
+settingsState = {};
 
-export default function settings(state = initialState, action) {
+export default function settings(state = settingsState, action) {
     let newState = null
 
     switch (action.type) {

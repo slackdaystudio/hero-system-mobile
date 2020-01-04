@@ -1,7 +1,8 @@
 import React, { Component }  from 'react';
 import { StyleSheet, Text, View, Button, StatusBar, Alert } from 'react-native';
+import { createAppContainer } from 'react-navigation';
 import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
+import { addNavigationHelpers, Provider, dispatch, addListener } from 'react-redux';
 import SplashScreen from 'react-native-splash-screen'
 import thunk from 'redux-thunk';
 import { Root } from "native-base";
@@ -14,6 +15,8 @@ import AppNavigator from './AppNavigator';
 
 export const store = createStore(reducer, applyMiddleware(thunk));
 
+const AppContainer = createAppContainer(AppNavigator);
+
 export default class App extends Component {
 	componentWillMount() {
         SplashScreen.hide();
@@ -23,7 +26,7 @@ export default class App extends Component {
 		return (
 			<Provider store={store}>
 				<Root>
-					<AppNavigator />
+					<AppContainer />
 				</Root>
 			</Provider>
 		);

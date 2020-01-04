@@ -1,7 +1,8 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { BackHandler,Platform, StyleSheet, View, ScrollView } from 'react-native';
+import { BackHandler, Platform, StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
+import { NavigationEvents } from 'react-navigation';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
 import Characteristics from '../Character/Characteristics';
@@ -18,12 +19,16 @@ import { updateForm } from '../../reducers/forms';
 import { setSparseCombatDetails } from '../../reducers/combat';
 
 class ViewCharacterScreen extends Component {
-    componentDidMount() {
+    onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.navigate('Home');
 
             return true;
         });
+    }
+
+    onDidBlur() {
+        this.backHandler.remove();
     }
 
     _renderPowers(powers) {
@@ -77,6 +82,10 @@ class ViewCharacterScreen extends Component {
 
 		return (
 		  <Container style={styles.container}>
+            <NavigationEvents
+                onDidFocus={(payload) => this.onDidFocus()}
+                onDidBlur={(payload) => this.onDidBlur()}
+            />
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
 		  	<Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
                 <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>

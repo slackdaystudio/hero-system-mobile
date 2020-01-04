@@ -14,7 +14,7 @@ export default class TextList extends Component {
 
     _rollCheck(threshold) {
         if (threshold !== '') {
-            this.props.navigation.navigate('Result', dieRoller.rollCheck(threshold))
+            this.props.navigation.navigate('Result', {from: 'ViewCharacter', result: dieRoller.rollCheck(threshold)})
         }
     }
 

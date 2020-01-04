@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler,Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
+import { NavigationEvents } from 'react-navigation';
 import General from '../HeroDesignerCharacter/General';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
 import Traits from '../HeroDesignerCharacter/Traits';
@@ -17,12 +18,16 @@ class ViewHeroDesignerCharacterScreen extends Component {
 		character: PropTypes.object.isRequired
 	}
 
-    componentDidMount() {
+    onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.navigate('Home');
 
             return true;
         });
+    }
+
+    onDidBlur() {
+        this.backHandler.remove();
     }
 
     _renderTab(title, listKey, subListKey) {
@@ -61,6 +66,10 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
 		return (
 		  <Container style={styles.container}>
+            <NavigationEvents
+                onDidFocus={(payload) => this.onDidFocus()}
+                onDidBlur={(payload) => this.onDidBlur()}
+            />
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
 		  	<Content scrollEnable={false} style={styles.content}>
                 <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>

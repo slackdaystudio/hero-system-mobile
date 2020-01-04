@@ -65,12 +65,12 @@ export function clearCharacter() {
     };
 }
 
-initialState = {
+characterState = {
     character: null,
     showSecondary: true
 };
 
-export default function character(state = initialState, action) {
+export default function character(state = characterState, action) {
     let newState = null
 
     switch (action.type) {

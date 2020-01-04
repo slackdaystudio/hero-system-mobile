@@ -297,7 +297,7 @@ class Characteristics extends Component {
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                     <TouchableHighlight
                                         underlayColor='#121212'
-                                        onPress={() => this.props.navigation.navigate('Result', dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.powersMap)))}
+                                        onPress={() => this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.powersMap))})}
                                     >
                                         <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.powersMap)}</Text>
                                     </TouchableHighlight>

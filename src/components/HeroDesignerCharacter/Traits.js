@@ -83,7 +83,7 @@ export default class Traits extends Component {
 
     _roll(roll) {
         if (roll.type === SKILL_CHECK) {
-            this.props.navigation.navigate('Result', dieRoller.rollCheck(roll.roll));
+            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(roll.roll)});
         } else if (roll.type === NORMAL_DAMAGE) {
             let dice = common.toDice(roll.roll);
 
@@ -92,7 +92,7 @@ export default class Traits extends Component {
                 partialDie: dice.partial
             });
 
-            this.props.navigation.navigate('Damage');
+            this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
         } else if (roll.type === KILLING_DAMAGE) {
             let dice = common.toDice(roll.roll);
 
@@ -103,7 +103,7 @@ export default class Traits extends Component {
                 damageType: KILLING_DAMAGE
             });
 
-            this.props.navigation.navigate('Damage');
+            this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
         } else if (roll.type === FREE_FORM) {
             let dice = common.toDice(roll.roll);
             let halfDice = 0;
@@ -123,7 +123,7 @@ export default class Traits extends Component {
                     // do nothing
             }
 
-            this.props.navigation.navigate('Result', dieRoller.freeFormRoll(dice.full, halfDice, pips));
+            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.freeFormRoll(dice.full, halfDice, pips)});
         }
     }
 

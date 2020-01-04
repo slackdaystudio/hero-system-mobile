@@ -1,8 +1,9 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, View, Image } from 'react-native';
+import { BackHandler, StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
+import { NavigationEvents } from 'react-navigation';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -18,18 +19,29 @@ class FreeFormScreen extends Component {
 		this.roll = this._roll.bind(this);
 	}
 	
-	componentDidMount() {
+	onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (this.props.navigation.state.params === undefined) {
+                this.props.navigation.navigate('Home');
+            } else {
+                this.props.navigation.navigate(this.props.navigation.state.params.from);
+            }
+
+            return true;
+        });
+
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
 	}
 
-   	componentWillUnmount() {
+   	onDidBlur() {
    		RNShake.removeEventListener('ShakeEvent');
+   		this.backHandler.remove();
    	}
 
     _roll() {
-        this.props.navigation.navigate('Result', dieRoller.freeFormRoll(this.props.freeFormForm.dice, this.props.freeFormForm.halfDice, this.props.freeFormForm.pips));
+        this.props.navigation.navigate('Result', {from: 'FreeForm', result: dieRoller.freeFormRoll(this.props.freeFormForm.dice, this.props.freeFormForm.halfDice, this.props.freeFormForm.pips)});
     }
 
 	_setSliderState(key, value) {
@@ -39,6 +51,10 @@ class FreeFormScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
 				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
 				    <Text style={styles.heading}>Free Form Roll</Text>

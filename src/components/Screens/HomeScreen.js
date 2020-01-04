@@ -20,6 +20,7 @@ class HomeScreen extends Component {
         super(props);
 
         this.state = {
+            loaded: false,
             characterLoading: false
         };
 
@@ -29,11 +30,15 @@ class HomeScreen extends Component {
     }
 
     async componentDidMount() {
-        await this.props.initializeApplicationSettings();
-		await this.props.initializeStatistics();
-		await this.props.initializeCharacter();
-		await this.props.initializeRandomHero();
-		await this.props.initializeCombatDetails();
+        if (!this.state.loaded) {
+            await this.props.initializeApplicationSettings();
+            await this.props.initializeStatistics();
+            await this.props.initializeCharacter();
+            await this.props.initializeRandomHero();
+            await this.props.initializeCombatDetails();
+
+            this.setState({loaded: true});
+        }
     }
 
     _startLoad() {

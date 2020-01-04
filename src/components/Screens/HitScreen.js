@@ -1,8 +1,9 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
+import { BackHandler, Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
 import RNShake from 'react-native-shake';
+import { NavigationEvents } from 'react-navigation';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
@@ -25,18 +26,25 @@ class HitScreen extends Component {
 		this.setLocation = this._setLocation.bind(this);
 	}
 
-	componentDidMount() {
+	onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
+
+            return true;
+        });
+
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
 	}
 
-   	componentWillUnmount() {
+   	onDidBlur() {
    		RNShake.removeEventListener('ShakeEvent');
+   		this.backHandler.remove();
    	}
 
     _roll() {
-        this.props.navigation.navigate('Result', dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv));
+        this.props.navigation.navigate('Result', {from: 'Hit', result: dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv)});
     }
 
 	_updateFormValue(key, value) {
@@ -107,6 +115,10 @@ class HitScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
 			    <Header navigation={this.props.navigation} />
 				<Content scrollEnable={false}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>

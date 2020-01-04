@@ -1,7 +1,8 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import {BackHandler, StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Text, List, ListItem, Left, Right, Spinner, Tabs, Tab, ScrollableTab } from 'native-base';
+import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
 import { statistics } from '../../lib/Statistics';
 import { chart } from '../../lib/Chart';
@@ -10,6 +11,18 @@ import styles from '../../Styles';
 class StatisticsScreen extends Component {
     constructor(props) {
         super(props);
+    }
+
+    onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
+
+            return true;
+        });
+    }
+
+    onDidBlur() {
+        this.backHandler.remove();
     }
 
     _renderHitLocationStat() {
@@ -56,6 +69,10 @@ class StatisticsScreen extends Component {
 
 		return (
 		  <Container style={styles.container}>
+            <NavigationEvents
+                onDidFocus={(payload) => this.onDidFocus()}
+                onDidBlur={(payload) => this.onDidBlur()}
+            />
 			<Header navigation={this.props.navigation} />
 	        <Content style={styles.content}>
 	            <Text style={styles.heading}>Statistics</Text>

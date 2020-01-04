@@ -1,6 +1,8 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { StyleSheet, View, Image, Switch } from 'react-native';
+import { NavigationEvents } from 'react-navigation';
+import { BackHandler, StyleSheet, View, Image, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
@@ -11,6 +13,11 @@ import styles from '../../Styles';
 import { updateFormValue } from '../../reducers/forms';
 
 class SkillScreen extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        skillForm: PropTypes.object.isRequired
+    }
+
 	constructor(props) {
 		super(props);
 
@@ -18,20 +25,27 @@ class SkillScreen extends Component {
 		this.roll = this._roll.bind(this);
 	}
 
-	componentDidMount() {
+	onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
+
+            return true;
+        });
+
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
 	}
 
-   	componentWillUnmount() {
+   	onDidBlur() {
    		RNShake.removeEventListener('ShakeEvent');
+   		this.backHandler.remove();
    	}
 
     _roll() {
         let threshold = this.props.skillForm.skillCheck ? this.props.skillForm.value + '-' : null;
 
-        this.props.navigation.navigate('Result', dieRoller.rollCheck(threshold));
+        this.props.navigation.navigate('Result', {from: 'Skill', result: dieRoller.rollCheck(threshold)});
     }
 
     _updateFormValue(key, value) {
@@ -64,6 +78,10 @@ class SkillScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
 			    <Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
 				    <Text style={styles.heading}>Roll 3d6</Text>

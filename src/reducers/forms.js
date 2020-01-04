@@ -124,7 +124,7 @@ function _initializeCostCruncherForm() {
    };
 }
 
-initialState = {
+formsState = {
     skill: _initializeSkillForm(),
     hit: _initializeHitForm(),
     damage: _initializeDamageForm(),
@@ -132,7 +132,7 @@ initialState = {
     costCruncher: _initializeCostCruncherForm()
 };
 
-export default function forms(state = initialState, action) {
+export default function forms(state = formsState, action) {
     let newState = null
 
     switch (action.type) {

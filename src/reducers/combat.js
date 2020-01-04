@@ -50,9 +50,9 @@ export function setSparseCombatDetails(sparseCombatDetails) {
     };
 }
 
-initialState = {};
+combatState = {};
 
-export default function combat(state = initialState, action) {
+export default function combat(state = combatState, action) {
     let newState = null
 
     switch (action.type) {

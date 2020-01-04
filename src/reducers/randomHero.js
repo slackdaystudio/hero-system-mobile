@@ -31,10 +31,10 @@ export function initializeRandomHero() {
 
 export function setRandomHero(randomHero) {
     return async (dispatch) => {
-        persistence.setRandomHero(randomHero).then((character) => {
+        persistence.setRandomHero(randomHero).then((randomHero) => {
             dispatch({
                 type: SET_RANDOM_HERO,
-                payload: character
+                payload: randomHero
             });
         });
     };
@@ -42,10 +42,10 @@ export function setRandomHero(randomHero) {
 
 export function setRandomHeroName(name) {
     return async (dispatch) => {
-        persistence.setRandomHeroName(name).then((character) => {
+        persistence.setRandomHeroName(name).then((randomHero) => {
             dispatch({
                 type: SET_RANDOM_HERO_NAME,
-                payload: character
+                payload: randomHero
             });
         });
     };
@@ -62,11 +62,11 @@ export function clearRandomHero() {
     };
 }
 
-initialState = {
-    character: null
+heroState = {
+    hero: null
 };
 
-export default function randomHero(state = initialState, action) {
+export default function randomHero(state = heroState, action) {
     let newState = null
 
     switch (action.type) {
@@ -76,12 +76,12 @@ export default function randomHero(state = initialState, action) {
         case CLEAR_HERO:
             newState = {
                 ...state,
-                character: {
-                    ...state.character
+                hero: {
+                    ...state.hero
                 }
             };
 
-            newState.character = action.payload;
+            newState.hero = action.payload;
 
             return newState;
         default:

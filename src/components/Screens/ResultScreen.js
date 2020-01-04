@@ -1,8 +1,9 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image, Alert } from 'react-native';
+import { BackHandler, StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
-import AnimateNumber from 'react-native-animate-number'
+import AnimateNumber from 'react-native-animate-number';
+import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
@@ -13,21 +14,31 @@ export default class ResultScreen extends Component {
 		super(props);
 
 		this.state = {
-			result: props.navigation.state.params
+			result: props.navigation.state.params.result
 		}
-
-        this._updateStatistics();
 
 		this.reRoll = this._reRoll.bind(this);
 	}
 
-	componentDidMount() {
+	onDidFocus() {
+		this.setState({result: this.props.navigation.state.params.result}, () => {
+		    this._updateStatistics();
+		});
+
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate(this.props.navigation.state.params.from || 'Home');
+
+            return true;
+        });
+
         RNShake.addEventListener('ShakeEvent', () => {
             this.reRoll();
         });
 	}
 
-   	componentWillUnmount() {
+   	onDidBlur() {
+   	    this.backHandler.remove();
+
    		RNShake.removeEventListener('ShakeEvent');
 
    		this.props.navigation.state.params = null;
@@ -45,7 +56,7 @@ export default class ResultScreen extends Component {
 
 	_reRoll() {
 		this.setState({
-			result: dieRoller.rollAgain(this.props.navigation.state.params)
+			result: dieRoller.rollAgain(this.props.navigation.state.params.result)
 		}, () => {
             this._updateStatistics();
 		});
@@ -227,6 +238,10 @@ export default class ResultScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
 				<Header navigation={this.props.navigation} />
 				<Content style={styles.content}>
 				    <Text style={styles.heading}>Roll Result</Text>

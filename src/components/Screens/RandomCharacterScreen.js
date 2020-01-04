@@ -1,8 +1,9 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { Platform, StyleSheet, View, Image, Alert } from 'react-native';
+import { BackHandler, Platform, StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
 import RNShake from 'react-native-shake';
+import { NavigationEvents } from 'react-navigation';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import LabelAndContent from '../LabelAndContent/LabelAndContent';
 import Header from '../Header/Header';
@@ -16,7 +17,13 @@ class RandomCharacterScreen extends Component {
 		this.reRoll = this._reRoll.bind(this);
 	}
 
-	componentDidMount() {
+	onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
+
+            return true;
+        });
+
 	    if (this.props.character === null) {
 	        this.props.setRandomHero(randomCharacter.generate());
 	    }
@@ -26,8 +33,9 @@ class RandomCharacterScreen extends Component {
         });
 	}
 
-	componentWillUnmount() {
+	onDidBlur() {
 		RNShake.removeEventListener('ShakeEvent');
+		this.backHandler.remove();
 	}
 
 	_reRoll() {
@@ -63,6 +71,10 @@ class RandomCharacterScreen extends Component {
 	    if (this.props.character === null) {
             return (
                 <Container style={styles.container}>
+                    <NavigationEvents
+                        onDidFocus={(payload) => this.onDidFocus()}
+                        onDidBlur={(payload) => this.onDidBlur()}
+                    />
                     <Header hasTabs={true} navigation={this.props.navigation} />
                     <Content style={styles.content}>
                         <Spinner color='#D0D1D3' />
@@ -73,6 +85,10 @@ class RandomCharacterScreen extends Component {
 
 		return (
 		  <Container style={styles.container}>
+            <NavigationEvents
+                onDidFocus={(payload) => this.onDidFocus()}
+                onDidBlur={(payload) => this.onDidBlur()}
+            />
 		  	<Header hasTabs={true} navigation={this.props.navigation} />
 				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
 			  	<Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
@@ -240,7 +256,7 @@ const localStyles = StyleSheet.create({
 
 const mapStateToProps = state => {
     return {
-        character: state.randomHero.character
+        character: state.randomHero.hero
     };
 }
 

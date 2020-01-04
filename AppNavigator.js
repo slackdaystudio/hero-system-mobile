@@ -1,5 +1,4 @@
 import React, { Component }  from 'react';
-import { createAppContainer } from 'react-navigation';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
@@ -16,18 +15,42 @@ import SettingsScreen from './src/components/Screens/SettingsScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
 
 const AppNavigator = createDrawerNavigator({
-    Home: HomeScreen,
-    ViewCharacter: ViewCharacterScreen,
-    ViewHeroDesignerCharacter: ViewHeroDesignerCharacterScreen,
-    RandomCharacter: RandomCharacterScreen,
-    Result: ResultScreen,
-    Skill: SkillScreen,
-    Hit: HitScreen,
-    Damage: DamageScreen,
-    FreeForm: FreeFormScreen,
-    CostCruncher: CostCruncherScreen,
-    Statistics: StatisticsScreen,
-    Settings: SettingsScreen
+    Home: {
+        screen: HomeScreen,
+    },
+    ViewCharacter: {
+        screen: ViewCharacterScreen,
+    },
+    ViewHeroDesignerCharacter: {
+        screen: ViewHeroDesignerCharacterScreen,
+    },
+    RandomCharacter: {
+        screen: RandomCharacterScreen,
+    },
+    Result: {
+        screen: ResultScreen,
+    },
+    Skill: {
+        screen: SkillScreen,
+    },
+    Hit: {
+        screen: HitScreen,
+    },
+    Damage: {
+        screen: DamageScreen,
+    },
+    FreeForm: {
+        screen: FreeFormScreen,
+    },
+    CostCruncher: {
+        screen: CostCruncherScreen,
+    },
+    Statistics: {
+        screen: StatisticsScreen,
+    },
+    Settings: {
+        screen: SettingsScreen
+    }
 }, {
     initialRouteName: 'Home',
     drawerPosition: 'right',
@@ -35,4 +58,4 @@ const AppNavigator = createDrawerNavigator({
     drawerWidth: 250
 });
 
-export default createAppContainer(AppNavigator);
+export default AppNavigator;

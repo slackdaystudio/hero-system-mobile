@@ -34,9 +34,9 @@ export function clearStatistics() {
     };
 }
 
-initialState = {};
+statisticsState = {};
 
-export default function statistics(state = initialState, action) {
+export default function statistics(state = statisticsState, action) {
     let newState = null
 
     switch (action.type) {

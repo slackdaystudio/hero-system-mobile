@@ -1,8 +1,9 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux';
-import { Platform, StyleSheet, View, Image, Picker, Switch, Alert } from 'react-native';
+import { BackHandler, Platform, StyleSheet, View, Image, Picker, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Item, Tabs, Tab, ScrollableTab } from 'native-base';
 import RNShake from 'react-native-shake';
+import { NavigationEvents } from 'react-navigation';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE } from '../../lib/DieRoller';
@@ -24,18 +25,29 @@ class DamageScreen extends Component {
 		this.roll = this._roll.bind(this);
 	}
 
-	componentDidMount() {
+	onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (this.props.navigation.state.params === undefined) {
+                this.props.navigation.navigate('Home');
+            } else {
+                this.props.navigation.navigate(this.props.navigation.state.params.from);
+            }
+
+            return true;
+        });
+
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
 	}
 
-   	componentWillUnmount() {
+   	onDidBlur() {
    		RNShake.removeEventListener('ShakeEvent');
+   		this.backHandler.remove();
    	}
 
     _roll() {
-        this.props.navigation.navigate('Result', dieRoller.rollDamage(this.props.damageForm));
+        this.props.navigation.navigate('Result', {from: 'Damage', result: dieRoller.rollDamage(this.props.damageForm)});
     }
 
     _updateFormValue(key, value) {
@@ -95,6 +107,10 @@ class DamageScreen extends Component {
 	render() {
 		return (
 			<Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
 				<Header navigation={this.props.navigation} hasTabs={true} />
 				<Content scrollEnable={false}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline}>
