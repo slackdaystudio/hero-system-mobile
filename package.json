@@ -29,7 +29,7 @@
     "iconv-lite": "^0.5.0",
     "native-base": "~2.12.2",
     "react": "16.8.6",
-    "react-native": "^0.60.6",
+    "react-native": "^0.60.4",
     "react-native-animate-number": "^0.1.2",
     "react-native-document-picker": "^3.2.4",
     "react-native-gesture-handler": "^1.5.3",
