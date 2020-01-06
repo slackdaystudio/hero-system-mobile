@@ -12,6 +12,10 @@ Below you'll find information about performing common tasks. The most recent ver
   * [npm run android](#npm-run-android)
 * [Writing and Running Tests](#writing-and-running-tests)
 * [Troubleshooting](#troubleshooting)
+  * [Flushing General Caches](#flushing-general-caches)
+  * [Flushing Android Caches](#flushing-android-caches)
+  * [Flushing iOS Caches](#flushing-ios-caches)
+  * [Rebuilding](#rebuilding)
 
 ## Updating to New Releases
 
@@ -66,7 +70,18 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 Occasionally you will run into build issues that will baffle and confuse you such as a build working one day and not the next.  This is usually a caching issue and can be fixed by flushing he various caches in your development environment.
 
-### Flushing Caches - General
+Very often you can simply do the old trick of removing your node modules and rebuilding.
+
+```
+rm -rf node_modules/
+npm install
+```
+
+After nuking your `node_modules` don't forget to rebuild your app in XCode or by running `npm run android` if your building the android app.
+
+However, from time to time you will have to go down the dark path of forcing all of your caches to refresh.  This is deailed below. 
+
+### Flushing General Caches 
 
 Execute the following commands to flush the general caches.  It's recommended that you complete quit XCode if you are working on a Mac before you do any of this.
 
@@ -81,11 +96,15 @@ npm cache clean --force
 npm cache verify
 ```
 
+### Flushing Android Caches
+
 If you are building the Android app
 
 ```
 rm -rf android/build
 ```
+
+### Flushing iOS Caches
 
 If you are building in iOS
 
@@ -94,6 +113,8 @@ rm -rf ios/build
 rm -rf ios/pods
 rm -rf ios/Podfile.lock
 ```
+
+### Rebuilding
 
 Once all your various caches have been flushed you can begin to rebuild.
 
