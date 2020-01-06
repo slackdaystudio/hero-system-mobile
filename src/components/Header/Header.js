@@ -3,7 +3,7 @@ import { Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
 import { common } from '../../lib/Common';
 
-// Copyright 2020 Philip J. Guinchard
+// Copyright 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

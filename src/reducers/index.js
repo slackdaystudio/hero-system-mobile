@@ -6,7 +6,7 @@ import settings from './settings';
 import statistics from './statistics';
 import randomHero from './randomHero';
 
-// Copyright 2020 Philip J. Guinchard
+// Copyright 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

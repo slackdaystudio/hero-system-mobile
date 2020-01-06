@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, FREE_FORM, SKILL_CHECK } from './DieRoller';
 import { persistence } from './Persistence';
 
-// Copyright 2020 Philip J. Guinchard
+// Copyright 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

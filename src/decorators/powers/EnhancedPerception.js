@@ -4,7 +4,7 @@ import { SKILL_CHECK } from '../../lib/DieRoller';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 import { common } from '../../lib/Common';
 
-// Copyright 2020 Philip J. Guinchard
+// Copyright 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

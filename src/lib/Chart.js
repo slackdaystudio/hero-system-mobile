@@ -4,7 +4,7 @@ import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from "victory-nat
 import { PieChart, BarChart, YAxis, XAxis  } from 'react-native-svg-charts';
 import { Circle, G, Line, Text } from 'react-native-svg';
 
-// Copyright 2020 Philip J. Guinchard
+// Copyright 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
