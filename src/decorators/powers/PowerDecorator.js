@@ -1,4 +1,4 @@
-?import Absorption from './Absorption';
+import Absorption from './Absorption';
 import Barrier from './Barrier';
 import Characteristic from './Characteristic';
 import Clinging from './Clinging';
