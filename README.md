@@ -84,7 +84,7 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 ## Troubleshooting
 
-Occasionally you will run into build issues that will baffle and confuse you such as a build working one day and not the next.  This is usually a caching issue and can be fixed by flushing he various caches in your development environment.
+Occasionally you will run into build issues that will baffle and confuse you such as a build working one day and not the next.  This is usually a caching issue and can be fixed by flushing the various caches in your development environment.
 
 Very often you can simply do the old trick of removing your node modules and rebuilding.
 
