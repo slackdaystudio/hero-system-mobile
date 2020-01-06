@@ -1,6 +1,10 @@
-This project was bootstrapped with [Create React Native App](https://github.com/react-community/create-react-native-app).
+# HERO System Mobile
 
-Below you'll find information about performing common tasks. The most recent version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
+This project is dedicated to providing the best possible mobile app for the HERO System family of games.  Since 2018, this application has been freely offered on the [Android Play Store](https://play.google.com/store/apps/details?id=com.herogmtools&hl=en_CA), [Apple App Store](https://apps.apple.com/us/app/hero-system-mobile/id1352750917), and [Amazon Appstore](https://www.amazon.ca/Phil-Guinchard-HERO-System-Mobile/dp/B07BJ9879M).  Not only is the app free - it is also ad free, respects user privacy, and it will remain that way.  
+
+Up until 2020 this project has been a private project that was a single developer's ([me!](https://github.com/sentry0)) labour of love.  I am opening up the project to anyone who is interested in helping out in the hope that we can make the app bettter from a technical, feature, and user satisfaction level.  Now, if you have an idea for a killer feature to add to the app, you can grab the code, build your feature, and submit a PR.  If you don't have the technical ability, feel free to open a ticket and file your idea with the project.
+
+This project was bootstrapped with [Create React Native App](https://github.com/react-community/create-react-native-app).
 
 ## Table of Contents
 
@@ -16,6 +20,7 @@ Below you'll find information about performing common tasks. The most recent ver
   * [Flushing Android Caches](#flushing-android-caches)
   * [Flushing iOS Caches](#flushing-ios-caches)
   * [Rebuilding](#rebuilding)
+* [Donating](#donating)
 
 ## Updating to New Releases
 
@@ -129,3 +134,7 @@ cd ios/
 pod deintegrate
 pod install
 ```
+
+## Donating
+
+If you feel like donating to the project for whatever reason you can do so by [clicking here](https://www.paypal.com/paypalme/my/profile).  
