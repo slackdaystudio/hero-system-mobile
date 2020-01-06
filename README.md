@@ -45,7 +45,7 @@ Upgrading to a new version of React Native is something that should be done spar
 
 Below is a list of available commands.
 
-### `npm start`
+#### `npm start`
 
 Runs your app in development mode.
 
