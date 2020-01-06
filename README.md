@@ -2,7 +2,7 @@
 
 This project is dedicated to providing the best possible mobile app for the HERO System family of games.  Since 2018, this application has been freely offered on the [Android Play Store](https://play.google.com/store/apps/details?id=com.herogmtools&hl=en_CA), [Apple App Store](https://apps.apple.com/us/app/hero-system-mobile/id1352750917), and [Amazon Appstore](https://www.amazon.ca/Phil-Guinchard-HERO-System-Mobile/dp/B07BJ9879M).  Not only is the app free - it is also ad free, respects user privacy, and it will remain that way.  
 
-Up until 2020 this project has been a private project that was a single developer's ([me!](https://github.com/sentry0)) labour of love.  I am opening up the project to anyone who is interested in helping out in the hope that we can make the app bettter from a technical, feature, and user satisfaction level.  Now, if you have an idea for a killer feature to add to the app, you can grab the code, build your feature, and submit a PR.  If you don't have the technical ability, feel free to open a ticket and file your idea with the project.
+Up until 2020 this project has been a private project which was a single developer's ([me!](https://github.com/sentry0)) labour of love.  I am opening up the project to anyone who is interested in helping out in the hope that we can make the app bettter from a technical, feature, and user satisfaction level.  Now, if you have an idea for a killer feature to add to the app, you can grab the code, build your feature, and submit a PR.  If you don't have the technical ability, feel free to open a ticket and file your idea with the project.
 
 This project was bootstrapped with [Create React Native App](https://github.com/react-community/create-react-native-app).
 
@@ -16,10 +16,11 @@ This project was bootstrapped with [Create React Native App](https://github.com/
   * [npm run android](#npm-run-android)
 * [Writing and Running Tests](#writing-and-running-tests)
 * [Troubleshooting](#troubleshooting)
-  * [Flushing General Caches](#flushing-general-caches)
-  * [Flushing Android Caches](#flushing-android-caches)
-  * [Flushing iOS Caches](#flushing-ios-caches)
-  * [Rebuilding](#rebuilding)
+  * [Nuke It From Orbit](#nuke-it-from-orbit)
+    * [Flushing General Caches](#flushing-general-caches)
+    * [Flushing Android Caches](#flushing-android-caches)
+    * [Flushing iOS Caches](#flushing-ios-caches)
+    * [Rebuilding](#rebuilding)
 * [Donating](#donating)
 
 ## Updating to New Releases
@@ -82,11 +83,13 @@ rm -rf node_modules/
 npm install
 ```
 
-After nuking your `node_modules` don't forget to rebuild your app in XCode or by running `npm run android` if your building the android app.
+After re-installing your `node_modules` don't forget to rebuild your app in XCode or by running `npm run android` if you're building the android app.
 
-However, from time to time you will have to go down the dark path of forcing all of your caches to refresh.  This is deailed below. 
+### Nuke It From Orbit
 
-### Flushing General Caches 
+From time to time you will have to go down the dark path of forcing all of your caches to refresh.  This is deailed below. 
+
+#### Flushing General Caches 
 
 Execute the following commands to flush the general caches.  It's recommended that you complete quit XCode if you are working on a Mac before you do any of this.
 
@@ -101,7 +104,7 @@ npm cache clean --force
 npm cache verify
 ```
 
-### Flushing Android Caches
+#### Flushing Android Caches
 
 If you are building the Android app
 
@@ -109,7 +112,7 @@ If you are building the Android app
 rm -rf android/build
 ```
 
-### Flushing iOS Caches
+#### Flushing iOS Caches
 
 If you are building in iOS
 
@@ -119,7 +122,7 @@ rm -rf ios/pods
 rm -rf ios/Podfile.lock
 ```
 
-### Rebuilding
+#### Rebuilding
 
 Once all your various caches have been flushed you can begin to rebuild.
 
@@ -137,4 +140,4 @@ pod install
 
 ## Donating
 
-If you feel like donating to the project for whatever reason you can do so by [clicking here](https://www.paypal.com/paypalme/my/profile).  
+If you feel like donating to the project for whatever reason you can do so by [clicking here](https://www.paypal.com/paypalme/my/profile)... street Cyberline doesn't buy itself!
