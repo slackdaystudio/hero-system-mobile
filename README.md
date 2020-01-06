@@ -8,6 +8,7 @@ This project was bootstrapped with [Create React Native App](https://github.com/
 
 ## Table of Contents
 
+* [Screenshots](#screenshots)
 * [Updating to New Releases](#updating-to-new-releases)
 * [Available Scripts](#available-scripts)
   * [npm start](#npm-start)
@@ -22,6 +23,15 @@ This project was bootstrapped with [Create React Native App](https://github.com/
     * [Flushing iOS Caches](#flushing-ios-caches)
     * [Rebuilding](#rebuilding)
 * [Donating](#donating)
+
+## Screenshots
+
+Here's a couple of screenshots of tthe current app as of 2020-01-06.
+
+|                                               |                                                       |
+| --------------------------------------------- | ----------------------------------------------------- |
+| ![General](https://i.imgur.com/MzOD6iB.png?1) | ![Characteristics](https://i.imgur.com/fyBA4Kj.png?1) |
+
 
 ## Updating to New Releases
 
