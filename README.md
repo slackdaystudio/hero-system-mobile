@@ -11,6 +11,7 @@ Below you'll find information about performing common tasks. The most recent ver
   * [npm run ios](#npm-run-ios)
   * [npm run android](#npm-run-android)
 * [Writing and Running Tests](#writing-and-running-tests)
+* [Troubleshooting](#troubleshooting)
 
 ## Updating to New Releases
 
@@ -31,7 +32,7 @@ Runs your app in development mode.
 Sometimes you may need to reset or clear the React Native packager's cache. To do so, you can pass the `--reset-cache` flag to the start script:
 
 ```
-react-native start -- --reset-cache
+npm start -- --reset-cache
 ```
 
 #### `npm test`
@@ -63,4 +64,47 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 ## Troubleshooting
 
+Occasionally you will run into build issues that will baffle and confuse you such as a build working one day and not the next.  This is usually a caching issue and can be fixed by flushing he various caches in your development environment.
 
+### Flushing Caches - General
+
+Execute the following commands to flush the general caches.  It's recommended that you complete quit XCode if you are working on a Mac before you do any of this.
+
+```
+# from within your project root
+rm -rf node_modules
+rm -rf $TMPDIR/react-*
+rm -rf $TMPDIR/metro-*
+watchman watch-del-all
+rm -rf node_modules
+npm cache clean --force
+npm cache verify
+```
+
+If you are building the Android app
+
+```
+rm -rf android/build
+```
+
+If you are building in iOS
+
+```
+rm -rf ios/build
+rm -rf ios/pods
+rm -rf ios/Podfile.lock
+```
+
+Once all your various caches have been flushed you can begin to rebuild.
+
+```
+npm install
+```
+
+For iOS you will need to rebuild your CocoaPods
+
+```
+cd ios/
+pod deintegrate
+pod install
+```
