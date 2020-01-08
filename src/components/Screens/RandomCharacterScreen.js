@@ -105,12 +105,12 @@ class RandomCharacterScreen extends Component {
 	    }
 
         return (
-		  <Container style={styles.container}>
+            <Container style={styles.container}>
                 <NavigationEvents
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-		  	<Header hasTabs={true} navigation={this.props.navigation} />
+                <Header hasTabs={true} navigation={this.props.navigation} />
                 <Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
 			  	<Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
@@ -237,10 +237,10 @@ class RandomCharacterScreen extends Component {
 					  		{this.props.character.skills.skills.map((skill, index) => {
                                     return (
                                         <ListItem key={'skill-' + index}>
-						        		<Body>
-						        			<Text style={styles.grey}>{skill}</Text>
-						        		</Body>
-						        	</ListItem>
+                                            <Body>
+                                                <Text style={styles.grey}>{skill}</Text>
+                                            </Body>
+						        	    </ListItem>
                                     );
                                 })}
 				  		</View>
