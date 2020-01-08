@@ -1,1272 +1,1551 @@
 {
-	archtypes: [
-	   {
-	       name: 'Energy Projector',
-	       characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 18,
-                ego: 11,
-                pre: 15,
-                com: 18,
-                pd: 6,
-                ed: 4,
-                spd: 4,
-                rec: 10,
-                end: 50,
-                stun: 32
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Entangle 5d6 DEF 5'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Force Wall 10 rPD 10 rED'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Energy]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Energy]'                            
-                       }, {
-                           cost: 35,
-                           power: '1) EB 10d6'                            
-                       }, {
-                           cost: 15,
-                           power: '2) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '3) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 30,
-                           power: '4) Invisibility [sight], No Fringe, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower '                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Flash [sight] 4d6, AE 3"r (+1), Personal Immunity (+1/4), 1/2 END (+1/4)'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Images [Sight/Hearing], PER -3, AE 8"r (+3/4), 1/2 END (+1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Energy]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Energy]'                            
-                       }, {
-                           cost: 35,
-                           power: '1) EB 10d6'                            
-                       }, {
-                           cost: 22,
-                           power: '2) Flight 10", 8x NCM, Usable Underwater (+1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 10,
-                           power: '4) HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: 5,
-                           power: 'ES: UV Sight'                            
-                       }, {
-                           cost: 8,
-                           power: 'LS: Breathe Underwater, High Pressure, Intense Cold'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '2u',
-                           power: 'HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: '4u',
-                           power: 'Telekinesis 30 STR'                            
-                       }, {
-                           cost: '4u',
-                           power: 'Telekinesis 20 STR, Fine Manipulation'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Telekinesis]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }
-           ]
-	   }, {
-	       name: 'Gadgeteer',
-	       characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 13,
-                ego: 18,
-                pre: 15,
-                com: 18,
-                pd: 6,
-                ed: 4,
-                spd: 4,
-                rec: 7,
-                end: 40,
-                stun: 32
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 45,
-                           power: 'Armor +15 rPD +15 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EGO Attack 5d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Entangle 5d6 DEF 5'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Flight 10", 4x NCM, 8x NCM, 1/2 END (+1/4)'                            
-                       }, {
-                           cost: '5u',
-                           power: 'FW 10 rPD 10 rED'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Mind Control 10d6'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Gadgetry]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 35,
-                           power: '3) Mind Control 10d6'                            
-                       }, {
-                           cost: 15,
-                           power: '4) STR +30'                            
-                       }, {
-                           cost: 15,
-                           power: '5) Stretching 4", No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Entangle 5d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Mind Control 10d6'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Gadgetry]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }
-           ]
-	   }, {
-           name: 'Martial Artist',
-           characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 18,
-                ego: 11,
-                pre: 20,
-                com: 18,
-                pd: 8,
-                ed: 6,
-                spd: 4,
-                rec: 8,
-                end: 40,
-                stun: 32
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 24,
-                           power: 'Armor +8 rPD +8 rED'
-                       }, {
-                           cost: 10,
-                           power: 'Clinging 20 STR'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Martial Arts]'                            
-                       }, {
-                           cost: 10,
-                           power: '1) HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: '2) Invisibility [Hearing], No Fringe, No END (+1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) Running +5", 8x NCM, No END (+1/2)'                            
-                       }, {
-                           cost: 3,
-                           power: 'ES: PER +1'                            
-                       }, {
-                           cost: 8,
-                           power: 'Running +4'                            
-                       }, {
-                           cost: 0,
-                           power: 'Martial Maneuvers'                            
-                       }, {
-                           cost: 4,
-                           power: '1) Martial Block'                            
-                       }, {
-                           cost: 4,
-                           power: '2) Martial Disarm'                            
-                       }, {
-                           cost: 4,
-                           power: '3) Martial Dodge'                            
-                       }, {
-                           cost: 3,
-                           power: '4) Martial Throw'                            
-                       }
-                   ],
-                   powersCost: 115
-               }, {
-                   powers: [
-                       {
-                           cost: 24,
-                           power: 'Armor +8 rPD +8 rED'
-                       }, {
-                           cost: 10,
-                           power: 'Clinging 20 STR'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Martial Arts]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 10,
-                           power: '2) HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) Invisibility [Hearing], No Fringe, No END (+1/2)'                            
-                       }, {
-                           cost: 3,
-                           power: 'ES: Telescopic Sight +2'                            
-                       }, {
-                           cost: 8,
-                           power: 'Running +4"'                            
-                       }, {
-                           cost: 0,
-                           power: 'Martial Maneuvers'                            
-                       }, {
-                           cost: 4,
-                           power: '1) Martial Block'                            
-                       }, {
-                           cost: 4,
-                           power: '2) Martial Disarm'                            
-                       }, {
-                           cost: 4,
-                           power: '3) Martial Dodge'                            
-                       }, {
-                           cost: 3,
-                           power: '4) Martial Throw'                            
-                       }
-                   ],
-                   powersCost: 140
-               }
-           ]
-       }, {
-           name: 'Mentalist',
-           characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 13,
-                ego: 18,
-                pre: 15,
-                com: 18,
-                pd: 6,
-                ed: 4,
-                spd: 4,
-                rec: 8,
-                end: 40,
-                stun: 32
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EGO Attack 5d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Mind Control 10d6'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Mental Powers]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 45,
-                           power: 'Armor +15 rPD +15 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EGO Attack 5d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Flight 10",  4x Mass, 8x NCM, 1/2 END (+1/4)'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Mental Illusion 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Mind Control 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Telepathy 10d6'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Mental Powers]'                            
-                       }, {
-                           cost: 22,
-                           power: '1) Flight 10", 8x NCM, Usable Underwater (+1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 10,
-                           power: '3) HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: 35,
-                           power: '4) Mind Control 10d6'                            
-                       }, {
-                           cost: 5,
-                           power: 'ES: UV Sight'                            
-                       }, {
-                           cost: 8,
-                           power: 'LS: Breathe Underwater, High Pressure, Intense Cold'                            
-                       }
-                   ],
-                   powersCost: 125
-               }
-           ]
-       }, {
-           name: 'Metamorph',
-           characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 13,
-                ego: 11,
-                pre: 20,
-                com: 18,
-                pd: 6,
-                ed: 4,
-                spd: 4,
-                rec: 10,
-                end: 50,
-                stun: 32  
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 8,
-                           power: 'Armor +4 rPD +4 rED, Linked [Density Increase] (-1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Metamorph]'                            
-                       }, {
-                           cost: 22,
-                           power: '1) Density Increase: Mass 6400kg, STR +30, KB -6", PD +6, ED +6, Cost END Only To Activate (+1/4)'                            
-                       }, {
-                           cost: 35,
-                           power: '2) EB 10d6'                            
-                       }, {
-                           cost: 15,
-                           power: '3) Leaping +10", 8x NCM,  No END (+1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: '4) Tunneling 6" DEF 6'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 20,
-                           power: 'Armor +10 rPD +10 rED, Linked [Growth] (-1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Metamorph]'                            
-                       }, {
-                           cost: 35,
-                           power: '1) EB 10d6'                            
-                       }, {
-                           cost: 22,
-                           power: '2) Growth: Height 4", Width 2", Mass 6400kg, BODY/STUN +6, DCV -4, PER +4, Reach +2", STR +30, KB -6", Cost END Only To Activate (+1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) Running +5", 8x NCM, No END (+1/2)'                            
-                       }, {
-                           cost: 3,
-                           power: 'ES: Telescopic Sight +2'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Multiform: 250 Points'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Multiform: 250 Points'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Metamorph]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 45,
-                           power: 'Armor +15 rPD +15 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Metamorph]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 30,
-                           power: '2) Shape Shift [sight/Hearing/Touch], Limited Group of Shapes [Humanoid], Imitation, Cost END Only To Change Shape (+1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) STR +30'                            
-                       }, {
-                           cost: 5,
-                           power: 'Transform: Instant Change [Any], Linked [shape Shift] (-1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 30,
-                           power: 'Armor +10 rPD +10 rED'
-                       }, {
-                           cost: 25,
-                           power: 'EC [Metamorph]'                            
-                       }, {
-                           cost: 25,
-                           power: '1) EB 10d6'                            
-                       }, {
-                           cost: 25,
-                           power: '2) Shrinking: Height .125m, Mass .025kg, PER -8, DCV +8, KB +12", Cost END Only To Activate (+1/4)'                            
-                       }, {
-                           cost: 20,
-                           power: 'Flight 10", 8x NCM, No END (+1/2), Linked [Shrinking] (-1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 45,
-                           power: 'Armor +15 rPD +15 rED'
-                       }, {
-                           cost: 10,
-                           power: 'Clinging 20 STR'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Metamorph]'                            
-                       }, {
-                           cost: 10,
-                           power: '1) Desolid, Cannot Pass Through Solid Objects (-1/2), Does Not Protect Against Damage (-1)'                            
-                       }, {
-                           cost: 15,
-                           power: '2) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '3) STR +30'                            
-                       }, {
-                           cost: 15,
-                           power: '4) Stretching 4", No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }
-           ]
-       }, {
-           name: 'Mystic',
-           characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 13,
-                ego: 18,
-                pre: 15,
-                com: 18,
-                pd: 6,
-                ed: 4,
-                spd: 4,
-                rec: 8,
-                end: 40,
-                stun: 32
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Mental Illusion 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Telepathy 10d6'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Magic]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Magic]'                            
-                       }, {
-                           cost: 22,
-                           power: '1) Flight 10", 8x NCM, Usable Underwater (+1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 10,
-                           power: '3) HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: 35,
-                           power: '4) Mental Illusion 10d6'                            
-                       }, {
-                           cost: 5,
-                           power: 'ES: UV Sight'                            
-                       }, {
-                           cost: 8,
-                           power: 'LS: Breathe Underwater, High Pressure, Intense Cold'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 45,
-                           power: 'Armor +15 rPD +15 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Mental Illusion 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Telepathy 10d6'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Teleport 10", 4x NCM, 8x NCM, 1/2 END (+1/4)'                            
-                       }, {
-                           cost: 10,
-                           power: 'ES: N-Ray Sight [Lead]'                            
-                       }
-                   ],
-                   powersCost: 125
-               }
-           ]        
-       }, {
-           name: 'Patriot',
-           characteristics: {
-                str: 20,
-                dex: 20,
-                con: 20,
-                body: 15,
-                int: 18,
-                ego: 14,
-                pre: 20,
-                com: 18,
-                pd: 8,
-                ed: 6,
-                spd: 4,
-                rec: 10,
-                end: 50,
-                stun: 35 
-           },
-           characteristicsCost: 125,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 24,
-                           power: 'Armor +8 rPD +8 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Leaping +10", 8x NCM'                            
-                       }, {
-                           cost: '3u',
-                           power: 'Missile Deflection [All Ranged Attacks] +5'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Running +5", 8x NCM'                            
-                       }, {
-                           cost: '3u',
-                           power: 'STR +30'                            
-                       }, {
-                           cost: 3,
-                           power: 'ES: PER +1'                            
-                       }, {
-                           cost: 8,
-                           power: 'Running +4"'                            
-                       }
-                   ],
-                   powersCost: 100
-               }, {
-                   powers: [
-                       {
-                           cost: 24,
-                           power: 'Armor +8 rPD +8 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Leaping +10", 8x NCM'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Running +5", 8x NCM'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Running +5", 8x NCM'                            
-                       }, {
-                           cost: '3u',
-                           power: 'STR +30'                            
-                       }, {
-                           cost: 6,
-                           power: 'KB Resistance -3"'                            
-                       }, {
-                           cost: 8,
-                           power: 'Running +4"'                            
-                       }
-                   ],
-                   powersCost: 100
-               }
-           ] 
-       }, {
-           name: 'Powered Armor',
-           characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 18,
-                ego: 11,
-                pre: 15,
-                com: 18,
-                pd: 6,
-                ed: 4,
-                spd: 4,
-                rec: 10,
-                end: 50,
-                stun: 35
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 45,
-                           power: 'Armor +15 rPD +15 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Powered Armor]'                            
-                       }, {
-                           cost: 35,
-                           power: '1) EB 10d6'                            
-                       }, {
-                           cost: 15,
-                           power: '2) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '3) STR +30'                            
-                       }
-                   ],
-                   powersCost: 125
-               }
-           ]
-       }, {
-           name: 'Speedster',
-           characteristics: {
-                str: 20,
-                dex: 23,
-                con: 20,
-                body: 12,
-                int: 13,
-                ego: 11,
-                pre: 15,
-                com: 18,
-                pd: 6,
-                ed: 4,
-                spd: 6,
-                rec: 10,
-                end: 50,
-                stun: 32
-           },
-           characteristicsCost: 125,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Super-Speed]'                            
-                       }, {
-                           cost: 35,
-                           power: '1) EB 10d6'                            
-                       }, {
-                           cost: 20,
-                           power: '2) Flight 15", 8x NCM, Only In Contact With A Surface (-1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 100
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Super-Speed]'                            
-                       }, {
-                           cost: 35,
-                           power: '1) Desolid [Magic]'                            
-                       }, {
-                           cost: 20,
-                           power: '2) Flight 15", 8x NCM, Only In Contact With A Surface (-1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 10,
-                           power: '4) HA +6d6, HTH Attack (-1/2)'
-                       }
-                   ],
-                   powersCost: 100
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Super-Speed]'                            
-                       }, {
-                           cost: 20,
-                           power: '1) Flight 15", 8x NCM, Only In Contact With A Surface (-1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 10,
-                           power: '3) HA +6d6, HTH Attack (-1/2)'
-                       }, {
-                           cost: 22,
-                           power: '4) Invisibility [Sight], No Fringe, 1/2 END (+1/2)'
-                       }, {
-                           cost: 3,
-                           power: 'ES: PER +1'
-                       }
-                   ],
-                   powersCost: 100
-               }, {
-                   powers: [
-                       {
-                           cost: 45,
-                           power: '45 Armor +15 rPD +15 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Super-Speed]'                            
-                       }, {
-                           cost: 25,
-                           power: '1) Flight 15", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) STR +30'                            
-                       }
-                   ],
-                   powersCost: 100
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 10,
-                           power: 'Clinging 50 STR'                            
-                       }, {
-                           cost: 15,
-                           power: 'EC [Super-Speed]'                            
-                       }, {
-                           cost: 15,
-                           power: '1) Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) STR +30'                            
-                       }, {
-                           cost: 15,
-                           power: '4) Stretching 4", No END (+1/2)'                            
-                       }
-                   ],
-                   powersCost: 100
-               }, {
-                   powers: [
-                       {
-                           cost: 15,
-                           power: 'Armor +5 rPD +5 rED'
-                       }, {
-                           cost: 15,
-                           power: 'EC [Super-Speed]'                            
-                       }, {
-                           cost: 22,
-                           power: '1) Flight 10, 8x NCM, Usable Underwater (+1/4)'                            
-                       }, {
-                           cost: 15,
-                           power: '2) FF +10 rPD +10 rED, No END (+1/2)'                            
-                       }, {
-                           cost: 15,
-                           power: '3) STR +30'                            
-                       }, {
-                           cost: 10,
-                           power: 'ES: Hearing PER +1, Telescopic Hearing +2, UV Sight'                            
-                       }, {
-                           cost: 8,
-                           power: 'LS: Breathe Underwater, High Pressure, Intense Cold'                            
-                       }
-                   ],
-                   powersCost: 100
-               }
-           ]
-       }, {
-           name: 'Weapons Master',
-           characteristics: {
-                str: 20,
-                dex: 18,
-                con: 20,
-                body: 12,
-                int: 18,
-                ego: 11,
-                pre: 20,
-                com: 18,
-                pd: 8,
-                ed: 6,
-                spd: 4,
-                rec: 8,
-                end: 40,
-                stun: 32
-           },
-           characteristicsCost: 100,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 24,
-                           power: 'Armor +8 rPD +8 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Darkness [Sight] AE 4"r, [12c/Duration 1 Turn] (+1/4)'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6, [16c] (-0)'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 5d6, NND [LS: Self Contained] (+1), [16c] (-0)'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Entangle 5d6 DEF 5, [16c] (-0)'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Gliding 10", 8x NCM'                            
-                       }, {
-                           cost: '2u',
-                           power: 'HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Running +5", 8x NCM'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Swinging 10", 8x NCM'                            
-                       }, {
-                           cost: 5,
-                           power: 'ES: UV Sight'                            
-                       }, {
-                           cost: 10,
-                           power: 'LS: Self Contained'                            
-                       }, {
-                           cost: 8,
-                           power: 'Running +4"'                            
-                       }
-                   ],
-                   powersCost: 125
-               }, {
-                   powers: [
-                       {
-                           cost: 24,
-                           power: 'Armor +8 rPD +8 rED'
-                       }, {
-                           cost: 50,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '5u',
-                           power: 'EB 10d6, [16c] (-0)'                            
-                       }, {
-                           cost: '4u',
-                           power: 'EB 6d6, AP (+1/2), [16c] (-0)'                            
-                       }, {
-                           cost: '4u',
-                           power: 'EB 6d6, Explosion (+1/2), [16c] (-0)'                            
-                       }, {
-                           cost: '5u',
-                           power: 'Entangle 5d6 DEF 5'                            
-                       }, {
-                           cost: '4u',
-                           power: 'Flash [Sight] 6d6, Explosion (+1/2), [16c] (-0)'                            
-                       }, {
-                           cost: '2u',
-                           power: 'HA +6d6, HTH Attack (-1/2)'                            
-                       }, {
-                           cost: '2u',
-                           power: 'Running +5", 8x NCM'                          
-                       }, {
-                           cost: '2u',
-                           power: 'Swinging 10", 8x NCM'                            
-                       }, {
-                           cost: 10,
-                           power: 'ES: Sight PER +2, Telescopic Sight +4'                            
-                       }, {
-                           cost: 5,
-                           power: 'Flash Def [Sight] 5 Points'                            
-                       }, {
-                           cost: 8,
-                           power: 'Running +4"'                            
-                       }
-                   ],
-                   powersCost: 125
-               }
-           ]
-       }, {
-           name: 'Brick',
-           characteristics: {
-               str: 50,
-               dex: 15,
-               con: 25,
-               body: 14,
-               int: 13,
-               ego: 10,
-               pre: 20,
-               com: 18,
-               pd: 25,
-               ed: 15,
-               spd: 4,
-               rec: 15,
-               end: 50,
-               stun: 52
-           },
-           characteristicsCost: 150,
-           powersets: [
-               {
-                   powers: [
-                       {
-                           cost: 10,
-                           power: 'Damage Resistance 10 rPD 10 rEd'
-                       }, {
-                           cost: 15,
-                           power: 'EC [super-Strength]'                            
-                       }, {
-                           cost: 35,
-                           power: '1) EB 10d6'                            
-                       }, {
-                           cost: 35,
-                           power: '2) Flight 10", 8x NCM'                            
-                       }
-                   ],
-                   powersCost: 75
-               }, {
-                   powers: [
-                       {
-                           cost: 10,
-                           power: 'Damage Resistance 10 rPD 10 rEd'
-                       }, {
-                           cost: 16,
-                           power: 'ES: N-Ray Sight [Lead], Telescopic Sight +4'                            
-                       }, {
-                           cost: 30,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '3u',
-                           power: 'Leaping +10", 8x NCM, No END (+1/2)'                            
-                       }, {
-                           cost: '3u',
-                           power: 'Running +5", 8x NCM, No END (+1/2)'                            
-                       }, {
-                           cost: '3u',
-                           power: 'Tunneling 6" DEF 6'                            
-                       }
-                   ],
-                   powersCost: 75
-               }, {
-                   powers: [
-                       {
-                           cost: 10,
-                           power: 'Damage Resistance 10 rPD 10 rEd'
-                       }, {
-                           cost: 20,
-                           power: 'ES: Active Sonar, UV Sight'                            
-                       }, {
-                           cost: 37,
-                           power: 'Flight 10", 8x NCM, Usable Underwater (+1/4)'                            
-                       }, {
-                           cost: 8,
-                           power: 'LS: Breathe Underwater, High Pressure, Intense Cold'                            
-                       }
-                   ],
-                   powersCost: 75
-               }, {
-                   powers: [
-                       {
-                           cost: 10,
-                           power: 'Damage Resistance 10 rPD 10 rEd'
-                       }, {
-                           cost: 10,
-                           power: 'ES: Sight PER +2, Telescopic Sight +4'                            
-                       }, {
-                           cost: 30,
-                           power: 'Multipower'                            
-                       }, {
-                           cost: '3u',
-                           power: 'FTL Travel 1000 LY/Year'                            
-                       }, {
-                           cost: '3u',
-                           power: 'Flight 10", 8x NCM'                            
-                       }, {
-                           cost: 19,
-                           power: 'LS: High Pressure, High Radiation, Intense Cold, Intense Heat, Low Pressure/Vacuum, Self Contained'                            
-                       }
-                   ],
-                   powersCost: 75
-               }
-           ]
-       }
-	]
-};
+    "archtypes": [
+        {
+            "name": "Energy Projector",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 18,
+                "ego": 11,
+                "pre": 15,
+                "com": 18,
+                "pd": 6,
+                "ed": 4,
+                "spd": 4,
+                "rec": 10,
+                "end": 50,
+                "stun": 32
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Entangle 5d6 DEF 5"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Force Wall 10 rPD 10 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Energy]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Energy]"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "1) EB 10d6"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 30,
+                            "power": "4) Invisibility [sight], No Fringe, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower "
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Flash [sight] 4d6, AE 3\"r (+1), Personal Immunity (+1/4), 1/2 END (+1/4)"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Images [Sight/Hearing], PER -3, AE 8\"r (+3/4), 1/2 END (+1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Energy]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Energy]"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "1) EB 10d6"
+                        },
+                        {
+                            "cost": 22,
+                            "power": "2) Flight 10\", 8x NCM, Usable Underwater (+1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "4) HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": 5,
+                            "power": "ES: UV Sight"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "LS: Breathe Underwater, High Pressure, Intense Cold"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": "4u",
+                            "power": "Telekinesis 30 STR"
+                        },
+                        {
+                            "cost": "4u",
+                            "power": "Telekinesis 20 STR, Fine Manipulation"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Telekinesis]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                }
+            ]
+        },
+        {
+            "name": "Gadgeteer",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 13,
+                "ego": 18,
+                "pre": 15,
+                "com": 18,
+                "pd": 6,
+                "ed": 4,
+                "spd": 4,
+                "rec": 7,
+                "end": 40,
+                "stun": 32
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 45,
+                            "power": "Armor +15 rPD +15 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EGO Attack 5d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Entangle 5d6 DEF 5"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Flight 10\", 4x NCM, 8x NCM, 1/2 END (+1/4)"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "FW 10 rPD 10 rED"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Mind Control 10d6"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Gadgetry]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "3) Mind Control 10d6"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "4) STR +30"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "5) Stretching 4\", No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Entangle 5d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Mind Control 10d6"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Gadgetry]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                }
+            ]
+        },
+        {
+            "name": "Martial Artist",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 18,
+                "ego": 11,
+                "pre": 20,
+                "com": 18,
+                "pd": 8,
+                "ed": 6,
+                "spd": 4,
+                "rec": 8,
+                "end": 40,
+                "stun": 32
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 24,
+                            "power": "Armor +8 rPD +8 rED"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "Clinging 20 STR"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Martial Arts]"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "1) HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) Invisibility [Hearing], No Fringe, No END (+1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) Running +5\", 8x NCM, No END (+1/2)"
+                        },
+                        {
+                            "cost": 3,
+                            "power": "ES: PER +1"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "Running +4\""
+                        },
+                        {
+                            "cost": 0,
+                            "power": "Martial Maneuvers"
+                        },
+                        {
+                            "cost": 4,
+                            "power": "1) Martial Block"
+                        },
+                        {
+                            "cost": 4,
+                            "power": "2) Martial Disarm"
+                        },
+                        {
+                            "cost": 4,
+                            "power": "3) Martial Dodge"
+                        },
+                        {
+                            "cost": 3,
+                            "power": "4) Martial Throw"
+                        }
+                    ],
+                    "powersCost": 115
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 24,
+                            "power": "Armor +8 rPD +8 rED"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "Clinging 20 STR"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Martial Arts]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "2) HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) Invisibility [Hearing], No Fringe, No END (+1/2)"
+                        },
+                        {
+                            "cost": 3,
+                            "power": "ES: Telescopic Sight +2"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "Running +4\""
+                        },
+                        {
+                            "cost": 0,
+                            "power": "Martial Maneuvers"
+                        },
+                        {
+                            "cost": 4,
+                            "power": "1) Martial Block"
+                        },
+                        {
+                            "cost": 4,
+                            "power": "2) Martial Disarm"
+                        },
+                        {
+                            "cost": 4,
+                            "power": "3) Martial Dodge"
+                        },
+                        {
+                            "cost": 3,
+                            "power": "4) Martial Throw"
+                        }
+                    ],
+                    "powersCost": 140
+                }
+            ]
+        },
+        {
+            "name": "Mentalist",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 13,
+                "ego": 18,
+                "pre": 15,
+                "com": 18,
+                "pd": 6,
+                "ed": 4,
+                "spd": 4,
+                "rec": 8,
+                "end": 40,
+                "stun": 32
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EGO Attack 5d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Mind Control 10d6"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Mental Powers]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 45,
+                            "power": "Armor +15 rPD +15 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EGO Attack 5d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Flight 10\",  4x Mass, 8x NCM, 1/2 END (+1/4)"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Mental Illusion 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Mind Control 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Telepathy 10d6"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Mental Powers]"
+                        },
+                        {
+                            "cost": 22,
+                            "power": "1) Flight 10\", 8x NCM, Usable Underwater (+1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "3) HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "4) Mind Control 10d6"
+                        },
+                        {
+                            "cost": 5,
+                            "power": "ES: UV Sight"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "LS: Breathe Underwater, High Pressure, Intense Cold"
+                        }
+                    ],
+                    "powersCost": 125
+                }
+            ]
+        },
+        {
+            "name": "Metamorph",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 13,
+                "ego": 11,
+                "pre": 20,
+                "com": 18,
+                "pd": 6,
+                "ed": 4,
+                "spd": 4,
+                "rec": 10,
+                "end": 50,
+                "stun": 32
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "Armor +4 rPD +4 rED, Linked [Density Increase] (-1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Metamorph]"
+                        },
+                        {
+                            "cost": 22,
+                            "power": "1) Density Increase: Mass 6400kg, STR +30, KB -6\", PD +6, ED +6, Cost END Only To Activate (+1/4)"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "2) EB 10d6"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) Leaping +10\", 8x NCM,  No END (+1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "4) Tunneling 6\" DEF 6"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 20,
+                            "power": "Armor +10 rPD +10 rED, Linked [Growth] (-1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Metamorph]"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "1) EB 10d6"
+                        },
+                        {
+                            "cost": 22,
+                            "power": "2) Growth: Height 4\", Width 2\", Mass 6400kg, BODY/STUN +6, DCV -4, PER +4, Reach +2\", STR +30, KB -6\", Cost END Only To Activate (+1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) Running +5\", 8x NCM, No END (+1/2)"
+                        },
+                        {
+                            "cost": 3,
+                            "power": "ES: Telescopic Sight +2"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Multiform: 250 Points"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Multiform: 250 Points"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Metamorph]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 45,
+                            "power": "Armor +15 rPD +15 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Metamorph]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 30,
+                            "power": "2) Shape Shift [sight/Hearing/Touch], Limited Group of Shapes [Humanoid], Imitation, Cost END Only To Change Shape (+1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) STR +30"
+                        },
+                        {
+                            "cost": 5,
+                            "power": "Transform: Instant Change [Any], Linked [shape Shift] (-1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 30,
+                            "power": "Armor +10 rPD +10 rED"
+                        },
+                        {
+                            "cost": 25,
+                            "power": "EC [Metamorph]"
+                        },
+                        {
+                            "cost": 25,
+                            "power": "1) EB 10d6"
+                        },
+                        {
+                            "cost": 25,
+                            "power": "2) Shrinking: Height .125m, Mass .025kg, PER -8, DCV +8, KB +12\", Cost END Only To Activate (+1/4)"
+                        },
+                        {
+                            "cost": 20,
+                            "power": "Flight 10\", 8x NCM, No END (+1/2), Linked [Shrinking] (-1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 45,
+                            "power": "Armor +15 rPD +15 rED"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "Clinging 20 STR"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Metamorph]"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "1) Desolid, Cannot Pass Through Solid Objects (-1/2), Does Not Protect Against Damage (-1)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) STR +30"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "4) Stretching 4\", No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                }
+            ]
+        },
+        {
+            "name": "Mystic",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 13,
+                "ego": 18,
+                "pre": 15,
+                "com": 18,
+                "pd": 6,
+                "ed": 4,
+                "spd": 4,
+                "rec": 8,
+                "end": 40,
+                "stun": 32
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Mental Illusion 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Telepathy 10d6"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Magic]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Magic]"
+                        },
+                        {
+                            "cost": 22,
+                            "power": "1) Flight 10\", 8x NCM, Usable Underwater (+1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "3) HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "4) Mental Illusion 10d6"
+                        },
+                        {
+                            "cost": 5,
+                            "power": "ES: UV Sight"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "LS: Breathe Underwater, High Pressure, Intense Cold"
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 45,
+                            "power": "Armor +15 rPD +15 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Mental Illusion 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Telepathy 10d6"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Teleport 10\", 4x NCM, 8x NCM, 1/2 END (+1/4)"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "ES: N-Ray Sight [Lead]"
+                        }
+                    ],
+                    "powersCost": 125
+                }
+            ]
+        },
+        {
+            "name": "Patriot",
+            "characteristics": {
+                "str": 20,
+                "dex": 20,
+                "con": 20,
+                "body": 15,
+                "int": 18,
+                "ego": 14,
+                "pre": 20,
+                "com": 18,
+                "pd": 8,
+                "ed": 6,
+                "spd": 4,
+                "rec": 10,
+                "end": 50,
+                "stun": 35
+            },
+            "characteristicsCost": 125,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 24,
+                            "power": "Armor +8 rPD +8 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Leaping +10\", 8x NCM"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "Missile Deflection [All Ranged Attacks] +5\""
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Running +5\", 8x NCM"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "STR +30"
+                        },
+                        {
+                            "cost": 3,
+                            "power": "ES: PER +1"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "Running +4\""
+                        }
+                    ],
+                    "powersCost": 100
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 24,
+                            "power": "Armor +8 rPD +8 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Leaping +10\", 8x NCM"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Running +5\", 8x NCM"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Running +5\", 8x NCM"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "STR +30"
+                        },
+                        {
+                            "cost": 6,
+                            "power": "KB Resistance -3\""
+                        },
+                        {
+                            "cost": 8,
+                            "power": "Running +4\""
+                        }
+                    ],
+                    "powersCost": 100
+                }
+            ]
+        },
+        {
+            "name": "Powered Armor",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 18,
+                "ego": 11,
+                "pre": 15,
+                "com": 18,
+                "pd": 6,
+                "ed": 4,
+                "spd": 4,
+                "rec": 10,
+                "end": 50,
+                "stun": 35
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 45,
+                            "power": "Armor +15 rPD +15 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Powered Armor]"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "1) EB 10d6"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) STR +30"
+                        }
+                    ],
+                    "powersCost": 125
+                }
+            ]
+        },
+        {
+            "name": "Speedster",
+            "characteristics": {
+                "str": 20,
+                "dex": 23,
+                "con": 20,
+                "body": 12,
+                "int": 13,
+                "ego": 11,
+                "pre": 15,
+                "com": 18,
+                "pd": 6,
+                "ed": 4,
+                "spd": 6,
+                "rec": 10,
+                "end": 50,
+                "stun": 32
+            },
+            "characteristicsCost": 125,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Super-Speed]"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "1) EB 10d6"
+                        },
+                        {
+                            "cost": 20,
+                            "power": "2) Flight 15\", 8x NCM, Only In Contact With A Surface (-1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) FF +10 rPD +10 rED, No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 100
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Super-Speed]"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "1) Desolid [Magic]"
+                        },
+                        {
+                            "cost": 20,
+                            "power": "2) Flight 15\", 8x NCM, Only In Contact With A Surface (-1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "4) HA +6d6, HTH Attack (-1/2)"
+                        }
+                    ],
+                    "powersCost": 100
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Super-Speed]"
+                        },
+                        {
+                            "cost": 20,
+                            "power": "1) Flight 15\", 8x NCM, Only In Contact With A Surface (-1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "3) HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": 22,
+                            "power": "4) Invisibility [Sight], No Fringe, 1/2 END (+1/2)"
+                        },
+                        {
+                            "cost": 3,
+                            "power": "ES: PER +1"
+                        }
+                    ],
+                    "powersCost": 100
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 45,
+                            "power": "45 Armor +15 rPD +15 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Super-Speed]"
+                        },
+                        {
+                            "cost": 25,
+                            "power": "1) Flight 15\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) STR +30"
+                        }
+                    ],
+                    "powersCost": 100
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "Clinging 50 STR"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Super-Speed]"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "1) Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) STR +30"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "4) Stretching 4\", No END (+1/2)"
+                        }
+                    ],
+                    "powersCost": 100
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 15,
+                            "power": "Armor +5 rPD +5 rED"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [Super-Speed]"
+                        },
+                        {
+                            "cost": 22,
+                            "power": "1) Flight 10, 8x NCM, Usable Underwater (+1/4)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "2) FF +10 rPD +10 rED, No END (+1/2)"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "3) STR +30"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "ES: Hearing PER +1, Telescopic Hearing +2, UV Sight"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "LS: Breathe Underwater, High Pressure, Intense Cold"
+                        }
+                    ],
+                    "powersCost": 100
+                }
+            ]
+        },
+        {
+            "name": "Weapons Master",
+            "characteristics": {
+                "str": 20,
+                "dex": 18,
+                "con": 20,
+                "body": 12,
+                "int": 18,
+                "ego": 11,
+                "pre": 20,
+                "com": 18,
+                "pd": 8,
+                "ed": 6,
+                "spd": 4,
+                "rec": 8,
+                "end": 40,
+                "stun": 32
+            },
+            "characteristicsCost": 100,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 24,
+                            "power": "Armor +8 rPD +8 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Darkness [Sight] AE 4\"r, [12c/Duration 1 Turn] (+1/4)"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6, [16c] (-0)"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 5d6, NND [LS: Self Contained] (+1), [16c] (-0)"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Entangle 5d6 DEF 5, [16c] (-0)"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Gliding 10\", 8x NCM"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Running +5\", 8x NCM"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Swinging 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 5,
+                            "power": "ES: UV Sight"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "LS: Self Contained"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "Running +4\""
+                        }
+                    ],
+                    "powersCost": 125
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 24,
+                            "power": "Armor +8 rPD +8 rED"
+                        },
+                        {
+                            "cost": 50,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "EB 10d6, [16c] (-0)"
+                        },
+                        {
+                            "cost": "4u",
+                            "power": "EB 6d6, AP (+1/2), [16c] (-0)"
+                        },
+                        {
+                            "cost": "4u",
+                            "power": "EB 6d6, Explosion (+1/2), [16c] (-0)"
+                        },
+                        {
+                            "cost": "5u",
+                            "power": "Entangle 5d6 DEF 5"
+                        },
+                        {
+                            "cost": "4u",
+                            "power": "Flash [Sight] 6d6, Explosion (+1/2), [16c] (-0)"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "HA +6d6, HTH Attack (-1/2)"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Running +5\", 8x NCM"
+                        },
+                        {
+                            "cost": "2u",
+                            "power": "Swinging 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "ES: Sight PER +2, Telescopic Sight +4"
+                        },
+                        {
+                            "cost": 5,
+                            "power": "Flash Def [Sight] 5 Points"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "Running +4\""
+                        }
+                    ],
+                    "powersCost": 125
+                }
+            ]
+        },
+        {
+            "name": "Brick",
+            "characteristics": {
+                "str": 50,
+                "dex": 15,
+                "con": 25,
+                "body": 14,
+                "int": 13,
+                "ego": 10,
+                "pre": 20,
+                "com": 18,
+                "pd": 25,
+                "ed": 15,
+                "spd": 4,
+                "rec": 15,
+                "end": 50,
+                "stun": 52
+            },
+            "characteristicsCost": 150,
+            "powersets": [
+                {
+                    "powers": [
+                        {
+                            "cost": 10,
+                            "power": "Damage Resistance 10 rPD 10 rEd"
+                        },
+                        {
+                            "cost": 15,
+                            "power": "EC [super-Strength]"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "1) EB 10d6"
+                        },
+                        {
+                            "cost": 35,
+                            "power": "2) Flight 10\", 8x NCM"
+                        }
+                    ],
+                    "powersCost": 75
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 10,
+                            "power": "Damage Resistance 10 rPD 10 rEd"
+                        },
+                        {
+                            "cost": 16,
+                            "power": "ES: N-Ray Sight [Lead], Telescopic Sight +4"
+                        },
+                        {
+                            "cost": 30,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "Leaping +10\", 8x NCM, No END (+1/2)"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "Running +5\", 8x NCM, No END (+1/2)"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "Tunneling 6\" DEF 6"
+                        }
+                    ],
+                    "powersCost": 75
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 10,
+                            "power": "Damage Resistance 10 rPD 10 rEd"
+                        },
+                        {
+                            "cost": 20,
+                            "power": "ES: Active Sonar, UV Sight"
+                        },
+                        {
+                            "cost": 37,
+                            "power": "Flight 10\", 8x NCM, Usable Underwater (+1/4)"
+                        },
+                        {
+                            "cost": 8,
+                            "power": "LS: Breathe Underwater, High Pressure, Intense Cold"
+                        }
+                    ],
+                    "powersCost": 75
+                },
+                {
+                    "powers": [
+                        {
+                            "cost": 10,
+                            "power": "Damage Resistance 10 rPD 10 rEd"
+                        },
+                        {
+                            "cost": 10,
+                            "power": "ES: Sight PER +2, Telescopic Sight +4"
+                        },
+                        {
+                            "cost": 30,
+                            "power": "Multipower"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "FTL Travel 1000 LY/Year"
+                        },
+                        {
+                            "cost": "3u",
+                            "power": "Flight 10\", 8x NCM"
+                        },
+                        {
+                            "cost": 19,
+                            "power": "LS: High Pressure, High Radiation, Intense Cold, Intense Heat, Low Pressure/Vacuum, Self Contained"
+                        }
+                    ],
+                    "powersCost": 75
+                }
+            ]
+        }
+    ]
+}

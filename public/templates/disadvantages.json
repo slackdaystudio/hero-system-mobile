@@ -1,112 +1,107 @@
 {
-    disadvantagePackages: [
-        {
-            disadvantages: [
-                {
-                    cost: 10,
-                    description: 'DNPC: Loved One (Normal) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Arch Enemy (As Powerful) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Evil Organization (As Powerful) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Government Agency (More Powerful/NCI/Watch) 8-'
-                }, {
-                    cost: 20,
-                    description: 'PsyL: Code Of The Hero (Very Common/Strong)'
-                }, {
-                    cost: 15,
-                    description: 'PsyL: Overconfidence (Very Common/Moderate)'
-                }, {
-                    cost: 10,
-                    description: 'SocL: Secret Identity (Occasionally/Major)'
-                }, {
-                    cost: 15,
-                    description: 'Vuln: Ambushes/Treacherous Attacks, 1 1/2x STUN (Very Common)'
-                }
-            ],
-            disadvantagesCost: 100
+    "disadvantagePackages": [{
+        "disadvantages": [{
+            "cost": 10,
+            "description": "DNPC: Loved One (Normal) 8-"
         }, {
-            disadvantages: [
-                {
-                    cost: 10,
-                    description: 'DNPC: Loved One (Normal) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Arch Enemy (As Powerful) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Evil Organization (As Powerful) 8-'
-                }, {
-                    cost: 20,
-                    description: 'Normal Characteristics Maxima'
-                }, {
-                    cost: 20,
-                    description: 'PsyL: Code Of The Hero (Very Common/Strong)'
-                }, {
-                    cost: 20,
-                    description: 'PsyL: Protective Of Innocents (Very Common/Strong)'
-                }, {
-                    cost: 10,
-                    description: 'SocL: Secret Identity (Occasionally/Major)'
-                }
-            ],
-            disadvantagesCost: 100
+            "cost": 10,
+            "description": "Hunted: Arch Enemy (As Powerful) 8-"
         }, {
-            disadvantages: [
-                {
-                    cost: 10,
-                    description: 'DNPC: Loved One (Normal) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Arch Enemy (As Powerful) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Evil Organization (As Powerful) 8-'
-                }, {
-                    cost: 20,
-                    description: 'Normal Characteristics Maxima'
-                }, {
-                    cost: 20,
-                    description: 'PsyL: Code Versus Killing (Very Common/Strong)'
-                }, {
-                    cost: 20,
-                    description: 'PsyL: Protective Of Innocents (Very Common/Strong)'
-                }, {
-                    cost: 10,
-                    description: 'SocL: Secret Identity (Occasionally/Major)'
-                }
-            ],
-            disadvantagesCost: 100
+            "cost": 10,
+            "description": "Hunted: Evil Organization (As Powerful) 8-"
         }, {
-            disadvantages: [
-                {
-                    cost: 10,
-                    description: 'DNPC: Loved One (Normal) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Arch Enemy (As Powerful) 8-'
-                }, {
-                    cost: 10,
-                    description: 'Hunted: Evil Organization (As Powerful) 8-'
-                }, {
-                    cost: 20,
-                    description: 'Normal Characteristics Maxima'
-                }, {
-                    cost: 20,
-                    description: 'PsyL: Honorable (Common/Total)'
-                }, {
-                    cost: 20,
-                    description: 'PsyL: Protective Of Innocents (Very Common/Strong)'
-                }, {
-                    cost: 10,
-                    description: 'SocL: Secret Identity (Occasionally/Major)'
-                }
-            ],
-            disadvantagesCost: 100
+            "cost": 10,
+            "description": "Hunted: Government Agency (More Powerful/NCI/Watch) 8-"
+        }, {
+            "cost": 20,
+            "description": "PsyL: Code Of The Hero (Very Common/Strong)"
+        }, {
+            "cost": 15,
+            "description": "PsyL: Overconfidence (Very Common/Moderate)"
+        }, {
+            "cost": 10,
+            "description": "SocL: Secret Identity (Occasionally/Major)"
+        }, {
+            "cost": 15,
+            "description": "Vuln: Ambushes/Treacherous Attacks, 1 1/2x STUN (Very Common)"
         }
+        ],
+        "disadvantagesCost": 100
+    }, {
+        "disadvantages": [{
+            "cost": 10,
+            "description": "DNPC: Loved One (Normal) 8-"
+        }, {
+            "cost": 10,
+            "description": "Hunted: Arch Enemy (As Powerful) 8-"
+        }, {
+            "cost": 10,
+            "description": "Hunted: Evil Organization (As Powerful) 8-"
+        }, {
+            "cost": 20,
+            "description": "Normal Characteristics Maxima"
+        }, {
+            "cost": 20,
+            "description": "PsyL: Code Of The Hero (Very Common/Strong)"
+        }, {
+            "cost": 20,
+            "description": "PsyL: Protective Of Innocents (Very Common/Strong)"
+        }, {
+            "cost": 10,
+            "description": "SocL: Secret Identity (Occasionally/Major)"
+        }
+        ],
+        "disadvantagesCost": 100
+    }, {
+        "disadvantages": [{
+            "cost": 10,
+            "description": "DNPC: Loved One (Normal) 8-"
+        }, {
+            "cost": 10,
+            "description": "Hunted: Arch Enemy (As Powerful) 8-"
+        }, {
+            "cost": 10,
+            "description": "Hunted: Evil Organization (As Powerful) 8-"
+        }, {
+            "cost": 20,
+            "description": "Normal Characteristics Maxima"
+        }, {
+            "cost": 20,
+            "description": "PsyL: Code Versus Killing (Very Common/Strong)"
+        }, {
+            "cost": 20,
+            "description": "PsyL: Protective Of Innocents (Very Common/Strong)"
+        }, {
+            "cost": 10,
+            "description": "SocL: Secret Identity (Occasionally/Major)"
+        }
+        ],
+        "disadvantagesCost": 100
+    }, {
+        "disadvantages": [{
+            "cost": 10,
+            "description": "DNPC: Loved One (Normal) 8-"
+        }, {
+            "cost": 10,
+            "description": "Hunted: Arch Enemy (As Powerful) 8-"
+        }, {
+            "cost": 10,
+            "description": "Hunted: Evil Organization (As Powerful) 8-"
+        }, {
+            "cost": 20,
+            "description": "Normal Characteristics Maxima"
+        }, {
+            "cost": 20,
+            "description": "PsyL: Honorable (Common/Total)"
+        }, {
+            "cost": 20,
+            "description": "PsyL: Protective Of Innocents (Very Common/Strong)"
+        }, {
+            "cost": 10,
+            "description": "SocL: Secret Identity (Occasionally/Major)"
+        }
+        ],
+        "disadvantagesCost": 100
+    }
     ]
 }

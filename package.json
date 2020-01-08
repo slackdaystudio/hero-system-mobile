@@ -6,6 +6,7 @@
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
     "@react-native-community/eslint-config": "^0.0.6",
+    "@react-native-community/eslint-plugin": "^1.0.0",
     "babel-jest": "^24.9.0",
     "eslint": "^5.16.0",
     "husky": "^4.0.0",
@@ -18,7 +19,7 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "test": "node node_modules/jest/bin/jest.js",
+    "test": "jest",
     "linter": "eslint --fix"
   },
   "husky": {
@@ -27,14 +28,19 @@
     }
   },
   "lint-staged": {
-    "*.js": [
+    "*{.js,test.js}": [
       "npm run linter --",
-      "npm run test --",
       "git add"
     ]
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupFiles": [
+      "./node_modules/react-native-gesture-handler/jestSetup.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|react-native-document-picker|rn-fetch-blob|@react-native-community/async-storage|native-base-shoutem-theme|@shoutem/animation|@shoutem/ui|tcomb-form-native|react-navigation|@react-navigation/.*|react-navigation-drawer)"
+    ]
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.7.1",
@@ -62,15 +68,13 @@
     "react-native-xml2js": "^1.0.3",
     "react-navigation": "^4.0.10",
     "react-navigation-drawer": "^2.3.3",
-    "react-navigation-stack": "^2.0.4",
     "react-redux": "^7.1.3",
     "redux": "^4.0.4",
     "redux-mock-store": "1.5.1",
     "redux-thunk": "2.3.0",
     "rn-fetch-blob": "^0.10.16",
     "snake-case": "^2.1.0",
-    "stream": "0.0.2",
-    "victory-native": "^31.0.0"
+    "stream": "0.0.2"
   },
   "appDir": "src"
 }

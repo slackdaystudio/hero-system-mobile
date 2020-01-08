@@ -1,93 +1,92 @@
-[
-  {
-    name: "Block",
-    phase: "½",
-    ocv: "+0",
-    dcv: "+0",
-    effect: "Block, abort"
-  }, {
-    name: "Brace",
-    phase: "0",
-    ocv: "+2",
-    dcv: "½",
-    effect: "+2 vs. Range Mod."
-  }, {
-    name: "Disarm",
-    phase: "½",
-    ocv: "-2",
-    dcv: "+0",
-    effect: "Can disarm"
-  }, {
-    name: "Dodge",
-    phase: "½",
-    ocv: "--",
-    dcv: "+3",
-    effect: "Abort, vs. all attacks"
-  }, {
-    name: "Grab",
-    phase: "½",
-    ocv: "-1",
-    dcv: "-2",
-    effect: "Grab two limbs"
-  }, {
-    name: "Grab By",
-    phase: "½",
-    ocv: "-3",
-    dcv: "-4",
-    effect: "Move and Grab"
-  }, {
-    name: "Haymaker",
-    phase: "½*",
-    ocv: "0",
-    dcv: "-5",
-    effect: "+4 DC attack damage"
-  }, {
-    name: "Move By",
-    phase: "½",
-    ocv: "-2",
-    dcv: "-2",
-    effect: "STR/2+v/10; you take 1/3"
-  }, {
-    name: "Move Through",
-    phase: "½",
-    ocv: "-v/10",
-    dcv: "-3",
-    effect: "STR+v/6; you take ½ or all"
-  }, {
-    name: "Multiple Attack",
-    phase: "1",
-    ocv: "var",
-    dcv: "½",
-    effect: "Attack multiple times"
-  }, {
-    name: "Set",
-    phase: "1",
-    ocv: "+1",
-    dcv: "+0",
-    effect: "Ranged Attacks only"
-  }, {
-    name: "Shove",
-    phase: "½",
-    ocv: "-1",
-    dcv: "-1",
-    effect: "Push 1m per 5 STR"
-  }, {
-    name: "Strike",
-    phase: "½",
-    ocv: "+0",
-    dcv: "+0",
-    effect: "STR or weapon"
-  }, {
-    name: "Throw",
-    phase: "½",
-    ocv: "+0",
-    dcv: "+0",
-    effect: "Throw w/STR dmg"
-  }, {
-    name: "Trip",
-    phase: "½",
-    ocv: "-1",
-    dcv: "-2",
-    effect: "Ranged Attacks only"
-  }
+[{
+  "name": "Block",
+  "phase": "½",
+  "ocv": "+0",
+  "dcv": "+0",
+  "effect": "Block, abort"
+}, {
+  "name": "Brace",
+  "phase": "0",
+  "ocv": "+2",
+  "dcv": "½",
+  "effect": "+2 vs. Range Mod."
+}, {
+  "name": "Disarm",
+  "phase": "½",
+  "ocv": "-2",
+  "dcv": "+0",
+  "effect": "Can disarm"
+}, {
+  "name": "Dodge",
+  "phase": "½",
+  "ocv": "--",
+  "dcv": "+3",
+  "effect": "Abort, vs. all attacks"
+}, {
+  "name": "Grab",
+  "phase": "½",
+  "ocv": "-1",
+  "dcv": "-2",
+  "effect": "Grab two limbs"
+}, {
+  "name": "Grab By",
+  "phase": "½",
+  "ocv": "-3",
+  "dcv": "-4",
+  "effect": "Move and Grab"
+}, {
+  "name": "Haymaker",
+  "phase": "½*",
+  "ocv": "0",
+  "dcv": "-5",
+  "effect": "+4 DC attack damage"
+}, {
+  "name": "Move By",
+  "phase": "½",
+  "ocv": "-2",
+  "dcv": "-2",
+  "effect": "STR/2+v/10; you take 1/3"
+}, {
+  "name": "Move Through",
+  "phase": "½",
+  "ocv": "-v/10",
+  "dcv": "-3",
+  "effect": "STR+v/6; you take ½ or all"
+}, {
+  "name": "Multiple Attack",
+  "phase": "1",
+  "ocv": "var",
+  "dcv": "½",
+  "effect": "Attack multiple times"
+}, {
+  "name": "Set",
+  "phase": "1",
+  "ocv": "+1",
+  "dcv": "+0",
+  "effect": "Ranged Attacks only"
+}, {
+  "name": "Shove",
+  "phase": "½",
+  "ocv": "-1",
+  "dcv": "-1",
+  "effect": "Push 1m per 5 STR"
+}, {
+  "name": "Strike",
+  "phase": "½",
+  "ocv": "+0",
+  "dcv": "+0",
+  "effect": "STR or weapon"
+}, {
+  "name": "Throw",
+  "phase": "½",
+  "ocv": "+0",
+  "dcv": "+0",
+  "effect": "Throw w/STR dmg"
+}, {
+  "name": "Trip",
+  "phase": "½",
+  "ocv": "-1",
+  "dcv": "-2",
+  "effect": "Ranged Attacks only"
+}
 ]
