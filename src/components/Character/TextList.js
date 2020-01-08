@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { Text, List, ListItem, Left, Right } from 'native-base';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
@@ -19,16 +20,22 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export default class TextList extends Component {
-	constructor(props) {
-		super(props);
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        text: PropTypes.string.isRequired,
+        columnHeading: PropTypes.string.isRequired,
+    }
 
-		this.rollCheck = this._rollCheck.bind(this);
-		this.onSkillCheckLongPress = this._onSkillCheckLongPress.bind(this);
-	}
+    constructor(props) {
+        super(props);
+
+        this.rollCheck = this._rollCheck.bind(this);
+        this.onSkillCheckLongPress = this._onSkillCheckLongPress.bind(this);
+    }
 
     _rollCheck(threshold) {
         if (threshold !== '') {
-            this.props.navigation.navigate('Result', {from: 'ViewCharacter', result: dieRoller.rollCheck(threshold)})
+            this.props.navigation.navigate('Result', {from: 'ViewCharacter', result: dieRoller.rollCheck(threshold)});
         }
     }
 
@@ -56,7 +63,7 @@ export default class TextList extends Component {
 
         return [
             '    ' + text.slice(0, end + 1),
-            text.substring(end + 3)
+            text.substring(end + 3),
         ];
     }
 
@@ -82,7 +89,7 @@ export default class TextList extends Component {
                     let costEndPosition = lineItem[1].indexOf(')');
 
                     return (
-                        <ListItem key={this.props.columnHeading + '-' + index} underlayColor='#3da0ff' onLongPress={() => this.onSkillCheckLongPress(this.props.columnHeading, lineItem[1].substring(costEndPosition + 1))}>
+                        <ListItem key={this.props.columnHeading + '-' + index} underlayColor="#3da0ff" onLongPress={() => this.onSkillCheckLongPress(this.props.columnHeading, lineItem[1].substring(costEndPosition + 1))}>
                             <Left>
                                 <Text style={styles.grey}>{lineItem[0] + ' ' + lineItem[1].substring(costEndPosition + 1)}</Text>
                             </Left>

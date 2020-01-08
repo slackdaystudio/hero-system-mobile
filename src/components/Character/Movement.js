@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { Text } from 'native-base';
 import styles from '../../Styles';
@@ -18,6 +19,11 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export default class Movement extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        movement: PropTypes.object.isRequired,
+    }
+
     _renderUnusualMovement(label, distance) {
         if (distance === '') {
             return null;

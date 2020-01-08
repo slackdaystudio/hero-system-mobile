@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native';
 import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Spinner } from 'native-base';
 import { character } from '../../lib/Character';
@@ -19,6 +20,14 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export default class Combat extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        character: PropTypes.object.isRequired,
+        combatDetails: PropTypes.object.isRequired,
+        setSparseCombatDetails: PropTypes.func.isRequired,
+        updateForm: PropTypes.func.isRequired,
+    }
+
     constructor(props) {
         super(props);
 
@@ -27,7 +36,7 @@ export default class Combat extends Component {
         this.takeRecovery = this._takeRecovery.bind(this);
     }
 
-	_updateCombatState(key, value) {
+    _updateCombatState(key, value) {
         if (/^(\-)?[0-9]*$/.test(value) === false) {
             return;
         }
@@ -36,16 +45,16 @@ export default class Combat extends Component {
 
         combatDetails[key] = value;
 
-		this.props.setSparseCombatDetails(combatDetails);
-	}
+        this.props.setSparseCombatDetails(combatDetails);
+    }
 
-	_resetCombatState(key) {
+    _resetCombatState(key) {
 	    let combatDetails = {};
 
 	    combatDetails[key] = character.getCharacteristic(this.props.character.characteristics.characteristic, key);
 
         this.props.setSparseCombatDetails(combatDetails);
-	}
+    }
 
     _takeRecovery() {
         let recovery = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'recovery'), 10);
@@ -170,7 +179,7 @@ export default class Combat extends Component {
                         <Item>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={3}
                                 value={this.props.combatDetails.stun.toString()}
                                 onChangeText={(text) => this.updateCombatState('stun', text)} />
@@ -190,7 +199,7 @@ export default class Combat extends Component {
                         <Item>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={3}
                                 value={this.props.combatDetails.body.toString()}
                                 onChangeText={(text) => this.updateCombatState('body', text)} />
@@ -210,7 +219,7 @@ export default class Combat extends Component {
                         <Item>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={3}
                                 value={this.props.combatDetails.endurance.toString()}
                                 onChangeText={(text) => this.updateCombatState('endurance', text)} />

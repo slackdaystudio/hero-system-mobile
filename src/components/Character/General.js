@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { Text, List, ListItem, Left, Body } from 'native-base';
 import styles from '../../Styles';
@@ -18,6 +19,11 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export default class General extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        character: PropTypes.object.isRequired,
+    }
+
     render() {
         return (
             <List>
@@ -139,8 +145,8 @@ export default class General extends Component {
                     <Body>
                         <Text style={styles.grey}>{this.props.character.experience.unspent}</Text>
                     </Body>
-                </ListItem>            
+                </ListItem>
             </List>
-        );    
+        );
     }
 }
