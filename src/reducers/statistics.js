@@ -31,7 +31,7 @@ export function initializeStatistics() {
         persistence.initializeStatistics().then(stats => {
             dispatch({
                 type: INITIALIZE_STATISTICS,
-                payload: stats
+                payload: stats,
             });
         });
     };
@@ -42,24 +42,24 @@ export function clearStatistics() {
         persistence.clearStatistics().then((stats) => {
             dispatch({
                 type: INITIALIZE_STATISTICS,
-                payload: stats
+                payload: stats,
             });
         });
     };
 }
 
-statisticsState = {};
+let statisticsState = {};
 
 export default function statistics(state = statisticsState, action) {
-    let newState = null
+    let newState = null;
 
     switch (action.type) {
-        case INITIALIZE_STATISTICS:
-            newState = {...state};
-            newState = action.payload;
+    case INITIALIZE_STATISTICS:
+        newState = {...state};
+        newState = action.payload;
 
-            return newState;
-        default:
-            return state;
+        return newState;
+    default:
+        return state;
     }
 }

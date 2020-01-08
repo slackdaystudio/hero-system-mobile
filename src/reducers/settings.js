@@ -34,7 +34,7 @@ export function initializeApplicationSettings() {
         persistence.initializeApplicationSettings().then(settings => {
             dispatch({
                 type: INITIALIZE_SETTINGS,
-                payload: settings
+                payload: settings,
             });
         });
     };
@@ -45,35 +45,35 @@ export function setUseFifthEditionRules(fifth) {
         persistence.setUseFifthEditionRules(fifth).then(useFifth => {
             dispatch({
                 type: USE_FIFTH_EDITION_RULES,
-                payload: useFifth
+                payload: useFifth,
             });
         });
     };
 }
 
-settingsState = {};
+let settingsState = {};
 
 export default function settings(state = settingsState, action) {
-    let newState = null
+    let newState = null;
 
     switch (action.type) {
-        case INITIALIZE_SETTINGS:
-            newState = {...state};
-            newState = action.payload;
+    case INITIALIZE_SETTINGS:
+        newState = {...state};
+        newState = action.payload;
 
-            return newState;
-        case USE_FIFTH_EDITION_RULES:
-            newState = {
-                ...state,
-                useFifthEdition: {
-                    ...state.useFifthEdition
-                }
-            };
+        return newState;
+    case USE_FIFTH_EDITION_RULES:
+        newState = {
+            ...state,
+            useFifthEdition: {
+                ...state.useFifthEdition,
+            },
+        };
 
-            newState.useFifthEdition = action.payload;
+        newState.useFifthEdition = action.payload;
 
-            return newState;
-        default:
-            return state;
+        return newState;
+    default:
+        return state;
     }
 }

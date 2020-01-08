@@ -21,10 +21,10 @@ import randomHero from './randomHero';
 // limitations under the License.
 
 export default combineReducers({
-   character,
-   combat,
-   forms,
-   settings,
-   statistics,
-   randomHero
+    character,
+    combat,
+    forms,
+    settings,
+    statistics,
+    randomHero,
 });

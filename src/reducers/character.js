@@ -40,7 +40,7 @@ export function setCharacter(character) {
         persistence.setCharacter(character).then(char => {
             dispatch({
                 type: SET_CHARACTER,
-                payload: char
+                payload: char,
             });
         });
     };
@@ -51,7 +51,7 @@ export function initializeCharacter() {
         persistence.getCharacter().then(char => {
             dispatch({
                 type: INITIALIZE_CHARACTER,
-                payload: char
+                payload: char,
             });
         });
     };
@@ -62,7 +62,7 @@ export function setShowSecondary(show) {
         persistence.setShowSecondaryCharacteristics(show).then(value => {
             dispatch({
                 type: SET_SHOW_SECONDARY,
-                payload: value
+                payload: value,
             });
         });
     };
@@ -73,67 +73,67 @@ export function clearCharacter() {
         persistence.clearCharacter().then(() => {
             dispatch({
                 type: CLEAR_CHARACTER,
-                payload: null
+                payload: null,
             });
         });
     };
 }
 
-characterState = {
+let characterState = {
     character: null,
-    showSecondary: true
+    showSecondary: true,
 };
 
 export default function character(state = characterState, action) {
-    let newState = null
+    let newState = null;
 
     switch (action.type) {
-        case SET_CHARACTER:
-            newState = {
-                ...state,
-                character: {
-                    ...state.character
-                }
-            };
-            newState.character = action.payload;
-            
-            return newState;
-        case INITIALIZE_CHARACTER:
-            if (action.payload === null) {
-                return state;
-            }
+    case SET_CHARACTER:
+        newState = {
+            ...state,
+            character: {
+                ...state.character,
+            },
+        };
+        newState.character = action.payload;
 
-            newState = {
-                ...state,
-                character: {
-                    ...state.character
-                }
-            };
-            newState.character = action.payload;
-
-            return newState;
-        case SET_SHOW_SECONDARY:
-            newState = {
-                ...state,
-                showSecondary: {
-                    ...state.showSecondary
-                }
-            };
-            newState.showSecondary = action.payload;
-
-            return newState;
-        case CLEAR_CHARACTER:
-            newState = {
-                ...state,
-                character: {
-                    ...state.character
-                }
-            };
-
-            newState.character = null;
-
-            return newState;
-        default:
+        return newState;
+    case INITIALIZE_CHARACTER:
+        if (action.payload === null) {
             return state;
+        }
+
+        newState = {
+            ...state,
+            character: {
+                ...state.character,
+            },
+        };
+        newState.character = action.payload;
+
+        return newState;
+    case SET_SHOW_SECONDARY:
+        newState = {
+            ...state,
+            showSecondary: {
+                ...state.showSecondary,
+            },
+        };
+        newState.showSecondary = action.payload;
+
+        return newState;
+    case CLEAR_CHARACTER:
+        newState = {
+            ...state,
+            character: {
+                ...state.character,
+            },
+        };
+
+        newState.character = null;
+
+        return newState;
+    default:
+        return state;
     }
 }

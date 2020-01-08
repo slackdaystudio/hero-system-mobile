@@ -36,7 +36,7 @@ export function initializeCombatDetails() {
         persistence.initializeCombatDetails().then(combatDetails => {
             dispatch({
                 type: INITIALIZE_COMBAT_DETAILS,
-                payload: combatDetails
+                payload: combatDetails,
             });
         });
     };
@@ -47,7 +47,7 @@ export function setCombatDetails(character) {
         persistence.setCombatDetails(character).then(combatDetails => {
             dispatch({
                 type: SET_COMBAT_DETAILS,
-                payload: combatDetails
+                payload: combatDetails,
             });
         });
     };
@@ -58,26 +58,26 @@ export function setSparseCombatDetails(sparseCombatDetails) {
         persistence.setSparseCombatDetails(sparseCombatDetails).then(combatDetails => {
             dispatch({
                 type: SET_SPARSE_COMBAT_DETAILS,
-                payload: combatDetails
+                payload: combatDetails,
             });
         });
     };
 }
 
-combatState = {};
+let combatState = {};
 
 export default function combat(state = combatState, action) {
-    let newState = null
+    let newState = null;
 
     switch (action.type) {
-        case INITIALIZE_COMBAT_DETAILS:
-        case SET_COMBAT_DETAILS:
-        case SET_SPARSE_COMBAT_DETAILS:
-            newState = {...state};
-            newState = action.payload;
+    case INITIALIZE_COMBAT_DETAILS:
+    case SET_COMBAT_DETAILS:
+    case SET_SPARSE_COMBAT_DETAILS:
+        newState = {...state};
+        newState = action.payload;
 
-            return newState;
-        default:
-            return state;
+        return newState;
+    default:
+        return state;
     }
 }
