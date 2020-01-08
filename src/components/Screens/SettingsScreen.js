@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, StyleSheet, View, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
@@ -30,11 +31,21 @@ import { clearStatistics } from '../../reducers/statistics';
 // limitations under the License.
 
 class SettingsScreen extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        useFifthEdition: PropTypes.bool.isRequired,
+        resetForm: PropTypes.func.isRequired,
+        clearCharacter: PropTypes.func.isRequired,
+        clearRandomHero: PropTypes.func.isRequired,
+        clearStatistics: PropTypes.func.isRequired,
+        initializeApplicationSettings: PropTypes.func.isRequired,
+    }
+
     constructor(props) {
         super(props);
 
         this.state = {
-            appSettings: null
+            appSettings: null,
         };
     }
 
@@ -50,33 +61,33 @@ class SettingsScreen extends Component {
         this.backHandler.remove();
     }
 
-	_clearFormData(showToast = true) {
-		this.props.resetForm('skill');
-		this.props.resetForm('hit');
-		this.props.resetForm('damage');
-		this.props.resetForm('freeForm');
-		this.props.resetForm('costCruncher');
+    _clearFormData(showToast = true) {
+        this.props.resetForm('skill');
+        this.props.resetForm('hit');
+        this.props.resetForm('damage');
+        this.props.resetForm('freeForm');
+        this.props.resetForm('costCruncher');
 
-		if (showToast) {
+        if (showToast) {
 		    common.toast('Form data has been cleared');
-		}
-	}
+        }
+    }
 
-	_clearCharacterData(showToast = true) {
+    _clearCharacterData(showToast = true) {
         this.props.clearCharacter();
 
         if (showToast) {
             common.toast('Loaded character has been cleared');
         }
-	}
+    }
 
-	async _clearHeroData(showToast = true) {
+    async _clearHeroData(showToast = true) {
 	    this.props.clearRandomHero();
 
         if (showToast) {
             common.toast('H.E.R.O. character has been cleared');
         }
-	}
+    }
 
     async _clearStatisticsData(showToast = true) {
 	    this.props.clearStatistics();
@@ -96,15 +107,15 @@ class SettingsScreen extends Component {
         common.toast('Everything has been cleared');
     }
 
-	render() {
-		return (
-			<Container style={styles.container}>
+    render() {
+        return (
+            <Container style={styles.container}>
                 <NavigationEvents
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
 			    <Header navigation={this.props.navigation} />
-				<Content style={styles.content}>
+                <Content style={styles.content}>
 			    	<Text style={styles.heading}>Settings</Text>
 			    	<List>
 			    		<ListItem>
@@ -113,8 +124,8 @@ class SettingsScreen extends Component {
 			        		</Left>
 			        		<Body>
 							    <Button style={styles.button} onPress={() => this._clearFormData()}>
-									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
-								</Button>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
 			        		</Body>
 		        		</ListItem>
 			    		<ListItem>
@@ -123,8 +134,8 @@ class SettingsScreen extends Component {
 			        		</Left>
 			        		<Body>
 							    <Button style={styles.button} onPress={() => this._clearCharacterData()}>
-									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
-								</Button>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
 			        		</Body>
 		        		</ListItem>
 			    		<ListItem>
@@ -133,8 +144,8 @@ class SettingsScreen extends Component {
 			        		</Left>
 			        		<Body>
 							    <Button style={styles.button} onPress={() => this._clearHeroData()}>
-									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
-								</Button>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
 			        		</Body>
 		        		</ListItem>
 			    		<ListItem>
@@ -143,8 +154,8 @@ class SettingsScreen extends Component {
 			        		</Left>
 			        		<Body>
 							    <Button style={styles.button} onPress={() => this._clearStatisticsData()}>
-									<Text uppercase={false} style={styles.buttonText}>Clear</Text>
-								</Button>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
 			        		</Body>
 		        		</ListItem>
 			    		<ListItem>
@@ -155,9 +166,9 @@ class SettingsScreen extends Component {
 							    <Switch
                                     value={this.props.useFifthEdition}
                                     onValueChange={() => this.props.setUseFifthEditionRules(!this.props.useFifthEdition)}
-                                    minimumTrackTintColor='#14354d'
-                                    maximumTrackTintColor='#14354d'
-                                    thumbTintColor='#14354d'
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbTintColor="#14354d"
                                     onTintColor="#01121E"
                                 />
 			        		</Right>
@@ -168,18 +179,17 @@ class SettingsScreen extends Component {
                             <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
                         </Button>
 			    	</View>
-				</Content>
-			</Container>
-		);
-	}
+                </Content>
+            </Container>
+        );
+    }
 }
 
 const mapStateToProps = state => {
     return {
-        forms: state.forms,
-        useFifthEdition: state.settings.useFifthEdition
+        useFifthEdition: state.settings.useFifthEdition,
     };
-}
+};
 
 const mapDispatchToProps = {
     initializeApplicationSettings,
@@ -187,7 +197,7 @@ const mapDispatchToProps = {
     resetForm,
     clearCharacter,
     clearRandomHero,
-    clearStatistics
-}
+    clearStatistics,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen);

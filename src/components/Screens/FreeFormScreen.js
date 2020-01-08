@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
@@ -26,14 +27,20 @@ import { updateFormValue } from '../../reducers/forms';
 // limitations under the License.
 
 class FreeFormScreen extends Component {
-	constructor(props) {
-		super(props);
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        freeFormForm: PropTypes.object.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+    }
 
-		this.setSliderState = this._setSliderState.bind(this);
-		this.roll = this._roll.bind(this);
-	}
-	
-	onDidFocus() {
+    constructor(props) {
+        super(props);
+
+        this.setSliderState = this._setSliderState.bind(this);
+        this.roll = this._roll.bind(this);
+    }
+
+    onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             if (this.props.navigation.state.params === undefined) {
                 this.props.navigation.navigate('Home');
@@ -47,7 +54,7 @@ class FreeFormScreen extends Component {
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
-	}
+    }
 
    	onDidBlur() {
    		RNShake.removeEventListener('ShakeEvent');
@@ -58,61 +65,61 @@ class FreeFormScreen extends Component {
         this.props.navigation.navigate('Result', {from: 'FreeForm', result: dieRoller.freeFormRoll(this.props.freeFormForm.dice, this.props.freeFormForm.halfDice, this.props.freeFormForm.pips)});
     }
 
-	_setSliderState(key, value) {
-		this.props.updateFormValue('freeForm', key, parseInt(value, 10));
-	}
-	
-	render() {
-		return (
-			<Container style={styles.container}>
+    _setSliderState(key, value) {
+        this.props.updateFormValue('freeForm', key, parseInt(value, 10));
+    }
+
+    render() {
+        return (
+            <Container style={styles.container}>
                 <NavigationEvents
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-				<Header navigation={this.props.navigation} />
-				<Content style={styles.content}>
+                <Header navigation={this.props.navigation} />
+                <Content style={styles.content}>
 				    <Text style={styles.heading}>Free Form Roll</Text>
-					<Slider 
-						label='Dice:'
-						value={this.props.freeFormForm.dice}
-						step={1} 
-						min={0} 
-						max={50}
-						onValueChange={this.setSliderState}
-						valueKey='dice' />
-					<Slider 
-						label='Half Dice:'
-						value={this.props.freeFormForm.halfDice}
-						step={1} 
-						min={0} 
-						max={50}
-						onValueChange={this.setSliderState}
-						valueKey='halfDice' />
-					<Slider 
-						label='Pips:'
-						value={this.props.freeFormForm.pips}
-						step={1} 
-						min={-50}
-						max={50}
-						onValueChange={this.setSliderState}
-						valueKey='pips' />
-					<Button block style={styles.button}  onPress={this.roll}>
-						<Text uppercase={false}>Roll</Text>
-					</Button>
-				</Content>
-			</Container>
-		);
-	}
+                    <Slider
+                        label="Dice:"
+                        value={this.props.freeFormForm.dice}
+                        step={1}
+                        min={0}
+                        max={50}
+                        onValueChange={this.setSliderState}
+                        valueKey="dice" />
+                    <Slider
+                        label="Half Dice:"
+                        value={this.props.freeFormForm.halfDice}
+                        step={1}
+                        min={0}
+                        max={50}
+                        onValueChange={this.setSliderState}
+                        valueKey="halfDice" />
+                    <Slider
+                        label="Pips:"
+                        value={this.props.freeFormForm.pips}
+                        step={1}
+                        min={-50}
+                        max={50}
+                        onValueChange={this.setSliderState}
+                        valueKey="pips" />
+                    <Button block style={styles.button}  onPress={this.roll}>
+                        <Text uppercase={false}>Roll</Text>
+                    </Button>
+                </Content>
+            </Container>
+        );
+    }
 }
 
 const mapStateToProps = state => {
     return {
-        freeFormForm: state.forms.freeForm
+        freeFormForm: state.forms.freeForm,
     };
-}
+};
 
 const mapDispatchToProps = {
-    updateFormValue
-}
+    updateFormValue,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(FreeFormScreen);

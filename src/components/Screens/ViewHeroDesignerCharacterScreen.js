@@ -29,107 +29,109 @@ import { updateForm } from '../../reducers/forms';
 
 class ViewHeroDesignerCharacterScreen extends Component {
 	static propTypes = {
-		character: PropTypes.object.isRequired
+	    navigation: PropTypes.object.isRequired,
+	    character: PropTypes.object.isRequired,
+	    updateForm: PropTypes.func.isRequired,
 	}
 
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
+	onDidFocus() {
+	    this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+	        this.props.navigation.navigate('Home');
 
-            return true;
-        });
-    }
+	        return true;
+	    });
+	}
 
-    onDidBlur() {
-        this.backHandler.remove();
-    }
+	onDidBlur() {
+	    this.backHandler.remove();
+	}
 
-    _renderTab(title, listKey, subListKey) {
-        if (this.props.character[listKey].length === 0) {
-            return null;
-        }
+	_renderTab(title, listKey, subListKey) {
+	    if (this.props.character[listKey].length === 0) {
+	        return null;
+	    }
 
-        return (
-            <Tab
-                tabStyle={styles.tabInactive}
-                activeTabStyle={styles.tabActive}
-                textStyle={styles.grey}
-                activeTextStyle={{color: '#FFF'}}
-                heading={title}
-            >
-                <View style={styles.tabContent}>
-                    <Traits
-                        navigation={this.props.navigation}
-                        headingText={title}
-                        character={this.props.character}
-                        listKey={listKey}
-                        subListKey={subListKey}
-                        updateForm={this.props.updateForm}
-                    />
-                </View>
-            </Tab>
-        );
-    }
+	    return (
+	        <Tab
+	            tabStyle={styles.tabInactive}
+	            activeTabStyle={styles.tabActive}
+	            textStyle={styles.grey}
+	            activeTextStyle={{color: '#FFF'}}
+	            heading={title}
+	        >
+	            <View style={styles.tabContent}>
+	                <Traits
+	                    navigation={this.props.navigation}
+	                    headingText={title}
+	                    character={this.props.character}
+	                    listKey={listKey}
+	                    subListKey={subListKey}
+	                    updateForm={this.props.updateForm}
+	                />
+	            </View>
+	        </Tab>
+	    );
+	}
 
 	render() {
 	    // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
 	    // guards against a error
-		if (!character.isHeroDesignerCharacter(this.props.character)) {
-			return null;
-		}
+	    if (!character.isHeroDesignerCharacter(this.props.character)) {
+	        return null;
+	    }
 
-		return (
+	    return (
 		  <Container style={styles.container}>
-            <NavigationEvents
-                onDidFocus={(payload) => this.onDidFocus()}
-                onDidBlur={(payload) => this.onDidBlur()}
-            />
+	            <NavigationEvents
+	                onDidFocus={(payload) => this.onDidFocus()}
+	                onDidBlur={(payload) => this.onDidBlur()}
+	            />
 		  	<Header hasTabs={false} navigation={this.props.navigation} />
 		  	<Content scrollEnable={false} style={styles.content}>
-                <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
+	                <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
 			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
 			  			<View style={styles.tabContent}>
-                            <General characterInfo={this.props.character.characterInfo} />
+	                            <General characterInfo={this.props.character.characterInfo} />
 			  			</View>
 			  		</Tab>
-					<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-						<View style={styles.tabContent}>
-							<Characteristics navigation={this.props.navigation} character={this.props.character} />
-						</View>
-					</Tab>
-                    {this._renderTab('Skills', 'skills', 'skills')}
-                    {this._renderTab('Perks', 'perks', 'perks')}
-                    {this._renderTab('Talents', 'talents', 'talents')}
-                    {this._renderTab('Martial Arts', 'martialArts', 'maneuver')}
-                    {this._renderTab('Powers', 'powers', 'powers')}
-                    {this._renderTab('Equipment', 'equipment', 'power')}
-                    {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
+	                    <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+	                        <View style={styles.tabContent}>
+	                            <Characteristics navigation={this.props.navigation} character={this.props.character} />
+	                        </View>
+	                    </Tab>
+	                    {this._renderTab('Skills', 'skills', 'skills')}
+	                    {this._renderTab('Perks', 'perks', 'perks')}
+	                    {this._renderTab('Talents', 'talents', 'talents')}
+	                    {this._renderTab('Martial Arts', 'martialArts', 'maneuver')}
+	                    {this._renderTab('Powers', 'powers', 'powers')}
+	                    {this._renderTab('Equipment', 'equipment', 'power')}
+	                    {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
 			  	</Tabs>
 		  	</Content>
 	      </Container>
-		);
+	    );
 	}
 }
 
 const localStyles = StyleSheet.create({
-	pointCostsHeader: {
-		alignSelf: 'center',
-		textDecorationLine: 'underline'
-	},
+    pointCostsHeader: {
+        alignSelf: 'center',
+        textDecorationLine: 'underline',
+    },
     button: {
         backgroundColor: '#478f79',
-        alignSelf: 'flex-end'
-    }
+        alignSelf: 'flex-end',
+    },
 });
 
 const mapStateToProps = state => {
     return {
-        character: state.character.character
+        character: state.character.character,
     };
-}
+};
 
 const mapDispatchToProps = {
-    updateForm
-}
+    updateForm,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);

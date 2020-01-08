@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
@@ -27,20 +28,26 @@ import { updateFormValue } from '../../reducers/forms';
 // limitations under the License.
 
 class HitScreen extends Component {
-	constructor(props) {
-		super(props);
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        hitForm: PropTypes.object.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+    }
 
-		this.state = {
-			tabsLocked: false
-		};
+    constructor(props) {
+        super(props);
 
-		this.updateFormValue = this._updateFormValue.bind(this);
-		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
-		this.roll = this._roll.bind(this);
-		this.setLocation = this._setLocation.bind(this);
-	}
+        this.state = {
+            tabsLocked: false,
+        };
 
-	onDidFocus() {
+        this.updateFormValue = this._updateFormValue.bind(this);
+        this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
+        this.roll = this._roll.bind(this);
+        this.setLocation = this._setLocation.bind(this);
+    }
+
+    onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.navigate('Home');
 
@@ -50,7 +57,7 @@ class HitScreen extends Component {
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
-	}
+    }
 
    	onDidBlur() {
    		RNShake.removeEventListener('ShakeEvent');
@@ -61,13 +68,13 @@ class HitScreen extends Component {
         this.props.navigation.navigate('Result', {from: 'Hit', result: dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv)});
     }
 
-	_updateFormValue(key, value) {
+    _updateFormValue(key, value) {
 	    if (key === 'numberOfRolls') {
 	        value = parseInt(value, 10);
 	    }
 
-		this.props.updateFormValue('hit', key, value);
-	}
+        this.props.updateFormValue('hit', key, value);
+    }
 
     _setLocation(location) {
         if (this.props.hitForm.selectedLocation === location) {
@@ -88,13 +95,13 @@ class HitScreen extends Component {
         if (this.props.hitForm.isAutofire) {
             return (
                 <Slider
-                    label='Target DCV/DMCV:'
+                    label="Target DCV/DMCV:"
                     value={this.props.hitForm.targetDcv}
                     step={1}
                     min={-30}
                     max={30}
                     onValueChange={this.updateFormValue}
-                    valueKey='targetDcv'
+                    valueKey="targetDcv"
                     toggleTabsLocked={this.toggleTabsLocked} />
             );
         }
@@ -126,50 +133,50 @@ class HitScreen extends Component {
         );
     }
 
-	render() {
-		return (
-			<Container style={styles.container}>
+    render() {
+        return (
+            <Container style={styles.container}>
                 <NavigationEvents
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
 			    <Header navigation={this.props.navigation} />
-				<Content scrollEnable={false}>
+                <Content scrollEnable={false}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <Slider
-                                    label='Total OCV/OMCV:'
+                                    label="Total OCV/OMCV:"
                                     value={this.props.hitForm.ocv}
                                     step={1}
                                     min={-30}
                                     max={30}
                                     onValueChange={this.updateFormValue}
-                                    valueKey='ocv'
+                                    valueKey="ocv"
                                     toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <Slider
-                                    label='Rolls:'
+                                    label="Rolls:"
                                     value={this.props.hitForm.numberOfRolls}
                                     step={1}
                                     min={1}
                                     max={20}
                                     onValueChange={this.updateFormValue}
-                                    valueKey='numberOfRolls'
+                                    valueKey="numberOfRolls"
                                     toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                     <Text style={styles.grey}>Is this an autofire attack?</Text>
                                     <View style={{paddingRight: 10}}>
                                         <Switch
-											value={this.props.hitForm.isAutofire}
-											onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
-											color='#3da0ff'
-											minimumTrackTintColor='#14354d'
-											maximumTrackTintColor='#14354d'
-											thumbTintColor='#14354d'
-											onTintColor="#01121E"
-										/>
+                                            value={this.props.hitForm.isAutofire}
+                                            onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
+                                            color="#3da0ff"
+                                            minimumTrackTintColor="#14354d"
+                                            maximumTrackTintColor="#14354d"
+                                            thumbTintColor="#14354d"
+                                            onTintColor="#01121E"
+                                        />
                                     </View>
                                 </View>
                                 {this._renderDcvSlider()}
@@ -181,59 +188,59 @@ class HitScreen extends Component {
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Range Mods">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>0-8</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>0</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>9-16</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-2</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>17-32</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-4</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>33-64</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-6</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>65-128</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-8</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>129-250</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-10</Text>
+                                        </View>
+                                    </View>
                                 </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>0-8</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>0</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>9-16</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-2</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>17-32</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-4</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>33-64</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-6</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>65-128</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-8</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>129-250</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-10</Text>
-                                    </View>
-                                </View>
-                            </View>
                             </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Hit Locations">
@@ -249,11 +256,11 @@ class HitScreen extends Component {
                                         let stars = [];
 
                                         for (let i = 0; i < hitLocation.stunX; i++) {
-                                            stars.push(<Icon key={'star-' + index + '-' + i} name='md-star' style={[styles.grey, {fontSize: 14}]} />);
+                                            stars.push(<Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: 14}]} />);
                                         }
 
                                         return (
-                                            <TouchableHighlight key={'hit-location-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}} underlayColor='#3da0ff' onPress={() => this.setLocation(index)}>
+                                            <TouchableHighlight key={'hit-location-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}} underlayColor="#3da0ff" onPress={() => this.setLocation(index)}>
                                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
                                                     <View style={{flex: 1, alignSelf: 'stretch'}}>
                                                         <Text style={styles.grey}>{hitLocation.location}</Text>
@@ -335,32 +342,32 @@ class HitScreen extends Component {
                             </View>
                         </Tab>
                     </Tabs>
-				</Content>
-			</Container>
-		);
-	}
+                </Content>
+            </Container>
+        );
+    }
 }
 
 const localStyles = StyleSheet.create({
-	titleContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingTop: 10
-	},
-	checkContainer: {
-		paddingBottom: 20
-	}
+    titleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 10,
+    },
+    checkContainer: {
+        paddingBottom: 20,
+    },
 });
 
 const mapStateToProps = state => {
     return {
-        hitForm: state.forms.hit
+        hitForm: state.forms.hit,
     };
-}
+};
 
 const mapDispatchToProps = {
-    updateFormValue
-}
+    updateFormValue,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(HitScreen);
