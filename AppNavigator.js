@@ -1,4 +1,3 @@
-import React, { Component }  from 'react';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
@@ -63,13 +62,13 @@ const AppNavigator = createDrawerNavigator({
         screen: StatisticsScreen,
     },
     Settings: {
-        screen: SettingsScreen
-    }
+        screen: SettingsScreen,
+    },
 }, {
     initialRouteName: 'Home',
     drawerPosition: 'right',
     contentComponent: Sidebar,
-    drawerWidth: 250
+    drawerWidth: 250,
 });
 
 export default AppNavigator;
