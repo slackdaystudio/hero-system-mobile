@@ -34,7 +34,7 @@ export default class RapidAttack extends CharacterTrait {
                     }
                 }
             } else {
-                if (modifier.xmlid.toUpperCase() === 'HTHONLY' || modifier.xmlid.toUpperCase() === 'RANGEDONLY') {
+                if (this.characterTrait.trait.modifier.xmlid.toUpperCase() === 'HTHONLY' || this.characterTrait.trait.modifier.xmlid.toUpperCase() === 'RANGEDONLY') {
                     cost--;
                 }
             }

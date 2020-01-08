@@ -48,7 +48,7 @@ export default class Regeneration extends CharacterTrait {
 
         attributes.push({
             label: 'BODY Per Interval',
-            value: this.characterTrait.trait.levels
+            value: this.characterTrait.trait.levels,
         });
 
         return attributes;

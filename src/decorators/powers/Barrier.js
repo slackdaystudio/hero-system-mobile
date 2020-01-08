@@ -82,39 +82,39 @@ export default class Barrier extends CharacterTrait {
         if (this.characterTrait.trait.pdlevels > 0) {
             attributes.push({
                 label: 'Physical Defense',
-                value: this.characterTrait.trait.pdlevels
+                value: this.characterTrait.trait.pdlevels,
             });
         }
 
         if (this.characterTrait.trait.edlevels > 0) {
             attributes.push({
                 label: 'Energy Defense',
-                value: this.characterTrait.trait.edlevels
+                value: this.characterTrait.trait.edlevels,
             });
         }
 
         if (this.characterTrait.trait.mdlevels > 0) {
             attributes.push({
                 label: 'Mental Defense',
-                value: this.characterTrait.trait.mdlevels
+                value: this.characterTrait.trait.mdlevels,
             });
         }
 
         if (this.characterTrait.trait.powdlevels > 0) {
             attributes.push({
                 label: 'Power Defense',
-                value: this.characterTrait.trait.powdlevels
+                value: this.characterTrait.trait.powdlevels,
             });
         }
 
         attributes.push({
             label: 'Body',
-            value: this.characterTrait.trait.bodylevels
+            value: this.characterTrait.trait.bodylevels,
         });
 
         attributes.push({
             label: 'Dimensions',
-            value: `${this.characterTrait.trait.lengthlevels + 1}m x ${this.characterTrait.trait.widthlevels + 0.5}m x ${this.characterTrait.trait.heightlevels + 1}m`
+            value: `${this.characterTrait.trait.lengthlevels + 1}m x ${this.characterTrait.trait.widthlevels + 0.5}m x ${this.characterTrait.trait.heightlevels + 1}m`,
         });
 
 
@@ -138,7 +138,7 @@ export default class Barrier extends CharacterTrait {
     }
 
     calculateDefenseCost(levels, levelValue, levelCost) {
-        cost = 0;
+        let cost = 0;
 
         if (levels === 0) {
             return cost;

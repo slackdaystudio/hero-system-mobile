@@ -50,7 +50,7 @@ export default class Entangle extends CharacterTrait {
 
         attributes.push({
             label: 'PD/ED',
-            value: this._getDefenses(this.characterTrait.trait.adder)
+            value: this._getDefenses(this.characterTrait.trait.adder),
         });
 
         return attributes;
@@ -98,6 +98,6 @@ export default class Entangle extends CharacterTrait {
             ed += this.adderMap.get('ADDITIONALED').levels;
         }
 
-        return `${pd}/${ed}`
+        return `${pd}/${ed}`;
     }
 }

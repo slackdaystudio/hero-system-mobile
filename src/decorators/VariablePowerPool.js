@@ -51,7 +51,7 @@ export default class VariablePowerPool extends CharacterTrait {
 
         attributes.push({
             label: 'Base Pool',
-            value: this.characterTrait.trait.levels
+            value: this.characterTrait.trait.levels,
         });
 
         return attributes;
@@ -106,7 +106,7 @@ export default class VariablePowerPool extends CharacterTrait {
                 }
             }
         } else {
-            cost = this.characterTrait.trait.adder.levels / this.characterTrait.trait.adder.lvlval * this.characterTrait.trait.adder.lvlcost
+            cost = this.characterTrait.trait.adder.levels / this.characterTrait.trait.adder.lvlval * this.characterTrait.trait.adder.lvlcost;
         }
 
         return cost;

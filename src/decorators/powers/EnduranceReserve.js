@@ -51,12 +51,12 @@ export default class EnduranceReserve extends CharacterTrait {
 
         attributes.push({
             label: 'Reserve',
-            value: this.characterTrait.trait.levels
+            value: this.characterTrait.trait.levels,
         });
 
         attributes.push({
             label: 'Recovery',
-            value: this.characterTrait.trait.power.levels
+            value: this.characterTrait.trait.power.levels,
         });
 
         return attributes;

@@ -47,7 +47,7 @@ export default class ExtraLimbs extends CharacterTrait {
 
         attributes.push({
             label: 'Number of Limbs',
-            value: this.characterTrait.trait.levels
+            value: this.characterTrait.trait.levels,
         });
 
         return attributes;

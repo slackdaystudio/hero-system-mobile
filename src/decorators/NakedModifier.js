@@ -48,7 +48,7 @@ export default class NakedModifier extends CharacterTrait {
 
         attributes.push({
             label: `Up to ${this.characterTrait.trait.levels} Active Points of ${this.characterTrait.trait.input}`,
-            value: ''
+            value: '',
         });
 
         return attributes;

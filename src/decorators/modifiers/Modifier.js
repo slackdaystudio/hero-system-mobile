@@ -106,18 +106,18 @@ export default class Modifier {
         formattedCost += Math.trunc(cost) === 0 ? '' : Math.trunc(cost);
 
         switch ((cost % 1).toFixed(2)) {
-            case '0.25':
-            case '-0.25':
-                formattedCost += '¼';
-                break;
-            case '0.50':
-            case '-0.50':
-                formattedCost += '½';
-                break;
-            case '0.75':
-            case '-0.75':
-                formattedCost += '¾';
-                break;
+        case '0.25':
+        case '-0.25':
+            formattedCost += '¼';
+            break;
+        case '0.50':
+        case '-0.50':
+            formattedCost += '½';
+            break;
+        case '0.75':
+        case '-0.75':
+            formattedCost += '¾';
+            break;
         }
 
         if (cost < 0 && !formattedCost.startsWith('-')) {

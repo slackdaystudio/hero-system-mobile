@@ -27,17 +27,17 @@ const RESOURCE_POOL = 'RESOURCE_POOL';
 class PerkDecorator {
     decorate(decorated) {
         switch (decorated.trait.xmlid.toUpperCase()) {
-            case FOLLOWER:
-            case VEHICLE_BASE:
-                decorated = new FollowerAndBase(decorated);
-                break;
-            case CONTACT:
-                decorated = new Contact(decorated);
-                break;
-            case RESOURCE_POOL:
-                decorated = new ResourcePoints(decorated);
-                break;
-            default:
+        case FOLLOWER:
+        case VEHICLE_BASE:
+            decorated = new FollowerAndBase(decorated);
+            break;
+        case CONTACT:
+            decorated = new Contact(decorated);
+            break;
+        case RESOURCE_POOL:
+            decorated = new ResourcePoints(decorated);
+            break;
+        default:
                 // do nothing
         }
 

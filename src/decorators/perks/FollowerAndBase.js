@@ -60,17 +60,17 @@ export default class FollowerAndBase extends CharacterTrait {
 
         attributes.push({
             label: 'Base Points',
-            value: this.characterTrait.trait.basepoints
+            value: this.characterTrait.trait.basepoints,
         });
 
         attributes.push({
             label: 'Complications',
-            value: this.characterTrait.trait.disadpoints
+            value: this.characterTrait.trait.disadpoints,
         });
 
         attributes.push({
             label: 'Number',
-            value: this.characterTrait.trait.number
+            value: this.characterTrait.trait.number,
         });
 
         return attributes;

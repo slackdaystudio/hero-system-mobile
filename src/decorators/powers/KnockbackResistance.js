@@ -48,7 +48,7 @@ export default class KnockbackResistance extends CharacterTrait {
 
         attributes.push({
             label: `-${this.characterTrait.trait.levels}m`,
-            value: ''
+            value: '',
         });
 
         return attributes;

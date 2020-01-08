@@ -52,7 +52,7 @@ export default class Telekinesis extends CharacterTrait {
 
         attributes.push({
             label: 'Strength',
-            value: `${this.characterTrait.trait.levels}`
+            value: `${this.characterTrait.trait.levels}`,
         });
 
         return attributes;

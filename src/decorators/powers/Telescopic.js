@@ -47,7 +47,7 @@ export default class Telescopic extends CharacterTrait {
 
         attributes.push({
             label: 'Range Modifier',
-            value: `+${this.characterTrait.trait.levels}`
+            value: `+${this.characterTrait.trait.levels}`,
         });
 
         return attributes;

@@ -54,8 +54,8 @@ export default class TwelveOrLessRoll extends CharacterTrait {
     roll() {
         return {
             roll: `${12 + this.characterTrait.trait.levels}-`,
-            type: SKILL_CHECK
-        }
+            type: SKILL_CHECK,
+        };
     }
 
     advantages() {

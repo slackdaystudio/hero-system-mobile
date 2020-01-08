@@ -61,8 +61,8 @@ export default class Contact extends CharacterTrait {
 
         return {
             roll: `${baseRoll + levels}-`,
-            type: SKILL_CHECK
-        }
+            type: SKILL_CHECK,
+        };
     }
 
     advantages() {

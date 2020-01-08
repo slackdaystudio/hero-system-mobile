@@ -51,35 +51,35 @@ export default class Maneuver extends CharacterTrait {
         if (this.characterTrait.trait.hasOwnProperty('category') && this.characterTrait.trait.category === 'Hand To Hand') {
             attributes.push({
                 label: 'Type',
-                value: this.characterTrait.trait.useweapon ? 'Weapon' : 'Empty Hand'
+                value: this.characterTrait.trait.useweapon ? 'Weapon' : 'Empty Hand',
             });
         }
 
         if (this.characterTrait.trait.hasOwnProperty('phase')) {
             attributes.push({
                 label: 'Phase',
-                value: this.characterTrait.trait.phase === '1/2' ? '½' : this.characterTrait.trait.phase
+                value: this.characterTrait.trait.phase === '1/2' ? '½' : this.characterTrait.trait.phase,
             });
         }
 
         if (this.characterTrait.trait.hasOwnProperty('ocv')) {
             attributes.push({
                 label: 'OCV',
-                value: `${this.characterTrait.trait.ocv < 0 ? '' : '+'}${this.characterTrait.trait.ocv}`
+                value: `${this.characterTrait.trait.ocv < 0 ? '' : '+'}${this.characterTrait.trait.ocv}`,
             });
         }
 
         if (this.characterTrait.trait.hasOwnProperty('dcv')) {
             attributes.push({
                 label: 'DCV',
-                value: `${this.characterTrait.trait.dcv < 0 ? '' : '+'}${this.characterTrait.trait.dcv}`
+                value: `${this.characterTrait.trait.dcv < 0 ? '' : '+'}${this.characterTrait.trait.dcv}`,
             });
         }
 
         if (this.characterTrait.trait.hasOwnProperty('range')) {
             attributes.push({
                 label: 'Range',
-                value: `${this.characterTrait.trait.range < 0 ? '' : '+'}${this.characterTrait.trait.range}`
+                value: `${this.characterTrait.trait.range < 0 ? '' : '+'}${this.characterTrait.trait.range}`,
             });
         }
 
@@ -109,13 +109,13 @@ export default class Maneuver extends CharacterTrait {
                 if (this.characterTrait.trait.effect.indexOf('[KILLINGDC]') > -1) {
                     return {
                         roll: this._getUnarmedKillingDamage(),
-                        type: KILLING_DAMAGE
-                    }
+                        type: KILLING_DAMAGE,
+                    };
                 } else {
                     return {
                         roll: this._getNormalDamage(),
-                        type: NORMAL_DAMAGE
-                    }
+                        type: NORMAL_DAMAGE,
+                    };
                 }
             }
         }
@@ -134,8 +134,8 @@ export default class Maneuver extends CharacterTrait {
     _performEffectInterpolation(effect) {
         let attribute = {
             label: 'Effect',
-            value: effect
-        }
+            value: effect,
+        };
 
         if (effect.indexOf('[WEAPONDC]') > -1) {
             attribute.value = effect.replace('[WEAPONDC]', `+${this._getKillingDc()} DC`);
@@ -154,7 +154,7 @@ export default class Maneuver extends CharacterTrait {
         }
 
         if (effect.indexOf('[STRDC]') > -1) {
-            attribute.value = effect.replace('[STRDC]', `${this._getStrengthDc()} STR`)
+            attribute.value = effect.replace('[STRDC]', `${this._getStrengthDc()} STR`);
         }
 
         return attribute;
@@ -204,9 +204,9 @@ export default class Maneuver extends CharacterTrait {
 
         damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5);
 
-         if (martialArtsMap.has('EXTRADC')) {
-             damageClasses += martialArtsMap.get('EXTRADC').levels;
-         }
+        if (martialArtsMap.has('EXTRADC')) {
+            damageClasses += martialArtsMap.get('EXTRADC').levels;
+        }
 
         dice = damageClasses / 3;
         remainder = parseFloat((dice % 1).toFixed(1));
@@ -225,15 +225,15 @@ export default class Maneuver extends CharacterTrait {
     }
 
     _getKillingDc() {
-         let character = this.characterTrait.getCharacter();
-         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
-         let dice = this.characterTrait.trait.dc;
+        let character = this.characterTrait.getCharacter();
+        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
+        let dice = this.characterTrait.trait.dc;
 
-         if (martialArtsMap.has('EXTRADC')) {
-             dice += martialArtsMap.get('EXTRADC').levels;
-         }
+        if (martialArtsMap.has('EXTRADC')) {
+            dice += martialArtsMap.get('EXTRADC').levels;
+        }
 
-         return dice;
+        return dice;
     }
 
     _getStrengthDc() {

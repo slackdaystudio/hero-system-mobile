@@ -67,7 +67,7 @@ export default class EffectRoll extends CharacterTrait {
 
         return {
             roll: roll,
-            type: this.rollType
+            type: this.rollType,
         };
     }
 

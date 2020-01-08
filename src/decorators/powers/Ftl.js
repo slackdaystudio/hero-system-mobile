@@ -48,7 +48,7 @@ export default class Ftl extends CharacterTrait {
 
         attributes.push({
             label: this._getSpeed(),
-            value: ''
+            value: '',
         });
 
         return attributes;
@@ -74,28 +74,28 @@ export default class Ftl extends CharacterTrait {
         let speed = this.characterTrait.trait.template.lvlpower ** Math.round(this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval);
         let units = 'year';
 
-		if (speed > 31536000) {
-			units = "second";
-			speed = speed / 31536000;
-		} else if (speed > 525600) {
-			units = "minute";
-			speed = speed / 525600;
-		} else if (speed > 8760) {
-			units = "hour";
-			speed = speed / 8760;
-		} else if (speed > 365) {
-			units = "day";
-			speed = speed / 365;
-		} else if (speed > 52) {
-			units = "week";
-			speed = speed / 52;
-		} else if (speed > 12) {
-			units = "month";
-			speed = speed / 12;
-		}
+        if (speed > 31536000) {
+            units = 'second';
+            speed = speed / 31536000;
+        } else if (speed > 525600) {
+            units = 'minute';
+            speed = speed / 525600;
+        } else if (speed > 8760) {
+            units = 'hour';
+            speed = speed / 8760;
+        } else if (speed > 365) {
+            units = 'day';
+            speed = speed / 365;
+        } else if (speed > 52) {
+            units = 'week';
+            speed = speed / 52;
+        } else if (speed > 12) {
+            units = 'month';
+            speed = speed / 12;
+        }
 
-		speed = common.roundInPlayersFavor(speed);
+        speed = common.roundInPlayersFavor(speed);
 
-		return `${speed} Light Years/${units}`
+        return `${speed} Light Years/${units}`;
     }
 }

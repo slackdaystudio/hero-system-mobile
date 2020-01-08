@@ -52,7 +52,7 @@ export default class MultiForm extends CharacterTrait {
 
         attributes.push({
             label: 'Max Character Points',
-            value: this.characterTrait.trait.levels
+            value: this.characterTrait.trait.levels,
         });
 
         return attributes;

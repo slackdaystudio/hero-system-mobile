@@ -48,12 +48,12 @@ export default class Stretching extends CharacterTrait {
 
         attributes.push({
             label: 'Distance',
-            value: `${this.characterTrait.trait.levels}m`
+            value: `${this.characterTrait.trait.levels}m`,
         });
 
         attributes.push({
             label: 'Non-Combat Distance',
-            value: `${this.characterTrait.trait.levels * this._getNonCombatDistance()}m`
+            value: `${this.characterTrait.trait.levels * this._getNonCombatDistance()}m`,
         });
 
         return attributes;

@@ -68,7 +68,7 @@ export default class LightningReflexes extends CharacterTrait {
 
         attributes.push({
             label: `+${this.characterTrait.trait.levels} DEX to act first`,
-            value: ''
+            value: '',
         });
 
         return attributes;

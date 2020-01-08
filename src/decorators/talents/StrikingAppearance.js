@@ -48,7 +48,7 @@ export default class StrikingAppearance extends CharacterTrait {
 
         attributes.push({
             label: `+${this.characterTrait.trait.levels}/+${this.characterTrait.trait.levels}d6`,
-            value: ''
+            value: '',
         });
 
         return attributes;

@@ -47,11 +47,11 @@ export default class Flash extends CharacterTrait {
                         cost += this.characterTrait.trait.template.targetingsensecost;
                     }
                 } else {
-                     if (this._isGroup(xmlid)) {
-                         cost += this.characterTrait.trait.template.nontargetinggroupcost;
-                     } else {
-                         cost += this.characterTrait.trait.template.nontargetingsensecost;
-                     }
+                    if (this._isGroup(xmlid)) {
+                        cost += this.characterTrait.trait.template.nontargetinggroupcost;
+                    } else {
+                        cost += this.characterTrait.trait.template.nontargetingsensecost;
+                    }
                 }
             }
         }

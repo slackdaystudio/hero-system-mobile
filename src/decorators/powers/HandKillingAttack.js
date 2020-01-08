@@ -50,7 +50,7 @@ export default class HandKillingAttack extends CharacterTrait {
 
         attributes.push({
             label: 'Dice',
-            value: this._getDice()
+            value: this._getDice(),
         });
 
         return attributes;
@@ -69,7 +69,7 @@ export default class HandKillingAttack extends CharacterTrait {
         let dice = '';
         let roll = {
             roll: '',
-            type: KILLING_DAMAGE
+            type: KILLING_DAMAGE,
         };
         let damageClasses = this.characterTrait.trait.levels * 3;
         let partialDie = false;

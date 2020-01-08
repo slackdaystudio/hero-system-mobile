@@ -47,7 +47,7 @@ export default class MagnifiedSense extends CharacterTrait {
 
         attributes.push({
             label: `x${this.characterTrait.trait.template.lvlpower ** this.characterTrait.trait.levels}`,
-            value: ''
+            value: '',
         });
 
         return attributes;

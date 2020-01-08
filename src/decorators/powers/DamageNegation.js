@@ -49,7 +49,7 @@ export default class DamageNegation extends CharacterTrait {
             if (adder.levels > 0) {
                 attributes.push({
                     label: `-${adder.levels} ${adder.alias}`,
-                    value: ''
+                    value: '',
                 });
             }
         }

@@ -69,7 +69,7 @@ export default class SenseAffectingPower extends CharacterTrait {
     _getCounts() {
         let counts = {
             group: 0,
-            sense: 0
+            sense: 0,
         };
 
         if (this._isGroup(this.characterTrait.trait.option)) {

@@ -24,7 +24,7 @@ export default class Duplication extends CharacterTrait {
     }
 
     cost() {
-        cost = 0;
+        let cost = 0;
 
         if (this.characterTrait.trait.points === 0) {
             cost = 1;
@@ -66,12 +66,12 @@ export default class Duplication extends CharacterTrait {
 
         attributes.push({
             label: 'Points',
-            value: this.characterTrait.trait.points
+            value: this.characterTrait.trait.points,
         });
 
         attributes.push({
             label: 'Number of Duplicates',
-            value: this.characterTrait.trait.number
+            value: this.characterTrait.trait.number,
         });
 
         return attributes;

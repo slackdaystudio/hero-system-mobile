@@ -49,7 +49,7 @@ export default class ExtraAttributes extends CharacterTrait {
         for (let attribute of this.extraAttributes) {
             attributes.push({
                 label: attribute.label,
-                value: attribute.value
+                value: attribute.value,
             });
         }
 

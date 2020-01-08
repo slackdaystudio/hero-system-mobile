@@ -66,47 +66,47 @@ const ROLL_BLACKLIST = [
     RAPID_ATTACK_HTH,
     SKILL_LEVELS,
     TRANSPORT_FAMILIARITY,
-    TWO_WEAPON_FIGHTING_HTH
-]
+    TWO_WEAPON_FIGHTING_HTH,
+];
 
 class SkillDecorator {
     decorate(decorated) {
         switch (decorated.trait.xmlid.toUpperCase()) {
-            case ANIMAL_HANDLER:
-            case NAVIGATION:
-            case WEAPONSMITH:
-                decorated = new SkillWithAdders(decorated);
-                break;
-            case AUTOFIRE_SKILLS:
-                decorated = new AutofireSkills(decorated);
-                break;
-            case COMBAT_LEVELS:
-            case MENTAL_COMBAT_LEVELS:
-            case PENALTY_SKILL_LEVELS:
-            case SKILL_LEVELS:
-                decorated = new SkillLevels(decorated);
-                break;
-            case DEFENSE_MANEUVER:
-                decorated = new DefensiveManeuver(decorated);
-                break;
-            case FORGERY:
-            case GAMBLING:
-            case SURVIVAL:
-                decorated = new SkillWithSubAdders(decorated);
-                break;
-            case RAPID_ATTACK_HTH:
-                decorated = new RapidAttack(decorated);
-                break;
-            case TRANSPORT_FAMILIARITY:
-                decorated = new TransportFamiliarity(decorated);
-                break;
-            case TWO_WEAPON_FIGHTING_HTH:
-                decorated = new TwoWeaponFighting(decorated);
-                break;
-            case WEAPON_FAMILIARITY:
-                decorated = new WeaponFamiliarity(decorated);
-                break;
-            default:
+        case ANIMAL_HANDLER:
+        case NAVIGATION:
+        case WEAPONSMITH:
+            decorated = new SkillWithAdders(decorated);
+            break;
+        case AUTOFIRE_SKILLS:
+            decorated = new AutofireSkills(decorated);
+            break;
+        case COMBAT_LEVELS:
+        case MENTAL_COMBAT_LEVELS:
+        case PENALTY_SKILL_LEVELS:
+        case SKILL_LEVELS:
+            decorated = new SkillLevels(decorated);
+            break;
+        case DEFENSE_MANEUVER:
+            decorated = new DefensiveManeuver(decorated);
+            break;
+        case FORGERY:
+        case GAMBLING:
+        case SURVIVAL:
+            decorated = new SkillWithSubAdders(decorated);
+            break;
+        case RAPID_ATTACK_HTH:
+            decorated = new RapidAttack(decorated);
+            break;
+        case TRANSPORT_FAMILIARITY:
+            decorated = new TransportFamiliarity(decorated);
+            break;
+        case TWO_WEAPON_FIGHTING_HTH:
+            decorated = new TwoWeaponFighting(decorated);
+            break;
+        case WEAPON_FAMILIARITY:
+            decorated = new WeaponFamiliarity(decorated);
+            break;
+        default:
                 // do nothing
         }
 

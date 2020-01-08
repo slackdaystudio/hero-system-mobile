@@ -48,7 +48,7 @@ export default class Concealed extends CharacterTrait {
 
         attributes.push({
             label: 'PER Penalty',
-            value: `-${this.characterTrait.trait.levels}`
+            value: `-${this.characterTrait.trait.levels}`,
         });
 
         return attributes;

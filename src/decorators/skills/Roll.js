@@ -67,7 +67,7 @@ export default class Roll extends CharacterTrait {
         if (this.characterTrait.trait.proficiency) {
             roll = SKILL_PROFICIENCY_BASE;
         } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman) {
-            roll = SKILL_FAMILIARITY_BASE
+            roll = SKILL_FAMILIARITY_BASE;
         } else if (this.characterTrait.trait.hasOwnProperty('characteristic') && this.characterTrait.trait.characteristic === 'GENERAL') {
             if (this.characterTrait.trait.xmlid.toUpperCase() !== 'COMBAT_LEVELS') {
                 roll = SKILL_GENERAL_CHARACTERISTIC;
@@ -85,8 +85,8 @@ export default class Roll extends CharacterTrait {
 
         return {
             roll: roll,
-            type: SKILL_CHECK
-        }
+            type: SKILL_CHECK,
+        };
     }
 
     advantages() {

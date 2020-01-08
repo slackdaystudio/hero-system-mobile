@@ -50,7 +50,7 @@ export default class HandToHandAttack extends CharacterTrait {
 
         attributes.push({
             label: 'Dice',
-            value: this._getDice()
+            value: this._getDice(),
         });
 
         return attributes;
@@ -68,7 +68,7 @@ export default class HandToHandAttack extends CharacterTrait {
         let dice = this.characterTrait.trait.levels;
         let roll = {
             roll: '',
-            type: NORMAL_DAMAGE
+            type: NORMAL_DAMAGE,
         };
         let partialDie = false;
 

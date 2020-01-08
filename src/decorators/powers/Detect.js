@@ -65,7 +65,7 @@ export default class EnduranceReserve extends CharacterTrait {
 
         return {
             roll: `${base + this.characterTrait.trait.levels}-`,
-            type: SKILL_CHECK
+            type: SKILL_CHECK,
         };
     }
 

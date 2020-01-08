@@ -39,7 +39,7 @@ export default class BaseCost extends CharacterTrait {
             } else if (this.characterTrait.trait.template.hasOwnProperty('lvlcost')) {
                 levelCost = this.characterTrait.trait.template.lvlcost;
             } else if (this.characterTrait.trait.hasOwnProperty('adder')) {
-                levelCost += this._getLevelCost(this.characterTrait.trait.adder)
+                levelCost += this._getLevelCost(this.characterTrait.trait.adder);
             }
 
             if (this.characterTrait.trait.template.hasOwnProperty('mincost')) {
@@ -142,7 +142,7 @@ export default class BaseCost extends CharacterTrait {
             }
 
             if (adder.hasOwnProperty('adder')) {
-                adderTotal += this._addSubAdder(adder.adder)
+                adderTotal += this._addSubAdder(adder.adder);
             }
         }
 

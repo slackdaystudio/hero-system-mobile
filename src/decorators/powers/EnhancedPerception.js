@@ -50,7 +50,7 @@ export default class EnhancedPerception extends CharacterTrait {
 
         attributes.push({
             label: 'PER Bonus',
-            value: `+${this.characterTrait.trait.levels}`
+            value: `+${this.characterTrait.trait.levels}`,
         });
 
         return attributes;
@@ -77,7 +77,7 @@ export default class EnhancedPerception extends CharacterTrait {
 
         return {
             roll: `${base + this.characterTrait.trait.levels}-`,
-            type: SKILL_CHECK
+            type: SKILL_CHECK,
         };
     }
 

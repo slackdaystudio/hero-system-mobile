@@ -51,7 +51,7 @@ export default class MultipowerItem extends CharacterTrait {
 
         attributes.push({
             label: 'Slot Type',
-            value: this.characterTrait.ultraSlot ? 'Variable' : 'Fixed'
+            value: this.characterTrait.ultraSlot ? 'Variable' : 'Fixed',
         });
 
         return attributes;

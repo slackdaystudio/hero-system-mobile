@@ -54,7 +54,7 @@ export default class Reflection extends CharacterTrait {
 
         attributes.push({
             label: 'Active Points Worth',
-            value: this.characterTrait.trait.levels
+            value: this.characterTrait.trait.levels,
         });
 
         return attributes;

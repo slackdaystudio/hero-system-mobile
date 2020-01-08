@@ -58,7 +58,7 @@ export default class SkillLevels extends CharacterTrait {
 
         attributes.push({
             label: 'Total Levels',
-            value: this.characterTrait.trait.levels
+            value: this.characterTrait.trait.levels,
         });
 
         return attributes;

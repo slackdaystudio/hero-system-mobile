@@ -47,7 +47,7 @@ export default class Absorption extends CharacterTrait {
 
         attributes.push({
             label: `${this.characterTrait.trait.levels} BODY`,
-            value: ''
+            value: '',
         });
 
         return attributes;

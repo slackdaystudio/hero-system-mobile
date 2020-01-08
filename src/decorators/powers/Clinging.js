@@ -56,7 +56,7 @@ export default class Clinging extends CharacterTrait {
 
         attributes.push({
             label: `+${this.characterTrait.trait.levels} STR`,
-            value: ''
+            value: '',
         });
 
         return attributes;

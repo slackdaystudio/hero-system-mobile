@@ -52,7 +52,7 @@ export default class Summon extends CharacterTrait {
 
         attributes.push({
             label: 'Points',
-            value: `${this.characterTrait.trait.levels}`
+            value: `${this.characterTrait.trait.levels}`,
         });
 
         return attributes;

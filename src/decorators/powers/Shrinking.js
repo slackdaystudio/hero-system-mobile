@@ -16,7 +16,7 @@ import { common } from '../../lib/Common';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-CUT_OFF_POINT = 0.0009;
+const CUT_OFF_POINT = 0.0009;
 
 export default class Shrinking extends CharacterTrait {
     constructor(characterTrait) {
@@ -51,27 +51,27 @@ export default class Shrinking extends CharacterTrait {
 
         attributes.push({
             label: 'Height',
-            value: `${alterations.height} m`
+            value: `${alterations.height} m`,
         });
 
         attributes.push({
             label: 'Weight',
-            value: `${alterations.mass} kg`
+            value: `${alterations.mass} kg`,
         });
 
         attributes.push({
             label: 'Perception Rolls',
-            value: alterations.perception
+            value: alterations.perception,
         });
 
         attributes.push({
             label: 'DCV',
-            value: `+${alterations.dcv}`
+            value: `+${alterations.dcv}`,
         });
 
         attributes.push({
             label: 'Knockback',
-            value: `+${alterations.knockback}m`
+            value: `+${alterations.knockback}m`,
         });
 
         return attributes;
@@ -109,12 +109,12 @@ export default class Shrinking extends CharacterTrait {
         );
 
         return {
-           height: height,
-           mass: mass,
-           perception: this.characterTrait.trait.levels / this.characterTrait.trait.template.perincreaselevels * this.characterTrait.trait.template.perincrease,
-           dcv: this.characterTrait.trait.template.dcvincrease * (this.characterTrait.trait.levels / this.characterTrait.trait.template.dcvincreaselevels),
-           knockback: this.characterTrait.trait.template.kbincrease * (this.characterTrait.trait.levels / this.characterTrait.trait.template.kbincreaselevels)
-       };
+            height: height,
+            mass: mass,
+            perception: this.characterTrait.trait.levels / this.characterTrait.trait.template.perincreaselevels * this.characterTrait.trait.template.perincrease,
+            dcv: this.characterTrait.trait.template.dcvincrease * (this.characterTrait.trait.levels / this.characterTrait.trait.template.dcvincreaselevels),
+            knockback: this.characterTrait.trait.template.kbincrease * (this.characterTrait.trait.levels / this.characterTrait.trait.template.kbincreaselevels),
+        };
     }
 
     _getAlteredMass(kg, massMultiplier, shrinkingLevels, massMultiplierLevels) {

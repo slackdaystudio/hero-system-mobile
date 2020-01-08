@@ -47,22 +47,22 @@ export default class DensityIncrease extends CharacterTrait {
 
         attributes.push({
             label: `+${this.characterTrait.trait.levels * 5} STR`,
-            value: ''
+            value: '',
         });
 
         attributes.push({
             label: `${100 * 2 ** this.characterTrait.trait.levels} kg mass`,
-            value: ''
+            value: '',
         });
 
         attributes.push({
             label: `+${this.characterTrait.trait.levels} PD/ED`,
-            value: ''
+            value: '',
         });
 
         attributes.push({
             label: `-${this.characterTrait.trait.levels * 2} KB`,
-            value: ''
+            value: '',
         });
 
         return attributes;

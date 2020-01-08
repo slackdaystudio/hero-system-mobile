@@ -92,7 +92,7 @@ export default class ModifierCalculator extends CharacterTrait {
 
                     totalModifiers.push({
                         label: decorated.label(),
-                        cost: decorated.cost()
+                        cost: decorated.cost(),
                     });
                 }
             } else {
@@ -100,7 +100,7 @@ export default class ModifierCalculator extends CharacterTrait {
 
                 totalModifiers.push({
                     label: decorated.label(),
-                    cost: decorated.cost()
+                    cost: decorated.cost(),
                 });
             }
         }

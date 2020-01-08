@@ -53,21 +53,21 @@ export default class CharacterTrait {
         if (this.trait.hasOwnProperty('name') && this.trait.name !== null) {
             attributes.push({
                 label: 'Name',
-                value: this.trait.alias
+                value: this.trait.alias,
             });
         }
 
         if (this.trait.hasOwnProperty('input') && this.trait.input !== null) {
             attributes.push({
                 label: this.trait.template.inputlabel || 'Input',
-                value: this.trait.input
+                value: this.trait.input,
             });
         }
 
         if (this.trait.hasOwnProperty('optionAlias')) {
             attributes.push({
                 label: this.trait.template.optionlabel || 'Option',
-                value: this.trait.optionAlias
+                value: this.trait.optionAlias,
             });
         }
 
@@ -105,7 +105,7 @@ export default class CharacterTrait {
     _addAttribute(attribute, attributes) {
         if (Array.isArray(attribute)) {
             for (let a of attribute) {
-                this._addAttribute(a, attributes)
+                this._addAttribute(a, attributes);
             }
         } else {
             if (!attribute.hasOwnProperty('template')) {
@@ -131,14 +131,14 @@ export default class CharacterTrait {
 
                 attributes.push({
                     label: attribute.alias,
-                    value: value + (attribute.levels > 0 ? ` (${attribute.levels} levels)` : '')
+                    value: value + (attribute.levels > 0 ? ` (${attribute.levels} levels)` : ''),
                 });
             }
         }
     }
 
     _getParent(item, listKey, getCharacter) {
-        let parent = undefined;
+        let parent;
 
         if (item.parentid === undefined) {
             return parent;

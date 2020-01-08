@@ -26,13 +26,13 @@ class ModifierDecorator {
         let decorated = new Modifier(modifier, trait);
 
         switch (modifier.xmlid.toUpperCase()) {
-            case AOE:
-                decorated = new Aoe(decorated);
-                break;
-            case DAMAGEOVERTIME:
-                decorated = new Dot(decorated);
-                break;
-            default:
+        case AOE:
+            decorated = new Aoe(decorated);
+            break;
+        case DAMAGEOVERTIME:
+            decorated = new Dot(decorated);
+            break;
+        default:
                 // do nothing
         }
 

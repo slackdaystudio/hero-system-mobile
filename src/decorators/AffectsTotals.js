@@ -48,12 +48,12 @@ export default class AffectsTotals extends CharacterTrait {
         if (this.characterTrait.trait.affectsTotal) {
             attributes.push({
                 label: `Added to ${this.characterTrait.trait.affectsPrimary ? 'Primary' : 'Secondary'}`,
-                value: ''
+                value: '',
             });
         } else {
             attributes.push({
                 label: 'Not added to totals',
-                value: ''
+                value: '',
             });
         }
 

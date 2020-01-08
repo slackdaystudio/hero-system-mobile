@@ -90,6 +90,7 @@ export default class Skill extends CharacterTrait {
 
     _getCostByCharacteristic() {
         let cost = 0;
+        let basecost = 0;
         let skillLevelCost = 0;
 
         if (Array.isArray(this.characterTrait.trait.template.characteristicChoice.item)) {

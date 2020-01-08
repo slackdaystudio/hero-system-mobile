@@ -52,22 +52,22 @@ export default class Movement extends CharacterTrait {
 
         attributes.push({
             label: 'Combat Move',
-            value: `${baseMove}m`
+            value: `${baseMove}m`,
         });
 
         attributes.push({
             label: 'Non-Combat Move',
-            value: `${baseMove * ncm}m`
+            value: `${baseMove * ncm}m`,
         });
 
         attributes.push({
             label: 'Max Combat',
-            value: `${(baseMove * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`
+            value: `${(baseMove * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`,
         });
 
         attributes.push({
             label: 'Max Non-Combat',
-            value: `${(baseMove * ncm * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`
+            value: `${(baseMove * ncm * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`,
         });
 
         return attributes;

@@ -23,7 +23,7 @@ export default class WeaponFamiliarity extends CharacterTrait {
     }
 
     cost() {
-         return this._totalAdders(this.characterTrait.trait.adder);
+        return this._totalAdders(this.characterTrait.trait.adder);
     }
 
     costMultiplier() {
