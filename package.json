@@ -39,7 +39,7 @@
       "./node_modules/react-native-gesture-handler/jestSetup.js"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(jest-)?react-native|react-native-document-picker|rn-fetch-blob|@react-native-community/async-storage|native-base-shoutem-theme|@shoutem/animation|@shoutem/ui|tcomb-form-native|react-navigation|@react-navigation/.*|react-navigation-drawer)"
+      "node_modules/(?!(jest-)?react-native|react-navigation|react-navigation-drawer|@react-navigation|native-base|@react-native-community/async-storage)"
     ]
   },
   "dependencies": {
