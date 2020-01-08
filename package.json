@@ -29,6 +29,7 @@
   "lint-staged": {
     "*.js": [
       "npm run linter --",
+      "npm run test --",
       "git add"
     ]
   },
