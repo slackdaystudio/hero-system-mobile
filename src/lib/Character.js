@@ -72,17 +72,17 @@ class Character {
         return [
             {
                 label: 'Physical Defense',
-                value: this._getDefense(pd[0])
+                value: this._getDefense(pd[0]),
             }, {
                 label: 'R. Physical Defense',
-                value: this._getDefense((pd.length === 4 ? pd[2].slice(1) : 0))
+                value: this._getDefense((pd.length === 4 ? pd[2].slice(1) : 0)),
             }, {
                 label: 'Energy Defense',
-                value: this._getDefense(ed[0])
+                value: this._getDefense(ed[0]),
             }, {
                 label: 'R. Energy Defense',
-                value: this._getDefense((ed.length === 4 ? ed[2].slice(1) : 0))
-            }
+                value: this._getDefense((ed.length === 4 ? ed[2].slice(1) : 0)),
+            },
         ];
     }
 
@@ -263,7 +263,7 @@ class Character {
     _getDamageDice(rawDieCode) {
         let damageDice = {
             dice: 0,
-            partialDie: 0
+            partialDie: 0,
         };
 
         let rawDieCodeParts = rawDieCode.split(' ');

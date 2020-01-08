@@ -17,44 +17,44 @@ import disadvantages from '../../public/templates/disadvantages.json';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class RandomCharacter {	
-	generate() {
-		let archtype = this._getArchtype();
+class RandomCharacter {
+    generate() {
+        let archtype = this._getArchtype();
 
-		return {
+        return {
 		    name: '',
-			archtype: archtype,
-			gender: this._getGender(),
-			specialFx: this._getSpecialFx(),
-			powers: this._getPowers(archtype),
-			skills: this._getSkills(),
-			disadvantages: this._getDisadvantages()
-		}
-	}
-	
-	_getArchtype() {
-		return archtypes.archtypes[Math.floor(Math.random() * archtypes.archtypes.length)];
-	}
-	
-	_getGender() {
-		return Math.random() < 0.5 ? 'Male' : 'Female';
-	}
-	
-	_getSpecialFx() {
-		return specialFx.effects[Math.floor(Math.random() * specialFx.effects.length)];
-	}
-	
-	_getPowers(archtype) {
-		return archtype.powersets[Math.floor(Math.random() * archtype.powersets.length)];
-	}
-	
-	_getSkills() {
-		return skills.skillsets[Math.floor(Math.random() * skills.skillsets.length)];
-	}
-	
-	_getDisadvantages() {
-		return disadvantages.disadvantagePackages[Math.floor(Math.random() * disadvantages.disadvantagePackages.length)];
-	}
+            archtype: archtype,
+            gender: this._getGender(),
+            specialFx: this._getSpecialFx(),
+            powers: this._getPowers(archtype),
+            skills: this._getSkills(),
+            disadvantages: this._getDisadvantages(),
+        };
+    }
+
+    _getArchtype() {
+        return archtypes.archtypes[Math.floor(Math.random() * archtypes.archtypes.length)];
+    }
+
+    _getGender() {
+        return Math.random() < 0.5 ? 'Male' : 'Female';
+    }
+
+    _getSpecialFx() {
+        return specialFx.effects[Math.floor(Math.random() * specialFx.effects.length)];
+    }
+
+    _getPowers(archtype) {
+        return archtype.powersets[Math.floor(Math.random() * archtype.powersets.length)];
+    }
+
+    _getSkills() {
+        return skills.skillsets[Math.floor(Math.random() * skills.skillsets.length)];
+    }
+
+    _getDisadvantages() {
+        return disadvantages.disadvantagePackages[Math.floor(Math.random() * disadvantages.disadvantagePackages.length)];
+    }
 }
 
 export let randomCharacter = new RandomCharacter();

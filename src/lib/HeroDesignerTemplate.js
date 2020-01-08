@@ -42,41 +42,41 @@ class HeroDesignerTemplate {
             }
 
             switch (template) {
-                case 'builtIn.AI.hdt':
-                    subTemplate = ai;
-                    break;
-                case 'builtIn.AI6E.hdt':
-                    subTemplate = aiSixth;
-                    break;
-                case 'builtIn.Automaton.hdt':
-                    subTemplate = automaton;
-                    break;
-                case 'builtIn.Automaton6E.hdt':
-                    subTemplate = automatonSixth;
-                    break;
-                case 'builtIn.Computer.hdt':
-                    subTemplate = computer;
-                    break;
-                case 'builtIn.Computer6E.hdt':
-                    subTemplate = computerSixth;
-                    break;
-                case 'builtIn.Heroic.hdt':
-                    subTemplate = heroic;
-                    break;
-                case 'builtIn.Heroic6E.hdt':
-                    subTemplate = heroicSixth;
-                    break;
-                case 'builtIn.Normal.hdt':
-                    subTemplate = normal;
-                    break;
-                case 'builtIn.Superheroic.hdt':
-                    subTemplate = superheroic;
-                    break;
-                case 'builtIn.Superheroic6E.hdt':
-                    subTemplate = superheroicSixth;
-                    break;
-                default:
-                    common.toast(`${template} is not recognized`);
+            case 'builtIn.AI.hdt':
+                subTemplate = ai;
+                break;
+            case 'builtIn.AI6E.hdt':
+                subTemplate = aiSixth;
+                break;
+            case 'builtIn.Automaton.hdt':
+                subTemplate = automaton;
+                break;
+            case 'builtIn.Automaton6E.hdt':
+                subTemplate = automatonSixth;
+                break;
+            case 'builtIn.Computer.hdt':
+                subTemplate = computer;
+                break;
+            case 'builtIn.Computer6E.hdt':
+                subTemplate = computerSixth;
+                break;
+            case 'builtIn.Heroic.hdt':
+                subTemplate = heroic;
+                break;
+            case 'builtIn.Heroic6E.hdt':
+                subTemplate = heroicSixth;
+                break;
+            case 'builtIn.Normal.hdt':
+                subTemplate = normal;
+                break;
+            case 'builtIn.Superheroic.hdt':
+                subTemplate = superheroic;
+                break;
+            case 'builtIn.Superheroic6E.hdt':
+                subTemplate = superheroicSixth;
+                break;
+            default:
+                common.toast(`${template} is not recognized`);
             }
         } else {
             baseTemplate = template.extends.endsWith('6E.hdt') ? mainSixth : main;

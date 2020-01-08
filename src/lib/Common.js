@@ -7,7 +7,7 @@ import {
     NORMAL_DAMAGE,
     PARTIAL_DIE_PLUS_ONE,
     PARTIAL_DIE_HALF,
-    PARTIAL_DIE_MINUS_ONE
+    PARTIAL_DIE_MINUS_ONE,
 } from './DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -69,7 +69,7 @@ class Common {
     	return false;
     }
 
-    getMultiplications(total, step=2) {
+    getMultiplications(total, step = 2) {
         return Math.ceil(Math.log(total) / Math.log(step));
     }
 
@@ -117,7 +117,7 @@ class Common {
         return flattened;
     }
 
-    toMap(objects, mapKey='xmlid') {
+    toMap(objects, mapKey = 'xmlid') {
         let map = new Map();
 
         if (objects === undefined || objects === null) {
@@ -165,12 +165,12 @@ class Common {
         return word.toLowerCase().charAt(0).toUpperCase() + word.slice(1);
     }
 
-    toast(message, buttonText='OK', duration=3000) {
+    toast(message, buttonText = 'OK', duration = 3000) {
         Toast.show({
             text: message,
             position: 'bottom',
             buttonText: buttonText,
-            duration: duration
+            duration: duration,
         });
     }
 
@@ -185,8 +185,8 @@ class Common {
     toDice(dieCode) {
         let dice = {
             full: 0,
-            partial: 0
-        }
+            partial: 0,
+        };
 
         if (typeof dieCode !== 'string') {
             return dice;

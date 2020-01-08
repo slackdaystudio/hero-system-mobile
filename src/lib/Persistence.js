@@ -57,12 +57,12 @@ class Persistence {
         let combatDetails = {
             stun: libCharacter.getCharacteristic(character.characteristics.characteristic, 'stun'),
             body: libCharacter.getCharacteristic(character.characteristics.characteristic, 'body'),
-            endurance: libCharacter.getCharacteristic(character.characteristics.characteristic, 'endurance')
+            endurance: libCharacter.getCharacteristic(character.characteristics.characteristic, 'endurance'),
         };
 
         try {
             await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
-        } catch(error) {
+        } catch (error) {
             common.toast('Unable to generate combat details');
         }
 
@@ -87,7 +87,7 @@ class Persistence {
                 await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
             }
         } catch (error) {
-            common.toast('Unable to update combat detail')
+            common.toast('Unable to update combat detail');
         }
 
         return combatDetails;
@@ -102,7 +102,7 @@ class Persistence {
         }
     }
 
-    async setShowSecondaryCharacteristics(show=true) {
+    async setShowSecondaryCharacteristics(show = true) {
         try {
             await AsyncStorage.setItem('showSecondaryCharacteristics', show.toString());
         } catch (error) {
@@ -120,7 +120,7 @@ class Persistence {
 
             if (settings === null) {
                 settings = {
-                    useFifthEdition: false
+                    useFifthEdition: false,
                 };
 
                 await AsyncStorage.setItem('appSettings', JSON.stringify(settings));
@@ -169,7 +169,7 @@ class Persistence {
             common.toast('Unable to persist statistics');
         }
 
-        return fifth;
+        return statistics;
     }
 
     async clearStatistics() {
@@ -241,33 +241,33 @@ class Persistence {
             largestDieRoll: 0,
             largestSum: 0,
             totals: {
-            diceRolled: 0,
-            hitRolls: 0,
-            skillChecks: 0,
-            freeFormRolls: 0,
-            normalDamage: {
-                rolls: 0,
-                stun: 0,
-                body: 0
-            },
-            killingDamage: {
-                rolls: 0,
-                stun: 0,
-                body: 0
-            },
-            knockback: 0,
-            hitLocations: {
-                head: 0,
-                hands: 0,
-                arms: 0,
-                shoulders: 0,
-                chest: 0,
-                stomach: 0,
-                vitals: 0,
-                thighs: 0,
-                legs: 0,
-                feet: 0
-            }
+                diceRolled: 0,
+                hitRolls: 0,
+                skillChecks: 0,
+                freeFormRolls: 0,
+                normalDamage: {
+                    rolls: 0,
+                    stun: 0,
+                    body: 0,
+                },
+                killingDamage: {
+                    rolls: 0,
+                    stun: 0,
+                    body: 0,
+                },
+                knockback: 0,
+                hitLocations: {
+                    head: 0,
+                    hands: 0,
+                    arms: 0,
+                    shoulders: 0,
+                    chest: 0,
+                    stomach: 0,
+                    vitals: 0,
+                    thighs: 0,
+                    legs: 0,
+                    feet: 0,
+                },
             },
             distributions: {
                 one: 0,
@@ -275,9 +275,9 @@ class Persistence {
                 three: 0,
                 four: 0,
                 five: 0,
-                six: 0
-            }
-        }
+                six: 0,
+            },
+        };
 
         try {
             await AsyncStorage.setItem('statistics', JSON.stringify(statistics));

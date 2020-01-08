@@ -55,7 +55,7 @@ class Statistics {
     getMostFrequentHitLocation(hitLocationStats) {
         let location = {
             location: '',
-            hits: 0
+            hits: 0,
         };
 
         for (let property in hitLocationStats) {
@@ -63,7 +63,7 @@ class Statistics {
                 if (hitLocationStats[property] > location.hits) {
                     location = {
                         location: property,
-                        hits: hitLocationStats[property]
+                        hits: hitLocationStats[property],
                     };
                 }
             }
@@ -74,26 +74,26 @@ class Statistics {
 
     _updateDistributions(rolls, distributions) {
         for (let roll of rolls) {
-            switch(roll) {
-                case 1:
-                    distributions.one++;
-                    break;
-                case 2:
-                    distributions.two++;
-                    break;
-                case 3:
-                    distributions.three++;
-                    break;
-                case 4:
-                    distributions.four++;
-                    break;
-                case 5:
-                    distributions.five++;
-                    break;
-                case 6:
-                    distributions.six++;
-                    break;
-                default:
+            switch (roll) {
+            case 1:
+                distributions.one++;
+                break;
+            case 2:
+                distributions.two++;
+                break;
+            case 3:
+                distributions.three++;
+                break;
+            case 4:
+                distributions.four++;
+                break;
+            case 5:
+                distributions.five++;
+                break;
+            case 6:
+                distributions.six++;
+                break;
+            default:
                     // do nothing
             }
         }

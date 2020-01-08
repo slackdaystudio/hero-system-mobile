@@ -1,7 +1,7 @@
 import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import DocumentPicker from 'react-native-document-picker';
-import RNFetchBlob from 'rn-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob';
 import xml2js from 'react-native-xml2js';
 import { common } from './Common';
 import { character as characterLib } from './Character';
@@ -60,12 +60,12 @@ class File {
         }
     }
 
-    async _read(uri, startLoad, endLoad, isHdc=false) {
+    async _read(uri, startLoad, endLoad, isHdc = false) {
         startLoad();
         let character = null;
 
         try {
-            let filePath = uri.startsWith('file://') ? uri.substring(7) : uri; ;
+            let filePath = uri.startsWith('file://') ? uri.substring(7) : uri;
 
             if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools\-Inbox/.test(filePath) === false) {
                 let arr = uri.split('/');
@@ -115,22 +115,22 @@ class File {
             attrNameProcessors: [
                 (name) => {
                     return common.toCamelCase(name);
-                }
+                },
             ],
             attrValueProcessors: [
                 (value) => {
                     return this._parseXmlValue(value);
-                }
+                },
             ],
             tagNameProcessors: [
                 (name) => {
                     return common.toCamelCase(name);
-                }
+                },
             ],
             valueProcessors: [
                 (value) => {
                     return this._parseXmlValue(value);
-                }
+                },
             ],
         });
         let character = null;
@@ -186,7 +186,7 @@ class File {
                     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
                     {
                         'title': 'HERO System Mobile File System Permission',
-                        'message': 'HERO System Mobile needs read/write access to your device to save characters'
+                        'message': 'HERO System Mobile needs read/write access to your device to save characters',
                     }
                 );
 
