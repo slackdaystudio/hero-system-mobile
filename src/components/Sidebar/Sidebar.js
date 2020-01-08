@@ -25,7 +25,7 @@ import styles from '../../Styles';
 class Sidebar extends Component {
 	static propTypes = {
 	    navigation: PropTypes.object.isRequired,
-	    character: PropTypes.object.isRequired,
+	    character: PropTypes.object,
 	}
 
 	_onLoadPress() {
