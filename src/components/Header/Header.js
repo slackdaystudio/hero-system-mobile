@@ -42,7 +42,7 @@ export default class MyHeader extends Component {
                     </Right>
                 </Header>
                 <StatusBar backgroundColor="#000" barStyle="light-content" />
-		    </View>
+            </View>
         );
     }
 }
