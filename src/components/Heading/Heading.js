@@ -1,5 +1,5 @@
 import React, { Component }  from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 import { Platform, StyleSheet, View, Image, TouchableHighlight } from 'react-native';
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
 import styles from '../../Styles';
@@ -19,11 +19,16 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export default class Heading extends Component {
-	render() {
-		return (
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        text: PropTypes.string.isRequired,
+    }
+
+    render() {
+        return (
             <View style={{flex: 1, maxHeight: 53, paddingBottom: 10}}>
                 <Text style={styles.heading}>{this.props.text}</Text>
             </View>
-		);
-	}
+        );
+    }
 }
