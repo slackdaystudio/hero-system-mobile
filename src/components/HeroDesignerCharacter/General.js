@@ -22,13 +22,14 @@ import styles from '../../Styles';
 
 export default class General extends Component {
     static propTypes = {
-        characterInfo: PropTypes.object.isRequired
+        navigation: PropTypes.object.isRequired,
+        characterInfo: PropTypes.object.isRequired,
     }
 
     render() {
         return (
             <View style={{paddingHorizontal: 5}}>
-                <Heading text='Information' />
+                <Heading text="Information" />
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <Text style={[styles.boldGrey, {flex: 1}]}>Name:</Text>
                     <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.characterName}</Text>
@@ -42,7 +43,7 @@ export default class General extends Component {
                     <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.playerName}</Text>
                 </View>
                 <View style={{paddingBottom: 20}} />
-                <Heading text='Traits' />
+                <Heading text="Traits" />
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <Text style={[styles.boldGrey, {flex: 1}]}>Height:</Text>
                     <Text style={[styles.grey, {flex: 3}]}>{common.toCm(this.props.characterInfo.height)} cm</Text>
@@ -60,22 +61,22 @@ export default class General extends Component {
                     <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.hairColor}</Text>
                 </View>
                 <View style={{paddingBottom: 20}} />
-                <Heading text='Background' />
+                <Heading text="Background" />
                 <Text style={styles.grey}>{this.props.characterInfo.background}</Text>
                 <View style={{paddingBottom: 20}} />
-                <Heading text='personality' />
+                <Heading text="personality" />
                 <Text style={styles.grey}>{this.props.characterInfo.personality}</Text>
                 <View style={{paddingBottom: 20}} />
-                <Heading text='Quote' />
+                <Heading text="Quote" />
                 <Text style={styles.grey}>{this.props.characterInfo.quote}</Text>
                 <View style={{paddingBottom: 20}} />
-                <Heading text='Tactics' />
+                <Heading text="Tactics" />
                 <Text style={styles.grey}>{this.props.characterInfo.tactics}</Text>
                 <View style={{paddingBottom: 20}} />
-                <Heading text='Campaign Use' />
+                <Heading text="Campaign Use" />
                 <Text style={styles.grey}>{this.props.characterInfo.campaignUse}</Text>
                 <View style={{paddingBottom: 20}} />
-                <Heading text='Appearance' />
+                <Heading text="Appearance" />
                 <Text style={styles.grey}>{this.props.characterInfo.appearance}</Text>
                 <View style={{paddingBottom: 20}} />
             </View>

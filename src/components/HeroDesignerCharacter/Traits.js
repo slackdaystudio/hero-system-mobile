@@ -14,7 +14,7 @@ import {
     FREE_FORM,
     PARTIAL_DIE_PLUS_ONE,
     PARTIAL_DIE_HALF,
-    PARTIAL_DIE_MINUS_ONE
+    PARTIAL_DIE_MINUS_ONE,
 } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
@@ -40,7 +40,7 @@ export default class Traits extends Component {
         character: PropTypes.object.isRequired,
         listKey: PropTypes.string.isRequired,
         subListKey: PropTypes.string.isRequired,
-        updateForm: PropTypes.func.isRequired
+        updateForm: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -50,8 +50,8 @@ export default class Traits extends Component {
 
         this.state = {
             itemShow: displayOptions.itemShow,
-            itemButtonShow: displayOptions.itemButtonShow
-        }
+            itemButtonShow: displayOptions.itemButtonShow,
+        };
 
         this.getCharacter = this._getCharacter.bind(this);
     }
@@ -79,7 +79,7 @@ export default class Traits extends Component {
 
         return {
             itemShow: itemShow,
-            itemButtonShow: itemButtonShow
+            itemButtonShow: itemButtonShow,
         };
     }
 
@@ -103,7 +103,7 @@ export default class Traits extends Component {
 
             this.props.updateForm('damage', {
                 dice: dice.full,
-                partialDie: dice.partial
+                partialDie: dice.partial,
             });
 
             this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
@@ -114,7 +114,7 @@ export default class Traits extends Component {
                 dice: dice.full,
                 partialDie: dice.partial,
                 killingToggled: true,
-                damageType: KILLING_DAMAGE
+                damageType: KILLING_DAMAGE,
             });
 
             this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
@@ -124,16 +124,16 @@ export default class Traits extends Component {
             let pips = 0;
 
             switch (dice.partial) {
-                case PARTIAL_DIE_HALF:
-                    halfDice = 1;
-                    break;
-                case PARTIAL_DIE_PLUS_ONE:
-                    pips = 1;
-                    break;
-                case PARTIAL_DIE_MINUS_ONE:
-                    pips -1;
-                    break;
-                default:
+            case PARTIAL_DIE_HALF:
+                halfDice = 1;
+                break;
+            case PARTIAL_DIE_PLUS_ONE:
+                pips = 1;
+                break;
+            case PARTIAL_DIE_MINUS_ONE:
+                pips - 1;
+                break;
+            default:
                     // do nothing
             }
 
@@ -318,12 +318,12 @@ export default class Traits extends Component {
         if (power.roll() !== null && power.roll() !== undefined) {
             return (
                 <CardItem style={styles.cardItem}>
-                <TouchableHighlight
-                    underlayColor='#121212'
-                    onPress={() => this._roll(power.roll())}
-                >
-                    <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
-                </TouchableHighlight>
+                    <TouchableHighlight
+                        underlayColor="#121212"
+                        onPress={() => this._roll(power.roll())}
+                    >
+                        <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
+                    </TouchableHighlight>
                 </CardItem>
             );
         }
@@ -335,7 +335,7 @@ export default class Traits extends Component {
         if (item.roll() !== null && item.roll() !== undefined) {
             return (
                 <TouchableHighlight
-                    underlayColor='#121212'
+                    underlayColor="#121212"
                     onPress={() => this._roll(item.roll())}
                 >
                     <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.roll().roll}</Text>
@@ -359,7 +359,7 @@ export default class Traits extends Component {
                         </View>
                         <View style={{flex: 1}}>
                             <Icon
-                                type='FontAwesome'
+                                type="FontAwesome"
                                 name={this.state.itemButtonShow[decoratedTrait.trait.id]}
                                 style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
                                 onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
@@ -386,7 +386,7 @@ export default class Traits extends Component {
         );
     }
 
-    _renderTrait(decoratedTrait, isListItem=false) {
+    _renderTrait(decoratedTrait, isListItem = false) {
         return (
             <Fragment>
                 <View style={{flex: 5, alignSelf: 'center'}}>
@@ -398,7 +398,7 @@ export default class Traits extends Component {
                     </View>
                     <View style={{flex: 1}}>
                         <Icon
-                            type='FontAwesome'
+                            type="FontAwesome"
                             name={this.state.itemButtonShow[decoratedTrait.trait.id]}
                             style={{paddingLeft: 10, fontSize: (isListItem ? 20 : 25), color: '#14354d'}}
                             onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
@@ -409,7 +409,7 @@ export default class Traits extends Component {
         );
     }
 
-    _renderTraits(items, indentItem=false) {
+    _renderTraits(items, indentItem = false) {
         return (
             <Fragment>
                 {items.map((item, index) => {

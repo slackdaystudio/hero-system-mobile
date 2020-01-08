@@ -32,7 +32,7 @@ class Characteristics extends Component {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
         showSecondary: PropTypes.bool.isRequired,
-        setShowSecondary: PropTypes.func.isRequired
+        setShowSecondary: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -42,8 +42,8 @@ class Characteristics extends Component {
 
         this.state = {
             characteristicsShow: displayOptions.characteristicsShow,
-            characteristicsButtonsShow: displayOptions.characteristicsButtonsShow
-        }
+            characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
+        };
 
         this.powersMap = common.toMap(common.flatten(props.character.powers, 'powers'));
     }
@@ -66,7 +66,7 @@ class Characteristics extends Component {
 
         return {
             characteristicsShow: characteristicsShow,
-            characteristicsButtonsShow: characteristicsButtonsShow
+            characteristicsButtonsShow: characteristicsButtonsShow,
         };
     }
 
@@ -147,7 +147,7 @@ class Characteristics extends Component {
             let power = null;
 
             if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
-                movementMode = this.powersMap.get(characteristic.shortName.toUpperCase());
+                let movementMode = this.powersMap.get(characteristic.shortName.toUpperCase());
 
                 if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
                     (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary)) {
@@ -238,17 +238,17 @@ class Characteristics extends Component {
             }
 
             return (
-                 <View style={{flex: 1, paddingBottom: 10}}>
-                     <Text style={styles.grey}>
-                         <Text style={styles.boldGrey}>Damage:</Text> {this._renderStrengthDamage(totalStrength)}
-                     </Text>
-                     <Text style={styles.grey}>
-                         <Text style={styles.boldGrey}>Lift:</Text> {this._renderLift(lift)}
-                     </Text>
-                     <Text style={styles.grey}>
-                         <Text style={styles.boldGrey}>Example:</Text> {step.example}
-                     </Text>
-                 </View>
+                <View style={{flex: 1, paddingBottom: 10}}>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>Damage:</Text> {this._renderStrengthDamage(totalStrength)}
+                    </Text>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>Lift:</Text> {this._renderLift(lift)}
+                    </Text>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>Example:</Text> {step.example}
+                    </Text>
+                </View>
             );
         }
 
@@ -286,10 +286,10 @@ class Characteristics extends Component {
 
     _renderStat(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} />
+            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} />;
         }
 
-        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap)} fontSize={22} size={50} />
+        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap)} fontSize={22} size={50} />;
     }
 
     _renderCharacteristics(characteristics) {
@@ -309,13 +309,13 @@ class Characteristics extends Component {
                                 </Body>
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                     <TouchableHighlight
-                                        underlayColor='#121212'
+                                        underlayColor="#121212"
                                         onPress={() => this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.powersMap))})}
                                     >
                                         <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.powersMap)}</Text>
                                     </TouchableHighlight>
                                     <Icon
-                                        type='FontAwesome'
+                                        type="FontAwesome"
                                         name={this.state.characteristicsButtonsShow[characteristic.shortName]}
                                         style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
                                         onPress={() => this._toggleDefinitionShow(characteristic.shortName)}
@@ -345,9 +345,9 @@ class Characteristics extends Component {
                         <Switch
                             value={this.props.showSecondary}
                             onValueChange={() => this._toggleSecondaryCharacteristics()}
-                            minimumTrackTintColor='#14354d'
-                            maximumTrackTintColor='#14354d'
-                            thumbTintColor='#14354d'
+                            minimumTrackTintColor="#14354d"
+                            maximumTrackTintColor="#14354d"
+                            thumbTintColor="#14354d"
                             onTintColor="#01121E"
                         />
                     </View>
@@ -361,11 +361,11 @@ class Characteristics extends Component {
     render() {
         return (
             <View>
-                <Heading text='Characteristics' />
+                <Heading text="Characteristics" />
                 {this._renderSecondaryCharacteristicToggle()}
                 {this._renderCharacteristics(this.props.character.characteristics)}
                 <View style={{paddingTop: 20}} />
-                <Heading text='Movement' />
+                <Heading text="Movement" />
                 {this._renderCharacteristics(this.props.character.movement)}
             </View>
         );
@@ -374,12 +374,12 @@ class Characteristics extends Component {
 
 const mapStateToProps = state => {
     return {
-        showSecondary: state.character.showSecondary
+        showSecondary: state.character.showSecondary,
     };
-}
+};
 
 const mapDispatchToProps = {
-    setShowSecondary
-}
+    setShowSecondary,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Characteristics);
