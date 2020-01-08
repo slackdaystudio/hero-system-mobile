@@ -1,5 +1,6 @@
 import React, { Component }  from 'react';
-import { View } from 'react-native';
+import PropTypes from 'prop-types';
+import { Platform, View } from 'react-native';
 import { Text } from 'native-base';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -17,11 +18,18 @@ import { Text } from 'native-base';
 // limitations under the License.
 
 export default class CircleText extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        title: PropTypes.string.isRequired,
+        size: PropTypes.number.isRequired,
+        fontSize: PropTypes.number.isRequired,
+        color: PropTypes.string.isRequired,
+    }
+
     render() {
         const size = this.props.size;
         const fontSize = this.props.fontSize;
         const borderWidth = 1;
-        let paddingRight = 5;
 
         return (
             <View style = {{
@@ -33,8 +41,7 @@ export default class CircleText extends Component {
                 height: size,
                 borderRadius: size / 2,
                 borderWidth: borderWidth,
-                borderColor: '#303030',
-                marginTop: 2
+                marginTop: 2,
             }}>
                 <Text style = {{
                     textAlign: 'center',
@@ -44,7 +51,7 @@ export default class CircleText extends Component {
                     lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
                     paddingTop: 3,
                     fontWeight: 'bold',
-                    color: '#F3EDE9'
+                    color: '#F3EDE9',
                 }}>
                     {this.props.title}
                 </Text>

@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   extends: '@react-native-community',
   rules: {
-    indent: ["error", 4]
+    indent: ["error", 4],
+    "no-inline-styles": 1
   }
 };
