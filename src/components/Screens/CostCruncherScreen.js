@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, StyleSheet, View } from 'react-native';
 import { Container, Content, Button, Text, Form, Item, Label, Input } from 'native-base';
@@ -23,11 +24,17 @@ import { updateFormValue } from '../../reducers/forms';
 // limitations under the License.
 
 class CostCruncherScreen extends Component {
-	constructor(props) {
-		super(props);
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        costCruncherForm: PropTypes.object.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+    }
 
-		this.updateFormValue = this._updateFormValue.bind(this);
-	}
+    constructor(props) {
+        super(props);
+
+        this.updateFormValue = this._updateFormValue.bind(this);
+    }
 
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -41,7 +48,7 @@ class CostCruncherScreen extends Component {
         this.backHandler.remove();
     }
 
-	_updateFormValue(key, value) {
+    _updateFormValue(key, value) {
 	    if (key === 'cost') {
 	        if (/^[0-9]*$/.test(value) === false) {
 	            return;
@@ -50,8 +57,8 @@ class CostCruncherScreen extends Component {
 	        value = parseFloat(value);
 	    }
 
-		this.props.updateFormValue('costCruncher', key, value);
-	}
+        this.props.updateFormValue('costCruncher', key, value);
+    }
 
     _renderActiveCost() {
         return (
@@ -67,23 +74,23 @@ class CostCruncherScreen extends Component {
         return <Text style={[styles.grey, {fontSize: 75}]}>{cost}</Text>;
     }
 
-	render() {
-		return (
-			<Container style={styles.container}>
+    render() {
+        return (
+            <Container style={styles.container}>
                 <NavigationEvents
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
 			    <Header navigation={this.props.navigation} />
-				<Content style={styles.content}>
+                <Content style={styles.content}>
 				    <Text style={styles.heading}>Cruncher</Text>
 				    <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingTop: 20}}>
-						<Text style={styles.boldGrey}>Active Cost</Text>
+                        <Text style={styles.boldGrey}>Active Cost</Text>
                         <Text style={styles.boldGrey}>Real Cost</Text>
 			      	</View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-						{this._renderActiveCost()}
+                        {this._renderActiveCost()}
                         {this._renderRealCost()}
 			      	</View>
 			      	<Form>
@@ -91,42 +98,42 @@ class CostCruncherScreen extends Component {
 			      	        <Label style={styles.boldGrey}>Base Cost:</Label>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={3}
                                 value={this.props.costCruncherForm.cost.toString()}
                                 onChangeText={(text) => this.updateFormValue('cost', text)} />
 			      	    </Item>
-					</Form>
-					<Slider
-						label='Advantages:'
-						value={this.props.costCruncherForm.advantages}
-						step={0.25}
-						min={0}
-						max={5}
-						onValueChange={this.updateFormValue}
-						valueKey='advantages' />
+                    </Form>
                     <Slider
-						label='Limitations:'
-						value={this.props.costCruncherForm.limitations}
-						step={0.25}
-						min={-5}
-						max={0}
-						onValueChange={this.updateFormValue}
-						valueKey='limitations' />
-				</Content>
-			</Container>
-		);
-	}
+                        label="Advantages:"
+                        value={this.props.costCruncherForm.advantages}
+                        step={0.25}
+                        min={0}
+                        max={5}
+                        onValueChange={this.updateFormValue}
+                        valueKey="advantages" />
+                    <Slider
+                        label="Limitations:"
+                        value={this.props.costCruncherForm.limitations}
+                        step={0.25}
+                        min={-5}
+                        max={0}
+                        onValueChange={this.updateFormValue}
+                        valueKey="limitations" />
+                </Content>
+            </Container>
+        );
+    }
 }
 
 const mapStateToProps = state => {
     return {
-        costCruncherForm: state.forms.costCruncher
+        costCruncherForm: state.forms.costCruncher,
     };
-}
+};
 
 const mapDispatchToProps = {
-    updateFormValue
-}
+    updateFormValue,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(CostCruncherScreen);
