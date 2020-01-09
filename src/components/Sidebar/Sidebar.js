@@ -49,7 +49,7 @@ class Sidebar extends Component {
                     <List>
                         <ListItem onPress={() => this.props.navigation.navigate('Home')}>
                             <View>
-                                <Image source={require('../../../public/hero_mobile_logo.png')} />
+                                <Image style={{height: 75, width: 161}} source={require('../../../public/hero_mobile_logo.png')} />
                             </View>
                         </ListItem>
                         <ListItem onPress={() => this._onLoadPress()}>

@@ -31,7 +31,7 @@ export default class MyHeader extends Component {
                     <Left>
                         <View style={localStyles.logo}>
                             <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
-                                <Image source={require('../../../public/hero_mobile_logo.png')} />
+                                <Image style={{height: 75, width: 161}} source={require('../../../public/hero_mobile_logo.png')} />
                             </TouchableHighlight>
                         </View>
                     </Left>
