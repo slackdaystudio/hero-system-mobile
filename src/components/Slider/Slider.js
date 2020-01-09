@@ -47,12 +47,17 @@ class Slider extends Component {
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props !== nextProps) {
-            if (this.state.textValue !== '' && this.state.textValue !== '-') {
-                this.setState({textValue: nextProps.value});
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState !== nextProps) {
+            if (prevState.textValue !== '' && prevState.textValue !== '-') {
+                let newState = {...prevState};
+                newState.textValue = nextProps.value;
+
+                return newState;
             }
         }
+
+        return null;
     }
 
     _keyboardDidHide () {
