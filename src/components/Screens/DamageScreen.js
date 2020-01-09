@@ -1,8 +1,8 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, Platform, StyleSheet, View, Image, Picker, Switch, Alert } from 'react-native';
-import { Container, Content, Button, Text, Item, Tabs, Tab, ScrollableTab } from 'native-base';
+import { BackHandler, Platform, StyleSheet, View, Image, Switch, Alert } from 'react-native';
+import { Container, Content, Button, Text, Tabs, Tab, Picker, Item, ScrollableTab } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
 import Slider from '../Slider/Slider';
@@ -134,7 +134,7 @@ class DamageScreen extends Component {
                 />
                 <Header navigation={this.props.navigation} hasTabs={true} />
                 <Content scrollEnable={false}>
-                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline}>
+                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000000'}} />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View>
@@ -149,14 +149,19 @@ class DamageScreen extends Component {
                                         toggleTabsLocked={this.toggleTabsLocked}
                                     />
                                     <Picker
+                                        inlinelabel
+                                        label='Partial Die'
+                                        style={{width: undefined, color: '#FFFFFF'}}
+                                        textStyle={{fontSize: 16, color: '#FFFFFF'}}
+                                        iosHeader="Select one"
+                                        mode="dropdown"
                                         selectedValue={this.props.damageForm.partialDie}
                                         onValueChange={(value) => this.updateFormValue('partialDie', value)}
-                                        style={{color: '#f0f0f0', height: 30, width: 200}}
                                     >
-                                        <Picker.Item label="No partial die" value="0" />
-                                        <Picker.Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-                                        <Picker.Item label="+½ die" value={PARTIAL_DIE_HALF} />
-                                        <Picker.Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
+                                        <Item label="No partial die" value="0" />
+                                        <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
+                                        <Item label="+½ die" value={PARTIAL_DIE_HALF} />
+                                        <Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
                                     </Picker>
                                     <View style={{paddingBottom: 30}} />
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
