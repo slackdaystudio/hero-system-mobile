@@ -27,9 +27,9 @@ export const store = createStore(reducer, applyMiddleware(thunk));
 const AppContainer = createAppContainer(AppNavigator);
 
 export default class App extends Component {
-    componentWillMount() {
-        // Adding a 300ms delay here gets rid of a white screen
-        setTimeout(() => SplashScreen.hide(), 300);
+    componentDidMount() {
+        // Adding a 100ms delay here gets rid of a white screen
+        setTimeout(() => SplashScreen.hide(), 100);
     }
 
     render() {
