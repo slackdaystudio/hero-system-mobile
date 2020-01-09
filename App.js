@@ -28,7 +28,8 @@ const AppContainer = createAppContainer(AppNavigator);
 
 export default class App extends Component {
     componentWillMount() {
-        SplashScreen.hide();
+        // Adding a 300ms delay here gets rid of a white screen
+        setTimeout(() => SplashScreen.hide(), 300);
     }
 
     render() {
