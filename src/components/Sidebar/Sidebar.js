@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { StyleSheet, Image, StatusBar, View } from 'react-native';
+import { Platform, StyleSheet, Image, StatusBar, View } from 'react-native';
 import { Container, Content, Text, List, ListItem } from 'native-base';
+import { ifIphoneX } from 'react-native-iphone-x-helper';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
@@ -93,6 +94,11 @@ class Sidebar extends Component {
 const localStyles = StyleSheet.create({
     container: {
         backgroundColor: '#242424',
+        ...ifIphoneX({
+            paddingTop: 50,
+        }, {
+            paddingTop: (Platform.OS === 'ios' ? 20 : 0),
+        }),
     },
 });
 
