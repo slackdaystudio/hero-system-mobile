@@ -148,7 +148,7 @@ export default class Traits extends Component {
                     <Text style={styles.boldGrey}>{label}</Text>
                     {modifiers.map((modifier, index) => {
                         return (
-                            <View style={{flex: 1, flexDirection: 'row'}}>
+                            <View style={{flex: 1, flexDirection: 'row'}} key={'mod-' + index}>
                                 <View>
                                     <Text style={styles.grey}> &bull; </Text>
                                 </View>
