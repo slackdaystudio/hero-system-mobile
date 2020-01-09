@@ -85,11 +85,11 @@ export default class Characteristics extends Component {
     }
 
     render() {
-	    let ignoredCharacteristics = ['comeliness'];
+        let ignoredCharacteristics = ['comeliness'];
 
-	    if (character.isFifthEdition(this.props.characteristics)) {
-	        ignoredCharacteristics = ['ocv', 'dcv', 'omcv', 'dmcv'];
-	    }
+        if (character.isFifthEdition(this.props.characteristics)) {
+            ignoredCharacteristics = ['ocv', 'dcv', 'omcv', 'dmcv'];
+        }
 
         return (
             <View style={{paddingBottom: 20, paddingHorizontal: 10}}>
