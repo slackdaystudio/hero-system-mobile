@@ -56,10 +56,10 @@ class FreeFormScreen extends Component {
         });
     }
 
-   	onDidBlur() {
-   		RNShake.removeEventListener('ShakeEvent');
-   		this.backHandler.remove();
-   	}
+    onDidBlur() {
+        RNShake.removeEventListener('ShakeEvent');
+        this.backHandler.remove();
+    }
 
     _roll() {
         this.props.navigation.navigate('Result', {from: 'FreeForm', result: dieRoller.freeFormRoll(this.props.freeFormForm.dice, this.props.freeFormForm.halfDice, this.props.freeFormForm.pips)});
@@ -78,7 +78,7 @@ class FreeFormScreen extends Component {
                 />
                 <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
-				    <Text style={styles.heading}>Free Form Roll</Text>
+                    <Text style={styles.heading}>Free Form Roll</Text>
                     <Slider
                         label="Dice:"
                         value={this.props.freeFormForm.dice}

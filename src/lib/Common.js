@@ -26,13 +26,13 @@ import {
 
 class Common {
     isIPad() {
-	    let {height, width} = Dimensions.get('window');
+        let {height, width} = Dimensions.get('window');
 
-	    if (Platform.OS === 'ios' && height / width <= 1.6) {
-		    return true;
-	    }
+        if (Platform.OS === 'ios' && height / width <= 1.6) {
+            return true;
+        }
 
-	    return false;
+        return false;
     }
 
     compare(first, second) {
@@ -63,10 +63,10 @@ class Common {
 
     isFloat(value) {
         if (!isNaN(value)) {
-    		return (value % 1 !== 0);
-    	}
+            return (value % 1 !== 0);
+        }
 
-    	return false;
+        return false;
     }
 
     getMultiplications(total, step = 2) {

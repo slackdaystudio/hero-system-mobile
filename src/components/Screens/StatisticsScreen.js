@@ -88,14 +88,14 @@ class StatisticsScreen extends Component {
         }
 
         return (
-		  <Container style={styles.container}>
+            <Container style={styles.container}>
                 <NavigationEvents
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
                 <Header navigation={this.props.navigation} />
-	        <Content style={styles.content}>
-	            <Text style={styles.heading}>Statistics</Text>
+                <Content style={styles.content}>
+                    <Text style={styles.heading}>Statistics</Text>
                     {this._renderDieDistributionChart()}
                     <List>
                         <ListItem>
@@ -204,8 +204,8 @@ class StatisticsScreen extends Component {
                         </ListItem>
                         <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>*Does not include hit location or knockback rolls</Text>
                     </List>
-	        </Content>
-	      </Container>
+                </Content>
+            </Container>
         );
     }
 }

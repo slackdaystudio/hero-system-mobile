@@ -69,7 +69,7 @@ class SettingsScreen extends Component {
         this.props.resetForm('costCruncher');
 
         if (showToast) {
-		    common.toast('Form data has been cleared');
+            common.toast('Form data has been cleared');
         }
     }
 
@@ -82,7 +82,7 @@ class SettingsScreen extends Component {
     }
 
     async _clearHeroData(showToast = true) {
-	    this.props.clearRandomHero();
+        this.props.clearRandomHero();
 
         if (showToast) {
             common.toast('H.E.R.O. character has been cleared');
@@ -90,7 +90,7 @@ class SettingsScreen extends Component {
     }
 
     async _clearStatisticsData(showToast = true) {
-	    this.props.clearStatistics();
+        this.props.clearStatistics();
 
         if (showToast) {
             common.toast('Statistical data has been cleared');
@@ -114,56 +114,56 @@ class SettingsScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-			    <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
-			    	<Text style={styles.heading}>Settings</Text>
-			    	<List>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Form data</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={styles.button} onPress={() => this._clearFormData()}>
+                    <Text style={styles.heading}>Settings</Text>
+                    <List>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Form data</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearFormData()}>
                                     <Text uppercase={false} style={styles.buttonText}>Clear</Text>
                                 </Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Loaded character</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={styles.button} onPress={() => this._clearCharacterData()}>
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Loaded character</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearCharacterData()}>
                                     <Text uppercase={false} style={styles.buttonText}>Clear</Text>
                                 </Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>H.E.R.O.</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={styles.button} onPress={() => this._clearHeroData()}>
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>H.E.R.O.</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearHeroData()}>
                                     <Text uppercase={false} style={styles.buttonText}>Clear</Text>
                                 </Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Statistics</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={styles.button} onPress={() => this._clearStatisticsData()}>
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Statistics</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearStatisticsData()}>
                                     <Text uppercase={false} style={styles.buttonText}>Clear</Text>
                                 </Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
-			        		</Left>
-			        		<Right>
-							    <Switch
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
+                            </Left>
+                            <Right>
+                                <Switch
                                     value={this.props.useFifthEdition}
                                     onValueChange={() => this.props.setUseFifthEditionRules(!this.props.useFifthEdition)}
                                     minimumTrackTintColor="#14354d"
@@ -171,14 +171,14 @@ class SettingsScreen extends Component {
                                     thumbTintColor="#14354d"
                                     onTintColor="#01121E"
                                 />
-			        		</Right>
-		        		</ListItem>
-			    	</List>
-			    	<View style={{paddingTop: 20}}>
+                            </Right>
+                        </ListItem>
+                    </List>
+                    <View style={{paddingTop: 20}}>
                         <Button block style={styles.button} onPress={() => this._clearAll()}>
                             <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
                         </Button>
-			    	</View>
+                    </View>
                 </Content>
             </Container>
         );

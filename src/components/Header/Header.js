@@ -56,9 +56,9 @@ const localStyles = StyleSheet.create({
         paddingLeft: 5,
         alignSelf: 'flex-start',
         ...Platform.select({
-		    ios: {
-			    paddingBottom: 20,
-		    },
+            ios: {
+                paddingBottom: 20,
+            },
         }),
     },
 });

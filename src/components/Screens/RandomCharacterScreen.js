@@ -45,9 +45,9 @@ class RandomCharacterScreen extends Component {
             return true;
         });
 
-	    if (this.props.character === null) {
-	        this.props.setRandomHero(randomCharacter.generate());
-	    }
+        if (this.props.character === null) {
+            this.props.setRandomHero(randomCharacter.generate());
+        }
 
         RNShake.addEventListener('ShakeEvent', () => {
             this._reRoll();
@@ -69,13 +69,13 @@ class RandomCharacterScreen extends Component {
         for (let prop in this.props.character.archtype.characteristics) {
             elements.push(
                 <ListItem key={prop}>
-	        		<Left>
-	        			<Text style={styles.boldGrey}>{this.props.character.archtype.characteristics[prop]}</Text>
-	        		</Left>
-	        		<Body>
-	        			<Text style={styles.grey}>{prop.toUpperCase()}</Text>
-	        		</Body>
-	        	</ListItem>
+                    <Left>
+                        <Text style={styles.boldGrey}>{this.props.character.archtype.characteristics[prop]}</Text>
+                    </Left>
+                    <Body>
+                        <Text style={styles.grey}>{prop.toUpperCase()}</Text>
+                    </Body>
+                </ListItem>
             );
         }
 
@@ -89,7 +89,7 @@ class RandomCharacterScreen extends Component {
     }
 
     render() {
-	    if (this.props.character === null) {
+        if (this.props.character === null) {
             return (
                 <Container style={styles.container}>
                     <NavigationEvents
@@ -100,9 +100,9 @@ class RandomCharacterScreen extends Component {
                     <Content style={styles.content}>
                         <Spinner color="#D0D1D3" />
                     </Content>
-	            </Container>
-	        );
-	    }
+                </Container>
+            );
+        }
 
         return (
             <Container style={styles.container}>
@@ -112,10 +112,10 @@ class RandomCharacterScreen extends Component {
                 />
                 <Header hasTabs={true} navigation={this.props.navigation} />
                 <Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
-			  	<Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-			  			<View style={styles.tabContent}>
-			  			    <List>
+                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+                            <View style={styles.tabContent}>
+                                <List>
                                     <ListItem>
                                         <Left>
                                             <Text style={styles.boldGrey}>Name:</Text>
@@ -200,7 +200,7 @@ class RandomCharacterScreen extends Component {
                                             <Text style={styles.grey}>{this.props.character.disadvantages.disadvantagesCost}</Text>
                                         </Body>
                                     </ListItem>
-				            </List>
+                                </List>
                                 <View style={{paddingBottom: 20}} />
                                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
                                     <View style={styles.buttonContainer}>
@@ -209,61 +209,61 @@ class RandomCharacterScreen extends Component {
                                         </Button>
                                     </View>
                                 </View>
-			    		</View>
-			  		</Tab>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-			  			<View style={styles.tabContent}>
-			  				{this._renderCharacteristics()}
-			  			</View>
-			  		</Tab>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
-			  			<View style={styles.tabContent}>
-					  		{this.props.character.powers.powers.map((power, index) => {
+                            </View>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                            <View style={styles.tabContent}>
+                                {this._renderCharacteristics()}
+                            </View>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
+                            <View style={styles.tabContent}>
+                                {this.props.character.powers.powers.map((power, index) => {
                                     return (
                                         <ListItem key={'power-' + index}>
-						        		<Left>
-						        			<Text style={styles.grey}>{power.power}</Text>
-						        		</Left>
-						        		<Right>
-						        			<Text style={styles.grey}>{power.cost}</Text>
-						        		</Right>
-						        	</ListItem>
+                                            <Left>
+                                                <Text style={styles.grey}>{power.power}</Text>
+                                            </Left>
+                                            <Right>
+                                                <Text style={styles.grey}>{power.cost}</Text>
+                                            </Right>
+                                        </ListItem>
                                     );
                                 })}
-				  		</View>
-			  		</Tab>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
-			  			<View style={styles.tabContent}>
-					  		{this.props.character.skills.skills.map((skill, index) => {
+                            </View>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
+                            <View style={styles.tabContent}>
+                                {this.props.character.skills.skills.map((skill, index) => {
                                     return (
                                         <ListItem key={'skill-' + index}>
                                             <Body>
                                                 <Text style={styles.grey}>{skill}</Text>
                                             </Body>
-						        	    </ListItem>
+                                        </ListItem>
                                     );
                                 })}
-				  		</View>
-			  		</Tab>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Disadvantages">
-			  			<View style={styles.tabContent}>
-					  		{this.props.character.disadvantages.disadvantages.map((disad, index) => {
+                            </View>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Disadvantages">
+                            <View style={styles.tabContent}>
+                                {this.props.character.disadvantages.disadvantages.map((disad, index) => {
                                     return (
                                         <ListItem key={'disad-' + index}>
-						        		<Left>
-						        			<Text style={styles.grey}>{disad.description}</Text>
-						        		</Left>
-						        		<Right>
-						        			<Text style={styles.grey}>{disad.cost}</Text>
-						        		</Right>
-						        	</ListItem>
+                                            <Left>
+                                                <Text style={styles.grey}>{disad.description}</Text>
+                                            </Left>
+                                            <Right>
+                                                <Text style={styles.grey}>{disad.cost}</Text>
+                                            </Right>
+                                        </ListItem>
                                     );
                                 })}
-				  		</View>
-			  		</Tab>
-			  	</Tabs>
-		  	</Content>
-	      </Container>
+                            </View>
+                        </Tab>
+                    </Tabs>
+                </Content>
+            </Container>
         );
     }
 }

@@ -47,28 +47,28 @@ class DieRoller {
     }
 
     rollCheck(threshold = null) {
-	    let regex = /^([0-9]+\-|[0-9]+\-\s\/\s[0-9]+\-)$/;
-	    let result = this._roll(3, SKILL_CHECK);
-	    result.threshold = -1;
+        let regex = /^([0-9]+\-|[0-9]+\-\s\/\s[0-9]+\-)$/;
+        let result = this._roll(3, SKILL_CHECK);
+        result.threshold = -1;
 
-	    if (threshold !== null && regex.test(threshold)) {
-	        let rollThreshold = threshold;
+        if (threshold !== null && regex.test(threshold)) {
+            let rollThreshold = threshold;
 
-	        if (threshold.indexOf('/') !== -1) {
+            if (threshold.indexOf('/') !== -1) {
                 rollThreshold = threshold.split(' / ')[1];
-	        }
+            }
 
             result.threshold = rollThreshold.slice(0, -1);
-	    }
+        }
 
         return result;
     }
 
     rollToHit(cv, numberOfRolls, isAutofire, targetDcv) {
-	    let results = [];
-	    let result;
+        let results = [];
+        let result;
 
-	    for (let i = 0; i < numberOfRolls; i++) {
+        for (let i = 0; i < numberOfRolls; i++) {
             result = this._roll(3, TO_HIT);
             result.hitCv = 11 + parseInt(cv, 10) - result.total;
             result.cv = cv;
@@ -84,7 +84,7 @@ class DieRoller {
             }
 
             results.push(result);
-	    }
+        }
 
         return {'results': results};
     }
@@ -102,28 +102,28 @@ class DieRoller {
         resultRoll.body = this._calculateBody(resultRoll);
         resultRoll.stun = this._calculateStun(resultRoll);
         resultRoll.knockback = this._calculateKnockback(
-		    resultRoll,
-		    damageForm.isTargetFlying,
-		    damageForm.isMartialManeuver,
-		    damageForm.isTargetInZeroG,
-		    damageForm.isTargetUnderwater,
-		    damageForm.rollWithPunch,
-		    damageForm.isUsingClinging
+            resultRoll,
+            damageForm.isTargetFlying,
+            damageForm.isMartialManeuver,
+            damageForm.isTargetInZeroG,
+            damageForm.isTargetUnderwater,
+            damageForm.rollWithPunch,
+            damageForm.isUsingClinging
         );
 
         if (damageForm.isExplosion) {
-		    resultRoll.rolls.sort((a, b) => a - b).reverse();
-		    resultRoll.explosion = [{
-		        distance: 0,
-		        stun: resultRoll.stun,
-		        body: resultRoll.body,
-		        knockback: resultRoll.knockback,
-		    }];
+            resultRoll.rolls.sort((a, b) => a - b).reverse();
+            resultRoll.explosion = [{
+                distance: 0,
+                stun: resultRoll.stun,
+                body: resultRoll.body,
+                knockback: resultRoll.knockback,
+            }];
 
             let newResultRoll = {...resultRoll};
             newResultRoll.rolls = resultRoll.rolls.slice();
 
-		    this._buildExplosionTable(resultRoll, newResultRoll);
+            this._buildExplosionTable(resultRoll, newResultRoll);
         }
 
         return resultRoll;
@@ -162,8 +162,8 @@ class DieRoller {
         let numberOfRolls;
 
         if (lastResult.hasOwnProperty('results')) {
-		    numberOfRolls = lastResult.results.length;
-		    lastResult = lastResult.results[0];
+            numberOfRolls = lastResult.results.length;
+            lastResult = lastResult.results[0];
         }
 
         if (lastResult.rollType === SKILL_CHECK) {
@@ -198,7 +198,7 @@ class DieRoller {
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
             resultRoll.total += 1;
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-		    resultRoll.total -= 1;
+            resultRoll.total -= 1;
         } else if (partialDieType === PARTIAL_DIE_HALF) {
             let halfDie = Math.floor(Math.random() * 3) + 1;
 
@@ -216,7 +216,7 @@ class DieRoller {
             if (resultRoll.damageForm.useHitLocations) {
                 stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier));
             } else {
-			    if (resultRoll.stunModifier === undefined) {
+                if (resultRoll.stunModifier === undefined) {
                     resultRoll.stunModifier = 1;
 
                     if (resultRoll.damageForm.useFifthEdition) {
@@ -229,7 +229,7 @@ class DieRoller {
                     } else {
                         resultRoll.stunModifier = Math.floor(Math.random() * 3) + 1;
                     }
-			    }
+                }
 
                 stun = resultRoll.total * (resultRoll.stunModifier + parseInt(resultRoll.stunMultiplier));
             }
@@ -259,7 +259,7 @@ class DieRoller {
     }
 
     _calculateKnockback(resultRoll, isTargetFlying, isMartialManeuver, zeroG, underwater, rolledWithPunch, usingClinging) {
-	    if (resultRoll.knockbackRollTotal === undefined) {
+        if (resultRoll.knockbackRollTotal === undefined) {
             let knockbackDice = 2;
 
             if (isMartialManeuver) {
@@ -291,28 +291,28 @@ class DieRoller {
             }
 
             resultRoll.knockbackRollTotal = knockbackDice <= 0 ? 0 : this._roll(knockbackDice, KNOCKBACK).total;
-	    }
+        }
 
         return (resultRoll.body - resultRoll.knockbackRollTotal) * 2;
     }
 
     _buildExplosionTable(resultRoll, newResultRoll) {
-	    newResultRoll.rolls.shift();
-	    newResultRoll.total = newResultRoll.rolls.reduce((a, b) => a + b, 0);
+        newResultRoll.rolls.shift();
+        newResultRoll.total = newResultRoll.rolls.reduce((a, b) => a + b, 0);
         newResultRoll.stun = this._calculateStun(newResultRoll);
         newResultRoll.body = this._calculateBody(newResultRoll);
         newResultRoll.knockback = this._calculateKnockback(newResultRoll);
 
-	    resultRoll.explosion.push({
-	        distance: (resultRoll.rolls.length - newResultRoll.rolls.length) * resultRoll.damageForm.fadeRate * 2,
+        resultRoll.explosion.push({
+            distance: (resultRoll.rolls.length - newResultRoll.rolls.length) * resultRoll.damageForm.fadeRate * 2,
             stun: newResultRoll.stun,
             body: newResultRoll.body,
             knockback: newResultRoll.knockback,
-	    });
+        });
 
-	    if (newResultRoll.rolls.length >= 2) {
-	        this._buildExplosionTable(resultRoll, newResultRoll);
-	    }
+        if (newResultRoll.rolls.length >= 2) {
+            this._buildExplosionTable(resultRoll, newResultRoll);
+        }
     }
 
     _getHitLocationModifiers(hitLocationRoll) {

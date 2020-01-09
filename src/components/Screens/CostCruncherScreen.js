@@ -49,13 +49,13 @@ class CostCruncherScreen extends Component {
     }
 
     _updateFormValue(key, value) {
-	    if (key === 'cost') {
-	        if (/^[0-9]*$/.test(value) === false) {
-	            return;
-	        }
-	    } else if (key === 'advantages' || key === 'limitations') {
-	        value = parseFloat(value);
-	    }
+        if (key === 'cost') {
+            if (/^[0-9]*$/.test(value) === false) {
+                return;
+            }
+        } else if (key === 'advantages' || key === 'limitations') {
+            value = parseFloat(value);
+        }
 
         this.props.updateFormValue('costCruncher', key, value);
     }
@@ -81,28 +81,28 @@ class CostCruncherScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-			    <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
-				    <Text style={styles.heading}>Cruncher</Text>
-				    <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>
+                    <Text style={styles.heading}>Cruncher</Text>
+                    <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingTop: 20}}>
                         <Text style={styles.boldGrey}>Active Cost</Text>
                         <Text style={styles.boldGrey}>Real Cost</Text>
-			      	</View>
+                    </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
                         {this._renderActiveCost()}
                         {this._renderRealCost()}
-			      	</View>
-			      	<Form>
-			      	    <Item stackedLabel>
-			      	        <Label style={styles.boldGrey}>Base Cost:</Label>
+                    </View>
+                    <Form>
+                        <Item stackedLabel>
+                            <Label style={styles.boldGrey}>Base Cost:</Label>
                             <Input
                                 style={styles.grey}
                                 keyboardType="numeric"
                                 maxLength={3}
                                 value={this.props.costCruncherForm.cost.toString()}
                                 onChangeText={(text) => this.updateFormValue('cost', text)} />
-			      	    </Item>
+                        </Item>
                     </Form>
                     <Slider
                         label="Advantages:"

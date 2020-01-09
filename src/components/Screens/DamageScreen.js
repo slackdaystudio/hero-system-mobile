@@ -62,10 +62,10 @@ class DamageScreen extends Component {
         });
     }
 
-   	onDidBlur() {
-   		RNShake.removeEventListener('ShakeEvent');
-   		this.backHandler.remove();
-   	}
+    onDidBlur() {
+        RNShake.removeEventListener('ShakeEvent');
+        this.backHandler.remove();
+    }
 
     _roll() {
         this.props.navigation.navigate('Result', {from: 'Damage', result: dieRoller.rollDamage(this.props.damageForm)});
@@ -73,12 +73,12 @@ class DamageScreen extends Component {
 
     _updateFormValue(key, value) {
         if (key === 'killingToggled' && value) {
-		    this.props.updateFormValue('damage', 'killingToggled', value);
+            this.props.updateFormValue('damage', 'killingToggled', value);
             this.props.updateFormValue('damage', 'damageType', value ? KILLING_DAMAGE : NORMAL_DAMAGE);
         } else {
-		    value = ['dice', 'stunMultiplier', 'fadeRate'].includes(key) ? parseInt(value) : value;
+            value = ['dice', 'stunMultiplier', 'fadeRate'].includes(key) ? parseInt(value) : value;
 
-		    this.props.updateFormValue('damage', key, value);
+            this.props.updateFormValue('damage', key, value);
         }
     }
 
@@ -151,7 +151,7 @@ class DamageScreen extends Component {
                                     <Picker
                                         selectedValue={this.props.damageForm.partialDie}
                                         onValueChange={(value) => this.updateFormValue('partialDie', value)}
-									  style={{color: '#f0f0f0', height: 30, width: 200}}
+                                        style={{color: '#f0f0f0', height: 30, width: 200}}
                                     >
                                         <Picker.Item label="No partial die" value="0" />
                                         <Picker.Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
@@ -339,11 +339,11 @@ const localStyles = StyleSheet.create({
         paddingBottom: 10,
     },
     grey: {
-	    ...Platform.select({
-	        android: {
-	            color: '#D0D1D3',
-	        },
-	    }),
+        ...Platform.select({
+            android: {
+                color: '#D0D1D3',
+            },
+        }),
     },
 });
 

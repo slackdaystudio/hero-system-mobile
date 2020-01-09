@@ -53,10 +53,10 @@ class SkillScreen extends Component {
         });
     }
 
-   	onDidBlur() {
-   		RNShake.removeEventListener('ShakeEvent');
-   		this.backHandler.remove();
-   	}
+    onDidBlur() {
+        RNShake.removeEventListener('ShakeEvent');
+        this.backHandler.remove();
+    }
 
     _roll() {
         let threshold = this.props.skillForm.skillCheck ? this.props.skillForm.value + '-' : null;
@@ -98,13 +98,13 @@ class SkillScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-			    <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
-				    <Text style={styles.heading}>Roll 3d6</Text>
+                    <Text style={styles.heading}>Roll 3d6</Text>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-	              	    <Text style={styles.grey}>Is skill check?</Text>
-		              	<View style={{paddingRight: 10}}>
-		              		<Switch
+                        <Text style={styles.grey}>Is skill check?</Text>
+                        <View style={{paddingRight: 10}}>
+                            <Switch
                                 value={this.props.skillForm.skillCheck}
                                 onValueChange={() => this.updateFormValue('skillCheck', !this.props.skillCheck)}
                                 minimumTrackTintColor="#14354d"
@@ -112,8 +112,8 @@ class SkillScreen extends Component {
                                 thumbTintColor="#14354d"
                                 onTintColor="#01121E"
                             />
-		              	</View>
-		            </View>
+                        </View>
+                    </View>
                     {this._renderSlider()}
                     <View style={styles.buttonContainer}>
                         <Button block style={styles.button}  onPress={this.roll}>

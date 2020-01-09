@@ -89,36 +89,36 @@ class ViewCharacterScreen extends Component {
 
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
-			    <View style={styles.tabContent}>
-			        <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
-			    </View>
+                <View style={styles.tabContent}>
+                    <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
+                </View>
             </Tab>
         );
     }
 
     render() {
-	    // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
-	    // guards against a error
-	    if (character.isHeroDesignerCharacter(this.props.character)) {
-	        return null;
-	    }
+        // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
+        // guards against a error
+        if (character.isHeroDesignerCharacter(this.props.character)) {
+            return null;
+        }
 
         return (
-		  <Container style={styles.container}>
+            <Container style={styles.container}>
                 <NavigationEvents
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
+                <Header hasTabs={false} navigation={this.props.navigation} />
+                <Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
                     <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-			  			<View style={styles.tabContent}>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+                            <View style={styles.tabContent}>
                                 <General character={this.props.character} />
-			  			</View>
-			  		</Tab>
+                            </View>
+                        </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
-			  			<View style={styles.tabContent}>
+                            <View style={styles.tabContent}>
                                 <Combat
                                     navigation={this.props.navigation}
                                     character={this.props.character}
@@ -126,24 +126,24 @@ class ViewCharacterScreen extends Component {
                                     updateForm={this.props.updateForm}
                                     setSparseCombatDetails={this.props.setSparseCombatDetails}
                                 />
-			  		    </View>
-			  		</Tab>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-			  		    <View style={styles.tabContent}>
-			  		        <Characteristics characteristics={this.props.character.characteristics.characteristic} navigation={this.props.navigation} />
-			  		        <Movement movement={this.props.character.movement} />
-			  		    </View>
-			  		</Tab>
+                            </View>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                            <View style={styles.tabContent}>
+                                <Characteristics characteristics={this.props.character.characteristics.characteristic} navigation={this.props.navigation} />
+                                <Movement movement={this.props.character.movement} />
+                            </View>
+                        </Tab>
                         {this._renderPowers(this.props.character.powers.text)}
-			  		{this._renderEquipment(this.props.character.equipment.text)}
+                        {this._renderEquipment(this.props.character.equipment.text)}
                         {this._renderTextList(this.props.character.martialArts.text, 'Maneuver', 'Martial Arts')}
                         {this._renderTextList(this.props.character.skills.text, 'Skill')}
                         {this._renderTextList(this.props.character.talents.text, 'Talent')}
                         {this._renderTextList(this.props.character.perks.text, 'Perk')}
                         {this._renderTextList(this.props.character.disadvantages.text, 'Disadvantage')}
-			  	</Tabs>
-		  	</Content>
-	      </Container>
+                    </Tabs>
+                </Content>
+            </Container>
         );
     }
 }

@@ -49,9 +49,9 @@ export default class Combat extends Component {
     }
 
     _resetCombatState(key) {
-	    let combatDetails = {};
+        let combatDetails = {};
 
-	    combatDetails[key] = character.getCharacteristic(this.props.character.characteristics.characteristic, key);
+        combatDetails[key] = character.getCharacteristic(this.props.character.characteristics.characteristic, key);
 
         this.props.setSparseCombatDetails(combatDetails);
     }

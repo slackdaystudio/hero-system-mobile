@@ -22,7 +22,7 @@ class RandomCharacter {
         let archtype = this._getArchtype();
 
         return {
-		    name: '',
+            name: '',
             archtype: archtype,
             gender: this._getGender(),
             specialFx: this._getSpecialFx(),

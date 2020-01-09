@@ -93,7 +93,7 @@ export default StyleSheet.create({
         backgroundColor: '#F3EDE9',
     },
     tabContent: {
-	    flex: 1,
+        flex: 1,
         backgroundColor: '#1b1d1f',
     },
     card: {

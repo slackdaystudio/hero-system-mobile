@@ -120,9 +120,9 @@ class HomeScreen extends Component {
 
     render() {
         return (
-		  <Container style={styles.container}>
-		    <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{ resizeMode: 'cover' }}>
-			    <Header navigation={this.props.navigation} />
+            <Container style={styles.container}>
+                <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{ resizeMode: 'cover' }}>
+                    <Header navigation={this.props.navigation} />
                     <Content style={styles.content}>
                         <Heading text="Character" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you&apos;re on the go.</Text>
@@ -181,7 +181,7 @@ class HomeScreen extends Component {
                         <View style={{paddingBottom: 20}} />
                     </Content>
                 </ImageBackground>
-	      </Container>
+            </Container>
         );
     }
 }

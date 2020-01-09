@@ -59,19 +59,19 @@ class HitScreen extends Component {
         });
     }
 
-   	onDidBlur() {
-   		RNShake.removeEventListener('ShakeEvent');
-   		this.backHandler.remove();
-   	}
+    onDidBlur() {
+        RNShake.removeEventListener('ShakeEvent');
+        this.backHandler.remove();
+    }
 
     _roll() {
         this.props.navigation.navigate('Result', {from: 'Hit', result: dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv)});
     }
 
     _updateFormValue(key, value) {
-	    if (key === 'numberOfRolls') {
-	        value = parseInt(value, 10);
-	    }
+        if (key === 'numberOfRolls') {
+            value = parseInt(value, 10);
+        }
 
         this.props.updateFormValue('hit', key, value);
     }
@@ -140,7 +140,7 @@ class HitScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-			    <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} />
                 <Content scrollEnable={false}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
