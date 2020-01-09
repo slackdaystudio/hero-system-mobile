@@ -20,7 +20,6 @@ import styles from '../../Styles';
 
 export default class Heading extends Component {
     static propTypes = {
-        navigation: PropTypes.object.isRequired,
         text: PropTypes.string.isRequired,
     }
 

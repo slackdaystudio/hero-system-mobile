@@ -20,7 +20,6 @@ import styles from '../../Styles';
 
 export default class Movement extends Component {
     static propTypes = {
-        navigation: PropTypes.object.isRequired,
         movement: PropTypes.object.isRequired,
     }
 

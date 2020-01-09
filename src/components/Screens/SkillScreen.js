@@ -30,7 +30,7 @@ class SkillScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         skillForm: PropTypes.object.isRequired,
-        skillCheck: PropTypes.bool.isRequired,
+        skillCheck: PropTypes.bool,
         updateFormValue: PropTypes.func.isRequired,
     }
 

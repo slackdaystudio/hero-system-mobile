@@ -21,7 +21,7 @@ import { common } from '../../lib/Common';
 export default class MyHeader extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        hasTabs: PropTypes.bool.isRequired,
+        hasTabs: PropTypes.bool,
     }
 
     render() {

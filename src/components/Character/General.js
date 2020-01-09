@@ -20,7 +20,6 @@ import styles from '../../Styles';
 
 export default class General extends Component {
     static propTypes = {
-        navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
     }
 

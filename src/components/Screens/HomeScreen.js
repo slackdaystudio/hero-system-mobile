@@ -33,7 +33,7 @@ import { initializeCombatDetails, setCombatDetails } from '../../reducers/combat
 class HomeScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        character: PropTypes.object.isRequired,
+        character: PropTypes.object,
         initializeApplicationSettings: PropTypes.func.isRequired,
         initializeStatistics: PropTypes.func.isRequired,
         initializeCharacter: PropTypes.func.isRequired,

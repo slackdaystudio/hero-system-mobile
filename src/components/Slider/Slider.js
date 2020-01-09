@@ -22,13 +22,12 @@ import styles from '../../Styles';
 
 class Slider extends Component {
 	static propTypes = {
-	    navigation: PropTypes.object.isRequired,
 	    label: PropTypes.string.isRequired,
-	    value: PropTypes.string.isRequired,
+	    value: PropTypes.number.isRequired,
 	    step: PropTypes.number.isRequired,
 	    min: PropTypes.number.isRequired,
 	    max: PropTypes.number.isRequired,
-	    disabled: PropTypes.bool.isRequired,
+	    disabled: PropTypes.bool,
 	    valueKey: PropTypes.string,
 	    onValueChange: PropTypes.func.isRequired,
 	    toggleTabsLocked: PropTypes.func,
@@ -151,6 +150,7 @@ class Slider extends Component {
 
 Slider.defaultProps = {
     toggleTabsLocked: () => {},
+    disabled: false,
 };
 
 const localStyles = StyleSheet.create({

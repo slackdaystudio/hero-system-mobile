@@ -22,7 +22,6 @@ import styles from '../../Styles';
 
 export default class General extends Component {
     static propTypes = {
-        navigation: PropTypes.object.isRequired,
         characterInfo: PropTypes.object.isRequired,
     }
 

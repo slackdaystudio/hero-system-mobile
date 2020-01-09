@@ -19,7 +19,6 @@ import { Text } from 'native-base';
 
 export default class CircleText extends Component {
     static propTypes = {
-        navigation: PropTypes.object.isRequired,
         title: PropTypes.string.isRequired,
         size: PropTypes.number.isRequired,
         fontSize: PropTypes.number.isRequired,
