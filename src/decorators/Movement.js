@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
+import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -116,9 +117,6 @@ export default class Movement extends CharacterTrait {
     }
 
     _getSpeed() {
-        let character = this.characterTrait.getCharacter();
-        let characteristicMap = common.toMap(character.characteristics, 'shortName');
-
-        return characteristicMap.get('SPD').value;
+        return heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', this.characterTrait.getCharacter());
     }
 }
