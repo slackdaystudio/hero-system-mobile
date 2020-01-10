@@ -3,6 +3,7 @@ import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import { common } from './Common';
 import { character as libCharacter } from './Character';
+import { heroDesignerCharacter } from './HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -55,10 +56,24 @@ class Persistence {
 
     async setCombatDetails(character) {
         let combatDetails = {
-            stun: libCharacter.getCharacteristic(character.characteristics.characteristic, 'stun'),
-            body: libCharacter.getCharacteristic(character.characteristics.characteristic, 'body'),
-            endurance: libCharacter.getCharacteristic(character.characteristics.characteristic, 'endurance'),
-        };
+            stun: 0,
+            body: 0,
+            endurance: 0
+        }
+
+        if (libCharacter.isHeroDesignerCharacter(character)) {
+            combatDetails = {
+                stun: heroDesignerCharacter.getCharacteristicTotalByShortName('stun', character),
+                body: heroDesignerCharacter.getCharacteristicTotalByShortName('body', character),
+                endurance: heroDesignerCharacter.getCharacteristicTotalByShortName('end', character),
+            };
+        } else {
+            combatDetails = {
+                stun: libCharacter.getCharacteristic(character.characteristics.characteristic, 'stun'),
+                body: libCharacter.getCharacteristic(character.characteristics.characteristic, 'body'),
+                endurance: libCharacter.getCharacteristic(character.characteristics.characteristic, 'endurance'),
+            };
+        }
 
         try {
             await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));

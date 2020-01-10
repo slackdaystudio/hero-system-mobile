@@ -85,10 +85,7 @@ class HomeScreen extends Component {
 
             this.props.setShowSecondary(true);
             this.props.setCharacter(char);
-
-            if (!character.isHeroDesignerCharacter(char)) {
-                this.props.setCombatDetails(char);
-            }
+            this.props.setCombatDetails(char);
         });
     }
 

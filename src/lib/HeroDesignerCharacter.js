@@ -160,6 +160,19 @@ class HeroDesignerCharacter {
         return false;
     }
 
+    getCharacteristicTotalByShortName(shortName, character) {
+        let characteristic = null;
+        let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
+
+        for (let characteristic of character.characteristics) {
+            if (shortName.toUpperCase() === characteristic.shortName.toUpperCase()) {
+                return this.getCharacteristicTotal(characteristic, powersMap);
+            }
+        }
+
+        return 0;
+    }
+
     getCharacteristicTotal(characteristic, powersMap) {
         let value = characteristic.value;
         let showSecondary = store.getState().character.showSecondary;

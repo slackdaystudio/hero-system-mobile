@@ -5,6 +5,7 @@ import { BackHandler,Platform, StyleSheet, View, ScrollView, Alert } from 'react
 import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import General from '../HeroDesignerCharacter/General';
+import Combat from '../HeroDesignerCharacter/Combat';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
 import Traits from '../HeroDesignerCharacter/Traits';
 import Header from '../Header/Header';
@@ -12,6 +13,7 @@ import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
+import { setSparseCombatDetails } from '../../reducers/combat';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -31,7 +33,9 @@ class ViewHeroDesignerCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
+        combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
+        setSparseCombatDetails: PropTypes.func.isRequired,
     }
 
     onDidFocus() {
@@ -94,6 +98,11 @@ class ViewHeroDesignerCharacterScreen extends Component {
                                 <General characterInfo={this.props.character.characterInfo} />
                             </View>
                         </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+                            <View style={styles.tabContent}>
+                                <Combat character={this.props.character} combatDetails={this.props.combatDetails} setSparseCombatDetails={this.props.setSparseCombatDetails} updateForm={this.props.updateForm}/>
+                            </View>
+                        </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
                             <View style={styles.tabContent}>
                                 <Characteristics navigation={this.props.navigation} character={this.props.character} />
@@ -127,11 +136,13 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         character: state.character.character,
+        combatDetails: state.combat,
     };
 };
 
 const mapDispatchToProps = {
     updateForm,
+    setSparseCombatDetails,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);
