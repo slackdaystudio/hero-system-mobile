@@ -12,6 +12,7 @@ import { heroDesignerCharacter, TYPE_MOVEMENT } from '../../lib/HeroDesignerChar
 import { SKILL_ROLL_BASE } from '../../decorators/skills/Roll';
 import styles from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
+import speedTable from '../../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -104,6 +105,36 @@ class Characteristics extends Component {
         return meters;
     }
 
+    _renderNotes(characteristic) {
+        let whitelistedCharacteristics = ['INT', 'SPD'];
+
+        if (whitelistedCharacteristics.includes(characteristic.shortName.toUpperCase())) {
+            let note = {
+                label: '',
+                text: ''
+            };
+
+            if (characteristic.shortName.toUpperCase() === 'INT') {
+                // TODO: total all sources or PER modifiers
+                note.label = 'PER';
+                note.text = heroDesignerCharacter.getRollTotal(characteristic, this.powersMap);
+            } else if (characteristic.shortName.toUpperCase() === 'SPD') {
+                note.label = 'Phases';
+                note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap).toString()].phases.join(', ');
+            }
+
+            return (
+                <View style={{flex: 1, paddingBottom: 10}}>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>{note.label}:</Text> {note.text}
+                    </Text>
+                </View>
+            );
+        }
+
+        return null;
+    }
+
     _renderDefinition(characteristic) {
         if (this.state.characteristicsShow[characteristic.shortName]) {
             let definition = characteristic.definition;
@@ -118,6 +149,7 @@ class Characteristics extends Component {
                         <Body>
                             {this._renderNonCombatMovement(characteristic)}
                             {this._renderStrength(characteristic)}
+                            {this._renderNotes(characteristic)}
                             <Text style={styles.grey}>{definition}</Text>
                         </Body>
                     </CardItem>
