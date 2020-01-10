@@ -1,205 +1,203 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Switch, Alert } from 'react-native';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { BackHandler, StyleSheet, View, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
+import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import { common } from '../../lib/Common';
+import { persistence } from '../../lib/Persistence';
 import styles from '../../Styles';
+import { resetForm } from '../../reducers/forms';
+import { clearCharacter } from '../../reducers/character';
+import { clearRandomHero } from '../../reducers/randomHero';
+import { initializeApplicationSettings, setUseFifthEditionRules } from '../../reducers/settings';
+import { clearStatistics } from '../../reducers/statistics';
 
-export default class SettingsScreen extends Component {
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+class SettingsScreen extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        useFifthEdition: PropTypes.bool.isRequired,
+        resetForm: PropTypes.func.isRequired,
+        clearCharacter: PropTypes.func.isRequired,
+        clearRandomHero: PropTypes.func.isRequired,
+        clearStatistics: PropTypes.func.isRequired,
+        initializeApplicationSettings: PropTypes.func.isRequired,
+    }
+
     constructor(props) {
         super(props);
 
         this.state = {
-            appSettings: null
+            appSettings: null,
         };
     }
 
-	async componentDidMount() {
-        let settings = await common.getAppSettings();
+    onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
 
-        this.setState({appSettings: settings});
-	}
+            return true;
+        });
+    }
 
-	async _clearFormData(showToast = true) {
-		await AsyncStorage.setItem('skillState', JSON.stringify({
-		    skillCheck: false,
-			value: 8
-		}));
-		await AsyncStorage.setItem('costCruncherState', JSON.stringify({
-		    cost: 5,
-			advantages: 0,
-			limitations: 0,
-        }));
-		await AsyncStorage.setItem('ocvSliderValue', JSON.stringify({
-			ocv: 0,
-			numberOfRolls: 1,
-			isAutofire: false,
-			targetDcv: 0,
-			selectedLocation: -1
-		}));
-		await AsyncStorage.setItem('damageState', JSON.stringify(common.initDamageForm()));
-		await AsyncStorage.setItem('freeFormState', JSON.stringify(common.initFreeFormForm()));
+    onDidBlur() {
+        this.backHandler.remove();
+    }
 
-		if (showToast) {
-            Toast.show({
-                text: 'Form data has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
-		}
-	}
-
-	async _clearCharacterData(showToast = true) {
-	    await AsyncStorage.removeItem('character');
-	    await AsyncStorage.removeItem('combat');
+    _clearFormData(showToast = true) {
+        this.props.resetForm('skill');
+        this.props.resetForm('hit');
+        this.props.resetForm('damage');
+        this.props.resetForm('freeForm');
+        this.props.resetForm('costCruncher');
 
         if (showToast) {
-            Toast.show({
-                text: 'Loaded character has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+            common.toast('Form data has been cleared');
         }
-	}
+    }
 
-	async _clearHeroData(showToast = true) {
-	    await AsyncStorage.removeItem('hero');
+    _clearCharacterData(showToast = true) {
+        this.props.clearCharacter();
 
         if (showToast) {
-            Toast.show({
-                text: 'H.E.R.O. character has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+            common.toast('Loaded character has been cleared');
         }
-	}
+    }
+
+    async _clearHeroData(showToast = true) {
+        this.props.clearRandomHero();
+
+        if (showToast) {
+            common.toast('H.E.R.O. character has been cleared');
+        }
+    }
 
     async _clearStatisticsData(showToast = true) {
-	    await AsyncStorage.removeItem('characterFile');
-	    statistics.init();
+        this.props.clearStatistics();
 
         if (showToast) {
-            Toast.show({
-                text: 'Statistical data has been cleared',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+            common.toast('Statistical data has been cleared');
         }
     }
 
     async _clearAll() {
-        await AsyncStorage.removeItem('appSettings');
-        let defaultAppSettings = await common.getAppSettings();
+        this.props.initializeApplicationSettings();
+        this._clearFormData(false);
+        this._clearCharacterData(false);
+        this._clearHeroData(false);
+        this._clearStatisticsData(false);
 
-        await AsyncStorage.setItem('appSettings', JSON.stringify(defaultAppSettings));
-        this.setState({appSettings: defaultAppSettings});
-
-        await this._clearFormData(false);
-        await this._clearCharacterData(false);
-        await this._clearHeroData(false);
-        await this._clearStatisticsData(false);
-
-        Toast.show({
-            text: 'Everything has been cleared',
-            position: 'bottom',
-            buttonText: 'OK'
-        });
+        common.toast('Everything has been cleared');
     }
 
-    async _toggleFifthEdition() {
-        let newState = {...this.state};
-        newState.appSettings.useFifthEdition = !this.state.appSettings.useFifthEdition;
-
-        await AsyncStorage.setItem('appSettings', JSON.stringify(newState.appSettings));
-
-        this.setState({appSettings: newState.appSettings});
-    }
-
-	render() {
-	    if (this.state.appSettings === null) {
-            return (
-                <Container>
-                    <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476', paddingTop: 10}}>
-                        <Spinner color='#D0D1D3' />
-                    </Content>
-                </Container>
-            );
-	    }
-
-		return (
-			<Container style={styles.container}>
-			    <Header navigation={this.props.navigation} />
-				<Content style={styles.content}>
-			    	<Text style={styles.heading}>Settings</Text>
-			    	<List>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Form data</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearFormData()}>
-									<Text uppercase={false}>Clear</Text>
-								</Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Loaded character</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearCharacterData()}>
-									<Text uppercase={false}>Clear</Text>
-								</Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>H.E.R.O.</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearHeroData()}>
-									<Text uppercase={false}>Clear</Text>
-								</Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Statistics</Text>
-			        		</Left>
-			        		<Body>
-							    <Button style={localStyles.button} onPress={() => this._clearStatisticsData()}>
-									<Text uppercase={false}>Clear</Text>
-								</Button>
-			        		</Body>
-		        		</ListItem>
-			    		<ListItem>
-					    	<Left>
-			        			<Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
-			        		</Left>
-			        		<Right>
-							    <Switch value={this.state.appSettings.useFifthEdition} onValueChange={() => this._toggleFifthEdition()} color='#3da0ff'/>
-			        		</Right>
-		        		</ListItem>
-			    	</List>
-			    	<View style={{paddingTop: 20}}>
-                        <Button block style={localStyles.button} onPress={() => this._clearAll()}>
-                            <Text uppercase={false}>Clear All</Text>
+    render() {
+        return (
+            <Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
+                <Header navigation={this.props.navigation} />
+                <Content style={styles.content}>
+                    <Text style={styles.heading}>Settings</Text>
+                    <List>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Form data</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearFormData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Loaded character</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearCharacterData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>H.E.R.O.</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearHeroData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Statistics</Text>
+                            </Left>
+                            <Body>
+                                <Button style={styles.button} onPress={() => this._clearStatisticsData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Body>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
+                            </Left>
+                            <Right>
+                                <Switch
+                                    value={this.props.useFifthEdition}
+                                    onValueChange={() => this.props.setUseFifthEditionRules(!this.props.useFifthEdition)}
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbTintColor="#14354d"
+                                    onTintColor="#01121E"
+                                />
+                            </Right>
+                        </ListItem>
+                    </List>
+                    <View style={{paddingTop: 20}}>
+                        <Button block style={styles.button} onPress={() => this._clearAll()}>
+                            <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
                         </Button>
-			    	</View>
-				</Content>
-			</Container>
-		);
-	}
+                    </View>
+                </Content>
+            </Container>
+        );
+    }
 }
 
-const localStyles = StyleSheet.create({
-	button: {
-		backgroundColor: '#478f79',
-		justifyContent: 'center',
-		alignSelf: 'center'
-	}
-});
+const mapStateToProps = state => {
+    return {
+        useFifthEdition: state.settings.useFifthEdition,
+    };
+};
+
+const mapDispatchToProps = {
+    initializeApplicationSettings,
+    setUseFifthEditionRules,
+    resetForm,
+    clearCharacter,
+    clearRandomHero,
+    clearStatistics,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen);

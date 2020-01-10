@@ -1,56 +1,24 @@
 import { Alert } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, FREE_FORM, SKILL_CHECK } from './DieRoller';
+import { persistence } from './Persistence';
+
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 class Statistics {
-    async init() {
-        await AsyncStorage.setItem('statistics', JSON.stringify({
-            sum: 0,
-            largestDieRoll: 0,
-            largestSum: 0,
-            totals: {
-                diceRolled: 0,
-                hitRolls: 0,
-                skillChecks: 0,
-                freeFormRolls: 0,
-                normalDamage: {
-                    rolls: 0,
-                    stun: 0,
-                    body: 0
-                },
-                killingDamage: {
-                    rolls: 0,
-                    stun: 0,
-                    body: 0
-                },
-                knockback: 0,
-                hitLocations: {
-                    head: 0,
-                    hands: 0,
-                    arms: 0,
-                    shoulders: 0,
-                    chest: 0,
-                    stomach: 0,
-                    vitals: 0,
-                    thighs: 0,
-                    legs: 0,
-                    feet: 0
-                }
-            },
-            distributions: {
-                one: 0,
-                two: 0,
-                three: 0,
-                four: 0,
-                five: 0,
-                six: 0
-            }
-        }));
-    }
-
     async add(resultRoll) {
-        let stats = await AsyncStorage.getItem('statistics');
-        stats = JSON.parse(stats);
+        let stats = await persistence.initializeStatistics();
         let total = resultRoll.rolls.reduce((a, b) => a + b, 0);
 
         stats.sum += total;
@@ -81,13 +49,13 @@ class Statistics {
 
         this._updateDistributions(resultRoll.rolls, stats.distributions);
 
-        return AsyncStorage.setItem('statistics', JSON.stringify(stats));
+        return persistence.setStatistics(stats);
     }
 
     getMostFrequentHitLocation(hitLocationStats) {
         let location = {
             location: '',
-            hits: 0
+            hits: 0,
         };
 
         for (let property in hitLocationStats) {
@@ -95,7 +63,7 @@ class Statistics {
                 if (hitLocationStats[property] > location.hits) {
                     location = {
                         location: property,
-                        hits: hitLocationStats[property]
+                        hits: hitLocationStats[property],
                     };
                 }
             }
@@ -106,26 +74,26 @@ class Statistics {
 
     _updateDistributions(rolls, distributions) {
         for (let roll of rolls) {
-            switch(roll) {
-                case 1:
-                    distributions.one++;
-                    break;
-                case 2:
-                    distributions.two++;
-                    break;
-                case 3:
-                    distributions.three++;
-                    break;
-                case 4:
-                    distributions.four++;
-                    break;
-                case 5:
-                    distributions.five++;
-                    break;
-                case 6:
-                    distributions.six++;
-                    break;
-                default:
+            switch (roll) {
+            case 1:
+                distributions.one++;
+                break;
+            case 2:
+                distributions.two++;
+                break;
+            case 3:
+                distributions.three++;
+                break;
+            case 4:
+                distributions.four++;
+                break;
+            case 5:
+                distributions.five++;
+                break;
+            case 6:
+                distributions.six++;
+                break;
+            default:
                     // do nothing
             }
         }

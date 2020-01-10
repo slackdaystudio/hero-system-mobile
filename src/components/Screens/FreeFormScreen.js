@@ -1,97 +1,125 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { BackHandler, StyleSheet, View, Image } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import RNShake from 'react-native-shake';
+import { NavigationEvents } from 'react-navigation';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
+import { updateFormValue } from '../../reducers/forms';
 
-export default class HitScreen extends Component {
-	constructor(props) {
-		super(props);
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-		this.state = common.initFreeFormForm(props.navigation.state.params);
+class FreeFormScreen extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        freeFormForm: PropTypes.object.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+    }
 
-		this.skipFormLoad = props.navigation.state.params !== undefined ? true : false;
+    constructor(props) {
+        super(props);
 
-        // So the next screen load doesn't reuse it we manually delete the params (bug in React???)
-        delete props.navigation.state.params;
+        this.setSliderState = this._setSliderState.bind(this);
+        this.roll = this._roll.bind(this);
+    }
 
-		this.setSliderState = this._setSliderState.bind(this);
-		this.roll = this._roll.bind(this);
-	}
-	
-	componentDidMount() {
+    onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (this.props.navigation.state.params === undefined) {
+                this.props.navigation.navigate('Home');
+            } else {
+                this.props.navigation.navigate(this.props.navigation.state.params.from);
+            }
+
+            return true;
+        });
+
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
-
-        if (!this.skipFormLoad) {
-            AsyncStorage.getItem('freeFormState').then((value) => {
-                if (value !== undefined) {
-                    if (common.compare(this.state, JSON.parse(value))) {
-                        this.setState(JSON.parse(value));
-                    }
-                }
-            }).done();
-        }
-	}
-
-   	componentWillUnmount() {
-   		RNShake.removeEventListener('ShakeEvent');
-   	}
-
-    _roll() {
-        this.props.navigation.navigate('Result', dieRoller.freeFormRoll(this.state.dice, this.state.halfDice, this.state.pips));
     }
 
-	_setSliderState(key, value) {
-		let newState = {...this.state};
-		newState[key] = parseInt(value, 10);
-		
-		AsyncStorage.setItem('freeFormState', JSON.stringify(newState));
-		
-        this.setState(newState);
-	}
-	
-	render() {
-		return (
-			<Container style={styles.container}>
-				<Header navigation={this.props.navigation} />
-				<Content style={styles.content}>
-				    <Text style={styles.heading}>Free Form Roll</Text>
-					<Slider 
-						label='Dice:'
-						value={this.state.dice} 
-						step={1} 
-						min={0} 
-						max={50}
-						onValueChange={this.setSliderState}
-						valueKey='dice' />
-					<Slider 
-						label='Half Dice:'
-						value={this.state.halfDice} 
-						step={1} 
-						min={0} 
-						max={50}
-						onValueChange={this.setSliderState}
-						valueKey='halfDice' />
-					<Slider 
-						label='Pips:'
-						value={this.state.pips} 
-						step={1} 
-						min={0} 
-						max={100}
-						onValueChange={this.setSliderState}
-						valueKey='pips' />
-					<Button block style={styles.button} onPress={this.roll}>
-						<Text uppercase={false}>Roll</Text>
-					</Button>
-				</Content>
-			</Container>
-		);
-	}
+    onDidBlur() {
+        RNShake.removeEventListener('ShakeEvent');
+        this.backHandler.remove();
+    }
+
+    _roll() {
+        this.props.navigation.navigate('Result', {from: 'FreeForm', result: dieRoller.freeFormRoll(this.props.freeFormForm.dice, this.props.freeFormForm.halfDice, this.props.freeFormForm.pips)});
+    }
+
+    _setSliderState(key, value) {
+        this.props.updateFormValue('freeForm', key, parseInt(value, 10));
+    }
+
+    render() {
+        return (
+            <Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
+                <Header navigation={this.props.navigation} />
+                <Content style={styles.content}>
+                    <Text style={styles.heading}>Free Form Roll</Text>
+                    <Slider
+                        label="Dice:"
+                        value={this.props.freeFormForm.dice}
+                        step={1}
+                        min={0}
+                        max={50}
+                        onValueChange={this.setSliderState}
+                        valueKey="dice" />
+                    <Slider
+                        label="Half Dice:"
+                        value={this.props.freeFormForm.halfDice}
+                        step={1}
+                        min={0}
+                        max={50}
+                        onValueChange={this.setSliderState}
+                        valueKey="halfDice" />
+                    <Slider
+                        label="Pips:"
+                        value={this.props.freeFormForm.pips}
+                        step={1}
+                        min={-50}
+                        max={50}
+                        onValueChange={this.setSliderState}
+                        valueKey="pips" />
+                    <Button block style={styles.button}  onPress={this.roll}>
+                        <Text uppercase={false}>Roll</Text>
+                    </Button>
+                </Content>
+            </Container>
+        );
+    }
 }
+
+const mapStateToProps = state => {
+    return {
+        freeFormForm: state.forms.freeForm,
+    };
+};
+
+const mapDispatchToProps = {
+    updateFormValue,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FreeFormScreen);

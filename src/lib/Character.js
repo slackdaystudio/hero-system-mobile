@@ -1,18 +1,36 @@
 import { Platform, Alert } from 'react-native';
 import { Toast } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 import { common } from './Common';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from './DieRoller';
 import { file } from './File';
+import { store } from '../../App';
+
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 class Character {
     constructor() {
         this.activeCostRegex = /\([0-9]+\sActive\sPoints\)/;
     }
 
-    load(startLoad, endLoad) {
-        file.loadCharacter(startLoad, endLoad);
+    async load(startLoad, endLoad) {
+        return file.loadCharacter(startLoad, endLoad);
+    }
+
+    isHeroDesignerCharacter(character) {
+        return character.hasOwnProperty('version');
     }
 
     isFifthEdition(characteristics) {
@@ -54,17 +72,17 @@ class Character {
         return [
             {
                 label: 'Physical Defense',
-                value: this._getDefense(pd[0])
+                value: this._getDefense(pd[0]),
             }, {
                 label: 'R. Physical Defense',
-                value: this._getDefense((pd.length === 4 ? pd[2].slice(1) : 0))
+                value: this._getDefense((pd.length === 4 ? pd[2].slice(1) : 0)),
             }, {
                 label: 'Energy Defense',
-                value: this._getDefense(ed[0])
+                value: this._getDefense(ed[0]),
             }, {
                 label: 'R. Energy Defense',
-                value: this._getDefense((ed.length === 4 ? ed[2].slice(1) : 0))
-            }
+                value: this._getDefense((ed.length === 4 ? ed[2].slice(1) : 0)),
+            },
         ];
     }
 
@@ -120,7 +138,7 @@ class Character {
     }
 
     getPresenceAttackDamage(presenceDamage) {
-        let damage = common.initFreeFormForm();
+        let damage = {};
         let damageDice = this._getDamageDice(presenceDamage);
 
         damage.dice = damageDice.dice;
@@ -130,7 +148,7 @@ class Character {
     }
 
     getDamage(text, strengthDamage) {
-        let damage = common.initDamageForm();
+        let damage = {};
 
         // Base strength damage
         if (text === null && strengthDamage !== '') {
@@ -173,7 +191,7 @@ class Character {
         let match = text.match(/(Killing\sAttack\s\-\sHand\-To\-Hand|HKA)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?(\sw\/STR)?\)/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageDice = this._getDamageDice(match[0].slice(match[0].indexOf('(') + 1, match[0].lastIndexOf(' w/STR)')));
 
             damage.dice = damageDice.dice;
@@ -191,7 +209,7 @@ class Character {
         let match = text.match(/(Killing\sAttack\s\-\sRanged|RKA)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageParts = match[0].split(' ');
             let damageDice = this._getDamageDice(damageParts[(damageParts.length - 1)]);
 
@@ -210,7 +228,7 @@ class Character {
         let match = text.match(/(Energy\sBlast|EB|Blast)\s.*([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageParts = match[0].split(' ');
             let damageDice = this._getDamageDice(damageParts[(damageParts.length - 1)]);
 
@@ -229,7 +247,7 @@ class Character {
         let match = text.match(/(Hand\-To\-Hand\sAttack|HA)\s\+([0-9]+\s1\/)?[0-9]+d6(\+1)?/);
 
         if (match !== null) {
-            let damage = common.initDamageForm();
+            let damage = {};
             let damageParts = match[0].slice(match[0].indexOf('+') + 1);
             let damageDice = this._getDamageDice(damageParts);
 
@@ -245,7 +263,7 @@ class Character {
     _getDamageDice(rawDieCode) {
         let damageDice = {
             dice: 0,
-            partialDie: 0
+            partialDie: 0,
         };
 
         let rawDieCodeParts = rawDieCode.split(' ');

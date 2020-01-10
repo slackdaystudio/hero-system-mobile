@@ -1,12 +1,33 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { Text, List, ListItem, Left, Right } from 'native-base';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 export default class Powers extends Component {
-	constructor(props) {
-		super(props);
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        strengthDamage: PropTypes.string.isRequired,
+        updateForm: PropTypes.func.isRequired,
+    }
+
+    constructor(props) {
+        super(props);
 
         let items = props.powers.split('|').slice(0, -1);
         let showFullTexts = [];
@@ -19,11 +40,11 @@ export default class Powers extends Component {
 
         this.state = {
             showFullTexts: showFullTexts,
-            items: items
+            items: items,
         };
 
         this.renderPower = this._renderPower.bind(this);
-	}
+    }
 
     _toggleFullText(index) {
         let showFullTexts = this.state.showFullTexts;
@@ -42,13 +63,15 @@ export default class Powers extends Component {
 
         return [
             '    ' + text.slice(0, end + 1),
-            text.substring(end + 3)
+            text.substring(end + 3),
         ];
     }
 
     _rollDamage(index) {
         if (character.isAttackPower(this.state.items[index])) {
-            this.props.navigation.navigate('Damage', character.getDamage(this.state.items[index], this.props.strengthDamage));
+            this.props.updateForm('damage', character.getDamage(this.state.items[index], this.props.strengthDamage));
+
+            this.props.navigation.navigate('Damage', {from: 'ViewCharacter'});
         }
     }
 
@@ -61,7 +84,7 @@ export default class Powers extends Component {
         let costEndPosition = lineItem[1].indexOf(')');
 
         return (
-            <ListItem key={'power-' + index} underlayColor='#3da0ff' onPress={() => this._toggleFullText(index)} onLongPress={() => this._rollDamage(index)}>
+            <ListItem key={'power-' + index} underlayColor="#3da0ff" onPress={() => this._toggleFullText(index)} onLongPress={() => this._rollDamage(index)}>
                 <Left>
                     <Text style={styles.grey}>{lineItem[0] + ' ' + lineItem[1].substring(costEndPosition + 1)}</Text>
                 </Left>
@@ -79,7 +102,7 @@ export default class Powers extends Component {
 
         return (
             <List>
-                <ListItem itemDivider style={{backgroundColor: '#375476'}}>
+                <ListItem itemDivider style={{backgroundColor: '#1b1d1f'}}>
                     <Left>
                         <Text style={styles.boldGrey}>Power</Text>
                     </Left>

@@ -1,87 +1,83 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { BackHandler, Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import RNShake from 'react-native-shake';
+import { NavigationEvents } from 'react-navigation';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import hitLocations from '../../../public/hitLocations.json';
+import { updateFormValue } from '../../reducers/forms';
 
-export default class HitScreen extends Component {
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			ocv: 0,
-			numberOfRolls: 1,
-			isAutofire: false,
-			targetDcv: 0,
-			selectedLocation: -1,
-			tabsLocked: false
-		}
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-		this.updateCv = this._updateCv.bind(this);
-		this.updateNumberOfRolls = this._updateNumberOfRolls.bind(this);
-		this.toggleAutofire = this._toggleAutofire.bind(this);
-		this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
-		this.roll = this._roll.bind(this);
-		this.setLocation = this._setLocation.bind(this);
-	}
+class HitScreen extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        hitForm: PropTypes.object.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+    }
 
-	componentDidMount() {
-	    AsyncStorage.getItem('ocvSliderValue').then((ocvSliderValue) => {
-	        if (ocvSliderValue !== undefined) {
-	            if (common.compare(this.state, JSON.parse(ocvSliderValue))) {
-	                this.setState(JSON.parse(ocvSliderValue));
-	            }
-	        }
-	    }).done();
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            tabsLocked: false,
+        };
+
+        this.updateFormValue = this._updateFormValue.bind(this);
+        this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
+        this.roll = this._roll.bind(this);
+        this.setLocation = this._setLocation.bind(this);
+    }
+
+    onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            this.props.navigation.navigate('Home');
+
+            return true;
+        });
 
         RNShake.addEventListener('ShakeEvent', () => {
             this.roll();
         });
-	}
+    }
 
-   	componentWillUnmount() {
-   		RNShake.removeEventListener('ShakeEvent');
-   	}
+    onDidBlur() {
+        RNShake.removeEventListener('ShakeEvent');
+        this.backHandler.remove();
+    }
 
     _roll() {
-        this.props.navigation.navigate('Result', dieRoller.rollToHit(this.state.ocv, this.state.numberOfRolls, this.state.isAutofire, this.state.targetDcv));
+        this.props.navigation.navigate('Result', {from: 'Hit', result: dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv)});
     }
 
-	_updateCv(key, value) {
-		let newState = {...this.state};
-		newState[key] = parseInt(value, 10);
+    _updateFormValue(key, value) {
+        if (key === 'numberOfRolls') {
+            value = parseInt(value, 10);
+        }
 
-		AsyncStorage.setItem('ocvSliderValue', JSON.stringify(newState));
-
-        this.setState(newState);
-	}
-
-    _updateNumberOfRolls(key, value) {
-		let newState = {...this.state};
-		newState[key] = parseInt(value, 10);
-
-		AsyncStorage.setItem('ocvSliderValue', JSON.stringify(newState));
-
-        this.setState(newState);
+        this.props.updateFormValue('hit', key, value);
     }
-
-	_toggleAutofire() {
-		let newState = {...this.state};
-		newState.isAutofire = !this.state.isAutofire;
-
-		AsyncStorage.setItem('ocvSliderValue', JSON.stringify(newState));
-
-        this.setState(newState);
-	}
 
     _setLocation(location) {
-        if (this.state.selectedLocation === location) {
+        if (this.props.hitForm.selectedLocation === location) {
             location = -1;
         }
 
@@ -96,16 +92,16 @@ export default class HitScreen extends Component {
     }
 
     _renderDcvSlider() {
-        if (this.state.isAutofire) {
+        if (this.props.hitForm.isAutofire) {
             return (
                 <Slider
-                    label='Target DCV/DMCV:'
-                    value={this.state.targetDcv}
+                    label="Target DCV/DMCV:"
+                    value={this.props.hitForm.targetDcv}
                     step={1}
                     min={-30}
                     max={30}
-                    onValueChange={this.updateCv}
-                    valueKey='targetDcv'
+                    onValueChange={this.updateFormValue}
+                    valueKey="targetDcv"
                     toggleTabsLocked={this.toggleTabsLocked} />
             );
         }
@@ -114,7 +110,7 @@ export default class HitScreen extends Component {
     }
 
     _renderLocationDetails() {
-        if (this.state.selectedLocation === -1) {
+        if (this.props.hitForm.selectedLocation === -1) {
             return null;
         }
 
@@ -128,51 +124,63 @@ export default class HitScreen extends Component {
                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>BODYx</Text></View>
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: 10}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.state.selectedLocation].stunX}</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.state.selectedLocation].nStun}</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.state.selectedLocation].bodyX}</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].stunX}</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].nStun}</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].bodyX}</Text></View>
                     </View>
                 </View>
             </View>
         );
     }
 
-	render() {
-		return (
-			<Container style={styles.container}>
-			    <Header navigation={this.props.navigation} />
-				<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
+    render() {
+        return (
+            <Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
+                <Header navigation={this.props.navigation} />
+                <Content scrollEnable={false}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <Slider
-                                    label='Total OCV/OMCV:'
-                                    value={this.state.ocv}
+                                    label="Total OCV/OMCV:"
+                                    value={this.props.hitForm.ocv}
                                     step={1}
                                     min={-30}
                                     max={30}
-                                    onValueChange={this.updateCv}
-                                    valueKey='ocv'
+                                    onValueChange={this.updateFormValue}
+                                    valueKey="ocv"
                                     toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <Slider
-                                    label='Rolls:'
-                                    value={this.state.numberOfRolls}
+                                    label="Rolls:"
+                                    value={this.props.hitForm.numberOfRolls}
                                     step={1}
                                     min={1}
                                     max={20}
-                                    onValueChange={this.updateNumberOfRolls}
-                                    valueKey='numberOfRolls'
+                                    onValueChange={this.updateFormValue}
+                                    valueKey="numberOfRolls"
                                     toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                     <Text style={styles.grey}>Is this an autofire attack?</Text>
                                     <View style={{paddingRight: 10}}>
-                                        <Switch value={this.state.isAutofire} onValueChange={() => this.toggleAutofire()} color='#3da0ff'/>
+                                        <Switch
+                                            value={this.props.hitForm.isAutofire}
+                                            onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
+                                            color="#3da0ff"
+                                            minimumTrackTintColor="#14354d"
+                                            maximumTrackTintColor="#14354d"
+                                            thumbTintColor="#14354d"
+                                            onTintColor="#01121E"
+                                        />
                                     </View>
                                 </View>
                                 {this._renderDcvSlider()}
-                                <Button block style={styles.button} onPress={this.roll}>
+                                <Button block style={styles.button}  onPress={this.roll}>
                                     <Text uppercase={false}>Roll</Text>
                                 </Button>
                             </View>
@@ -180,59 +188,59 @@ export default class HitScreen extends Component {
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Range Mods">
                             <View style={[styles.tabContent, {paddingHorizontal: 10}]}>
                                 <View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>0-8</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>0</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>9-16</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-2</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>17-32</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-4</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>33-64</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-6</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>65-128</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-8</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>129-250</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={styles.grey}>-10</Text>
+                                        </View>
+                                    </View>
                                 </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>0-8</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>0</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>9-16</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-2</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>17-32</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-4</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>33-64</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-6</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>65-128</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-8</Text>
-                                    </View>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>129-250</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={styles.grey}>-10</Text>
-                                    </View>
-                                </View>
-                            </View>
                             </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Hit Locations">
@@ -248,11 +256,11 @@ export default class HitScreen extends Component {
                                         let stars = [];
 
                                         for (let i = 0; i < hitLocation.stunX; i++) {
-                                            stars.push(<Icon key={'star-' + index + '-' + i} name='md-star' style={[styles.grey, {fontSize: 14}]} />);
+                                            stars.push(<Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: 14}]} />);
                                         }
 
                                         return (
-                                            <TouchableHighlight key={'hit-location-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}} underlayColor='#3da0ff' onPress={() => this.setLocation(index)}>
+                                            <TouchableHighlight key={'hit-location-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}} underlayColor="#3da0ff" onPress={() => this.setLocation(index)}>
                                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
                                                     <View style={{flex: 1, alignSelf: 'stretch'}}>
                                                         <Text style={styles.grey}>{hitLocation.location}</Text>
@@ -334,20 +342,32 @@ export default class HitScreen extends Component {
                             </View>
                         </Tab>
                     </Tabs>
-				</Content>
-			</Container>
-		);
-	}
+                </Content>
+            </Container>
+        );
+    }
 }
 
 const localStyles = StyleSheet.create({
-	titleContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingTop: 10
-	},
-	checkContainer: {
-		paddingBottom: 20
-	}
+    titleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 10,
+    },
+    checkContainer: {
+        paddingBottom: 20,
+    },
 });
+
+const mapStateToProps = state => {
+    return {
+        hitForm: state.forms.hit,
+    };
+};
+
+const mapDispatchToProps = {
+    updateFormValue,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(HitScreen);

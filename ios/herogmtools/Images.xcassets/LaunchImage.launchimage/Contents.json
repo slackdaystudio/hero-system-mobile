@@ -22,7 +22,7 @@
       "extent" : "full-screen",
       "idiom" : "iphone",
       "subtype" : "736h",
-      "filename" : "iphone8-retina-hd-55.png",
+      "filename" : "iphone5-retina-2.png",
       "minimum-system-version" : "8.0",
       "orientation" : "portrait",
       "scale" : "3x"
@@ -48,7 +48,7 @@
     {
       "orientation" : "portrait",
       "idiom" : "iphone",
-      "filename" : "iphone7-2x.png",
+      "filename" : "iphone5-2x-1.png",
       "extent" : "full-screen",
       "minimum-system-version" : "7.0",
       "scale" : "2x"
@@ -57,7 +57,7 @@
       "extent" : "full-screen",
       "idiom" : "iphone",
       "subtype" : "retina4",
-      "filename" : "iphone7-retina.png",
+      "filename" : "iphone5-retina-1.png",
       "minimum-system-version" : "7.0",
       "orientation" : "portrait",
       "scale" : "2x"

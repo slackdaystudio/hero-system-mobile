@@ -1,32 +1,63 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { StyleSheet, View, Keyboard, Alert } from 'react-native';
 import { Text, Icon, Item, Input } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
-import Slider from 'react-native-slider';
+import { default as RNSlider } from 'react-native-slider';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
-class MySlider extends Component {
-	constructor(props) {
-		super(props);
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+class Slider extends Component {
+    static propTypes = {
+        label: PropTypes.string.isRequired,
+        value: PropTypes.number.isRequired,
+        step: PropTypes.number.isRequired,
+        min: PropTypes.number.isRequired,
+        max: PropTypes.number.isRequired,
+        disabled: PropTypes.bool,
+        valueKey: PropTypes.string,
+        onValueChange: PropTypes.func.isRequired,
+        toggleTabsLocked: PropTypes.func,
+    }
+
+    constructor(props) {
+        super(props);
 
         this.state = {
-            textValue: props.value
-        }
+            textValue: props.value,
+        };
 
         this.onTextValueChange = this._onTextValueChange.bind(this);
-		this.onValueChange = this._onValueChange.bind(this);
+        this.onValueChange = this._onValueChange.bind(this);
         this.keyboardDidHide = this._keyboardDidHide.bind(this);
 
-		this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
-	}
+        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
+    }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props !== nextProps) {
-            if (this.state.textValue !== '' && this.state.textValue !== '-') {
-                this.setState({textValue: nextProps.value});
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState !== nextProps) {
+            if (prevState.textValue !== '' && prevState.textValue !== '-') {
+                let newState = {...prevState};
+                newState.textValue = nextProps.value;
+
+                return newState;
             }
         }
+
+        return null;
     }
 
     _keyboardDidHide () {
@@ -77,33 +108,33 @@ class MySlider extends Component {
         }
     }
 
-	_onValueChange(value) {
+    _onValueChange(value) {
         if (typeof this.props.valueKey === 'string') {
             this.props.onValueChange(this.props.valueKey, value);
         } else {
             this.props.onValueChange(value);
         }
-	}
-	
-	render() {
-		return (
-			<View>
-				<View style={localStyles.titleContainer}>
-					<Text style={styles.grey}>{this.props.label}</Text>
-                    <View style={{width: (this._isFraction() ? 50: 40)}}>
+    }
+
+    render() {
+        return (
+            <View>
+                <View style={localStyles.titleContainer}>
+                    <Text style={styles.grey}>{this.props.label}</Text>
+                    <View style={{width: (this._isFraction() ? 50 : 40)}}>
                         <Item>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={(this._isFraction() ? 5 : 3)}
                                 value={this.state.textValue.toString()}
                                 onChangeText={(value) => this.onTextValueChange(value)}
                             />
                         </Item>
                     </View>
-				</View>
-				<View>
-                    <Slider
+                </View>
+                <View>
+                    <RNSlider
                         value={this.props.value}
                         step={this.props.step}
                         minimumValue={this.props.min}
@@ -114,40 +145,44 @@ class MySlider extends Component {
                         disabled={this.props.disabled}
                         trackStyle={thumbStyles.track}
                         thumbStyle={thumbStyles.thumb}
-                        minimumTrackTintColor='#3da0ff'
+                        minimumTrackTintColor="#14354d"
                     />
-				</View>
-			</View>
-		);
-	}
+                </View>
+            </View>
+        );
+    }
 }
 
-MySlider.defaultProps = {
-    toggleTabsLocked: () => {}
+Slider.defaultProps = {
+    toggleTabsLocked: () => {},
+    disabled: false,
 };
 
 const localStyles = StyleSheet.create({
-	titleContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingTop: 10
-	},
+    titleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 10,
+    },
 });
 
 const thumbStyles = StyleSheet.create({
-	track: {
-		height: 16,
-		borderRadius: 10,
-	},
-	thumb: {
-		width: 30,
-		height: 30,
-		borderRadius: 30 / 2,
-		backgroundColor: 'white',
-		borderColor: '#3da0ff',
-		borderWidth: 2,
-	}
+    track: {
+        height: 16,
+        borderRadius: 10,
+        backgroundColor: '#01121E',
+        borderColor: '#062134',
+        borderWidth: 1,
+    },
+    thumb: {
+        width: 30,
+        height: 30,
+        borderRadius: 30 / 2,
+        backgroundColor: '#14354d',
+        borderColor: '#062134',
+        borderWidth: 2,
+    },
 });
 
-export default MySlider;
+export default Slider;

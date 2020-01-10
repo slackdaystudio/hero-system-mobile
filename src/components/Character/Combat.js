@@ -1,96 +1,102 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, TouchableHighlight } from 'react-native';
+import PropTypes from 'prop-types';
+import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native';
 import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Spinner } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 export default class Combat extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        character: PropTypes.object.isRequired,
+        combatDetails: PropTypes.object.isRequired,
+        setSparseCombatDetails: PropTypes.func.isRequired,
+        updateForm: PropTypes.func.isRequired,
+    }
+
     constructor(props) {
         super(props);
-
-        this.state = {
-            character: props.character,
-            combat: null
-        };
 
         this.updateCombatState = this._updateCombatState.bind(this);
         this.resetCombatState = this._resetCombatState.bind(this);
         this.takeRecovery = this._takeRecovery.bind(this);
     }
 
-    async componentDidMount() {
-        let combat = await AsyncStorage.getItem('combat');
-
-        if (combat === null) {
-            this.setState({
-                combat: {
-                    stun: character.getCharacteristic(this.state.character.characteristics.characteristic, 'stun'),
-                    body: character.getCharacteristic(this.state.character.characteristics.characteristic, 'body'),
-                    endurance: character.getCharacteristic(this.state.character.characteristics.characteristic, 'endurance')
-                }
-            });
-        } else {
-            this.setState({combat: JSON.parse(combat)});
-        }
-    }
-
-	_updateCombatState(key, value) {
+    _updateCombatState(key, value) {
         if (/^(\-)?[0-9]*$/.test(value) === false) {
             return;
         }
 
-		let newState = {...this.state.combat};
-		newState[key] = value;
+        let combatDetails = {};
 
-		AsyncStorage.setItem('combat', JSON.stringify(newState));
+        combatDetails[key] = value;
 
-        this.setState({combat: newState});
-	}
+        this.props.setSparseCombatDetails(combatDetails);
+    }
 
-	_resetCombatState(key) {
-		let newState = {...this.state.combat};
-		newState[key] = character.getCharacteristic(this.state.character.characteristics.characteristic, key);
+    _resetCombatState(key) {
+        let combatDetails = {};
 
-		AsyncStorage.setItem('combat', JSON.stringify(newState));
+        combatDetails[key] = character.getCharacteristic(this.props.character.characteristics.characteristic, key);
 
-        this.setState({combat: newState});
-	}
+        this.props.setSparseCombatDetails(combatDetails);
+    }
 
     _takeRecovery() {
-        let recovery = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'recovery'), 10);
-        let stunMax = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'stun'), 10);
-        let endMax = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'endurance'), 10);
-        let combat = {...this.state.combat};
-        let combatStun = parseInt(combat.stun, 10);
-        let combatEnd = parseInt(combat.endurance, 10);
+        let recovery = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'recovery'), 10);
+        let stunMax = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'stun'), 10);
+        let endMax = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'endurance'), 10);
+        let stun = this.props.combatDetails.stun;
+        let combatStun = parseInt(stun, 10);
+        let endurance = this.props.combatDetails.endurance;
+        let combatEnd = parseInt(endurance, 10);
+        let combatDetails = {};
 
-        if (combat.stun < stunMax) {
-            combat.stun = combatStun + recovery > stunMax ? stunMax : combatStun + recovery;
+        if (stun < stunMax) {
+            stun = combatStun + recovery > stunMax ? stunMax : combatStun + recovery;
         }
 
-        if (combat.endurance < endMax) {
-            combat.endurance = combatEnd + recovery > endMax ? endMax : combatEnd + recovery;
+        if (endurance < endMax) {
+            endurance = combatEnd + recovery > endMax ? endMax : combatEnd + recovery;
         }
 
-        AsyncStorage.setItem('combat', JSON.stringify(combat));
+        combatDetails.stun = stun;
+        combatDetails.endurance = endurance;
 
-        this.setState({combat: combat});
+        this.props.setSparseCombatDetails(combatDetails);
     }
 
     _rollDamage(strengthDamage) {
-        this.props.navigation.navigate('Damage', character.getDamage(null, strengthDamage));
+        this.props.updateForm('damage', character.getDamage(null, strengthDamage));
+
+        this.props.navigation.navigate('Damage', {from: 'ViewCharacter'});
     }
 
     _rollPresenceDamage(presenceDamage) {
-        this.props.navigation.navigate('FreeForm', character.getPresenceAttackDamage(presenceDamage));
+        this.props.updateForm('freeForm', character.getPresenceAttackDamage(presenceDamage));
+
+        this.props.navigation.navigate('FreeForm', {from: 'ViewCharacter'});
     }
 
     _renderDefenses() {
-        let stunThreshold = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'constitution'), 10);
-        let ego = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'ego'), 10);
-        let presence = parseInt(character.getCharacteristic(this.state.character.characteristics.characteristic, 'presence'), 10);
-        let defenses = character.getDefenses(this.state.character);
+        let stunThreshold = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'constitution'), 10);
+        let ego = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'ego'), 10);
+        let presence = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'presence'), 10);
+        let defenses = character.getDefenses(this.props.character);
 
         return (
             <List>
@@ -135,8 +141,8 @@ export default class Combat extends Component {
     }
 
     _renderBaseDamage() {
-        let strengthDamage = character.getStrengthDamage(this.state.character);
-        let presenceDamage = character.getPresenceDamage(this.state.character);
+        let strengthDamage = character.getStrengthDamage(this.props.character);
+        let presenceDamage = character.getPresenceDamage(this.props.character);
 
         return (
             <List>
@@ -161,10 +167,6 @@ export default class Combat extends Component {
     }
 
     render() {
-	    if (this.state.combat === null) {
-	        return <Spinner color='#D0D1D3' />;
-	    }
-
         return (
             <View>
                 <View style={{paddingBottom: 20}} />
@@ -177,15 +179,15 @@ export default class Combat extends Component {
                         <Item>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={3}
-                                value={this.state.combat.stun.toString()}
+                                value={this.props.combatDetails.stun.toString()}
                                 onChangeText={(text) => this.updateCombatState('stun', text)} />
                         </Item>
                     </View>
                     <View>
-                        <Button style={localStyles.button} onPress={() => this.resetCombatState('stun')}>
-                            <Text uppercase={false}>Reset</Text>
+                        <Button style={styles.button} onPress={() => this.resetCombatState('stun')}>
+                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
                         </Button>
                     </View>
                 </View>
@@ -197,15 +199,15 @@ export default class Combat extends Component {
                         <Item>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={3}
-                                value={this.state.combat.body.toString()}
+                                value={this.props.combatDetails.body.toString()}
                                 onChangeText={(text) => this.updateCombatState('body', text)} />
                         </Item>
                     </View>
                     <View>
-                        <Button style={localStyles.button} onPress={() => this.resetCombatState('body')}>
-                            <Text uppercase={false}>Reset</Text>
+                        <Button style={styles.button} onPress={() => this.resetCombatState('body')}>
+                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
                         </Button>
                     </View>
                 </View>
@@ -217,21 +219,21 @@ export default class Combat extends Component {
                         <Item>
                             <Input
                                 style={styles.grey}
-                                keyboardType='numeric'
+                                keyboardType="numeric"
                                 maxLength={3}
-                                value={this.state.combat.endurance.toString()}
+                                value={this.props.combatDetails.endurance.toString()}
                                 onChangeText={(text) => this.updateCombatState('endurance', text)} />
                         </Item>
                     </View>
                     <View>
-                        <Button style={localStyles.button} onPress={() => this.resetCombatState('endurance')}>
-                            <Text uppercase={false}>Reset</Text>
+                        <Button style={styles.button} onPress={() => this.resetCombatState('endurance')}>
+                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
                         </Button>
                     </View>
                 </View>
                 <View style={[styles.buttonContainer, {alignSelf: 'center', paddingTop: 10}]}>
                     <Button style={[styles.button, {minWidth: 160}]} onPress={() => this.takeRecovery()}>
-                        <Text uppercase={false}>Recovery</Text>
+                        <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
                     </Button>
                 </View>
                 <View style={{paddingBottom: 20}} />
@@ -244,10 +246,3 @@ export default class Combat extends Component {
         );
     }
 }
-
-const localStyles = StyleSheet.create({
-    button: {
-        backgroundColor: '#478f79',
-        alignSelf: 'flex-end'
-    }
-});

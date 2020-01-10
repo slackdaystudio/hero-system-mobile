@@ -1,151 +1,150 @@
 {
-    skillsets: [
-        {
-            profession: 'Actor/Actress',
-            skills: [
-                'Acting',
-                'Conversation',
-                'Disguise',
-                'Mimicry',
-                'Persuation',
-                'Seduction',
-                'SL: Interactive Skills +1',
-                'Navigation [Air or Ground]'
-            ],
-            cost: 25          
-        }, {
-            profession: 'Entrepreneur',
-            skills: [
-                'Bribery',
-                'Bureaucratics',
-                'Conversation',
-                'Money: Well Off',
-                'Navigation [Air or Ground]',
-                'Oratory',
-                'Persuation',
-                'Trading'
-            ],
-            cost: 25
-        }, {
-            profession: 'Investigator', 
-            skills: [
-                'CSL: HTH Combat +1 or Ranged Combat +1',
-                'Conversation',
-                'Criminology',
-                'Deduction',
-                'Interrogation',
-                'Navigation [Air or Ground]',
-                'Shadowing',
-                'Streetwise'
-            ],
-            cost: 25
-        }, {
-            profession: 'Physician',
-            skills: [
-                'Deduction',
-                'Forensic Medicine',
-                'FB: Medical License',
-                'Navigation [Air or Ground]',
-                'Paramedic',
-                'PS: Physician',
-                'SS[iNT]: Medicine',
-                'SS[iNT]: Type of Medicine',
-                'SL: Intellect Skills +1'
-            ],
-            cost: 25
-        }, {
-            profession: 'Playboy/Socialite',
-            skills: [
-                'Bribery',
-                'Bureaucratics',
-                'Conversation',
-                'High Society',
-                'Lang:',
-                'Money: Well Off',
-                'Navigation [Air or Ground]',
-                'Seduction'
-            ],
-            cost: 25
-        }, {
-            profession: 'Royalty',
-            skills: [
-                'AK[INT]: Home Country',
-                'Bureaucratics',
-                'FB: Member of the Aristocracy',
-                'High Society',
-                'Lang:',
-                'Oratory',
-                'Navigation [Air or Ground]',
-                'Tactics'
-            ],
-            cost: 25         
-        }, {
-            profession: 'Scientist',
-            skills: [
-                'Computer Programming',
-                'Eidetic Memory',
-                'Inventor',
-                'Lightning Calculator',
-                'Navigation [Air or Ground]',
-                'SS[INT]:',
-                'SS[INT]:',
-                'SS[INT]:',
-                'Scientist'
-            ],
-            cost: 25
-        }, {
-            profession: 'Soldier',
-            skills: [
-                'Bureaucratics',
-                'CSL: HTH Combat +1 or Ranged Combat +1',
-                'Concealment',
-                'Demolitions',
-                'Lang:',
-                'Navigation [Air or Ground]',
-                'Systems Operation',
-                'Tactics'
-            ],
-            cost: 25       
-        }, {
-            profession: 'Spy',
-            skills: [
-                'Acting',
-                'Cramming',
-                'Cryptography',
-                'Conversation',
-                'Lang:',
-                'Lockpicking',
-                'Navigation [Air or Ground]',
-                'Seduction'
-            ],
-            cost: 25    
-        }, {
-            profession: 'Technician',
-            skills: [
-                'Bugging',
-                'Computer Programming',
-                'Electronics',
-                'Mechanics',
-                'Navigation [Air or Ground]',
-                'Security Systems',
-                'SL: Intellect Skills +1',
-                'Systems Operation'
-            ],
-            cost: 25       
-        }, {
-            profession: 'Warrior', 
-            skills: [
-                'CSL: HTH Combat +1 or Ranged combat +1',
-                'Concealment',
-                'Defense Maneuver',
-                'Interrogation',
-                'Lightning Reflexes',
-                'Oratory',
-                'Paramedic',
-                'Navigation [Air or Ground]',
-                'Tracking'
-            ],
-            cost: 28
-        }
+    "skillsets": [{
+        "profession": "Actor/Actress",
+        "skills": [
+            "Acting",
+            "Conversation",
+            "Disguise",
+            "Mimicry",
+            "Persuation",
+            "Seduction",
+            "SL: Interactive Skills +1",
+            "Navigation [Air or Ground]"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Entrepreneur",
+        "skills": [
+            "Bribery",
+            "Bureaucratics",
+            "Conversation",
+            "Money: Well Off",
+            "Navigation [Air or Ground]",
+            "Oratory",
+            "Persuation",
+            "Trading"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Investigator",
+        "skills": [
+            "CSL: HTH Combat +1 or Ranged Combat +1",
+            "Conversation",
+            "Criminology",
+            "Deduction",
+            "Interrogation",
+            "Navigation [Air or Ground]",
+            "Shadowing",
+            "Streetwise"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Physician",
+        "skills": [
+            "Deduction",
+            "Forensic Medicine",
+            "FB: Medical License",
+            "Navigation [Air or Ground]",
+            "Paramedic",
+            "PS: Physician",
+            "SS[iNT]: Medicine",
+            "SS[iNT]: Type of Medicine",
+            "SL: Intellect Skills +1"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Playboy/Socialite",
+        "skills": [
+            "Bribery",
+            "Bureaucratics",
+            "Conversation",
+            "High Society",
+            "Lang:",
+            "Money: Well Off",
+            "Navigation [Air or Ground]",
+            "Seduction"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Royalty",
+        "skills": [
+            "AK[INT]: Home Country",
+            "Bureaucratics",
+            "FB: Member of the Aristocracy",
+            "High Society",
+            "Lang:",
+            "Oratory",
+            "Navigation [Air or Ground]",
+            "Tactics"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Scientist",
+        "skills": [
+            "Computer Programming",
+            "Eidetic Memory",
+            "Inventor",
+            "Lightning Calculator",
+            "Navigation [Air or Ground]",
+            "SS[INT]:",
+            "SS[INT]:",
+            "SS[INT]:",
+            "Scientist"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Soldier",
+        "skills": [
+            "Bureaucratics",
+            "CSL: HTH Combat +1 or Ranged Combat +1",
+            "Concealment",
+            "Demolitions",
+            "Lang:",
+            "Navigation [Air or Ground]",
+            "Systems Operation",
+            "Tactics"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Spy",
+        "skills": [
+            "Acting",
+            "Cramming",
+            "Cryptography",
+            "Conversation",
+            "Lang:",
+            "Lockpicking",
+            "Navigation [Air or Ground]",
+            "Seduction"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Technician",
+        "skills": [
+            "Bugging",
+            "Computer Programming",
+            "Electronics",
+            "Mechanics",
+            "Navigation [Air or Ground]",
+            "Security Systems",
+            "SL: Intellect Skills +1",
+            "Systems Operation"
+        ],
+        "cost": 25
+    }, {
+        "profession": "Warrior",
+        "skills": [
+            "CSL: HTH Combat +1 or Ranged combat +1",
+            "Concealment",
+            "Defense Maneuver",
+            "Interrogation",
+            "Lightning Reflexes",
+            "Oratory",
+            "Paramedic",
+            "Navigation [Air or Ground]",
+            "Tracking"
+        ],
+        "cost": 28
+    }
     ]
 }

@@ -1,13 +1,33 @@
 import React, { Component }  from 'react';
+import PropTypes from 'prop-types';
 import { View, TouchableHighlight } from 'react-native';
 import { Text, Card, CardItem, Left, Right, Body } from 'native-base';
 import { character } from '../../lib/Character';
 import { dieRoller } from '../../lib/DieRoller';
 import styles from '../../Styles';
 
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 export default class Characteristics extends Component {
-	constructor(props) {
-		super(props);
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        characteristics: PropTypes.array.isRequired,
+    }
+
+    constructor(props) {
+        super(props);
 
         let items = props.characteristics;
         let showFullTexts = [];
@@ -20,15 +40,15 @@ export default class Characteristics extends Component {
 
         this.state = {
             showFullTexts: showFullTexts,
-            items: items
+            items: items,
         };
 
-		this.rollCheck = this._rollCheck.bind(this);
-	}
+        this.rollCheck = this._rollCheck.bind(this);
+    }
 
     _rollCheck(threshold) {
         if (threshold !== '') {
-            this.props.navigation.navigate('Result', dieRoller.rollCheck(threshold))
+            this.props.navigation.navigate('Result', {from: 'ViewCharacter', result: dieRoller.rollCheck(threshold)});
         }
     }
 
@@ -53,7 +73,7 @@ export default class Characteristics extends Component {
         if (this.state.showFullTexts[index] && notes !== '') {
             return (
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingBottom: 5}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}></Text></View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey} /></View>
                     <View style={{flex: 3, justifyContent: 'flex-start'}}>
                         <Text style={[styles.grey, {fontStyle: 'italic'}]}>{notes}</Text>
                     </View>
@@ -65,11 +85,11 @@ export default class Characteristics extends Component {
     }
 
     render() {
-	    let ignoredCharacteristics = ['comeliness'];
+        let ignoredCharacteristics = ['comeliness'];
 
-	    if (character.isFifthEdition(this.props.characteristics)) {
-	        ignoredCharacteristics = ['ocv', 'dcv', 'omcv', 'dmcv'];
-	    }
+        if (character.isFifthEdition(this.props.characteristics)) {
+            ignoredCharacteristics = ['ocv', 'dcv', 'omcv', 'dmcv'];
+        }
 
         return (
             <View style={{paddingBottom: 20, paddingHorizontal: 10}}>
@@ -85,7 +105,7 @@ export default class Characteristics extends Component {
                     }
 
                     return (
-                        <TouchableHighlight key={'characteristic-' + index} underlayColor='#3da0ff' onPress={() => this._toggleNotes(index)} onLongPress={() => this.rollCheck(characteristic.roll)}>
+                        <TouchableHighlight key={'characteristic-' + index} underlayColor="#3da0ff" onPress={() => this._toggleNotes(index)} onLongPress={() => this.rollCheck(characteristic.roll)}>
                             <View>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{characteristic.total}</Text></View>

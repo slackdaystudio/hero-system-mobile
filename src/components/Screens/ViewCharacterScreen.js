@@ -1,7 +1,9 @@
 import React, { Component }  from 'react';
-import { Platform, StyleSheet, View, ScrollView } from 'react-native';
-import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner } from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { BackHandler, Platform, StyleSheet, View, ScrollView } from 'react-native';
+import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
+import { NavigationEvents } from 'react-navigation';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
 import Characteristics from '../Character/Characteristics';
@@ -12,36 +14,45 @@ import Equipment from '../Character/Equipment';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
+import { updateForm } from '../../reducers/forms';
+import { setSparseCombatDetails } from '../../reducers/combat';
 
-export default class ViewCharacterScreen extends Component {
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			character: null
-		};
-	}
-	
-	async componentDidMount() {
-		let loadedCharacter = await AsyncStorage.getItem('character');
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-        if (loadedCharacter === null) {
+class ViewCharacterScreen extends Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        character: PropTypes.object.isRequired,
+        combatDetails: PropTypes.object.isRequired,
+        updateForm: PropTypes.func.isRequired,
+        setSparseCombatDetails: PropTypes.func.isRequired,
+    }
+
+    onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.navigate('Home');
 
-            Toast.show({
-                text: 'Please load a character first',
-                position: 'bottom',
-                buttonText: 'OK'
-            });
+            return true;
+        });
+    }
 
-            return;
-        }
-
-        let characterJson = JSON.parse(loadedCharacter).character;
-
-		this.setState({character: characterJson});
-	}
+    onDidBlur() {
+        this.backHandler.remove();
+    }
 
     _renderPowers(powers) {
         if (powers === '' || powers === undefined || powers === null) {
@@ -49,9 +60,9 @@ export default class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Powers'>
+            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
                 <View style={styles.tabContent}>
-                    <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.state.character)} />
+                    <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
                 </View>
             </Tab>
         );
@@ -63,9 +74,9 @@ export default class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading='Equipment'>
+            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Equipment">
                 <View style={styles.tabContent}>
-                    <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.state.character)}/>
+                    <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
                 </View>
             </Tab>
         );
@@ -78,67 +89,82 @@ export default class ViewCharacterScreen extends Component {
 
         return (
             <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
-			    <View style={styles.tabContent}>
-			        <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
-			    </View>
-			</Tab>
+                <View style={styles.tabContent}>
+                    <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
+                </View>
+            </Tab>
         );
     }
 
-	render() {
-	    if (this.state.character === null) {
-	        return (
-                <Container style={styles.container}>
-                    <Header hasTabs={false} navigation={this.props.navigation} />
-                    <Content style={{backgroundColor: '#375476'}}>
-                        <Spinner color='#D0D1D3' />
-                    </Content>
-	            </Container>
-	        );
-	    }
+    render() {
+        // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
+        // guards against a error
+        if (character.isHeroDesignerCharacter(this.props.character)) {
+            return null;
+        }
 
-		return (
-		  <Container style={styles.container}>
-		  	<Header hasTabs={false} navigation={this.props.navigation} />
-		  	<Content scrollEnable={false} style={{backgroundColor: '#375476'}}>
-                <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-			  			<View style={styles.tabContent}>
-                            <General character={this.state.character} />
-			  			</View>
-			  		</Tab>
-                    <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
-			  			<View style={styles.tabContent}>
-                            <Combat navigation={this.props.navigation} character={this.state.character} />
-			  		    </View>
-			  		</Tab>
-			  		<Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-			  		    <View style={styles.tabContent}>
-			  		        <Characteristics characteristics={this.state.character.characteristics.characteristic} navigation={this.props.navigation} />
-			  		        <Movement movement={this.state.character.movement} />
-			  		    </View>
-			  		</Tab>
-                    {this._renderPowers(this.state.character.powers.text)}
-			  		{this._renderEquipment(this.state.character.equipment.text)}
-                    {this._renderTextList(this.state.character.martialArts.text, 'Maneuver', 'Martial Arts')}
-                    {this._renderTextList(this.state.character.skills.text, 'Skill')}
-                    {this._renderTextList(this.state.character.talents.text, 'Talent')}
-                    {this._renderTextList(this.state.character.perks.text, 'Perk')}
-                    {this._renderTextList(this.state.character.disadvantages.text, 'Disadvantage')}
-			  	</Tabs>
-		  	</Content>
-	      </Container>	
-		);
-	}
+        return (
+            <Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
+                <Header hasTabs={false} navigation={this.props.navigation} />
+                <Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
+                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+                            <View style={styles.tabContent}>
+                                <General character={this.props.character} />
+                            </View>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+                            <View style={styles.tabContent}>
+                                <Combat
+                                    navigation={this.props.navigation}
+                                    character={this.props.character}
+                                    combatDetails={this.props.combatDetails}
+                                    updateForm={this.props.updateForm}
+                                    setSparseCombatDetails={this.props.setSparseCombatDetails}
+                                />
+                            </View>
+                        </Tab>
+                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                            <View style={styles.tabContent}>
+                                <Characteristics characteristics={this.props.character.characteristics.characteristic} navigation={this.props.navigation} />
+                                <Movement movement={this.props.character.movement} />
+                            </View>
+                        </Tab>
+                        {this._renderPowers(this.props.character.powers.text)}
+                        {this._renderEquipment(this.props.character.equipment.text)}
+                        {this._renderTextList(this.props.character.martialArts.text, 'Maneuver', 'Martial Arts')}
+                        {this._renderTextList(this.props.character.skills.text, 'Skill')}
+                        {this._renderTextList(this.props.character.talents.text, 'Talent')}
+                        {this._renderTextList(this.props.character.perks.text, 'Perk')}
+                        {this._renderTextList(this.props.character.disadvantages.text, 'Disadvantage')}
+                    </Tabs>
+                </Content>
+            </Container>
+        );
+    }
 }
 
 const localStyles = StyleSheet.create({
-	pointCostsHeader: {
-		alignSelf: 'center',
-		textDecorationLine: 'underline'
-	},
-    button: {
-        backgroundColor: '#478f79',
-        alignSelf: 'flex-end'
-    }
+    pointCostsHeader: {
+        alignSelf: 'center',
+        textDecorationLine: 'underline',
+    },
 });
+
+const mapStateToProps = state => {
+    return {
+        character: state.character.character,
+        combatDetails: state.combat,
+    };
+};
+
+const mapDispatchToProps = {
+    updateForm,
+    setSparseCombatDetails,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ViewCharacterScreen);
