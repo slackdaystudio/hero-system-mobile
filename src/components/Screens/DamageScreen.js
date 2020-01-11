@@ -72,7 +72,7 @@ class DamageScreen extends Component {
     }
 
     _updateFormValue(key, value) {
-        if (key === 'killingToggled' && value) {
+        if (key === 'killingToggled') {
             this.props.updateFormValue('damage', 'killingToggled', value);
             this.props.updateFormValue('damage', 'damageType', value ? KILLING_DAMAGE : NORMAL_DAMAGE);
         } else {
