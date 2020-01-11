@@ -1,14 +1,12 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Alert, Platform, StyleSheet, ScrollView, View, ImageBackground, TouchableHighlight } from 'react-native';
-import { Container, Content, Button, Text, Spinner, Card, CardItem, Body, Icon } from 'native-base';
+import { Alert, View, ImageBackground } from 'react-native';
+import { Container, Content, Button, Spinner, Text } from 'native-base';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
-import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
-import { persistence } from '../../lib/Persistence';
 import styles from '../../Styles';
 import { initializeApplicationSettings } from '../../reducers/settings';
 import { initializeStatistics } from '../../reducers/statistics';
@@ -48,7 +46,6 @@ class HomeScreen extends Component {
         super(props);
 
         this.state = {
-            loaded: false,
             characterLoading: false,
         };
 
@@ -58,15 +55,11 @@ class HomeScreen extends Component {
     }
 
     async componentDidMount() {
-        if (!this.state.loaded) {
-            await this.props.initializeApplicationSettings();
-            await this.props.initializeStatistics();
-            await this.props.initializeCharacter();
-            await this.props.initializeRandomHero();
-            await this.props.initializeCombatDetails();
-
-            this.setState({loaded: true});
-        }
+        await this.props.initializeApplicationSettings();
+        await this.props.initializeStatistics();
+        await this.props.initializeCharacter();
+        await this.props.initializeRandomHero();
+        await this.props.initializeCombatDetails();
     }
 
     _startLoad() {
