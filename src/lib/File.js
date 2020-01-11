@@ -39,11 +39,11 @@ class File {
             if (result.name.toLowerCase().endsWith('.xml')) {
                 character = await this._read(result.uri, startLoad, endLoad);
             } else if (result.name.toLowerCase().endsWith('.hdc')) {
-                let hasWritePermission = await this._askForWritePermission();
-
-                if (hasWritePermission) {
-                    character = await this._read(result.uri, startLoad, endLoad, true);
-                }
+                // let hasWritePermission = await this._askForWritePermission();
+                //
+                // if (hasWritePermission) {
+                character = await this._read(result.uri, startLoad, endLoad, true);
+                // }
             } else {
                 common.toast('Unsupported file type: ' + result.type);
 
