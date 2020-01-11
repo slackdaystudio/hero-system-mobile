@@ -1,5 +1,6 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { BackHandler, StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
@@ -9,6 +10,7 @@ import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import styles from '../../Styles';
+import { addStatistics } from '../../reducers/statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -24,9 +26,10 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default class ResultScreen extends Component {
+class ResultScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
+        addStatisticts: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -63,13 +66,13 @@ export default class ResultScreen extends Component {
         this.props.navigation.state.params = null;
     }
 
-    async _updateStatistics() {
+    _updateStatistics() {
         if (this.state.result.hasOwnProperty('results')) {
             for (let i = 0; i < this.state.result.results.length; i++) {
-                await statistics.add(this.state.result.results[i]);
+                this.props.addStatistics(this.state.result.results[i]);
             }
         } else {
-            await statistics.add(this.state.result);
+            this.props.addStatistics(this.state.result);
         }
     }
 
@@ -291,3 +294,13 @@ const localStyles = StyleSheet.create({
         alignSelf: 'flex-start',
     },
 });
+
+const mapStateToProps = state => {
+    return {}
+};
+
+const mapDispatchToProps = {
+    addStatistics,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ResultScreen);

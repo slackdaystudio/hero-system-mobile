@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import { common } from '../lib/Common';
 import { persistence } from '../lib/Persistence';
+import { statistics as libStatistics } from '../lib/Statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -22,6 +23,8 @@ import { persistence } from '../lib/Persistence';
 
 export const INITIALIZE_STATISTICS = 'INITIALIZE_STATISTICS';
 
+export const ADD_STATISTICS = 'ADD_STATISTICS';
+
 //////////////////////////////
 // ACTIONS                  //
 //////////////////////////////
@@ -31,6 +34,17 @@ export function initializeStatistics() {
         persistence.initializeStatistics().then(stats => {
             dispatch({
                 type: INITIALIZE_STATISTICS,
+                payload: stats,
+            });
+        });
+    };
+}
+
+export function addStatistics(statistics) {
+    return async (dispatch) => {
+        libStatistics.add(statistics).then((stats) => {
+            dispatch({
+                type: ADD_STATISTICS,
                 payload: stats,
             });
         });
@@ -54,12 +68,13 @@ export default function statistics(state = statisticsState, action) {
     let newState = null;
 
     switch (action.type) {
-    case INITIALIZE_STATISTICS:
-        newState = {...state};
-        newState = action.payload;
+        case INITIALIZE_STATISTICS:
+        case ADD_STATISTICS:
+            newState = {...state};
+            newState = action.payload;
 
-        return newState;
-    default:
-        return state;
+            return newState;
+        default:
+            return state;
     }
 }
