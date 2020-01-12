@@ -106,7 +106,7 @@ class SkillScreen extends Component {
                         <View style={{paddingRight: 10}}>
                             <Switch
                                 value={this.props.skillForm.skillCheck}
-                                onValueChange={() => this.updateFormValue('skillCheck', !this.props.skillCheck)}
+                                onValueChange={() => this.updateFormValue('skillCheck', !this.props.skillForm.skillCheck)}
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbTintColor="#14354d"
