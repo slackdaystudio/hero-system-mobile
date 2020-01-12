@@ -26,11 +26,12 @@ This project was bootstrapped with [Create React Native App](https://github.com/
 
 ## Screenshots
 
-Here's a couple of screenshots of tthe current app as of 2020-01-06.
+Here are some screenshots of the current app as of 2020-01-11 (click to enlarge).
 
-|                                               |                                                       |
-| --------------------------------------------- | ----------------------------------------------------- |
-| ![General](https://i.imgur.com/MzOD6iB.png?1) | ![Characteristics](https://i.imgur.com/fyBA4Kj.png?1) |
+|                                                                                                                |                                                                                                                |                                                                                                                |
+| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| <img src="https://i.imgur.com/U0AEJfp.png" data-canonical-src="https://i.imgur.com/U0AEJfp.png" width="100" /> | <img src="https://i.imgur.com/IVFf2fv.png" data-canonical-src="https://i.imgur.com/IVFf2fv.png" width="100" /> | <img src="https://i.imgur.com/E1TEFeA.png" data-canonical-src="https://i.imgur.com/E1TEFeA.png" width="100" /> |
+| <img src="https://i.imgur.com/UMT8pGm.png" data-canonical-src="https://i.imgur.com/UMT8pGm.png" width="100" /> | <img src="https://i.imgur.com/NUGWCYh.png" data-canonical-src="https://i.imgur.com/NUGWCYh.png" width="100" /> | <img src="https://i.imgur.com/12pjazW.png" data-canonical-src="https://i.imgur.com/12pjazW.png" width="100" /> |
 
 
 ## Updating to New Releases
