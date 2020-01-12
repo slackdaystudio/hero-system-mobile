@@ -121,16 +121,16 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
         this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'powers', 'power');
 
-        if (__DEV__) {
-            this._askForWritePermission().then(writePermissionGranted => {
-                if (writePermissionGranted) {
-                    RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-                    RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
-                }
-            }).catch(error => {
-                common.toast(error.message);
-            });
-        }
+        // if (__DEV__) {
+        //     this._askForWritePermission().then(writePermissionGranted => {
+        //         if (writePermissionGranted) {
+        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+        //         }
+        //     }).catch(error => {
+        //         common.toast(error.message);
+        //     });
+        // }
 
         return character;
     }
