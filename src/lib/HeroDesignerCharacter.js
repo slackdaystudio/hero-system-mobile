@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { common } from './Common';
 import { heroDesignerTemplate } from './HeroDesignerTemplate';
@@ -93,7 +93,6 @@ const CHARACTER_TRAITS = {
 
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
-        //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdChar.json', JSON.stringify(heroDesignerCharacter));
         const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
 
         let character = {
@@ -122,8 +121,16 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
         this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'powers', 'power');
 
-        //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-        //        RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+        if (__DEV__) {
+            this._askForWritePermission().then(writePermissionGranted => {
+                if (writePermissionGranted) {
+                    RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
+                    RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+                }
+            }).catch(error => {
+                common.toast(error.message);
+            });
+        }
 
         return character;
     }
@@ -191,14 +198,14 @@ class HeroDesignerCharacter {
             if ((densityIncrease.affectsPrimary && densityIncrease.affectsTotal) ||
                  (!densityIncrease.affectsPrimary && densityIncrease.affectsTotal && showSecondary)) {
                 switch (characteristic.shortName.toUpperCase()) {
-                case 'STR':
-                    value += densityIncrease.levels * 5;
-                    break;
-                case 'PD':
-                case 'ED':
-                    value += densityIncrease.levels;
-                    break;
-                default:
+                    case 'STR':
+                        value += densityIncrease.levels * 5;
+                        break;
+                    case 'PD':
+                    case 'ED':
+                        value += densityIncrease.levels;
+                        break;
+                    default:
                          // Do nothing
                 }
             }
@@ -210,13 +217,13 @@ class HeroDesignerCharacter {
             if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
                  (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
                 switch (characteristic.shortName.toUpperCase()) {
-                case 'PD':
-                    value += resistantDefence.pdlevels;
-                    break;
-                case 'ED':
-                    value += resistantDefence.edlevels;
-                    break;
-                default:
+                    case 'PD':
+                        value += resistantDefence.pdlevels;
+                        break;
+                    case 'ED':
+                        value += resistantDefence.edlevels;
+                        break;
+                    default:
                          // Do nothing
                 }
             }
@@ -663,6 +670,32 @@ class HeroDesignerCharacter {
             modifier: mods,
             adder: adds,
         };
+    }
+
+    async _askForWritePermission() {
+        if (Platform.OS === 'android') {
+            try {
+                let check = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+
+                if (check === PermissionsAndroid.RESULTS.GRANTED) {
+                    return check;
+                }
+
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        'title': 'HERO System Mobile File System Permission',
+                        'message': 'HERO System Mobile needs read/write access to your device to save characters',
+                    }
+                );
+
+                return granted;
+            } catch (error) {
+                common.toast(error.message);
+            }
+        }
+
+        return null;
     }
 }
 

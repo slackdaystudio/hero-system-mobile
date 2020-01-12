@@ -1,4 +1,4 @@
-import { Platform, PermissionsAndroid, Alert } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import DocumentPicker from 'react-native-document-picker';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -39,11 +39,7 @@ class File {
             if (result.name.toLowerCase().endsWith('.xml')) {
                 character = await this._read(result.uri, startLoad, endLoad);
             } else if (result.name.toLowerCase().endsWith('.hdc')) {
-                // let hasWritePermission = await this._askForWritePermission();
-                //
-                // if (hasWritePermission) {
                 character = await this._read(result.uri, startLoad, endLoad, true);
-                // }
             } else {
                 common.toast('Unsupported file type: ' + result.type);
 
@@ -171,32 +167,6 @@ class File {
         }
 
         return value.replace(/\r\n\t\t\t\t/gi, '').replace(/\r\n/gi, '\n');
-    }
-
-    async _askForWritePermission() {
-        if (Platform.OS === 'android') {
-            try {
-                let check = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-
-                if (check === PermissionsAndroid.RESULTS.GRANTED) {
-                    return check;
-                }
-
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                    {
-                        'title': 'HERO System Mobile File System Permission',
-                        'message': 'HERO System Mobile needs read/write access to your device to save characters',
-                    }
-                );
-
-                return granted;
-            } catch (error) {
-                common.toast(error.message);
-            }
-        }
-
-        return null;
     }
 }
 

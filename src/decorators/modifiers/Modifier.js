@@ -45,7 +45,19 @@ export default class Modifier {
                     basecost += templateModifier.lvlcost / templateModifier.lvlval * this.modifier.levels;
                 }
             }
+        }
 
+        if (this.modifier.hasOwnProperty('optionid')) {
+            if (this.modifier.hasOwnProperty('template') && Array.isArray(this.modifier.template.option)) {
+                for (let option of this.modifier.template.option) {
+                    if (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                        basecost = option.basecost;
+                        break;
+                    }
+                }
+            } else {
+                basecost = this.modifier.template.option.basecost;
+            }
         }
 
         let totalModifiers = this._getAdderTotal(basecost, this.modifier.modifier, this.modifier);
@@ -58,6 +70,10 @@ export default class Modifier {
             } else {
                 totalModifiers += this._getAdderTotal(this.modifier.adder.basecost, this.modifier.modifier, this.modifier) || 0;
             }
+        }
+
+        if (this.modifier.hasOwnProperty('template') && this.modifier.template.hasOwnProperty('mincost')) {
+            totalModifiers = totalModifiers < this.modifier.template.mincost ? this.modifier.template.mincost : totalModifiers;
         }
 
         return totalModifiers;
@@ -106,18 +122,18 @@ export default class Modifier {
         formattedCost += Math.trunc(cost) === 0 ? '' : Math.trunc(cost);
 
         switch ((cost % 1).toFixed(2)) {
-        case '0.25':
-        case '-0.25':
-            formattedCost += '¼';
-            break;
-        case '0.50':
-        case '-0.50':
-            formattedCost += '½';
-            break;
-        case '0.75':
-        case '-0.75':
-            formattedCost += '¾';
-            break;
+            case '0.25':
+            case '-0.25':
+                formattedCost += '¼';
+                break;
+            case '0.50':
+            case '-0.50':
+                formattedCost += '½';
+                break;
+            case '0.75':
+            case '-0.75':
+                formattedCost += '¾';
+                break;
         }
 
         if (cost < 0 && !formattedCost.startsWith('-')) {
