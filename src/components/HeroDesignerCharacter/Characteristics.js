@@ -257,7 +257,7 @@ class Characteristics extends Component {
                             if (remainder === 0.0) {
                                 lift += (entry.lift - lift) / divisor * (remainder + 1);
                             } else {
-                                lift += (entry.lift - lift) / divisor * (parseFloat(remainder % 1).toFixed(1) * 10 / 2);
+                                lift += (entry.lift - lift) / divisor * (totalStrength - previousKey);
                             }
 
                             break;
