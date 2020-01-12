@@ -89,15 +89,21 @@ class File {
 
     async _loadXmlExportCharacter(rawXml) {
         let parser = xml2js.Parser({explicitArray: false});
-        let character = await new Promise((resolve, reject) => parser.parseString(rawXml, (error, result) => {
-            if (error) {
-                reject(error);
-            }
+        let character = null;
 
-            resolve(result);
-        }));
+        try {
+            character = await new Promise((resolve, reject) => parser.parseString(rawXml, (error, result) => {
+                if (error) {
+                    reject(error);
+                }
 
-        common.toast('Character successfully loaded');
+                resolve(result);
+            }));
+
+            common.toast('Character successfully loaded');
+        } catch (error) {
+            common.toast(error.message);
+        }
 
         return character.character;
     }
@@ -131,13 +137,21 @@ class File {
         });
         let character = null;
 
-        parser.parseString(rawXml, (error, result) => {
-            character = heroDesignerCharacter.getCharacter(result);
-        });
+        try {
+            character = await new Promise((resolve, reject) => parser.parseString(rawXml, (error, result) => {
+                if (error) {
+                    reject(error);
+                }
 
-        common.toast('Character successfully loaded');
+                resolve(result);
+            }));
 
-        return character;
+            common.toast('Character successfully loaded');
+        } catch (error) {
+            common.toast(error.message);
+        }
+
+        return heroDesignerCharacter.getCharacter(character);
     }
 
     _decode(base64Payload) {
