@@ -72,8 +72,14 @@ export default class Modifier {
             }
         }
 
-        if (this.modifier.hasOwnProperty('template') && this.modifier.template.hasOwnProperty('mincost')) {
-            totalModifiers = totalModifiers < this.modifier.template.mincost ? this.modifier.template.mincost : totalModifiers;
+        let minMaxCosts = this._getMinMaxCosts();
+
+        if (minMaxCosts.hasOwnProperty('min')) {
+            totalModifiers = totalModifiers < minMaxCosts.min ? minMaxCosts.min : totalModifiers;
+        }
+
+        if (minMaxCosts.hasOwnProperty('max')) {
+            totalModifiers = totalModifiers > minMaxCosts.max ? minMaxCosts.max : totalModifiers;
         }
 
         return totalModifiers;
@@ -164,10 +170,49 @@ export default class Modifier {
                     totalAdderCost += this._getAdderTotal(mod.cost, mod, modifier);
                 }
             } else {
-                totalAdderCost *= 2;
+                if (cost < 0) {
+                    let newCost = parseFloat((totalAdderCost / 2).toFixed(2));
+
+                    totalAdderCost = parseFloat((Math.round(newCost * 4) / 4).toFixed(2));
+                } else {
+                    totalAdderCost *= 2;
+                }
             }
         }
 
         return totalAdderCost;
+    }
+
+    _getMinMaxCosts() {
+        let costs = {
+            min: undefined,
+            max: undefined,
+        };
+
+        if (this.modifier === null || this.modifier === undefined) {
+            return costs;
+        }
+
+        if (this.modifier.hasOwnProperty('template')) {
+            if (this.modifier.template.hasOwnProperty('mincost') || this.modifier.template.hasOwnProperty('maxcost')) {
+                costs.min = this.modifier.template.mincost || undefined;
+                costs.max = this.modifier.template.maxcost || undefined;
+            } else if (this.modifier.template.hasOwnProperty('option') && this.modifier.hasOwnProperty('optionid')) {
+                if (Array.isArray(this.modifier.template.option)) {
+                    for (let option of this.modifier.template.option) {
+                        if (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                            costs.min = option.mincost || undefined;
+                            costs.max = option.maxcost || undefined;
+                            break;
+                        }
+                    }
+                } else {
+                    costs.min = this.modifier.template.option.mincost || undefined;
+                    costs.max = this.modifier.template.option.maxcost || undefined;
+                }
+            }
+        }
+
+        return costs;
     }
 }
