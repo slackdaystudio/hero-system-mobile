@@ -2,6 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import { modifierDecorator } from '../modifiers/ModifierDecorator';
 import { KILLING_DAMAGE } from '../../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -17,6 +18,8 @@ import { KILLING_DAMAGE } from '../../lib/DieRoller';
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+const DC_BASE_COST = 5;
 
 export default class HandKillingAttack extends CharacterTrait {
     constructor(characterTrait) {
@@ -76,7 +79,7 @@ export default class HandKillingAttack extends CharacterTrait {
         let remainder = 0;
 
         if (!modifierMap.has('STRMINIMUM')) {
-            damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5);
+            damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / this._getStrengthDcCost());
         }
 
         if (adderMap.has('PLUSONEPIP')) {
@@ -128,5 +131,29 @@ export default class HandKillingAttack extends CharacterTrait {
         }
 
         return dice;
+    }
+
+    _getStrengthDcCost() {
+        return DC_BASE_COST * (1 + this._totalAdvantages(this.characterTrait.trait.modifier));
+    }
+
+    _totalAdvantages(modifiers) {
+        let total = 0;
+
+        if (modifiers === null || modifiers === undefined) {
+            return total;
+        }
+
+        if (Array.isArray(modifiers)) {
+            for (let modifier of modifiers) {
+                total += this._totalAdvantages(modifier);
+            }
+        } else {
+            let decorated = modifierDecorator.decorate(modifiers, this.characterTrait.trait);
+
+            total += decorated.cost() > 0 ? decorated.cost() : 0;
+        }
+
+        return total;
     }
 }
