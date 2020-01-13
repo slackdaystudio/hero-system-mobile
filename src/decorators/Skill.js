@@ -28,9 +28,7 @@ export default class Skill extends CharacterTrait {
             return cost;
         }
 
-        if (this.characterTrait.trait.levelsonly) {
-            cost = this.characterTrait.trait.levels * 2;
-        } else if (this.characterTrait.trait.proficiency) {
+        if (this.characterTrait.trait.proficiency) {
             cost = 2;
         } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman || this.characterTrait.trait.nativeTongue) {
             cost = this.characterTrait.trait.familiarity ? 1 : 0;
