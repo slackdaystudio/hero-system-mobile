@@ -33,7 +33,7 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function _initItemShow(items, subListKey) {
+function initItemShow(items, subListKey) {
     let itemShow = {};
     let itemButtonShow = {};
 
@@ -73,7 +73,7 @@ export default class Traits extends Component {
     constructor(props) {
         super(props);
 
-        const displayOptions = _initItemShow(props.character[props.listKey], props.subListKey);
+        const displayOptions = initItemShow(props.character[props.listKey], props.subListKey);
 
         this.state = {
             itemShow: displayOptions.itemShow,
@@ -87,7 +87,7 @@ export default class Traits extends Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         if (prevState.character !== nextProps.character || prevState.listKey !== nextProps.listKey) {
-            const displayOptions = _initItemShow(nextProps.character[nextProps.listKey], nextProps.subListKey);
+            const displayOptions = initItemShow(nextProps.character[nextProps.listKey], nextProps.subListKey);
             let newState = {...prevState};
 
             newState.itemShow = displayOptions.itemShow;

@@ -28,6 +28,27 @@ import speedTable from '../../../public/speed.json';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function initCharacteristicsShow(characteristics, movement) {
+    let characteristicsShow = {};
+    let characteristicsButtonsShow = {};
+
+    characteristics.map((characteristic, index) => {
+        characteristicsShow[characteristic.shortName] = false;
+        characteristicsButtonsShow[characteristic.shortName] = 'plus-circle';
+    });
+
+    movement.map((move, index) => {
+        characteristicsShow[move.shortName] = false;
+        characteristicsButtonsShow[move.shortName] = 'plus-circle';
+    });
+
+
+    return {
+        characteristicsShow: characteristicsShow,
+        characteristicsButtonsShow: characteristicsButtonsShow,
+    };
+}
+
 class Characteristics extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
@@ -39,36 +60,30 @@ class Characteristics extends Component {
     constructor(props) {
         super(props);
 
-        const displayOptions =  this._initCharacteristicsShow(props.character.characteristics, props.character.movement);
+        const displayOptions = initCharacteristicsShow(props.character.characteristics, props.character.movement);
 
         this.state = {
             characteristicsShow: displayOptions.characteristicsShow,
             characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
+            character: props.character,
         };
 
         this.powersMap = common.toMap(common.flatten(props.character.powers, 'powers'));
     }
 
-    _initCharacteristicsShow(characteristics, movement) {
-        let characteristicsShow = {};
-        let characteristicsButtonsShow = {};
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState.character !== nextProps.character) {
+            const displayOptions = initCharacteristicsShow(nextProps.character.characteristics, nextProps.character.movement);
+            let newState = {...prevState};
 
+            newState.characteristicsShow = displayOptions.characteristicsShow;
+            newState.characteristicsButtonsShow = displayOptions.characteristicsButtonsShow;
+            newState.character = nextProps.character;
 
-        characteristics.map((characteristic, index) => {
-            characteristicsShow[characteristic.shortName] = false;
-            characteristicsButtonsShow[characteristic.shortName] = 'plus-circle';
-        });
+            return newState;
+        }
 
-        movement.map((move, index) => {
-            characteristicsShow[move.shortName] = false;
-            characteristicsButtonsShow[move.shortName] = 'plus-circle';
-        });
-
-
-        return {
-            characteristicsShow: characteristicsShow,
-            characteristicsButtonsShow: characteristicsButtonsShow,
-        };
+        return null;
     }
 
     _toggleDefinitionShow(name) {
