@@ -28,7 +28,9 @@ export default class Skill extends CharacterTrait {
             return cost;
         }
 
-        if (this.characterTrait.trait.proficiency) {
+        if (this.characterTrait.trait.xmlid.toUpperCase() === 'CUSTOMSKILL') {
+            cost = this.characterTrait.trait.basecost + (this.characterTrait.trait.levels * this.characterTrait.trait.template.lvlcost);
+        } else if (this.characterTrait.trait.proficiency) {
             cost = 2;
         } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman || this.characterTrait.trait.nativeTongue) {
             cost = this.characterTrait.trait.familiarity ? 1 : 0;
@@ -39,7 +41,7 @@ export default class Skill extends CharacterTrait {
                     break;
                 }
             }
-        } else {
+        } else if (this.characterTrait.trait.hasOwnProperty('characteristic')) {
             cost = this._getCostByCharacteristic();
         }
 
