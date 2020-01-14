@@ -66,9 +66,8 @@ class Characteristics extends Component {
             characteristicsShow: displayOptions.characteristicsShow,
             characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
             character: props.character,
+            powersMap: common.toMap(common.flatten(props.character.powers, 'powers')),
         };
-
-        this.powersMap = common.toMap(common.flatten(props.character.powers, 'powers'));
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -79,6 +78,7 @@ class Characteristics extends Component {
             newState.characteristicsShow = displayOptions.characteristicsShow;
             newState.characteristicsButtonsShow = displayOptions.characteristicsButtonsShow;
             newState.character = nextProps.character;
+            newState.powersMap = common.toMap(common.flatten(nextProps.character.powers, 'powers'));
 
             return newState;
         }
@@ -97,7 +97,7 @@ class Characteristics extends Component {
     _getSpeed() {
         for (let characteristic of this.props.character.characteristics) {
             if (characteristic.shortName.toLowerCase() === 'spd') {
-                return heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap);
+                return heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap);
             }
         }
 
@@ -107,8 +107,8 @@ class Characteristics extends Component {
     _getMovementTotal(characteristic) {
         let meters = characteristic.value;
 
-        if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
-            let movementMode = this.powersMap.get(characteristic.shortName.toUpperCase());
+        if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
+            let movementMode = this.state.powersMap.get(characteristic.shortName.toUpperCase());
 
             if (movementMode.affectsPrimary && movementMode.affectsTotal) {
                 meters += movementMode.levels;
@@ -132,10 +132,10 @@ class Characteristics extends Component {
             if (characteristic.shortName.toUpperCase() === 'INT') {
                 // TODO: total all sources or PER modifiers
                 note.label = 'PER';
-                note.text = heroDesignerCharacter.getRollTotal(characteristic, this.powersMap);
+                note.text = heroDesignerCharacter.getRollTotal(characteristic, this.state.powersMap);
             } else if (characteristic.shortName.toUpperCase() === 'SPD') {
                 note.label = 'Phases';
-                note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap).toString()].phases.join(', ');
+                note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap).toString()].phases.join(', ');
             }
 
             return (
@@ -193,8 +193,8 @@ class Characteristics extends Component {
             let ncm = 2;
             let power = null;
 
-            if (this.powersMap.has(characteristic.shortName.toUpperCase())) {
-                let movementMode = this.powersMap.get(characteristic.shortName.toUpperCase());
+            if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
+                let movementMode = this.state.powersMap.get(characteristic.shortName.toUpperCase());
 
                 if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
                     (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary)) {
@@ -231,7 +231,7 @@ class Characteristics extends Component {
         if (characteristic.shortName === 'STR') {
             let step = null;
             let lift = '0.0 kg';
-            let totalStrength = heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap);
+            let totalStrength = heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap);
 
             for (let key of Object.keys(strengthTable)) {
                 if (totalStrength === parseInt(key, 10)) {
@@ -336,7 +336,7 @@ class Characteristics extends Component {
             return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} color="#303030" />;
         }
 
-        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic, this.powersMap).toString()} fontSize={22} size={50} color="#303030" />;
+        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap).toString()} fontSize={22} size={50} color="#303030" />;
     }
 
     _renderCharacteristics(characteristics) {
@@ -357,9 +357,9 @@ class Characteristics extends Component {
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                     <TouchableHighlight
                                         underlayColor="#121212"
-                                        onPress={() => this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.powersMap))})}
+                                        onPress={() => this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.state.powersMap))})}
                                     >
-                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.powersMap)}</Text>
+                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.state.powersMap)}</Text>
                                     </TouchableHighlight>
                                     <Icon
                                         type="FontAwesome"
