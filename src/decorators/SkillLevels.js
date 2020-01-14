@@ -50,15 +50,15 @@ export default class SkillLevels extends CharacterTrait {
     }
 
     label() {
-        return this.characterTrait.label();
+        return `+${this.characterTrait.trait.levels} ${this.characterTrait.trait.optionAlias}`;
     }
 
     attributes() {
         let attributes = this.characterTrait.attributes();
 
         attributes.push({
-            label: 'Total Levels',
-            value: this.characterTrait.trait.levels,
+            label: `+${this.characterTrait.trait.levels} ${this.characterTrait.label()}`,
+            value: '',
         });
 
         return attributes;
