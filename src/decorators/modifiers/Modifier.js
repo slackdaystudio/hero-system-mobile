@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
+import { common } from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -52,7 +53,8 @@ export default class Modifier {
                 if (this.modifier.template.hasOwnProperty('option')) {
                     if (Array.isArray(this.modifier.template.option)) {
                         for (let option of this.modifier.template.option) {
-                            if (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                            if ((common.isInt(option.xmlid && option.xmlid === this.modifier.optionid)) ||
+                                (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase())) {
                                 basecost = option.basecost || basecost;
                                 break;
                             }
@@ -61,7 +63,8 @@ export default class Modifier {
                 } else if (this.modifier.template.hasOwnProperty('modifier')) {
                     if (Array.isArray(this.modifier.template.modifier)) {
                         for (let mod of this.modifier.template.modifier) {
-                            if (mod.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                            if ((common.isInt(mod.xmlid && mod.xmlid === this.modifier.optionid)) ||
+                                (mod.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase())) {
                                 basecost = mod.basecost || basecost;
                                 break;
                             }
