@@ -19,9 +19,26 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function initEquipmentShow(equipment) {
+    let items = equipment.split('|').slice(0, -1);
+    let showFullTexts = [];
+
+    if (items.length >= 1) {
+        for (let i = 0; i < items.length; i++) {
+            showFullTexts.push(false);
+        }
+    }
+
+    return {
+        items: items,
+        showFullTexts: showFullTexts,
+    }
+}
+
 export default class Equipment extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
+        equipment: PropTypes.string.isRequired,
         strengthDamage: PropTypes.string.isRequired,
         updateForm: PropTypes.func.isRequired,
     }
@@ -29,21 +46,30 @@ export default class Equipment extends Component {
     constructor(props) {
         super(props);
 
-        let items = props.equipment.split('|').slice(0, -1);
-        let showFullTexts = [];
-
-        if (items.length >= 1) {
-            for (let i = 0; i < items.length; i++) {
-                showFullTexts.push(false);
-            }
-        }
+        const equipmentShow = initEquipmentShow(props.equipment);
 
         this.state = {
-            showFullTexts: showFullTexts,
-            items: items,
+            showFullTexts: equipmentShow.showFullTexts,
+            items: equipmentShow.items,
+            equipment: props.equipment,
         };
 
         this.renderItem = this._renderItem.bind(this);
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState.equipment !== nextProps.equipment) {
+            const equipmentShow = initEquipmentShow(nextProps.equipment);
+            let newState = {...prevState};
+
+            newState.showFullTexts = equipmentShow.showFullTexts;
+            newState.items = equipmentShow.items;
+            newState.equipment = nextProps.equipment;
+
+            return newState;
+        }
+
+        return null;
     }
 
     _toggleFullText(index) {

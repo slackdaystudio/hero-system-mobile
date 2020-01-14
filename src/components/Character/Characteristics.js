@@ -1,9 +1,10 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight } from 'react-native';
+import { Alert, View, TouchableHighlight } from 'react-native';
 import { Text, Card, CardItem, Left, Right, Body } from 'native-base';
 import { character } from '../../lib/Character';
 import { dieRoller } from '../../lib/DieRoller';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -20,6 +21,18 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function initCharacteristicsShow(characteristics) {
+    let showFullTexts = [];
+
+    if (characteristics.length >= 1) {
+        for (let i = 0; i < characteristics.length; i++) {
+            showFullTexts.push(false);
+        }
+    }
+
+    return showFullTexts;
+}
+
 export default class Characteristics extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
@@ -29,21 +42,25 @@ export default class Characteristics extends Component {
     constructor(props) {
         super(props);
 
-        let items = props.characteristics;
-        let showFullTexts = [];
-
-        if (items.length >= 1) {
-            for (let i = 0; i < items.length; i++) {
-                showFullTexts.push(false);
-            }
-        }
-
         this.state = {
-            showFullTexts: showFullTexts,
-            items: items,
+            showFullTexts: initCharacteristicsShow(props.characteristics),
+            items: props.characteristics,
         };
 
         this.rollCheck = this._rollCheck.bind(this);
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (!common.isArrayEqual(prevState.items, nextProps.characteristics)) {
+            let newState = {...prevState};
+
+            newState.showFullTexts = initCharacteristicsShow(nextProps.characteristics);
+            newState.items = nextProps.characteristics;
+
+            return newState;
+        }
+
+        return null;
     }
 
     _rollCheck(threshold) {

@@ -19,6 +19,22 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function initPowersShow(powers) {
+    let items = powers.split('|').slice(0, -1);
+    let showFullTexts = [];
+
+    if (items.length >= 1) {
+        for (let i = 0; i < items.length; i++) {
+            showFullTexts.push(false);
+        }
+    }
+
+    return {
+        showFullTexts: showFullTexts,
+        items: items,
+    }
+}
+
 export default class Powers extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
@@ -29,21 +45,30 @@ export default class Powers extends Component {
     constructor(props) {
         super(props);
 
-        let items = props.powers.split('|').slice(0, -1);
-        let showFullTexts = [];
-
-        if (items.length >= 1) {
-            for (let i = 0; i < items.length; i++) {
-                showFullTexts.push(false);
-            }
-        }
+        const powersShow = initPowersShow(props.powers);
 
         this.state = {
-            showFullTexts: showFullTexts,
-            items: items,
+            showFullTexts: powersShow.showFullTexts,
+            items: powersShow.items,
+            powers: props.powers,
         };
 
         this.renderPower = this._renderPower.bind(this);
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState.powers !== nextProps.powers) {
+            const equipmentShow = initPowersShow(nextProps.powers);
+            let newState = {...prevState};
+
+            newState.showFullTexts = equipmentShow.showFullTexts;
+            newState.items = equipmentShow.items;
+            newState.powers = nextProps.powers;
+
+            return newState;
+        }
+
+        return null;
     }
 
     _toggleFullText(index) {

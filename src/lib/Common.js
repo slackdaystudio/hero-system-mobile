@@ -49,6 +49,24 @@ class Common {
         return true;
     }
 
+    isArrayEqual(first, second) {
+        if (!Array.isArray(first) || !Array.isArray(second)) {
+            return false;
+        }
+
+        if (first.length !== second.length) {
+            return false;
+        }
+
+        for (let i = 0; i < first.length; i++) {
+            if (first[i] !== second[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     isEmptyObject(obj) {
         if (obj === null || obj === undefined) {
             return true;
