@@ -3,6 +3,7 @@ import Barrier from './Barrier';
 import Characteristic from './Characteristic';
 import Clinging from './Clinging';
 import Concealed from './Concealed';
+import CustomPower from './CustomPower';
 import DamageNegation from './DamageNegation';
 import DensityIncrease from './DensityIncrease';
 import Detect from './Detect';
@@ -65,6 +66,8 @@ const BLAST = 'ENERGYBLAST';
 const CLINGING = 'CLINGING';
 
 const CONCEALED = 'CONCEALED';
+
+const CUSTOMPOWER = 'CUSTOMPOWER';
 
 const DAMAGENEGATION = 'DAMAGENEGATION';
 
@@ -161,149 +164,152 @@ const TUNNELING = 'TUNNELING';
 class PowerDecorator {
     decorate(decorated) {
         switch (decorated.trait.xmlid.toUpperCase()) {
-        case ABSORPTION:
-            decorated = new Absorption(decorated);
-            break;
-        case BLAST:
-        case EGOATTACK:
-            decorated = new EffectRoll(decorated, NORMAL_DAMAGE);
-            break;
-        case TRANSFORM:
-        case RKA:
-            decorated = new EffectRoll(decorated, KILLING_DAMAGE);
-            break;
-        case AID:
-        case DISPEL:
-        case DRAIN:
-        case HEALING:
-        case LUCK:
-        case MENTALILLUSIONS:
-        case MINDCONTROL:
-        case MINDSCAN:
-        case TELEPATHY:
-            decorated = new EffectRoll(decorated, FREE_FORM);
-            break;
-        case BARRIER:
-            decorated = new Barrier(decorated);
-            break;
-        case CLINGING:
-            decorated = new Clinging(decorated);
-            break;
-        case CONCEALED:
-            decorated = new Concealed(decorated);
-            decorated = new SenseAffectingPower(decorated);
-            break;
-        case DAMAGENEGATION:
-            decorated = new DamageNegation(decorated);
-            break;
-        case DENSITYINCREASE:
-            decorated = new DensityIncrease(decorated);
-            decorated = new AffectsTotals(decorated);
-            break;
-        case DETECT:
-            decorated = new Detect(decorated);
-            break;
-        case DUPLICATION:
-            decorated = new Duplication(decorated);
-            break;
-        case ENDURANCERESERVE:
-            decorated = new EnduranceReserve(decorated);
-            break;
-        case ENHANCEDPERCEPTION:
-            decorated = new EnhancedPerception(decorated);
-            decorated = new SenseAffectingPower(decorated);
-            break;
-        case ENTANGLE:
-            decorated = new Entangle(decorated);
-            decorated = new EffectRoll(decorated, FREE_FORM);
-            break;
-        case EXTRALIMBS:
-            decorated = new ExtraLimbs(decorated);
-            break;
-        case FLASH:
-            decorated = new EffectRoll(decorated, FREE_FORM);
-            decorated = new Flash(decorated);
-            break;
-        case FTL:
-            decorated = new Ftl(decorated);
-            break;
-        case FLASHDEFENSE:
-        case MENTALDEFENSE:
-        case POWERDEFENSE:
-            decorated = new UnusualDefense(decorated);
-            break;
-        case FLIGHT:
-        case SWINGING:
-        case TELEPORTATION:
-        case TUNNELING:
-            decorated = new Movement(decorated);
-            break;
-        case FORCEFIELD:
-            decorated = new ResistantProtection(decorated);
-            decorated = new AffectsTotals(decorated);
-            break;
-        case HKA:
-            decorated = new HandKillingAttack(decorated);
-            break;
-        case HANDTOHANDATTACK:
-            decorated = new HandToHandAttack(decorated);
-            break;
-        case KBRESISTANCE:
-            decorated = new KnockbackResistance(decorated);
-            break;
-        case LEAPING:
-            decorated = new Leaping(decorated);
-            decorated = new Movement(decorated);
-            decorated = new AffectsTotals(decorated);
-            break;
-        case MICROSCOPIC:
-        case RAPID:
-            decorated = new SenseAffectingPower(decorated);
-            decorated = new MagnifiedSense(decorated);
-            break;
-        case MULTIFORM:
-            decorated = new MultiForm(decorated);
-            break;
-        case POSSESSION:
-            decorated = new Possession(decorated);
-            break;
-        case REFLECTION:
-            decorated = new Reflection(decorated);
-            break;
-        case REGENERATION:
-            decorated = new Regeneration(decorated);
-            break;
-        case RUNNING:
-        case SWIMMING:
-            decorated = new AffectsTotals(decorated);
-            break;
-        case SHRINKING:
-            decorated = new Shrinking(decorated);
-            break;
-        case STRETCHING:
-            decorated = new Stretching(decorated);
-            break;
-        case SUMMON:
-            decorated = new Summon(decorated);
-            break;
-        case TELEKINESIS:
-            decorated = new Telekinesis(decorated);
-            break;
-        case TELESCOPIC:
-            decorated = new Telescopic(decorated);
-            decorated = new SenseAffectingPower(decorated);
-            break;
-        default:
-            if (heroDesignerCharacter.isCharacteristic(decorated.trait)) {
-                decorated = new Characteristic(decorated);
+            case ABSORPTION:
+                decorated = new Absorption(decorated);
+                break;
+            case BLAST:
+            case EGOATTACK:
+                decorated = new EffectRoll(decorated, NORMAL_DAMAGE);
+                break;
+            case TRANSFORM:
+            case RKA:
+                decorated = new EffectRoll(decorated, KILLING_DAMAGE);
+                break;
+            case AID:
+            case DISPEL:
+            case DRAIN:
+            case HEALING:
+            case LUCK:
+            case MENTALILLUSIONS:
+            case MINDCONTROL:
+            case MINDSCAN:
+            case TELEPATHY:
+                decorated = new EffectRoll(decorated, FREE_FORM);
+                break;
+            case BARRIER:
+                decorated = new Barrier(decorated);
+                break;
+            case CLINGING:
+                decorated = new Clinging(decorated);
+                break;
+            case CONCEALED:
+                decorated = new Concealed(decorated);
+                decorated = new SenseAffectingPower(decorated);
+                break;
+            case CUSTOMPOWER:
+                decorated = new CustomPower(decorated);
+                break;
+            case DAMAGENEGATION:
+                decorated = new DamageNegation(decorated);
+                break;
+            case DENSITYINCREASE:
+                decorated = new DensityIncrease(decorated);
                 decorated = new AffectsTotals(decorated);
-            } else if (decorated.trait.originalType === 'talent') {
-                decorated = talentDecorator.decorate(decorated);
-            } else if (decorated.trait.originalType === 'perk') {
-                decorated = perkDecorator.decorate(decorated);
-            } else if (decorated.trait.originalType === 'skill') {
-                decorated = new Skill(decorated);
-            }
+                break;
+            case DETECT:
+                decorated = new Detect(decorated);
+                break;
+            case DUPLICATION:
+                decorated = new Duplication(decorated);
+                break;
+            case ENDURANCERESERVE:
+                decorated = new EnduranceReserve(decorated);
+                break;
+            case ENHANCEDPERCEPTION:
+                decorated = new EnhancedPerception(decorated);
+                decorated = new SenseAffectingPower(decorated);
+                break;
+            case ENTANGLE:
+                decorated = new Entangle(decorated);
+                decorated = new EffectRoll(decorated, FREE_FORM);
+                break;
+            case EXTRALIMBS:
+                decorated = new ExtraLimbs(decorated);
+                break;
+            case FLASH:
+                decorated = new EffectRoll(decorated, FREE_FORM);
+                decorated = new Flash(decorated);
+                break;
+            case FTL:
+                decorated = new Ftl(decorated);
+                break;
+            case FLASHDEFENSE:
+            case MENTALDEFENSE:
+            case POWERDEFENSE:
+                decorated = new UnusualDefense(decorated);
+                break;
+            case FLIGHT:
+            case SWINGING:
+            case TELEPORTATION:
+            case TUNNELING:
+                decorated = new Movement(decorated);
+                break;
+            case FORCEFIELD:
+                decorated = new ResistantProtection(decorated);
+                decorated = new AffectsTotals(decorated);
+                break;
+            case HKA:
+                decorated = new HandKillingAttack(decorated);
+                break;
+            case HANDTOHANDATTACK:
+                decorated = new HandToHandAttack(decorated);
+                break;
+            case KBRESISTANCE:
+                decorated = new KnockbackResistance(decorated);
+                break;
+            case LEAPING:
+                decorated = new Leaping(decorated);
+                decorated = new Movement(decorated);
+                decorated = new AffectsTotals(decorated);
+                break;
+            case MICROSCOPIC:
+            case RAPID:
+                decorated = new SenseAffectingPower(decorated);
+                decorated = new MagnifiedSense(decorated);
+                break;
+            case MULTIFORM:
+                decorated = new MultiForm(decorated);
+                break;
+            case POSSESSION:
+                decorated = new Possession(decorated);
+                break;
+            case REFLECTION:
+                decorated = new Reflection(decorated);
+                break;
+            case REGENERATION:
+                decorated = new Regeneration(decorated);
+                break;
+            case RUNNING:
+            case SWIMMING:
+                decorated = new AffectsTotals(decorated);
+                break;
+            case SHRINKING:
+                decorated = new Shrinking(decorated);
+                break;
+            case STRETCHING:
+                decorated = new Stretching(decorated);
+                break;
+            case SUMMON:
+                decorated = new Summon(decorated);
+                break;
+            case TELEKINESIS:
+                decorated = new Telekinesis(decorated);
+                break;
+            case TELESCOPIC:
+                decorated = new Telescopic(decorated);
+                decorated = new SenseAffectingPower(decorated);
+                break;
+            default:
+                if (heroDesignerCharacter.isCharacteristic(decorated.trait)) {
+                    decorated = new Characteristic(decorated);
+                    decorated = new AffectsTotals(decorated);
+                } else if (decorated.trait.originalType === 'talent') {
+                    decorated = talentDecorator.decorate(decorated);
+                } else if (decorated.trait.originalType === 'perk') {
+                    decorated = perkDecorator.decorate(decorated);
+                } else if (decorated.trait.originalType === 'skill') {
+                    decorated = new Skill(decorated);
+                }
         }
 
         return decorated;
