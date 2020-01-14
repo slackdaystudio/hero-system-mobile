@@ -33,6 +33,33 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function _initItemShow(items, subListKey) {
+    let itemShow = {};
+    let itemButtonShow = {};
+
+    items.map((item, index) => {
+        itemShow[item.id] = false;
+        itemButtonShow[item.id] = 'plus-circle';
+
+        if (item.hasOwnProperty(subListKey)) {
+            if (Array.isArray(item[subListKey])) {
+                for (let s of item[subListKey]) {
+                    itemShow[s.id] = false;
+                    itemButtonShow[s.id] = 'plus-circle';
+                }
+            } else {
+                itemShow[item[subListKey].id] = false;
+                itemButtonShow[item[subListKey].id] = 'plus-circle';
+            }
+        }
+    });
+
+    return {
+        itemShow: itemShow,
+        itemButtonShow: itemButtonShow,
+    };
+}
+
 export default class Traits extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
@@ -46,41 +73,32 @@ export default class Traits extends Component {
     constructor(props) {
         super(props);
 
-        const displayOptions =  this._initItemShow(props.character[props.listKey]);
+        const displayOptions = _initItemShow(props.character[props.listKey], props.subListKey);
 
         this.state = {
             itemShow: displayOptions.itemShow,
             itemButtonShow: displayOptions.itemButtonShow,
-        };
+            character: props.character,
+            listKey: props.listKey,
+        }
 
         this.getCharacter = this._getCharacter.bind(this);
     }
 
-    _initItemShow(items) {
-        let itemShow = {};
-        let itemButtonShow = {};
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState.character !== nextProps.character || prevState.listKey !== nextProps.listKey) {
+            const displayOptions = _initItemShow(nextProps.character[nextProps.listKey], nextProps.subListKey);
+            let newState = {...prevState};
 
-        items.map((item, index) => {
-            itemShow[item.id] = false;
-            itemButtonShow[item.id] = 'plus-circle';
+            newState.itemShow = displayOptions.itemShow;
+            newState.itemButtonShow = displayOptions.itemButtonShow;
+            newState.character = nextProps.character;
+            newState.listKey = nextProps.listKey;
 
-            if (item.hasOwnProperty(this.props.subListKey)) {
-                if (Array.isArray(item[this.props.subListKey])) {
-                    for (let s of item[this.props.subListKey]) {
-                        itemShow[s.id] = false;
-                        itemButtonShow[s.id] = 'plus-circle';
-                    }
-                } else {
-                    itemShow[item[this.props.subListKey].id] = false;
-                    itemButtonShow[item[this.props.subListKey].id] = 'plus-circle';
-                }
-            }
-        });
+            return newState;
+        }
 
-        return {
-            itemShow: itemShow,
-            itemButtonShow: itemButtonShow,
-        };
+        return null;
     }
 
     _getCharacter() {
@@ -124,16 +142,16 @@ export default class Traits extends Component {
             let pips = 0;
 
             switch (dice.partial) {
-            case PARTIAL_DIE_HALF:
-                halfDice = 1;
-                break;
-            case PARTIAL_DIE_PLUS_ONE:
-                pips = 1;
-                break;
-            case PARTIAL_DIE_MINUS_ONE:
-                pips - 1;
-                break;
-            default:
+                case PARTIAL_DIE_HALF:
+                    halfDice = 1;
+                    break;
+                case PARTIAL_DIE_PLUS_ONE:
+                    pips = 1;
+                    break;
+                case PARTIAL_DIE_MINUS_ONE:
+                    pips - 1;
+                    break;
+                default:
                     // do nothing
             }
 
