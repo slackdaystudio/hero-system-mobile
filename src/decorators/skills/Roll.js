@@ -64,7 +64,11 @@ export default class Roll extends CharacterTrait {
     roll() {
         let roll = null;
 
-        if (this.characterTrait.trait.proficiency) {
+        if (this.characterTrait.trait.xmlid.toUpperCase() === 'CUSTOMSKILL') {
+            if (this.characterTrait.trait.roll > 0) {
+                roll = this.characterTrait.trait.roll;
+            }
+        } else if (this.characterTrait.trait.proficiency) {
             roll = SKILL_PROFICIENCY_BASE;
         } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman) {
             roll = SKILL_FAMILIARITY_BASE;
