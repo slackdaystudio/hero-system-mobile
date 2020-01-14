@@ -28,7 +28,9 @@ export default class Skill extends CharacterTrait {
             return cost;
         }
 
-        if (this.characterTrait.trait.xmlid.toUpperCase() === 'CUSTOMSKILL') {
+        if (this.characterTrait.trait.xmlid.toUpperCase() === 'CRAMMING') {
+            cost = this.characterTrait.trait.basecost;
+        } else if (this.characterTrait.trait.xmlid.toUpperCase() === 'CUSTOMSKILL') {
             cost = this.characterTrait.trait.basecost + (this.characterTrait.trait.levels * this.characterTrait.trait.template.lvlcost);
         } else if (this.characterTrait.trait.proficiency) {
             cost = 2;
