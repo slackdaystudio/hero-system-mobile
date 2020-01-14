@@ -48,15 +48,26 @@ export default class Modifier {
         }
 
         if (this.modifier.hasOwnProperty('optionid')) {
-            if (this.modifier.hasOwnProperty('template') && Array.isArray(this.modifier.template.option)) {
-                for (let option of this.modifier.template.option) {
-                    if (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
-                        basecost = option.basecost;
-                        break;
+            if (this.modifier.hasOwnProperty('template')) {
+                if (this.modifier.template.hasOwnProperty('option')) {
+                    if (Array.isArray(this.modifier.template.option)) {
+                        for (let option of this.modifier.template.option) {
+                            if (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                                basecost = option.basecost || basecost;
+                                break;
+                            }
+                        }
+                    }
+                } else if (this.modifier.template.hasOwnProperty('modifier')) {
+                    if (Array.isArray(this.modifier.template.modifier)) {
+                        for (let mod of this.modifier.template.modifier) {
+                            if (mod.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                                basecost = mod.basecost || basecost;
+                                break;
+                            }
+                        }
                     }
                 }
-            } else {
-                basecost = this.modifier.template.option.basecost;
             }
         }
 
