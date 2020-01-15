@@ -51,25 +51,9 @@ export default class Modifier {
         if (this.modifier.hasOwnProperty('optionid')) {
             if (this.modifier.hasOwnProperty('template')) {
                 if (this.modifier.template.hasOwnProperty('option')) {
-                    if (Array.isArray(this.modifier.template.option)) {
-                        for (let option of this.modifier.template.option) {
-                            if ((common.isInt(option.xmlid && option.xmlid === this.modifier.optionid)) ||
-                                (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase())) {
-                                basecost = option.basecost || basecost;
-                                break;
-                            }
-                        }
-                    }
+                    basecost = this._getCostByOptionOrModifier(basecost, this.modifier.template.option);
                 } else if (this.modifier.template.hasOwnProperty('modifier')) {
-                    if (Array.isArray(this.modifier.template.modifier)) {
-                        for (let mod of this.modifier.template.modifier) {
-                            if ((common.isInt(mod.xmlid && mod.xmlid === this.modifier.optionid)) ||
-                                (mod.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase())) {
-                                basecost = mod.basecost || basecost;
-                                break;
-                            }
-                        }
-                    }
+                    basecost = this._getCostByOptionOrModifier(basecost, this.modifier.template.modifier);
                 }
             }
         }
@@ -228,5 +212,25 @@ export default class Modifier {
         }
 
         return costs;
+    }
+
+    _getCostByOptionOrModifier(basecost, optionOrModifier) {
+        if (Array.isArray(optionOrModifier)) {
+            for (let item of optionOrModifier) {
+                if (common.isInt(item.xmlid)) {
+                    if (item.xmlid === this.modifier.optionid) {
+                        basecost = item.basecost || basecost;
+                        break;
+                    }
+                } else if (item.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                    basecost = item.basecost || basecost;
+                    break;
+                }
+            }
+        } else {
+            basecost = optionOrModifier.basecost || basecost;
+        }
+
+        return basecost;
     }
 }
