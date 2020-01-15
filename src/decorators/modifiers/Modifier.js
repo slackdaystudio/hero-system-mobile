@@ -121,6 +121,10 @@ export default class Modifier {
     }
 
     _formatCost(cost) {
+        if (cost === 0) {
+            return '+0';
+        }
+
         let formattedCost = cost < 0 ? '' : '+';
 
         formattedCost += Math.trunc(cost) === 0 ? '' : Math.trunc(cost);
