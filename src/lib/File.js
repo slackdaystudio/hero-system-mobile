@@ -29,7 +29,10 @@ class File {
 
         try {
             const result = await DocumentPicker.pick({
-                type: [DocumentPicker.types.allFiles],
+                type: [
+                    DocumentPicker.types.allFiles,
+                    'public.item',
+                ],
             });
 
             if (result === null) {
