@@ -210,7 +210,7 @@ export default class Combat extends Component {
         if (this.props.character.skills.length > 0) {
             let skillMap = common.toMap(common.flatten(this.props.character.skills, 'skills'));
 
-            if (skillMap.has('COMBAT_LEVELS')) {
+            if (skillMap.has('COMBAT_LEVELS') || skillMap.has('SKILL_LEVELS')) {
                 return (
                     <View style={{flex: 1, width: 300, alignSelf: 'center', paddingTop: 10}}>
                         {Array.from(skillMap.values()).map((skill, index) => {
@@ -231,8 +231,14 @@ export default class Combat extends Component {
     }
 
     _renderCombatSkillLevel(skill) {
-        if (skill.xmlid.toUpperCase() !== 'COMBAT_LEVELS') {
+        if (skill.xmlid.toUpperCase() !== 'COMBAT_LEVELS' && skill.xmlid.toUpperCase() !== 'SKILL_LEVELS') {
             return null;
+        }
+
+        if (skill.xmlid.toUpperCase() === 'SKILL_LEVELS') {
+            if (skill.optionid.toUpperCase() !== 'OVERALL') {
+                return null;
+            }
         }
 
         let decorated = characterTraitDecorator.decorate(skill, 'skills', () => this.props.character);
