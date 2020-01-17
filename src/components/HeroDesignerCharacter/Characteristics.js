@@ -108,8 +108,18 @@ class Characteristics extends Component {
         let meters = characteristic.value;
 
         if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
-            let movementMode = this.state.powersMap.get(characteristic.shortName.toUpperCase());
+            meters = this._getTotalMeters(this.state.powersMap.get(characteristic.shortName.toUpperCase()), meters);
+        }
 
+        return meters;
+    }
+
+    _getTotalMeters(movementMode, meters) {
+        if (Array.isArray(movementMode)) {
+            for (let move of movementMode) {
+                meters += this._getTotalMeters(move, meters);
+            }
+        } else {
             if (movementMode.affectsPrimary && movementMode.affectsTotal) {
                 meters += movementMode.levels;
             } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary) {
@@ -117,7 +127,7 @@ class Characteristics extends Component {
             }
         }
 
-        return meters;
+        return meters
     }
 
     _renderNotes(characteristic) {
@@ -194,16 +204,7 @@ class Characteristics extends Component {
             let power = null;
 
             if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
-                let movementMode = this.state.powersMap.get(characteristic.shortName.toUpperCase());
-
-                if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
-                    (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary)) {
-                    let adderMap = common.toMap(movementMode.adder);
-
-                    if (adderMap.has('IMPROVEDNONCOMBAT')) {
-                        ncm **= adderMap.get('IMPROVEDNONCOMBAT').levels + 1;
-                    }
-                }
+                ncm = this._getTotalNcm(this.state.powersMap.get(characteristic.shortName.toUpperCase()), ncm);
             }
 
             let combatKph = meters * speed * 5 * 60 / 1000;
@@ -225,6 +226,25 @@ class Characteristics extends Component {
         }
 
         return null;
+    }
+
+    _getTotalNcm(movementMode, ncm) {
+        if (Array.isArray(movementMode)) {
+            for (let move of movementMode) {
+                ncm += this._getTotalNcm(move, ncm);
+            }
+        } else {
+            if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
+                (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary)) {
+                let adderMap = common.toMap(movementMode.adder);
+
+                if (adderMap.has('IMPROVEDNONCOMBAT')) {
+                    ncm **= adderMap.get('IMPROVEDNONCOMBAT').levels + 1;
+                }
+            }
+        }
+
+        return ncm;
     }
 
     _renderStrength(characteristic) {

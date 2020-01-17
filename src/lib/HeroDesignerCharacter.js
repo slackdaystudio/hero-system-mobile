@@ -185,16 +185,49 @@ class HeroDesignerCharacter {
         let showSecondary = store.getState().character.showSecondary;
 
         if (powersMap.has(characteristic.shortName.toUpperCase())) {
-            let char = powersMap.get(characteristic.shortName.toUpperCase());
-
-            if ((char.affectsPrimary && char.affectsTotal) || (!char.affectsPrimary && char.affectsTotal && showSecondary)) {
-                value += char.levels;
-            }
+            value = this._getTotalCharacteristicPoints(powersMap.get(characteristic.shortName.toUpperCase()), value, showSecondary);
         }
 
         if (powersMap.has('DENSITYINCREASE')) {
-            let densityIncrease = powersMap.get('DENSITYINCREASE');
+            value = this._getTotalDensityIncreaseCharacteristcs(characteristic, powersMap.get('DENSITYINCREASE'), value, showSecondary)
+        }
 
+        if (powersMap.has('FORCEFIELD')) {
+            value = this._getTotalResistantDefensesIncrease(characteristic, powersMap.get('FORCEFIELD'), value, showSecondary);
+        }
+
+        return value;
+    }
+
+    getRollTotal(characteristic, powersMap) {
+        if (characteristic.roll) {
+            return `${Math.round(this.getCharacteristicTotal(characteristic, powersMap) / 5) + SKILL_ROLL_BASE}-`;
+        }
+
+        return null;
+    }
+
+    _getTotalCharacteristicPoints(characteristic, value, showSecondary) {
+        if (Array.isArray(characteristic)) {
+            for (let char of characteristic) {
+                value += this._getTotalCharacteristicPoints(char, value, showSecondary)
+            }
+        } else {
+            if ((characteristic.affectsPrimary && characteristic.affectsTotal) ||
+                (!characteristic.affectsPrimary && characteristic.affectsTotal && showSecondary)) {
+                value += characteristic.levels;
+            }
+        }
+
+        return value;
+    }
+
+    _getTotalDensityIncreaseCharacteristcs(characteristic, densityIncrease, value, showSecondary) {
+        if (Array.isArray(densityIncrease)) {
+            for (let di of densityIncrease) {
+                value += this._getTotalDensityIncreaseCharacteristcs(characteristic, di, value, showSecondary);
+            }
+        } else {
             if ((densityIncrease.affectsPrimary && densityIncrease.affectsTotal) ||
                  (!densityIncrease.affectsPrimary && densityIncrease.affectsTotal && showSecondary)) {
                 switch (characteristic.shortName.toUpperCase()) {
@@ -211,9 +244,15 @@ class HeroDesignerCharacter {
             }
         }
 
-        if (powersMap.has('FORCEFIELD')) {
-            let resistantDefence = powersMap.get('FORCEFIELD');
+        return value;
+    }
 
+    _getTotalResistantDefensesIncrease(characteristic, resistantDefence, value, showSecondary) {
+        if (Array.isArray(resistantDefence)) {
+            for (let rd of resistantDefence) {
+                value += this._getTotalResistantDefensesIncrease(characteristic, rd, value, showSecondary);
+            }
+        } else {
             if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
                  (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
                 switch (characteristic.shortName.toUpperCase()) {
@@ -230,14 +269,6 @@ class HeroDesignerCharacter {
         }
 
         return value;
-    }
-
-    getRollTotal(characteristic, powersMap) {
-        if (characteristic.roll) {
-            return `${Math.round(this.getCharacteristicTotal(characteristic, powersMap) / 5) + SKILL_ROLL_BASE}-`;
-        }
-
-        return null;
     }
 
     _populateMovementAndCharacteristics(character, characteristics, template) {
