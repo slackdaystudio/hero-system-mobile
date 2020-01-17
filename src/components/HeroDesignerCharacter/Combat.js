@@ -125,7 +125,7 @@ export default class Combat extends Component {
                     <View style={{alignSelf: 'center', width: 75}}>
                         <CalculatorInput
                             itemKey={stateKey}
-                            value={this.props.combatDetails[stateKey]}
+                            value={this.props.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotalByShortName(stateKey, this.props.character)}
                             onAccept={this.updateCombatState}
                             alignment='flex-end'
                         />
@@ -195,7 +195,7 @@ export default class Combat extends Component {
                 </View>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <NumberPicker
-                        value={this.props.combatDetails[stateKey]}
+                        value={this.props.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotalByShortName(stateKey, this.props.character)}
                         increment={this.incrementCv}
                         decrement={this.decrementCv}
                         stateKey={stateKey}
