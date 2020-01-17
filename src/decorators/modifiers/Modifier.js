@@ -202,7 +202,7 @@ export default class Modifier {
             } else if (this.modifier.template.hasOwnProperty('option') && this.modifier.hasOwnProperty('optionid')) {
                 if (Array.isArray(this.modifier.template.option)) {
                     for (let option of this.modifier.template.option) {
-                        if (option.xmlid.toUpperCase() === this.modifier.optionid.toUpperCase()) {
+                        if (option.xmlid === this.modifier.optionid) {
                             costs.min = option.mincost || undefined;
                             costs.max = option.maxcost || undefined;
                             break;
