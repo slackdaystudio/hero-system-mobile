@@ -212,6 +212,7 @@ export default class Traits extends Component {
                 <CardItem style={styles.cardItem}>
                     <Body>
                         {this._renderModifiers('Advantages', item.advantages())}
+                        <View style={{paddingBottom: 10}} />
                         {this._renderModifiers('Limitations', item.limitations())}
                     </Body>
                 </CardItem>
