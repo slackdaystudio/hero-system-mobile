@@ -103,7 +103,7 @@ export default class Maneuver extends CharacterTrait {
     }
 
     roll() {
-        if (this.characterTrait.trait.hasOwnProperty('effect')) {
+        if (this.characterTrait.trait.hasOwnProperty('effect') && this.characterTrait.trait.hasOwnProperty('template')) {
             if (this.characterTrait.trait.template.doesdamage && this.characterTrait.trait.category === 'Hand To Hand' && !this.characterTrait.trait.useweapon) {
                 if (this.characterTrait.trait.effect.indexOf('[KILLINGDC]') > -1) {
                     return {
