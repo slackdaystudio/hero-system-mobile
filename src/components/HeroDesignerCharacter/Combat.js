@@ -142,7 +142,27 @@ export default class Combat extends Component {
 
     _renderPhases() {
         let totalSpeed = heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', this.props.character);
-        let phases = speedTable[totalSpeed.toString()].phases;
+        let phases = speedTable[(totalSpeed > 12 ? '12' : totalSpeed.toString())].phases;
+
+        if (phases.length > 6) {
+            let firstRow = phases.slice(0, 6);
+            let secondRow = phases.slice(6);
+
+            return (
+                <View style={{flex: 1, alignItems: 'center'}}>
+                    <View style={{flex: 1, flexDirection: 'row'}}>
+                        {firstRow.map((phase, index) => {
+                            return <CircleText title={phase} fontSize={20} size={40} color="#303030" />
+                        })}
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row'}}>
+                        {secondRow.map((phase, index) => {
+                            return <CircleText title={phase} fontSize={20} size={40} color="#303030" />
+                        })}
+                    </View>
+                </View>
+            );
+        }
 
         return (
             <Fragment>
