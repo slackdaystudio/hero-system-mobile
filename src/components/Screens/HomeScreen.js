@@ -59,7 +59,7 @@ class HomeScreen extends Component {
         await this.props.initializeStatistics();
         await this.props.initializeCharacter();
         await this.props.initializeRandomHero();
-        await this.props.initializeCombatDetails();
+        await this.props.initializeCombatDetails(this.props.character);
     }
 
     _startLoad() {

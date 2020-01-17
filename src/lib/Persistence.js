@@ -42,7 +42,7 @@ class Persistence {
         return character;
     }
 
-    async initializeCombatDetails() {
+    async initializeCombatDetails(character) {
         let combatDetails = null;
 
         try {
@@ -66,6 +66,10 @@ class Persistence {
                 stun: heroDesignerCharacter.getCharacteristicTotalByShortName('stun', character),
                 body: heroDesignerCharacter.getCharacteristicTotalByShortName('body', character),
                 endurance: heroDesignerCharacter.getCharacteristicTotalByShortName('end', character),
+                ocv: heroDesignerCharacter.getCharacteristicTotalByShortName('ocv', character),
+                dcv: heroDesignerCharacter.getCharacteristicTotalByShortName('dcv', character),
+                omcv: heroDesignerCharacter.getCharacteristicTotalByShortName('omcv', character),
+                dmcv: heroDesignerCharacter.getCharacteristicTotalByShortName('dmcv', character),
             };
         } else {
             combatDetails = {

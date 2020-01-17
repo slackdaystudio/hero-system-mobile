@@ -100,7 +100,14 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
                             <View style={styles.tabContent}>
-                                <Combat character={this.props.character} combatDetails={this.props.combatDetails} setSparseCombatDetails={this.props.setSparseCombatDetails} updateForm={this.props.updateForm}/>
+                                <Combat
+                                    navigation={this.props.navigation}
+                                    character={this.props.character}
+                                    combatDetails={this.props.combatDetails}
+                                    setSparseCombatDetails={this.props.setSparseCombatDetails}
+                                    forms={this.props.forms}
+                                    updateForm={this.props.updateForm}
+                                />
                             </View>
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
@@ -137,6 +144,7 @@ const mapStateToProps = state => {
     return {
         character: state.character.character,
         combatDetails: state.combat,
+        forms: state.forms,
     };
 };
 

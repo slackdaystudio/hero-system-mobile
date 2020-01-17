@@ -31,9 +31,9 @@ export const SET_SPARSE_COMBAT_DETAILS = 'SET_SPARSE_COMBAT_DETAILS';
 // ACTIONS                  //
 //////////////////////////////
 
-export function initializeCombatDetails() {
+export function initializeCombatDetails(character) {
     return async (dispatch) => {
-        persistence.initializeCombatDetails().then(combatDetails => {
+        persistence.initializeCombatDetails(character).then(combatDetails => {
             dispatch({
                 type: INITIALIZE_COMBAT_DETAILS,
                 payload: combatDetails,
@@ -70,14 +70,14 @@ export default function combat(state = combatState, action) {
     let newState = null;
 
     switch (action.type) {
-    case INITIALIZE_COMBAT_DETAILS:
-    case SET_COMBAT_DETAILS:
-    case SET_SPARSE_COMBAT_DETAILS:
-        newState = {...state};
-        newState = action.payload;
+        case INITIALIZE_COMBAT_DETAILS:
+        case SET_COMBAT_DETAILS:
+        case SET_SPARSE_COMBAT_DETAILS:
+            newState = {...state};
+            newState = action.payload;
 
-        return newState;
-    default:
-        return state;
+            return newState;
+        default:
+            return state;
     }
 }

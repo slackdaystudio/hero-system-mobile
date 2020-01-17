@@ -150,71 +150,74 @@ export default function forms(state = formsState, action) {
     let newState = null;
 
     switch (action.type) {
-    case UPDATE_FORM_VALUE:
-        newState = _copyState(state);
-        newState[action.payload.formName][action.payload.key] = action.payload.value;
-
-        return newState;
-    case UPDATE_FORM:
-        let form = null;
-
-        switch (action.payload.type) {
-        case 'damage':
-            form = _initializeDamageForm();
-            break;
-        case 'freeForm':
-            form = _initializeFreeFormForm();
-            break;
-        default:
-                    // Do nothing
-        }
-
-        if (form !== null) {
+        case UPDATE_FORM_VALUE:
             newState = _copyState(state);
-            newState[action.payload.type] = form;
+            newState[action.payload.formName][action.payload.key] = action.payload.value;
 
-            for (let [key, value] of Object.entries(action.payload.json)) {
-                if (newState[action.payload.type].hasOwnProperty(key)) {
-                    newState[action.payload.type][key] = value;
-                }
+            return newState;
+        case UPDATE_FORM:
+            let form = null;
+
+            switch (action.payload.type) {
+                case 'damage':
+                    form = _initializeDamageForm();
+                    break;
+                case 'freeForm':
+                    form = _initializeFreeFormForm();
+                    break;
+                case 'hit':
+                    form = _initializeHitForm();
+                    break;
+                default:
+                        // Do nothing
             }
 
-            return newState;
-        }
+            if (form !== null) {
+                newState = _copyState(state);
+                newState[action.payload.type] = form;
 
-        return state;
-    case RESET_FORM:
-        let reinitializedForm = null;
+                for (let [key, value] of Object.entries(action.payload.json)) {
+                    if (newState[action.payload.type].hasOwnProperty(key)) {
+                        newState[action.payload.type][key] = value;
+                    }
+                }
 
-        switch (action.payload) {
-        case 'skill':
-            reinitializedForm = _initializeSkillForm();
-            break;
-        case 'hit':
-            reinitializedForm = _initializeHitForm();
-            break;
-        case 'damage':
-            reinitializedForm = _initializeDamageForm();
-            break;
-        case 'freeForm':
-            reinitializedForm = _initializeFreeFormForm();
-            break;
-        case 'costCruncher':
-            reinitializedForm = _initializeCostCruncherForm();
-            break;
+                return newState;
+            }
+
+            return state;
+        case RESET_FORM:
+            let reinitializedForm = null;
+
+            switch (action.payload) {
+                case 'skill':
+                    reinitializedForm = _initializeSkillForm();
+                    break;
+                case 'hit':
+                    reinitializedForm = _initializeHitForm();
+                    break;
+                case 'damage':
+                    reinitializedForm = _initializeDamageForm();
+                    break;
+                case 'freeForm':
+                    reinitializedForm = _initializeFreeFormForm();
+                    break;
+                case 'costCruncher':
+                    reinitializedForm = _initializeCostCruncherForm();
+                    break;
+                default:
+                        // Do nothing
+            }
+
+            if (reinitializedForm !== null) {
+                newState = _copyState(state);
+                newState[action.payload] = reinitializedForm;
+
+                return newState;
+            }
+
+            return state;
         default:
-                    // Do nothing
-        }
-
-        if (reinitializedForm !== null) {
-            newState = _copyState(state);
-            newState[action.payload] = reinitializedForm;
-
-            return newState;
-        }
-
-        return state;
-    default:
-        return state;
+            return state;
     }
 }

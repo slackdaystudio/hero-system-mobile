@@ -73,6 +73,13 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
     },
+    buttonSmall: {
+        backgroundColor: '#14354d',
+        minWidth: 75,
+        maxHeight: 28,
+        justifyContent: 'center',
+        alignSelf: 'center',
+    },
     buttonText: {
         color: '#e8e8e8',
     },

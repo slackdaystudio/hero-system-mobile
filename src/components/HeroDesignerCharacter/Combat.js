@@ -1,9 +1,17 @@
-import React, { Component }  from 'react';
+import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native';
-import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Spinner } from 'native-base';
+import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Icon } from 'native-base';
+import Heading from '../Heading/Heading';
+import CircleText from '../CircleText/CircleText';
+import NumberPicker from '../NumberPicker/NumberPicker';
+import CalculatorInput from '../CalculatorInput/CalculatorInput';
+import { common } from '../../lib/Common';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import { dieRoller } from '../../lib/DieRoller';
+import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';
 import styles from '../../Styles';
+import speedTable from '../../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -21,9 +29,11 @@ import styles from '../../Styles';
 
 export default class Combat extends Component {
     static propTypes = {
+        navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
         combatDetails: PropTypes.object.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
+        forms: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
     }
 
@@ -33,6 +43,9 @@ export default class Combat extends Component {
         this.updateCombatState = this._updateCombatState.bind(this);
         this.resetCombatState = this._resetCombatState.bind(this);
         this.takeRecovery = this._takeRecovery.bind(this);
+        this.incrementCv = this._incrementCv.bind(this);
+        this.decrementCv = this._decrementCv.bind(this);
+        this.rollToHit = this._rollToHit.bind(this);
     }
 
     _updateCombatState(key, value) {
@@ -79,77 +92,166 @@ export default class Combat extends Component {
         this.props.setSparseCombatDetails(combatDetails);
     }
 
+    _incrementCv(key, step) {
+        let combatDetails = {};
+        combatDetails[key] = this.props.combatDetails[key] + step;
+
+        this.props.setSparseCombatDetails(combatDetails);
+    }
+
+    _decrementCv(key, step) {
+        let combatDetails = {};
+        combatDetails[key] = this.props.combatDetails[key] - step;
+
+        this.props.setSparseCombatDetails(combatDetails);
+    }
+
+    _rollToHit(stateKey) {
+        let hitForm = {...this.props.forms.hit};
+        hitForm.ocv = this.props.combatDetails[stateKey];
+
+        this.props.updateForm('hit', hitForm);
+
+        this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollToHit(hitForm.ocv, 1, false, 0)});
+    }
+
+    _renderHealthItem(stateKey, label=null) {
+        return (
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                <View style={{flex: 1, alignSelf: 'center'}}>
+                    <Text style={styles.boldGrey}>{label === null ? stateKey.toUpperCase() : label}:</Text>
+                </View>
+                <View style={{flex: 1, alignSelf: 'center'}}>
+                    <View style={{alignSelf: 'center', width: 75}}>
+                        <CalculatorInput
+                            itemKey={stateKey}
+                            value={this.props.combatDetails[stateKey]}
+                            onAccept={this.updateCombatState}
+                            alignment='flex-end'
+                        />
+                    </View>
+                </View>
+                <View style={{flex: 1, alignSelf: 'center'}}>
+                    <Button style={styles.buttonSmall} onPress={() => this.resetCombatState(stateKey)}>
+                        <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                    </Button>
+                </View>
+            </View>
+        );
+    }
+
+    _renderPhases() {
+        let totalSpeed = heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', this.props.character);
+        let phases = speedTable[totalSpeed.toString()].phases;
+
+        return (
+            <Fragment>
+                {phases.map((phase, index) => {
+                    return <CircleText title={phase} fontSize={20} size={40} color="#303030" />
+                })}
+            </Fragment>
+        );
+    }
+
+    _renderCvRollButton(stateKey, renderRollButton) {
+        if (renderRollButton) {
+            return (
+                <View style={{flex: 1, alignSelf: 'center'}}>
+                    <Button style={styles.buttonSmall} onPress={() => this.rollToHit(stateKey)}>
+                        <Text uppercase={false} style={styles.buttonText}>Roll</Text>
+                    </Button>
+                </View>
+            );
+        }
+
+        return <View style={{width: 100}}/>;
+    }
+
+    _renderCv(stateKey, renderRollButton=false) {
+        return (
+            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', justifyContent: 'center'}}>
+                <View style={{flex: 1, alignSelf: 'center'}}>
+                    <Text style={styles.boldGrey}>{stateKey.toUpperCase()}:</Text>
+                </View>
+                <View style={{flex: 1, alignSelf: 'center'}}>
+                    <NumberPicker
+                        value={this.props.combatDetails[stateKey]}
+                        increment={this.incrementCv}
+                        decrement={this.decrementCv}
+                        stateKey={stateKey}
+                    />
+                </View>
+                {this._renderCvRollButton(stateKey, renderRollButton)}
+            </View>
+        )
+    }
+
+    _renderLevels() {
+        if (this.props.character.skills.length > 0) {
+            let skillMap = common.toMap(common.flatten(this.props.character.skills, 'skills'));
+
+            if (skillMap.has('COMBAT_LEVELS')) {
+                return (
+                    <View style={{flex: 1, width: 300, alignSelf: 'center', paddingTop: 10}}>
+                        {Array.from(skillMap.values()).map((skill, index) => {
+                            if (Array.isArray(skill)) {
+                                return skill.map((s, i) => {
+                                    return this._renderCombatSkillLevel(s);
+                                });
+                            } else {
+                                return this._renderCombatSkillLevel(skill);
+                            }
+                        })}
+                    </View>
+                );
+            }
+        }
+
+        return null;
+    }
+
+    _renderCombatSkillLevel(skill) {
+        if (skill.xmlid.toUpperCase() !== 'COMBAT_LEVELS') {
+            return null;
+        }
+
+        let decorated = characterTraitDecorator.decorate(skill, 'skills', () => this.props.character);
+
+        return (
+            <View style={{flex: 1, flexDirection: 'row'}} key={'skill-' + decorated.trait.id}>
+                <View>
+                    <Text style={styles.grey}>{decorated.label()}</Text>
+                </View>
+            </View>
+        );
+    }
+
     render() {
         return (
             <View>
-                <View style={{paddingBottom: 20}} />
-                <Text style={styles.subHeading}>Health</Text>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: 50}}>
-                        <Text style={styles.boldGrey}>Stun:</Text>
-                    </View>
-                    <View style={{width: 40}}>
-                        <Item>
-                            <Input
-                                style={styles.grey}
-                                keyboardType="numeric"
-                                maxLength={3}
-                                value={this.props.combatDetails.stun.toString()}
-                                onChangeText={(text) => this.updateCombatState('stun', text)} />
-                        </Item>
-                    </View>
-                    <View>
-                        <Button style={styles.button} onPress={() => this.resetCombatState('stun')}>
-                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                <Heading text='Health' />
+                <View style={{flex: 1, width: 300, alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                    {this._renderHealthItem('stun')}
+                    {this._renderHealthItem('body')}
+                    {this._renderHealthItem('endurance', 'end')}
+                    <View style={[styles.buttonContainer, {paddingVertical: 10}]}>
+                        <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
+                            <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
                         </Button>
                     </View>
                 </View>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: 50}}>
-                        <Text style={styles.boldGrey}>Body:</Text>
-                    </View>
-                    <View style={{width: 40}}>
-                        <Item>
-                            <Input
-                                style={styles.grey}
-                                keyboardType="numeric"
-                                maxLength={3}
-                                value={this.props.combatDetails.body.toString()}
-                                onChangeText={(text) => this.updateCombatState('body', text)} />
-                        </Item>
-                    </View>
-                    <View>
-                        <Button style={styles.button} onPress={() => this.resetCombatState('body')}>
-                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
-                        </Button>
-                    </View>
+                <Heading text='Phases' />
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: 10}}>
+                    {this._renderPhases()}
                 </View>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: 50}}>
-                        <Text style={styles.boldGrey}>End:</Text>
-                    </View>
-                    <View style={{width: 40}}>
-                        <Item>
-                            <Input
-                                style={styles.grey}
-                                keyboardType="numeric"
-                                maxLength={3}
-                                value={this.props.combatDetails.endurance.toString()}
-                                onChangeText={(text) => this.updateCombatState('endurance', text)} />
-                        </Item>
-                    </View>
-                    <View>
-                        <Button style={styles.button} onPress={() => this.resetCombatState('endurance')}>
-                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
-                        </Button>
-                    </View>
+                <Heading text='Combat Values' />
+                <View style={{flex: 1, width: 300, alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                    {this._renderCv('ocv', true)}
+                    {this._renderCv('dcv')}
+                    {this._renderCv('omcv', true)}
+                    {this._renderCv('dmcv')}
                 </View>
-                <View style={[styles.buttonContainer, {alignSelf: 'center', paddingTop: 10}]}>
-                    <Button style={[styles.button, {minWidth: 160}]} onPress={() => this.takeRecovery()}>
-                        <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
-                    </Button>
-                </View>
-                <View style={{paddingBottom: 20}} />
+                {this._renderLevels()}
             </View>
         );
     }

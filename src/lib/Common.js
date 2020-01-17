@@ -145,7 +145,15 @@ class Common {
         if (Array.isArray(objects)) {
             for (let object of objects) {
                 if (object.hasOwnProperty(mapKey)) {
-                    map.set(object[mapKey], object);
+                    if (map.has(object[mapKey])) {
+                        if (Array.isArray(map.get(object[mapKey]))) {
+                            map.get(object[mapKey]).push(object);
+                        } else {
+                            map.set(object[mapKey], [map.get(object[mapKey]), object]);
+                        }
+                    } else {
+                        map.set(object[mapKey], object);
+                    }
                 }
             }
         } else {
