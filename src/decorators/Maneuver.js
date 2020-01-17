@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
 import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
-import { NORMAL_DAMAGE, KILLING_DAMAGE } from '../lib/DieRoller';
+import { NORMAL_DAMAGE, KILLING_DAMAGE, FREE_FORM } from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -105,16 +105,25 @@ export default class Maneuver extends CharacterTrait {
     roll() {
         if (this.characterTrait.trait.hasOwnProperty('effect')) {
             if (this.characterTrait.trait.template.doesdamage && this.characterTrait.trait.category === 'Hand To Hand' && !this.characterTrait.trait.useweapon) {
-
                 if (this.characterTrait.trait.effect.indexOf('[KILLINGDC]') > -1) {
                     return {
                         roll: this._getUnarmedKillingDamage(),
                         type: KILLING_DAMAGE,
                     };
-                } else {
+                } else if (this.characterTrait.trait.effect.indexOf('[NORMALDC]') > -1) {
                     return {
                         roll: this._getNormalDamage(),
                         type: NORMAL_DAMAGE,
+                    };
+                } else if (this.characterTrait.trait.effect.indexOf('[NNDDC]') > -1) {
+                    return {
+                        roll: this._getNndDamage(),
+                        type: NORMAL_DAMAGE,
+                    };
+                } else if (this.characterTrait.trait.effect.indexOf('[FLASHDC]') > -1) {
+                    return {
+                        roll: this._getFlashDamage(),
+                        type: FREE_FORM,
                     };
                 }
             }
@@ -143,6 +152,14 @@ export default class Maneuver extends CharacterTrait {
 
         if (effect.indexOf('[NORMALDC]') > -1) {
             attribute.value = effect.replace('[NORMALDC]', this._getNormalDamage());
+        }
+
+        if (effect.indexOf('[NNDDC]') > -1) {
+            attribute.value = effect.replace('[NNDDC]', `${this._getNndDamage()} NND`);
+        }
+
+        if (effect.indexOf('[FLASHDC]') > -1) {
+            attribute.value = effect.replace('[FLASHDC]', `Flash ${this._getFlashDamage()}`);
         }
 
         if (effect.indexOf('[KILLINGDC]') > -1) {
@@ -189,6 +206,41 @@ export default class Maneuver extends CharacterTrait {
         }
 
         return partialDie ? `${dice}½d6` : `${dice}d6`;
+    }
+
+    _getNndDamage() {
+        let character = this.characterTrait.getCharacter();
+        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
+        let dice = this.characterTrait.trait.dc / 2;
+        let partialDie = false;
+
+        if (this.characterTrait.trait.category === 'Hand To Hand') {
+            if (martialArtsMap.has('EXTRADC')) {
+                dice += martialArtsMap.get('EXTRADC').levels / 2;
+            }
+        }
+
+        if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
+            partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.5 ? true : false;
+            dice = Math.trunc(dice);
+        }
+
+        return partialDie ? `${dice}½d6` : `${dice}d6`;
+    }
+
+    _getFlashDamage() {
+        let character = this.characterTrait.getCharacter();
+        let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
+        let dice = this.characterTrait.trait.dc;
+        let partialDie = false;
+
+        if (this.characterTrait.trait.category === 'Hand To Hand') {
+            if (martialArtsMap.has('EXTRADC')) {
+                dice += martialArtsMap.get('EXTRADC').levels;
+            }
+        }
+
+        return `${dice}d6`;
     }
 
     _getUnarmedKillingDamage() {
