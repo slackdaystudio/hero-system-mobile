@@ -152,8 +152,7 @@ export default class Combat extends Component {
     }
 
     _renderPhases() {
-        let totalSpeed = heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', this.props.character);
-        let phases = speedTable[(totalSpeed > 12 ? '12' : totalSpeed.toString())].phases;
+        let phases = Object.keys(this.props.combatDetails.phases);
 
         if (phases.length > 6) {
             let firstRow = phases.slice(0, 6);
