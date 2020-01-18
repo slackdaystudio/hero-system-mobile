@@ -39,6 +39,12 @@ class ViewHeroDesignerCharacterScreen extends Component {
         usePhase: PropTypes.func.isRequired,
     }
 
+    constructor(props) {
+        super(props);
+
+        this.tabs = null;
+    }
+
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.navigate('Home');
@@ -49,6 +55,12 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
     onDidBlur() {
         this.backHandler.remove();
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.character !== prevProps.character) {
+            this.tabs.goToPage(0);
+        }
     }
 
     _renderTab(title, listKey, subListKey) {
@@ -93,7 +105,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 />
                 <Header hasTabs={false} navigation={this.props.navigation} />
                 <Content scrollEnable={false} style={styles.content}>
-                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
+                    <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
                             <View style={styles.tabContent}>
                                 <General characterInfo={this.props.character.characterInfo} />
