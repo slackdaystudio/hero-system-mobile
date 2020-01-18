@@ -167,6 +167,94 @@ class HeroDesignerCharacter {
         return false;
     }
 
+    getTotalDefense(character, type, withResistant=true) {
+        if (type === null || type === undefined) {
+            return withResistant ? '0/0' : '0';
+        }
+
+        let nonResistant = this.getCharacteristicTotalByShortName(type, character);
+        let resistant = 0;
+
+        if (!withResistant) {
+            return nonResistant.toString();
+        }
+
+        let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
+        let characteristic = this.getCharacteristicByShortName(type, character);
+        let showSecondary = store.getState().character.showSecondary;
+
+        if (powersMap.has('FORCEFIELD')) {
+            resistant = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), powersMap.get('FORCEFIELD'), resistant, showSecondary);
+        }
+
+        if (powersMap.has(type.toUpperCase())) {
+            resistant = this._getResistantDefense(resistant, powersMap.get(type.toUpperCase()), showSecondary);
+        }
+
+        if (powersMap.has('COMPOUNDPOWER')) {
+            resistant = this._getDefenseFromCompoundPower(resistant, powersMap.get('COMPOUNDPOWER'), type.toUpperCase(), true, showSecondary);
+        }
+
+        if (powersMap.has('NAKEDMODIFIER')) {
+            resistant = this._getDefenseFromCompoundPower(resistant, powersMap.get('NAKEDMODIFIER'), type.toUpperCase(), true, showSecondary);
+        }
+
+        return `${nonResistant}/${resistant}`;
+    }
+
+    getTotalUnusualDefense(character, powerXmlId, withResistant=true) {
+        let nonResistant = 0;
+        let resistant = 0;
+        let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
+        let unusualDefense = null;
+        let showSecondary = store.getState().character.showSecondary;
+
+        if (powersMap.has(powerXmlId)) {
+            unusualDefense = powersMap.get(powerXmlId);
+
+            if (Array.isArray(unusualDefense)) {
+                for (let ud of unusualDefense) {
+                    nonResistant += ud.levels;
+
+                    if (this._isResistent(ud)) {
+                        resistant += ud.levels;
+                    }
+                }
+            } else {
+                nonResistant = unusualDefense.levels;
+
+                if (this._isResistent(unusualDefense)) {
+                    resistant = unusualDefense.levels;
+                }
+            }
+        }
+
+        if (powersMap.has('FORCEFIELD')) {
+            nonResistant += powersMap.get('FORCEFIELD').mdlevels;
+            resistant += powersMap.get('FORCEFIELD').mdlevels;
+        }
+
+        if (powersMap.has('COMPOUNDPOWER')) {
+            nonResistant = this._getDefenseFromCompoundPower(nonResistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, false, showSecondary);
+            resistant = this._getDefenseFromCompoundPower(resistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, true, showSecondary);
+        }
+
+        return `${nonResistant}/${resistant}`;
+    }
+
+    getCharacteristicByShortName(shortName, character) {
+        let characteristic = null;
+
+        for (let char of character.characteristics) {
+            if (char.shortName.toUpperCase() === shortName.toUpperCase()) {
+                characteristic = char;
+                break;
+            }
+        }
+
+        return characteristic;
+    }
+
     getCharacteristicTotalByShortName(shortName, character) {
         let characteristic = null;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
@@ -189,11 +277,15 @@ class HeroDesignerCharacter {
         }
 
         if (powersMap.has('DENSITYINCREASE')) {
-            value = this._getTotalDensityIncreaseCharacteristcs(characteristic, powersMap.get('DENSITYINCREASE'), value, showSecondary)
+            value = this._getTotalDensityIncreaseCharacteristcs(characteristic, powersMap.get('DENSITYINCREASE'), value, showSecondary);
         }
 
         if (powersMap.has('FORCEFIELD')) {
-            value = this._getTotalResistantDefensesIncrease(characteristic, powersMap.get('FORCEFIELD'), value, showSecondary);
+            value = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), powersMap.get('FORCEFIELD'), value, showSecondary);
+        }
+
+        if (powersMap.has('COMPOUNDPOWER')) {
+            value = this._getTotalCompoundPowerIncrease(characteristic, powersMap.get('COMPOUNDPOWER'), value, showSecondary);
         }
 
         return value;
@@ -247,20 +339,26 @@ class HeroDesignerCharacter {
         return value;
     }
 
-    _getTotalResistantDefensesIncrease(characteristic, resistantDefence, value, showSecondary) {
+    _getTotalResistantDefensesIncrease(type, resistantDefence, value, showSecondary) {
         if (Array.isArray(resistantDefence)) {
             for (let rd of resistantDefence) {
-                value += this._getTotalResistantDefensesIncrease(characteristic, rd, value, showSecondary);
+                value += this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
             }
         } else {
             if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
                  (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
-                switch (characteristic.shortName.toUpperCase()) {
+                switch (type.toUpperCase()) {
                     case 'PD':
                         value += resistantDefence.pdlevels;
                         break;
                     case 'ED':
                         value += resistantDefence.edlevels;
+                        break;
+                    case 'MD':
+                        value += resistantDefence.mdlevels;
+                        break;
+                    case 'PwD':
+                        value += resistantDefence.powdlevels;
                         break;
                     default:
                          // Do nothing
@@ -269,6 +367,124 @@ class HeroDesignerCharacter {
         }
 
         return value;
+    }
+
+    _getTotalCompoundPowerIncrease(characteristic, power, value, showSecondary) {
+        if (Array.isArray(power)) {
+            for (let p of power) {
+                value = this._getTotalCompoundPowerIncrease(characteristic, p, value, showSecondary);
+            }
+        } else {
+            if (Array.isArray(power.powers)) {
+                for (let cp of power.powers) {
+                    if (cp.xmlid.toUpperCase() === characteristic.shortName.toUpperCase()) {
+                        if ((cp.affectsPrimary && cp.affectsTotal) || (!cp.affectsPrimary && cp.affectsTotal && showSecondary)) {
+                            value += cp.levels;
+                        }
+                    } else if (cp.xmlid.toUpperCase() === 'FORCEFIELD') {
+                        value = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), cp, value, showSecondary);
+                    } else if (cp.xmlid.toUpperCase() === 'DENSITYINCREASE') {
+                        value = this._getTotalDensityIncreaseCharacteristcs(characteristic, cp, value, showSecondary);
+                    }
+                }
+            } else {
+                if (power.xmlid.toUpperCase() === characteristic.shortName.toUpperCase()) {
+                    if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                        value += power.levels;
+                    }
+                } else if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+                    value = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), power, value, showSecondary);
+                } else if (power.xmlid.toUpperCase() === 'DENSITYINCREASE') {
+                    value = this._getTotalDensityIncreaseCharacteristcs(characteristic, power, value, showSecondary);
+                }
+            }
+        }
+
+        return value;
+    }
+
+    _getDefenseFromCompoundPower(value, power, id, resistant, showSecondary) {
+        if (Array.isArray(power)) {
+            for (let p of power) {
+                value = this._getDefenseFromCompoundPower(value, p, id, resistant, showSecondary);
+            }
+        } else {
+            if (Array.isArray(power.powers)) {
+                for (let cp of power.powers) {
+                    value = this._getDefense(cp, id, value, resistant, showSecondary);
+                }
+            } else {
+                value = this._getDefense(power, id, value, resistant, showSecondary);
+            }
+        }
+
+        return value;
+    }
+
+    _getDefense(power, id, value, resistant, showSecondary) {
+        if (power.xmlid.toUpperCase() === id.toUpperCase()) {
+            if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                if (!resistant || (resistant && this._isResistent(power))) {
+                    value += power.levels;
+                }
+            }
+        } else if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+            if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                if (id.toUpperCase() === 'PD' || id.toUpperCase() === 'ED') {
+                    value += power[`${id.toLowerCase()}levels`];
+                } else if (id.toUpperCase() === 'MENTALDEFENSE') {
+                    value += power.mdlevels;
+                } else if (id.toUpperCase() === 'POWERDEFENSE') {
+                    value += power.powdlevels;
+                }
+            }
+        } else if (power.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
+            if (power.input !== null && power.input !== undefined && power.input.toUpperCase() === id.toUpperCase()) {
+                if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                    if (!resistant || (resistant && this._isResistent(power))) {
+                        value += power.levels;
+                    }
+                }
+            }
+        }
+
+        return value;
+    }
+
+    _getResistantDefense(resistant, power, character, showSecondary) {
+        if (Array.isArray(power)) {
+            for (let p of power) {
+                resistant = this._getResistantDefense(resistant, p, showSecondary);
+            }
+        } else {
+            if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                if (this._isResistent(power)) {
+                    resistant += power.levels;
+                }
+            }
+        }
+
+        return resistant;
+    }
+
+    _isResistent(power) {
+        if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+            return true;
+        }
+
+        if (power.hasOwnProperty('modifier')) {
+            if (Array.isArray(power.modifier)) {
+                for (let m of power.modifier) {
+                    if (m.xmlid.toUpperCase() === 'RESISTANT') {
+                        return true;
+                    }
+                }
+            } else {
+                return power.modifier.xmlid === 'RESISTANT';
+            }
+        }
+
+        return false;
     }
 
     _populateMovementAndCharacteristics(character, characteristics, template) {

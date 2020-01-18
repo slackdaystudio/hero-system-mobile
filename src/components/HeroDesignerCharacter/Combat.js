@@ -151,6 +151,52 @@ export default class Combat extends Component {
         );
     }
 
+    _renderDefenses() {
+        let rows = [
+            {
+                label: 'PD',
+                value: heroDesignerCharacter.getTotalDefense(this.props.character, 'PD'),
+            }, {
+                label: 'ED',
+                value: heroDesignerCharacter.getTotalDefense(this.props.character, 'ED'),
+            }, {
+                label: 'MD',
+                value: heroDesignerCharacter.getTotalUnusualDefense(this.props.character, 'MENTALDEFENSE'),
+            }, {
+                label: 'PwD',
+                value: heroDesignerCharacter.getTotalUnusualDefense(this.props.character, 'POWERDEFENSE'),
+            },
+        ];
+
+        return (
+            <Fragment>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                    {this._renderDefense(rows[0])}
+                    {this._renderDefense(rows[1])}
+                </View>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                    {this._renderDefense(rows[2])}
+                    {this._renderDefense(rows[3])}
+                </View>
+            </Fragment>
+        );
+    }
+
+    _renderDefense(row) {
+        return (
+            <Fragment>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-end'}}>
+                    <Text style={styles.boldGrey}>{row.label}: </Text>
+                </View>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center'}}>
+                    <View style={{flex: 1}}>
+                        <Text style={styles.grey}>{row.value}</Text>
+                    </View>
+                </View>
+            </Fragment>
+        );
+    }
+
     _renderPhases() {
         let phases = Object.keys(this.props.combatDetails.phases);
 
@@ -311,6 +357,10 @@ export default class Combat extends Component {
                             <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
                         </Button>
                     </View>
+                </View>
+                <Heading text='Defenses' />
+                <View style={{flex: 1, width: 300, alignSelf: 'center', alignItems: 'center', paddingBottom: 10}}>
+                    {this._renderDefenses()}
                 </View>
                 <Heading text='Phases' />
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: 10}}>
