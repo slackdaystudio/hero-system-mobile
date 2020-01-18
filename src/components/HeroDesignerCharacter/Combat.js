@@ -33,6 +33,7 @@ export default class Combat extends Component {
         character: PropTypes.object.isRequired,
         combatDetails: PropTypes.object.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
+        usePhase: PropTypes.func.isRequired,
         forms: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
     }
@@ -46,6 +47,8 @@ export default class Combat extends Component {
         this.incrementCv = this._incrementCv.bind(this);
         this.decrementCv = this._decrementCv.bind(this);
         this.rollToHit = this._rollToHit.bind(this);
+        this.usePhase = this._usePhase.bind(this);
+        this.abortPhase = this._abortPhase.bind(this);
     }
 
     _updateCombatState(key, value) {
@@ -115,6 +118,14 @@ export default class Combat extends Component {
         this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollToHit(hitForm.ocv, 1, false, 0)});
     }
 
+    _usePhase(phase) {
+        this.props.usePhase(phase);
+    }
+
+    _abortPhase(phase) {
+        this.props.usePhase(phase, true);
+    }
+
     _renderHealthItem(stateKey, label=null) {
         return (
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
@@ -150,26 +161,62 @@ export default class Combat extends Component {
 
             return (
                 <View style={{flex: 1, alignItems: 'center'}}>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
                         {firstRow.map((phase, index) => {
-                            return <CircleText title={phase} fontSize={20} size={40} color="#303030" />
+                            return this._renderPhase(phase.toString());
                         })}
                     </View>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
                         {secondRow.map((phase, index) => {
-                            return <CircleText title={phase} fontSize={20} size={40} color="#303030" />
+                            return this._renderPhase(phase.toString());
                         })}
                     </View>
+                    {this._renderPhaseInfo()}
                 </View>
             );
         }
 
         return (
-            <Fragment>
-                {phases.map((phase, index) => {
-                    return <CircleText title={phase} fontSize={20} size={40} color="#303030" />
-                })}
-            </Fragment>
+            <View style={{flex: 1, alignItems: 'center'}}>
+                <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
+                    {phases.map((phase, index) => {
+                        return this._renderPhase(phase.toString());
+                    })}
+                </View>
+                {this._renderPhaseInfo()}
+            </View>
+        );
+    }
+
+    _renderPhase(phase) {
+        let color = '#303030';
+
+        if (this.props.combatDetails.phases[phase].used) {
+            color = '#FFC300';
+        } else if (this.props.combatDetails.phases[phase].aborted) {
+            color = '#D11F1F';
+        }
+
+        return (
+            <View style={{paddingHorizontal: 5}}>
+                <TouchableHighlight underlayColor='#1b1d1f' onPress={() => this.usePhase(phase)} onLongPress={() => this.abortPhase(phase)}>
+                    <CircleText title={phase} fontSize={20} size={40} color={color} />
+                </TouchableHighlight>
+            </View>
+        );
+    }
+
+    _renderPhaseInfo() {
+        return (
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                <Text style={styles.grey}>
+                    <Text style={styles.boldGrey}>Dexterity:</Text> {heroDesignerCharacter.getCharacteristicTotalByShortName('DEX', this.props.character)}
+                </Text>
+                <View style={{width: 40}} />
+                <Text style={styles.grey}>
+                    <Text style={styles.boldGrey}>Speed:</Text> {heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', this.props.character)}
+                </Text>
+            </View>
         );
     }
 
@@ -259,7 +306,7 @@ export default class Combat extends Component {
                 <View style={{flex: 1, width: 300, alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                     {this._renderHealthItem('stun')}
                     {this._renderHealthItem('body')}
-                    {this._renderHealthItem('endurance', 'end')}
+                    {this._renderHealthItem('endurance', 'END')}
                     <View style={[styles.buttonContainer, {paddingVertical: 10}]}>
                         <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
                             <Text uppercase={false} style={styles.buttonText}>Recovery</Text>

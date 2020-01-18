@@ -27,6 +27,8 @@ export const SET_COMBAT_DETAILS = 'SET_COMBAT_DETAILS';
 
 export const SET_SPARSE_COMBAT_DETAILS = 'SET_SPARSE_COMBAT_DETAILS';
 
+export const USE_PHASE = 'USE_PHASE';
+
 //////////////////////////////
 // ACTIONS                  //
 //////////////////////////////
@@ -64,6 +66,17 @@ export function setSparseCombatDetails(sparseCombatDetails) {
     };
 }
 
+export function usePhase(phase, abort = false) {
+    return async (dispatch) => {
+        persistence.usePhase(phase, abort).then(combatDetails => {
+            dispatch({
+                type: USE_PHASE,
+                payload: combatDetails,
+            });
+        });
+    };
+}
+
 let combatState = {};
 
 export default function combat(state = combatState, action) {
@@ -73,6 +86,7 @@ export default function combat(state = combatState, action) {
         case INITIALIZE_COMBAT_DETAILS:
         case SET_COMBAT_DETAILS:
         case SET_SPARSE_COMBAT_DETAILS:
+        case USE_PHASE:
             newState = {...state};
             newState = action.payload;
 

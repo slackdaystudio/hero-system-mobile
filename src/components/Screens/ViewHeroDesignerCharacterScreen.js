@@ -13,7 +13,7 @@ import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setSparseCombatDetails } from '../../reducers/combat';
+import { setSparseCombatDetails, usePhase } from '../../reducers/combat';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -36,6 +36,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
         combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
+        usePhase: PropTypes.func.isRequired,
     }
 
     onDidFocus() {
@@ -107,6 +108,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                                     setSparseCombatDetails={this.props.setSparseCombatDetails}
                                     forms={this.props.forms}
                                     updateForm={this.props.updateForm}
+                                    usePhase={this.props.usePhase}
                                 />
                             </View>
                         </Tab>
@@ -151,6 +153,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     updateForm,
     setSparseCombatDetails,
+    usePhase,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);

@@ -55,11 +55,15 @@ class HomeScreen extends Component {
     }
 
     async componentDidMount() {
-        await this.props.initializeApplicationSettings();
-        await this.props.initializeStatistics();
-        await this.props.initializeCharacter();
-        await this.props.initializeRandomHero();
-        await this.props.initializeCombatDetails(this.props.character);
+        try {
+            await this.props.initializeApplicationSettings();
+            await this.props.initializeStatistics();
+            await this.props.initializeCharacter();
+            await this.props.initializeRandomHero();
+            await this.props.initializeCombatDetails(this.props.character);
+        } catch (error) {
+            common.toast(error.message);
+        }
     }
 
     _startLoad() {

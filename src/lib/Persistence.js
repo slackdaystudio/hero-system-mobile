@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { common } from './Common';
 import { character as libCharacter } from './Character';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
+import speedTable from '../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -44,6 +45,7 @@ class Persistence {
 
     async initializeCombatDetails(character) {
         let combatDetails = null;
+        let combatStats = ['stun', 'body', 'end', 'ocv', 'dcv', 'omcv', 'dmcv']
 
         try {
             combatDetails = await AsyncStorage.getItem('combat');
@@ -70,6 +72,7 @@ class Persistence {
                 dcv: heroDesignerCharacter.getCharacteristicTotalByShortName('dcv', character),
                 omcv: heroDesignerCharacter.getCharacteristicTotalByShortName('omcv', character),
                 dmcv: heroDesignerCharacter.getCharacteristicTotalByShortName('dmcv', character),
+                phases: this._initPhases(character),
             };
         } else {
             combatDetails = {
@@ -107,6 +110,45 @@ class Persistence {
             }
         } catch (error) {
             common.toast('Unable to update combat detail');
+        }
+
+        return combatDetails;
+    }
+
+    async usePhase(phase, abort) {
+        let combatDetails = null;
+
+        try {
+            combatDetails = await AsyncStorage.getItem('combat');
+
+            if (combatDetails !== null) {
+                combatDetails = JSON.parse(combatDetails);
+
+                let used = combatDetails.phases[phase.toString()].used;
+                let aborted = combatDetails.phases[phase.toString()].aborted;
+
+                if (abort) {
+                    used = false;
+                    aborted = !aborted;
+                } else {
+                    if (aborted) {
+                        used = false;
+                        aborted = false;
+                    } else {
+                        used = !used;
+                        aborted = false;
+                    }
+                }
+
+                combatDetails.phases[phase.toString()] = {
+                    used: used,
+                    aborted: aborted,
+                };
+
+                await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
+            }
+        } catch (error) {
+            common.toast(`Unable to toggle phase ${phase}: ${error.message}`);
         }
 
         return combatDetails;
@@ -305,6 +347,20 @@ class Persistence {
         }
 
         return statistics;
+    }
+
+    _initPhases(character) {
+        let speed = heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', character);
+        let phases = {};
+
+        for (let phase of speedTable[(speed > 12 ? '12' : speed.toString())].phases) {
+            phases[phase.toString()] = {
+                used: false,
+                aborted: false,
+            }
+        }
+
+        return phases;
     }
 }
 
