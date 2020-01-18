@@ -33,6 +33,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
+        showSecondary: PropTypes.bool.isRequired,
         combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
@@ -81,6 +82,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         navigation={this.props.navigation}
                         headingText={title}
                         character={this.props.character}
+                        showSecondary={this.props.showSecondary}
                         listKey={listKey}
                         subListKey={subListKey}
                         updateForm={this.props.updateForm}
@@ -116,6 +118,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                                 <Combat
                                     navigation={this.props.navigation}
                                     character={this.props.character}
+                                    showSecondary={this.props.showSecondary}
                                     combatDetails={this.props.combatDetails}
                                     setSparseCombatDetails={this.props.setSparseCombatDetails}
                                     forms={this.props.forms}
@@ -157,6 +160,7 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         character: state.character.character,
+        showSecondary: state.character.showSecondary,
         combatDetails: state.combat,
         forms: state.forms,
     };

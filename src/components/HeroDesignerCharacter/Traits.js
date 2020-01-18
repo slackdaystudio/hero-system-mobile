@@ -65,6 +65,7 @@ export default class Traits extends Component {
         navigation: PropTypes.object.isRequired,
         headingText: PropTypes.string.isRequired,
         character: PropTypes.object.isRequired,
+        showSecondary: PropTypes.bool.isRequired,
         listKey: PropTypes.string.isRequired,
         subListKey: PropTypes.string.isRequired,
         updateForm: PropTypes.func.isRequired,

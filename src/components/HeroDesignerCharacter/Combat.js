@@ -31,6 +31,7 @@ export default class Combat extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
+        showSecondary: PropTypes.bool.isRequired,
         combatDetails: PropTypes.object.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
