@@ -190,11 +190,11 @@ class DieRoller {
         let name = 'None';
 
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
-            name = '+1'
+            name = '+1 pip'
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            name = '-1'
+            name = '-1 pip'
         } else if (partialDieType === PARTIAL_DIE_HALF) {
-            name = '½';
+            name = '½d6';
         }
 
         return name;
