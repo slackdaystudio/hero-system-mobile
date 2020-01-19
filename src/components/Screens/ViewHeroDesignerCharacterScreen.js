@@ -63,7 +63,9 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.character !== prevProps.character) {
-            this.tabs.goToPage(0);
+            if (this.tabs !== null) {
+                this.tabs.goToPage(0);
+            }
         }
     }
 

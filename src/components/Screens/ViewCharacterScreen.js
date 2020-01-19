@@ -60,6 +60,14 @@ class ViewCharacterScreen extends Component {
         this.backHandler.remove();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.character !== prevProps.character) {
+            if (this.tabs !== null) {
+                this.tabs.goToPage(0);
+            }
+        }
+    }
+
     _renderPowers(powers) {
         if (powers === '' || powers === undefined || powers === null) {
             return null;
