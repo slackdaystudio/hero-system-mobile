@@ -30,6 +30,10 @@ class Character {
     }
 
     isHeroDesignerCharacter(character) {
+        if (character === null || character === undefined) {
+            return false;
+        }
+
         return character.hasOwnProperty('version');
     }
 
