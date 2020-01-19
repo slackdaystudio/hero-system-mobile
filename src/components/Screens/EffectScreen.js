@@ -99,7 +99,7 @@ class EffectScreen extends Component {
             <List>
                 {effectTypes.map((type, index) => {
                     return (
-                        <ListItem noIndent style={{borderBottomWidth: 0, paddingBottom: 0}}>
+                        <ListItem noIndent underlayColor="#1b1d1f" style={{borderBottomWidth: 0, paddingBottom: 0}} onPress={() => this.selectEffect(type)}>
                             <Left>
                                 <Text style={styles.grey}>{type}</Text>
                             </Left>
