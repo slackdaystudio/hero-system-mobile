@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
-import { FREE_FORM_ROLL } from '../lib/DieRoller';
+import { FREE_FORM } from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -127,7 +127,7 @@ export default class Complication extends CharacterTrait {
         if (this.characterTrait.trait.xmlid.toUpperCase() === 'UNLUCK') {
             return {
                 roll: `${this.characterTrait.trait.levels}d6`,
-                type: FREE_FORM_ROLL,
+                type: FREE_FORM,
             }
         }
 
