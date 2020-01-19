@@ -156,7 +156,7 @@ class StatisticsScreen extends Component {
                         </ListItem>
                         <ListItem>
                             <Left>
-                                <Text style={styles.boldGrey}>Total Free Form Rolls:</Text>
+                                <Text style={styles.boldGrey}>Total Effect Rolls:</Text>
                             </Left>
                             <Right>
                                 <Text style={styles.grey}>{this.props.statistics.totals.effectRolls}</Text>
