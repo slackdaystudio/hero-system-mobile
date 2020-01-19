@@ -202,9 +202,9 @@ class ResultScreen extends Component {
             case 'HEALING':
                 return <Text style={styles.grey}>You healed your target for {result.total} points</Text>;
             case 'LUCK':
-                return <Text style={styles.grey}>You have aquired {dieRoller.countLuck(result)} points of <Text style={{color: 'green'}}>Luck</Text></Text>;
+                return <Text style={styles.grey}>You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'green'}}>Luck</Text></Text>;
             case 'UNLUCK':
-                return <Text style={styles.grey}>You have aquired {dieRoller.countLuck(result)} points of <Text style={{color: 'red'}}>Unluck</Text></Text>;
+                return <Text style={styles.grey}>You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'red'}}>Unluck</Text></Text>;
             default:
                 return null;
         }
