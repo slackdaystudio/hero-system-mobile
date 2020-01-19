@@ -103,20 +103,26 @@ class ResultScreen extends Component {
     }
 
     _renderHitLocation() {
-        let hitLocation = this.state.result.hitLocationDetails;
+        if (this.state.result.damageForm.useHitLocations) {
+            let hitLocation = this.state.result.hitLocationDetails;
 
-        if (this.state.result.rollType === NORMAL_DAMAGE) {
-            return (
-                <Text style={styles.grey}>
-                    {hitLocation.location} (NSTUN: x{hitLocation.nStun})
-                </Text>
-            );
-        } else if (this.state.result.rollType === KILLING_DAMAGE) {
-            return (
-                <Text style={styles.grey}>
-                    {hitLocation.location} (STUNx: x{hitLocation.stunX}, BODYx: x{hitLocation.bodyX})
-                </Text>
-            );
+            if (this.state.result.rollType === NORMAL_DAMAGE) {
+                return (
+                    <Text style={styles.grey}>
+                        {hitLocation.location} (NSTUN: x{hitLocation.nStun})
+                    </Text>
+                );
+            } else if (this.state.result.rollType === KILLING_DAMAGE) {
+                return (
+                    <Text style={styles.grey}>
+                        {hitLocation.location} (STUNx: x{hitLocation.stunX}, BODYx: x{hitLocation.bodyX})
+                    </Text>
+                );
+            }
+        }
+
+        if (this.state.result.rollType === KILLING_DAMAGE) {
+            return <Text style={styles.grey}>x{this.state.result.stunModifier}</Text>;
         }
 
         return <Text />;
@@ -148,10 +154,7 @@ class ResultScreen extends Component {
 
         return (
             <View style={{paddingBottom: 20}}>
-                <View style={localStyles.lineContainer}>
-                    <Text style={[styles.boldGrey, localStyles.alignStart]}>Hit Location: </Text>
-                    {this._renderHitLocation()}
-                </View>
+                {this._renderHitLocations()}
                 <View style={localStyles.lineContainer}>
                     <Text style={[styles.boldGrey, localStyles.alignStart]}>Stun: </Text>
                     {this._renderStun(result.stun)}
@@ -166,6 +169,26 @@ class ResultScreen extends Component {
                 </View>
             </View>
         );
+    }
+
+    _renderHitLocations() {
+        if (this.state.result.damageForm.useHitLocations) {
+            return (
+                <View style={localStyles.lineContainer}>
+                    <Text style={[styles.boldGrey, localStyles.alignStart]}>Hit Location: </Text>
+                    {this._renderHitLocation()}
+                </View>
+            );
+        } else if (!this.state.result.damageForm.useHitLocations && this.state.result.rollType === KILLING_DAMAGE) {
+            return (
+                <View style={localStyles.lineContainer}>
+                    <Text style={[styles.boldGrey, localStyles.alignStart]}>Stun Multiplier: </Text>
+                    {this._renderHitLocation()}
+                </View>
+            );
+        }
+
+        return null;
     }
 
     _renderSkillCheckInfo(result) {
