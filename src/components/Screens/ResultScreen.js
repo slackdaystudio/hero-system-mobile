@@ -197,6 +197,7 @@ class ResultScreen extends Component {
             case 'ENTANGLE':
                 return <Text style={styles.grey}>Your entangle has a BODY of {dieRoller.countNormalDamageBody(result)}</Text>;
             case 'FLASH':
+            case 'MARTIAL_FLASH':
                 return <Text style={styles.grey}>You Flashed your target for {dieRoller.countNormalDamageBody(result)} segments</Text>;
             case 'HEALING':
                 return <Text style={styles.grey}>You healed your target for {result.total} points</Text>;
