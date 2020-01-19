@@ -8,6 +8,7 @@ import VariablePowerPool from './VariablePowerPool';
 import MultipowerItem from './powers/MultipowerItem';
 import NakedModifier from './NakedModifier';
 import CompoundPower from './CompoundPower';
+import Complication from './Complication';
 import { skillDecorator } from './skills/SkillDecorator';
 import { perkDecorator } from './perks/PerkDecorator';
 import { talentDecorator } from './talents/TalentDecorator';
@@ -40,6 +41,10 @@ class CharacterTraitDecorator {
 
         if (decorated.trait.type === 'maneuver' || decorated.trait.hasOwnProperty('maneuver')) {
             decorated = new Maneuver(decorated);
+        }
+
+        if (decorated.trait.type === 'disad') {
+            decorated = new Complication(decorated);
         }
 
         decorated = this._decorateItem(decorated);
