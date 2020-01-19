@@ -190,6 +190,8 @@ class ResultScreen extends Component {
 
     _renderEffectInfo(result) {
         switch (result.type.toUpperCase()) {
+            case 'NONE':
+                return null;
             case 'AID':
                 return <Text style={styles.grey}>You have added {result.total} AP to the target power/effect</Text>;
             case 'DISPEL':
@@ -206,7 +208,7 @@ class ResultScreen extends Component {
             case 'UNLUCK':
                 return <Text style={styles.grey}>You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'red'}}>Unluck</Text></Text>;
             default:
-                return null;
+                return <Text style={styles.grey}>You have scored {result.total} points on your effect</Text>;
         }
     }
 
