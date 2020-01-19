@@ -7,7 +7,6 @@ import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
-import { setShowSecondary } from '../../reducers/character';
 import { heroDesignerCharacter, TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
 import { SKILL_ROLL_BASE } from '../../decorators/skills/Roll';
 import styles from '../../Styles';
@@ -49,12 +48,13 @@ function initCharacteristicsShow(characteristics, movement) {
     };
 }
 
-class Characteristics extends Component {
+export default class Characteristics extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
         showSecondary: PropTypes.bool.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
+        setCombatDetails: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -399,6 +399,7 @@ class Characteristics extends Component {
 
     _toggleSecondaryCharacteristics() {
         this.props.setShowSecondary(!this.props.showSecondary);
+        this.props.setCombatDetails(this.props.character);
     }
 
     _renderSecondaryCharacteristicToggle() {
@@ -438,15 +439,3 @@ class Characteristics extends Component {
         );
     }
 }
-
-const mapStateToProps = state => {
-    return {
-        showSecondary: state.character.showSecondary,
-    };
-};
-
-const mapDispatchToProps = {
-    setShowSecondary,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Characteristics);

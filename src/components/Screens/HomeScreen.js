@@ -10,7 +10,7 @@ import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { initializeApplicationSettings } from '../../reducers/settings';
 import { initializeStatistics } from '../../reducers/statistics';
-import { initializeCharacter, setCharacter, setShowSecondary } from '../../reducers/character';
+import { initializeCharacter, initializeShowSecondary, setCharacter, setShowSecondary } from '../../reducers/character';
 import { initializeRandomHero } from '../../reducers/randomHero';
 import { initializeCombatDetails, setCombatDetails } from '../../reducers/combat';
 
@@ -59,6 +59,7 @@ class HomeScreen extends Component {
             await this.props.initializeApplicationSettings();
             await this.props.initializeStatistics();
             await this.props.initializeCharacter();
+            await this.props.initializeShowSecondary();
             await this.props.initializeRandomHero();
             await this.props.initializeCombatDetails(this.props.character);
         } catch (error) {
@@ -82,7 +83,6 @@ class HomeScreen extends Component {
 
             this.props.setShowSecondary(true);
             this.props.setCharacter(char);
-            this.props.setCombatDetails(char);
         });
     }
 
@@ -190,6 +190,7 @@ const mapDispatchToProps = {
     initializeApplicationSettings,
     initializeStatistics,
     initializeCharacter,
+    initializeShowSecondary,
     initializeCombatDetails,
     initializeRandomHero,
     setCharacter,

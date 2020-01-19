@@ -13,7 +13,8 @@ import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setSparseCombatDetails, usePhase } from '../../reducers/combat';
+import { setCombatDetails, setSparseCombatDetails, usePhase } from '../../reducers/combat';
+import { setShowSecondary } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -36,7 +37,9 @@ class ViewHeroDesignerCharacterScreen extends Component {
         showSecondary: PropTypes.bool.isRequired,
         combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
+        setCombatDetails: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
+        setShowSecondary: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
     }
 
@@ -129,7 +132,13 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         </Tab>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
                             <View style={styles.tabContent}>
-                                <Characteristics navigation={this.props.navigation} character={this.props.character} />
+                                <Characteristics
+                                    navigation={this.props.navigation}
+                                    character={this.props.character}
+                                    showSecondary={this.props.showSecondary}
+                                    setCombatDetails={this.props.setCombatDetails}
+                                    setShowSecondary={this.props.setShowSecondary}
+                                />
                             </View>
                         </Tab>
                         {this._renderTab('Skills', 'skills', 'skills')}
@@ -168,6 +177,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     updateForm,
+    setShowSecondary,
+    setCombatDetails,
     setSparseCombatDetails,
     usePhase,
 };

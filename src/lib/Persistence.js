@@ -33,6 +33,24 @@ class Persistence {
         return character === null ? null : JSON.parse(character);
     }
 
+    async getShowSecondary() {
+        let showSecondary = null;
+
+        try {
+            showSecondary = await AsyncStorage.getItem('showSecondaryCharacteristics');
+
+            if (showSecondary === null) {
+                await AsyncStorage.setItem('showSecondaryCharacteristics', true);
+
+                showSecondary = JSON.stringify(true);
+            }
+        } catch (error) {
+            common.toast('Unable to retrieve show secondary characteristics');
+        }
+
+        return JSON.parse(showSecondary);
+    }
+
     async setCharacter(character) {
         try {
             await AsyncStorage.setItem('character', JSON.stringify(character));
@@ -62,17 +80,18 @@ class Persistence {
             body: 0,
             endurance: 0
         }
+        let showSecondary = JSON.parse(await AsyncStorage.getItem('showSecondaryCharacteristics'));
 
         if (libCharacter.isHeroDesignerCharacter(character)) {
             combatDetails = {
-                stun: heroDesignerCharacter.getCharacteristicTotalByShortName('stun', character),
-                body: heroDesignerCharacter.getCharacteristicTotalByShortName('body', character),
-                endurance: heroDesignerCharacter.getCharacteristicTotalByShortName('end', character),
-                ocv: heroDesignerCharacter.getCharacteristicTotalByShortName('ocv', character),
-                dcv: heroDesignerCharacter.getCharacteristicTotalByShortName('dcv', character),
-                omcv: heroDesignerCharacter.getCharacteristicTotalByShortName('omcv', character),
-                dmcv: heroDesignerCharacter.getCharacteristicTotalByShortName('dmcv', character),
-                phases: this._initPhases(character),
+                stun: this._getCharacteristic(character, 'stun', showSecondary),
+                body: this._getCharacteristic(character, 'body', showSecondary),
+                endurance: this._getCharacteristic(character, 'end', showSecondary),
+                ocv: this._getCharacteristic(character, 'ocv', showSecondary),
+                dcv: this._getCharacteristic(character, 'dcv', showSecondary),
+                omcv: this._getCharacteristic(character, 'omcv', showSecondary),
+                dmcv: this._getCharacteristic(character, 'dmcv', showSecondary),
+                phases: this._initPhases(character, showSecondary),
             };
         } else {
             combatDetails = {
@@ -163,7 +182,7 @@ class Persistence {
         }
     }
 
-    async setShowSecondaryCharacteristics(show = true) {
+    async setShowSecondaryCharacteristics(show) {
         try {
             await AsyncStorage.setItem('showSecondaryCharacteristics', show.toString());
         } catch (error) {
@@ -349,9 +368,17 @@ class Persistence {
         return statistics;
     }
 
-    _initPhases(character) {
-        let speed = heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', character);
+    _initPhases(character, showSecondary) {
+        let speed = 1;
         let phases = {};
+
+        if (showSecondary) {
+            speed = heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', character);
+        } else {
+            let speedCharacteristic = heroDesignerCharacter.getCharacteristicByShortName('SPD', character);
+
+            speed = speedCharacteristic === null ? 1 : speedCharacteristic.value;
+        }
 
         for (let phase of speedTable[(speed > 12 ? '12' : speed.toString())].phases) {
             phases[phase.toString()] = {
@@ -361,6 +388,16 @@ class Persistence {
         }
 
         return phases;
+    }
+
+    _getCharacteristic(character, shortName, showSecondary) {
+        if (showSecondary) {
+            return heroDesignerCharacter.getCharacteristicTotalByShortName(shortName, character)
+        }
+
+        let characteristic = heroDesignerCharacter.getCharacteristicByShortName(shortName, character);
+
+        return characteristic === null ? 0 : characteristic.value;
     }
 }
 

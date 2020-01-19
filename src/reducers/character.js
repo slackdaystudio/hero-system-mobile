@@ -27,6 +27,8 @@ export const SET_CHARACTER = 'SET_CHARACTER';
 
 export const INITIALIZE_CHARACTER = 'INITIALIZE_CHARACTER';
 
+export const INITIALIZE_SHOW_SECONDARY = 'INITIALIZE_SHOW_SECONDARY';
+
 export const SET_SHOW_SECONDARY = 'SET_SHOW_SECONDARY';
 
 export const CLEAR_CHARACTER = 'CLEAR_CHARACTER';
@@ -52,6 +54,17 @@ export function initializeCharacter() {
             dispatch({
                 type: INITIALIZE_CHARACTER,
                 payload: char,
+            });
+        });
+    };
+}
+
+export function initializeShowSecondary() {
+    return async (dispatch) => {
+        persistence.getShowSecondary().then(showSecondary => {
+            dispatch({
+                type: INITIALIZE_SHOW_SECONDARY,
+                payload: showSecondary,
             });
         });
     };
@@ -88,52 +101,66 @@ export default function character(state = characterState, action) {
     let newState = null;
 
     switch (action.type) {
-    case SET_CHARACTER:
-        newState = {
-            ...state,
-            character: {
-                ...state.character,
-            },
-        };
-        newState.character = action.payload;
+        case SET_CHARACTER:
+            newState = {
+                ...state,
+                character: {
+                    ...state.character,
+                },
+            };
+            newState.character = action.payload;
 
-        return newState;
-    case INITIALIZE_CHARACTER:
-        if (action.payload === null) {
+            return newState;
+        case INITIALIZE_CHARACTER:
+            if (action.payload === null) {
+                return state;
+            }
+
+            newState = {
+                ...state,
+                character: {
+                    ...state.character,
+                },
+            };
+            newState.character = action.payload;
+
+            return newState;
+        case INITIALIZE_SHOW_SECONDARY:
+            newState = {
+                ...state,
+                character: {
+                    ...state.character,
+                },
+                showSecondary: {
+                    ...state.showSecondary
+                }
+            };
+
+            newState.showSecondary = action.payload;
+
+            return newState;
+        case SET_SHOW_SECONDARY:
+            newState = {
+                ...state,
+                showSecondary: {
+                    ...state.showSecondary,
+                },
+            };
+            newState.showSecondary = action.payload;
+
+            return newState;
+        case CLEAR_CHARACTER:
+            newState = {
+                ...state,
+                character: {
+                    ...state.character,
+                },
+            };
+
+            newState.character = null;
+
+            return newState;
+        default:
             return state;
-        }
-
-        newState = {
-            ...state,
-            character: {
-                ...state.character,
-            },
-        };
-        newState.character = action.payload;
-
-        return newState;
-    case SET_SHOW_SECONDARY:
-        newState = {
-            ...state,
-            showSecondary: {
-                ...state.showSecondary,
-            },
-        };
-        newState.showSecondary = action.payload;
-
-        return newState;
-    case CLEAR_CHARACTER:
-        newState = {
-            ...state,
-            character: {
-                ...state.character,
-            },
-        };
-
-        newState.character = null;
-
-        return newState;
-    default:
-        return state;
     }
 }
