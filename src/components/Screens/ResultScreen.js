@@ -191,14 +191,14 @@ class ResultScreen extends Component {
     _renderEffectInfo(result) {
         switch (result.type.toUpperCase()) {
             case 'AID':
-                return <Text style={styles.grey}>You have added {result.total} AP</Text>;
+                return <Text style={styles.grey}>You have added {result.total} AP to the target power/effect</Text>;
             case 'DISPEL':
                 return <Text style={styles.grey}>You have dispelled {result.total} AP</Text>;
             case 'ENTANGLE':
                 return <Text style={styles.grey}>Your entangle has a BODY of {dieRoller.countNormalDamageBody(result)}</Text>;
             case 'FLASH':
             case 'MARTIAL_FLASH':
-                return <Text style={styles.grey}>You Flashed your target for {dieRoller.countNormalDamageBody(result)} segments</Text>;
+                return <Text style={styles.grey}>You flashed your target for {dieRoller.countNormalDamageBody(result)} segments</Text>;
             case 'HEALING':
                 return <Text style={styles.grey}>You healed your target for {result.total} points</Text>;
             case 'LUCK':
