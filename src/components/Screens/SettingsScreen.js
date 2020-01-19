@@ -65,7 +65,7 @@ class SettingsScreen extends Component {
         this.props.resetForm('skill');
         this.props.resetForm('hit');
         this.props.resetForm('damage');
-        this.props.resetForm('freeForm');
+        this.props.resetForm('effect');
         this.props.resetForm('costCruncher');
 
         if (showToast) {

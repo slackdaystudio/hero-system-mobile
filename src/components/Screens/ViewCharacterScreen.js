@@ -42,6 +42,12 @@ class ViewCharacterScreen extends Component {
         setSparseCombatDetails: PropTypes.func.isRequired,
     }
 
+    constructor(props) {
+        super(props);
+
+        this.tabs = null;
+    }
+
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.navigate('Home');
@@ -111,7 +117,7 @@ class ViewCharacterScreen extends Component {
                 />
                 <Header hasTabs={false} navigation={this.props.navigation} />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
-                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+                    <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
                             <View style={styles.tabContent}>
                                 <General character={this.props.character} />

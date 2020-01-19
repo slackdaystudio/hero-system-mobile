@@ -153,8 +153,8 @@ class HomeScreen extends Component {
                                 </Button>
                             </View>
                             <View style={styles.buttonContainer}>
-                                <Button style={styles.button}  onPress={() => this.props.navigation.navigate('FreeForm')}>
-                                    <Text uppercase={false} style={styles.buttonText}>Free Form</Text>
+                                <Button style={styles.button}  onPress={() => this.props.navigation.navigate('Effect')}>
+                                    <Text uppercase={false} style={styles.buttonText}>Effect</Text>
                                 </Button>
                             </View>
                         </View>

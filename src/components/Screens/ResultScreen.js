@@ -7,7 +7,7 @@ import RNShake from 'react-native-shake';
 import AnimateNumber from 'react-native-animate-number';
 import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
-import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE } from '../../lib/DieRoller';
+import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import styles from '../../Styles';
 import { addStatistics } from '../../reducers/statistics';
@@ -188,6 +188,27 @@ class ResultScreen extends Component {
         );
     }
 
+    _renderEffectInfo(result) {
+        switch (result.type.toUpperCase()) {
+            case 'AID':
+                return <Text style={styles.grey}>You have added {result.total} AP</Text>;
+            case 'DISPEL':
+                return <Text style={styles.grey}>You have dispelled {result.total} AP</Text>;
+            case 'ENTANGLE':
+                return <Text style={styles.grey}>Your entangle has a BODY of {dieRoller.countNormalDamageBody(result)}</Text>;
+            case 'FLASH':
+                return <Text style={styles.grey}>You Flashed your target for {dieRoller.countNormalDamageBody(result)} segments</Text>;
+            case 'HEALING':
+                return <Text style={styles.grey}>You healed your target for {result.total} points</Text>;
+            case 'LUCK':
+                return <Text style={styles.grey}>You have aquired {dieRoller.countLuck(result)} points of <Text style={{color: 'green'}}>Luck</Text></Text>;
+            case 'UNLUCK':
+                return <Text style={styles.grey}>You have aquired {dieRoller.countLuck(result)} points of <Text style={{color: 'red'}}>Unluck</Text></Text>;
+            default:
+                return null;
+        }
+    }
+
     _renderAdditionalRollInfo(result) {
         if (result.rollType === TO_HIT) {
             return this._renderToHitInfo(result);
@@ -195,6 +216,8 @@ class ResultScreen extends Component {
             return this._renderDamageInfo(result);
         } else if (result.rollType === SKILL_CHECK && result.threshold !== -1) {
             return this._renderSkillCheckInfo(result);
+        } else if (result.rollType === EFFECT) {
+            return this._renderEffectInfo(result);
         }
 
         return null;
@@ -240,6 +263,9 @@ class ResultScreen extends Component {
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Dice Rolled: </Text>{result.rolls.length} ({result.rolls.join(', ')})
                         </Text>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Partial Die: </Text>{dieRoller.getPartialDieName(result.partialDieType)}
+                        </Text>
                         {this._renderAdditionalRollInfo(result)}
                     </View>
                 );
@@ -251,6 +277,9 @@ class ResultScreen extends Component {
                 <Text style={[styles.grey, localStyles.rollResult]}><AnimateNumber value={this.state.result.total} formatter={(val) => {return val.toFixed(0);}} /></Text>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dice Rolled: </Text>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
+                </Text>
+                <Text style={styles.grey}>
+                    <Text style={styles.boldGrey}>Partial Die: </Text>{dieRoller.getPartialDieName(this.state.result.partialDieType)}
                 </Text>
                 {this._renderAdditionalRollInfo(this.state.result)}
             </View>

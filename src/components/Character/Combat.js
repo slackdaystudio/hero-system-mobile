@@ -87,9 +87,9 @@ export default class Combat extends Component {
     }
 
     _rollPresenceDamage(presenceDamage) {
-        this.props.updateForm('freeForm', character.getPresenceAttackDamage(presenceDamage));
+        this.props.updateForm('effect', character.getPresenceAttackDamage(presenceDamage));
 
-        this.props.navigation.navigate('FreeForm', {from: 'ViewCharacter'});
+        this.props.navigation.navigate('Effect', {from: 'ViewCharacter'});
     }
 
     _renderDefenses() {

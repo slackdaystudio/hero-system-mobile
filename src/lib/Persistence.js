@@ -324,7 +324,7 @@ class Persistence {
                 diceRolled: 0,
                 hitRolls: 0,
                 skillChecks: 0,
-                freeFormRolls: 0,
+                effectRolls: 0,
                 normalDamage: {
                     rolls: 0,
                     stun: 0,

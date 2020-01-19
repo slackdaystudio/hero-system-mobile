@@ -39,7 +39,7 @@ import Skill from '../Skill';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 import { talentDecorator } from '../talents/TalentDecorator';
 import { perkDecorator } from '../perks/PerkDecorator';
-import { NORMAL_DAMAGE, KILLING_DAMAGE, FREE_FORM } from '../../lib/DieRoller';
+import { NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -184,7 +184,7 @@ class PowerDecorator {
             case MINDCONTROL:
             case MINDSCAN:
             case TELEPATHY:
-                decorated = new EffectRoll(decorated, FREE_FORM);
+                decorated = new EffectRoll(decorated, EFFECT);
                 break;
             case BARRIER:
                 decorated = new Barrier(decorated);
@@ -221,13 +221,13 @@ class PowerDecorator {
                 break;
             case ENTANGLE:
                 decorated = new Entangle(decorated);
-                decorated = new EffectRoll(decorated, FREE_FORM);
+                decorated = new EffectRoll(decorated, EFFECT);
                 break;
             case EXTRALIMBS:
                 decorated = new ExtraLimbs(decorated);
                 break;
             case FLASH:
-                decorated = new EffectRoll(decorated, FREE_FORM);
+                decorated = new EffectRoll(decorated, EFFECT);
                 decorated = new Flash(decorated);
                 break;
             case FTL:

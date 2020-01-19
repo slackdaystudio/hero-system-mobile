@@ -11,7 +11,7 @@ import {
     SKILL_CHECK,
     NORMAL_DAMAGE,
     KILLING_DAMAGE,
-    FREE_FORM,
+    EFFECT,
     PARTIAL_DIE_PLUS_ONE,
     PARTIAL_DIE_HALF,
     PARTIAL_DIE_MINUS_ONE,
@@ -114,7 +114,7 @@ export default class Traits extends Component {
         this.setState(newState);
     }
 
-    _roll(roll) {
+    _roll(roll, decorated) {
         if (roll.type === SKILL_CHECK) {
             this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(roll.roll)});
         } else if (roll.type === NORMAL_DAMAGE) {
@@ -137,26 +137,15 @@ export default class Traits extends Component {
             });
 
             this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
-        } else if (roll.type === FREE_FORM) {
+        } else if (roll.type === EFFECT) {
             let dice = common.toDice(roll.roll);
-            let halfDice = 0;
-            let pips = 0;
+            let type = 'None';
 
-            switch (dice.partial) {
-                case PARTIAL_DIE_HALF:
-                    halfDice = 1;
-                    break;
-                case PARTIAL_DIE_PLUS_ONE:
-                    pips = 1;
-                    break;
-                case PARTIAL_DIE_MINUS_ONE:
-                    pips - 1;
-                    break;
-                default:
-                    // do nothing
+            if (decorated.characterTrait.trait.hasOwnProperty('xmlid')) {
+                type = decorated.characterTrait.trait.xmlid.toUpperCase();
             }
 
-            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.freeFormRoll(dice.full, halfDice, pips)});
+            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.effectRoll(dice.full, dice.partial, type)});
         }
     }
 
@@ -340,7 +329,7 @@ export default class Traits extends Component {
                 <CardItem style={styles.cardItem}>
                     <TouchableHighlight
                         underlayColor="#121212"
-                        onPress={() => this._roll(power.roll())}
+                        onPress={() => this._roll(power.roll(), power)}
                     >
                         <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
                     </TouchableHighlight>
@@ -356,7 +345,7 @@ export default class Traits extends Component {
             return (
                 <TouchableHighlight
                     underlayColor="#121212"
-                    onPress={() => this._roll(item.roll())}
+                    onPress={() => this._roll(item.roll(), item)}
                 >
                     <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.roll().roll}</Text>
                 </TouchableHighlight>

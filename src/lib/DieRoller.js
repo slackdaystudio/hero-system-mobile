@@ -23,7 +23,7 @@ export const NORMAL_DAMAGE = 3;
 
 export const KILLING_DAMAGE = 4;
 
-export const FREE_FORM = 5;
+export const EFFECT = 5;
 
 export const HIT_LOCATIONS = 6;
 
@@ -42,7 +42,7 @@ class DieRoller {
             TO_HIT,
             NORMAL_DAMAGE,
             KILLING_DAMAGE,
-            FREE_FORM,
+            EFFECT,
         ];
     }
 
@@ -129,30 +129,11 @@ class DieRoller {
         return resultRoll;
     }
 
-    freeFormRoll(dice, halfDice, pips) {
-        let resultRoll = {
-            rollType: FREE_FORM,
-            total: pips,
-            rolls: [],
-            dice: dice,
-            halfDice: halfDice,
-            pips: pips,
-        };
-        let roll = 0;
+    effectRoll(dice, partialDie, type) {
+        let resultRoll = this._roll(dice, EFFECT, partialDie);
 
-        for (let i = 0; i < dice; i++) {
-            roll = Math.floor(Math.random() * 6) + 1;
-
-            resultRoll.total += roll;
-            resultRoll.rolls.push(roll);
-        }
-
-        for (let i = 0; i < halfDice; i++) {
-            roll = Math.floor(Math.random() * 3) + 1;
-
-            resultRoll.total += roll;
-            resultRoll.rolls.push(roll);
-        }
+        resultRoll.dice = dice;
+        resultRoll.type = type;
 
         return resultRoll;
     }
@@ -172,11 +153,51 @@ class DieRoller {
             result = this.rollToHit(lastResult.cv, numberOfRolls, lastResult.isAutofire, lastResult.targetDcv);
         } else if (lastResult.rollType === NORMAL_DAMAGE || lastResult.rollType === KILLING_DAMAGE) {
             result = this.rollDamage(lastResult.damageForm);
-        } else if (lastResult.rollType === FREE_FORM) {
-            result = this.freeFormRoll(lastResult.dice, lastResult.halfDice, lastResult.pips);
+        } else if (lastResult.rollType === EFFECT) {
+            result = this.effectRoll(lastResult.dice, lastResult.partialDie, lastResult.type);
         }
 
         return result;
+    }
+
+    countNormalDamageBody(resultRoll) {
+        let body = 0;
+
+        for (let roll of resultRoll.rolls) {
+            if (roll >= 2 && roll <= 5) {
+                body += 1;
+            } else if (roll === 6) {
+                body += 2;
+            }
+        }
+
+        return body;
+    }
+
+    countLuck(resultRoll) {
+        let luckPoints = 0;
+
+        for (let roll of resultRoll.rolls) {
+            if (roll === 6) {
+                luckPoints++;
+            }
+        }
+
+        return luckPoints;
+    }
+
+    getPartialDieName(partialDieType) {
+        let name = 'None';
+
+        if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
+            name = '+1'
+        } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
+            name = '-1'
+        } else if (partialDieType === PARTIAL_DIE_HALF) {
+            name = '½';
+        }
+
+        return name;
     }
 
     _roll(dice, rollType, partialDieType) {
@@ -244,13 +265,7 @@ class DieRoller {
         let body = 0;
 
         if (resultRoll.rollType === NORMAL_DAMAGE) {
-            for (let roll of resultRoll.rolls) {
-                if (roll >= 2 && roll <= 5) {
-                    body += 1;
-                } else if (roll === 6) {
-                    body += 2;
-                }
-            }
+            body += this.countNormalDamageBody(resultRoll);
         } else if (resultRoll.rollType === KILLING_DAMAGE) {
             body += resultRoll.total;
         }

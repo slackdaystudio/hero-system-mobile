@@ -2,7 +2,7 @@ import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
 import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
-import { NORMAL_DAMAGE, KILLING_DAMAGE, FREE_FORM } from '../lib/DieRoller';
+import { NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -127,7 +127,7 @@ export default class Maneuver extends CharacterTrait {
                 } else if (this.characterTrait.trait.effect.indexOf('[FLASHDC]') > -1) {
                     return {
                         roll: this._getFlashDamage(),
-                        type: FREE_FORM,
+                        type: EFFECT,
                     };
                 }
             }

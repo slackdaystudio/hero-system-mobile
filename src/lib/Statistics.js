@@ -1,5 +1,5 @@
 import { Alert } from 'react-native';
-import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, FREE_FORM, SKILL_CHECK } from './DieRoller';
+import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK } from './DieRoller';
 import { persistence } from './Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -41,8 +41,8 @@ class Statistics {
             stats.totals.hitLocations[resultRoll.hitLocationDetails.location.toLowerCase()]++;
         } else if (resultRoll.rollType === TO_HIT) {
             stats.totals.hitRolls++;
-        } else if (resultRoll.rollType === FREE_FORM) {
-            stats.totals.freeFormRolls++;
+        } else if (resultRoll.rollType === EFFECT) {
+            stats.totals.effectRolls++;
         } else if (resultRoll.rollType === SKILL_CHECK) {
             stats.totals.skillChecks++;
         }
@@ -75,25 +75,25 @@ class Statistics {
     _updateDistributions(rolls, distributions) {
         for (let roll of rolls) {
             switch (roll) {
-            case 1:
-                distributions.one++;
-                break;
-            case 2:
-                distributions.two++;
-                break;
-            case 3:
-                distributions.three++;
-                break;
-            case 4:
-                distributions.four++;
-                break;
-            case 5:
-                distributions.five++;
-                break;
-            case 6:
-                distributions.six++;
-                break;
-            default:
+                case 1:
+                    distributions.one++;
+                    break;
+                case 2:
+                    distributions.two++;
+                    break;
+                case 3:
+                    distributions.three++;
+                    break;
+                case 4:
+                    distributions.four++;
+                    break;
+                case 5:
+                    distributions.five++;
+                    break;
+                case 6:
+                    distributions.six++;
+                    break;
+                default:
                     // do nothing
             }
         }

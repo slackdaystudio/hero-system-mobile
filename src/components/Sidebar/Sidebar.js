@@ -66,7 +66,7 @@ class Sidebar extends Component {
                         <ListItem onPress={() => this.props.navigation.navigate('Damage')}>
                             <Text style={styles.grey}>Damage</Text>
                         </ListItem>
-                        <ListItem onPress={() => this.props.navigation.navigate('FreeForm')}>
+                        <ListItem onPress={() => this.props.navigation.navigate('Effect')}>
                             <Text style={styles.grey}>Free Form</Text>
                         </ListItem>
                         <ListItem itemDivider style={{backgroundColor: '#242424'}} />

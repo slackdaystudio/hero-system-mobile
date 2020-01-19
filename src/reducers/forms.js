@@ -76,8 +76,8 @@ function _copyState(state) {
         damage: {
             ...state.damage,
         },
-        freeForm: {
-            ...state.freeForm,
+        effect: {
+            ...state.effect,
         },
         costCruncher: {
             ...state.costCruncher,
@@ -122,11 +122,11 @@ function _initializeDamageForm() {
     };
 }
 
-function _initializeFreeFormForm() {
+function _initializeEffectForm() {
     return {
         dice: 1,
-        halfDice: 0,
-        pips: 0,
+        partialDie: '0',
+        effectType: 'None',
     };
 }
 
@@ -142,7 +142,7 @@ let formsState = {
     skill: _initializeSkillForm(),
     hit: _initializeHitForm(),
     damage: _initializeDamageForm(),
-    freeForm: _initializeFreeFormForm(),
+    effect: _initializeEffectForm(),
     costCruncher: _initializeCostCruncherForm(),
 };
 
@@ -162,14 +162,14 @@ export default function forms(state = formsState, action) {
                 case 'damage':
                     form = _initializeDamageForm();
                     break;
-                case 'freeForm':
-                    form = _initializeFreeFormForm();
+                case 'effect':
+                    form = _initializeEffectForm();
                     break;
                 case 'hit':
                     form = _initializeHitForm();
                     break;
                 default:
-                        // Do nothing
+                    // Do nothing
             }
 
             if (form !== null) {
@@ -199,14 +199,14 @@ export default function forms(state = formsState, action) {
                 case 'damage':
                     reinitializedForm = _initializeDamageForm();
                     break;
-                case 'freeForm':
-                    reinitializedForm = _initializeFreeFormForm();
+                case 'effect':
+                    reinitializedForm = _initializeEffectForm();
                     break;
                 case 'costCruncher':
                     reinitializedForm = _initializeCostCruncherForm();
                     break;
                 default:
-                        // Do nothing
+                    // Do nothing
             }
 
             if (reinitializedForm !== null) {

@@ -7,7 +7,7 @@ import ResultScreen from './src/components/Screens/ResultScreen';
 import SkillScreen from './src/components/Screens/SkillScreen';
 import HitScreen from './src/components/Screens/HitScreen';
 import DamageScreen from './src/components/Screens/DamageScreen';
-import FreeFormScreen from './src/components/Screens/FreeFormScreen';
+import EffectScreen from './src/components/Screens/EffectScreen';
 import CostCruncherScreen from './src/components/Screens/CostCruncherScreen';
 import StatisticsScreen from './src/components/Screens/StatisticsScreen';
 import SettingsScreen from './src/components/Screens/SettingsScreen';
@@ -52,8 +52,8 @@ const AppNavigator = createDrawerNavigator({
     Damage: {
         screen: DamageScreen,
     },
-    FreeForm: {
-        screen: FreeFormScreen,
+    Effect: {
+        screen: EffectScreen,
     },
     CostCruncher: {
         screen: CostCruncherScreen,
