@@ -13,6 +13,7 @@ import { initializeStatistics } from '../../reducers/statistics';
 import { initializeCharacter, initializeShowSecondary, setCharacter, setShowSecondary } from '../../reducers/character';
 import { initializeRandomHero } from '../../reducers/randomHero';
 import { initializeCombatDetails, setCombatDetails } from '../../reducers/combat';
+import { initializeSounds } from '../../reducers/sounds';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,6 +33,7 @@ class HomeScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
+        initializeSounds: PropTypes.func.isRequired,
         initializeApplicationSettings: PropTypes.func.isRequired,
         initializeStatistics: PropTypes.func.isRequired,
         initializeCharacter: PropTypes.func.isRequired,
@@ -56,6 +58,7 @@ class HomeScreen extends Component {
 
     async componentDidMount() {
         try {
+            await this.props.initializeSounds();
             await this.props.initializeApplicationSettings();
             await this.props.initializeStatistics();
             await this.props.initializeCharacter();
@@ -188,6 +191,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = {
+    initializeSounds,
     initializeApplicationSettings,
     initializeStatistics,
     initializeCharacter,

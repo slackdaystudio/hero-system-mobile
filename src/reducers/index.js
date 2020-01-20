@@ -3,6 +3,7 @@ import character from './character';
 import combat from './combat';
 import forms from './forms';
 import settings from './settings';
+import sounds from './sounds';
 import statistics from './statistics';
 import randomHero from './randomHero';
 
@@ -24,6 +25,7 @@ export default combineReducers({
     character,
     combat,
     forms,
+    sounds,
     settings,
     statistics,
     randomHero,

@@ -29,6 +29,7 @@ import { addStatistics } from '../../reducers/statistics';
 class ResultScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
+        sfx: PropTypes.object.isRequired,
         addStatisticts: PropTypes.func.isRequired,
     }
 
@@ -44,6 +45,7 @@ class ResultScreen extends Component {
 
     onDidFocus() {
         this.setState({result: this.props.navigation.state.params.result}, () => {
+            this.props.sfx.dice.play();
             this._updateStatistics();
         });
 
@@ -80,6 +82,7 @@ class ResultScreen extends Component {
         this.setState({
             result: dieRoller.rollAgain(this.props.navigation.state.params.result),
         }, () => {
+            this.props.sfx.dice.play();
             this._updateStatistics();
         });
     }
@@ -351,7 +354,9 @@ const localStyles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-    return {}
+    return {
+        sfx: state.sounds.sfx
+    }
 };
 
 const mapDispatchToProps = {
