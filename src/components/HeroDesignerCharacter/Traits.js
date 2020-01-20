@@ -212,6 +212,22 @@ export default class Traits extends Component {
         return null;
     }
 
+    _renderNotes(decorated) {
+        if (decorated.characterTrait.trait.notes === null) {
+            return null;
+        }
+
+        return (
+            <CardItem style={styles.cardItem}>
+                <Body>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>Notes:</Text> {decorated.characterTrait.trait.notes}
+                    </Text>
+                </Body>
+            </CardItem>
+        );
+    }
+
     _renderDefinition(item) {
         if (item.definition() !== '' || item.attributes().length > 0) {
             return (
@@ -237,6 +253,7 @@ export default class Traits extends Component {
                 <Fragment>
                     {this._renderDefinition(item)}
                     {this._renderAdvantagesAndLimitations(item)}
+                    {this._renderNotes(item)}
                     <CardItem style={styles.cardItem} footer>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                             <Text style={styles.grey}>
@@ -277,6 +294,7 @@ export default class Traits extends Component {
             <Fragment>
                 {this._renderDefinition(item)}
                 {this._renderAdvantagesAndLimitations(item)}
+                {this._renderNotes(item)}
                 <CardItem style={styles.cardItem} footer>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                         <Text style={styles.grey}>
@@ -301,6 +319,7 @@ export default class Traits extends Component {
                             {this._renderCompoundPowerRoll(power)}
                             {this._renderDefinition(power)}
                             {this._renderAdvantagesAndLimitations(power)}
+                            {this._renderNotes(power)}
                             <CardItem style={styles.cardItem} footer>
                                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                                     <Text style={styles.grey}>
