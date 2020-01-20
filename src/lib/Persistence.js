@@ -40,7 +40,7 @@ class Persistence {
             showSecondary = await AsyncStorage.getItem('showSecondaryCharacteristics');
 
             if (showSecondary === null) {
-                await AsyncStorage.setItem('showSecondaryCharacteristics', true);
+                await AsyncStorage.setItem('showSecondaryCharacteristics', true.toString());
 
                 showSecondary = JSON.stringify(true);
             }
@@ -63,7 +63,6 @@ class Persistence {
 
     async initializeCombatDetails(character) {
         let combatDetails = null;
-        let combatStats = ['stun', 'body', 'end', 'ocv', 'dcv', 'omcv', 'dmcv']
 
         try {
             combatDetails = await AsyncStorage.getItem('combat');
