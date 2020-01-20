@@ -5,7 +5,7 @@ import { View, TouchableHighlight, Alert, Switch } from 'react-native';
 import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
-import { dieRoller } from '../../lib/DieRoller';
+import { dieRoller, NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter, TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
 import { SKILL_ROLL_BASE } from '../../decorators/skills/Roll';
@@ -55,6 +55,7 @@ export default class Characteristics extends Component {
         showSecondary: PropTypes.bool.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
         setCombatDetails: PropTypes.func.isRequired,
+        updateForm: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -128,6 +129,32 @@ export default class Characteristics extends Component {
         }
 
         return meters
+    }
+
+    _getStrengthDamage(strength) {
+        let damage = strength / 5;
+        let fractionalPart = parseFloat((damage % 1).toFixed(1));
+
+        if (fractionalPart > 0.0) {
+            if (fractionalPart >= 0.6) {
+                damage = `${Math.trunc(damage)}½`;
+            } else {
+                damage = Math.trunc(damage);
+            }
+        }
+
+        return `${damage}d6`;
+    }
+
+    _rollStrengthDamage(strengthDamage) {
+        let dice = common.toDice(strengthDamage);
+
+        this.props.updateForm('damage', {
+            dice: dice.full,
+            partialDie: dice.partial,
+        });
+
+        this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
     }
 
     _renderNotes(characteristic) {
@@ -304,11 +331,19 @@ export default class Characteristics extends Component {
                 }
             }
 
+            let strengthDamage = this._getStrengthDamage(totalStrength);
+
             return (
                 <View style={{flex: 1, paddingBottom: 10}}>
-                    <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Damage:</Text> {this._renderStrengthDamage(totalStrength)}
-                    </Text>
+                    <TouchableHighlight
+                        underlayColor="#121212"
+                        onPress={() => this._rollStrengthDamage(strengthDamage)}
+                    >
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Damage:</Text> {strengthDamage}
+                        </Text>
+                    </TouchableHighlight>
+
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>Lift:</Text> {this._renderLift(lift)}
                     </Text>
@@ -320,21 +355,6 @@ export default class Characteristics extends Component {
         }
 
         return null;
-    }
-
-    _renderStrengthDamage(strength) {
-        let damage = strength / 5;
-        let fractionalPart = parseFloat((damage % 1).toFixed(1));
-
-        if (fractionalPart > 0.0) {
-            if (fractionalPart >= 0.6) {
-                damage = `${Math.trunc(damage)}½`;
-            } else {
-                damage = Math.trunc(damage);
-            }
-        }
-
-        return `${damage}d6`;
     }
 
     _renderLift(lift) {

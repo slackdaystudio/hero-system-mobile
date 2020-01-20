@@ -140,6 +140,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                                     showSecondary={this.props.showSecondary}
                                     setCombatDetails={this.props.setCombatDetails}
                                     setShowSecondary={this.props.setShowSecondary}
+                                    updateForm={this.props.updateForm}
                                 />
                             </View>
                         </Tab>
