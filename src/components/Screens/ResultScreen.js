@@ -44,8 +44,9 @@ class ResultScreen extends Component {
     }
 
     onDidFocus() {
+        this._playRollSound();
+
         this.setState({result: this.props.navigation.state.params.result}, () => {
-            this.props.sfx.dice.play();
             this._updateStatistics();
         });
 
@@ -68,6 +69,18 @@ class ResultScreen extends Component {
         this.props.navigation.state.params = null;
     }
 
+    _playRollSound() {
+        if (this.state.result.hasOwnProperty('sfx') && this.state.result.sfx !== null && this.props.sfx.hasOwnProperty(this.state.result.sfx)) {
+            this.props.sfx[this.state.result.sfx].stop(() => {
+                this.props.sfx[this.state.result.sfx].play();
+            });
+        } else {
+            this.props.sfx.dice.stop(() => {
+                this.props.sfx.dice.play();
+            });
+        }
+    }
+
     _updateStatistics() {
         if (this.state.result.hasOwnProperty('results')) {
             for (let i = 0; i < this.state.result.results.length; i++) {
@@ -79,10 +92,11 @@ class ResultScreen extends Component {
     }
 
     _reRoll() {
+        this._playRollSound();
+
         this.setState({
             result: dieRoller.rollAgain(this.props.navigation.state.params.result),
         }, () => {
-            this.props.sfx.dice.play();
             this._updateStatistics();
         });
     }

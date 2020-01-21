@@ -40,6 +40,10 @@ export function initializeSounds() {
 let initSfx = async () => {
     let sounds = {
         "dice": null,
+        "sfx_acid": null,
+        "sfx_air": null,
+        "sfx_earth": null,
+        "sfx_electricity": null,
     };
 
     Sound.setCategory('Playback');

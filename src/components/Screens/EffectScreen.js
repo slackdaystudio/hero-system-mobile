@@ -78,7 +78,7 @@ class EffectScreen extends Component {
     _roll() {
         this.props.navigation.navigate('Result', {
             from: 'Effect',
-            result: dieRoller.effectRoll(this.props.effectForm.dice, this.props.effectForm.partialDie, this.props.effectForm.effectType)
+            result: dieRoller.effectRoll(this.props.effectForm.dice, this.props.effectForm.partialDie, this.props.effectForm.effectType, this.props.effectForm.sfx)
         });
     }
 
