@@ -196,15 +196,12 @@ class Persistence {
 
         try {
             settings = await AsyncStorage.getItem('appSettings');
+            settings = settings === null ? {} : JSON.parse(settings);
 
-            if (settings === null) {
-                settings = {
-                    useFifthEdition: false,
-                };
-
+            if (this._populateMissingSetttings(settings)) {
                 await AsyncStorage.setItem('appSettings', JSON.stringify(settings));
-            } else {
-                settings = JSON.parse(settings);
+
+                return settings;
             }
         } catch (error) {
             common.toast('Unable to retrieve application settings or initialize a fresh set');
@@ -213,14 +210,33 @@ class Persistence {
         return settings;
     }
 
-    async setUseFifthEditionRules(fifth) {
+    async clearApplicationSettings() {
+        let settings = {};
+
         try {
-            await AsyncStorage.setItem('appSettings', JSON.stringify({useFifthEdition: fifth}));
+            this._populateMissingSetttings(settings);
+
+            await AsyncStorage.setItem('appSettings', JSON.stringify(settings));
         } catch (error) {
-            common.toast('Unable to set the value for the setting to use fifth edition rules');
+            common.toast('Unable to clear application settings');
         }
 
-        return fifth;
+        return settings;
+    }
+
+    async toggleSetting(key, value) {
+        try {
+            let appSettings = await AsyncStorage.getItem('appSettings');
+            appSettings = JSON.parse(appSettings);
+
+            appSettings[key] = value;
+            
+            await AsyncStorage.setItem('appSettings', JSON.stringify(appSettings));
+        } catch (error) {
+            common.toast(`Unable to toggle ${key}`);
+        }
+
+        return value;
     }
 
     async initializeStatistics() {
@@ -397,6 +413,25 @@ class Persistence {
         let characteristic = heroDesignerCharacter.getCharacteristicByShortName(shortName, character);
 
         return characteristic === null ? 0 : characteristic.value;
+    }
+
+    _populateMissingSetttings(settings) {
+        let shouldUpdate = false;
+        let settingDefaults = {
+            useFifthEdition: false,
+            playSounds: true,
+        };
+
+        settings = settings === null || settings === undefined ? {} : settings;
+
+        for (let [key, value] of Object.entries(settingDefaults)) {
+            if (settings[key] === null || settings[key] === undefined || settings[key] === '') {
+                settings[key] = value;
+                shouldUpdate = true;
+            }
+        }
+
+        return shouldUpdate;
     }
 }
 

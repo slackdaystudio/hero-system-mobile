@@ -23,7 +23,9 @@ import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
 
 export const INITIALIZE_SETTINGS = 'INITIALIZE_SETTINGS';
 
-export const USE_FIFTH_EDITION_RULES = 'USE_FIFTH_EDITION_RULES';
+export const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
+
+export const TOGGLE_SETTING = 'TOGGLE_SETTING';
 
 //////////////////////////////
 // ACTIONS                  //
@@ -40,12 +42,26 @@ export function initializeApplicationSettings() {
     };
 }
 
-export function setUseFifthEditionRules(fifth) {
+export function clearApplicationSettings() {
     return async (dispatch) => {
-        persistence.setUseFifthEditionRules(fifth).then(useFifth => {
+        persistence.clearApplicationSettings().then(settings => {
             dispatch({
-                type: USE_FIFTH_EDITION_RULES,
-                payload: useFifth,
+                type: CLEAR_SETTINGS,
+                payload: settings,
+            });
+        });
+    };
+}
+
+export function toggleSetting(key, value) {
+    return async (dispatch) => {
+        persistence.toggleSetting(key, value).then(settingValue => {
+            dispatch({
+                type: TOGGLE_SETTING,
+                payload: {
+                    key: key,
+                    value: settingValue,
+                },
             });
         });
     };
@@ -57,23 +73,25 @@ export default function settings(state = settingsState, action) {
     let newState = null;
 
     switch (action.type) {
-    case INITIALIZE_SETTINGS:
-        newState = {...state};
-        newState = action.payload;
+        case INITIALIZE_SETTINGS:
+        case CLEAR_SETTINGS:
+            newState = {
+                ...state,
+            };
 
-        return newState;
-    case USE_FIFTH_EDITION_RULES:
-        newState = {
-            ...state,
-            useFifthEdition: {
-                ...state.useFifthEdition,
-            },
-        };
+            newState.useFifthEdition = action.payload.useFifthEdition;
+            newState.playSounds = action.payload.playSounds;
 
-        newState.useFifthEdition = action.payload;
+            return newState;
+        case TOGGLE_SETTING:
+            newState = {
+                ...state
+            };
 
-        return newState;
-    default:
-        return state;
+            newState[action.payload.key] = action.payload.value;
+            
+            return newState;
+        default:
+            return state;
     }
 }

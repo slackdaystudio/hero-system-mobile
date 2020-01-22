@@ -31,6 +31,7 @@ class ResultScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         addStatistics: PropTypes.func.isRequired,
+        playSounds: PropTypes.bool.isRequired,
     }
 
     constructor(props) {
@@ -45,7 +46,7 @@ class ResultScreen extends Component {
 
     onDidFocus() {
         this.setState({result: this.props.navigation.state.params.result}, () => {
-            soundPlayer.play(this.state.result.sfx);
+            this._playSoundClip();
             this._updateStatistics();
         });
 
@@ -70,6 +71,12 @@ class ResultScreen extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.result !== this.state.result) {
+            this._playSoundClip();
+        }
+    }
+
+    _playSoundClip() {
+        if (this.props.playSounds) {
             soundPlayer.play(this.state.result.sfx);
         }
     }
@@ -357,7 +364,9 @@ const localStyles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-    return {}
+    return {
+        playSounds: state.settings.playSounds,
+    }
 };
 
 const mapDispatchToProps = {

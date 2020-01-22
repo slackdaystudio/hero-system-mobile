@@ -13,7 +13,7 @@ import styles from '../../Styles';
 import { resetForm } from '../../reducers/forms';
 import { clearCharacter } from '../../reducers/character';
 import { clearRandomHero } from '../../reducers/randomHero';
-import { initializeApplicationSettings, setUseFifthEditionRules } from '../../reducers/settings';
+import { clearApplicationSettings, toggleSetting } from '../../reducers/settings';
 import { clearStatistics } from '../../reducers/statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -34,19 +34,12 @@ class SettingsScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         useFifthEdition: PropTypes.bool.isRequired,
+        playSounds: PropTypes.bool.isRequired,
         resetForm: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
         clearRandomHero: PropTypes.func.isRequired,
         clearStatistics: PropTypes.func.isRequired,
-        initializeApplicationSettings: PropTypes.func.isRequired,
-    }
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            appSettings: null,
-        };
+        clearApplicationSettings: PropTypes.func.isRequired,
     }
 
     onDidFocus() {
@@ -98,12 +91,12 @@ class SettingsScreen extends Component {
     }
 
     async _clearAll() {
-        this.props.initializeApplicationSettings();
-        this._clearFormData(false);
-        this._clearCharacterData(false);
-        this._clearHeroData(false);
-        this._clearStatisticsData(false);
-
+        await this.props.clearApplicationSettings()
+        await this._clearFormData(false);
+        await this._clearCharacterData(false);
+        await this._clearHeroData(false);
+        await this._clearStatisticsData(false);
+        
         common.toast('Everything has been cleared');
     }
 
@@ -165,7 +158,22 @@ class SettingsScreen extends Component {
                             <Right>
                                 <Switch
                                     value={this.props.useFifthEdition}
-                                    onValueChange={() => this.props.setUseFifthEditionRules(!this.props.useFifthEdition)}
+                                    onValueChange={() => this.props.toggleSetting('useFifthEdition', !this.props.useFifthEdition)}
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbTintColor="#14354d"
+                                    onTintColor="#01121E"
+                                />
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Play sounds?</Text>
+                            </Left>
+                            <Right>
+                                <Switch
+                                    value={this.props.playSounds}
+                                    onValueChange={() => this.props.toggleSetting('playSounds', !this.props.playSounds)}
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbTintColor="#14354d"
@@ -188,12 +196,13 @@ class SettingsScreen extends Component {
 const mapStateToProps = state => {
     return {
         useFifthEdition: state.settings.useFifthEdition,
+        playSounds: state.settings.playSounds,
     };
 };
 
 const mapDispatchToProps = {
-    initializeApplicationSettings,
-    setUseFifthEditionRules,
+    clearApplicationSettings,
+    toggleSetting,
     resetForm,
     clearCharacter,
     clearRandomHero,
