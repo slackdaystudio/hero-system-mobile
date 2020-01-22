@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import thunk from 'redux-thunk';
 import { Root } from 'native-base';
+import Sound from 'react-native-sound';
+import { soundPlayer } from './src/lib/SoundPlayer';
 import reducer from './src/reducers/index';
 import AppNavigator from './AppNavigator';
 
@@ -22,12 +24,20 @@ import AppNavigator from './AppNavigator';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export let sounds = {};
+
+export function setSound(name, soundClip) {
+    sounds[name] = soundClip;
+}
+
 export const store = createStore(reducer, applyMiddleware(thunk));
 
 const AppContainer = createAppContainer(AppNavigator);
 
 export default class App extends Component {
-    componentDidMount() {
+    async componentDidMount() {
+        await soundPlayer.initialize();
+
         // Adding a 100ms delay here gets rid of a white screen
         setTimeout(() => SplashScreen.hide(), 100);
     }

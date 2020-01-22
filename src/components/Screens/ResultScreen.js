@@ -9,6 +9,7 @@ import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
+import { soundPlayer } from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import { addStatistics } from '../../reducers/statistics';
 
@@ -29,8 +30,7 @@ import { addStatistics } from '../../reducers/statistics';
 class ResultScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        sfx: PropTypes.object.isRequired,
-        addStatisticts: PropTypes.func.isRequired,
+        addStatistics: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -44,9 +44,8 @@ class ResultScreen extends Component {
     }
 
     onDidFocus() {
-        this._playRollSound();
-
         this.setState({result: this.props.navigation.state.params.result}, () => {
+            soundPlayer.play(this.state.result.sfx);
             this._updateStatistics();
         });
 
@@ -69,15 +68,9 @@ class ResultScreen extends Component {
         this.props.navigation.state.params = null;
     }
 
-    _playRollSound() {
-        if (this.state.result.hasOwnProperty('sfx') && this.state.result.sfx !== null && this.props.sfx.hasOwnProperty(this.state.result.sfx)) {
-            this.props.sfx[this.state.result.sfx].stop(() => {
-                this.props.sfx[this.state.result.sfx].play();
-            });
-        } else {
-            this.props.sfx.dice.stop(() => {
-                this.props.sfx.dice.play();
-            });
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevState.result !== this.state.result) {
+            soundPlayer.play(this.state.result.sfx);
         }
     }
 
@@ -92,11 +85,7 @@ class ResultScreen extends Component {
     }
 
     _reRoll() {
-        this._playRollSound();
-
-        this.setState({
-            result: dieRoller.rollAgain(this.props.navigation.state.params.result),
-        }, () => {
+        this.setState({result: dieRoller.rollAgain(this.state.result)}, () => {
             this._updateStatistics();
         });
     }
@@ -368,9 +357,7 @@ const localStyles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-    return {
-        sfx: state.sounds.sfx
-    }
+    return {}
 };
 
 const mapDispatchToProps = {
