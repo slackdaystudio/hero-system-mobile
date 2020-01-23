@@ -21,50 +21,47 @@ import { sounds, setSound } from '../../App.js';
 const DEFAULT_SOUND = 'dice';
 
 const VOLUME = {
-    "sfx_electricity": 0.10
+    "electricity": 0.10
 }
 
 class SoundPlayer {
     play(name) {
-        let clip = sounds[DEFAULT_SOUND];
+        name = this._getClipName(name);
 
-        if (name !== null && name !== undefined && name !== '') {
-            if (sounds.hasOwnProperty(name)) {
-                if (sounds[name].initialized) {
-                    clip = sounds[name];
-                }
-            } else {
-                clip = this.initialize(name);
-            }
-        }
-
-        // The sound may still be loading so check it and add a slight delay if it is
-        if (clip.sound.isLoaded()) {
-            this._playClip(clip);
+        if (!sounds.hasOwnProperty(name)) {
+            this.initialize(name);
         } else {
-            setTimeout(() => this._playClip(clip), 100);
+            let clip = sounds[DEFAULT_SOUND];
+
+            if (sounds[name].initialized) {
+                clip = sounds[name];
+            }
+            
+            this._playClip(clip);
         }
     }
 
-    initialize(name=DEFAULT_SOUND) {
+    initialize(name, playOnLoad=true) {
+        if (name === null || name === undefined || name === '') {
+            return null;
+        }
+
+        name = this._getClipName(name);
+
         if (sounds.hasOwnProperty(name)) {
             return null;
         }
 
-        let sound = null;
         let clip = {
             initialized: false,
             sound: null,
             volume: 1.0,
         };
 
-        try {
-            sound = new Sound(`${name}.mp3`, Sound.MAIN_BUNDLE, (error) => {
-                if (error) {
-                    common.toast(`Unable to load the sound ${name}`);
-                    return;
-                }
-            });
+        let sound = new Sound(`${name}.mp3`, Sound.MAIN_BUNDLE, (error) => {
+            if (error) {
+                setSound(name, clip);
+            }
 
             clip.initialized = true;
             clip.sound = sound;
@@ -72,17 +69,21 @@ class SoundPlayer {
             if (VOLUME.hasOwnProperty(name)) {
                 clip.volume = VOLUME[name];
             }
-        } catch (error) {
-            common.toast(`Unable to initialize the sound ${name}`);
-        } finally {
-            setSound(name, clip);
-        }
 
-        return clip;
+            setSound(name, clip);
+
+            if (playOnLoad) {
+                this._playClip(clip);
+            }
+        });
     }
 
     _playClip(clip) {
         try {
+            if (!clip.sound.isLoaded()) {
+                setTimeout(() => this._playClip(clip), 100);
+            }
+
             clip.sound.setVolume(clip.volume);
 
             // Stop the sound if it's already playing
@@ -92,6 +93,14 @@ class SoundPlayer {
         } catch (error) {
             common.toast(error.message);
         }
+    }
+
+    _getClipName(name) {
+        if (name === null || name === undefined) {
+            return DEFAULT_SOUND;
+        }
+
+        return common.toSnakeCase(name);
     }
 }
 

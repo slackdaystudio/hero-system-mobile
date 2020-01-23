@@ -6,7 +6,7 @@ import SplashScreen from 'react-native-splash-screen';
 import thunk from 'redux-thunk';
 import { Root } from 'native-base';
 import Sound from 'react-native-sound';
-import { soundPlayer } from './src/lib/SoundPlayer';
+import { soundPlayer, DEFAULT_SOUND } from './src/lib/SoundPlayer';
 import reducer from './src/reducers/index';
 import AppNavigator from './AppNavigator';
 
@@ -36,7 +36,7 @@ const AppContainer = createAppContainer(AppNavigator);
 
 export default class App extends Component {
     componentDidMount() {
-        soundPlayer.initialize();
+        soundPlayer.initialize(DEFAULT_SOUND, false);
 
         // Adding a 100ms delay here gets rid of a white screen
         setTimeout(() => SplashScreen.hide(), 100);

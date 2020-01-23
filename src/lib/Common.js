@@ -49,18 +49,6 @@ class Common {
         return true;
     }
 
-    getSfxName(sfx) {
-        if (sfx === null || sfx === undefined || sfx.toLowerCase() === 'default') {
-            return 'dice';
-        }
-
-        if (sfx.indexOf('/') > -1) {
-            return `sfx_${sfx.split('/')[0].toLowerCase()}`;
-        }
-
-        return `sfx_${sfx.toLowerCase()}`;
-    }
-
     isArrayEqual(first, second) {
         if (!Array.isArray(first) || !Array.isArray(second)) {
             return false;
