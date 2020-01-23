@@ -9,7 +9,7 @@ import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
-import { soundPlayer } from '../../lib/SoundPlayer';
+import { soundPlayer, DEFAULT_SOUND } from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import { addStatistics } from '../../reducers/statistics';
 
@@ -32,6 +32,7 @@ class ResultScreen extends Component {
         navigation: PropTypes.object.isRequired,
         addStatistics: PropTypes.func.isRequired,
         playSounds: PropTypes.bool.isRequired,
+        onlyDiceSounds: PropTypes.bool.isRequired,
     }
 
     constructor(props) {
@@ -77,7 +78,9 @@ class ResultScreen extends Component {
 
     _playSoundClip() {
         if (this.props.playSounds) {
-            soundPlayer.play(this.state.result.sfx);
+            let soundName = this.props.onlyDiceSounds ? DEFAULT_SOUND : this.state.result.sfx;
+
+            soundPlayer.play(soundName);
         }
     }
 
@@ -366,6 +369,7 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         playSounds: state.settings.playSounds,
+        onlyDiceSounds: state.settings.onlyDiceSounds,
     }
 };
 

@@ -206,7 +206,7 @@ class Persistence {
         } catch (error) {
             common.toast('Unable to retrieve application settings or initialize a fresh set');
         }
-
+        
         return settings;
     }
 
@@ -230,7 +230,7 @@ class Persistence {
             appSettings = JSON.parse(appSettings);
 
             appSettings[key] = value;
-            
+
             await AsyncStorage.setItem('appSettings', JSON.stringify(appSettings));
         } catch (error) {
             common.toast(`Unable to toggle ${key}`);
@@ -420,6 +420,7 @@ class Persistence {
         let settingDefaults = {
             useFifthEdition: false,
             playSounds: true,
+            onlyDiceSounds: false,
         };
 
         settings = settings === null || settings === undefined ? {} : settings;

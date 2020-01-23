@@ -5,6 +5,7 @@ import { BackHandler, StyleSheet, View, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
+import Heading from '../Heading/Heading';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import { common } from '../../lib/Common';
@@ -35,6 +36,7 @@ class SettingsScreen extends Component {
         navigation: PropTypes.object.isRequired,
         useFifthEdition: PropTypes.bool.isRequired,
         playSounds: PropTypes.bool.isRequired,
+        onlyDiceSounds: PropTypes.bool.isRequired,
         resetForm: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
         clearRandomHero: PropTypes.func.isRequired,
@@ -96,7 +98,7 @@ class SettingsScreen extends Component {
         await this._clearCharacterData(false);
         await this._clearHeroData(false);
         await this._clearStatisticsData(false);
-        
+
         common.toast('Everything has been cleared');
     }
 
@@ -109,49 +111,9 @@ class SettingsScreen extends Component {
                 />
                 <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
-                    <Text style={styles.heading}>Settings</Text>
+                    <Heading text="Game" />
                     <List>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Form data</Text>
-                            </Left>
-                            <Body>
-                                <Button style={styles.button} onPress={() => this._clearFormData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
-                                </Button>
-                            </Body>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Loaded character</Text>
-                            </Left>
-                            <Body>
-                                <Button style={styles.button} onPress={() => this._clearCharacterData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
-                                </Button>
-                            </Body>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>H.E.R.O.</Text>
-                            </Left>
-                            <Body>
-                                <Button style={styles.button} onPress={() => this._clearHeroData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
-                                </Button>
-                            </Body>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Statistics</Text>
-                            </Left>
-                            <Body>
-                                <Button style={styles.button} onPress={() => this._clearStatisticsData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
-                                </Button>
-                            </Body>
-                        </ListItem>
-                        <ListItem>
+                        <ListItem noIndent style={{borderBottomWidth: 0}}>
                             <Left>
                                 <Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
                             </Left>
@@ -166,9 +128,12 @@ class SettingsScreen extends Component {
                                 />
                             </Right>
                         </ListItem>
-                        <ListItem>
+                    </List>
+                    <Heading text="Sound" />
+                    <List>
+                        <ListItem noIndent>
                             <Left>
-                                <Text style={styles.boldGrey}>Play sounds?</Text>
+                                <Text style={styles.boldGrey}>Play rolling sounds?</Text>
                             </Left>
                             <Right>
                                 <Switch
@@ -181,9 +146,68 @@ class SettingsScreen extends Component {
                                 />
                             </Right>
                         </ListItem>
+                        <ListItem noIndent style={{borderBottomWidth: 0}}>
+                            <Left>
+                                <Text style={styles.boldGrey}>Play dice sounds only?</Text>
+                            </Left>
+                            <Right>
+                                <Switch
+                                    value={this.props.onlyDiceSounds}
+                                    onValueChange={() => this.props.toggleSetting('onlyDiceSounds', !this.props.onlyDiceSounds)}
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbTintColor="#14354d"
+                                    onTintColor="#01121E"
+                                    disabled={!this.props.playSounds}
+                                />
+                            </Right>
+                        </ListItem>
+                    </List>
+                    <Heading text="Cache" />
+                    <List>
+                        <ListItem noIndent>
+                            <Left>
+                                <Text style={styles.boldGrey}>Form data</Text>
+                            </Left>
+                            <Right>
+                                <Button style={styles.buttonSmall} onPress={() => this._clearFormData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Right>
+                        </ListItem>
+                        <ListItem noIndent>
+                            <Left>
+                                <Text style={styles.boldGrey}>Loaded character</Text>
+                            </Left>
+                            <Right>
+                                <Button style={styles.buttonSmall} onPress={() => this._clearCharacterData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Right>
+                        </ListItem>
+                        <ListItem noIndent>
+                            <Left>
+                                <Text style={styles.boldGrey}>H.E.R.O.</Text>
+                            </Left>
+                            <Right>
+                                <Button style={styles.buttonSmall} onPress={() => this._clearHeroData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Right>
+                        </ListItem>
+                        <ListItem noIndent>
+                            <Left>
+                                <Text style={styles.boldGrey}>Statistics</Text>
+                            </Left>
+                            <Right>
+                                <Button style={styles.buttonSmall} onPress={() => this._clearStatisticsData()}>
+                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                </Button>
+                            </Right>
+                        </ListItem>
                     </List>
                     <View style={{paddingTop: 20}}>
-                        <Button block style={styles.button} onPress={() => this._clearAll()}>
+                        <Button block style={styles.buttonSmall} onPress={() => this._clearAll()}>
                             <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
                         </Button>
                     </View>
@@ -197,6 +221,7 @@ const mapStateToProps = state => {
     return {
         useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,
+        onlyDiceSounds: state.settings.onlyDiceSounds,
     };
 };
 
