@@ -18,6 +18,10 @@ import { sounds, setSound } from '../../App.js';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const MAX_PLAY_SOUND_ATTEMPTS = 50;
+
+const PLAY_SOUND_ATTEMPT_DELAY = 5;
+
 const DEFAULT_SOUND = 'dice';
 
 const VOLUME = {
@@ -36,7 +40,7 @@ class SoundPlayer {
             if (sounds[name].initialized) {
                 clip = sounds[name];
             }
-            
+
             this._playClip(clip);
         }
     }
@@ -78,10 +82,13 @@ class SoundPlayer {
         });
     }
 
-    _playClip(clip) {
+    _playClip(clip, attempts=0) {
         try {
-            if (!clip.sound.isLoaded()) {
-                setTimeout(() => this._playClip(clip), 100);
+            // Attempt to load the clip up to 50x, sleeping for 5ms in between attempts
+            if (attempts < MAX_PLAY_SOUND_ATTEMPTS && !clip.sound.isLoaded()) {
+                attempts++
+
+                setTimeout(() => this._playClip(clip, attempts), PLAY_SOUND_ATTEMPT_DELAY);
             }
 
             clip.sound.setVolume(clip.volume);
