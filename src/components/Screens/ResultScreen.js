@@ -31,6 +31,7 @@ class ResultScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         addStatistics: PropTypes.func.isRequired,
+        useFifthEdition: PropTypes.bool.isRequired,
         playSounds: PropTypes.bool.isRequired,
         onlyDiceSounds: PropTypes.bool.isRequired,
     }
@@ -268,7 +269,7 @@ class ResultScreen extends Component {
     _renderDistance(distance, result) {
         let distanceText = '';
 
-        if (result.damageForm.useFifthEdition) {
+        if (this.props.useFifthEdition) {
             distanceText = distance / 2 + '"';
         } else {
             distanceText = distance + 'm';
@@ -287,7 +288,7 @@ class ResultScreen extends Component {
         knockback = knockback < 0 ? 0 : knockback;
         let knockbackText = '';
 
-        if (result.damageForm.useFifthEdition) {
+        if (this.props.useFifthEdition) {
             knockbackText = knockback / 2 + '"';
         } else {
             knockbackText = knockback + 'm';
@@ -368,6 +369,7 @@ const localStyles = StyleSheet.create({
 
 const mapStateToProps = state => {
     return {
+        useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,
         onlyDiceSounds: state.settings.onlyDiceSounds,
     }

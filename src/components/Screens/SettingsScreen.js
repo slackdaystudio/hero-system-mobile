@@ -34,9 +34,7 @@ import { clearStatistics } from '../../reducers/statistics';
 class SettingsScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        useFifthEdition: PropTypes.bool.isRequired,
-        playSounds: PropTypes.bool.isRequired,
-        onlyDiceSounds: PropTypes.bool.isRequired,
+        settings: PropTypes.object.isRequired,
         resetForm: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
         clearRandomHero: PropTypes.func.isRequired,
@@ -119,8 +117,8 @@ class SettingsScreen extends Component {
                             </Left>
                             <Right>
                                 <Switch
-                                    value={this.props.useFifthEdition}
-                                    onValueChange={() => this.props.toggleSetting('useFifthEdition', !this.props.useFifthEdition)}
+                                    value={this.props.settings.useFifthEdition}
+                                    onValueChange={() => this.props.toggleSetting('useFifthEdition', !this.props.settings.useFifthEdition)}
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbTintColor="#14354d"
@@ -137,8 +135,8 @@ class SettingsScreen extends Component {
                             </Left>
                             <Right>
                                 <Switch
-                                    value={this.props.playSounds}
-                                    onValueChange={() => this.props.toggleSetting('playSounds', !this.props.playSounds)}
+                                    value={this.props.settings.playSounds}
+                                    onValueChange={() => this.props.toggleSetting('playSounds', !this.props.settings.playSounds)}
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbTintColor="#14354d"
@@ -152,13 +150,13 @@ class SettingsScreen extends Component {
                             </Left>
                             <Right>
                                 <Switch
-                                    value={this.props.onlyDiceSounds}
-                                    onValueChange={() => this.props.toggleSetting('onlyDiceSounds', !this.props.onlyDiceSounds)}
+                                    value={this.props.settings.onlyDiceSounds}
+                                    onValueChange={() => this.props.toggleSetting('onlyDiceSounds', !this.props.settings.onlyDiceSounds)}
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbTintColor="#14354d"
                                     onTintColor="#01121E"
-                                    disabled={!this.props.playSounds}
+                                    disabled={!this.props.settings.playSounds}
                                 />
                             </Right>
                         </ListItem>
@@ -219,9 +217,7 @@ class SettingsScreen extends Component {
 
 const mapStateToProps = state => {
     return {
-        useFifthEdition: state.settings.useFifthEdition,
-        playSounds: state.settings.playSounds,
-        onlyDiceSounds: state.settings.onlyDiceSounds,
+        settings: state.settings
     };
 };
 
