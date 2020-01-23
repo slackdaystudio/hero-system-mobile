@@ -35,8 +35,8 @@ export const store = createStore(reducer, applyMiddleware(thunk));
 const AppContainer = createAppContainer(AppNavigator);
 
 export default class App extends Component {
-    async componentDidMount() {
-        await soundPlayer.initialize();
+    componentDidMount() {
+        soundPlayer.initialize();
 
         // Adding a 100ms delay here gets rid of a white screen
         setTimeout(() => SplashScreen.hide(), 100);
