@@ -47,6 +47,16 @@ class SoundPlayer {
         }
     }
 
+    stop(name) {
+        name = this._getClipName(name);
+
+        if (sounds.hasOwnProperty(name)) {
+            if (sounds[name].initialized && sounds[name].sound.isLoaded() && sounds[name].sound.isPlaying()) {
+                sounds[name].sound.stop();
+            }
+        }
+    }
+
     initialize(name, playOnLoad=true) {
         if (name === null || name === undefined || name === '') {
             return null;

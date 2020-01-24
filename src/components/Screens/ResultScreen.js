@@ -64,6 +64,8 @@ class ResultScreen extends Component {
     }
 
     onDidBlur() {
+        soundPlayer.stop(this.state.result.sfx);
+
         this.backHandler.remove();
 
         RNShake.removeEventListener('ShakeEvent');
