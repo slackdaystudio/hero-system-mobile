@@ -127,6 +127,8 @@ class HeroDesignerCharacter {
         //         if (granted) {
         //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
         //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
+        //         } else {
+        //             common.toast('Unable to write file: Write permission has not been granted');
         //         }
         //     }).catch(error => {
         //         common.toast(error.message);
