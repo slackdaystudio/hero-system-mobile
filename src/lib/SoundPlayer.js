@@ -22,6 +22,8 @@ const MAX_PLAY_SOUND_ATTEMPTS = 50;
 
 const PLAY_SOUND_ATTEMPT_DELAY = 5;
 
+const DEFAULT_SFX_NAME = 'Default';
+
 const DEFAULT_SOUND = 'dice';
 
 const VOLUME = {
@@ -106,6 +108,8 @@ class SoundPlayer {
         if (name === null || name === undefined) {
             return DEFAULT_SOUND;
         }
+
+        name = name === DEFAULT_SFX_NAME ? DEFAULT_SOUND : name;
 
         return common.toSnakeCase(name);
     }
