@@ -1,7 +1,8 @@
-import { Platform, PermissionsAndroid, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { common } from './Common';
 import { heroDesignerTemplate } from './HeroDesignerTemplate';
+import { permission } from './Permission';
 import { SKILL_ROLL_BASE } from '../decorators/skills/Roll';
 import { store } from '../../App';
 
@@ -122,8 +123,8 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'powers', 'power');
 
         // if (__DEV__) {
-        //     this._askForWritePermission().then(writePermissionGranted => {
-        //         if (writePermissionGranted) {
+        //     permission.askForWrite().then(granted => {
+        //         if (granted) {
         //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
         //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
         //         }
@@ -917,32 +918,6 @@ class HeroDesignerCharacter {
             modifier: mods,
             adder: adds,
         };
-    }
-
-    async _askForWritePermission() {
-        if (Platform.OS === 'android') {
-            try {
-                let check = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-
-                if (check === PermissionsAndroid.RESULTS.GRANTED) {
-                    return check;
-                }
-
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                    {
-                        'title': 'HERO System Mobile File System Permission',
-                        'message': 'HERO System Mobile needs read/write access to your device to save characters',
-                    }
-                );
-
-                return granted;
-            } catch (error) {
-                common.toast(error.message);
-            }
-        }
-
-        return null;
     }
 }
 
