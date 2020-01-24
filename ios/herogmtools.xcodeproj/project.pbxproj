@@ -28,6 +28,54 @@
 		74FFE52DECFF4E59BA23DCC0 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30C7D698B4C94501A0EE994B /* EvilIcons.ttf */; };
 		82FC0DA23C064D1EB6C109D8 /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB0A7146301A4C179A539474 /* Roboto.ttf */; };
 		84A72374E14E20C69F20A5A8 /* libPods-herogmtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86885E9CDB63427FB2D2269E /* libPods-herogmtools.a */; };
+		882C16FD23DAA8710002BDF9 /* mental_psionic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16CD23DAA86E0002BDF9 /* mental_psionic.mp3 */; };
+		882C16FE23DAA8710002BDF9 /* mutant.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16CE23DAA86E0002BDF9 /* mutant.mp3 */; };
+		882C16FF23DAA8710002BDF9 /* sleep_dream.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16CF23DAA86E0002BDF9 /* sleep_dream.mp3 */; };
+		882C170023DAA8710002BDF9 /* solar_celestial.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D023DAA86E0002BDF9 /* solar_celestial.mp3 */; };
+		882C170123DAA8710002BDF9 /* cosmic_energy.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D123DAA86E0002BDF9 /* cosmic_energy.mp3 */; };
+		882C170223DAA8710002BDF9 /* magic_mystic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D223DAA86E0002BDF9 /* magic_mystic.mp3 */; };
+		882C170323DAA8710002BDF9 /* animal.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D323DAA86E0002BDF9 /* animal.mp3 */; };
+		882C170423DAA8710002BDF9 /* time.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D423DAA86E0002BDF9 /* time.mp3 */; };
+		882C170523DAA8710002BDF9 /* electricity.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D523DAA86E0002BDF9 /* electricity.mp3 */; };
+		882C170623DAA8710002BDF9 /* shape_alteration.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D623DAA86E0002BDF9 /* shape_alteration.mp3 */; };
+		882C170723DAA8710002BDF9 /* precognition.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D723DAA86E0002BDF9 /* precognition.mp3 */; };
+		882C170823DAA8710002BDF9 /* acid.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D823DAA86E0002BDF9 /* acid.mp3 */; };
+		882C170923DAA8710002BDF9 /* speedster.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16D923DAA86E0002BDF9 /* speedster.mp3 */; };
+		882C170A23DAA8710002BDF9 /* darkness.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16DA23DAA86E0002BDF9 /* darkness.mp3 */; };
+		882C170B23DAA8710002BDF9 /* stretching.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16DB23DAA86E0002BDF9 /* stretching.mp3 */; };
+		882C170C23DAA8710002BDF9 /* water.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16DC23DAA86E0002BDF9 /* water.mp3 */; };
+		882C170D23DAA8710002BDF9 /* ice_cold.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16DD23DAA86E0002BDF9 /* ice_cold.mp3 */; };
+		882C170E23DAA8710002BDF9 /* chi.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16DE23DAA86E0002BDF9 /* chi.mp3 */; };
+		882C170F23DAA8710002BDF9 /* luck.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16DF23DAA86F0002BDF9 /* luck.mp3 */; };
+		882C171023DAA8710002BDF9 /* cyberkinesis.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E023DAA86F0002BDF9 /* cyberkinesis.mp3 */; };
+		882C171123DAA8710002BDF9 /* matter_manipulation.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E123DAA86F0002BDF9 /* matter_manipulation.mp3 */; };
+		882C171223DAA8710002BDF9 /* illusion.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E223DAA86F0002BDF9 /* illusion.mp3 */; };
+		882C171323DAA8710002BDF9 /* martial_arts.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E323DAA86F0002BDF9 /* martial_arts.mp3 */; };
+		882C171423DAA8710002BDF9 /* teleportation.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E423DAA86F0002BDF9 /* teleportation.mp3 */; };
+		882C171523DAA8710002BDF9 /* serum_based.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E523DAA86F0002BDF9 /* serum_based.mp3 */; };
+		882C171623DAA8710002BDF9 /* sonic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E623DAA86F0002BDF9 /* sonic.mp3 */; };
+		882C171723DAA8710002BDF9 /* strength_toughness.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E723DAA86F0002BDF9 /* strength_toughness.mp3 */; };
+		882C171823DAA8710002BDF9 /* magnetism.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E823DAA86F0002BDF9 /* magnetism.mp3 */; };
+		882C171923DAA8710002BDF9 /* fire_heat.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16E923DAA86F0002BDF9 /* fire_heat.mp3 */; };
+		882C171A23DAA8710002BDF9 /* dice.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16EA23DAA86F0002BDF9 /* dice.mp3 */; };
+		882C171B23DAA8710002BDF9 /* body_control.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16EB23DAA86F0002BDF9 /* body_control.mp3 */; };
+		882C171C23DAA8710002BDF9 /* earth_stone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16EC23DAA86F0002BDF9 /* earth_stone.mp3 */; };
+		882C171D23DAA8710002BDF9 /* gravity.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16ED23DAA86F0002BDF9 /* gravity.mp3 */; };
+		882C171E23DAA8710002BDF9 /* dimensional_manipulation.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16EE23DAA8700002BDF9 /* dimensional_manipulation.mp3 */; };
+		882C171F23DAA8710002BDF9 /* radiation.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16EF23DAA8700002BDF9 /* radiation.mp3 */; };
+		882C172023DAA8710002BDF9 /* density_alteration.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F023DAA8700002BDF9 /* density_alteration.mp3 */; };
+		882C172123DAA8710002BDF9 /* emotion_control.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F123DAA8700002BDF9 /* emotion_control.mp3 */; };
+		882C172223DAA8710002BDF9 /* metamorphic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F223DAA8700002BDF9 /* metamorphic.mp3 */; };
+		882C172323DAA8710002BDF9 /* weather.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F323DAA8700002BDF9 /* weather.mp3 */; };
+		882C172423DAA8710002BDF9 /* force.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F423DAA8700002BDF9 /* force.mp3 */; };
+		882C172523DAA8710002BDF9 /* alien.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F523DAA8700002BDF9 /* alien.mp3 */; };
+		882C172623DAA8710002BDF9 /* size_alteration.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F623DAA8700002BDF9 /* size_alteration.mp3 */; };
+		882C172723DAA8710002BDF9 /* vibration.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F723DAA8700002BDF9 /* vibration.mp3 */; };
+		882C172823DAA8710002BDF9 /* kinetic_energy.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F823DAA8700002BDF9 /* kinetic_energy.mp3 */; };
+		882C172923DAA8710002BDF9 /* light.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16F923DAA8700002BDF9 /* light.mp3 */; };
+		882C172A23DAA8710002BDF9 /* air_wind.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FA23DAA8700002BDF9 /* air_wind.mp3 */; };
+		882C172B23DAA8710002BDF9 /* wood_plant.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FB23DAA8700002BDF9 /* wood_plant.mp3 */; };
+		882C172C23DAA8710002BDF9 /* telekinetic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FC23DAA8700002BDF9 /* telekinetic.mp3 */; };
 		8DCB02B73A4067C287CD22F9 /* libPods-herogmtools-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF954DCDA721AC9486F8B80 /* libPods-herogmtools-tvOSTests.a */; };
 		A97B10E5E96D4A538A48F2FD /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA78EEC83CBA4126A6B62A4B /* Octicons.ttf */; };
 		AE96D6E114EA4D62BCBB5E4F /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65CC709197BC4A0F8B59DE19 /* MaterialIcons.ttf */; };
@@ -83,6 +131,54 @@
 		80832267E5977A17CB093D0E /* libPods-herogmtoolsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtoolsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		86885E9CDB63427FB2D2269E /* libPods-herogmtools.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		87C59F7F7F0E499CAB455D14 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		882C16CD23DAA86E0002BDF9 /* mental_psionic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = mental_psionic.mp3; path = ../../android/app/src/main/res/raw/mental_psionic.mp3; sourceTree = "<group>"; };
+		882C16CE23DAA86E0002BDF9 /* mutant.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = mutant.mp3; path = ../../android/app/src/main/res/raw/mutant.mp3; sourceTree = "<group>"; };
+		882C16CF23DAA86E0002BDF9 /* sleep_dream.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sleep_dream.mp3; path = ../../android/app/src/main/res/raw/sleep_dream.mp3; sourceTree = "<group>"; };
+		882C16D023DAA86E0002BDF9 /* solar_celestial.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = solar_celestial.mp3; path = ../../android/app/src/main/res/raw/solar_celestial.mp3; sourceTree = "<group>"; };
+		882C16D123DAA86E0002BDF9 /* cosmic_energy.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = cosmic_energy.mp3; path = ../../android/app/src/main/res/raw/cosmic_energy.mp3; sourceTree = "<group>"; };
+		882C16D223DAA86E0002BDF9 /* magic_mystic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = magic_mystic.mp3; path = ../../android/app/src/main/res/raw/magic_mystic.mp3; sourceTree = "<group>"; };
+		882C16D323DAA86E0002BDF9 /* animal.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = animal.mp3; path = ../../android/app/src/main/res/raw/animal.mp3; sourceTree = "<group>"; };
+		882C16D423DAA86E0002BDF9 /* time.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = time.mp3; path = ../../android/app/src/main/res/raw/time.mp3; sourceTree = "<group>"; };
+		882C16D523DAA86E0002BDF9 /* electricity.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = electricity.mp3; path = ../../android/app/src/main/res/raw/electricity.mp3; sourceTree = "<group>"; };
+		882C16D623DAA86E0002BDF9 /* shape_alteration.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = shape_alteration.mp3; path = ../../android/app/src/main/res/raw/shape_alteration.mp3; sourceTree = "<group>"; };
+		882C16D723DAA86E0002BDF9 /* precognition.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = precognition.mp3; path = ../../android/app/src/main/res/raw/precognition.mp3; sourceTree = "<group>"; };
+		882C16D823DAA86E0002BDF9 /* acid.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = acid.mp3; path = ../../android/app/src/main/res/raw/acid.mp3; sourceTree = "<group>"; };
+		882C16D923DAA86E0002BDF9 /* speedster.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = speedster.mp3; path = ../../android/app/src/main/res/raw/speedster.mp3; sourceTree = "<group>"; };
+		882C16DA23DAA86E0002BDF9 /* darkness.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = darkness.mp3; path = ../../android/app/src/main/res/raw/darkness.mp3; sourceTree = "<group>"; };
+		882C16DB23DAA86E0002BDF9 /* stretching.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = stretching.mp3; path = ../../android/app/src/main/res/raw/stretching.mp3; sourceTree = "<group>"; };
+		882C16DC23DAA86E0002BDF9 /* water.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = water.mp3; path = ../../android/app/src/main/res/raw/water.mp3; sourceTree = "<group>"; };
+		882C16DD23DAA86E0002BDF9 /* ice_cold.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = ice_cold.mp3; path = ../../android/app/src/main/res/raw/ice_cold.mp3; sourceTree = "<group>"; };
+		882C16DE23DAA86E0002BDF9 /* chi.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = chi.mp3; path = ../../android/app/src/main/res/raw/chi.mp3; sourceTree = "<group>"; };
+		882C16DF23DAA86F0002BDF9 /* luck.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = luck.mp3; path = ../../android/app/src/main/res/raw/luck.mp3; sourceTree = "<group>"; };
+		882C16E023DAA86F0002BDF9 /* cyberkinesis.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = cyberkinesis.mp3; path = ../../android/app/src/main/res/raw/cyberkinesis.mp3; sourceTree = "<group>"; };
+		882C16E123DAA86F0002BDF9 /* matter_manipulation.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = matter_manipulation.mp3; path = ../../android/app/src/main/res/raw/matter_manipulation.mp3; sourceTree = "<group>"; };
+		882C16E223DAA86F0002BDF9 /* illusion.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = illusion.mp3; path = ../../android/app/src/main/res/raw/illusion.mp3; sourceTree = "<group>"; };
+		882C16E323DAA86F0002BDF9 /* martial_arts.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = martial_arts.mp3; path = ../../android/app/src/main/res/raw/martial_arts.mp3; sourceTree = "<group>"; };
+		882C16E423DAA86F0002BDF9 /* teleportation.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = teleportation.mp3; path = ../../android/app/src/main/res/raw/teleportation.mp3; sourceTree = "<group>"; };
+		882C16E523DAA86F0002BDF9 /* serum_based.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = serum_based.mp3; path = ../../android/app/src/main/res/raw/serum_based.mp3; sourceTree = "<group>"; };
+		882C16E623DAA86F0002BDF9 /* sonic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sonic.mp3; path = ../../android/app/src/main/res/raw/sonic.mp3; sourceTree = "<group>"; };
+		882C16E723DAA86F0002BDF9 /* strength_toughness.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = strength_toughness.mp3; path = ../../android/app/src/main/res/raw/strength_toughness.mp3; sourceTree = "<group>"; };
+		882C16E823DAA86F0002BDF9 /* magnetism.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = magnetism.mp3; path = ../../android/app/src/main/res/raw/magnetism.mp3; sourceTree = "<group>"; };
+		882C16E923DAA86F0002BDF9 /* fire_heat.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = fire_heat.mp3; path = ../../android/app/src/main/res/raw/fire_heat.mp3; sourceTree = "<group>"; };
+		882C16EA23DAA86F0002BDF9 /* dice.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = dice.mp3; path = ../../android/app/src/main/res/raw/dice.mp3; sourceTree = "<group>"; };
+		882C16EB23DAA86F0002BDF9 /* body_control.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = body_control.mp3; path = ../../android/app/src/main/res/raw/body_control.mp3; sourceTree = "<group>"; };
+		882C16EC23DAA86F0002BDF9 /* earth_stone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = earth_stone.mp3; path = ../../android/app/src/main/res/raw/earth_stone.mp3; sourceTree = "<group>"; };
+		882C16ED23DAA86F0002BDF9 /* gravity.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = gravity.mp3; path = ../../android/app/src/main/res/raw/gravity.mp3; sourceTree = "<group>"; };
+		882C16EE23DAA8700002BDF9 /* dimensional_manipulation.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = dimensional_manipulation.mp3; path = ../../android/app/src/main/res/raw/dimensional_manipulation.mp3; sourceTree = "<group>"; };
+		882C16EF23DAA8700002BDF9 /* radiation.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = radiation.mp3; path = ../../android/app/src/main/res/raw/radiation.mp3; sourceTree = "<group>"; };
+		882C16F023DAA8700002BDF9 /* density_alteration.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = density_alteration.mp3; path = ../../android/app/src/main/res/raw/density_alteration.mp3; sourceTree = "<group>"; };
+		882C16F123DAA8700002BDF9 /* emotion_control.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = emotion_control.mp3; path = ../../android/app/src/main/res/raw/emotion_control.mp3; sourceTree = "<group>"; };
+		882C16F223DAA8700002BDF9 /* metamorphic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = metamorphic.mp3; path = ../../android/app/src/main/res/raw/metamorphic.mp3; sourceTree = "<group>"; };
+		882C16F323DAA8700002BDF9 /* weather.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = weather.mp3; path = ../../android/app/src/main/res/raw/weather.mp3; sourceTree = "<group>"; };
+		882C16F423DAA8700002BDF9 /* force.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = force.mp3; path = ../../android/app/src/main/res/raw/force.mp3; sourceTree = "<group>"; };
+		882C16F523DAA8700002BDF9 /* alien.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alien.mp3; path = ../../android/app/src/main/res/raw/alien.mp3; sourceTree = "<group>"; };
+		882C16F623DAA8700002BDF9 /* size_alteration.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = size_alteration.mp3; path = ../../android/app/src/main/res/raw/size_alteration.mp3; sourceTree = "<group>"; };
+		882C16F723DAA8700002BDF9 /* vibration.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = vibration.mp3; path = ../../android/app/src/main/res/raw/vibration.mp3; sourceTree = "<group>"; };
+		882C16F823DAA8700002BDF9 /* kinetic_energy.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = kinetic_energy.mp3; path = ../../android/app/src/main/res/raw/kinetic_energy.mp3; sourceTree = "<group>"; };
+		882C16F923DAA8700002BDF9 /* light.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = light.mp3; path = ../../android/app/src/main/res/raw/light.mp3; sourceTree = "<group>"; };
+		882C16FA23DAA8700002BDF9 /* air_wind.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = air_wind.mp3; path = ../../android/app/src/main/res/raw/air_wind.mp3; sourceTree = "<group>"; };
+		882C16FB23DAA8700002BDF9 /* wood_plant.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = wood_plant.mp3; path = ../../android/app/src/main/res/raw/wood_plant.mp3; sourceTree = "<group>"; };
+		882C16FC23DAA8700002BDF9 /* telekinetic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = telekinetic.mp3; path = ../../android/app/src/main/res/raw/telekinetic.mp3; sourceTree = "<group>"; };
 		8877D15423C29BF400BD2AE0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		88E0EDE32212595C00EAE0BE /* herogmtools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = herogmtools.entitlements; path = herogmtools/herogmtools.entitlements; sourceTree = "<group>"; };
 		8CF37D7ADB634CDED8240CDD /* Pods-herogmtools.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.debug.xcconfig"; sourceTree = "<group>"; };
@@ -212,6 +308,7 @@
 				00E356EF1AD99517003FC87E /* herogmtoolsTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
+				882C16CC23DAA7A20002BDF9 /* sounds */,
 				BFADF3D9AFCB487385E6D847 /* Resources */,
 				88DF058D220BE7570001ED6B /* Recovered References */,
 				3E25AF80E96BABBBA241FD29 /* Pods */,
@@ -230,6 +327,61 @@
 				2D02E4901E0B4A5D006451C7 /* herogmtools-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		882C16CC23DAA7A20002BDF9 /* sounds */ = {
+			isa = PBXGroup;
+			children = (
+				882C16D823DAA86E0002BDF9 /* acid.mp3 */,
+				882C16FA23DAA8700002BDF9 /* air_wind.mp3 */,
+				882C16F523DAA8700002BDF9 /* alien.mp3 */,
+				882C16D323DAA86E0002BDF9 /* animal.mp3 */,
+				882C16EB23DAA86F0002BDF9 /* body_control.mp3 */,
+				882C16DE23DAA86E0002BDF9 /* chi.mp3 */,
+				882C16D123DAA86E0002BDF9 /* cosmic_energy.mp3 */,
+				882C16E023DAA86F0002BDF9 /* cyberkinesis.mp3 */,
+				882C16DA23DAA86E0002BDF9 /* darkness.mp3 */,
+				882C16F023DAA8700002BDF9 /* density_alteration.mp3 */,
+				882C16EA23DAA86F0002BDF9 /* dice.mp3 */,
+				882C16EE23DAA8700002BDF9 /* dimensional_manipulation.mp3 */,
+				882C16EC23DAA86F0002BDF9 /* earth_stone.mp3 */,
+				882C16D523DAA86E0002BDF9 /* electricity.mp3 */,
+				882C16F123DAA8700002BDF9 /* emotion_control.mp3 */,
+				882C16E923DAA86F0002BDF9 /* fire_heat.mp3 */,
+				882C16F423DAA8700002BDF9 /* force.mp3 */,
+				882C16ED23DAA86F0002BDF9 /* gravity.mp3 */,
+				882C16DD23DAA86E0002BDF9 /* ice_cold.mp3 */,
+				882C16E223DAA86F0002BDF9 /* illusion.mp3 */,
+				882C16F823DAA8700002BDF9 /* kinetic_energy.mp3 */,
+				882C16F923DAA8700002BDF9 /* light.mp3 */,
+				882C16DF23DAA86F0002BDF9 /* luck.mp3 */,
+				882C16D223DAA86E0002BDF9 /* magic_mystic.mp3 */,
+				882C16E823DAA86F0002BDF9 /* magnetism.mp3 */,
+				882C16E323DAA86F0002BDF9 /* martial_arts.mp3 */,
+				882C16E123DAA86F0002BDF9 /* matter_manipulation.mp3 */,
+				882C16CD23DAA86E0002BDF9 /* mental_psionic.mp3 */,
+				882C16F223DAA8700002BDF9 /* metamorphic.mp3 */,
+				882C16CE23DAA86E0002BDF9 /* mutant.mp3 */,
+				882C16D723DAA86E0002BDF9 /* precognition.mp3 */,
+				882C16EF23DAA8700002BDF9 /* radiation.mp3 */,
+				882C16E523DAA86F0002BDF9 /* serum_based.mp3 */,
+				882C16D623DAA86E0002BDF9 /* shape_alteration.mp3 */,
+				882C16F623DAA8700002BDF9 /* size_alteration.mp3 */,
+				882C16CF23DAA86E0002BDF9 /* sleep_dream.mp3 */,
+				882C16D023DAA86E0002BDF9 /* solar_celestial.mp3 */,
+				882C16E623DAA86F0002BDF9 /* sonic.mp3 */,
+				882C16D923DAA86E0002BDF9 /* speedster.mp3 */,
+				882C16E723DAA86F0002BDF9 /* strength_toughness.mp3 */,
+				882C16DB23DAA86E0002BDF9 /* stretching.mp3 */,
+				882C16FC23DAA8700002BDF9 /* telekinetic.mp3 */,
+				882C16E423DAA86F0002BDF9 /* teleportation.mp3 */,
+				882C16D423DAA86E0002BDF9 /* time.mp3 */,
+				882C16F723DAA8700002BDF9 /* vibration.mp3 */,
+				882C16DC23DAA86E0002BDF9 /* water.mp3 */,
+				882C16F323DAA8700002BDF9 /* weather.mp3 */,
+				882C16FB23DAA8700002BDF9 /* wood_plant.mp3 */,
+			);
+			path = sounds;
 			sourceTree = "<group>";
 		};
 		88DF058D220BE7570001ED6B /* Recovered References */ = {
@@ -406,17 +558,65 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				5069CA3FEC4141AE9B9AFBBC /* Entypo.ttf in Resources */,
+				882C171223DAA8710002BDF9 /* illusion.mp3 in Resources */,
+				882C170323DAA8710002BDF9 /* animal.mp3 in Resources */,
 				74FFE52DECFF4E59BA23DCC0 /* EvilIcons.ttf in Resources */,
+				882C172923DAA8710002BDF9 /* light.mp3 in Resources */,
 				D00BAE095B6E43DEA03B8771 /* FontAwesome.ttf in Resources */,
+				882C171F23DAA8710002BDF9 /* radiation.mp3 in Resources */,
+				882C170123DAA8710002BDF9 /* cosmic_energy.mp3 in Resources */,
+				882C171623DAA8710002BDF9 /* sonic.mp3 in Resources */,
+				882C171023DAA8710002BDF9 /* cyberkinesis.mp3 in Resources */,
+				882C172123DAA8710002BDF9 /* emotion_control.mp3 in Resources */,
+				882C170D23DAA8710002BDF9 /* ice_cold.mp3 in Resources */,
 				62EE979F47374B98B7BE7276 /* Foundation.ttf in Resources */,
+				882C172C23DAA8710002BDF9 /* telekinetic.mp3 in Resources */,
+				882C170B23DAA8710002BDF9 /* stretching.mp3 in Resources */,
+				882C171B23DAA8710002BDF9 /* body_control.mp3 in Resources */,
 				3CB4141F7FEC4710A0A71A61 /* Ionicons.ttf in Resources */,
+				882C172023DAA8710002BDF9 /* density_alteration.mp3 in Resources */,
+				882C170423DAA8710002BDF9 /* time.mp3 in Resources */,
+				882C171C23DAA8710002BDF9 /* earth_stone.mp3 in Resources */,
 				AE96D6E114EA4D62BCBB5E4F /* MaterialIcons.ttf in Resources */,
+				882C172523DAA8710002BDF9 /* alien.mp3 in Resources */,
+				882C171423DAA8710002BDF9 /* teleportation.mp3 in Resources */,
+				882C172623DAA8710002BDF9 /* size_alteration.mp3 in Resources */,
+				882C170E23DAA8710002BDF9 /* chi.mp3 in Resources */,
 				A97B10E5E96D4A538A48F2FD /* Octicons.ttf in Resources */,
+				882C171E23DAA8710002BDF9 /* dimensional_manipulation.mp3 in Resources */,
+				882C171723DAA8710002BDF9 /* strength_toughness.mp3 in Resources */,
+				882C170A23DAA8710002BDF9 /* darkness.mp3 in Resources */,
+				882C16FE23DAA8710002BDF9 /* mutant.mp3 in Resources */,
+				882C172423DAA8710002BDF9 /* force.mp3 in Resources */,
 				6A75C6990E7F49F18C934B54 /* Roboto_medium.ttf in Resources */,
+				882C171123DAA8710002BDF9 /* matter_manipulation.mp3 in Resources */,
+				882C16FD23DAA8710002BDF9 /* mental_psionic.mp3 in Resources */,
+				882C172723DAA8710002BDF9 /* vibration.mp3 in Resources */,
 				82FC0DA23C064D1EB6C109D8 /* Roboto.ttf in Resources */,
 				319876A75DE8479EB7D55624 /* rubicon-icon-font.ttf in Resources */,
+				882C170823DAA8710002BDF9 /* acid.mp3 in Resources */,
+				882C172323DAA8710002BDF9 /* weather.mp3 in Resources */,
+				882C171A23DAA8710002BDF9 /* dice.mp3 in Resources */,
+				882C170F23DAA8710002BDF9 /* luck.mp3 in Resources */,
+				882C171323DAA8710002BDF9 /* martial_arts.mp3 in Resources */,
+				882C171523DAA8710002BDF9 /* serum_based.mp3 in Resources */,
+				882C172B23DAA8710002BDF9 /* wood_plant.mp3 in Resources */,
 				32FD3A167B7644A1A7E64CA3 /* SimpleLineIcons.ttf in Resources */,
+				882C16FF23DAA8710002BDF9 /* sleep_dream.mp3 in Resources */,
+				882C172A23DAA8710002BDF9 /* air_wind.mp3 in Resources */,
+				882C172823DAA8710002BDF9 /* kinetic_energy.mp3 in Resources */,
+				882C170523DAA8710002BDF9 /* electricity.mp3 in Resources */,
+				882C170C23DAA8710002BDF9 /* water.mp3 in Resources */,
+				882C170023DAA8710002BDF9 /* solar_celestial.mp3 in Resources */,
+				882C170623DAA8710002BDF9 /* shape_alteration.mp3 in Resources */,
+				882C171823DAA8710002BDF9 /* magnetism.mp3 in Resources */,
 				103F7D77CE7741EBB8DD3B9B /* Zocial.ttf in Resources */,
+				882C172223DAA8710002BDF9 /* metamorphic.mp3 in Resources */,
+				882C171D23DAA8710002BDF9 /* gravity.mp3 in Resources */,
+				882C170223DAA8710002BDF9 /* magic_mystic.mp3 in Resources */,
+				882C170923DAA8710002BDF9 /* speedster.mp3 in Resources */,
+				882C171923DAA8710002BDF9 /* fire_heat.mp3 in Resources */,
+				882C170723DAA8710002BDF9 /* precognition.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

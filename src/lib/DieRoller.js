@@ -93,6 +93,7 @@ class DieRoller {
         let resultRoll = this._roll(damageForm.dice, damageForm.damageType, damageForm.partialDie);
         let hitLocationRoll = damageForm.useHitLocations ? this._roll(3, HIT_LOCATIONS).total : 10;
         resultRoll.damageForm = damageForm;
+        resultRoll.sfx = damageForm.sfx;
 
         if (damageForm.damageType === KILLING_DAMAGE) {
             resultRoll.stunMultiplier = damageForm.stunMultiplier;
@@ -129,11 +130,12 @@ class DieRoller {
         return resultRoll;
     }
 
-    effectRoll(dice, partialDie, type) {
+    effectRoll(dice, partialDie, type, sfx) {
         let resultRoll = this._roll(dice, EFFECT, partialDie);
 
         resultRoll.dice = dice;
         resultRoll.type = type;
+        resultRoll.sfx = sfx;
 
         return resultRoll;
     }
@@ -154,7 +156,7 @@ class DieRoller {
         } else if (lastResult.rollType === NORMAL_DAMAGE || lastResult.rollType === KILLING_DAMAGE) {
             result = this.rollDamage(lastResult.damageForm);
         } else if (lastResult.rollType === EFFECT) {
-            result = this.effectRoll(lastResult.dice, lastResult.partialDie, lastResult.type);
+            result = this.effectRoll(lastResult.dice, lastResult.partialDie, lastResult.type, lastResult.sfx);
         }
 
         return result;

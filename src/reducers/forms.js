@@ -118,7 +118,7 @@ function _initializeDamageForm() {
         isUsingClinging: false,
         isExplosion: false,
         fadeRate: 1,
-        useFifthEdition: false,
+        sfx: null,
     };
 }
 
@@ -127,6 +127,7 @@ function _initializeEffectForm() {
         dice: 1,
         partialDie: '0',
         effectType: 'None',
+        sfx: null,
     };
 }
 

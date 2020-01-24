@@ -123,6 +123,7 @@ export default class Traits extends Component {
             this.props.updateForm('damage', {
                 dice: dice.full,
                 partialDie: dice.partial,
+                sfx: decorated.characterTrait.trait.sfx,
             });
 
             this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
@@ -134,18 +135,20 @@ export default class Traits extends Component {
                 partialDie: dice.partial,
                 killingToggled: true,
                 damageType: KILLING_DAMAGE,
+                sfx: decorated.characterTrait.trait.sfx,
             });
 
             this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
         } else if (roll.type === EFFECT) {
             let dice = common.toDice(roll.roll);
             let type = 'None';
+            let sfx = decorated.characterTrait.trait.sfx;
 
             if (decorated.characterTrait.trait.hasOwnProperty('xmlid')) {
                 type = decorated.characterTrait.trait.xmlid.toUpperCase();
             }
 
-            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.effectRoll(dice.full, dice.partial, type)});
+            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.effectRoll(dice.full, dice.partial, type, sfx)});
         }
     }
 

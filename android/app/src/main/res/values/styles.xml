@@ -4,7 +4,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:windowDisablePreview">true</item>
-        <item name="android:colorControlNormal">#000000</item>
+        <item name="android:colorControlNormal">#e8e8e8</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">

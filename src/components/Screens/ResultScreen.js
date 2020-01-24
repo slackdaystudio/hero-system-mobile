@@ -9,6 +9,7 @@ import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
+import { soundPlayer, DEFAULT_SOUND } from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import { addStatistics } from '../../reducers/statistics';
 
@@ -29,7 +30,10 @@ import { addStatistics } from '../../reducers/statistics';
 class ResultScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        addStatisticts: PropTypes.func.isRequired,
+        addStatistics: PropTypes.func.isRequired,
+        useFifthEdition: PropTypes.bool.isRequired,
+        playSounds: PropTypes.bool.isRequired,
+        onlyDiceSounds: PropTypes.bool.isRequired,
     }
 
     constructor(props) {
@@ -44,6 +48,7 @@ class ResultScreen extends Component {
 
     onDidFocus() {
         this.setState({result: this.props.navigation.state.params.result}, () => {
+            this._playSoundClip();
             this._updateStatistics();
         });
 
@@ -59,11 +64,27 @@ class ResultScreen extends Component {
     }
 
     onDidBlur() {
+        soundPlayer.stop(this.state.result.sfx);
+
         this.backHandler.remove();
 
         RNShake.removeEventListener('ShakeEvent');
 
         this.props.navigation.state.params = null;
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevState.result !== this.state.result) {
+            this._playSoundClip();
+        }
+    }
+
+    _playSoundClip() {
+        if (this.props.playSounds) {
+            let soundName = this.props.onlyDiceSounds ? DEFAULT_SOUND : this.state.result.sfx;
+
+            soundPlayer.play(soundName);
+        }
     }
 
     _updateStatistics() {
@@ -77,9 +98,7 @@ class ResultScreen extends Component {
     }
 
     _reRoll() {
-        this.setState({
-            result: dieRoller.rollAgain(this.props.navigation.state.params.result),
-        }, () => {
+        this.setState({result: dieRoller.rollAgain(this.state.result)}, () => {
             this._updateStatistics();
         });
     }
@@ -252,7 +271,7 @@ class ResultScreen extends Component {
     _renderDistance(distance, result) {
         let distanceText = '';
 
-        if (result.damageForm.useFifthEdition) {
+        if (this.props.useFifthEdition) {
             distanceText = distance / 2 + '"';
         } else {
             distanceText = distance + 'm';
@@ -271,7 +290,7 @@ class ResultScreen extends Component {
         knockback = knockback < 0 ? 0 : knockback;
         let knockbackText = '';
 
-        if (result.damageForm.useFifthEdition) {
+        if (this.props.useFifthEdition) {
             knockbackText = knockback / 2 + '"';
         } else {
             knockbackText = knockback + 'm';
@@ -351,7 +370,11 @@ const localStyles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-    return {}
+    return {
+        useFifthEdition: state.settings.useFifthEdition,
+        playSounds: state.settings.playSounds,
+        onlyDiceSounds: state.settings.onlyDiceSounds,
+    }
 };
 
 const mapDispatchToProps = {
