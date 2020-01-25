@@ -36,7 +36,7 @@ import { setSparseCombatDetails } from '../../reducers/combat';
 class ViewCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        character: PropTypes.object.isRequired,
+        character: PropTypes.object,
         combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
@@ -50,7 +50,7 @@ class ViewCharacterScreen extends Component {
 
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
+            this.props.navigation.navigate(this.props.navigation.state.params.from || 'Home');
 
             return true;
         });
@@ -110,13 +110,49 @@ class ViewCharacterScreen extends Component {
         );
     }
 
-    render() {
+    _renderCharacter() {
         // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
         // guards against a error
-        if (character.isHeroDesignerCharacter(this.props.character)) {
-            return null;
+        if (common.isEmptyObject(this.props.character) || character.isHeroDesignerCharacter(this.props.character)) {
+            return <Spinner color="#D0D1D3" />;
         }
 
+        return (
+            <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
+                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+                    <View style={styles.tabContent}>
+                        <General character={this.props.character} />
+                    </View>
+                </Tab>
+                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+                    <View style={styles.tabContent}>
+                        <Combat
+                            navigation={this.props.navigation}
+                            character={this.props.character}
+                            combatDetails={this.props.combatDetails}
+                            updateForm={this.props.updateForm}
+                            setSparseCombatDetails={this.props.setSparseCombatDetails}
+                        />
+                    </View>
+                </Tab>
+                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                    <View style={styles.tabContent}>
+                        <Characteristics characteristics={this.props.character.characteristics.characteristic} navigation={this.props.navigation} />
+                        <Movement movement={this.props.character.movement} />
+                    </View>
+                </Tab>
+                {this._renderPowers(this.props.character.powers.text)}
+                {this._renderEquipment(this.props.character.equipment.text)}
+                {this._renderTextList(this.props.character.martialArts.text, 'Maneuver', 'Martial Arts')}
+                {this._renderTextList(this.props.character.skills.text, 'Skill')}
+                {this._renderTextList(this.props.character.talents.text, 'Talent')}
+                {this._renderTextList(this.props.character.perks.text, 'Perk')}
+                {this._renderTextList(this.props.character.disadvantages.text, 'Disadvantage')}
+            </Tabs>
+        );
+    }
+
+    render() {
         return (
             <Container style={styles.container}>
                 <NavigationEvents
@@ -125,37 +161,7 @@ class ViewCharacterScreen extends Component {
                 />
                 <Header hasTabs={false} navigation={this.props.navigation} />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
-                    <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-                            <View style={styles.tabContent}>
-                                <General character={this.props.character} />
-                            </View>
-                        </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
-                            <View style={styles.tabContent}>
-                                <Combat
-                                    navigation={this.props.navigation}
-                                    character={this.props.character}
-                                    combatDetails={this.props.combatDetails}
-                                    updateForm={this.props.updateForm}
-                                    setSparseCombatDetails={this.props.setSparseCombatDetails}
-                                />
-                            </View>
-                        </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-                            <View style={styles.tabContent}>
-                                <Characteristics characteristics={this.props.character.characteristics.characteristic} navigation={this.props.navigation} />
-                                <Movement movement={this.props.character.movement} />
-                            </View>
-                        </Tab>
-                        {this._renderPowers(this.props.character.powers.text)}
-                        {this._renderEquipment(this.props.character.equipment.text)}
-                        {this._renderTextList(this.props.character.martialArts.text, 'Maneuver', 'Martial Arts')}
-                        {this._renderTextList(this.props.character.skills.text, 'Skill')}
-                        {this._renderTextList(this.props.character.talents.text, 'Talent')}
-                        {this._renderTextList(this.props.character.perks.text, 'Perk')}
-                        {this._renderTextList(this.props.character.disadvantages.text, 'Disadvantage')}
-                    </Tabs>
+                    {this._renderCharacter()}
                 </Content>
             </Container>
         );

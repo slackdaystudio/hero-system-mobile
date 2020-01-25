@@ -25,8 +25,8 @@ class Character {
         this.activeCostRegex = /\([0-9]+\sActive\sPoints\)/;
     }
 
-    async load(startLoad, endLoad) {
-        return file.loadCharacter(startLoad, endLoad);
+    async import(startLoad, endLoad) {
+        return file.importCharacter(startLoad, endLoad);
     }
 
     isHeroDesignerCharacter(character) {

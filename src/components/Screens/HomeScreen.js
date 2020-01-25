@@ -10,9 +10,9 @@ import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { initializeApplicationSettings } from '../../reducers/settings';
 import { initializeStatistics } from '../../reducers/statistics';
-import { initializeCharacter, initializeShowSecondary, setCharacter, setShowSecondary } from '../../reducers/character';
+import { initializeCharacter, initializeShowSecondary } from '../../reducers/character';
 import { initializeRandomHero } from '../../reducers/randomHero';
-import { initializeCombatDetails, setCombatDetails } from '../../reducers/combat';
+import { initializeCombatDetails } from '../../reducers/combat';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -37,21 +37,6 @@ class HomeScreen extends Component {
         initializeCharacter: PropTypes.func.isRequired,
         initializeRandomHero: PropTypes.func.isRequired,
         initializeCombatDetails: PropTypes.func.isRequired,
-        setShowSecondary: PropTypes.func.isRequired,
-        setCharacter: PropTypes.func.isRequired,
-        setCombatDetails: PropTypes.func.isRequired,
-    }
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            characterLoading: false,
-        };
-
-        this.startLoad = this._startLoad.bind(this);
-        this.endLoad = this._endLoad.bind(this);
-        this.onLoadPress = this._onLoadPress.bind(this);
     }
 
     async componentDidMount() {
@@ -67,49 +52,40 @@ class HomeScreen extends Component {
         }
     }
 
-    _startLoad() {
-        this.setState({characterLoading: true});
-    }
+    _onViewPress() {
+        let screen = 'ViewCharacter';
 
-    _endLoad() {
-        this.setState({characterLoading: false});
-    }
-
-    _loadCharacter() {
-        character.load(this.startLoad, this.endLoad).then(char => {
-            if (char === null || char === undefined) {
-                return;
-            }
-
-            this.props.setCharacter(char);
-            this.props.setShowSecondary(true);
-            this.props.setCombatDetails(char);
-        });
-    }
-
-    _onLoadPress() {
-        if (common.isEmptyObject(this.props.character)) {
-            common.toast('Please load a character first');
-        } else {
-            let screen = 'ViewCharacter';
-
-            if (character.isHeroDesignerCharacter(this.props.character)) {
-                screen = 'ViewHeroDesignerCharacter';
-            }
-
-            this.props.navigation.navigate(screen);
+        if (character.isHeroDesignerCharacter(this.props.character)) {
+            screen = 'ViewHeroDesignerCharacter';
         }
+
+        this.props.navigation.navigate(screen, {from: 'Home'});
     }
 
-    _renderViewCharacterButton() {
-        if (this.state.characterLoading) {
-            return <Spinner color="#D0D1D3" />;
+    _renderCharacterButtons() {
+        if (common.isEmptyObject(this.props.character)) {
+            return (
+                <View style={styles.buttonContainer}>
+                    <Button style={styles.button}  onPress={() => this.props.navigation.navigate('Characters')}>
+                        <Text uppercase={false} style={styles.buttonText}>Characters</Text>
+                    </Button>
+                </View>
+            );
         }
 
         return (
-            <Button style={styles.button} onPress={() => this.onLoadPress()}>
-                <Text uppercase={false} style={styles.buttonText}>View</Text>
-            </Button>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                <View style={styles.buttonContainer}>
+                    <Button style={styles.button}  onPress={() => this._onViewPress()}>
+                        <Text uppercase={false} style={styles.buttonText}>View</Text>
+                    </Button>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Button style={styles.button}  onPress={() => this.props.navigation.navigate('Characters')}>
+                        <Text uppercase={false} style={styles.buttonText}>Characters</Text>
+                    </Button>
+                </View>
+            </View>
         );
     }
 
@@ -121,16 +97,7 @@ class HomeScreen extends Component {
                     <Content style={styles.content}>
                         <Heading text="Character" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you&apos;re on the go.</Text>
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                            <View style={styles.buttonContainer}>
-                                {this._renderViewCharacterButton()}
-                            </View>
-                            <View style={styles.buttonContainer}>
-                                <Button style={styles.button}  onPress={() => this._loadCharacter()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Load</Text>
-                                </Button>
-                            </View>
-                        </View>
+                        {this._renderCharacterButtons()}
                         <View style={{paddingBottom: 20}} />
                         <Heading text="Rolls" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
@@ -194,9 +161,6 @@ const mapDispatchToProps = {
     initializeShowSecondary,
     initializeCombatDetails,
     initializeRandomHero,
-    setCharacter,
-    setShowSecondary,
-    setCombatDetails,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

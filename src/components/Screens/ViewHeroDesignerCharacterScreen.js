@@ -11,6 +11,7 @@ import Traits from '../HeroDesignerCharacter/Traits';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
+import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
 import { setCombatDetails, setSparseCombatDetails, usePhase } from '../../reducers/combat';
@@ -33,7 +34,7 @@ import { setShowSecondary } from '../../reducers/character';
 class ViewHeroDesignerCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        character: PropTypes.object.isRequired,
+        character: PropTypes.object,
         showSecondary: PropTypes.bool.isRequired,
         combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
@@ -51,7 +52,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
+            this.props.navigation.navigate(this.props.navigation.state.params.from || 'Home');
 
             return true;
         });
@@ -97,13 +98,58 @@ class ViewHeroDesignerCharacterScreen extends Component {
         );
     }
 
-    render() {
+    _renderCharacter() {
         // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
         // guards against a error
-        if (!character.isHeroDesignerCharacter(this.props.character)) {
-            return null;
+        if (common.isEmptyObject(this.props.character) || !character.isHeroDesignerCharacter(this.props.character)) {
+            return <Spinner color="#D0D1D3" />;
         }
 
+        return (
+            <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
+                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+                    <View style={styles.tabContent}>
+                        <General characterInfo={this.props.character.characterInfo} />
+                    </View>
+                </Tab>
+                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+                    <View style={styles.tabContent}>
+                        <Combat
+                            navigation={this.props.navigation}
+                            character={this.props.character}
+                            showSecondary={this.props.showSecondary}
+                            combatDetails={this.props.combatDetails}
+                            setSparseCombatDetails={this.props.setSparseCombatDetails}
+                            forms={this.props.forms}
+                            updateForm={this.props.updateForm}
+                            usePhase={this.props.usePhase}
+                        />
+                    </View>
+                </Tab>
+                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                    <View style={styles.tabContent}>
+                        <Characteristics
+                            navigation={this.props.navigation}
+                            character={this.props.character}
+                            showSecondary={this.props.showSecondary}
+                            setCombatDetails={this.props.setCombatDetails}
+                            setShowSecondary={this.props.setShowSecondary}
+                            updateForm={this.props.updateForm}
+                        />
+                    </View>
+                </Tab>
+                {this._renderTab('Skills', 'skills', 'skills')}
+                {this._renderTab('Perks', 'perks', 'perks')}
+                {this._renderTab('Talents', 'talents', 'talents')}
+                {this._renderTab('Martial Arts', 'martialArts', 'maneuver')}
+                {this._renderTab('Powers', 'powers', 'powers')}
+                {this._renderTab('Equipment', 'equipment', 'power')}
+                {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
+            </Tabs>
+        );
+    }
+
+    render() {
         return (
             <Container style={styles.container}>
                 <NavigationEvents
@@ -112,46 +158,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 />
                 <Header hasTabs={false} navigation={this.props.navigation} />
                 <Content scrollEnable={false} style={styles.content}>
-                    <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
-                            <View style={styles.tabContent}>
-                                <General characterInfo={this.props.character.characterInfo} />
-                            </View>
-                        </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
-                            <View style={styles.tabContent}>
-                                <Combat
-                                    navigation={this.props.navigation}
-                                    character={this.props.character}
-                                    showSecondary={this.props.showSecondary}
-                                    combatDetails={this.props.combatDetails}
-                                    setSparseCombatDetails={this.props.setSparseCombatDetails}
-                                    forms={this.props.forms}
-                                    updateForm={this.props.updateForm}
-                                    usePhase={this.props.usePhase}
-                                />
-                            </View>
-                        </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
-                            <View style={styles.tabContent}>
-                                <Characteristics
-                                    navigation={this.props.navigation}
-                                    character={this.props.character}
-                                    showSecondary={this.props.showSecondary}
-                                    setCombatDetails={this.props.setCombatDetails}
-                                    setShowSecondary={this.props.setShowSecondary}
-                                    updateForm={this.props.updateForm}
-                                />
-                            </View>
-                        </Tab>
-                        {this._renderTab('Skills', 'skills', 'skills')}
-                        {this._renderTab('Perks', 'perks', 'perks')}
-                        {this._renderTab('Talents', 'talents', 'talents')}
-                        {this._renderTab('Martial Arts', 'martialArts', 'maneuver')}
-                        {this._renderTab('Powers', 'powers', 'powers')}
-                        {this._renderTab('Equipment', 'equipment', 'power')}
-                        {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
-                    </Tabs>
+                    {this._renderCharacter()}
                 </Content>
             </Container>
         );

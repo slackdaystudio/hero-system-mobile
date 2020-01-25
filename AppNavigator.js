@@ -1,5 +1,6 @@
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import HomeScreen from './src/components/Screens/HomeScreen';
+import CharactersScreen from './src/components/Screens/CharactersScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
 import ViewHeroDesignerCharacterScreen from './src/components/Screens/ViewHeroDesignerCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
@@ -30,6 +31,9 @@ import Sidebar from './src/components/Sidebar/Sidebar';
 const AppNavigator = createDrawerNavigator({
     Home: {
         screen: HomeScreen,
+    },
+    Characters: {
+        screen: CharactersScreen,
     },
     ViewCharacter: {
         screen: ViewCharacterScreen,

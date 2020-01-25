@@ -115,4 +115,32 @@ export default StyleSheet.create({
         color: '#e8e8e8',
         backgroundColor: '#121212',
     },
+    modal: {
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#303030',
+        flex: 1,
+        flexDirection: 'column',
+        maxHeight: 295
+    },
+    modalHeader: {
+        fontSize: 20,
+        paddingLeft: 22,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: '#F3EDE9',
+        paddingVertical: 5,
+        backgroundColor: '#121212',
+        width: '100%',
+        borderColor: '#303030',
+        borderBottomWidth: 1,
+        borderTopWidth: 1,
+    },
+    modalContent: {
+        backgroundColor: '#1b1d1f',
+        padding: 22,
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        height: 255
+    }
 });
