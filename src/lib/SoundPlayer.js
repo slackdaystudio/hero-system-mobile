@@ -101,14 +101,14 @@ class SoundPlayer {
                 attempts++
 
                 setTimeout(() => this._playClip(clip, attempts), PLAY_SOUND_ATTEMPT_DELAY);
+            } else {
+                clip.sound.setVolume(clip.volume);
+
+                // Stop the sound if it's already playing
+                clip.sound.stop(() => {
+                    clip.sound.play();
+                });
             }
-
-            clip.sound.setVolume(clip.volume);
-
-            // Stop the sound if it's already playing
-            clip.sound.stop(() => {
-                clip.sound.play();
-            });
         } catch (error) {
             common.toast(error.message);
         }
