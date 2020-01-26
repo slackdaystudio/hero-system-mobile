@@ -60,7 +60,7 @@ class ViewCharacterScreen extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.character.filename !== prevProps.character.filename) {
+        if (this.props.character !== null && prevProps.character !== null && this.props.character.filename !== prevProps.character.filename) {
             if (this.tabs !== null) {
                 this.tabs.goToPage(0);
             }
