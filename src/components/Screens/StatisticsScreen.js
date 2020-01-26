@@ -93,7 +93,7 @@ class StatisticsScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Statistics</Text>
                     {this._renderDieDistributionChart()}

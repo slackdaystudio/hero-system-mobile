@@ -49,7 +49,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate(this.props.navigation.state.params.from || 'Home');
+            this.props.navigation.navigate(this._getBackScreen());
 
             return true;
         });
@@ -65,6 +65,16 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 this.tabs.goToPage(0);
             }
         }
+    }
+
+    _getBackScreen() {
+        let backScreen = 'Home';
+
+        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
+            backScreen = this.props.navigation.state.params.from;
+        }
+
+        return backScreen;
     }
 
     _renderTab(title, listKey, subListKey) {
@@ -149,7 +159,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header hasTabs={false} navigation={this.props.navigation} />
+                <Header hasTabs={false} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false} style={styles.content}>
                     {this._renderCharacter()}
                 </Content>

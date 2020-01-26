@@ -108,7 +108,7 @@ class SettingsScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Heading text="App Version" />
                     <View style={{paddingLeft: 20, paddingBottom: 20}}>

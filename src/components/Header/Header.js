@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
-import { Button, Text, Header, Left, Right, Icon } from 'native-base';
+import { Button, Text, Header, Left, Right, Body, Icon } from 'native-base';
 import { common } from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -22,24 +22,42 @@ export default class MyHeader extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hasTabs: PropTypes.bool,
+        backScreen: PropTypes.string,
+    }
+
+    _renderBackButton() {
+        if (this.props.backScreen === null || this.props.backScreen === undefined) {
+            return null;
+        }
+
+        return (
+            <Button transparent underlayColor="#000" onPress={() => this.props.navigation.navigate(this.props.backScreen)}>
+                <Icon type='FontAwesome' name="angle-left" style={{fontSize: 26, color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
+            </Button>
+        );
     }
 
     render() {
         return (
             <View>
                 <Header hasTabs={this.props.hasTabs || false} style={localStyles.header}>
-                    <Left>
-                        <View style={localStyles.logo}>
-                            <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
-                                <Image style={{height: 75, width: 161}} source={require('../../../public/hero_mobile_logo.png')} />
-                            </TouchableHighlight>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={{flex: 1}}>
+                            {this._renderBackButton()}
                         </View>
-                    </Left>
-                    <Right>
-                        <Button transparent underlayColor="#000" onPress={() => this.props.navigation.toggleDrawer()}>
-                            <Icon name="menu" style={{color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
-                        </Button>
-                    </Right>
+                        <View style={{flex: 4}}>
+                            <View style={localStyles.logo}>
+                                <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
+                                    <Image style={{height: 75, width: 161}} source={require('../../../public/hero_mobile_logo.png')} />
+                                </TouchableHighlight>
+                            </View>
+                        </View>
+                        <View style={{flex: 1}}>
+                            <Button transparent underlayColor="#000" onPress={() => this.props.navigation.toggleDrawer()}>
+                                <Icon name="menu" style={{color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
+                            </Button>
+                        </View>
+                    </View>
                 </Header>
                 <StatusBar backgroundColor="#000" barStyle="light-content" />
             </View>
@@ -53,8 +71,7 @@ const localStyles = StyleSheet.create({
         height: Platform.OS === 'ios' ? 60 : 70,
     },
     logo: {
-        paddingLeft: 5,
-        alignSelf: 'flex-start',
+        alignSelf: 'center',
         ...Platform.select({
             ios: {
                 paddingBottom: 20,
