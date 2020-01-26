@@ -32,7 +32,7 @@ export default class MyHeader extends Component {
 
         return (
             <Button transparent underlayColor="#000" onPress={() => this.props.navigation.navigate(this.props.backScreen)}>
-                <Icon type='FontAwesome' name="angle-left" style={{fontSize: 26, color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
+                <Icon type='FontAwesome' name="chevron-left" style={{fontSize: 18, color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
             </Button>
         );
     }
