@@ -77,10 +77,9 @@ export default class Roll extends CharacterTrait {
                 roll = SKILL_GENERAL_CHARACTERISTIC;
             }
         } else if (this.characterTrait.trait.hasOwnProperty('characteristic')) {
-            let powersMap = common.toMap(common.flatten(this.characterTrait.getCharacter().powers, 'powers'));
             let characteristic = this.characterTrait.getCharacter().characteristics.filter(c => c.shortName.toLowerCase() === this.characterTrait.trait.characteristic.toLowerCase()).shift();
 
-            roll = parseInt(heroDesignerCharacter.getRollTotal(characteristic, powersMap).slice(0, -1), 10);
+            roll = parseInt(heroDesignerCharacter.getRollTotal(characteristic, this.characterTrait.getCharacter()).slice(0, -1), 10);
         }
 
         if (roll !== null) {

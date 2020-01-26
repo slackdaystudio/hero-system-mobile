@@ -10,9 +10,9 @@ import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { file } from '../../lib/File';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
+import { combatDetails } from '../../lib/CombatDetails';
 import styles from '../../Styles';
-import { setCharacter, setShowSecondary, clearCharacter } from '../../reducers/character';
-import { setCombatDetails } from '../../reducers/combat';
+import { setCharacter, clearCharacter, setCombatDetails } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,9 +32,7 @@ class CharactersScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
-        setShowSecondary: PropTypes.func.isRequired,
         setCharacter: PropTypes.func.isRequired,
-        setCombatDetails: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
     }
 
@@ -101,11 +99,13 @@ class CharactersScreen extends Component {
             this.props.navigation.navigate(screen, {from: 'Characters'});
         } else {
             file.loadCharacter(characterFilename, this.startLoad, this.endLoad).then((char) => {
-                char.filename = characterFilename;
+                if (!char.hasOwnProperty('filename')) {
+                    char.filename = characterFilename;
+                    char.showSecondary = true;
+                    char.combatDetails = combatDetails.init(char);
+                }
 
                 this.props.setCharacter(char);
-                this.props.setShowSecondary(true);
-                this.props.setCombatDetails(char);
 
                 let screen = 'ViewCharacter';
 
@@ -239,7 +239,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     setCharacter,
-    setShowSecondary,
     clearCharacter,
     setCombatDetails,
 };

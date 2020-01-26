@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
+import appState from './appState';
 import character from './character';
-import combat from './combat';
 import forms from './forms';
 import settings from './settings';
 import statistics from './statistics';
@@ -21,8 +21,8 @@ import randomHero from './randomHero';
 // limitations under the License.
 
 export default combineReducers({
+    appState,
     character,
-    combat,
     forms,
     settings,
     statistics,

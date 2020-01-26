@@ -79,9 +79,7 @@ class File {
                 return;
             }
 
-            if (__DEV__) {
-                await this._saveCharacter(character, result.name);
-            }
+            await this._saveCharacter(character, result.name);
 
             return character;
         } catch (error) {
@@ -100,6 +98,8 @@ class File {
         try {
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
             characters = await RNFetchBlob.fs.ls(path);
+
+            characters.sort();
         } catch (error) {
             Alert.alert(error.message);
         }
@@ -131,10 +131,28 @@ class File {
         }
     }
 
-    async deleteCharacter(filename) {
-        let path = await this._getPath(DEFAULT_CHARACTER_DIR);
+    async saveCharacter(character, filename) {
+        try {
+            let path = await this._getPath(DEFAULT_CHARACTER_DIR);
 
-        await RNFetchBlob.fs.unlink(`${path}/${filename}`);
+            await this._saveCharacter(character, filename);
+
+            return true;
+        } catch (error) {
+            Alert.alert(error.message)
+        }
+
+        return false;
+    }
+
+    async deleteCharacter(filename) {
+        try {
+            let path = await this._getPath(DEFAULT_CHARACTER_DIR);
+
+            await RNFetchBlob.fs.unlink(`${path}/${filename}`);
+        } catch (error) {
+            Alert.alert(error.message)
+        }
     }
 
     async _read(uri, startLoad, endLoad, isHdc = false) {

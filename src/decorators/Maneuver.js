@@ -188,10 +188,7 @@ export default class Maneuver extends CharacterTrait {
         let partialDie = false;
 
         if (this.characterTrait.trait.addstr) {
-            let characteristicsMap = common.toMap(character.characteristics, 'shortName');
-            let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
-
-            dice += heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5;
+            dice += heroDesignerCharacter.getCharacteristicTotal('STR', character) / 5;
         }
 
         if (this.characterTrait.trait.category === 'Hand To Hand') {
@@ -249,8 +246,6 @@ export default class Maneuver extends CharacterTrait {
 
     _getUnarmedKillingDamage() {
         let character = this.getCharacter();
-        let characteristicsMap = common.toMap(character.characteristics, 'shortName');
-        let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
         let dice = '';
         let damageClasses = this.characterTrait.trait.dc;
@@ -258,7 +253,7 @@ export default class Maneuver extends CharacterTrait {
         let remainder = 0;
         let damageString = '';
 
-        damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5);
+        damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal('STR', character) / 5);
 
         if (martialArtsMap.has('EXTRADC')) {
             damageClasses += martialArtsMap.get('EXTRADC').levels;
@@ -298,10 +293,7 @@ export default class Maneuver extends CharacterTrait {
         let strength = this.characterTrait.trait.dc * 5;
 
         if (this.characterTrait.trait.addstr) {
-            let characteristicsMap = common.toMap(character.characteristics, 'shortName');
-            let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
-
-            strength += heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap);
+            strength += heroDesignerCharacter.getCharacteristicTotal('STR', character);
         }
 
         if (this.characterTrait.trait.category === 'Hand To Hand') {

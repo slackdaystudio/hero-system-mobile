@@ -62,12 +62,11 @@ export default class EnhancedPerception extends CharacterTrait {
 
     roll() {
         let characteristics = this.characterTrait.getCharacter().characteristics;
-        let powersMap = common.toMap(common.flatten(this.characterTrait.getCharacter().powers, 'powers'));
         let base = 0;
 
         for (let characteristic of characteristics) {
             if (characteristic.shortName === 'INT') {
-                let totalRoll = heroDesignerCharacter.getRollTotal(characteristic, powersMap);
+                let totalRoll = heroDesignerCharacter.getRollTotal(characteristic, this.characterTrait.getCharacter());
 
                 base += parseInt(totalRoll.substring(0, (totalRoll.length - 1)), 10);
 

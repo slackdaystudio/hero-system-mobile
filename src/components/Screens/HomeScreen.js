@@ -8,11 +8,6 @@ import Heading from '../Heading/Heading';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
-import { initializeApplicationSettings } from '../../reducers/settings';
-import { initializeStatistics } from '../../reducers/statistics';
-import { initializeCharacter, initializeShowSecondary } from '../../reducers/character';
-import { initializeRandomHero } from '../../reducers/randomHero';
-import { initializeCombatDetails } from '../../reducers/combat';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,24 +27,6 @@ class HomeScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
-        initializeApplicationSettings: PropTypes.func.isRequired,
-        initializeStatistics: PropTypes.func.isRequired,
-        initializeCharacter: PropTypes.func.isRequired,
-        initializeRandomHero: PropTypes.func.isRequired,
-        initializeCombatDetails: PropTypes.func.isRequired,
-    }
-
-    async componentDidMount() {
-        try {
-            await this.props.initializeApplicationSettings();
-            await this.props.initializeStatistics();
-            await this.props.initializeCharacter();
-            await this.props.initializeShowSecondary();
-            await this.props.initializeRandomHero();
-            await this.props.initializeCombatDetails(this.props.character);
-        } catch (error) {
-            common.toast(error.message);
-        }
     }
 
     _onViewPress() {
@@ -154,13 +131,6 @@ const mapStateToProps = state => {
     };
 };
 
-const mapDispatchToProps = {
-    initializeApplicationSettings,
-    initializeStatistics,
-    initializeCharacter,
-    initializeShowSecondary,
-    initializeCombatDetails,
-    initializeRandomHero,
-};
+const mapDispatchToProps = {};
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

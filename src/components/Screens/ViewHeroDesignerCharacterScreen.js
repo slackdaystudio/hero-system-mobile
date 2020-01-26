@@ -14,8 +14,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setCombatDetails, setSparseCombatDetails, usePhase } from '../../reducers/combat';
-import { setShowSecondary } from '../../reducers/character';
+import { setShowSecondary, setCombatDetails, setSparseCombatDetails, usePhase } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -35,7 +34,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
-        showSecondary: PropTypes.bool.isRequired,
         combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
         setCombatDetails: PropTypes.func.isRequired,
@@ -63,7 +61,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.character !== prevProps.character) {
+        if (this.props.character !== null && prevProps.character !== null && this.props.character.filename !== prevProps.character.filename) {
             if (this.tabs !== null) {
                 this.tabs.goToPage(0);
             }
@@ -88,7 +86,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         navigation={this.props.navigation}
                         headingText={title}
                         character={this.props.character}
-                        showSecondary={this.props.showSecondary}
                         listKey={listKey}
                         subListKey={subListKey}
                         updateForm={this.props.updateForm}
@@ -117,7 +114,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         <Combat
                             navigation={this.props.navigation}
                             character={this.props.character}
-                            showSecondary={this.props.showSecondary}
                             combatDetails={this.props.combatDetails}
                             setSparseCombatDetails={this.props.setSparseCombatDetails}
                             forms={this.props.forms}
@@ -131,7 +127,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         <Characteristics
                             navigation={this.props.navigation}
                             character={this.props.character}
-                            showSecondary={this.props.showSecondary}
                             setCombatDetails={this.props.setCombatDetails}
                             setShowSecondary={this.props.setShowSecondary}
                             updateForm={this.props.updateForm}
@@ -179,7 +174,6 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         character: state.character.character,
-        showSecondary: state.character.showSecondary,
         combatDetails: state.combat,
         forms: state.forms,
     };

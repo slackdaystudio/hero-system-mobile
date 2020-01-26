@@ -17,7 +17,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setSparseCombatDetails } from '../../reducers/combat';
+import { setSparseCombatDetails } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -61,7 +61,7 @@ class ViewCharacterScreen extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.character !== prevProps.character) {
+        if (this.props.character.filename !== prevProps.character.filename) {
             if (this.tabs !== null) {
                 this.tabs.goToPage(0);
             }
