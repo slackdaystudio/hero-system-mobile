@@ -83,39 +83,55 @@ class CharactersScreen extends Component {
     }
 
     _importCharacter() {
-        character.import(this.startLoad, this.endLoad).then(char => {
-            this._refreshCharacters();
-        });
+        if (this.props.character !== null && this.props.character.hasOwnProperty('filename')) {
+            file.saveCharacter(this.props.character, this.props.character.filename).then(() => {
+                character.import(this.startLoad, this.endLoad).then(char => {
+                    this._refreshCharacters();
+                });
+            })
+        } else {
+            character.import(this.startLoad, this.endLoad).then(char => {
+                this._refreshCharacters();
+            });
+        }
     }
 
     _onViewCharacterPress(characterFilename) {
         if (!common.isEmptyObject(this.props.character) && this.props.character.filename === characterFilename) {
-            let screen = 'ViewCharacter';
+            this._goToCharacterScreen(this.props.character);
+        } else {
+            if (!common.isEmptyObject(this.props.character) && this.props.character.hasOwnProperty('filename')) {
+                file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
+                    this._loadCharacter(characterFilename);
+                });
+            } else {
+                this._loadCharacter(characterFilename);
+            }
+        }
+    }
 
-            if (character.isHeroDesignerCharacter(this.props.character)) {
-                screen = 'ViewHeroDesignerCharacter';
+    _loadCharacter(characterFilename) {
+        file.loadCharacter(characterFilename, this.startLoad, this.endLoad).then((char) => {
+            if (!char.hasOwnProperty('filename')) {
+                char.filename = characterFilename;
+                char.showSecondary = true;
+                char.combatDetails = combatDetails.init(char);
             }
 
-            this.props.navigation.navigate(screen, {from: 'Characters'});
-        } else {
-            file.loadCharacter(characterFilename, this.startLoad, this.endLoad).then((char) => {
-                if (!char.hasOwnProperty('filename')) {
-                    char.filename = characterFilename;
-                    char.showSecondary = true;
-                    char.combatDetails = combatDetails.init(char);
-                }
+            this.props.setCharacter(char);
 
-                this.props.setCharacter(char);
+            this._goToCharacterScreen(char);
+        });
+    }
 
-                let screen = 'ViewCharacter';
+    _goToCharacterScreen(char) {
+        let screen = 'ViewCharacter';
 
-                if (character.isHeroDesignerCharacter(char)) {
-                    screen = 'ViewHeroDesignerCharacter';
-                }
-
-                this.props.navigation.navigate(screen, {from: 'Characters'});
-            });
+        if (character.isHeroDesignerCharacter(char)) {
+            screen = 'ViewHeroDesignerCharacter';
         }
+
+        this.props.navigation.navigate(screen, {from: 'Characters'});
     }
 
     _openDeleteDialog(filename) {
