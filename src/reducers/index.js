@@ -5,6 +5,7 @@ import forms from './forms';
 import settings from './settings';
 import statistics from './statistics';
 import randomHero from './randomHero';
+import version from './version';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -27,4 +28,5 @@ export default combineReducers({
     settings,
     statistics,
     randomHero,
+    version,
 });

@@ -36,6 +36,38 @@ class Persistence {
         };
     }
 
+    async getVersion() {
+        let version = null;
+
+        try {
+            version = await AsyncStorage.getItem('version');
+        } catch (error) {
+            common.toast('Unable to retrieve version');
+        }
+
+        return version;
+    }
+
+    async setVersion(version) {
+        try {
+            await AsyncStorage.setItem('version', version);
+        } catch (error) {
+            common.toast('Unable to persist version');
+        }
+
+        return version;
+    }
+
+    async clearCaches() {
+        let cacheKeys = ['appSettings', 'character', 'statistics', 'statistics'];
+        let legacyCacheKeys = ['showSecondaryCharacteristics', 'combat'];
+        let allCacheKeys = cacheKeys.concat(legacyCacheKeys);
+
+        await AsyncStorage.multiRemove(allCacheKeys);
+
+        common.toast('All caches have been cleared');
+    }
+
     async saveCharacter(character) {
         try {
             await AsyncStorage.setItem('character', JSON.stringify(character));

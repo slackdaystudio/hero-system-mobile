@@ -81,6 +81,7 @@ export default function settings(state = settingsState, action) {
 
             newState.useFifthEdition = action.payload.useFifthEdition;
             newState.playSounds = action.payload.playSounds;
+            newState.onlyDiceSounds = action.payload.onlyDiceSounds;
 
             return newState;
         case TOGGLE_SETTING:
@@ -89,7 +90,7 @@ export default function settings(state = settingsState, action) {
             };
 
             newState[action.payload.key] = action.payload.value;
-            
+
             return newState;
         default:
             return state;
