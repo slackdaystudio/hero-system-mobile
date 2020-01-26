@@ -84,7 +84,7 @@ class CharactersScreen extends Component {
 
     _importCharacter() {
         if (this.props.character !== null && this.props.character.hasOwnProperty('filename')) {
-            file.saveCharacter(this.props.character, this.props.character.filename).then(() => {
+            file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
                 character.import(this.startLoad, this.endLoad).then(char => {
                     this._refreshCharacters();
                 });
