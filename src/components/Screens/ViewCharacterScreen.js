@@ -37,7 +37,6 @@ class ViewCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
-        combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
     }
@@ -129,7 +128,6 @@ class ViewCharacterScreen extends Component {
                         <Combat
                             navigation={this.props.navigation}
                             character={this.props.character}
-                            combatDetails={this.props.combatDetails}
                             updateForm={this.props.updateForm}
                             setSparseCombatDetails={this.props.setSparseCombatDetails}
                         />
@@ -178,7 +176,6 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         character: state.character.character,
-        combatDetails: state.combat,
     };
 };
 

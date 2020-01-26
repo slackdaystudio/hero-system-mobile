@@ -23,7 +23,6 @@ export default class Combat extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
-        combatDetails: PropTypes.object.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         updateForm: PropTypes.func.isRequired,
     }
@@ -45,7 +44,7 @@ export default class Combat extends Component {
 
         combatDetails[key] = value;
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, true);
     }
 
     _resetCombatState(key) {
@@ -53,16 +52,16 @@ export default class Combat extends Component {
 
         combatDetails[key] = character.getCharacteristic(this.props.character.characteristics.characteristic, key);
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, true);
     }
 
     _takeRecovery() {
         let recovery = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'recovery'), 10);
         let stunMax = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'stun'), 10);
         let endMax = parseInt(character.getCharacteristic(this.props.character.characteristics.characteristic, 'endurance'), 10);
-        let stun = this.props.combatDetails.stun;
+        let stun = this.props.character.combatDetails.secondary.stun;
         let combatStun = parseInt(stun, 10);
-        let endurance = this.props.combatDetails.endurance;
+        let endurance = this.props.character.combatDetails.secondary.endurance;
         let combatEnd = parseInt(endurance, 10);
         let combatDetails = {};
 
@@ -77,7 +76,7 @@ export default class Combat extends Component {
         combatDetails.stun = stun;
         combatDetails.endurance = endurance;
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, true);
     }
 
     _rollDamage(strengthDamage) {
@@ -181,7 +180,7 @@ export default class Combat extends Component {
                                 style={styles.grey}
                                 keyboardType="numeric"
                                 maxLength={3}
-                                value={this.props.combatDetails.stun.toString()}
+                                value={this.props.character.combatDetails.secondary.stun.toString()}
                                 onChangeText={(text) => this.updateCombatState('stun', text)} />
                         </Item>
                     </View>
@@ -201,7 +200,7 @@ export default class Combat extends Component {
                                 style={styles.grey}
                                 keyboardType="numeric"
                                 maxLength={3}
-                                value={this.props.combatDetails.body.toString()}
+                                value={this.props.character.combatDetails.secondary.body.toString()}
                                 onChangeText={(text) => this.updateCombatState('body', text)} />
                         </Item>
                     </View>
@@ -221,7 +220,7 @@ export default class Combat extends Component {
                                 style={styles.grey}
                                 keyboardType="numeric"
                                 maxLength={3}
-                                value={this.props.combatDetails.endurance.toString()}
+                                value={this.props.character.combatDetails.secondary.endurance.toString()}
                                 onChangeText={(text) => this.updateCombatState('endurance', text)} />
                         </Item>
                     </View>
