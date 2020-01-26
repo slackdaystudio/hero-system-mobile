@@ -274,7 +274,7 @@ class HeroDesignerCharacter {
     getRollTotal(characteristic, character) {
         if (characteristic.roll) {
             let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
-            
+
             return `${Math.round(this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary) / 5) + SKILL_ROLL_BASE}-`;
         }
 

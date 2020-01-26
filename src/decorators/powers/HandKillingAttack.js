@@ -77,7 +77,7 @@ export default class HandKillingAttack extends CharacterTrait {
         let remainder = 0;
 
         if (!modifierMap.has('STRMINIMUM')) {
-            damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicByShortName('STR', character) / this._getStrengthDcCost());
+            damageClasses += Math.floor(heroDesignerCharacter.getCharacteristicTotal('STR', character) / this._getStrengthDcCost());
         }
 
         if (adderMap.has('PLUSONEPIP')) {

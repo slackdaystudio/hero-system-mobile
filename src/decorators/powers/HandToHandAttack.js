@@ -70,7 +70,7 @@ export default class HandToHandAttack extends CharacterTrait {
         };
         let partialDie = false;
 
-        dice += heroDesignerCharacter.getCharacteristicByShortName('STR', character) / 5;
+        dice += heroDesignerCharacter.getCharacteristicTotal('STR', character) / 5;
 
         if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
             partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.6 ? true : false;

@@ -214,7 +214,7 @@ export default class Characteristics extends Component {
 
     _renderNonCombatMovement(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            let speed = heroDesignerCharacter.getCharacteristicByShortName('SPD', this.props.character);
+            let speed = heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character);
             let meters = this._getMovementTotal(characteristic);
             let ncm = 2;
             let power = null;
@@ -267,7 +267,7 @@ export default class Characteristics extends Component {
         if (characteristic.shortName === 'STR') {
             let step = null;
             let lift = '0.0 kg';
-            let totalStrength = heroDesignerCharacter.getCharacteristicByShortName('STR', this.props.character);
+            let totalStrength = heroDesignerCharacter.getCharacteristicTotal('STR', this.props.character);
 
             for (let key of Object.keys(strengthTable)) {
                 if (totalStrength === parseInt(key, 10)) {
