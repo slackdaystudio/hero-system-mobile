@@ -189,7 +189,7 @@ class CharactersScreen extends Component {
                                     <Icon
                                         type='FontAwesome'
                                         name='chevron-right'
-                                        style={{fontSize: 20, color: '#14354d', alignSelf: 'center', paddingTop: 0}}
+                                        style={{fontSize: 20, color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => this.onViewCharacterPress(characterName)}
                                     />
                                 </Right>

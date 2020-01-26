@@ -53,7 +53,7 @@ class File {
             let writePermission = await permission.askForWrite();
 
             if (!writePermission) {
-                common.toast('Unable to load character: write permission is denied.');
+                common.toast('Unable to import character: write permission is denied.');
 
                 return;
             }
@@ -96,6 +96,14 @@ class File {
         let characters = null;
 
         try {
+            let writePermission = await permission.askForWrite();
+
+            if (!writePermission) {
+                common.toast('Unable to list characters: read permission is denied.');
+
+                return [];
+            }
+
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
             characters = await RNFetchBlob.fs.ls(path);
 
@@ -112,6 +120,14 @@ class File {
 
         try {
 	        startLoad();
+
+            let writePermission = await permission.askForWrite();
+
+            if (!writePermission) {
+                common.toast('Unable to load character: write permission is denied.');
+
+                return;
+            }
 
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
             let canonicalFromName = `${path}/${characterName}`;
@@ -133,6 +149,14 @@ class File {
 
     async saveCharacter(character, filename) {
         try {
+            let writePermission = await permission.askForWrite();
+
+            if (!writePermission) {
+                common.toast('Unable to save character: write permission is denied.');
+
+                return;
+            }
+
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
 
             await this._saveCharacter(character, filename);
@@ -147,6 +171,14 @@ class File {
 
     async deleteCharacter(filename) {
         try {
+            let writePermission = await permission.askForWrite();
+
+            if (!writePermission) {
+                common.toast('Unable to delete character: write permission is denied.');
+
+                return;
+            }
+
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
 
             await RNFetchBlob.fs.unlink(`${path}/${filename}`);
