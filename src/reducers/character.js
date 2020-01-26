@@ -1,7 +1,6 @@
 import { Alert } from 'react-native';
 import { common } from '../lib/Common';
 import { persistence } from '../lib/Persistence';
-import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -77,18 +76,22 @@ export function setCombatDetails(character) {
     };
 }
 
-export function setSparseCombatDetails(sparseCombatDetails) {
+export function setSparseCombatDetails(sparseCombatDetails, secondary) {
     return {
         type: SET_SPARSE_COMBAT_DETAILS,
-        payload: sparseCombatDetails,
+        payload: {
+            secondary: secondary,
+            sparseCombatDetails: sparseCombatDetails,
+        }
     };
 }
 
-export function usePhase(phase, abort = false) {
+export function usePhase(phase, secondary, abort = false) {
     return {
         type: USE_PHASE,
         payload: {
             phase: phase,
+            secondary: secondary,
             abort: abort,
         },
     };
@@ -182,9 +185,11 @@ export default function character(state = characterState, action) {
                 },
             };
 
-            for (let [key, value] of Object.entries(action.payload)) {
-                if (newState.character.combatDetails.hasOwnProperty(key)) {
-                    newState.character.combatDetails[key] = value;
+            let combatDetailsKey = action.payload.secondary ? 'secondary' : 'primary';
+
+            for (let [key, value] of Object.entries(action.payload.sparseCombatDetails)) {
+                if (newState.character.combatDetails[combatDetailsKey].hasOwnProperty(key)) {
+                    newState.character.combatDetails[combatDetailsKey][key] = value;
                 }
             }
 
@@ -200,8 +205,9 @@ export default function character(state = characterState, action) {
                 },
             };
 
-            let used = newState.character.combatDetails.phases[action.payload.phase.toString()].used;
-            let aborted = newState.character.combatDetails.phases[action.payload.phase.toString()].aborted;
+            let detailsKey = action.payload.secondary ? 'secondary' : 'primary';
+            let used = newState.character.combatDetails[detailsKey].phases[action.payload.phase.toString()].used;
+            let aborted = newState.character.combatDetails[detailsKey].phases[action.payload.phase.toString()].aborted;
 
             if (action.payload.abort) {
                 used = false;
@@ -216,7 +222,7 @@ export default function character(state = characterState, action) {
                 }
             }
 
-            newState.character.combatDetails.phases[action.payload.phase.toString()] = {
+            newState.character.combatDetails[detailsKey].phases[action.payload.phase.toString()] = {
                 used: used,
                 aborted: aborted,
             };

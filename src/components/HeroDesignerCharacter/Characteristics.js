@@ -53,7 +53,6 @@ export default class Characteristics extends Component {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
-        setCombatDetails: PropTypes.func.isRequired,
         updateForm: PropTypes.func.isRequired,
     }
 
@@ -408,7 +407,6 @@ export default class Characteristics extends Component {
 
     _toggleSecondaryCharacteristics() {
         this.props.setShowSecondary(!this.props.character.showSecondary);
-        // this.props.setCombatDetails(this.props.character);
     }
 
     _renderSecondaryCharacteristicToggle() {

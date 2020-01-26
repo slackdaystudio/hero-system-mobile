@@ -19,6 +19,18 @@ import speedTable from '../../public/speed.json';
 
 class CombatDetails {
     init(character) {
+        let combatDetails = {};
+
+        character.showSecondary = false;
+        combatDetails.primary = this._init(character);
+
+        character.showSecondary = true;
+        combatDetails.secondary = this._init(character);
+
+        return combatDetails;
+    }
+
+    _init(character, showSecondary) {
         let combatDetails = {
             stun: 0,
             body: 0,

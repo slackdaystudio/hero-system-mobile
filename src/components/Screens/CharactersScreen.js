@@ -12,7 +12,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import { combatDetails } from '../../lib/CombatDetails';
 import styles from '../../Styles';
-import { setCharacter, clearCharacter, setCombatDetails } from '../../reducers/character';
+import { setCharacter, clearCharacter } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -240,7 +240,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     setCharacter,
     clearCharacter,
-    setCombatDetails,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CharactersScreen);

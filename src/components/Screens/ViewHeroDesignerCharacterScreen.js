@@ -14,7 +14,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setShowSecondary, setCombatDetails, setSparseCombatDetails, usePhase } from '../../reducers/character';
+import { setShowSecondary, setSparseCombatDetails, usePhase } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -36,7 +36,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
         character: PropTypes.object,
         combatDetails: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
-        setCombatDetails: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
@@ -127,7 +126,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         <Characteristics
                             navigation={this.props.navigation}
                             character={this.props.character}
-                            setCombatDetails={this.props.setCombatDetails}
                             setShowSecondary={this.props.setShowSecondary}
                             updateForm={this.props.updateForm}
                         />
@@ -174,7 +172,6 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         character: state.character.character,
-        combatDetails: state.combat,
         forms: state.forms,
     };
 };
@@ -182,7 +179,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     updateForm,
     setShowSecondary,
-    setCombatDetails,
     setSparseCombatDetails,
     usePhase,
 };
