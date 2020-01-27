@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Platform, View } from 'react-native';
 import { Text, Icon, Item, Label } from 'native-base';
 import { CalculatorInput as BaseCalculatorInput } from 'react-native-calculator'
+import { verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
 
 export default class CalculatorInput extends Component {
@@ -27,34 +28,38 @@ export default class CalculatorInput extends Component {
     render() {
         return (
             <View style={{flex: 1, flexDirection: 'row', width: this.props.width}}>
-                <Item>
-                    <BaseCalculatorInput
-                        ref={(ref) => this.currentBodyPointsCalculator = ref}
-                        fieldContainerStyle={{borderBottomWidth: 0}}
-                        fieldTextStyle={[styles.grey, {textAlign: 'left', alignSelf: 'baseline', paddingTop: Platform.OS === 'ios' ? 15 : 5}]}
-                        value={this.props.value.toString()}
-                        onAccept={(value) => this._onAccept(value)}
-                        modalAnimationType='slide'
-                        hasAcceptButton={true}
-                        displayTextAlign='left'
+                <View style={{flex: 1}}>
+                    <Item>
+                        <BaseCalculatorInput
+                            ref={(ref) => this.currentBodyPointsCalculator = ref}
+                            fieldContainerStyle={{borderBottomWidth: 0}}
+                            fieldTextStyle={[styles.grey, {textAlign: 'left', alignSelf: 'baseline', paddingTop: Platform.OS === 'ios' ? verticalScale(15) : verticalScale(5)}]}
+                            value={this.props.value.toString()}
+                            onAccept={(value) => this._onAccept(value)}
+                            modalAnimationType='slide'
+                            hasAcceptButton={true}
+                            displayTextAlign='left'
+                        />
+                    </Item>
+                </View>
+                <View style={{flex: 1}}>
+                    <Icon
+                        type='FontAwesome'
+                        name='calculator'
+                        style={{fontSize: verticalScale(20), color: '#14354d', alignSelf: 'center', paddingTop: this.props.iconPaddingTop}}
+                        onPress={() => this.currentBodyPointsCalculator.calculatorModalToggle()}
                     />
-                </Item>
-                <Icon
-                    type='FontAwesome'
-                    name='calculator'
-                    style={{fontSize: 20, color: '#14354d', alignSelf: 'center', paddingTop: this.props.iconPaddingTop}}
-                    onPress={() => this.currentBodyPointsCalculator.calculatorModalToggle()}
-                />
+                </View>
             </View>
         );
     }
 }
 
 CalculatorInput.defaultProps = {
-    width: 110,
-    fontSize: 12,
-    labelFontSize: 10,
+    width: verticalScale(85),
+    fontSize: verticalScale(12),
+    labelFontSize: verticalScale(10),
     stackedLabel: true,
     boldLabel: false,
-    iconPaddingTop: 10,
+    iconPaddingTop: verticalScale(16),
 };

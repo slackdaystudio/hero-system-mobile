@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import Modal from 'react-native-modal';
+import { verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
 import Heading from '../Heading/Heading';
 
@@ -46,7 +47,7 @@ export default class ConfirmationDialog extends Component {
             >
                 <View style={styles.modal}>
                     <Text style={styles.modalHeader}>{this.props.title}</Text>
-                    <View style={[styles.modalContent, {minHeight: 170}]}>
+                    <View style={[styles.modalContent, {minHeight: verticalScale(170)}]}>
                         <ScrollView
                             ref={ref => (this.scrollViewRef = ref)}
                             onScroll={this._handleOnScroll}

@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
 import { Button, Text, Header, Left, Right, Body, Icon } from 'native-base';
+import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -32,7 +33,7 @@ export default class MyHeader extends Component {
 
         return (
             <Button transparent underlayColor="#000" onPress={() => this.props.navigation.navigate(this.props.backScreen)}>
-                <Icon type='FontAwesome' name="chevron-left" style={{fontSize: 18, color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
+                <Icon type='FontAwesome' name="chevron-left" style={{fontSize: verticalScale(18), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
             </Button>
         );
     }
@@ -48,13 +49,13 @@ export default class MyHeader extends Component {
                         <View style={{flex: 4}}>
                             <View style={localStyles.logo}>
                                 <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
-                                    <Image style={{height: 75, width: 161}} source={require('../../../public/hero_mobile_logo.png')} />
+                                    <Image style={{height: verticalScale(65), width: scale(149)}} source={require('../../../public/hero_mobile_logo.png')} />
                                 </TouchableHighlight>
                             </View>
                         </View>
                         <View style={{flex: 1}}>
                             <Button transparent underlayColor="#000" onPress={() => this.props.navigation.toggleDrawer()}>
-                                <Icon name="menu" style={{color: 'white', paddingBottom: Platform.OS === 'ios' ? 50 : 0}} />
+                                <Icon name="menu" style={{fontSize: verticalScale(24), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
                             </Button>
                         </View>
                     </View>
@@ -65,16 +66,16 @@ export default class MyHeader extends Component {
     }
 }
 
-const localStyles = StyleSheet.create({
+const localStyles = ScaledSheet.create({
     header: {
         backgroundColor: '#000',
-        height: Platform.OS === 'ios' ? 60 : 70,
+        height: Platform.OS === 'ios' ? '60@vs' : '70@vs',
     },
     logo: {
         alignSelf: 'center',
         ...Platform.select({
             ios: {
-                paddingBottom: 20,
+                paddingBottom: '20@vs',
             },
         }),
     },

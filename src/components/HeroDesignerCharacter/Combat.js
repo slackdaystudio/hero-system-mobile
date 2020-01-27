@@ -6,6 +6,7 @@ import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
 import CalculatorInput from '../CalculatorInput/CalculatorInput';
+import { verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 import { dieRoller } from '../../lib/DieRoller';
@@ -272,7 +273,7 @@ export default class Combat extends Component {
         return (
             <View style={{paddingHorizontal: 5}}>
                 <TouchableHighlight underlayColor='#1b1d1f' onPress={() => this.usePhase(phase, this.props.character.showSecondary)} onLongPress={() => this.abortPhase(phase)}>
-                    <CircleText title={phase} fontSize={20} size={40} color={color} />
+                    <CircleText title={phase} fontSize={verticalScale(18)} size={verticalScale(35)} color={color} />
                 </TouchableHighlight>
             </View>
         );

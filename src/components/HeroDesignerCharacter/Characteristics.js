@@ -361,10 +361,10 @@ export default class Characteristics extends Component {
 
     _renderStat(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} color="#303030" />;
+            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={18} size={55} color="#303030" />;
         }
 
-        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()} fontSize={22} size={50} color="#303030" />;
+        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()} fontSize={18} size={45} color="#303030" />;
     }
 
     _renderCharacteristics(characteristics) {

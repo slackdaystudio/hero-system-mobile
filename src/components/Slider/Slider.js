@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { StyleSheet, View, Keyboard, Alert } from 'react-native';
 import { Text, Icon, Item, Input } from 'native-base';
 import { default as RNSlider } from 'react-native-slider';
+import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 
@@ -121,7 +122,7 @@ class Slider extends Component {
             <View>
                 <View style={localStyles.titleContainer}>
                     <Text style={styles.grey}>{this.props.label}</Text>
-                    <View style={{width: (this._isFraction() ? 50 : 40)}}>
+                    <View style={{width: (this._isFraction() ? scale(50) : scale(40))}}>
                         <Item>
                             <Input
                                 style={styles.grey}
@@ -158,27 +159,27 @@ Slider.defaultProps = {
     disabled: false,
 };
 
-const localStyles = StyleSheet.create({
+const localStyles = ScaledSheet.create({
     titleContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 10,
+        paddingTop: '10@vs',
     },
 });
 
-const thumbStyles = StyleSheet.create({
+const thumbStyles = ScaledSheet.create({
     track: {
-        height: 16,
+        height: '16@vs',
         borderRadius: 10,
         backgroundColor: '#01121E',
         borderColor: '#062134',
         borderWidth: 1,
     },
     thumb: {
-        width: 30,
-        height: 30,
-        borderRadius: 30 / 2,
+        width: '30@s',
+        height: '30@s',
+        borderRadius: scale(30) / 2,
         backgroundColor: '#14354d',
         borderColor: '#062134',
         borderWidth: 2,

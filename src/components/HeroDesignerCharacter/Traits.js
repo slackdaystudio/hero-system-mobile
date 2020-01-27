@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { View, TouchableHighlight, Alert } from 'react-native';
 import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
 import Heading from '../Heading/Heading';
-import CircleText from '../CircleText/CircleText';
 import { dieRoller } from '../../lib/DieRoller';
 import { TYPE_MOVEMENT, GENERIC_OBJECT } from '../../lib/HeroDesignerCharacter';
 import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';

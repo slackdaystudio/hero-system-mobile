@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Platform, StyleSheet, Image, StatusBar, View } from 'react-native';
 import { Container, Content, Text, List, ListItem } from 'native-base';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
+import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
@@ -50,7 +51,7 @@ class Sidebar extends Component {
                     <List>
                         <ListItem onPress={() => this.props.navigation.navigate('Home')}>
                             <View>
-                                <Image style={{height: 75, width: 161}} source={require('../../../public/hero_mobile_logo.png')} />
+                                <Image style={{height: verticalScale(65), width: scale(149)}} source={require('../../../public/hero_mobile_logo.png')} />
                             </View>
                         </ListItem>
                         <ListItem onPress={() => this._onLoadPress()}>
@@ -91,13 +92,13 @@ class Sidebar extends Component {
     }
 }
 
-const localStyles = StyleSheet.create({
+const localStyles = ScaledSheet.create({
     container: {
         backgroundColor: '#242424',
         ...ifIphoneX({
-            paddingTop: 50,
+            paddingTop: '50@vs',
         }, {
-            paddingTop: (Platform.OS === 'ios' ? 20 : 0),
+            paddingTop: (Platform.OS === 'ios' ? '20@vs' : 0),
         }),
     },
 });

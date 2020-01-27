@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { Platform, View } from 'react-native';
 import { Text } from 'native-base';
+import { verticalScale } from 'react-native-size-matters';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -40,15 +41,15 @@ export default class CircleText extends Component {
                 height: size,
                 borderRadius: size / 2,
                 borderWidth: borderWidth,
-                marginTop: 2,
+                marginTop: verticalScale(2),
             }}>
                 <Text style = {{
                     textAlign: 'center',
                     alignSelf: 'center',
                     justifyContent: 'center',
-                    fontSize: fontSize - 2 * borderWidth,
-                    lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
-                    paddingTop: 3,
+                    fontSize: verticalScale(fontSize - 2 * borderWidth),
+                    lineHeight: verticalScale(fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth)),
+                    paddingTop: verticalScale(3),
                     fontWeight: 'bold',
                     color: '#F3EDE9',
                 }}>
