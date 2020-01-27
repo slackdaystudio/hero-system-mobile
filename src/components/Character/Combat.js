@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native';
 import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Spinner } from 'native-base';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
@@ -168,13 +169,13 @@ export default class Combat extends Component {
     render() {
         return (
             <View>
-                <View style={{paddingBottom: 20}} />
+                <View style={{paddingBottom: verticalScale(20)}} />
                 <Text style={styles.subHeading}>Health</Text>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: 50}}>
+                    <View style={{alignSelf: 'center', width: scale(50)}}>
                         <Text style={styles.boldGrey}>Stun:</Text>
                     </View>
-                    <View style={{width: 40}}>
+                    <View style={{width: scale(40)}}>
                         <Item>
                             <Input
                                 style={styles.grey}
@@ -194,7 +195,7 @@ export default class Combat extends Component {
                     <View style={{alignSelf: 'center', width: 50}}>
                         <Text style={styles.boldGrey}>Body:</Text>
                     </View>
-                    <View style={{width: 40}}>
+                    <View style={{width: scale(40)}}>
                         <Item>
                             <Input
                                 style={styles.grey}
@@ -211,10 +212,10 @@ export default class Combat extends Component {
                     </View>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: 50}}>
+                    <View style={{alignSelf: 'center', width: scale(50)}}>
                         <Text style={styles.boldGrey}>End:</Text>
                     </View>
-                    <View style={{width: 40}}>
+                    <View style={{width: scale(40)}}>
                         <Item>
                             <Input
                                 style={styles.grey}
@@ -230,15 +231,15 @@ export default class Combat extends Component {
                         </Button>
                     </View>
                 </View>
-                <View style={[styles.buttonContainer, {alignSelf: 'center', paddingTop: 10}]}>
+                <View style={[styles.buttonContainer, {alignSelf: 'center', paddingTop: verticalScale(10)}]}>
                     <Button style={[styles.button, {minWidth: 160}]} onPress={() => this.takeRecovery()}>
                         <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
                     </Button>
                 </View>
-                <View style={{paddingBottom: 20}} />
+                <View style={{paddingBottom: verticalScale(20)}} />
                 <Text style={styles.subHeading}>Defenses</Text>
                 {this._renderDefenses()}
-                <View style={{paddingBottom: 20}} />
+                <View style={{paddingBottom: verticalScale(20)}} />
                 <Text style={styles.subHeading}>Base Damage</Text>
                 {this._renderBaseDamage()}
             </View>

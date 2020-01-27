@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { Text, List, ListItem, Left, Body } from 'native-base';
+import { verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -112,7 +113,7 @@ export default class General extends Component {
                         <Text style={styles.boldGrey}>Campaign Use: </Text>{this.props.character.campaignUse}
                     </Text>
                 </ListItem>
-                <View style={{paddingBottom: 20}} />
+                <View style={{paddingBottom: verticalScale(20)}} />
                 <ListItem>
                     <Left>
                         <Text style={styles.boldGrey}>Total Experience:</Text>
