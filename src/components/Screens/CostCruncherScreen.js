@@ -81,7 +81,7 @@ class CostCruncherScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Cruncher</Text>
                     <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>

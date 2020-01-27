@@ -31,8 +31,6 @@ export default class Combat extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
-        showSecondary: PropTypes.bool.isRequired,
-        combatDetails: PropTypes.object.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
         forms: PropTypes.object.isRequired,
@@ -41,6 +39,10 @@ export default class Combat extends Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            combatDetails: this._getCombatDetails(props.character)
+        }
 
         this.updateCombatState = this._updateCombatState.bind(this);
         this.resetCombatState = this._resetCombatState.bind(this);
@@ -52,6 +54,30 @@ export default class Combat extends Component {
         this.abortPhase = this._abortPhase.bind(this);
     }
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState.character !== nextProps.character) {
+            let newState = {...prevState};
+
+            if (nextProps.character.showSecondary) {
+                newState.combatDetails = nextProps.character.combatDetails.secondary;
+            } else {
+                newState.combatDetails = nextProps.character.combatDetails.primary;
+            }
+
+            return newState;
+        }
+
+        return null;
+    }
+
+    _getCombatDetails(character) {
+        if (character === null) {
+            return null;
+        }
+
+        return character.showSecondary ? character.combatDetails.secondary : character.combatDetails.primary;
+    }
+
     _updateCombatState(key, value) {
         if (/^(\-)?[0-9]*$/.test(value) === false) {
             return;
@@ -61,24 +87,24 @@ export default class Combat extends Component {
 
         combatDetails[key] = value;
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
     }
 
     _resetCombatState(key) {
         let combatDetails = {};
 
-        combatDetails[key] = heroDesignerCharacter.getCharacteristicTotalByShortName(key, this.props.character);
+        combatDetails[key] = heroDesignerCharacter.getCharacteristicTotal(key, this.props.character);
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
     }
 
     _takeRecovery() {
-        let recovery = heroDesignerCharacter.getCharacteristicTotalByShortName('rec', this.props.character);
-        let stunMax = heroDesignerCharacter.getCharacteristicTotalByShortName('stun', this.props.character);
-        let endMax = heroDesignerCharacter.getCharacteristicTotalByShortName('end', this.props.character);
-        let stun = this.props.combatDetails.stun;
+        let recovery = heroDesignerCharacter.getCharacteristicTotal('rec', this.props.character);
+        let stunMax = heroDesignerCharacter.getCharacteristicTotal('stun', this.props.character);
+        let endMax = heroDesignerCharacter.getCharacteristicTotal('end', this.props.character);
+        let stun = this.state.combatDetails.stun;
         let combatStun = parseInt(stun, 10);
-        let endurance = this.props.combatDetails.endurance;
+        let endurance = this.state.combatDetails.endurance;
         let combatEnd = parseInt(endurance, 10);
         let combatDetails = {};
 
@@ -93,26 +119,26 @@ export default class Combat extends Component {
         combatDetails.stun = stun;
         combatDetails.endurance = endurance;
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
     }
 
     _incrementCv(key, step) {
         let combatDetails = {};
-        combatDetails[key] = this.props.combatDetails[key] + step;
+        combatDetails[key] = this.state.combatDetails[key] + step;
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
     }
 
     _decrementCv(key, step) {
         let combatDetails = {};
-        combatDetails[key] = this.props.combatDetails[key] - step;
+        combatDetails[key] = this.state.combatDetails[key] - step;
 
-        this.props.setSparseCombatDetails(combatDetails);
+        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
     }
 
     _rollToHit(stateKey) {
         let hitForm = {...this.props.forms.hit};
-        hitForm.ocv = this.props.combatDetails[stateKey];
+        hitForm.ocv = this.state.combatDetails[stateKey];
 
         this.props.updateForm('hit', hitForm);
 
@@ -120,11 +146,11 @@ export default class Combat extends Component {
     }
 
     _usePhase(phase) {
-        this.props.usePhase(phase);
+        this.props.usePhase(phase, this.props.character.showSecondary);
     }
 
     _abortPhase(phase) {
-        this.props.usePhase(phase, true);
+        this.props.usePhase(phase, this.props.character.showSecondary, true);
     }
 
     _renderHealthItem(stateKey, label=null) {
@@ -137,7 +163,7 @@ export default class Combat extends Component {
                     <View style={{alignSelf: 'center', width: 75}}>
                         <CalculatorInput
                             itemKey={stateKey}
-                            value={this.props.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotalByShortName(stateKey, this.props.character)}
+                            value={this.state.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, this.props.character)}
                             onAccept={this.updateCombatState}
                             alignment='flex-end'
                         />
@@ -199,7 +225,7 @@ export default class Combat extends Component {
     }
 
     _renderPhases() {
-        let phases = Object.keys(this.props.combatDetails.phases);
+        let phases = Object.keys(this.state.combatDetails.phases);
 
         if (phases.length > 6) {
             let firstRow = phases.slice(0, 6);
@@ -237,15 +263,15 @@ export default class Combat extends Component {
     _renderPhase(phase) {
         let color = '#303030';
 
-        if (this.props.combatDetails.phases[phase].used) {
+        if (this.state.combatDetails.phases[phase].used) {
             color = '#FFC300';
-        } else if (this.props.combatDetails.phases[phase].aborted) {
+        } else if (this.state.combatDetails.phases[phase].aborted) {
             color = '#D11F1F';
         }
 
         return (
             <View style={{paddingHorizontal: 5}}>
-                <TouchableHighlight underlayColor='#1b1d1f' onPress={() => this.usePhase(phase)} onLongPress={() => this.abortPhase(phase)}>
+                <TouchableHighlight underlayColor='#1b1d1f' onPress={() => this.usePhase(phase, this.props.character.showSecondary)} onLongPress={() => this.abortPhase(phase)}>
                     <CircleText title={phase} fontSize={20} size={40} color={color} />
                 </TouchableHighlight>
             </View>
@@ -256,11 +282,11 @@ export default class Combat extends Component {
         return (
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                 <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Dexterity:</Text> {heroDesignerCharacter.getCharacteristicTotalByShortName('DEX', this.props.character)}
+                    <Text style={styles.boldGrey}>Dexterity:</Text> {heroDesignerCharacter.getCharacteristicTotal('DEX', this.props.character)}
                 </Text>
                 <View style={{width: 40}} />
                 <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Speed:</Text> {heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', this.props.character)}
+                    <Text style={styles.boldGrey}>Speed:</Text> {heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character)}
                 </Text>
             </View>
         );
@@ -288,7 +314,7 @@ export default class Combat extends Component {
                 </View>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <NumberPicker
-                        value={this.props.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotalByShortName(stateKey, this.props.character)}
+                        value={this.state.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, this.props.character)}
                         increment={this.incrementCv}
                         decrement={this.decrementCv}
                         stateKey={stateKey}

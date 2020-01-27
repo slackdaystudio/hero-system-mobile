@@ -53,7 +53,7 @@ class ResultScreen extends Component {
         });
 
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate(this.props.navigation.state.params.from || 'Home');
+            this.props.navigation.navigate(this._getBackScreen());
 
             return true;
         });
@@ -77,6 +77,16 @@ class ResultScreen extends Component {
         if (prevState.result !== this.state.result) {
             this._playSoundClip();
         }
+    }
+
+    _getBackScreen() {
+        let backScreen = 'Home';
+
+        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
+            backScreen = this.props.navigation.state.params.from;
+        }
+        
+        return backScreen;
     }
 
     _playSoundClip() {
@@ -338,7 +348,7 @@ class ResultScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll Result</Text>
                     <View>

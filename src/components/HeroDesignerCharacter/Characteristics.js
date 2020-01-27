@@ -52,9 +52,7 @@ export default class Characteristics extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
-        showSecondary: PropTypes.bool.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
-        setCombatDetails: PropTypes.func.isRequired,
         updateForm: PropTypes.func.isRequired,
     }
 
@@ -95,16 +93,6 @@ export default class Characteristics extends Component {
         this.setState(newState);
     }
 
-    _getSpeed() {
-        for (let characteristic of this.props.character.characteristics) {
-            if (characteristic.shortName.toLowerCase() === 'spd') {
-                return heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap);
-            }
-        }
-
-        return 0;
-    }
-
     _getMovementTotal(characteristic) {
         let meters = characteristic.value;
 
@@ -123,7 +111,7 @@ export default class Characteristics extends Component {
         } else {
             if (movementMode.affectsPrimary && movementMode.affectsTotal) {
                 meters += movementMode.levels;
-            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary) {
+            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.character.showSecondary) {
                 meters += movementMode.levels;
             }
         }
@@ -169,10 +157,10 @@ export default class Characteristics extends Component {
             if (characteristic.shortName.toUpperCase() === 'INT') {
                 // TODO: total all sources or PER modifiers
                 note.label = 'PER';
-                note.text = heroDesignerCharacter.getRollTotal(characteristic, this.state.powersMap);
+                note.text = heroDesignerCharacter.getRollTotal(characteristic, this.props.character);
             } else if (characteristic.shortName.toUpperCase() === 'SPD') {
                 note.label = 'Phases';
-                note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap).toString()].phases.join(', ');
+                note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character).toString()].phases.join(', ');
             }
 
             return (
@@ -225,7 +213,7 @@ export default class Characteristics extends Component {
 
     _renderNonCombatMovement(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            let speed = this._getSpeed();
+            let speed = heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character);
             let meters = this._getMovementTotal(characteristic);
             let ncm = 2;
             let power = null;
@@ -262,7 +250,7 @@ export default class Characteristics extends Component {
             }
         } else {
             if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
-                (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.showSecondary)) {
+                (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.character.showSecondary)) {
                 let adderMap = common.toMap(movementMode.adder);
 
                 if (adderMap.has('IMPROVEDNONCOMBAT')) {
@@ -278,7 +266,7 @@ export default class Characteristics extends Component {
         if (characteristic.shortName === 'STR') {
             let step = null;
             let lift = '0.0 kg';
-            let totalStrength = heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap);
+            let totalStrength = heroDesignerCharacter.getCharacteristicTotal('STR', this.props.character);
 
             for (let key of Object.keys(strengthTable)) {
                 if (totalStrength === parseInt(key, 10)) {
@@ -376,7 +364,7 @@ export default class Characteristics extends Component {
             return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} color="#303030" />;
         }
 
-        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic, this.state.powersMap).toString()} fontSize={22} size={50} color="#303030" />;
+        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()} fontSize={22} size={50} color="#303030" />;
     }
 
     _renderCharacteristics(characteristics) {
@@ -397,9 +385,9 @@ export default class Characteristics extends Component {
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                     <TouchableHighlight
                                         underlayColor="#121212"
-                                        onPress={() => this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.state.powersMap))})}
+                                        onPress={() => this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character))})}
                                     >
-                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.state.powersMap)}</Text>
+                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}</Text>
                                     </TouchableHighlight>
                                     <Icon
                                         type="FontAwesome"
@@ -418,8 +406,7 @@ export default class Characteristics extends Component {
     }
 
     _toggleSecondaryCharacteristics() {
-        this.props.setShowSecondary(!this.props.showSecondary);
-        this.props.setCombatDetails(this.props.character);
+        this.props.setShowSecondary(!this.props.character.showSecondary);
     }
 
     _renderSecondaryCharacteristicToggle() {
@@ -431,7 +418,7 @@ export default class Characteristics extends Component {
                     </View>
                     <View>
                         <Switch
-                            value={this.props.showSecondary}
+                            value={this.props.character.showSecondary}
                             onValueChange={() => this._toggleSecondaryCharacteristics()}
                             minimumTrackTintColor="#14354d"
                             maximumTrackTintColor="#14354d"

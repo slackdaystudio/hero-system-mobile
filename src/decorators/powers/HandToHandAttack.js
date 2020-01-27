@@ -62,9 +62,7 @@ export default class HandToHandAttack extends CharacterTrait {
 
     roll() {
         let character = this.characterTrait.getCharacter();
-        let characteristicsMap = common.toMap(character.characteristics, 'shortName');
         let adderMap = common.toMap(this.characterTrait.trait.adder);
-        let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
         let dice = this.characterTrait.trait.levels;
         let roll = {
             roll: '',
@@ -72,7 +70,7 @@ export default class HandToHandAttack extends CharacterTrait {
         };
         let partialDie = false;
 
-        dice += heroDesignerCharacter.getCharacteristicTotal(characteristicsMap.get('STR'), powersMap) / 5;
+        dice += heroDesignerCharacter.getCharacteristicTotal('STR', character) / 5;
 
         if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
             partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.6 ? true : false;

@@ -35,6 +35,7 @@ class SettingsScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         settings: PropTypes.object.isRequired,
+        version: PropTypes.string.isRequired,
         resetForm: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
         clearRandomHero: PropTypes.func.isRequired,
@@ -107,8 +108,14 @@ class SettingsScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
+                    <Heading text="App Version" />
+                    <View style={{paddingLeft: 20, paddingBottom: 20}}>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>HERO System Mobile v</Text>{this.props.version}
+                        </Text>
+                    </View>
                     <Heading text="Game" />
                     <List>
                         <ListItem noIndent style={{borderBottomWidth: 0}}>
@@ -204,8 +211,8 @@ class SettingsScreen extends Component {
                             </Right>
                         </ListItem>
                     </List>
-                    <View style={{paddingTop: 20}}>
-                        <Button block style={styles.buttonSmall} onPress={() => this._clearAll()}>
+                    <View style={{paddingTop: 20, paddingBottom: 20}}>
+                        <Button block style={styles.button} onPress={() => this._clearAll()}>
                             <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
                         </Button>
                     </View>
@@ -217,7 +224,8 @@ class SettingsScreen extends Component {
 
 const mapStateToProps = state => {
     return {
-        settings: state.settings
+        settings: state.settings,
+        version: state.version.version,
     };
 };
 

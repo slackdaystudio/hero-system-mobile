@@ -29,7 +29,7 @@ class Permission {
                     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
                     {
                         title: 'File System Access',
-                        message: 'HERO System Mobile needs read/write access to your device to save characters and sounds',
+                        message: 'HERO System Mobile needs write access to your device to save characters and sounds',
                         buttonPositive: 'Continue',
                     }
                 );

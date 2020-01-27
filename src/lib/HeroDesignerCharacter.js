@@ -175,7 +175,7 @@ class HeroDesignerCharacter {
             return withResistant ? '0/0' : '0';
         }
 
-        let nonResistant = this.getCharacteristicTotalByShortName(type, character);
+        let nonResistant = this.getCharacteristicTotal(type, character);
         let resistant = 0;
 
         if (!withResistant) {
@@ -184,7 +184,7 @@ class HeroDesignerCharacter {
 
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
         let characteristic = this.getCharacteristicByShortName(type, character);
-        let showSecondary = store.getState().character.showSecondary;
+        let showSecondary = character.showSecondary;
 
         if (powersMap.has('FORCEFIELD')) {
             resistant = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), powersMap.get('FORCEFIELD'), resistant, showSecondary);
@@ -210,7 +210,7 @@ class HeroDesignerCharacter {
         let resistant = 0;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
         let unusualDefense = null;
-        let showSecondary = store.getState().character.showSecondary;
+        let showSecondary = character.showSecondary;
 
         if (powersMap.has(powerXmlId)) {
             unusualDefense = powersMap.get(powerXmlId);
@@ -258,22 +258,31 @@ class HeroDesignerCharacter {
         return characteristic;
     }
 
-    getCharacteristicTotalByShortName(shortName, character) {
+    getCharacteristicTotal(shortName, character) {
         let characteristic = null;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
 
         for (let characteristic of character.characteristics) {
             if (shortName.toUpperCase() === characteristic.shortName.toUpperCase()) {
-                return this.getCharacteristicTotal(characteristic, powersMap);
+                return this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary);
             }
         }
 
         return 0;
     }
 
-    getCharacteristicTotal(characteristic, powersMap) {
+    getRollTotal(characteristic, character) {
+        if (characteristic.roll) {
+            let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
+
+            return `${Math.round(this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary) / 5) + SKILL_ROLL_BASE}-`;
+        }
+
+        return null;
+    }
+
+    _getCharacteristicTotal(characteristic, powersMap, showSecondary) {
         let value = characteristic.value;
-        let showSecondary = store.getState().character.showSecondary;
 
         if (powersMap.has(characteristic.shortName.toUpperCase())) {
             value = this._getTotalCharacteristicPoints(powersMap.get(characteristic.shortName.toUpperCase()), value, showSecondary);
@@ -292,14 +301,6 @@ class HeroDesignerCharacter {
         }
 
         return value;
-    }
-
-    getRollTotal(characteristic, powersMap) {
-        if (characteristic.roll) {
-            return `${Math.round(this.getCharacteristicTotal(characteristic, powersMap) / 5) + SKILL_ROLL_BASE}-`;
-        }
-
-        return null;
     }
 
     _getTotalCharacteristicPoints(characteristic, value, showSecondary) {

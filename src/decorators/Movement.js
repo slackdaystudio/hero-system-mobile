@@ -117,6 +117,6 @@ export default class Movement extends CharacterTrait {
     }
 
     _getSpeed() {
-        return heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', this.characterTrait.getCharacter());
+        return heroDesignerCharacter.getCharacteristicTotal('SPD', this.characterTrait.getCharacter());
     }
 }

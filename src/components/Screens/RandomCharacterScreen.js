@@ -110,7 +110,7 @@ class RandomCharacterScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header hasTabs={true} navigation={this.props.navigation} />
+                <Header hasTabs={true} navigation={this.props.navigation} backScreen='Home' />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1b1f'}}>
                     <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">

@@ -48,11 +48,7 @@ class DamageScreen extends Component {
 
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (this.props.navigation.state.params === undefined) {
-                this.props.navigation.navigate('Home');
-            } else {
-                this.props.navigation.navigate(this.props.navigation.state.params.from);
-            }
+            this.props.navigation.navigate(this._getBackScreen());
 
             return true;
         });
@@ -65,6 +61,16 @@ class DamageScreen extends Component {
     onDidBlur() {
         RNShake.removeEventListener('ShakeEvent');
         this.backHandler.remove();
+    }
+
+    _getBackScreen() {
+        let backScreen = 'Home';
+
+        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
+            backScreen = this.props.navigation.state.params.from;
+        }
+
+        return backScreen;
     }
 
     _roll() {
@@ -132,7 +138,7 @@ class DamageScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} hasTabs={true} />
+                <Header navigation={this.props.navigation} hasTabs={true} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false}>
                     <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000000'}} />}>
                         <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">

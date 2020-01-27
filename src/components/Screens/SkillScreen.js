@@ -98,7 +98,7 @@ class SkillScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll 3d6</Text>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>

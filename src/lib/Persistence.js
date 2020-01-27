@@ -2,6 +2,7 @@ import { Dimensions, Platform, Alert } from 'react-native';
 import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import { common } from './Common';
+import { file } from './File';
 import { character as libCharacter } from './Character';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
 import speedTable from '../../public/speed.json';
@@ -21,6 +22,64 @@ import speedTable from '../../public/speed.json';
 // limitations under the License.
 
 class Persistence {
+    async initializeApplication() {
+        let settings = await this.initializeApplicationSettings();
+        let statistics = await this.initializeStatistics();
+        let character = await this.getCharacter();
+        let randomHero = await this.initializeRandomHero();
+
+        return {
+            settings: settings,
+            statistics: statistics,
+            character: character,
+            randomHero: randomHero,
+        };
+    }
+
+    async getVersion() {
+        let version = null;
+
+        try {
+            version = await AsyncStorage.getItem('version');
+        } catch (error) {
+            common.toast('Unable to retrieve version');
+        }
+
+        return version;
+    }
+
+    async setVersion(version) {
+        try {
+            await AsyncStorage.setItem('version', version);
+        } catch (error) {
+            common.toast('Unable to persist version');
+        }
+
+        return version;
+    }
+
+    async clearCaches() {
+        let cacheKeys = ['appSettings', 'character', 'statistics', 'statistics'];
+        let legacyCacheKeys = ['showSecondaryCharacteristics', 'combat'];
+        let allCacheKeys = cacheKeys.concat(legacyCacheKeys);
+
+        await AsyncStorage.multiRemove(allCacheKeys);
+
+        common.toast('All caches have been cleared');
+    }
+
+    async saveCharacter(character) {
+        try {
+            await AsyncStorage.setItem('character', JSON.stringify(character));
+
+            await file.saveCharacter(character, character.filename.slice(0, -5));
+        } catch (error) {
+            common.toast('Unable to persist statistics');
+        }
+
+        return character;
+    }
+
     async getCharacter() {
         let character = null;
 
@@ -33,162 +92,12 @@ class Persistence {
         return character === null ? null : JSON.parse(character);
     }
 
-    async getShowSecondary() {
-        let showSecondary = null;
-
-        try {
-            showSecondary = await AsyncStorage.getItem('showSecondaryCharacteristics');
-
-            if (showSecondary === null) {
-                await AsyncStorage.setItem('showSecondaryCharacteristics', true.toString());
-
-                showSecondary = JSON.stringify(true);
-            }
-        } catch (error) {
-            common.toast('Unable to retrieve show secondary characteristics');
-        }
-
-        return JSON.parse(showSecondary);
-    }
-
-    async setCharacter(character) {
-        try {
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-        } catch (error) {
-            common.toast('Unable to persist character');
-        }
-
-        return character;
-    }
-
-    async initializeCombatDetails(character) {
-        let combatDetails = null;
-
-        try {
-            combatDetails = await AsyncStorage.getItem('combat');
-        } catch (error) {
-            common.toast('Unable to retrieve persisted combat details');
-        }
-
-        return combatDetails === null ? null : JSON.parse(combatDetails);
-    }
-
-    async setCombatDetails(character) {
-        let combatDetails = {
-            stun: 0,
-            body: 0,
-            endurance: 0
-        }
-        let showSecondary = JSON.parse(await AsyncStorage.getItem('showSecondaryCharacteristics'));
-
-        if (libCharacter.isHeroDesignerCharacter(character)) {
-            combatDetails = {
-                stun: this._getCharacteristic(character, 'stun', showSecondary),
-                body: this._getCharacteristic(character, 'body', showSecondary),
-                endurance: this._getCharacteristic(character, 'end', showSecondary),
-                ocv: this._getCharacteristic(character, 'ocv', showSecondary),
-                dcv: this._getCharacteristic(character, 'dcv', showSecondary),
-                omcv: this._getCharacteristic(character, 'omcv', showSecondary),
-                dmcv: this._getCharacteristic(character, 'dmcv', showSecondary),
-                phases: this._initPhases(character, showSecondary),
-            };
-        } else {
-            combatDetails = {
-                stun: libCharacter.getCharacteristic(character.characteristics.characteristic, 'stun'),
-                body: libCharacter.getCharacteristic(character.characteristics.characteristic, 'body'),
-                endurance: libCharacter.getCharacteristic(character.characteristics.characteristic, 'endurance'),
-            };
-        }
-
-        try {
-            await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
-        } catch (error) {
-            common.toast('Unable to generate combat details');
-        }
-
-        return combatDetails;
-    }
-
-    async setSparseCombatDetails(sparseCombatDetails) {
-        let combatDetails = null;
-
-        try {
-            combatDetails = await AsyncStorage.getItem('combat');
-
-            if (combatDetails !== null) {
-                combatDetails = JSON.parse(combatDetails);
-
-                for (let [key, value] of Object.entries(sparseCombatDetails)) {
-                    if (combatDetails.hasOwnProperty(key)) {
-                        combatDetails[key] = value;
-                    }
-                }
-
-                await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
-            }
-        } catch (error) {
-            common.toast('Unable to update combat detail');
-        }
-
-        return combatDetails;
-    }
-
-    async usePhase(phase, abort) {
-        let combatDetails = null;
-
-        try {
-            combatDetails = await AsyncStorage.getItem('combat');
-
-            if (combatDetails !== null) {
-                combatDetails = JSON.parse(combatDetails);
-
-                let used = combatDetails.phases[phase.toString()].used;
-                let aborted = combatDetails.phases[phase.toString()].aborted;
-
-                if (abort) {
-                    used = false;
-                    aborted = !aborted;
-                } else {
-                    if (aborted) {
-                        used = false;
-                        aborted = false;
-                    } else {
-                        used = !used;
-                        aborted = false;
-                    }
-                }
-
-                combatDetails.phases[phase.toString()] = {
-                    used: used,
-                    aborted: aborted,
-                };
-
-                await AsyncStorage.setItem('combat', JSON.stringify(combatDetails));
-            }
-        } catch (error) {
-            common.toast(`Unable to toggle phase ${phase}: ${error.message}`);
-        }
-
-        return combatDetails;
-    }
-
     async clearCharacter() {
         try {
             await AsyncStorage.removeItem('character');
-            await AsyncStorage.removeItem('combat');
         } catch (error) {
             common.toast('Unable to clear persisted character');
         }
-    }
-
-    async setShowSecondaryCharacteristics(show) {
-        try {
-            await AsyncStorage.setItem('showSecondaryCharacteristics', show.toString());
-        } catch (error) {
-            common.toast('Unable to update the value of show secondary characteristics');
-        }
-
-        return show;
     }
 
     async initializeApplicationSettings() {
@@ -206,7 +115,7 @@ class Persistence {
         } catch (error) {
             common.toast('Unable to retrieve application settings or initialize a fresh set');
         }
-        
+
         return settings;
     }
 
@@ -381,38 +290,6 @@ class Persistence {
         }
 
         return statistics;
-    }
-
-    _initPhases(character, showSecondary) {
-        let speed = 1;
-        let phases = {};
-
-        if (showSecondary) {
-            speed = heroDesignerCharacter.getCharacteristicTotalByShortName('SPD', character);
-        } else {
-            let speedCharacteristic = heroDesignerCharacter.getCharacteristicByShortName('SPD', character);
-
-            speed = speedCharacteristic === null ? 1 : speedCharacteristic.value;
-        }
-
-        for (let phase of speedTable[(speed > 12 ? '12' : speed.toString())].phases) {
-            phases[phase.toString()] = {
-                used: false,
-                aborted: false,
-            }
-        }
-
-        return phases;
-    }
-
-    _getCharacteristic(character, shortName, showSecondary) {
-        if (showSecondary) {
-            return heroDesignerCharacter.getCharacteristicTotalByShortName(shortName, character)
-        }
-
-        let characteristic = heroDesignerCharacter.getCharacteristicByShortName(shortName, character);
-
-        return characteristic === null ? 0 : characteristic.value;
     }
 
     _populateMissingSetttings(settings) {
