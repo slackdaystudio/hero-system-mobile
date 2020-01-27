@@ -5,6 +5,7 @@ import { BackHandler, StyleSheet, View, Image } from 'react-native';
 import { Container, Content, List, ListItem, Left, Right, Button, Text, Radio, Picker, Item } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
+import { verticalScale } from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
@@ -147,7 +148,7 @@ class EffectScreen extends Component {
                         inlinelabel
                         label='Partial Die'
                         style={{width: undefined, color: '#FFFFFF'}}
-                        textStyle={{fontSize: 16, color: '#FFFFFF'}}
+                        textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
                         iosHeader="Select one"
                         mode="dropdown"
                         selectedValue={this.props.effectForm.partialDie}
@@ -160,11 +161,11 @@ class EffectScreen extends Component {
                     </Picker>
                     <Heading text='Effect' />
                     {this._renderEffects()}
-                    <View style={{paddingBottom: 20}} />
+                    <View style={{paddingBottom: verticalScale(20)}} />
                     <Button block style={styles.button}  onPress={this.roll}>
                         <Text uppercase={false}>Roll</Text>
                     </Button>
-                    <View style={{paddingBottom: 20}} />
+                    <View style={{paddingBottom: verticalScale(20)}} />
                 </Content>
             </Container>
         );

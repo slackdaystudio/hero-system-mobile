@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { BackHandler, Alert, View, ImageBackground } from 'react-native';
 import { Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
+import { verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
@@ -194,7 +195,7 @@ class CharactersScreen extends Component {
                                     <Icon
                                         type='FontAwesome'
                                         name='trash'
-                                        style={{fontSize: 25, color: '#14354d', alignSelf: 'center', paddingTop: 0}}
+                                        style={{fontSize: verticalScale(25), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => this.openDeleteDialog(characterName)}
                                     />
                                 </Left>
@@ -205,7 +206,7 @@ class CharactersScreen extends Component {
                                     <Icon
                                         type='FontAwesome'
                                         name='chevron-right'
-                                        style={{fontSize: 20, color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
+                                        style={{fontSize: verticalScale(20), color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => this.onViewCharacterPress(characterName)}
                                     />
                                 </Right>
@@ -213,7 +214,7 @@ class CharactersScreen extends Component {
                         );
                     })}
                 </List>
-                <View style={[styles.buttonContainer, {paddingTop: 20}]}>
+                <View style={[styles.buttonContainer, {paddingTop: verticalScale(20)}]}>
                     <Button style={styles.button}  onPress={() => this._importCharacter()}>
                         <Text uppercase={false} style={styles.buttonText}>Import</Text>
                     </Button>
@@ -233,7 +234,7 @@ class CharactersScreen extends Component {
                 <Content style={styles.content}>
                     <Heading text="Characters" />
                     {this._renderCharacters()}
-                    <View style={{paddingBottom: 20}} />
+                    <View style={{paddingBottom: verticalScale(20)}} />
                     <ConfirmationDialog
                         visible={this.state.deleteDialogVisible}
                         title='Delete Character?'

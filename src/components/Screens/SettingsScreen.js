@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { BackHandler, StyleSheet, View, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
+import { scale, verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import { NORMAL_DAMAGE } from '../../lib/DieRoller';
@@ -111,7 +112,7 @@ class SettingsScreen extends Component {
                 <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Heading text="App Version" />
-                    <View style={{paddingLeft: 20, paddingBottom: 20}}>
+                    <View style={{paddingLeft: scale(20), paddingBottom: verticalScale(20)}}>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>HERO System Mobile v</Text>{this.props.version}
                         </Text>
@@ -211,7 +212,7 @@ class SettingsScreen extends Component {
                             </Right>
                         </ListItem>
                     </List>
-                    <View style={{paddingTop: 20, paddingBottom: 20}}>
+                    <View style={{paddingTop: verticalScale(20), paddingBottom: verticalScale(20)}}>
                         <Button block style={styles.button} onPress={() => this._clearAll()}>
                             <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
                         </Button>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Alert, View, ImageBackground } from 'react-native';
 import { Container, Content, Button, Spinner, Text } from 'native-base';
+import { verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import { character } from '../../lib/Character';
@@ -75,7 +76,7 @@ class HomeScreen extends Component {
                         <Heading text="Character" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you&apos;re on the go.</Text>
                         {this._renderCharacterButtons()}
-                        <View style={{paddingBottom: 20}} />
+                        <View style={{paddingBottom: verticalScale(20)}} />
                         <Heading text="Rolls" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
@@ -102,22 +103,22 @@ class HomeScreen extends Component {
                                 </Button>
                             </View>
                         </View>
-                        <View style={{paddingBottom: 20}} />
+                        <View style={{paddingBottom: verticalScale(20)}} />
                         <Heading text="Tools" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool or use the cruncher to calculate power costs.</Text>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                            <View style={[styles.buttonContainer, {paddingBottom: 20}]}>
+                            <View style={[styles.buttonContainer, {paddingBottom: verticalScale(20)}]}>
                                 <Button style={styles.button}  onPress={() => this.props.navigation.navigate('RandomCharacter')}>
                                     <Text uppercase={false} style={styles.buttonText}>H.E.R.O.</Text>
                                 </Button>
                             </View>
-                            <View style={[styles.buttonContainer, {paddingBottom: 20}]}>
+                            <View style={[styles.buttonContainer, {paddingBottom: verticalScale(20)}]}>
                                 <Button style={styles.button}  onPress={() => this.props.navigation.navigate('CostCruncher')}>
                                     <Text uppercase={false} style={styles.buttonText}>Cruncher</Text>
                                 </Button>
                             </View>
                         </View>
-                        <View style={{paddingBottom: 20}} />
+                        <View style={{paddingBottom: verticalScale(20)}} />
                     </Content>
                 </ImageBackground>
             </Container>

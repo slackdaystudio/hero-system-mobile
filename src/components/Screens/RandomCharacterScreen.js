@@ -5,6 +5,7 @@ import { BackHandler, Platform, StyleSheet, View, Image, Alert } from 'react-nat
 import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
+import { verticalScale } from 'react-native-size-matters';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import Header from '../Header/Header';
 import styles from '../../Styles';
@@ -165,7 +166,7 @@ class RandomCharacterScreen extends Component {
                                         </Body>
                                     </ListItem>
                                 </List>
-                                <View style={{paddingBottom: 20}} />
+                                <View style={{paddingBottom: verticalScale(20)}} />
                                 <Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
                                 <List>
                                     <ListItem>
@@ -201,7 +202,7 @@ class RandomCharacterScreen extends Component {
                                         </Body>
                                     </ListItem>
                                 </List>
-                                <View style={{paddingBottom: 20}} />
+                                <View style={{paddingBottom: verticalScale(20)}} />
                                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
                                     <View style={styles.buttonContainer}>
                                         <Button block style={styles.button}  onPress={this.reRoll}>
