@@ -876,6 +876,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.diceless.herogmtools;
 				PRODUCT_NAME = herogmtools;
 				PROVISIONING_PROFILE_SPECIFIER = PG;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -903,6 +904,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.diceless.herogmtools;
 				PRODUCT_NAME = herogmtools;
 				PROVISIONING_PROFILE_SPECIFIER = PG;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

@@ -106,6 +106,14 @@ PODS:
     - React
   - RNSVG (9.13.6):
     - React
+  - RNZipArchive (5.0.0):
+    - React
+    - RNZipArchive/Core (= 5.0.0)
+    - SSZipArchive (= 2.2.2)
+  - RNZipArchive/Core (5.0.0):
+    - React
+    - SSZipArchive (= 2.2.2)
+  - SSZipArchive (2.2.2)
   - yoga (0.60.6.React)
 
 DEPENDENCIES:
@@ -141,11 +149,13 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNZipArchive (from `../node_modules/react-native-zip-archive`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - SSZipArchive
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -212,6 +222,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-sound"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNZipArchive:
+    :path: "../node_modules/react-native-zip-archive"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -249,6 +261,8 @@ SPEC CHECKSUMS:
   RNScreens: 6adf01eb4080f44af6cca551207c6b0505066857
   RNSound: c980916b596cc15c8dcd2f6ecd3b13c4881dbe20
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
+  RNZipArchive: 5ec612981549e645d2dc11a6b79ca3806299b479
+  SSZipArchive: fa16b8cc4cdeceb698e5e5d9f67e9558532fbf23
   yoga: 5079887aa3e4c62142d6bcee493022643ee4d730
 
 PODFILE CHECKSUM: 297de0f44cd98948df0aea23302ecf16dc429daf
