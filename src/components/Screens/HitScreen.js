@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
-import { Container, Content, Button, Text, Tabs, Tab, ScrollableTab, Icon } from 'native-base';
+import { Container, Content, Button, Text, Tabs, Tab, TabHeading, ScrollableTab, Icon } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
@@ -38,12 +38,7 @@ class HitScreen extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            tabsLocked: false,
-        };
-
         this.updateFormValue = this._updateFormValue.bind(this);
-        this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
         this.roll = this._roll.bind(this);
         this.setLocation = this._setLocation.bind(this);
     }
@@ -85,13 +80,6 @@ class HitScreen extends Component {
         this.setState({selectedLocation: location});
     }
 
-    _toggleTabsLocked(locked) {
-        let newState = {...this.state};
-        newState.tabsLocked = locked;
-
-        this.setState(newState);
-    }
-
     _renderDcvSlider() {
         if (this.props.hitForm.isAutofire) {
             return (
@@ -103,7 +91,7 @@ class HitScreen extends Component {
                     max={30}
                     onValueChange={this.updateFormValue}
                     valueKey="targetDcv"
-                    toggleTabsLocked={this.toggleTabsLocked} />
+                />
             );
         }
 
@@ -134,6 +122,16 @@ class HitScreen extends Component {
         );
     }
 
+    _renderTabHeading(headingText) {
+        return (
+            <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
+                <Text style={styles.tabStyle}>
+                    {headingText}
+                </Text>
+            </TabHeading>
+        );
+    }
+
     render() {
         return (
             <Container style={styles.container}>
@@ -143,8 +141,8 @@ class HitScreen extends Component {
                 />
                 <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content scrollEnable={false}>
-                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll To Hit">
+                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Roll To Hit')}>
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <Slider
                                     label="Total OCV/OMCV:"
@@ -154,7 +152,6 @@ class HitScreen extends Component {
                                     max={30}
                                     onValueChange={this.updateFormValue}
                                     valueKey="ocv"
-                                    toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <Slider
                                     label="Rolls:"
@@ -164,7 +161,6 @@ class HitScreen extends Component {
                                     max={20}
                                     onValueChange={this.updateFormValue}
                                     valueKey="numberOfRolls"
-                                    toggleTabsLocked={this.toggleTabsLocked}
                                 />
                                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                     <Text style={styles.grey}>Is this an autofire attack?</Text>
@@ -186,7 +182,7 @@ class HitScreen extends Component {
                                 </Button>
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Range Mods">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Range Mods')}>
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
@@ -244,7 +240,7 @@ class HitScreen extends Component {
                                 </View>
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Hit Locations">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Hit Locations')}>
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
@@ -285,7 +281,7 @@ class HitScreen extends Component {
                                 {this._renderLocationDetails()}
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Targeted Shots">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Targeted Shots')}>
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View>
                                     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: verticalScale(5)}}>

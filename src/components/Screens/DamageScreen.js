@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, Platform, StyleSheet, View, Image, Switch, Alert } from 'react-native';
-import { Container, Content, Button, Text, Tabs, Tab, Picker, Item, ScrollableTab } from 'native-base';
+import { Container, Content, Button, Text, Tabs, Tab, TabHeading, Picker, Item, ScrollableTab } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
@@ -38,12 +38,7 @@ class DamageScreen extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            tabsLocked: false,
-        };
-
         this.updateFormValue = this._updateFormValue.bind(this);
-        this.toggleTabsLocked = this._toggleTabsLocked.bind(this);
         this.roll = this._roll.bind(this);
     }
 
@@ -89,13 +84,6 @@ class DamageScreen extends Component {
         }
     }
 
-    _toggleTabsLocked(locked) {
-        let newState = {...this.state};
-        newState.tabsLocked = locked;
-
-        this.setState(newState);
-    }
-
     _renderFadeRate() {
         if (this.props.damageForm.isExplosion) {
             return (
@@ -107,7 +95,7 @@ class DamageScreen extends Component {
                     max={10}
                     onValueChange={this.updateFormValue}
                     valueKey="fadeRate"
-                    toggleTabsLocked={this.toggleTabsLocked} />
+                />
             );
         }
 
@@ -125,11 +113,21 @@ class DamageScreen extends Component {
                     max={10}
                     onValueChange={this.updateFormValue}
                     valueKey="stunMultiplier"
-                    toggleTabsLocked={this.toggleTabsLocked} />
+                />
             );
         }
 
         return null;
+    }
+
+    _renderTabHeading(headingText) {
+        return (
+            <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
+                <Text style={styles.tabStyle}>
+                    {headingText}
+                </Text>
+            </TabHeading>
+        );
     }
 
     render() {
@@ -141,8 +139,8 @@ class DamageScreen extends Component {
                 />
                 <Header navigation={this.props.navigation} hasTabs={true} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false}>
-                    <Tabs locked={this.state.tabsLocked} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000000'}} />}>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Roll For Damage">
+                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Roll For Damage')}>
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View>
                                     <Slider
@@ -153,7 +151,6 @@ class DamageScreen extends Component {
                                         max={50}
                                         onValueChange={this.updateFormValue}
                                         valueKey="dice"
-                                        toggleTabsLocked={this.toggleTabsLocked}
                                     />
                                     <Picker
                                         inlinelabel
@@ -299,7 +296,7 @@ class DamageScreen extends Component {
                                 <View style={{paddingBottom: 30}} />
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat Moves">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Maneuvers')}>
                             <View style={[styles.tabContent, {paddingBottom: scale(20), paddingHorizontal: scale(10)}]}>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text></View>
