@@ -27,8 +27,8 @@ export default class CircleText extends Component {
     }
 
     render() {
-        const size = this.props.size;
-        const fontSize = this.props.fontSize;
+        const size = verticalScale(this.props.size);
+        const fontSize = verticalScale(this.props.fontSize);
         const borderWidth = 1;
 
         return (
@@ -47,8 +47,8 @@ export default class CircleText extends Component {
                     textAlign: 'center',
                     alignSelf: 'center',
                     justifyContent: 'center',
-                    fontSize: verticalScale(fontSize - 2 * borderWidth),
-                    lineHeight: verticalScale(fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth)),
+                    fontSize: fontSize - 2 * borderWidth,
+                    lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
                     paddingTop: verticalScale(3),
                     fontWeight: 'bold',
                     color: '#F3EDE9',

@@ -383,15 +383,15 @@ export default class Traits extends Component {
                     <View style={{flex: 5, alignSelf: 'center'}}>
                         <Text style={[styles.boldGrey, {fontSize: verticalScale(16)}]}>{decoratedTrait.label()}</Text>
                     </View>
-                    <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                        <View style={{flex: 4, alignItems: 'flex-end'}}>
+                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                        <View style={{flex: 2, alignItems: 'flex-end'}}>
                             {this._renderRoll(decoratedTrait)}
                         </View>
                         <View style={{flex: 1}}>
                             <Icon
                                 type="FontAwesome"
                                 name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                                style={{paddingLeft: scale(10), fontSize: verticalScale(22), color: '#14354d'}}
+                                style={{paddingLeft: scale(5), fontSize: verticalScale(22), color: '#14354d'}}
                                 onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                             />
                         </View>
@@ -422,15 +422,15 @@ export default class Traits extends Component {
                 <View style={{flex: 5, alignSelf: 'center'}}>
                     <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 14 : 16)}]}>{isListItem ? ' ‣ ' : ''}{decoratedTrait.label()}</Text>
                 </View>
-                <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                    <View style={{flex: 4, alignItems: 'flex-end'}}>
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={{flex: 2, alignItems: 'flex-end'}}>
                         {this._renderRoll(decoratedTrait)}
                     </View>
                     <View style={{flex: 1}}>
                         <Icon
                             type="FontAwesome"
                             name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                            style={{paddingLeft: scale(10), fontSize: verticalScale(isListItem ? 18 : 22), color: '#14354d'}}
+                            style={{paddingLeft: scale(5), fontSize: verticalScale(isListItem ? 18 : 22), color: '#14354d'}}
                             onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                         />
                     </View>

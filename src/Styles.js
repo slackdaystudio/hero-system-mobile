@@ -64,7 +64,7 @@ export default ScaledSheet.create({
     },
     button: {
         backgroundColor: '#14354d',
-        minWidth: '120@s',
+        minWidth: '110@s',
         justifyContent: 'center',
         alignSelf: 'center',
     },
@@ -76,6 +76,7 @@ export default ScaledSheet.create({
         alignSelf: 'center',
     },
     buttonText: {
+        fontSize: '12@vs',
         color: '#e8e8e8',
     },
     grey: {
@@ -87,10 +88,24 @@ export default ScaledSheet.create({
         color: '#e8e8e8',
         fontWeight: 'bold',
     },
-    tabInactive: {
+    tabHeading: {
         backgroundColor: '#000',
+        color: '#000', /* For iOS */
     },
-    tabActive: {
+    activeTabStyle: {
+        backgroundColor: '#000',
+        color: '#000',
+        fontSize: 999,
+    },
+    activeTextStyle: {
+        backgroundColor: '#000',
+        color: '#000',
+    },
+    tabStyle: {
+        fontSize: '14@vs',
+        color: '#e8e8e8',
+    },
+    scrollableTab: {
         backgroundColor: '#000',
     },
     tabBarUnderline: {
@@ -107,7 +122,7 @@ export default ScaledSheet.create({
         backgroundColor: '#0e0e0f',
     },
     cardTitle: {
-        fontSize: '18@vs',
+        fontSize: '16@vs',
         fontWeight: 'bold',
         color: '#e8e8e8',
         backgroundColor: '#121212',

@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler,Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
-import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
+import { Container, Content, Toast, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import General from '../HeroDesignerCharacter/General';
 import Combat from '../HeroDesignerCharacter/Combat';
@@ -77,6 +77,16 @@ class ViewHeroDesignerCharacterScreen extends Component {
         return backScreen;
     }
 
+    _renderTabHeading(headingText) {
+        return (
+            <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
+                <Text style={styles.tabStyle}>
+                    {headingText}
+                </Text>
+            </TabHeading>
+        );
+    }
+
     _renderTab(title, listKey, subListKey) {
         if (this.props.character[listKey].length === 0) {
             return null;
@@ -84,11 +94,10 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
         return (
             <Tab
-                tabStyle={styles.tabInactive}
-                activeTabStyle={styles.tabActive}
-                textStyle={styles.grey}
-                activeTextStyle={{color: '#FFF'}}
-                heading={title}
+                tabStyle={styles.tabHeading}
+                activeTabStyle={styles.activeTabStyle}
+                activeTextStyle={styles.activeTextStyle}
+                heading={this._renderTabHeading(title)}
             >
                 <View style={styles.tabContent}>
                     <Traits
@@ -112,13 +121,13 @@ class ViewHeroDesignerCharacterScreen extends Component {
         }
 
         return (
-            <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={{backgroundColor: '#000'}} />}>
-                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+            <Tabs locked={true} ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
+                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('General')}>
                     <View style={styles.tabContent}>
                         <General characterInfo={this.props.character.characterInfo} />
                     </View>
                 </Tab>
-                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Combat')}>
                     <View style={styles.tabContent}>
                         <Combat
                             navigation={this.props.navigation}
@@ -131,7 +140,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         />
                     </View>
                 </Tab>
-                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Characteristics')}>
                     <View style={styles.tabContent}>
                         <Characteristics
                             navigation={this.props.navigation}
@@ -167,17 +176,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
         );
     }
 }
-
-const localStyles = StyleSheet.create({
-    pointCostsHeader: {
-        alignSelf: 'center',
-        textDecorationLine: 'underline',
-    },
-    button: {
-        backgroundColor: '#478f79',
-        alignSelf: 'flex-end',
-    },
-});
 
 const mapStateToProps = state => {
     return {

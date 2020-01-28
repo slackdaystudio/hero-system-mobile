@@ -46,7 +46,7 @@ export default class CalculatorInput extends Component {
                     <Icon
                         type='FontAwesome'
                         name='calculator'
-                        style={{fontSize: verticalScale(20), color: '#14354d', alignSelf: 'center', paddingTop: this.props.iconPaddingTop}}
+                        style={{fontSize: verticalScale(18), color: '#14354d', alignSelf: 'center', paddingTop: this.props.iconPaddingTop}}
                         onPress={() => this.currentBodyPointsCalculator.calculatorModalToggle()}
                     />
                 </View>
@@ -61,5 +61,5 @@ CalculatorInput.defaultProps = {
     labelFontSize: verticalScale(10),
     stackedLabel: true,
     boldLabel: false,
-    iconPaddingTop: verticalScale(16),
+    iconPaddingTop: verticalScale(15),
 };
