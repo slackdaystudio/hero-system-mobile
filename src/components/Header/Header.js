@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
-import { Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
+import { BackHandler, Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
 import { Button, Text, Header, Left, Right, Body, Icon } from 'native-base';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
@@ -19,11 +19,23 @@ import { common } from '../../lib/Common';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const EXIT_APP = 0;
+
 export default class MyHeader extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hasTabs: PropTypes.bool,
         backScreen: PropTypes.string,
+    }
+
+    _onBackButtonPress() {
+        if (this.props.backScreen === EXIT_APP) {
+            BackHandler.exitApp();
+
+            return true;
+        }
+
+        this.props.navigation.navigate(this.props.backScreen);
     }
 
     _renderBackButton() {
@@ -32,7 +44,7 @@ export default class MyHeader extends Component {
         }
 
         return (
-            <Button transparent underlayColor="#000" onPress={() => this.props.navigation.navigate(this.props.backScreen)}>
+            <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
                 <Icon type='FontAwesome' name="chevron-left" style={{fontSize: verticalScale(18), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
             </Button>
         );

@@ -1,10 +1,11 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Alert, View, ImageBackground } from 'react-native';
+import { BackHandler, Alert, View, ImageBackground } from 'react-native';
 import { Container, Content, Button, Spinner, Text } from 'native-base';
 import { verticalScale } from 'react-native-size-matters';
-import Header from '../Header/Header';
+import { NavigationEvents } from 'react-navigation';
+import Header, { EXIT_APP } from '../Header/Header';
 import Heading from '../Heading/Heading';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
@@ -28,6 +29,18 @@ class HomeScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
+    }
+
+    onDidFocus() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            BackHandler.exitApp();
+
+            return true;
+        });
+    }
+
+    onDidBlur() {
+        this.backHandler.remove();
     }
 
     _onViewPress() {
@@ -70,8 +83,12 @@ class HomeScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
+                <NavigationEvents
+                    onDidFocus={(payload) => this.onDidFocus()}
+                    onDidBlur={(payload) => this.onDidBlur()}
+                />
                 <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{ resizeMode: 'cover' }}>
-                    <Header navigation={this.props.navigation} />
+                    <Header navigation={this.props.navigation} backScreen={EXIT_APP} />
                     <Content style={styles.content}>
                         <Heading text="Character" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you&apos;re on the go.</Text>
