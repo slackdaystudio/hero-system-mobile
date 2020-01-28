@@ -171,68 +171,70 @@ export default class Combat extends Component {
             <View>
                 <View style={{paddingBottom: verticalScale(20)}} />
                 <Text style={styles.subHeading}>Health</Text>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: scale(50)}}>
-                        <Text style={styles.boldGrey}>Stun:</Text>
+                <View style={{flex: 1, width: scale(200), alignSelf: 'center'}}>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                        <View style={{flex: 2, alignSelf: 'center'}}>
+                            <Text style={styles.boldGrey}>Stun:</Text>
+                        </View>
+                        <View style={{flex: 1}}>
+                            <Item>
+                                <Input
+                                    style={styles.grey}
+                                    keyboardType="numeric"
+                                    maxLength={3}
+                                    value={this.props.character.combatDetails.secondary.stun.toString()}
+                                    onChangeText={(text) => this.updateCombatState('stun', text)} />
+                            </Item>
+                        </View>
+                        <View style={{flex: 2}}>
+                            <Button style={styles.buttonSmall} onPress={() => this.resetCombatState('stun')}>
+                                <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                            </Button>
+                        </View>
                     </View>
-                    <View style={{width: scale(40)}}>
-                        <Item>
-                            <Input
-                                style={styles.grey}
-                                keyboardType="numeric"
-                                maxLength={3}
-                                value={this.props.character.combatDetails.secondary.stun.toString()}
-                                onChangeText={(text) => this.updateCombatState('stun', text)} />
-                        </Item>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                        <View style={{flex: 2, alignSelf: 'center'}}>
+                            <Text style={styles.boldGrey}>Body:</Text>
+                        </View>
+                        <View style={{flex: 1}}>
+                            <Item>
+                                <Input
+                                    style={styles.grey}
+                                    keyboardType="numeric"
+                                    maxLength={3}
+                                    value={this.props.character.combatDetails.secondary.body.toString()}
+                                    onChangeText={(text) => this.updateCombatState('body', text)} />
+                            </Item>
+                        </View>
+                        <View style={{flex: 2}}>
+                            <Button style={styles.buttonSmall} onPress={() => this.resetCombatState('body')}>
+                                <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                            </Button>
+                        </View>
                     </View>
-                    <View>
-                        <Button style={styles.button} onPress={() => this.resetCombatState('stun')}>
-                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
-                        </Button>
-                    </View>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: 50}}>
-                        <Text style={styles.boldGrey}>Body:</Text>
-                    </View>
-                    <View style={{width: scale(40)}}>
-                        <Item>
-                            <Input
-                                style={styles.grey}
-                                keyboardType="numeric"
-                                maxLength={3}
-                                value={this.props.character.combatDetails.secondary.body.toString()}
-                                onChangeText={(text) => this.updateCombatState('body', text)} />
-                        </Item>
-                    </View>
-                    <View>
-                        <Button style={styles.button} onPress={() => this.resetCombatState('body')}>
-                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
-                        </Button>
-                    </View>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                    <View style={{alignSelf: 'center', width: scale(50)}}>
-                        <Text style={styles.boldGrey}>End:</Text>
-                    </View>
-                    <View style={{width: scale(40)}}>
-                        <Item>
-                            <Input
-                                style={styles.grey}
-                                keyboardType="numeric"
-                                maxLength={3}
-                                value={this.props.character.combatDetails.secondary.endurance.toString()}
-                                onChangeText={(text) => this.updateCombatState('endurance', text)} />
-                        </Item>
-                    </View>
-                    <View>
-                        <Button style={styles.button} onPress={() => this.resetCombatState('endurance')}>
-                            <Text uppercase={false} style={styles.buttonText}>Reset</Text>
-                        </Button>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                        <View style={{flex: 2, alignSelf: 'center'}}>
+                            <Text style={styles.boldGrey}>End:</Text>
+                        </View>
+                        <View style={{flex: 1}}>
+                            <Item>
+                                <Input
+                                    style={styles.grey}
+                                    keyboardType="numeric"
+                                    maxLength={3}
+                                    value={this.props.character.combatDetails.secondary.endurance.toString()}
+                                    onChangeText={(text) => this.updateCombatState('endurance', text)} />
+                            </Item>
+                        </View>
+                        <View style={{flex: 2}}>
+                            <Button style={styles.buttonSmall} onPress={() => this.resetCombatState('endurance')}>
+                                <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                            </Button>
+                        </View>
                     </View>
                 </View>
                 <View style={[styles.buttonContainer, {alignSelf: 'center', paddingTop: verticalScale(10)}]}>
-                    <Button style={[styles.button, {minWidth: 160}]} onPress={() => this.takeRecovery()}>
+                    <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
                         <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
                     </Button>
                 </View>
