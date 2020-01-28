@@ -2,6 +2,7 @@ import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { View, TouchableHighlight, Alert } from 'react-native';
 import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
+import { scale, verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import { dieRoller } from '../../lib/DieRoller';
 import { TYPE_MOVEMENT, GENERIC_OBJECT } from '../../lib/HeroDesignerCharacter';
@@ -203,7 +204,7 @@ export default class Traits extends Component {
                 <CardItem style={styles.cardItem}>
                     <Body>
                         {this._renderModifiers('Advantages', item.advantages())}
-                        <View style={{paddingBottom: 10}} />
+                        <View style={{paddingBottom: verticalScale(10)}} />
                         {this._renderModifiers('Limitations', item.limitations())}
                     </Body>
                 </CardItem>
@@ -260,11 +261,11 @@ export default class Traits extends Component {
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
                             </Text>
-                            <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                            <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Active:</Text> {item.activeCost()}
                             </Text>
-                            <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                            <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
                             </Text>
@@ -301,11 +302,11 @@ export default class Traits extends Component {
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
                         </Text>
-                        <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                        <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Active:</Text> {item.activeCost()}
                         </Text>
-                        <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                        <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
                         </Text>
@@ -326,11 +327,11 @@ export default class Traits extends Component {
                                     <Text style={styles.grey}>
                                         <Text style={styles.boldGrey}>Base:</Text> {power.cost()}
                                     </Text>
-                                    <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                                    <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
                                     <Text style={styles.grey}>
                                         <Text style={styles.boldGrey}>Active:</Text> {power.activeCost()}
                                     </Text>
-                                    <View style={{width: 30, alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                                    <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
                                     <Text style={styles.grey}>
                                         <Text style={styles.boldGrey}>Real:</Text> {power.realCost()}
                                     </Text>
@@ -380,7 +381,7 @@ export default class Traits extends Component {
             <Card style={[styles.card, {paddingBottom: 0}]} key={'item-' + decoratedTrait.trait.position}>
                 <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'}]} header>
                     <View style={{flex: 5, alignSelf: 'center'}}>
-                        <Text style={[styles.boldGrey, {fontSize: 18}]}>{decoratedTrait.label()}</Text>
+                        <Text style={[styles.boldGrey, {fontSize: verticalScale(16)}]}>{decoratedTrait.label()}</Text>
                     </View>
                     <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                         <View style={{flex: 4, alignItems: 'flex-end'}}>
@@ -390,27 +391,27 @@ export default class Traits extends Component {
                             <Icon
                                 type="FontAwesome"
                                 name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                                style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
+                                style={{paddingLeft: scale(10), fontSize: verticalScale(22), color: '#14354d'}}
                                 onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                             />
                         </View>
                     </View>
                 </CardItem>
                 {this._renderItemDetails(decoratedTrait)}
-                <View style={{backgroundColor: '#0e0e0f', paddingTop: 20}} />
+                <View style={{backgroundColor: '#0e0e0f', paddingTop: verticalScale(20)}} />
                 {decoratedTrait.trait[this.props.subListKey].map((item, index) => {
                     let decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
 
                     return (
                         <Fragment>
-                            <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: 5, paddingBottom: 5}]} header>
+                            <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: verticalScale(5), paddingBottom: verticalScale(5)}]} header>
                                 {this._renderTrait(decoratedSubTrait, true)}
                             </CardItem>
                             {this._renderItemDetails(decoratedSubTrait)}
                         </Fragment>
                     );
                 })}
-                <View style={{backgroundColor: '#0e0e0f', paddingBottom: 20}} />
+                <View style={{backgroundColor: '#0e0e0f', paddingBottom: verticalScale(20)}} />
             </Card>
         );
     }
@@ -419,7 +420,7 @@ export default class Traits extends Component {
         return (
             <Fragment>
                 <View style={{flex: 5, alignSelf: 'center'}}>
-                    <Text style={[styles.boldGrey, {fontSize: (isListItem ? 16 : 18)}]}>{isListItem ? ' ‣ ' : ''}{decoratedTrait.label()}</Text>
+                    <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 14 : 16)}]}>{isListItem ? ' ‣ ' : ''}{decoratedTrait.label()}</Text>
                 </View>
                 <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                     <View style={{flex: 4, alignItems: 'flex-end'}}>
@@ -429,7 +430,7 @@ export default class Traits extends Component {
                         <Icon
                             type="FontAwesome"
                             name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                            style={{paddingLeft: 10, fontSize: (isListItem ? 20 : 25), color: '#14354d'}}
+                            style={{paddingLeft: scale(10), fontSize: verticalScale(isListItem ? 18 : 22), color: '#14354d'}}
                             onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                         />
                     </View>
@@ -468,7 +469,7 @@ export default class Traits extends Component {
             <View>
                 <Heading text={this.props.headingText} />
                 {this._renderTraits(this.props.character[this.props.listKey])}
-                <View style={{paddingTop: 20}} />
+                <View style={{paddingTop: verticalScale(20)}} />
             </View>
         );
     }

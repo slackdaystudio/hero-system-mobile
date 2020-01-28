@@ -6,7 +6,7 @@ import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
 import CalculatorInput from '../CalculatorInput/CalculatorInput';
-import { verticalScale } from 'react-native-size-matters';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 import { dieRoller } from '../../lib/DieRoller';
@@ -161,7 +161,7 @@ export default class Combat extends Component {
                     <Text style={styles.boldGrey}>{label === null ? stateKey.toUpperCase() : label}:</Text>
                 </View>
                 <View style={{flex: 1, alignSelf: 'center'}}>
-                    <View style={{alignSelf: 'center', width: 75}}>
+                    <View style={{alignSelf: 'center', width: scale(75)}}>
                         <CalculatorInput
                             itemKey={stateKey}
                             value={this.state.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, this.props.character)}
@@ -234,12 +234,12 @@ export default class Combat extends Component {
 
             return (
                 <View style={{flex: 1, alignItems: 'center'}}>
-                    <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
+                    <View style={{flex: 1, flexDirection: 'row', paddingBottom: verticalScale(10)}}>
                         {firstRow.map((phase, index) => {
                             return this._renderPhase(phase.toString());
                         })}
                     </View>
-                    <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
+                    <View style={{flex: 1, flexDirection: 'row', paddingBottom: verticalScale(10)}}>
                         {secondRow.map((phase, index) => {
                             return this._renderPhase(phase.toString());
                         })}
@@ -251,7 +251,7 @@ export default class Combat extends Component {
 
         return (
             <View style={{flex: 1, alignItems: 'center'}}>
-                <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
+                <View style={{flex: 1, flexDirection: 'row', paddingBottom: verticalScale(10)}}>
                     {phases.map((phase, index) => {
                         return this._renderPhase(phase.toString());
                     })}
@@ -271,9 +271,9 @@ export default class Combat extends Component {
         }
 
         return (
-            <View style={{paddingHorizontal: 5}}>
+            <View style={{paddingHorizontal: scale(5)}}>
                 <TouchableHighlight underlayColor='#1b1d1f' onPress={() => this.usePhase(phase, this.props.character.showSecondary)} onLongPress={() => this.abortPhase(phase)}>
-                    <CircleText title={phase} fontSize={verticalScale(18)} size={verticalScale(35)} color={color} />
+                    <CircleText title={phase} fontSize={18} size={35} color={color} />
                 </TouchableHighlight>
             </View>
         );
@@ -285,7 +285,7 @@ export default class Combat extends Component {
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dexterity:</Text> {heroDesignerCharacter.getCharacteristicTotal('DEX', this.props.character)}
                 </Text>
-                <View style={{width: 40}} />
+                <View style={{width: scale(40)}} />
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Speed:</Text> {heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character)}
                 </Text>
@@ -332,7 +332,7 @@ export default class Combat extends Component {
 
             if (skillMap.has('COMBAT_LEVELS') || skillMap.has('SKILL_LEVELS')) {
                 return (
-                    <View style={{flex: 1, width: 300, alignSelf: 'center', paddingTop: 10}}>
+                    <View style={{flex: 1, width: scale(300), alignSelf: 'center', paddingTop: verticalScale(10)}}>
                         {Array.from(skillMap.values()).map((skill, index) => {
                             if (Array.isArray(skill)) {
                                 return skill.map((s, i) => {
@@ -376,26 +376,26 @@ export default class Combat extends Component {
         return (
             <View>
                 <Heading text='Health' />
-                <View style={{flex: 1, width: 300, alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                     {this._renderHealthItem('stun')}
                     {this._renderHealthItem('body')}
                     {this._renderHealthItem('endurance', 'END')}
-                    <View style={[styles.buttonContainer, {paddingVertical: 10}]}>
+                    <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
                         <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
                             <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
                         </Button>
                     </View>
                 </View>
                 <Heading text='Defenses' />
-                <View style={{flex: 1, width: 300, alignSelf: 'center', alignItems: 'center', paddingBottom: 10}}>
+                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: 10}}>
                     {this._renderDefenses()}
                 </View>
                 <Heading text='Phases' />
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: 10}}>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>
                     {this._renderPhases()}
                 </View>
                 <Heading text='Combat Values' />
-                <View style={{flex: 1, width: 300, alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                     {this._renderCv('ocv', true)}
                     {this._renderCv('dcv')}
                     {this._renderCv('omcv', true)}
