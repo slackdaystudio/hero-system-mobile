@@ -127,10 +127,11 @@ class SettingsScreen extends Component {
                                 <Switch
                                     value={this.props.settings.useFifthEdition}
                                     onValueChange={() => this.props.toggleSetting('useFifthEdition', !this.props.settings.useFifthEdition)}
-                                    minimumTrackTintColor="#14354d"
-                                    maximumTrackTintColor="#14354d"
-                                    thumbTintColor="#14354d"
-                                    onTintColor="#01121E"
+                                    minimumTrackTintColor='#14354d'
+                                    maximumTrackTintColor='#14354d'
+                                    thumbColor='#14354d'
+                                    trackColor={{false: '#000', true: '#01121E'}}
+                                    ios_backgroundColor='#01121E'
                                 />
                             </Right>
                         </ListItem>
@@ -145,10 +146,11 @@ class SettingsScreen extends Component {
                                 <Switch
                                     value={this.props.settings.playSounds}
                                     onValueChange={() => this.props.toggleSetting('playSounds', !this.props.settings.playSounds)}
-                                    minimumTrackTintColor="#14354d"
-                                    maximumTrackTintColor="#14354d"
-                                    thumbTintColor="#14354d"
-                                    onTintColor="#01121E"
+                                    minimumTrackTintColor='#14354d'
+                                    maximumTrackTintColor='#14354d'
+                                    thumbColor='#14354d'
+                                    trackColor={{false: '#000', true: '#01121E'}}
+                                    ios_backgroundColor='#01121E'
                                 />
                             </Right>
                         </ListItem>
@@ -160,10 +162,11 @@ class SettingsScreen extends Component {
                                 <Switch
                                     value={this.props.settings.onlyDiceSounds}
                                     onValueChange={() => this.props.toggleSetting('onlyDiceSounds', !this.props.settings.onlyDiceSounds)}
-                                    minimumTrackTintColor="#14354d"
-                                    maximumTrackTintColor="#14354d"
-                                    thumbTintColor="#14354d"
-                                    onTintColor="#01121E"
+                                    minimumTrackTintColor='#14354d'
+                                    maximumTrackTintColor='#14354d'
+                                    thumbColor='#14354d'
+                                    trackColor={{false: '#000', true: '#01121E'}}
+                                    ios_backgroundColor='#01121E'
                                     disabled={!this.props.settings.playSounds}
                                 />
                             </Right>

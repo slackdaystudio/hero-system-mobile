@@ -170,16 +170,16 @@ const localStyles = ScaledSheet.create({
 
 const thumbStyles = ScaledSheet.create({
     track: {
-        height: '16@vs',
+        height: '12@vs',
         borderRadius: 10,
         backgroundColor: '#01121E',
         borderColor: '#062134',
         borderWidth: 1,
     },
     thumb: {
-        width: '30@s',
-        height: '30@s',
-        borderRadius: scale(30) / 2,
+        width: '25@s',
+        height: '25@s',
+        borderRadius: scale(25) / 2,
         backgroundColor: '#14354d',
         borderColor: '#062134',
         borderWidth: 2,

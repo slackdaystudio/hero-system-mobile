@@ -169,10 +169,11 @@ class HitScreen extends Component {
                                             value={this.props.hitForm.isAutofire}
                                             onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
                                             color="#3da0ff"
-                                            minimumTrackTintColor="#14354d"
-                                            maximumTrackTintColor="#14354d"
-                                            thumbTintColor="#14354d"
-                                            onTintColor="#01121E"
+                                            minimumTrackTintColor='#14354d'
+                                            maximumTrackTintColor='#14354d'
+                                            thumbColor='#14354d'
+                                            trackColor={{false: '#000', true: '#01121E'}}
+                                            ios_backgroundColor='#01121E'
                                         />
                                     </View>
                                 </View>

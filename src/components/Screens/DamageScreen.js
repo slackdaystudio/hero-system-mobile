@@ -175,10 +175,11 @@ class DamageScreen extends Component {
                                                 value={this.props.damageForm.killingToggled}
                                                 onValueChange={() => this.updateFormValue('killingToggled', !this.props.damageForm.killingToggled)}
                                                 color="#3da0ff"
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -189,10 +190,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.isExplosion}
                                                 onValueChange={() => this.updateFormValue('isExplosion', !this.props.damageForm.isExplosion)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -203,10 +205,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.useHitLocations}
                                                 onValueChange={() => this.updateFormValue('useHitLocations', !this.props.damageForm.useHitLocations)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -216,10 +219,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.isMartialManeuver}
                                                 onValueChange={() => this.updateFormValue('isMartialManeuver', !this.props.damageForm.isMartialManeuver)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -229,10 +233,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.isTargetFlying}
                                                 onValueChange={() => this.updateFormValue('isTargetFlying', !this.props.damageForm.isTargetFlying)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -242,10 +247,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.isTargetInZeroG}
                                                 onValueChange={() => this.updateFormValue('isTargetInZeroG', !this.props.damageForm.isTargetInZeroG)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -255,10 +261,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.isTargetUnderwater}
                                                 onValueChange={() => this.updateFormValue('isTargetUnderwater', !this.props.damageForm.isTargetUnderwater)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -268,10 +275,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.rollWithPunch}
                                                 onValueChange={() => this.updateFormValue('rollWithPunch', !this.props.damageForm.rollWithPunch)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -281,10 +289,11 @@ class DamageScreen extends Component {
                                             <Switch
                                                 value={this.props.damageForm.isUsingClinging}
                                                 onValueChange={() => this.updateFormValue('isUsingClinging', !this.props.damageForm.isUsingClinging)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbTintColor="#14354d"
-                                                onTintColor="#01121E"
+                                                minimumTrackTintColor='#14354d'
+                                                maximumTrackTintColor='#14354d'
+                                                thumbColor='#14354d'
+                                                trackColor={{false: '#000', true: '#01121E'}}
+                                                ios_backgroundColor='#01121E'
                                             />
                                         </View>
                                     </View>
@@ -336,10 +345,10 @@ const localStyles = ScaledSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: '10@vs',
+        paddingTop: '5@vs',
     },
     checkContainer: {
-        paddingBottom: '20@vs',
+        paddingBottom: '5@vs',
     },
     picker: {
         color: '#fff',
