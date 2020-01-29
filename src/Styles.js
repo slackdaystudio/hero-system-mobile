@@ -21,8 +21,6 @@ export default ScaledSheet.create({
         backgroundColor: '#1b1d1f',
         ...ifIphoneX({
             paddingTop: '50@vs',
-        }, {
-            paddingTop: (Platform.OS === 'ios' ? '20@vs' : 0),
         }),
     },
     content: {

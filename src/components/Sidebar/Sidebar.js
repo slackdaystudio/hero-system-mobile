@@ -51,7 +51,7 @@ class Sidebar extends Component {
                     <List>
                         <ListItem onPress={() => this.props.navigation.navigate('Home')}>
                             <View>
-                                <Image style={{height: verticalScale(65), width: scale(149)}} source={require('../../../public/hero_mobile_logo.png')} />
+                                <Image style={{height: scale(50), width: scale(115)}} source={require('../../../public/hero_mobile_logo.png')} />
                             </View>
                         </ListItem>
                         <ListItem onPress={() => this._onLoadPress()}>
@@ -97,8 +97,6 @@ const localStyles = ScaledSheet.create({
         backgroundColor: '#242424',
         ...ifIphoneX({
             paddingTop: '50@vs',
-        }, {
-            paddingTop: (Platform.OS === 'ios' ? '20@vs' : 0),
         }),
     },
 });

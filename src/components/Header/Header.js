@@ -45,7 +45,7 @@ export default class MyHeader extends Component {
 
         return (
             <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
-                <Icon type='FontAwesome' name="chevron-left" style={{fontSize: verticalScale(18), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
+                <Icon type='FontAwesome' name="chevron-left" style={{fontSize: verticalScale(18), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : 0}} />
             </Button>
         );
     }
@@ -61,7 +61,7 @@ export default class MyHeader extends Component {
                         <View style={{flex: 4}}>
                             <View style={localStyles.logo}>
                                 <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
-                                    <Image style={{height: verticalScale(65), width: scale(149)}} source={require('../../../public/hero_mobile_logo.png')} />
+                                    <Image style={{height: scale(60), width: scale(138)}} source={require('../../../public/hero_mobile_logo.png')} />
                                 </TouchableHighlight>
                             </View>
                         </View>
@@ -81,7 +81,7 @@ export default class MyHeader extends Component {
 const localStyles = ScaledSheet.create({
     header: {
         backgroundColor: '#000',
-        height: Platform.OS === 'ios' ? '60@vs' : '70@vs',
+        height: Platform.OS === 'ios' ? common.isIPad() ? '75@vs' : '50@vs' : '60@vs',
     },
     logo: {
         alignSelf: 'center',

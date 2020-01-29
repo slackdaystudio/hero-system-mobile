@@ -73,7 +73,7 @@ const AppNavigator = createDrawerNavigator({
     initialRouteName: 'Home',
     drawerPosition: 'right',
     contentComponent: Sidebar,
-    drawerWidth: scale(230),
+    drawerWidth: scale(210),
 });
 
 export default AppNavigator;
