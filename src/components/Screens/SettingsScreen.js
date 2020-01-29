@@ -112,7 +112,7 @@ class SettingsScreen extends Component {
                 <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Heading text="App Version" />
-                    <View style={{paddingLeft: scale(20), paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>
+                    <View style={{paddingLeft: 20, paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>HERO System Mobile v</Text>{this.props.version}
                         </Text>
