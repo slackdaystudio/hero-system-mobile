@@ -19,7 +19,7 @@ import { common } from '../../lib/Common';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const EXIT_APP = 0;
+export const EXIT_APP = '0';
 
 export default class MyHeader extends Component {
     static propTypes = {
