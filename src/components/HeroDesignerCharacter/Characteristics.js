@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { View, TouchableHighlight, Alert, Switch } from 'react-native';
 import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
+import { scale, verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import { dieRoller, NORMAL_DAMAGE } from '../../lib/DieRoller';
@@ -164,7 +165,7 @@ export default class Characteristics extends Component {
             }
 
             return (
-                <View style={{flex: 1, paddingBottom: 10}}>
+                <View style={{flex: 1, paddingBottom: verticalScale(10)}}>
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>{note.label}:</Text> {note.text}
                     </Text>
@@ -198,7 +199,7 @@ export default class Characteristics extends Component {
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
                             </Text>
-                            <View style={{width: 20, alignItems: 'center'}}><Text style={styles.grey}>&bull;</Text></View>
+                            <View style={{width: scale(20), alignItems: 'center'}}><Text style={styles.grey}>&bull;</Text></View>
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Cost:</Text> {characteristic.cost}
                             </Text>
@@ -226,7 +227,7 @@ export default class Characteristics extends Component {
             let nonCombatKph = meters * ncm * speed * 5 * 60 / 1000;
 
             return (
-                <View style={{flex: 1, paddingBottom: 10}}>
+                <View style={{flex: 1, paddingBottom: verticalScale(10)}}>
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>NCM:</Text> {meters * ncm}m (x{ncm})
                     </Text>
@@ -322,7 +323,7 @@ export default class Characteristics extends Component {
             let strengthDamage = this._getStrengthDamage(totalStrength);
 
             return (
-                <View style={{flex: 1, paddingBottom: 10}}>
+                <View style={{flex: 1, paddingBottom: verticalScale(10)}}>
                     <TouchableHighlight
                         underlayColor="#121212"
                         onPress={() => this._rollStrengthDamage(strengthDamage)}
@@ -361,10 +362,10 @@ export default class Characteristics extends Component {
 
     _renderStat(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={22} size={60} color="#303030" />;
+            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={18} size={55} color="#303030" />;
         }
 
-        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()} fontSize={22} size={50} color="#303030" />;
+        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()} fontSize={18} size={45} color="#303030" />;
     }
 
     _renderCharacteristics(characteristics) {
@@ -379,7 +380,7 @@ export default class Characteristics extends Component {
                                 <Body>
                                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                                         {this._renderStat(characteristic)}
-                                        <Text style={[styles.cardTitle, {paddingLeft: 10}]}>{name}</Text>
+                                        <Text style={[styles.cardTitle, {paddingLeft: scale(10)}]}>{name}</Text>
                                     </View>
                                 </Body>
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
@@ -392,7 +393,7 @@ export default class Characteristics extends Component {
                                     <Icon
                                         type="FontAwesome"
                                         name={this.state.characteristicsButtonsShow[characteristic.shortName]}
-                                        style={{paddingLeft: 10, fontSize: 25, color: '#14354d'}}
+                                        style={{paddingLeft: scale(10), fontSize: verticalScale(25), color: '#14354d'}}
                                         onPress={() => this._toggleDefinitionShow(characteristic.shortName)}
                                     />
                                 </Right>
@@ -412,7 +413,7 @@ export default class Characteristics extends Component {
     _renderSecondaryCharacteristicToggle() {
         if (heroDesignerCharacter.hasSecondaryCharacteristics(common.flatten(this.props.character.powers, 'powers'))) {
             return (
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 20}}>
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingVertical: verticalScale(20)}}>
                     <View>
                         <Text style={styles.boldGrey}>Include Secondary Characteristics?</Text>
                     </View>
@@ -420,10 +421,11 @@ export default class Characteristics extends Component {
                         <Switch
                             value={this.props.character.showSecondary}
                             onValueChange={() => this._toggleSecondaryCharacteristics()}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbTintColor="#14354d"
-                            onTintColor="#01121E"
+                            minimumTrackTintColor='#14354d'
+                            maximumTrackTintColor='#14354d'
+                            thumbColor='#14354d'
+                            trackColor={{false: '#000', true: '#01121E'}}
+                            ios_backgroundColor='#01121E'
                         />
                     </View>
                 </View>
@@ -439,7 +441,7 @@ export default class Characteristics extends Component {
                 <Heading text="Characteristics" />
                 {this._renderSecondaryCharacteristicToggle()}
                 {this._renderCharacteristics(this.props.character.characteristics)}
-                <View style={{paddingTop: 20}} />
+                <View style={{paddingTop: verticalScale(20)}} />
                 <Heading text="Movement" />
                 {this._renderCharacteristics(this.props.character.movement)}
             </View>

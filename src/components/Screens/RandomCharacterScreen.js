@@ -2,9 +2,10 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, Platform, StyleSheet, View, Image, Alert } from 'react-native';
-import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
+import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
+import { verticalScale } from 'react-native-size-matters';
 import { randomCharacter } from '../../lib/RandomCharacter';
 import Header from '../Header/Header';
 import styles from '../../Styles';
@@ -88,6 +89,16 @@ class RandomCharacterScreen extends Component {
         );
     }
 
+    _renderTabHeading(headingText) {
+        return (
+            <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
+                <Text style={styles.tabStyle}>
+                    {headingText}
+                </Text>
+            </TabHeading>
+        );
+    }
+
     render() {
         if (this.props.character === null) {
             return (
@@ -112,8 +123,8 @@ class RandomCharacterScreen extends Component {
                 />
                 <Header hasTabs={true} navigation={this.props.navigation} backScreen='Home' />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1b1f'}}>
-                    <Tabs tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('General')}>
                             <View style={styles.tabContent}>
                                 <List>
                                     <ListItem>
@@ -165,7 +176,7 @@ class RandomCharacterScreen extends Component {
                                         </Body>
                                     </ListItem>
                                 </List>
-                                <View style={{paddingBottom: 20}} />
+                                <View style={{paddingBottom: verticalScale(20)}} />
                                 <Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
                                 <List>
                                     <ListItem>
@@ -201,7 +212,7 @@ class RandomCharacterScreen extends Component {
                                         </Body>
                                     </ListItem>
                                 </List>
-                                <View style={{paddingBottom: 20}} />
+                                <View style={{paddingBottom: verticalScale(20)}} />
                                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
                                     <View style={styles.buttonContainer}>
                                         <Button block style={styles.button}  onPress={this.reRoll}>
@@ -211,12 +222,12 @@ class RandomCharacterScreen extends Component {
                                 </View>
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Characteristics')}>
                             <View style={styles.tabContent}>
                                 {this._renderCharacteristics()}
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Powers')}>
                             <View style={styles.tabContent}>
                                 {this.props.character.powers.powers.map((power, index) => {
                                     return (
@@ -232,7 +243,7 @@ class RandomCharacterScreen extends Component {
                                 })}
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Skills">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Skills')}>
                             <View style={styles.tabContent}>
                                 {this.props.character.skills.skills.map((skill, index) => {
                                     return (
@@ -245,7 +256,7 @@ class RandomCharacterScreen extends Component {
                                 })}
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Disadvantages">
+                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Disadvantages')}>
                             <View style={styles.tabContent}>
                                 {this.props.character.disadvantages.disadvantages.map((disad, index) => {
                                     return (

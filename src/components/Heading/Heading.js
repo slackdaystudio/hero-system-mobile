@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { Platform, StyleSheet, View, Image, TouchableHighlight } from 'react-native';
 import { Button, Text, Header, Left, Right, Icon } from 'native-base';
+import { verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -25,7 +26,7 @@ export default class Heading extends Component {
 
     render() {
         return (
-            <View style={{flex: 1, maxHeight: 53, paddingBottom: 10}}>
+            <View style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: 20}}>
                 <Text style={styles.heading}>{this.props.text}</Text>
             </View>
         );

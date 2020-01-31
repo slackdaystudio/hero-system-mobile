@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View } from 'react-native';
 import { Text, Icon } from 'native-base';
+import { ScaledSheet, verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -36,7 +37,7 @@ export default class NumberPicker extends Component {
                     <Icon
                         type='FontAwesome'
                         name='minus-square'
-                        style={[styles.grey, {fontSize: 25, color: '#14354d', alignItems: 'flex-start'}]}
+                        style={[styles.grey, {fontSize: verticalScale(22), color: '#14354d', alignItems: 'flex-start'}]}
                         onPress={() => this.props.decrement(this.props.stateKey, this.props.step)}
                     />
                 </View>
@@ -47,7 +48,7 @@ export default class NumberPicker extends Component {
                     <Icon
                         type='FontAwesome'
                         name='plus-square'
-                        style={[styles.grey, {fontSize: 25, color: '#14354d', alignItems: 'flex-end'}]}
+                        style={[styles.grey, {fontSize: verticalScale(22), color: '#14354d', alignItems: 'flex-end'}]}
                         onPress={() => this.props.increment(this.props.stateKey, this.props.step)}
                     />
                 </View>
@@ -62,11 +63,12 @@ NumberPicker.defaultProps = {
     max: 99
 };
 
-const localStyles = StyleSheet.create({
+const localStyles = ScaledSheet.create({
     row: {
 	    alignSelf: 'center',
 	    alignItems:'center',
-        width: 30,
+        width: '30@s',
+        height: '25@vs',
     },
     modalContent: {
         flex: 1,

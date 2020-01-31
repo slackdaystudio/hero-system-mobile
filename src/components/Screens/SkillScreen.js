@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { NavigationEvents } from 'react-navigation';
 import { BackHandler, StyleSheet, View, Image, Switch, Alert } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
+import { ScaledSheet, scale } from 'react-native-size-matters';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -103,14 +104,15 @@ class SkillScreen extends Component {
                     <Text style={styles.heading}>Roll 3d6</Text>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                         <Text style={styles.grey}>Is skill check?</Text>
-                        <View style={{paddingRight: 10}}>
+                        <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.skillForm.skillCheck}
                                 onValueChange={() => this.updateFormValue('skillCheck', !this.props.skillForm.skillCheck)}
-                                minimumTrackTintColor="#14354d"
-                                maximumTrackTintColor="#14354d"
-                                thumbTintColor="#14354d"
-                                onTintColor="#01121E"
+                                minimumTrackTintColor='#14354d'
+                                maximumTrackTintColor='#14354d'
+                                thumbColor='#14354d'
+                                trackColor={{false: '#000', true: '#01121E'}}
+                                ios_backgroundColor='#01121E'
                             />
                         </View>
                     </View>
@@ -126,15 +128,15 @@ class SkillScreen extends Component {
     }
 }
 
-const localStyles = StyleSheet.create({
+const localStyles = ScaledSheet.create({
     titleContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 10,
+        paddingTop: '10@vs',
     },
     checkContainer: {
-        paddingBottom: 20,
+        paddingBottom: '20@vs',
     },
 });
 

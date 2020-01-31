@@ -1,4 +1,5 @@
 import { StyleSheet, Platform } from 'react-native';
+import { ScaledSheet } from 'react-native-size-matters';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -15,13 +16,11 @@ import { ifIphoneX } from 'react-native-iphone-x-helper';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default StyleSheet.create({
+export default ScaledSheet.create({
     container: {
         backgroundColor: '#1b1d1f',
         ...ifIphoneX({
-            paddingTop: 50,
-        }, {
-            paddingTop: (Platform.OS === 'ios' ? 20 : 0),
+            paddingTop: '50@vs',
         }),
     },
     content: {
@@ -29,11 +28,11 @@ export default StyleSheet.create({
         paddingHorizontal: 0,
     },
     heading: {
-        fontSize: 24,
+        fontSize: '20@vs',
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: '#F3EDE9',
-        paddingVertical: 5,
+        paddingVertical: '5@s',
         textAlign: 'center',
         backgroundColor: '#121212',
         width: '100%',
@@ -50,50 +49,61 @@ export default StyleSheet.create({
         color: '#F3EDE9',
     },
     hdSubHeading: {
-        fontSize: 22,
+        fontSize: '18@vs',
         fontWeight: 'bold',
-        paddingTop: 10,
+        paddingTop: '10@vs',
         color: '#F3EDE9',
         borderBottomColor: '#F3EDE9',
-        borderBottomWidth: 2,
+        borderBottomWidth: '2@vs',
         width: '100%',
     },
     buttonContainer: {
-        paddingVertical: 5,
+        paddingVertical: '5@s',
     },
     button: {
         backgroundColor: '#14354d',
-        minWidth: 140,
-        justifyContent: 'center',
-        alignSelf: 'center',
-    },
-    buttonBig: {
-        backgroundColor: '#14354d',
-        minWidth: 300,
+        minWidth: '110@s',
         justifyContent: 'center',
         alignSelf: 'center',
     },
     buttonSmall: {
         backgroundColor: '#14354d',
-        minWidth: 75,
-        maxHeight: 28,
+        minWidth: '75@s',
+        maxHeight: '28@vs',
         justifyContent: 'center',
         alignSelf: 'center',
     },
     buttonText: {
+        fontSize: '12@vs',
         color: '#e8e8e8',
     },
     grey: {
+        fontSize: '14@vs',
         color: '#e8e8e8',
     },
     boldGrey: {
+        fontSize: '14@vs',
         color: '#e8e8e8',
         fontWeight: 'bold',
     },
-    tabInactive: {
+    tabHeading: {
         backgroundColor: '#000',
+        color: '#000', /* For iOS */
     },
-    tabActive: {
+    activeTabStyle: {
+        backgroundColor: '#000',
+        color: '#000',
+        fontSize: 999,
+    },
+    activeTextStyle: {
+        backgroundColor: '#000',
+        color: '#000',
+    },
+    tabStyle: {
+        fontSize: '14@vs',
+        color: '#e8e8e8',
+    },
+    scrollableTab: {
         backgroundColor: '#000',
     },
     tabBarUnderline: {
@@ -110,7 +120,7 @@ export default StyleSheet.create({
         backgroundColor: '#0e0e0f',
     },
     cardTitle: {
-        fontSize: 18,
+        fontSize: '16@vs',
         fontWeight: 'bold',
         color: '#e8e8e8',
         backgroundColor: '#121212',
@@ -121,15 +131,15 @@ export default StyleSheet.create({
         borderColor: '#303030',
         flex: 1,
         flexDirection: 'column',
-        maxHeight: 295
+        maxHeight: '295@vs'
     },
     modalHeader: {
-        fontSize: 20,
-        paddingLeft: 22,
+        fontSize: '20@vs',
+        paddingLeft: '22@s',
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: '#F3EDE9',
-        paddingVertical: 5,
+        paddingVertical: '5@vs',
         backgroundColor: '#121212',
         width: '100%',
         borderColor: '#303030',
@@ -138,9 +148,9 @@ export default StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#1b1d1f',
-        padding: 22,
+        padding: '22@s',
         justifyContent: 'center',
         alignItems: 'stretch',
-        height: 255
+        height: '255@vs'
     }
 });

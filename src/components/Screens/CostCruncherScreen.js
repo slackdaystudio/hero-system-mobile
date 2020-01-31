@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { BackHandler, StyleSheet, View } from 'react-native';
 import { Container, Content, Button, Text, Form, Item, Label, Input } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
+import { verticalScale } from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import styles from '../../Styles';
@@ -62,7 +63,7 @@ class CostCruncherScreen extends Component {
 
     _renderActiveCost() {
         return (
-            <Text style={[styles.grey, {fontSize: 75}]}>
+            <Text style={[styles.grey, {fontSize: verticalScale(75)}]}>
                 {Math.round(this.props.costCruncherForm.cost * (1 + this.props.costCruncherForm.advantages))}
             </Text>
         );
@@ -71,7 +72,7 @@ class CostCruncherScreen extends Component {
     _renderRealCost() {
         let cost = Math.round(this.props.costCruncherForm.cost * (1 + this.props.costCruncherForm.advantages) / (1 + Math.abs(this.props.costCruncherForm.limitations)));
 
-        return <Text style={[styles.grey, {fontSize: 75}]}>{cost}</Text>;
+        return <Text style={[styles.grey, {fontSize: verticalScale(75)}]}>{cost}</Text>;
     }
 
     render() {

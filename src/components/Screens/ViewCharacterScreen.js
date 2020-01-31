@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, Platform, StyleSheet, View, ScrollView } from 'react-native';
-import { Container, Content, Toast, Tabs, Tab, ScrollableTab, Spinner, Text } from 'native-base';
+import { Container, Content, Toast, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
@@ -83,7 +83,7 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Powers">
+            <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Powers')}>
                 <View style={styles.tabContent}>
                     <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
                 </View>
@@ -97,7 +97,7 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Equipment">
+            <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Equipment')}>
                 <View style={styles.tabContent}>
                     <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
                 </View>
@@ -111,11 +111,21 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading={tabTitle === null ? columnHeading + 's' : tabTitle}>
+            <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading(tabTitle === null ? columnHeading + 's' : tabTitle)}>
                 <View style={styles.tabContent}>
                     <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
                 </View>
             </Tab>
+        );
+    }
+
+    _renderTabHeading(headingText) {
+        return (
+            <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
+                <Text style={styles.tabStyle}>
+                    {headingText}
+                </Text>
+            </TabHeading>
         );
     }
 
@@ -127,13 +137,13 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tabs ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab />}>
-                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="General">
+            <Tabs locked={true} ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
+                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('General')}>
                     <View style={styles.tabContent}>
                         <General character={this.props.character} />
                     </View>
                 </Tab>
-                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Combat">
+                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Combat')}>
                     <View style={styles.tabContent}>
                         <Combat
                             navigation={this.props.navigation}
@@ -143,7 +153,7 @@ class ViewCharacterScreen extends Component {
                         />
                     </View>
                 </Tab>
-                <Tab tabStyle={styles.tabInactive} activeTabStyle={styles.tabActive} textStyle={styles.grey} activeTextStyle={{color: '#FFF'}} heading="Characteristics">
+                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Characteristics')}>
                     <View style={styles.tabContent}>
                         <Characteristics characteristics={this.props.character.characteristics.characteristic} navigation={this.props.navigation} />
                         <Movement movement={this.props.character.movement} />

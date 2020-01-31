@@ -1,4 +1,5 @@
 import { createDrawerNavigator } from 'react-navigation-drawer';
+import { scale } from 'react-native-size-matters';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import CharactersScreen from './src/components/Screens/CharactersScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
@@ -72,7 +73,7 @@ const AppNavigator = createDrawerNavigator({
     initialRouteName: 'Home',
     drawerPosition: 'right',
     contentComponent: Sidebar,
-    drawerWidth: 250,
+    drawerWidth: scale(210),
 });
 
 export default AppNavigator;

@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { Alert, View, TouchableHighlight } from 'react-native';
 import { Text, Card, CardItem, Left, Right, Body } from 'native-base';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { character } from '../../lib/Character';
 import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
@@ -89,7 +90,7 @@ export default class Characteristics extends Component {
     _renderNotes(notes, index) {
         if (this.state.showFullTexts[index] && notes !== '') {
             return (
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingBottom: 5}}>
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingBottom: verticalScale(5)}}>
                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey} /></View>
                     <View style={{flex: 3, justifyContent: 'flex-start'}}>
                         <Text style={[styles.grey, {fontStyle: 'italic'}]}>{notes}</Text>
@@ -109,8 +110,8 @@ export default class Characteristics extends Component {
         }
 
         return (
-            <View style={{paddingBottom: 20, paddingHorizontal: 10}}>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+            <View style={{paddingBottom: verticalScale(20), paddingHorizontal: scale(10)}}>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Val</Text></View>
                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Char</Text></View>
                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Pts</Text></View>
@@ -124,7 +125,7 @@ export default class Characteristics extends Component {
                     return (
                         <TouchableHighlight key={'characteristic-' + index} underlayColor="#3da0ff" onPress={() => this._toggleNotes(index)} onLongPress={() => this.rollCheck(characteristic.roll)}>
                             <View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{characteristic.total}</Text></View>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._getShortName(characteristic.name)}</Text></View>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{characteristic.cost}</Text></View>

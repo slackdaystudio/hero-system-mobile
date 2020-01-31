@@ -6,6 +6,7 @@ import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
 import AnimateNumber from 'react-native-animate-number';
 import { NavigationEvents } from 'react-navigation';
+import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
@@ -85,7 +86,7 @@ class ResultScreen extends Component {
         if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
             backScreen = this.props.navigation.state.params.from;
         }
-        
+
         return backScreen;
     }
 
@@ -160,8 +161,8 @@ class ResultScreen extends Component {
     _renderDamageInfo(result) {
         if (result.damageForm.isExplosion) {
             return (
-                <View style={{paddingBottom: 20}}>
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                <View style={{paddingBottom: verticalScale(20)}}>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: scale(5)}}>
                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Distance</Text></View>
                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>STUN</Text></View>
                         <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>BODY</Text></View>
@@ -169,7 +170,7 @@ class ResultScreen extends Component {
                     </View>
                     {result.explosion.map((entry, index) => {
                         return (
-                            <View key={'exp-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: 5}}>
+                            <View key={'exp-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
                                 <View style={{flex: 1, alignSelf: 'flex-end'}}><Text style={styles.grey}>{this._renderDistance(entry.distance, result)}</Text></View>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderStun(entry.stun)}</Text></View>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{entry.body}</Text></View>
@@ -182,7 +183,7 @@ class ResultScreen extends Component {
         }
 
         return (
-            <View style={{paddingBottom: 20}}>
+            <View style={{paddingBottom: verticalScale(20)}}>
                 {this._renderHitLocations()}
                 <View style={localStyles.lineContainer}>
                     <Text style={[styles.boldGrey, localStyles.alignStart]}>Stun: </Text>
@@ -365,9 +366,9 @@ class ResultScreen extends Component {
     }
 }
 
-const localStyles = StyleSheet.create({
+const localStyles = ScaledSheet.create({
     rollResult: {
-        fontSize: 100,
+        fontSize: '100@vs',
         fontWeight: 'bold',
     },
     lineContainer: {
