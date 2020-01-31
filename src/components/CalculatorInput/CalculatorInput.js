@@ -12,10 +12,6 @@ export default class CalculatorInput extends Component {
         value: PropTypes.number.isRequired,
         onAccept: PropTypes.func.isRequired,
         width: PropTypes.number,
-        fontSize: PropTypes.number,
-        labelFontSize: PropTypes.number,
-        stackedLabel: PropTypes.bool,
-        boldLabel: PropTypes.bool,
         iconPaddingTop: PropTypes.number,
     }
 
@@ -27,13 +23,13 @@ export default class CalculatorInput extends Component {
 
     render() {
         return (
-            <View style={{flex: 1, flexDirection: 'row', width: this.props.width}}>
+            <View style={{flex: 1, flexDirection: 'row', width: verticalScale(this.props.width)}}>
                 <View style={{flex: 1}}>
                     <Item>
                         <BaseCalculatorInput
                             ref={(ref) => this.currentBodyPointsCalculator = ref}
                             fieldContainerStyle={{borderBottomWidth: 0}}
-                            fieldTextStyle={[styles.grey, {textAlign: 'left', alignSelf: 'baseline', paddingTop: Platform.OS === 'ios' ? verticalScale(15) : verticalScale(5)}]}
+                            fieldTextStyle={[styles.grey, {textAlign: 'left', alignSelf: 'baseline'}]}
                             value={this.props.value.toString()}
                             onAccept={(value) => this._onAccept(value)}
                             modalAnimationType='slide'
@@ -46,7 +42,7 @@ export default class CalculatorInput extends Component {
                     <Icon
                         type='FontAwesome'
                         name='calculator'
-                        style={{fontSize: verticalScale(18), color: '#14354d', alignSelf: 'center', paddingTop: this.props.iconPaddingTop}}
+                        style={{fontSize: verticalScale(18), color: '#14354d', alignSelf: 'center', paddingTop: verticalScale(this.props.iconPaddingTop)}}
                         onPress={() => this.currentBodyPointsCalculator.calculatorModalToggle()}
                     />
                 </View>
@@ -56,10 +52,6 @@ export default class CalculatorInput extends Component {
 }
 
 CalculatorInput.defaultProps = {
-    width: verticalScale(85),
-    fontSize: verticalScale(12),
-    labelFontSize: verticalScale(10),
-    stackedLabel: true,
-    boldLabel: false,
-    iconPaddingTop: verticalScale(15),
+    width: 85,
+    iconPaddingTop: 15,
 };

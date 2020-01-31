@@ -380,7 +380,7 @@ export default class Traits extends Component {
         return (
             <Card style={[styles.card, {paddingBottom: 0}]} key={'item-' + decoratedTrait.trait.position}>
                 <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'}]} header>
-                    <View style={{flex: 5, alignSelf: 'center'}}>
+                    <View style={{flex: 3, alignSelf: 'center'}}>
                         <Text style={[styles.boldGrey, {fontSize: verticalScale(16)}]}>{decoratedTrait.label()}</Text>
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
@@ -391,7 +391,7 @@ export default class Traits extends Component {
                             <Icon
                                 type="FontAwesome"
                                 name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                                style={{paddingLeft: scale(5), fontSize: verticalScale(22), color: '#14354d'}}
+                                style={{paddingLeft: scale(3), fontSize: verticalScale(22), color: '#14354d'}}
                                 onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                             />
                         </View>
@@ -419,7 +419,7 @@ export default class Traits extends Component {
     _renderTrait(decoratedTrait, isListItem = false) {
         return (
             <Fragment>
-                <View style={{flex: 5, alignSelf: 'center'}}>
+                <View style={{flex: 3, alignSelf: 'center'}}>
                     <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 14 : 16)}]}>{isListItem ? ' ‣ ' : ''}{decoratedTrait.label()}</Text>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
@@ -430,7 +430,7 @@ export default class Traits extends Component {
                         <Icon
                             type="FontAwesome"
                             name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                            style={{paddingLeft: scale(5), fontSize: verticalScale(isListItem ? 18 : 22), color: '#14354d'}}
+                            style={{paddingLeft: scale(3), fontSize: verticalScale(isListItem ? 18 : 22), color: '#14354d'}}
                             onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                         />
                     </View>
