@@ -82,6 +82,8 @@ class ViewHeroDesignerCharacterScreen extends Component {
             }
 
             this._setPortraitDimensions();
+        } else if (this.props.character !== null && prevProps.character === null) {
+            this._setPortraitDimensions();
         }
     }
 
@@ -105,12 +107,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
             this.setState({width: imageWidth, height: imageHeight});
         });
-    }
-
-    _isLandscape() {
-        const screen = Dimensions.get('screen');
-
-        return screen.height <= screen.width;
     }
 
     _getBackScreen() {
