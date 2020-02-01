@@ -44,7 +44,7 @@ export default class General extends Component {
 
     render() {
         return (
-            <View style={{paddingHorizontal: scale(5)}}>
+            <View>
                 <Heading text="Information" />
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     <Text style={[styles.boldGrey, {flex: 1}]}>Name:</Text>

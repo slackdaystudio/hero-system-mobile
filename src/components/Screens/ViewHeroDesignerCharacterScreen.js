@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Dimensions, BackHandler, Platform, StyleSheet, View, ScrollView, Alert, Image } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
+import { verticalScale } from 'react-native-size-matters';
 import General from '../HeroDesignerCharacter/General';
 import Combat from '../HeroDesignerCharacter/Combat';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
@@ -94,12 +95,11 @@ class ViewHeroDesignerCharacterScreen extends Component {
         }
 
         Image.getSize(this.props.character.portrait, (imageWidth, imageHeight) => {
-            let { height, width } = Dimensions.get('window');
-            height = Math.floor(height);
-            width = Math.floor(width);
+            const { height, width } = Dimensions.get('window');
+            const paddedWidth = width - 40;
 
-            if ((imageWidth - width) > 0) {
-                let percentageDecrease = 1 - (imageWidth - width) / imageWidth;
+            if (imageWidth - paddedWidth > 0) {
+                let percentageDecrease = 1 - (imageWidth - paddedWidth) / imageWidth;
 
                 imageWidth = imageWidth * percentageDecrease;
                 imageHeight = imageHeight * percentageDecrease;
