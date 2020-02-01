@@ -84,21 +84,21 @@ export default function randomHero(state = heroState, action) {
     let newState = null;
 
     switch (action.type) {
-    case INITIALIZE_RANDOM_HERO:
-    case SET_RANDOM_HERO:
-    case SET_RANDOM_HERO_NAME:
-    case CLEAR_HERO:
-        newState = {
-            ...state,
-            hero: {
-                ...state.hero,
-            },
-        };
+        case INITIALIZE_RANDOM_HERO:
+        case SET_RANDOM_HERO:
+        case SET_RANDOM_HERO_NAME:
+        case CLEAR_HERO:
+            newState = {
+                ...state,
+                hero: {
+                    ...state.hero,
+                },
+            };
 
-        newState.hero = action.payload;
+            newState.hero = action.payload;
 
-        return newState;
-    default:
-        return state;
+            return newState;
+        default:
+            return state;
     }
 }
