@@ -9,13 +9,14 @@ import General from '../HeroDesignerCharacter/General';
 import Combat from '../HeroDesignerCharacter/Combat';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
 import Traits from '../HeroDesignerCharacter/Traits';
+import Notes from '../HeroDesignerCharacter/Notes';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setShowSecondary, setSparseCombatDetails, usePhase } from '../../reducers/character';
+import { setShowSecondary, setSparseCombatDetails, usePhase, updateNotes } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -40,6 +41,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
         setSparseCombatDetails: PropTypes.func.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
+        updateNotes: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -204,6 +206,11 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 {this._renderTab('Powers', 'powers', 'powers')}
                 {this._renderTab('Equipment', 'equipment', 'power')}
                 {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
+                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Notes')}>
+                    <View style={styles.tabContent}>
+                        <Notes notes={this.props.character.notes || ''} updateNotes={this.props.updateNotes} />
+                    </View>
+                </Tab>
             </Tabs>
         );
     }
@@ -236,6 +243,7 @@ const mapDispatchToProps = {
     setShowSecondary,
     setSparseCombatDetails,
     usePhase,
+    updateNotes,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);

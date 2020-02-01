@@ -36,6 +36,8 @@ export const SET_SPARSE_COMBAT_DETAILS = 'SET_SPARSE_COMBAT_DETAILS';
 
 export const USE_PHASE = 'USE_PHASE';
 
+export const UPDATE_NOTES = 'UPDATE_NOTES';
+
 //////////////////////////////
 // ACTIONS                  //
 //////////////////////////////
@@ -94,6 +96,13 @@ export function usePhase(phase, secondary, abort = false) {
             secondary: secondary,
             abort: abort,
         },
+    };
+}
+
+export function updateNotes(notes) {
+    return {
+        type: UPDATE_NOTES,
+        payload: notes,
     };
 }
 
@@ -226,6 +235,17 @@ export default function character(state = characterState, action) {
                 used: used,
                 aborted: aborted,
             };
+
+            return newState;
+        case UPDATE_NOTES:
+            newState = {
+                ...state,
+                character: {
+                    ...state.character,
+                },
+            };
+
+            newState.character.notes = action.payload;
 
             return newState;
         default:
