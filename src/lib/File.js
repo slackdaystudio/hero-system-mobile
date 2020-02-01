@@ -4,6 +4,7 @@ import DocumentPicker from 'react-native-document-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import xml2js from 'react-native-xml2js';
 import { zip, unzip } from 'react-native-zip-archive';
+import { isBase64 } from 'is-base64';
 import { common } from './Common';
 import { character as characterLib } from './Character';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
@@ -206,6 +207,8 @@ class File {
 
             if (isHdc) {
                 character = await this._loadHdcCharacter(rawXml);
+
+                this._savePortrait(character);
             } else {
                 character = await this._loadXmlExportCharacter(rawXml);
             }
@@ -214,7 +217,6 @@ class File {
         } finally {
             endLoad();
         }
-
 
         return character;
     }
@@ -283,6 +285,12 @@ class File {
             common.toast(error.message);
         }
 
+        if (character.hasOwnProperty('image')) {
+            await this._savePortrait(character);
+
+            delete character.image;
+        }
+
         return heroDesignerCharacter.getCharacter(character);
     }
 
@@ -310,6 +318,8 @@ class File {
             return parseFloat(value);
         } else if (value === 'true' || value === 'false' || value.toLowerCase() == 'yes' || value.toLowerCase() === 'no') {
             return value === 'true' || value.toLowerCase() === 'yes' ? true : false;
+        } else if (isBase64(value)) {
+            return value;
         }
 
         return value.replace(/\r\n\t\t\t\t/gi, '').replace(/\r\n/gi, '\n');
@@ -322,6 +332,19 @@ class File {
         await RNFetchBlob.fs.writeFile(characterPath, JSON.stringify(character));
         await zip(characterPath, zipPath);
         await RNFetchBlob.fs.unlink(characterPath);
+    }
+
+    _savePortrait(character) {
+        if (!character.hasOwnProperty('image')) {
+            return;
+        }
+
+        let extensionParts = character.image.fileName.split('.');
+        let extension = extensionParts[extensionParts.length - 1];
+
+        character.portrait = `data:image/${extension};base64,${character.image._}`;
+
+        delete character.image;
     }
 
     async _getPath(defaultPath) {

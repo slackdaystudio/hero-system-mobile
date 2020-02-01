@@ -108,6 +108,7 @@ class HeroDesignerCharacter {
             powers: [],
             equipment: [],
             disadvantages: [],
+            portrait: null
         };
 
         this._normalizeCharacterData(heroDesignerCharacter);
@@ -121,6 +122,10 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
         this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
         this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'powers', 'power');
+
+        if (heroDesignerCharacter.hasOwnProperty('portrait')) {
+            character.portrait = heroDesignerCharacter.portrait;
+        }
 
         // if (__DEV__) {
         //     permission.askForWrite().then(granted => {

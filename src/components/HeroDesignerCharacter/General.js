@@ -1,6 +1,6 @@
-import React, { Component }  from 'react';
+import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
+import { Alert, View, Image, Dimensions } from 'react-native';
 import { Text, List, ListItem, Left, Body } from 'native-base';
 import { scale, verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
@@ -24,6 +24,22 @@ import styles from '../../Styles';
 export default class General extends Component {
     static propTypes = {
         characterInfo: PropTypes.object.isRequired,
+        portrait: PropTypes.string,
+        portraitWidth: PropTypes.number,
+        portraitHeight: PropTypes.number,
+    }
+
+    _renderPortrait() {
+        if (this.props.portrait === null || this.props.portrait === undefined) {
+            return null;
+        }
+
+        return (
+            <Fragment>
+                <Heading text="Portrait" />
+                <Image style={{width: this.props.portraitWidth, height: this.props.portraitHeight, alignSelf: 'center'}} source={{ uri: this.props.portrait}} />
+            </Fragment>
+        )
     }
 
     render() {
@@ -42,6 +58,8 @@ export default class General extends Component {
                     <Text style={[styles.boldGrey, {flex: 1}]}>Player:</Text>
                     <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.playerName}</Text>
                 </View>
+                <View style={{paddingBottom: verticalScale(20)}} />
+                {this._renderPortrait()}
                 <View style={{paddingBottom: verticalScale(20)}} />
                 <Heading text="Traits" />
                 <View style={{flex: 1, flexDirection: 'row'}}>

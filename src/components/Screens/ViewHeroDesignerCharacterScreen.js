@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler,Platform, StyleSheet, View, ScrollView, Alert } from 'react-native';
+import { Dimensions, BackHandler, Platform, StyleSheet, View, ScrollView, Alert, Image } from 'react-native';
 import { Container, Content, Toast, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import General from '../HeroDesignerCharacter/General';
@@ -44,19 +44,35 @@ class ViewHeroDesignerCharacterScreen extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            width: 300,
+            height: 400
+        };
+
         this.tabs = null;
+
+        this.backHandler = null;
+        this.screenOrientationHandler = null;
     }
 
     onDidFocus() {
+        this._setPortraitDimensions();
+
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             this.props.navigation.navigate(this._getBackScreen());
 
             return true;
         });
+
+        this.screenOrientationHandler = Dimensions.addEventListener('change', () => {
+            this._setPortraitDimensions();
+        });
     }
 
     onDidBlur() {
         this.backHandler.remove();
+
+        Dimensions.removeEventListener('change', this.screenOrientationHandler);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -64,7 +80,37 @@ class ViewHeroDesignerCharacterScreen extends Component {
             if (this.tabs !== null) {
                 this.tabs.goToPage(0);
             }
+
+            this._setPortraitDimensions();
         }
+    }
+
+    _setPortraitDimensions() {
+        if (this.props.character === null || this.props.character === undefined ||
+            this.props.character.portrait === null || this.props.character.portrait === undefined) {
+            return;
+        }
+
+        Image.getSize(this.props.character.portrait, (imageWidth, imageHeight) => {
+            let { height, width } = Dimensions.get('window');
+            height = Math.floor(height);
+            width = Math.floor(width);
+
+            if ((imageWidth - width) > 0) {
+                let percentageDecrease = 1 - (imageWidth - width) / imageWidth;
+
+                imageWidth = imageWidth * percentageDecrease;
+                imageHeight = imageHeight * percentageDecrease;
+            }
+
+            this.setState({width: imageWidth, height: imageHeight});
+        });
+    }
+
+    _isLandscape() {
+        const screen = Dimensions.get('screen');
+
+        return screen.height <= screen.width;
     }
 
     _getBackScreen() {
@@ -124,7 +170,12 @@ class ViewHeroDesignerCharacterScreen extends Component {
             <Tabs locked={true} ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
                 <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('General')}>
                     <View style={styles.tabContent}>
-                        <General characterInfo={this.props.character.characterInfo} />
+                        <General
+                            characterInfo={this.props.character.characterInfo}
+                            portrait={this.props.character.portrait}
+                            portraitWidth={this.state.width}
+                            portraitHeight={this.state.height}
+                        />
                     </View>
                 </Tab>
                 <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Combat')}>
