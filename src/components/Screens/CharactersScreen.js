@@ -239,7 +239,7 @@ class CharactersScreen extends Component {
                     <ConfirmationDialog
                         visible={this.state.deleteDialogVisible}
                         title='Delete Character?'
-                        info='Are you certain you want to delete this character?'
+                        info={`Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded`}
                         onOk={this.onDeleteDialogOk}
                         onClose={this.onDeleteDialogClose}
                     />
