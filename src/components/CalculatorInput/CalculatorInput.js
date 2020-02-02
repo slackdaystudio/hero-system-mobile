@@ -52,6 +52,6 @@ export default class CalculatorInput extends Component {
 }
 
 CalculatorInput.defaultProps = {
-    width: 85,
+    width: 90,
     iconPaddingTop: 15,
 };
