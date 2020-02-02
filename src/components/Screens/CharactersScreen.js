@@ -113,6 +113,7 @@ class CharactersScreen extends Component {
 
     _loadCharacter(characterFilename) {
         file.loadCharacter(characterFilename, this.startLoad, this.endLoad).then((char) => {
+            // Legacy: done on character load now, do not touch
             if (!char.hasOwnProperty('filename')) {
                 char.filename = characterFilename;
                 char.showSecondary = true;

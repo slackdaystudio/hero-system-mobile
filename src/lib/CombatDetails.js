@@ -30,6 +30,20 @@ class CombatDetails {
         return combatDetails;
     }
 
+    sync(character, oldCharacter) {
+        character.combatDetails = this.init(character);
+
+        if (oldCharacter.hasOwnProperty('combatDetails')) {
+            character.combatDetails.primary = {...oldCharacter.combatDetails.primary};
+            character.combatDetails.secondary = {...oldCharacter.combatDetails.secondary};
+
+            if (libCharacter.isHeroDesignerCharacter(character)) {
+                this._syncPhases(character.combatDetails.primary, oldCharacter.combatDetails.primary);
+                this._syncPhases(character.combatDetails.secondary, oldCharacter.combatDetails.secondary);
+            }
+        }
+    }
+
     _init(character, showSecondary) {
         let combatDetails = {
             stun: 0,
@@ -57,6 +71,15 @@ class CombatDetails {
         }
 
         return combatDetails;
+    }
+
+    _syncPhases(combatDetails, oldCombatDetails) {
+        for (let phase of Object.keys(combatDetails.phases)) {
+            if (oldCombatDetails.phases.hasOwnProperty(phase)) {
+                combatDetails.phases[phase].used = oldCombatDetails.phases[phase].used;
+                combatDetails.phases[phase].aborted = oldCombatDetails.phases[phase].aborted;
+            }
+        }
     }
 
     _getCharacteristic(character, shortName) {

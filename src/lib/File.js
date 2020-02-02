@@ -8,6 +8,7 @@ import { isBase64 } from 'is-base64';
 import { common } from './Common';
 import { character as characterLib } from './Character';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
+import { combatDetails } from './CombatDetails';
 import { permission } from './Permission';
 import { Buffer } from 'buffer';
 import iconv from 'iconv-lite';
@@ -80,6 +81,7 @@ class File {
                 return;
             }
 
+            await this._initCharacterState(character, result.name);
             await this._saveCharacter(character, result.name);
 
             return character;
@@ -345,6 +347,27 @@ class File {
         character.portrait = `data:image/${extension};base64,${character.image._}`;
 
         delete character.image;
+    }
+
+    async _initCharacterState(character, filename) {
+        let hsmFilename = `${filename.slice(0, -4)}.hsmc`;
+        let path = await this._getPath(DEFAULT_CHARACTER_DIR);
+        let exists = await RNFetchBlob.fs.exists(`${path}/${hsmFilename}`);
+
+        character.filename = hsmFilename;
+
+        if (exists) {
+            let oldCharacter = await this.loadCharacter(hsmFilename, () => {}, () => {});
+
+            character.showSecondary = oldCharacter.showSecondary;
+            character.notes = oldCharacter.notes;
+
+            combatDetails.sync(character, oldCharacter);
+        } else {
+            character.showSecondary = true;
+            character.notes = '';
+            character.combatDetails = combatDetails.init(character);
+        }
     }
 
     async _getPath(defaultPath) {
