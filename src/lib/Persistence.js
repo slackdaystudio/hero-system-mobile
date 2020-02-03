@@ -149,26 +149,10 @@ class Persistence {
         return characterData;
     }
 
-    async clearCharacter(filename) {
-        let characterData = {
-            character: null,
-            characters: null,
-        };
-
+    async clearCharacter(filename, character, characters, saveCharacters = true) {
         try {
-            let character = await AsyncStorage.getItem('character');
-            let characters = await AsyncStorage.getItem('characters');
-
-            character = JSON.parse(character);
-            characters = JSON.parse(characters);
-
-            character = null;
-
-            for (let char of Object.values(characters)) {
-                if (char !== null && char.filename !== filename) {
-                    character = char;
-                    break;
-                }
+            if (saveCharacters) {
+                await this.saveCharacterData(character, characters);
             }
 
             let toBeRemoved = null;
@@ -181,19 +165,30 @@ class Persistence {
             }
 
             if (toBeRemoved !== null) {
+                if (character.filename === filename) {
+                    character = null;
+
+                    for (let char of Object.values(characters)) {
+                        if (char !== null && char.filename !== filename) {
+                            character = char;
+                            break;
+                        }
+                    }
+                }
+
                 characters[toBeRemoved] = null;
+
+                await AsyncStorage.setItem('character', JSON.stringify(character));
+                await AsyncStorage.setItem('characters', JSON.stringify(characters));
             }
-
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-            await AsyncStorage.setItem('characters', JSON.stringify(characters));
-
-            characterData.character = character;
-            characterData.characters = characters;
         } catch (error) {
             common.toast('Unable to clear persisted character');
         }
 
-        return characterData;
+        return {
+            character: character,
+            characters: characters,
+        };
     }
 
     async clearCharacterData() {

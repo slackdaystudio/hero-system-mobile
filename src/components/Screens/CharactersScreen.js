@@ -34,6 +34,7 @@ class CharactersScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
+        characters: PropTypes.object,
         setCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
     }
@@ -183,8 +184,8 @@ class CharactersScreen extends Component {
 
     _onDeleteDialogOk() {
         file.deleteCharacter(this.state.toBeDeleted).then(() => {
-            if (!common.isEmptyObject(this.props.character) && this.props.character.filename === this.state.toBeDeleted) {
-                this.props.clearCharacter(this.state.toBeDeleted);
+            if (!common.isEmptyObject(this.props.character)) {
+                this.props.clearCharacter(this.state.toBeDeleted, this.props.character, this.props.characters, false);
             }
 
             this._onDeleteDialogClose();
@@ -297,7 +298,8 @@ class CharactersScreen extends Component {
 
 const mapStateToProps = state => {
     return {
-        character: state.character.character
+        character: state.character.character,
+        characters: state.character.characters,
     };
 };
 

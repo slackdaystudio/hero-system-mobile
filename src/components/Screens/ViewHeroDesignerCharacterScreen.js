@@ -17,7 +17,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setShowSecondary, selectCharacter, setSparseCombatDetails, usePhase, updateNotes, emptyCharacterSlot } from '../../reducers/character';
+import { setShowSecondary, selectCharacter, setSparseCombatDetails, usePhase, updateNotes, clearCharacter } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -44,7 +44,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
         usePhase: PropTypes.func.isRequired,
         updateNotes: PropTypes.func.isRequired,
         selectCharacter: PropTypes.func.isRequired,
-        emptyCharacterSlot: PropTypes.func.isRequired,
+        clearCharacter: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -234,7 +234,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     character={this.props.character}
                     characters={this.props.characters}
                     selectCharacter={this.props.selectCharacter}
-                    emptyCharacterSlot={this.props.emptyCharacterSlot}
+                    clearCharacter={this.props.clearCharacter}
                 />
             </Container>
         );
@@ -256,7 +256,7 @@ const mapDispatchToProps = {
     setSparseCombatDetails,
     usePhase,
     updateNotes,
-    emptyCharacterSlot,
+    clearCharacter,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);

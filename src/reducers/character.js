@@ -34,8 +34,6 @@ export const CLEAR_CHARACTER_DATA = 'CLEAR_CHARACTER_DATA';
 
 export const SELECT_CHARACTER = 'SELECT_CHARACTER';
 
-export const EMPTY_CHARACTER_SLOT = 'EMPTY_CHARACTER_SLOT';
-
 export const SET_COMBAT_DETAILS = 'SET_COMBAT_DETAILS';
 
 export const SET_SPARSE_COMBAT_DETAILS = 'SET_SPARSE_COMBAT_DETAILS';
@@ -66,9 +64,9 @@ export function setShowSecondary(showSecondary) {
     };
 }
 
-export function clearCharacter(filename) {
+export function clearCharacter(filename, character, characters, saveCharacter) {
     return async (dispatch) => {
-        persistence.clearCharacter(filename).then((characterData) => {
+        persistence.clearCharacter(filename, character, characters, saveCharacter).then((characterData) => {
             dispatch({
                 type: CLEAR_CHARACTER,
                 payload: characterData,
@@ -92,13 +90,6 @@ export function selectCharacter(character) {
     return {
         type: SELECT_CHARACTER,
         payload: character,
-    };
-}
-
-export function emptyCharacterSlot(slot) {
-    return {
-        type: EMPTY_CHARACTER_SLOT,
-        payload: slot,
     };
 }
 
@@ -147,6 +138,7 @@ export default function character(state = characterState, action) {
 
     switch (action.type) {
         case SET_CHARACTER:
+        case CLEAR_CHARACTER:
             newState = {
                 ...state,
                 character: {
@@ -157,8 +149,8 @@ export default function character(state = characterState, action) {
                 }
             };
 
-            newState.character = action.payload.character;
-            newState.characters = action.payload.characters;
+            newState.character = {...action.payload.character};
+            newState.characters = {...action.payload.characters};
 
             return newState;
         case INITIALIZE_CHARACTER:
@@ -192,21 +184,6 @@ export default function character(state = characterState, action) {
             };
 
             newState.character.showSecondary = action.payload;
-
-            return newState;
-        case CLEAR_CHARACTER:
-            newState = {
-                ...state,
-                character: {
-                    ...state.character,
-                },
-                characters: {
-                    ...state.characters,
-                },
-            };
-
-            newState.character = action.payload.character;
-            newState.characters = action.payload.characters;
 
             return newState;
         case CLEAR_CHARACTER_DATA:
@@ -311,20 +288,6 @@ export default function character(state = characterState, action) {
             };
 
             newState.character.notes = action.payload;
-
-            return newState;
-        case EMPTY_CHARACTER_SLOT:
-            newState = {
-                ...action.payload,
-                character: {
-                    ...state.character,
-                },
-                characters: {
-                    ...state.characters
-                }
-            };
-
-            newState.characters[action.payload] = null;
 
             return newState;
         default:

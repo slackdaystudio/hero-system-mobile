@@ -14,7 +14,7 @@ export default class HeroDesignerCharacterFooter extends Component {
         character: PropTypes.object,
         characters: PropTypes.object.isRequired,
         selectCharacter: PropTypes.func.isRequired,
-        emptyCharacterSlot: PropTypes.func.isRequired,
+        clearCharacter: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -90,7 +90,7 @@ export default class HeroDesignerCharacterFooter extends Component {
     }
 
     _onDeleteDialogOk() {
-        this.props.emptyCharacterSlot(this.state.selectedSlot);
+        this.props.clearCharacter(this.props.characters[this.state.selectedSlot].filename, this.props.character, this.props.characters);
 
         this._onDeleteDialogClose();
     }
@@ -111,7 +111,7 @@ export default class HeroDesignerCharacterFooter extends Component {
                                 onPress={() => this._activateSlot(slot.toString())}
                                 onLongPress={() => this._emptySlot(slot.toString())}
                             >
-                                <Icon type='FontAwesome' name={this._getIcon(slot)} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
+                                <Icon type='FontAwesome' name={this._getIcon(slot.toString())} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
                             </Button>
                         );
                     })}

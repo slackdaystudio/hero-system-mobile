@@ -18,7 +18,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setSparseCombatDetails, selectCharacter, emptyCharacterSlot } from '../../reducers/character';
+import { setSparseCombatDetails, selectCharacter, clearCharacter } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -42,7 +42,7 @@ class ViewCharacterScreen extends Component {
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         selectCharacter: PropTypes.func.isRequired,
-        emptyCharacterSlot: PropTypes.func.isRequired,
+        clearCharacter: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -190,7 +190,7 @@ class ViewCharacterScreen extends Component {
                     character={this.props.character}
                     characters={this.props.characters}
                     selectCharacter={this.props.selectCharacter}
-                    emptyCharacterSlot={this.props.emptyCharacterSlot}
+                    clearCharacter={this.props.clearCharacter}
                 />
             </Container>
         );
@@ -215,7 +215,7 @@ const mapDispatchToProps = {
     updateForm,
     setSparseCombatDetails,
     selectCharacter,
-    emptyCharacterSlot,
+    clearCharacter,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewCharacterScreen);
