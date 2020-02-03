@@ -13,11 +13,12 @@ import TextList from '../Character/TextList';
 import Equipment from '../Character/Equipment';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
+import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setSparseCombatDetails } from '../../reducers/character';
+import { setSparseCombatDetails, selectCharacter, emptyCharacterSlot } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -37,8 +38,11 @@ class ViewCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
+        characters: PropTypes.object,
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
+        selectCharacter: PropTypes.func.isRequired,
+        emptyCharacterSlot: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -181,6 +185,13 @@ class ViewCharacterScreen extends Component {
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
                     {this._renderCharacter()}
                 </Content>
+                <HeroDesignerCharacterFooter
+                    navigation={this.props.navigation}
+                    character={this.props.character}
+                    characters={this.props.characters}
+                    selectCharacter={this.props.selectCharacter}
+                    emptyCharacterSlot={this.props.emptyCharacterSlot}
+                />
             </Container>
         );
     }
@@ -196,12 +207,15 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         character: state.character.character,
+        characters: state.character.characters,
     };
 };
 
 const mapDispatchToProps = {
     updateForm,
     setSparseCombatDetails,
+    selectCharacter,
+    emptyCharacterSlot,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewCharacterScreen);

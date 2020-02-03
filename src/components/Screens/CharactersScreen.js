@@ -2,9 +2,9 @@ import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { BackHandler, Alert, View, ImageBackground } from 'react-native';
-import { Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon } from 'native-base';
+import { Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon, Picker, Item } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
-import { verticalScale } from 'react-native-size-matters';
+import { scale, verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
@@ -14,6 +14,7 @@ import { common } from '../../lib/Common';
 import { combatDetails } from '../../lib/CombatDetails';
 import styles from '../../Styles';
 import { setCharacter, clearCharacter } from '../../reducers/character';
+import { MAX_CHARACTER_SLOTS } from '../../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -45,7 +46,14 @@ class CharactersScreen extends Component {
             characterLoading: false,
             deleteDialogVisible: false,
             toBeDeleted: null,
+            slot: 0,
         };
+
+        this.slots = [];
+
+        for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+            this.slots.push(i);
+        }
 
         this.startLoad = this._startLoad.bind(this);
         this.endLoad = this._endLoad.bind(this);
@@ -53,20 +61,39 @@ class CharactersScreen extends Component {
         this.openDeleteDialog = this._openDeleteDialog.bind(this);
         this.onDeleteDialogOk = this._onDeleteDialogOk.bind(this);
         this.onDeleteDialogClose = this._onDeleteDialogClose.bind(this);
+        this.updateSlot = this._updateSlot.bind(this);
     }
 
     onDidFocus() {
         this._refreshCharacters();
 
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
+            this.props.navigation.navigate(this._getBackScreen());
 
             return true;
         });
+
+        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('slot')) {
+            this.setState({slot: this.props.navigation.state.params.slot});
+        }
     }
 
     onDidBlur() {
         this.backHandler.remove();
+    }
+
+    _getBackScreen() {
+        let backScreen = 'Home';
+
+        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
+            backScreen = this.props.navigation.state.params.from;
+        }
+
+        return backScreen;
+    }
+
+    _updateSlot(slot) {
+        this.setState({slot: slot});
     }
 
     _refreshCharacters() {
@@ -120,7 +147,7 @@ class CharactersScreen extends Component {
                 char.combatDetails = combatDetails.init(char);
             }
 
-            this.props.setCharacter(char);
+            this.props.setCharacter(char, this.state.slot.toString());
 
             this._goToCharacterScreen(char);
         });
@@ -157,7 +184,7 @@ class CharactersScreen extends Component {
     _onDeleteDialogOk() {
         file.deleteCharacter(this.state.toBeDeleted).then(() => {
             if (!common.isEmptyObject(this.props.character) && this.props.character.filename === this.state.toBeDeleted) {
-                this.props.clearCharacter();
+                this.props.clearCharacter(this.state.toBeDeleted);
             }
 
             this._onDeleteDialogClose();
@@ -186,6 +213,25 @@ class CharactersScreen extends Component {
 
         return (
             <Fragment>
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: scale(300), alignSelf: 'center'}}>
+                    <View style={{flex: 1}}>
+                        <Text style={styles.grey}>Load character into: </Text>
+                    </View>
+                    <View style={{flex: 1}}>
+                        <Picker
+                            style={{width: undefined, color: '#FFFFFF'}}
+                            textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
+                            iosHeader="Select one"
+                            mode="dropdown"
+                            selectedValue={this.state.slot}
+                            onValueChange={(value) => this.updateSlot(value)}
+                        >
+                            {this.slots.map((slot, index) => {
+                                return <Item key={'slot-' + slot} label={`Slot ${slot + 1}`} value={slot} />
+                            })}
+                        </Picker>
+                    </View>
+                </View>
                 <List>
                     {this.state.characters.map((characterName, index) => {
                         name = characterName.slice(0, -5);
