@@ -65,6 +65,20 @@ export default class HeroDesignerCharacterFooter extends Component {
         return '#000';
     }
 
+    _getFooterButtonStyle(slot) {
+        if (this._isSlotFilled(slot) && this._isCharacterSelected(slot)) {
+            return {
+                backgroundColor: '#121212',
+                borderWidth: 1,
+                borderColor: '#303030',
+            };
+        }
+
+        return {
+            backgroundColor: '#000',
+        };
+    }
+
     _getIcon(slot) {
         if (this._isSlotFilled(slot)) {
             return 'user';
@@ -107,7 +121,7 @@ export default class HeroDesignerCharacterFooter extends Component {
                         return (
                             <Button
                                 key={'character-' + slot}
-                                style={{backgroundColor: this._getBackgroundColor(slot.toString())}}
+                                style={this._getFooterButtonStyle(slot.toString())}
                                 onPress={() => this._activateSlot(slot.toString())}
                                 onLongPress={() => this._emptySlot(slot.toString())}
                             >
