@@ -57,14 +57,6 @@ export default class HeroDesignerCharacterFooter extends Component {
         return this.props.characters[slot] !== null;
     }
 
-    _getBackgroundColor(slot) {
-        if (this._isSlotFilled(slot) && this._isCharacterSelected(slot)) {
-            return '#121212';
-        }
-
-        return '#000';
-    }
-
     _getFooterButtonStyle(slot) {
         if (this._isSlotFilled(slot) && this._isCharacterSelected(slot)) {
             return {
