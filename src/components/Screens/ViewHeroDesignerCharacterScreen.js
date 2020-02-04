@@ -12,11 +12,12 @@ import Traits from '../HeroDesignerCharacter/Traits';
 import Notes from '../HeroDesignerCharacter/Notes';
 import Header from '../Header/Header';
 import Slider from '../Slider/Slider';
+import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateForm } from '../../reducers/forms';
-import { setShowSecondary, setSparseCombatDetails, usePhase, updateNotes } from '../../reducers/character';
+import { setShowSecondary, selectCharacter, setSparseCombatDetails, usePhase, updateNotes, clearCharacter } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -36,12 +37,14 @@ class ViewHeroDesignerCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
-        combatDetails: PropTypes.object.isRequired,
+        characters: PropTypes.object,
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
         updateNotes: PropTypes.func.isRequired,
+        selectCharacter: PropTypes.func.isRequired,
+        clearCharacter: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -181,7 +184,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         <Combat
                             navigation={this.props.navigation}
                             character={this.props.character}
-                            combatDetails={this.props.combatDetails}
+                            combatDetails={this.props.character.combatDetails}
                             setSparseCombatDetails={this.props.setSparseCombatDetails}
                             forms={this.props.forms}
                             updateForm={this.props.updateForm}
@@ -226,6 +229,13 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 <Content scrollEnable={false} style={styles.content}>
                     {this._renderCharacter()}
                 </Content>
+                <HeroDesignerCharacterFooter
+                    navigation={this.props.navigation}
+                    character={this.props.character}
+                    characters={this.props.characters}
+                    selectCharacter={this.props.selectCharacter}
+                    clearCharacter={this.props.clearCharacter}
+                />
             </Container>
         );
     }
@@ -234,6 +244,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 const mapStateToProps = state => {
     return {
         character: state.character.character,
+        characters: state.character.characters,
         forms: state.forms,
     };
 };
@@ -241,9 +252,11 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     updateForm,
     setShowSecondary,
+    selectCharacter,
     setSparseCombatDetails,
     usePhase,
     updateNotes,
+    clearCharacter,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);

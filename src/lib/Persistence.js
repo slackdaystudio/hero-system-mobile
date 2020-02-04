@@ -21,11 +21,13 @@ import speedTable from '../../public/speed.json';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const MAX_CHARACTER_SLOTS = 5;
+
 class Persistence {
     async initializeApplication() {
         let settings = await this.initializeApplicationSettings();
         let statistics = await this.initializeStatistics();
-        let character = await this.getCharacter();
+        let character = await this.initializeCharacter();
         let randomHero = await this.initializeRandomHero();
 
         return {
@@ -68,33 +70,131 @@ class Persistence {
         common.toast('All caches have been cleared');
     }
 
-    async saveCharacter(character) {
+    async saveCharacter(character, slot) {
+        let characters = null;
+
         try {
             await AsyncStorage.setItem('character', JSON.stringify(character));
 
             await file.saveCharacter(character, character.filename.slice(0, -5));
+
+            characters = await AsyncStorage.getItem('characters');
+
+            if (characters === null) {
+                characters = this._initializeCharacters();
+
+                characters[slot] = character;
+            } else {
+                characters = JSON.parse(characters);
+
+                characters[slot] = character;
+            }
+
+            await AsyncStorage.setItem('characters', JSON.stringify(characters));
         } catch (error) {
             common.toast('Unable to persist statistics');
         }
 
-        return character;
+        return {
+            character: character,
+            characters: characters,
+        };
     }
 
-    async getCharacter() {
-        let character = null;
+    async saveCharacterData(character, characters) {
+        try {
+            for (let char of Object.values(characters)) {
+                if (char !== null) {
+                    await file.saveCharacter(char, char.filename.slice(0, -5));
+                }
+            }
+
+            await AsyncStorage.setItem('character', JSON.stringify(character));
+            await AsyncStorage.setItem('characters', JSON.stringify(characters));
+        } catch (error) {
+            common.toast('Unable to persist character data');
+        }
+    }
+
+    async initializeCharacter() {
+        let characterData = {
+            character: null,
+            characters: this._initializeCharacters(),
+        }
 
         try {
+            let character = null;
+            let characters = this._initializeCharacters();
+
             character = await AsyncStorage.getItem('character');
+
+            if (character !== null) {
+                characterData.character = JSON.parse(character);
+            }
+
+            characters = await AsyncStorage.getItem('characters');
+
+            if (characters === null) {
+                if (character !== null) {
+                    // Do not change, we want the object ref
+                    characterData.characters['0'] = characterData.character;
+                }
+            } else {
+                characterData.characters = JSON.parse(characters);
+            }
         } catch (error) {
             common.toast('Unable to retrieve persisted character');
         }
 
-        return character === null ? null : JSON.parse(character);
+        return characterData;
     }
 
-    async clearCharacter() {
+    async clearCharacter(filename, character, characters, saveCharacters = true) {
+        try {
+            if (saveCharacters) {
+                await this.saveCharacterData(character, characters);
+            }
+
+            let toBeRemoved = null;
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                if (characters[i.toString()] !== null && characters[i.toString()].filename === filename) {
+                    toBeRemoved = i.toString();
+                    break;
+                }
+            }
+
+            if (toBeRemoved !== null) {
+                if (character.filename === filename) {
+                    character = null;
+
+                    for (let char of Object.values(characters)) {
+                        if (char !== null && char.filename !== filename) {
+                            character = char;
+                            break;
+                        }
+                    }
+                }
+
+                characters[toBeRemoved] = null;
+
+                await AsyncStorage.setItem('character', JSON.stringify(character));
+                await AsyncStorage.setItem('characters', JSON.stringify(characters));
+            }
+        } catch (error) {
+            common.toast('Unable to clear persisted character');
+        }
+
+        return {
+            character: character,
+            characters: characters,
+        };
+    }
+
+    async clearCharacterData() {
         try {
             await AsyncStorage.removeItem('character');
+            await AsyncStorage.removeItem('characters');
         } catch (error) {
             common.toast('Unable to clear persisted character');
         }
@@ -290,6 +390,16 @@ class Persistence {
         }
 
         return statistics;
+    }
+
+    _initializeCharacters() {
+        let characters = {};
+
+        for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+            characters[i.toString()] = null;
+        }
+
+        return characters;
     }
 
     _populateMissingSetttings(settings) {

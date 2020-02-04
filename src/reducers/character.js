@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 import { common } from '../lib/Common';
-import { persistence } from '../lib/Persistence';
+import { persistence, MAX_CHARACTER_SLOTS } from '../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -30,6 +30,10 @@ export const SET_SHOW_SECONDARY = 'SET_SHOW_SECONDARY';
 
 export const CLEAR_CHARACTER = 'CLEAR_CHARACTER';
 
+export const CLEAR_CHARACTER_DATA = 'CLEAR_CHARACTER_DATA';
+
+export const SELECT_CHARACTER = 'SELECT_CHARACTER';
+
 export const SET_COMBAT_DETAILS = 'SET_COMBAT_DETAILS';
 
 export const SET_SPARSE_COMBAT_DETAILS = 'SET_SPARSE_COMBAT_DETAILS';
@@ -42,12 +46,12 @@ export const UPDATE_NOTES = 'UPDATE_NOTES';
 // ACTIONS                  //
 //////////////////////////////
 
-export function setCharacter(character) {
+export function setCharacter(character, slot) {
     return async (dispatch) => {
-        persistence.saveCharacter(character).then(char => {
+        persistence.saveCharacter(character, slot).then(characterData => {
             dispatch({
                 type: SET_CHARACTER,
-                payload: char,
+                payload: characterData,
             });
         });
     };
@@ -60,14 +64,32 @@ export function setShowSecondary(showSecondary) {
     };
 }
 
-export function clearCharacter() {
+export function clearCharacter(filename, character, characters, saveCharacter) {
     return async (dispatch) => {
-        persistence.clearCharacter().then(() => {
+        persistence.clearCharacter(filename, character, characters, saveCharacter).then((characterData) => {
             dispatch({
                 type: CLEAR_CHARACTER,
+                payload: characterData,
+            });
+        });
+    };
+}
+
+export function clearCharacterData() {
+    return async (dispatch) => {
+        persistence.clearCharacterData().then(() => {
+            dispatch({
+                type: CLEAR_CHARACTER_DATA,
                 payload: null,
             });
         });
+    };
+}
+
+export function selectCharacter(character) {
+    return {
+        type: SELECT_CHARACTER,
+        payload: character,
     };
 }
 
@@ -108,7 +130,7 @@ export function updateNotes(notes) {
 
 let characterState = {
     character: null,
-    showSecondary: true,
+    characters: [],
 };
 
 export default function character(state = characterState, action) {
@@ -116,14 +138,19 @@ export default function character(state = characterState, action) {
 
     switch (action.type) {
         case SET_CHARACTER:
+        case CLEAR_CHARACTER:
             newState = {
                 ...state,
                 character: {
                     ...state.character,
                 },
+                characters: {
+                    ...state.characters
+                }
             };
 
-            newState.character = action.payload;
+            newState.character = {...action.payload.character};
+            newState.characters = {...action.payload.characters};
 
             return newState;
         case INITIALIZE_CHARACTER:
@@ -132,17 +159,18 @@ export default function character(state = characterState, action) {
             }
 
             newState = {
-                ...state,
+                ...action.payload,
                 character: {
-                    ...state.character,
+                    ...action.payload.character,
                 },
+                characters: {
+                    ...action.payload.characters
+                }
             };
-
-            newState.character = action.payload;
 
             return newState;
         case SAVE_CACHED_CHARACTER:
-            persistence.saveCharacter(state.character).then(() => {
+            persistence.saveCharacterData(state.character, state.characters).then(() => {
                 console.log('Saved cached characters');
             });
 
@@ -158,15 +186,44 @@ export default function character(state = characterState, action) {
             newState.character.showSecondary = action.payload;
 
             return newState;
-        case CLEAR_CHARACTER:
+        case CLEAR_CHARACTER_DATA:
             newState = {
                 ...state,
                 character: {
                     ...state.character,
                 },
+                characters: {
+                    ...state.characters
+                },
             };
 
             newState.character = null;
+            newState.characters = {};
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                newState.characters[i.toString()] = null;
+            }
+
+            return newState;
+        case SELECT_CHARACTER:
+            newState = {
+                ...state,
+                character: {
+                    ...state.character,
+                },
+                characters: {
+                    ...state.characters
+                },
+            };
+
+            for (let [k, v] of Object.entries(newState.characters)) {
+                if (v !== null && v.filename === newState.character.filename) {
+                    newState.characters[k] = {...newState.character};
+                    break;
+                }
+            }
+
+            newState.character = {...action.payload};
 
             return newState;
         case SET_COMBAT_DETAILS:

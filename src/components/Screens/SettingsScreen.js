@@ -13,7 +13,7 @@ import { common } from '../../lib/Common';
 import { persistence } from '../../lib/Persistence';
 import styles from '../../Styles';
 import { resetForm } from '../../reducers/forms';
-import { clearCharacter } from '../../reducers/character';
+import { clearCharacterData } from '../../reducers/character';
 import { clearRandomHero } from '../../reducers/randomHero';
 import { clearApplicationSettings, toggleSetting } from '../../reducers/settings';
 import { clearStatistics } from '../../reducers/statistics';
@@ -38,7 +38,7 @@ class SettingsScreen extends Component {
         settings: PropTypes.object.isRequired,
         version: PropTypes.string.isRequired,
         resetForm: PropTypes.func.isRequired,
-        clearCharacter: PropTypes.func.isRequired,
+        clearCharacterData: PropTypes.func.isRequired,
         clearRandomHero: PropTypes.func.isRequired,
         clearStatistics: PropTypes.func.isRequired,
         clearApplicationSettings: PropTypes.func.isRequired,
@@ -69,10 +69,10 @@ class SettingsScreen extends Component {
     }
 
     _clearCharacterData(showToast = true) {
-        this.props.clearCharacter();
+        this.props.clearCharacterData();
 
         if (showToast) {
-            common.toast('Loaded character has been cleared');
+            common.toast('Loaded characters have been cleared');
         }
     }
 
@@ -186,7 +186,7 @@ class SettingsScreen extends Component {
                         </ListItem>
                         <ListItem noIndent>
                             <Left>
-                                <Text style={styles.boldGrey}>Loaded character</Text>
+                                <Text style={styles.boldGrey}>Loaded characters</Text>
                             </Left>
                             <Right>
                                 <Button style={styles.buttonSmall} onPress={() => this._clearCharacterData()}>
@@ -237,7 +237,7 @@ const mapDispatchToProps = {
     clearApplicationSettings,
     toggleSetting,
     resetForm,
-    clearCharacter,
+    clearCharacterData,
     clearRandomHero,
     clearStatistics,
 };
