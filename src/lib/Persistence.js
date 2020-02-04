@@ -103,9 +103,9 @@ class Persistence {
 
     async saveCharacterData(character, characters) {
         try {
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null) {
-                    await file.saveCharacter(characters[i.toString()], characters[i.toString()].filename.slice(0, -5));
+            for (let char of Object.values(characters)) {
+                if (char !== null) {
+                    await file.saveCharacter(char, char.filename.slice(0, -5));
                 }
             }
 

@@ -206,9 +206,24 @@ export default function character(state = characterState, action) {
 
             return newState;
         case SELECT_CHARACTER:
-            newState = {...state};
+            newState = {
+                ...state,
+                character: {
+                    ...state.character,
+                },
+                characters: {
+                    ...state.characters
+                },
+            };
 
-            newState.character = action.payload;
+            for (let [k, v] of Object.entries(newState.characters)) {
+                if (v !== null && v.filename === newState.character.filename) {
+                    newState.characters[k] = {...newState.character};
+                    break;
+                }
+            }
+
+            newState.character = {...action.payload};
 
             return newState;
         case SET_COMBAT_DETAILS:
