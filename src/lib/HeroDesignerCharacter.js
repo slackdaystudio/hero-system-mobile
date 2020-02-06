@@ -348,30 +348,30 @@ class HeroDesignerCharacter {
                 switch(characteristic.shortName.toUpperCase()) {
                     case 'PD':
                         total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
-                        value = characteristic.base + characteristic.levels + total;
+                        value += total;
                         break;
                     case 'ED':
                         total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
-                        value = characteristic.base + characteristic.levels + total;
+                        value += total;
                         break;
                     case 'SPD':
                         total = this.getAdditionalCharacteristicPoints('DEX', character) / 10;
-                        value = Math.floor(characteristic.base + characteristic.levels + total);
+                        value += Math.floor(total);
                         break;
                     case 'REC':
                         total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
                         total += common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
-                        value = characteristic.base + characteristic.levels + total;
+                        value += total;
                         break;
                     case 'END':
                         total = this.getAdditionalCharacteristicPoints('CON', character) * 2;
-                        value = characteristic.base + characteristic.levels + total;
+                        value += total;
                         break;
                     case 'STUN':
                         total = this.getAdditionalCharacteristicPoints('BODY', character);
                         total += this.getAdditionalCharacteristicPoints('STR', character) / 2;
                         total += this.getAdditionalCharacteristicPoints('CON', character) / 2;
-                        value = characteristic.base + characteristic.levels + total;
+                        value += total;
                         break;
                 }
             }
@@ -602,9 +602,6 @@ class HeroDesignerCharacter {
                 definition: definition,
                 roll: roll,
                 ncm: null,
-                levels: characteristic.levels,
-                levelValue: templateCharacteristic.lvlval,
-                costPerLevel: templateCharacteristic.lvlcost,
             };
 
             if (type === TYPE_MOVEMENT) {
@@ -674,9 +671,12 @@ class HeroDesignerCharacter {
                 break;
             case 'LEAPING':
                 bonus = this.getCharacteristicBaseValue('STR', character) / 5;
+                let fractionalPart = parseFloat((bonus % 1).toFixed(1));
 
-                if (bonus.toFixed(1) >= '0.6') {
+                if (fractionalPart >= 0.6) {
                     bonus = Math.trunc(bonus) + 0.5;
+                } else {
+                    bonus = Math.trunc(bonus);
                 }
 
                 value += bonus;
