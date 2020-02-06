@@ -92,12 +92,15 @@ const CHARACTER_TRAITS = {
     'equipment': 'powers',
 };
 
+const FIGURED_CHARACTERISTCS = ['PD', 'ED', 'SPD', 'REC', 'END', 'STUN'];
+
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
         const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
 
         let character = {
             version: heroDesignerCharacter.version,
+            template: template.baseTemplateName,
             characterInfo: heroDesignerCharacter.characterInfo,
             characteristics: [],
             movement: [],
@@ -141,6 +144,14 @@ class HeroDesignerCharacter {
         // }
 
         return character;
+    }
+
+    isFifth(character) {
+        if (character.characteristics[0].definition.startsWith('(Hero System Fifth Edition')) {
+            return true;
+        }
+
+        return false;
     }
 
     isCharacteristic(item) {
@@ -261,6 +272,12 @@ class HeroDesignerCharacter {
         }
 
         return characteristic;
+    }
+
+    getCharacteristicBaseValue(shortName, character) {
+        let characteristic = this.getCharacteristicByShortName(shortName, character);
+
+        return characteristic === null ? 0 : characteristic.value;
     }
 
     getCharacteristicTotal(shortName, character) {
@@ -510,18 +527,9 @@ class HeroDesignerCharacter {
             type = CHARACTERISTIC_NAMES.hasOwnProperty(key.toLowerCase()) ? TYPE_CHARACTERISTIC : TYPE_MOVEMENT;
             templateCharacteristic = template.characteristics[key.toLowerCase()];
             name = type === TYPE_CHARACTERISTIC ? CHARACTERISTIC_NAMES[key.toLowerCase()] : BASE_MOVEMENT_MODES[key.toLowerCase()];
-            definition = templateCharacteristic.definition;
-            roll = false;
+            let { definition, roll, value, cost, base } = this._getCharacteristicFields(characteristic, templateCharacteristic, character);
 
-            if (templateCharacteristic.lvlval > 1) {
-                value = characteristic.levels + templateCharacteristic.base;
-                cost = Math.round((value - templateCharacteristic.base) / templateCharacteristic.lvlval);
-            } else {
-                value = characteristic.levels * templateCharacteristic.lvlval + templateCharacteristic.base;
-                cost = templateCharacteristic.lvlcost * characteristic.levels;
-            }
-
-            if (templateCharacteristic.base === 10 && name.toLowerCase() !== 'body') {
+            if (base === 10 && name.toLowerCase() !== 'body') {
                 roll = true;
             }
 
@@ -535,7 +543,7 @@ class HeroDesignerCharacter {
                 shortName: characteristic.alias,
                 value: value,
                 cost: cost,
-                base: templateCharacteristic.base,
+                base: base,
                 definition: definition,
                 roll: roll,
                 ncm: null,
@@ -549,6 +557,74 @@ class HeroDesignerCharacter {
                 character.characteristics.push(formattedCharacteristic);
             }
         }
+    }
+
+    _getCharacteristicFields(characteristic, templateCharacteristic, character) {
+        if (templateCharacteristic.definition !== null && templateCharacteristic.definition.startsWith('(Hero System Fifth Edition')) {
+            return this._updateCharacteristic(characteristic, templateCharacteristic, character);
+        }
+
+        return {
+            definition: templateCharacteristic.definition,
+            roll: false,
+            value: characteristic.levels + templateCharacteristic.base,
+            cost: Math.round(characteristic.levels / templateCharacteristic.lvlval * templateCharacteristic.lvlcost),
+            base: templateCharacteristic.base,
+        };
+    }
+
+    _updateCharacteristic(characteristic, templateCharacteristic, character) {
+        let bonus = 0;
+        let value = characteristic.levels + templateCharacteristic.base;
+        let cost = Math.round(characteristic.levels / templateCharacteristic.lvlval * templateCharacteristic.lvlcost);
+        let base = templateCharacteristic.base;
+
+        switch(characteristic.alias.toUpperCase()) {
+            case 'PD':
+                bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('STR', character) / 5);
+                value += bonus;
+                base += bonus;
+                break;
+            case 'ED':
+                bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('CON', character) / 5);
+                value += bonus;
+                base += bonus;
+                break;
+            case 'SPD':
+                bonus = 1 + parseFloat((this.getCharacteristicBaseValue('DEX', character) / 10), 1);
+                value += Math.floor(bonus) - 1;
+                base = bonus;
+                cost = value * 10 - bonus * 10;
+                break;
+            case 'REC':
+                bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('STR', character) / 5);
+                bonus += common.roundInPlayersFavor(this.getCharacteristicBaseValue('CON', character) / 5);
+                value += bonus;
+                base += bonus;
+                break;
+            case 'END':
+                bonus = this.getCharacteristicBaseValue('CON', character) * 2;
+                value += bonus;
+                base += bonus;
+                break;
+            case 'STUN':
+                bonus = this.getCharacteristicBaseValue('BODY', character);
+                bonus += this.getCharacteristicBaseValue('STR', character) / 2;
+                bonus += this.getCharacteristicBaseValue('CON', character) / 2;
+                value += Math.round(bonus);
+                base += Math.round(bonus);
+                break;
+            default:
+                // do nothing
+        }
+
+        return {
+            definition: templateCharacteristic.definition,
+            roll: false,
+            value: value,
+            cost: cost,
+            base: base,
+        };
     }
 
     _getCharacteristicNcm(templateCharacteristic) {
