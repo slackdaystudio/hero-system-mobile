@@ -214,6 +214,10 @@ class HeroDesignerCharacter {
         let characteristic = this.getCharacteristicByShortName(type, character);
         let showSecondary = character.showSecondary;
 
+        if (powersMap.has('ARMOR')) {
+            resistant = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), powersMap.get('ARMOR'), resistant, showSecondary);
+        }
+
         if (powersMap.has('FORCEFIELD')) {
             resistant = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), powersMap.get('FORCEFIELD'), resistant, showSecondary);
         }
@@ -261,8 +265,8 @@ class HeroDesignerCharacter {
         }
 
         if (powersMap.has('FORCEFIELD')) {
-            nonResistant += powersMap.get('FORCEFIELD').mdlevels;
-            resistant += powersMap.get('FORCEFIELD').mdlevels;
+            nonResistant += powersMap.get('FORCEFIELD').mdlevels || 0;
+            resistant += powersMap.get('FORCEFIELD').mdlevels || 0;
         }
 
         if (powersMap.has('COMPOUNDPOWER')) {
@@ -327,6 +331,10 @@ class HeroDesignerCharacter {
 
         if (powersMap.has(characteristic.shortName.toUpperCase())) {
             value = this._getTotalCharacteristicPoints(powersMap.get(characteristic.shortName.toUpperCase()), value, showSecondary);
+        }
+
+        if (powersMap.has('ARMOR')) {
+            value = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), powersMap.get('ARMOR'), value, showSecondary);
         }
 
         if (powersMap.has('DENSITYINCREASE')) {
@@ -420,10 +428,34 @@ class HeroDesignerCharacter {
         return value;
     }
 
+    _getTotalArmorDefenseIncrease(type, resistantDefence, value, showSecondary) {
+        if (Array.isArray(resistantDefence)) {
+            for (let rd of resistantDefence) {
+                value += this._getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
+            }
+        } else {
+            if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                 (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
+                switch (type.toUpperCase()) {
+                    case 'PD':
+                        value += resistantDefence.pdlevels;
+                        break;
+                    case 'ED':
+                        value += resistantDefence.edlevels;
+                        break;
+                    default:
+                         // Do nothing
+                }
+            }
+        }
+
+        return value;
+    }
+
     _getTotalResistantDefensesIncrease(type, resistantDefence, value, showSecondary) {
         if (Array.isArray(resistantDefence)) {
             for (let rd of resistantDefence) {
-                value += this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
+                value = this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
             }
         } else {
             if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
@@ -466,6 +498,8 @@ class HeroDesignerCharacter {
                         value = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), cp, value, showSecondary);
                     } else if (cp.xmlid.toUpperCase() === 'DENSITYINCREASE') {
                         value = this._getTotalDensityIncreaseCharacteristcs(characteristic, cp, value, showSecondary);
+                    } else if (cp.xmlid.toUpperCase() === 'ARMOR') {
+                        value = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), cp, value, showSecondary);
                     }
                 }
             } else {
@@ -477,6 +511,8 @@ class HeroDesignerCharacter {
                     value = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), power, value, showSecondary);
                 } else if (power.xmlid.toUpperCase() === 'DENSITYINCREASE') {
                     value = this._getTotalDensityIncreaseCharacteristcs(characteristic, power, value, showSecondary);
+                } else if (power.xmlid.toUpperCase() === 'ARMOR') {
+                    value = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), power, value, showSecondary);
                 }
             }
         }
@@ -509,14 +545,14 @@ class HeroDesignerCharacter {
                     value += power.levels;
                 }
             }
-        } else if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+        } else if (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR') {
             if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
                 if (id.toUpperCase() === 'PD' || id.toUpperCase() === 'ED') {
                     value += power[`${id.toLowerCase()}levels`];
                 } else if (id.toUpperCase() === 'MENTALDEFENSE') {
-                    value += power.mdlevels;
+                    value += power.mdlevels || 0;
                 } else if (id.toUpperCase() === 'POWERDEFENSE') {
-                    value += power.powdlevels;
+                    value += power.powdlevels || 0;
                 }
             }
         } else if (power.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
@@ -549,7 +585,7 @@ class HeroDesignerCharacter {
     }
 
     _isResistent(power) {
-        if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+        if (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR') {
             return true;
         }
 

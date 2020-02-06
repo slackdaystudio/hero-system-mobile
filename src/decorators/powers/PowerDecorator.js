@@ -1,4 +1,5 @@
 import Absorption from './Absorption';
+import Armor from './Armor';
 import Barrier from './Barrier';
 import Characteristic from './Characteristic';
 import Clinging from './Clinging';
@@ -56,6 +57,8 @@ import { NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 // limitations under the License.
 
 const ABSORPTION = 'ABSORPTION';
+
+const ARMOR = 'ARMOR';
 
 const AID = 'AID';
 
@@ -166,6 +169,9 @@ class PowerDecorator {
         switch (decorated.trait.xmlid.toUpperCase()) {
             case ABSORPTION:
                 decorated = new Absorption(decorated);
+                break;
+            case ARMOR:
+                decorated = new Armor(decorated);
                 break;
             case BLAST:
             case EGOATTACK:
