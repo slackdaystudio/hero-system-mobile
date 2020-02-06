@@ -96,6 +96,18 @@ const FIGURED_CHARACTERISTCS = ['PD', 'ED', 'SPD', 'REC', 'END', 'STUN'];
 
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
+        // if (__DEV__) {
+        //     permission.askForWrite().then(granted => {
+        //         if (granted) {
+        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdc.json', JSON.stringify(heroDesignerCharacter));
+        //         } else {
+        //             common.toast('Unable to write file: Write permission has not been granted');
+        //         }
+        //     }).catch(error => {
+        //         common.toast(error.message);
+        //     });
+        // }
+
         const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
 
         let character = {
@@ -280,13 +292,20 @@ class HeroDesignerCharacter {
         return characteristic === null ? 0 : characteristic.value;
     }
 
+    getAdditionalCharacteristicPoints(shortName, character) {
+        let characteristic = this.getCharacteristicByShortName(shortName, character);
+        let total = this.getCharacteristicTotal(shortName, character);
+
+        return total - characteristic.value;
+    }
+
     getCharacteristicTotal(shortName, character) {
         let characteristic = null;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
 
         for (let characteristic of character.characteristics) {
             if (shortName.toUpperCase() === characteristic.shortName.toUpperCase()) {
-                return this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary);
+                return this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary, character);
             }
         }
 
@@ -297,13 +316,13 @@ class HeroDesignerCharacter {
         if (characteristic.roll) {
             let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
 
-            return `${Math.round(this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary) / 5) + SKILL_ROLL_BASE}-`;
+            return `${Math.round(this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary, character) / 5) + SKILL_ROLL_BASE}-`;
         }
 
         return null;
     }
 
-    _getCharacteristicTotal(characteristic, powersMap, showSecondary) {
+    _getCharacteristicTotal(characteristic, powersMap, showSecondary, character) {
         let value = characteristic.value;
 
         if (powersMap.has(characteristic.shortName.toUpperCase())) {
@@ -322,7 +341,43 @@ class HeroDesignerCharacter {
             value = this._getTotalCompoundPowerIncrease(characteristic, powersMap.get('COMPOUNDPOWER'), value, showSecondary);
         }
 
-        return value;
+        if (this.isFifth(character)) {
+            if (FIGURED_CHARACTERISTCS.includes(characteristic.shortName.toUpperCase())) {
+                let total = 0;
+
+                switch(characteristic.shortName.toUpperCase()) {
+                    case 'PD':
+                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
+                        value = characteristic.base + characteristic.levels + total;
+                        break;
+                    case 'ED':
+                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
+                        value = characteristic.base + characteristic.levels + total;
+                        break;
+                    case 'SPD':
+                        total = this.getAdditionalCharacteristicPoints('DEX', character) / 10;
+                        value = Math.floor(characteristic.base + characteristic.levels + total);
+                        break;
+                    case 'REC':
+                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
+                        total += common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
+                        value = characteristic.base + characteristic.levels + total;
+                        break;
+                    case 'END':
+                        total = this.getAdditionalCharacteristicPoints('CON', character) * 2;
+                        value = characteristic.base + characteristic.levels + total;
+                        break;
+                    case 'STUN':
+                        total = this.getAdditionalCharacteristicPoints('BODY', character);
+                        total += this.getAdditionalCharacteristicPoints('STR', character) / 2;
+                        total += this.getAdditionalCharacteristicPoints('CON', character) / 2;
+                        value = characteristic.base + characteristic.levels + total;
+                        break;
+                }
+            }
+        }
+
+        return Math.round(value);
     }
 
     _getTotalCharacteristicPoints(characteristic, value, showSecondary) {
@@ -547,6 +602,9 @@ class HeroDesignerCharacter {
                 definition: definition,
                 roll: roll,
                 ncm: null,
+                levels: characteristic.levels,
+                levelValue: templateCharacteristic.lvlval,
+                costPerLevel: templateCharacteristic.lvlcost,
             };
 
             if (type === TYPE_MOVEMENT) {
@@ -591,7 +649,7 @@ class HeroDesignerCharacter {
                 base += bonus;
                 break;
             case 'SPD':
-                bonus = 1 + parseFloat((this.getCharacteristicBaseValue('DEX', character) / 10), 1);
+                bonus = 1 + this.getCharacteristicBaseValue('DEX', character) / 10;
                 value += Math.floor(bonus) - 1;
                 base = bonus;
                 cost = value * 10 - bonus * 10;
@@ -613,6 +671,16 @@ class HeroDesignerCharacter {
                 bonus += this.getCharacteristicBaseValue('CON', character) / 2;
                 value += Math.round(bonus);
                 base += Math.round(bonus);
+                break;
+            case 'LEAPING':
+                bonus = this.getCharacteristicBaseValue('STR', character) / 5;
+
+                if (bonus.toFixed(1) >= '0.6') {
+                    bonus = Math.trunc(bonus) + 0.5;
+                }
+
+                value += bonus;
+                base += bonus;
                 break;
             default:
                 // do nothing
@@ -925,6 +993,16 @@ class HeroDesignerCharacter {
     _normalizeCharacterItems(heroDesignerCharacter, listKey, subListKey) {
         if (heroDesignerCharacter[listKey] === null || heroDesignerCharacter[listKey] === undefined) {
             return;
+        }
+
+        if (heroDesignerCharacter[listKey].hasOwnProperty(subListKey)) {
+            if (!Array.isArray(heroDesignerCharacter[listKey][subListKey])) {
+                let subListItem = heroDesignerCharacter[listKey][subListKey];
+
+                heroDesignerCharacter[listKey][subListKey] = [subListItem];
+            }
+        } else {
+            heroDesignerCharacter[listKey][subListKey] = [];
         }
 
         for (let [key, item] of Object.entries(heroDesignerCharacter[listKey])) {
