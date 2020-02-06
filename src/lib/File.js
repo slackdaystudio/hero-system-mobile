@@ -282,18 +282,20 @@ class File {
                 resolve(result);
             }));
 
+            if (character.hasOwnProperty('image')) {
+                await this._savePortrait(character);
+
+                delete character.image;
+            }
+
+            character = heroDesignerCharacter.getCharacter(character);
+
             common.toast('Character successfully loaded');
         } catch (error) {
             common.toast(error.message);
         }
 
-        if (character.hasOwnProperty('image')) {
-            await this._savePortrait(character);
-
-            delete character.image;
-        }
-
-        return heroDesignerCharacter.getCharacter(character);
+        return character;
     }
 
     _decode(base64Payload) {

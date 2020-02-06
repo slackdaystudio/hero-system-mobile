@@ -94,11 +94,34 @@ export default class Characteristics extends Component {
         this.setState(newState);
     }
 
-    _getMovementTotal(characteristic) {
+    _getMovementTotal(characteristic, formatFraction = false) {
         let meters = characteristic.value;
+
+        if (characteristic.shortName.toUpperCase() === 'LEAPING' && heroDesignerCharacter.isFifth(this.props.character)) {
+            let total = heroDesignerCharacter.getAdditionalCharacteristicPoints('STR', this.props.character) / 5;
+            let fractionalPart = parseFloat((total % 1).toFixed(1));
+
+            if (fractionalPart >= 0.6) {
+                total = Math.trunc(total) + 0.5;
+            } else {
+                total = Math.trunc(total);
+            }
+
+            meters = characteristic.base + total;
+        }
 
         if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
             meters = this._getTotalMeters(this.state.powersMap.get(characteristic.shortName.toUpperCase()), meters);
+        }
+
+        if (formatFraction) {
+            let fractionalMeters = parseFloat((meters % 1).toFixed(1));
+
+            if (fractionalMeters >= 0.5) {
+                meters = `${Math.trunc(meters)}½`;
+            } else {
+                meters = Math.trunc(meters);
+            }
         }
 
         return meters;
@@ -147,7 +170,7 @@ export default class Characteristics extends Component {
     }
 
     _renderNotes(characteristic) {
-        let whitelistedCharacteristics = ['INT', 'SPD'];
+        let whitelistedCharacteristics = ['DEX', 'INT', 'EGO', 'SPD'];
 
         if (whitelistedCharacteristics.includes(characteristic.shortName.toUpperCase())) {
             let note = {
@@ -162,6 +185,22 @@ export default class Characteristics extends Component {
             } else if (characteristic.shortName.toUpperCase() === 'SPD') {
                 note.label = 'Phases';
                 note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character).toString()].phases.join(', ');
+            }
+
+            if (heroDesignerCharacter.isFifth(this.props.character)) {
+                if (characteristic.shortName.toUpperCase() === 'DEX') {
+                    let cv = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('DEX', this.props.character) / 3);
+
+                    note.label = 'OCV/DCV';
+                    note.text = `${cv}/${cv}`;
+                } else if (characteristic.shortName.toUpperCase() === 'EGO') {
+                    note.label = 'ECV';
+                    note.text = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', this.props.character) / 3);;
+                }
+            }
+
+            if (note.label === '') {
+                return null;
             }
 
             return (
@@ -215,9 +254,16 @@ export default class Characteristics extends Component {
     _renderNonCombatMovement(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
             let speed = heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character);
-            let meters = this._getMovementTotal(characteristic);
+            let movement = this._getMovementTotal(characteristic);
+            let meters = movement;
+            let unit = 'm';
             let ncm = 2;
             let power = null;
+
+            if (heroDesignerCharacter.isFifth(this.props.character)) {
+                unit = '"';
+                meters *= 2;
+            }
 
             if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
                 ncm = this._getTotalNcm(this.state.powersMap.get(characteristic.shortName.toUpperCase()), ncm);
@@ -229,7 +275,7 @@ export default class Characteristics extends Component {
             return (
                 <View style={{flex: 1, paddingBottom: verticalScale(10)}}>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>NCM:</Text> {meters * ncm}m (x{ncm})
+                        <Text style={styles.boldGrey}>NCM:</Text> {movement * ncm}{unit} (x{ncm})
                     </Text>
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>Max Combat:</Text> {combatKph.toFixed(1)} km/h
@@ -362,7 +408,13 @@ export default class Characteristics extends Component {
 
     _renderStat(characteristic) {
         if (characteristic.type === TYPE_MOVEMENT) {
-            return <CircleText title={this._getMovementTotal(characteristic) + 'm'} fontSize={18} size={55} color="#303030" />;
+            let unit = 'm';
+
+            if (heroDesignerCharacter.isFifth(this.props.character)) {
+                unit = '"';
+            }
+
+            return <CircleText title={this._getMovementTotal(characteristic, true) + unit} fontSize={18} size={55} color="#303030" />;
         }
 
         return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()} fontSize={18} size={45} color="#303030" />;

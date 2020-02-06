@@ -92,12 +92,27 @@ const CHARACTER_TRAITS = {
     'equipment': 'powers',
 };
 
+const FIGURED_CHARACTERISTCS = ['PD', 'ED', 'SPD', 'REC', 'END', 'STUN'];
+
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
+        // if (__DEV__) {
+        //     permission.askForWrite().then(granted => {
+        //         if (granted) {
+        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdc.json', JSON.stringify(heroDesignerCharacter));
+        //         } else {
+        //             common.toast('Unable to write file: Write permission has not been granted');
+        //         }
+        //     }).catch(error => {
+        //         common.toast(error.message);
+        //     });
+        // }
+
         const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
 
         let character = {
             version: heroDesignerCharacter.version,
+            template: template.baseTemplateName,
             characterInfo: heroDesignerCharacter.characterInfo,
             characteristics: [],
             movement: [],
@@ -141,6 +156,14 @@ class HeroDesignerCharacter {
         // }
 
         return character;
+    }
+
+    isFifth(character) {
+        if (character.characteristics[0].definition.startsWith('(Hero System Fifth Edition')) {
+            return true;
+        }
+
+        return false;
     }
 
     isCharacteristic(item) {
@@ -191,6 +214,10 @@ class HeroDesignerCharacter {
         let characteristic = this.getCharacteristicByShortName(type, character);
         let showSecondary = character.showSecondary;
 
+        if (powersMap.has('ARMOR')) {
+            resistant = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), powersMap.get('ARMOR'), resistant, showSecondary);
+        }
+
         if (powersMap.has('FORCEFIELD')) {
             resistant = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), powersMap.get('FORCEFIELD'), resistant, showSecondary);
         }
@@ -238,8 +265,8 @@ class HeroDesignerCharacter {
         }
 
         if (powersMap.has('FORCEFIELD')) {
-            nonResistant += powersMap.get('FORCEFIELD').mdlevels;
-            resistant += powersMap.get('FORCEFIELD').mdlevels;
+            nonResistant += powersMap.get('FORCEFIELD').mdlevels || 0;
+            resistant += powersMap.get('FORCEFIELD').mdlevels || 0;
         }
 
         if (powersMap.has('COMPOUNDPOWER')) {
@@ -263,13 +290,26 @@ class HeroDesignerCharacter {
         return characteristic;
     }
 
+    getCharacteristicBaseValue(shortName, character) {
+        let characteristic = this.getCharacteristicByShortName(shortName, character);
+
+        return characteristic === null ? 0 : characteristic.value;
+    }
+
+    getAdditionalCharacteristicPoints(shortName, character) {
+        let characteristic = this.getCharacteristicByShortName(shortName, character);
+        let total = this.getCharacteristicTotal(shortName, character);
+
+        return total - characteristic.value;
+    }
+
     getCharacteristicTotal(shortName, character) {
         let characteristic = null;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
 
         for (let characteristic of character.characteristics) {
             if (shortName.toUpperCase() === characteristic.shortName.toUpperCase()) {
-                return this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary);
+                return this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary, character);
             }
         }
 
@@ -280,17 +320,21 @@ class HeroDesignerCharacter {
         if (characteristic.roll) {
             let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
 
-            return `${Math.round(this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary) / 5) + SKILL_ROLL_BASE}-`;
+            return `${Math.round(this._getCharacteristicTotal(characteristic, powersMap, character.showSecondary, character) / 5) + SKILL_ROLL_BASE}-`;
         }
 
         return null;
     }
 
-    _getCharacteristicTotal(characteristic, powersMap, showSecondary) {
+    _getCharacteristicTotal(characteristic, powersMap, showSecondary, character) {
         let value = characteristic.value;
 
         if (powersMap.has(characteristic.shortName.toUpperCase())) {
             value = this._getTotalCharacteristicPoints(powersMap.get(characteristic.shortName.toUpperCase()), value, showSecondary);
+        }
+
+        if (powersMap.has('ARMOR')) {
+            value = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), powersMap.get('ARMOR'), value, showSecondary);
         }
 
         if (powersMap.has('DENSITYINCREASE')) {
@@ -305,7 +349,43 @@ class HeroDesignerCharacter {
             value = this._getTotalCompoundPowerIncrease(characteristic, powersMap.get('COMPOUNDPOWER'), value, showSecondary);
         }
 
-        return value;
+        if (this.isFifth(character)) {
+            if (FIGURED_CHARACTERISTCS.includes(characteristic.shortName.toUpperCase())) {
+                let total = 0;
+
+                switch(characteristic.shortName.toUpperCase()) {
+                    case 'PD':
+                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
+                        value += total;
+                        break;
+                    case 'ED':
+                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
+                        value += total;
+                        break;
+                    case 'SPD':
+                        total = this.getAdditionalCharacteristicPoints('DEX', character) / 10;
+                        value += Math.floor(total);
+                        break;
+                    case 'REC':
+                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
+                        total += common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
+                        value += total;
+                        break;
+                    case 'END':
+                        total = this.getAdditionalCharacteristicPoints('CON', character) * 2;
+                        value += total;
+                        break;
+                    case 'STUN':
+                        total = this.getAdditionalCharacteristicPoints('BODY', character);
+                        total += this.getAdditionalCharacteristicPoints('STR', character) / 2;
+                        total += this.getAdditionalCharacteristicPoints('CON', character) / 2;
+                        value += total;
+                        break;
+                }
+            }
+        }
+
+        return Math.round(value);
     }
 
     _getTotalCharacteristicPoints(characteristic, value, showSecondary) {
@@ -348,10 +428,34 @@ class HeroDesignerCharacter {
         return value;
     }
 
+    _getTotalArmorDefenseIncrease(type, resistantDefence, value, showSecondary) {
+        if (Array.isArray(resistantDefence)) {
+            for (let rd of resistantDefence) {
+                value += this._getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
+            }
+        } else {
+            if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                 (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
+                switch (type.toUpperCase()) {
+                    case 'PD':
+                        value += resistantDefence.pdlevels;
+                        break;
+                    case 'ED':
+                        value += resistantDefence.edlevels;
+                        break;
+                    default:
+                         // Do nothing
+                }
+            }
+        }
+
+        return value;
+    }
+
     _getTotalResistantDefensesIncrease(type, resistantDefence, value, showSecondary) {
         if (Array.isArray(resistantDefence)) {
             for (let rd of resistantDefence) {
-                value += this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
+                value = this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
             }
         } else {
             if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
@@ -394,6 +498,8 @@ class HeroDesignerCharacter {
                         value = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), cp, value, showSecondary);
                     } else if (cp.xmlid.toUpperCase() === 'DENSITYINCREASE') {
                         value = this._getTotalDensityIncreaseCharacteristcs(characteristic, cp, value, showSecondary);
+                    } else if (cp.xmlid.toUpperCase() === 'ARMOR') {
+                        value = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), cp, value, showSecondary);
                     }
                 }
             } else {
@@ -405,6 +511,8 @@ class HeroDesignerCharacter {
                     value = this._getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), power, value, showSecondary);
                 } else if (power.xmlid.toUpperCase() === 'DENSITYINCREASE') {
                     value = this._getTotalDensityIncreaseCharacteristcs(characteristic, power, value, showSecondary);
+                } else if (power.xmlid.toUpperCase() === 'ARMOR') {
+                    value = this._getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), power, value, showSecondary);
                 }
             }
         }
@@ -437,14 +545,14 @@ class HeroDesignerCharacter {
                     value += power.levels;
                 }
             }
-        } else if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+        } else if (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR') {
             if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
                 if (id.toUpperCase() === 'PD' || id.toUpperCase() === 'ED') {
                     value += power[`${id.toLowerCase()}levels`];
                 } else if (id.toUpperCase() === 'MENTALDEFENSE') {
-                    value += power.mdlevels;
+                    value += power.mdlevels || 0;
                 } else if (id.toUpperCase() === 'POWERDEFENSE') {
-                    value += power.powdlevels;
+                    value += power.powdlevels || 0;
                 }
             }
         } else if (power.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
@@ -477,7 +585,7 @@ class HeroDesignerCharacter {
     }
 
     _isResistent(power) {
-        if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+        if (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR') {
             return true;
         }
 
@@ -510,18 +618,9 @@ class HeroDesignerCharacter {
             type = CHARACTERISTIC_NAMES.hasOwnProperty(key.toLowerCase()) ? TYPE_CHARACTERISTIC : TYPE_MOVEMENT;
             templateCharacteristic = template.characteristics[key.toLowerCase()];
             name = type === TYPE_CHARACTERISTIC ? CHARACTERISTIC_NAMES[key.toLowerCase()] : BASE_MOVEMENT_MODES[key.toLowerCase()];
-            definition = templateCharacteristic.definition;
-            roll = false;
+            let { definition, roll, value, cost, base } = this._getCharacteristicFields(characteristic, templateCharacteristic, character);
 
-            if (templateCharacteristic.lvlval > 1) {
-                value = characteristic.levels + templateCharacteristic.base;
-                cost = Math.round((value - templateCharacteristic.base) / templateCharacteristic.lvlval);
-            } else {
-                value = characteristic.levels * templateCharacteristic.lvlval + templateCharacteristic.base;
-                cost = templateCharacteristic.lvlcost * characteristic.levels;
-            }
-
-            if (templateCharacteristic.base === 10 && name.toLowerCase() !== 'body') {
+            if (base === 10 && name.toLowerCase() !== 'body') {
                 roll = true;
             }
 
@@ -535,7 +634,7 @@ class HeroDesignerCharacter {
                 shortName: characteristic.alias,
                 value: value,
                 cost: cost,
-                base: templateCharacteristic.base,
+                base: base,
                 definition: definition,
                 roll: roll,
                 ncm: null,
@@ -549,6 +648,87 @@ class HeroDesignerCharacter {
                 character.characteristics.push(formattedCharacteristic);
             }
         }
+    }
+
+    _getCharacteristicFields(characteristic, templateCharacteristic, character) {
+        if (templateCharacteristic.definition !== null && templateCharacteristic.definition.startsWith('(Hero System Fifth Edition')) {
+            return this._updateCharacteristic(characteristic, templateCharacteristic, character);
+        }
+
+        return {
+            definition: templateCharacteristic.definition,
+            roll: false,
+            value: characteristic.levels + templateCharacteristic.base,
+            cost: Math.round(characteristic.levels / templateCharacteristic.lvlval * templateCharacteristic.lvlcost),
+            base: templateCharacteristic.base,
+        };
+    }
+
+    _updateCharacteristic(characteristic, templateCharacteristic, character) {
+        let bonus = 0;
+        let value = characteristic.levels + templateCharacteristic.base;
+        let cost = Math.round(characteristic.levels / templateCharacteristic.lvlval * templateCharacteristic.lvlcost);
+        let base = templateCharacteristic.base;
+
+        switch(characteristic.alias.toUpperCase()) {
+            case 'PD':
+                bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('STR', character) / 5);
+                value += bonus;
+                base += bonus;
+                break;
+            case 'ED':
+                bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('CON', character) / 5);
+                value += bonus;
+                base += bonus;
+                break;
+            case 'SPD':
+                bonus = 1 + this.getCharacteristicBaseValue('DEX', character) / 10;
+                value += Math.floor(bonus) - 1;
+                base = bonus;
+                cost = value * 10 - bonus * 10;
+                break;
+            case 'REC':
+                bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('STR', character) / 5);
+                bonus += common.roundInPlayersFavor(this.getCharacteristicBaseValue('CON', character) / 5);
+                value += bonus;
+                base += bonus;
+                break;
+            case 'END':
+                bonus = this.getCharacteristicBaseValue('CON', character) * 2;
+                value += bonus;
+                base += bonus;
+                break;
+            case 'STUN':
+                bonus = this.getCharacteristicBaseValue('BODY', character);
+                bonus += this.getCharacteristicBaseValue('STR', character) / 2;
+                bonus += this.getCharacteristicBaseValue('CON', character) / 2;
+                value += Math.round(bonus);
+                base += Math.round(bonus);
+                break;
+            case 'LEAPING':
+                bonus = this.getCharacteristicBaseValue('STR', character) / 5;
+                let fractionalPart = parseFloat((bonus % 1).toFixed(1));
+
+                if (fractionalPart >= 0.6) {
+                    bonus = Math.trunc(bonus) + 0.5;
+                } else {
+                    bonus = Math.trunc(bonus);
+                }
+
+                value += bonus;
+                base += bonus;
+                break;
+            default:
+                // do nothing
+        }
+
+        return {
+            definition: templateCharacteristic.definition,
+            roll: false,
+            value: value,
+            cost: cost,
+            base: base,
+        };
     }
 
     _getCharacteristicNcm(templateCharacteristic) {
@@ -849,6 +1029,16 @@ class HeroDesignerCharacter {
     _normalizeCharacterItems(heroDesignerCharacter, listKey, subListKey) {
         if (heroDesignerCharacter[listKey] === null || heroDesignerCharacter[listKey] === undefined) {
             return;
+        }
+
+        if (heroDesignerCharacter[listKey].hasOwnProperty(subListKey)) {
+            if (!Array.isArray(heroDesignerCharacter[listKey][subListKey])) {
+                let subListItem = heroDesignerCharacter[listKey][subListKey];
+
+                heroDesignerCharacter[listKey][subListKey] = [subListItem];
+            }
+        } else {
+            heroDesignerCharacter[listKey][subListKey] = [];
         }
 
         for (let [key, item] of Object.entries(heroDesignerCharacter[listKey])) {

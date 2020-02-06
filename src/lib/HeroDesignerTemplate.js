@@ -36,11 +36,6 @@ class HeroDesignerTemplate {
         if (typeof template === 'string') {
             baseTemplate = template.endsWith('6E.hdt') ? mainSixth : main;
 
-            // TODO: Remove if/when 5th edition support is implemented
-            if (!template.endsWith('6E.hdt')) {
-                Alert.alert('Loading 5th Edition characters directly is not officially supported.');
-            }
-
             switch (template) {
                 case 'builtIn.AI.hdt':
                     subTemplate = ai;
@@ -80,11 +75,6 @@ class HeroDesignerTemplate {
             }
         } else {
             baseTemplate = template.extends.endsWith('6E.hdt') ? mainSixth : main;
-
-            // TODO: Remove if/when 5th edition support is implemented
-            if (!template.extends.endsWith('6E.hdt')) {
-                Alert.alert('Loading 5th Edition characters directly is not officially supported.');
-            }
 
             subTemplate = template;
         }

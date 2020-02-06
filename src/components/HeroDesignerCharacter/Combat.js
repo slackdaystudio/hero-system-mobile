@@ -308,6 +308,10 @@ export default class Combat extends Component {
     }
 
     _renderCv(stateKey, renderRollButton=false) {
+        if (!this.state.combatDetails.hasOwnProperty(stateKey)) {
+            return null;
+        }
+
         return (
             <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', justifyContent: 'center'}}>
                 <View style={{flex: 1, alignSelf: 'center'}}>
