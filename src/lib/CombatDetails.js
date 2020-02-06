@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
 import { character as libCharacter } from './Character';
+import { common } from './Common';
 import speedTable from '../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -52,16 +53,29 @@ class CombatDetails {
         }
 
         if (libCharacter.isHeroDesignerCharacter(character)) {
-            combatDetails = {
-                stun: this._getCharacteristic(character, 'stun'),
-                body: this._getCharacteristic(character, 'body'),
-                endurance: this._getCharacteristic(character, 'end'),
-                ocv: this._getCharacteristic(character, 'ocv'),
-                dcv: this._getCharacteristic(character, 'dcv'),
-                omcv: this._getCharacteristic(character, 'omcv'),
-                dmcv: this._getCharacteristic(character, 'dmcv'),
-                phases: this._initPhases(character),
-            };
+            if (heroDesignerCharacter.isFifth(character)) {
+                let cv = common.roundInPlayersFavor(this._getCharacteristic(character, 'dex') / 3);
+
+                combatDetails = {
+                    stun: this._getCharacteristic(character, 'stun'),
+                    body: this._getCharacteristic(character, 'body'),
+                    endurance: this._getCharacteristic(character, 'end'),
+                    ocv: cv,
+                    dcv: cv,
+                    phases: this._initPhases(character),
+                };
+            } else {
+                combatDetails = {
+                    stun: this._getCharacteristic(character, 'stun'),
+                    body: this._getCharacteristic(character, 'body'),
+                    endurance: this._getCharacteristic(character, 'end'),
+                    ocv: this._getCharacteristic(character, 'ocv'),
+                    dcv: this._getCharacteristic(character, 'dcv'),
+                    omcv: this._getCharacteristic(character, 'omcv'),
+                    dmcv: this._getCharacteristic(character, 'dmcv'),
+                    phases: this._initPhases(character),
+                };
+            }
         } else {
             combatDetails = {
                 stun: libCharacter.getCharacteristic(character.characteristics.characteristic, 'stun'),
