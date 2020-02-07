@@ -13,6 +13,7 @@ import EnduranceReserve from './EnduranceReserve';
 import EnhancedPerception from './EnhancedPerception';
 import Entangle from './Entangle';
 import ExtraLimbs from './ExtraLimbs';
+import FindWeakness from './FindWeakness';
 import Flash from './Flash';
 import Ftl from './Ftl';
 import HandKillingAttack from './HandKillingAttack';
@@ -35,6 +36,7 @@ import AffectsTotals from '../AffectsTotals';
 import ExtraAttributes from '../ExtraAttributes';
 import EffectRoll from '../EffectRoll';
 import Movement from '../Movement';
+import NegativeLevels from '../NegativeLevels';
 import UnusualDefense from '../UnusualDefense';
 import Skill from '../Skill';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
@@ -94,6 +96,8 @@ const ENTANGLE = 'ENTANGLE';
 
 const EXTRALIMBS = 'EXTRALIMBS';
 
+const FINDWEAKNESS = 'FINDWEAKNESS';
+
 const FLASH = 'FLASH';
 
 const FLASHDEFENSE = 'FLASHDEFENSE';
@@ -104,6 +108,8 @@ const FORCEFIELD = 'FORCEFIELD';
 
 const FTL = 'FTL';
 
+const GLIDING = 'GLIDING';
+
 const HKA = 'HKA';
 
 const HANDTOHANDATTACK = 'HANDTOHANDATTACK';
@@ -111,6 +117,8 @@ const HANDTOHANDATTACK = 'HANDTOHANDATTACK';
 const HEALING = 'HEALING';
 
 const KBRESISTANCE = 'KBRESISTANCE';
+
+const LACKOFWEAKNESS = 'LACKOFWEAKNESS';
 
 const LEAPING = 'LEAPING';
 
@@ -127,6 +135,12 @@ const MINDCONTROL = 'MINDCONTROL';
 const MINDSCAN = 'MINDSCAN';
 
 const MULTIFORM = 'MULTIFORM';
+
+const NEGATIVECOMBATSKILLLEVELS = 'NEGATIVECOMBATSKILLLEVELS';
+
+const NEGATIVEPENALTYSKILLLEVELS = 'NEGATIVEPENALTYSKILLLEVELS';
+
+const NEGATIVESKILLLEVELS = 'NEGATIVESKILLLEVELS';
 
 const POSSESSION = 'POSSESSION';
 
@@ -146,7 +160,11 @@ const SHRINKING = 'SHRINKING';
 
 const STRETCHING = 'STRETCHING';
 
+const SUCCOR = 'SUCCOR';
+
 const SUMMON = 'SUMMON';
+
+const SUPPRESS = 'SUPPRESS';
 
 const SWIMMING = 'SWIMMING';
 
@@ -159,6 +177,8 @@ const TELEPATHY = 'TELEPATHY';
 const TELEPORTATION = 'TELEPORTATION';
 
 const TELESCOPIC = 'TELESCOPIC';
+
+const TRANSFER = 'TRANSFER';
 
 const TRANSFORM = 'TRANSFORM';
 
@@ -177,6 +197,7 @@ class PowerDecorator {
             case EGOATTACK:
                 decorated = new EffectRoll(decorated, NORMAL_DAMAGE);
                 break;
+            case TRANSFER:
             case TRANSFORM:
             case RKA:
                 decorated = new EffectRoll(decorated, KILLING_DAMAGE);
@@ -189,6 +210,8 @@ class PowerDecorator {
             case MENTALILLUSIONS:
             case MINDCONTROL:
             case MINDSCAN:
+            case SUCCOR:
+            case SUPPRESS:
             case TELEPATHY:
                 decorated = new EffectRoll(decorated, EFFECT);
                 break;
@@ -232,6 +255,9 @@ class PowerDecorator {
             case EXTRALIMBS:
                 decorated = new ExtraLimbs(decorated);
                 break;
+            case FINDWEAKNESS:
+                decorated = new FindWeakness(decorated);
+                break;
             case FLASH:
                 decorated = new EffectRoll(decorated, EFFECT);
                 decorated = new Flash(decorated);
@@ -245,6 +271,7 @@ class PowerDecorator {
                 decorated = new UnusualDefense(decorated);
                 break;
             case FLIGHT:
+            case GLIDING:
             case SWINGING:
             case TELEPORTATION:
             case TUNNELING:
@@ -262,6 +289,12 @@ class PowerDecorator {
                 break;
             case KBRESISTANCE:
                 decorated = new KnockbackResistance(decorated);
+                break;
+            case LACKOFWEAKNESS:
+            case NEGATIVECOMBATSKILLLEVELS:
+            case NEGATIVEPENALTYSKILLLEVELS:
+            case NEGATIVESKILLLEVELS:
+                decorated = new NegativeLevels(decorated);
                 break;
             case LEAPING:
                 decorated = new Leaping(decorated);

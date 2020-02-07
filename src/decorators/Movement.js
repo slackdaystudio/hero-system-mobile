@@ -50,16 +50,21 @@ export default class Movement extends CharacterTrait {
         let attributes = this.characterTrait.attributes();
         let baseMove = this.characterTrait.trait.levels + this._getBaseMove();
         let ncm = this._getNcm();
+        let unit = heroDesignerCharacter.isFifth(this.characterTrait.getCharacter()) ? '"' : 'm'
 
         attributes.push({
             label: 'Combat Move',
-            value: `${baseMove}m`,
+            value: `${baseMove}${unit}`,
         });
 
         attributes.push({
             label: 'Non-Combat Move',
-            value: `${baseMove * ncm}m`,
+            value: `${baseMove * ncm}${unit}`,
         });
+
+        if (heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
+            baseMove *= 2;
+        }
 
         attributes.push({
             label: 'Max Combat',
