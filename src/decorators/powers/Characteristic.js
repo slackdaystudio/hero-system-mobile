@@ -25,6 +25,12 @@ export default class Characteristic extends CharacterTrait {
     }
 
     cost() {
+        if (this.characterTrait.trait.levels === 0) {
+            let value = heroDesignerCharacter.getCharacteristicTotal(this.characterTrait.trait.xmlid, this.characterTrait.getCharacter());
+
+            return common.roundInPlayersFavor(value / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost);
+        }
+
         let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
 
         cost += common.totalAdders(this.characterTrait.trait.adder);

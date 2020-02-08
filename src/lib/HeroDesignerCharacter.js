@@ -223,7 +223,7 @@ class HeroDesignerCharacter {
         }
 
         if (powersMap.has(type.toUpperCase())) {
-            resistant = this._getResistantDefense(resistant, powersMap.get(type.toUpperCase()), showSecondary);
+            resistant = this._getResistantDefense(resistant, powersMap.get(type.toUpperCase()), character, showSecondary);
         }
 
         if (powersMap.has('COMPOUNDPOWER')) {
@@ -571,12 +571,16 @@ class HeroDesignerCharacter {
     _getResistantDefense(resistant, power, character, showSecondary) {
         if (Array.isArray(power)) {
             for (let p of power) {
-                resistant = this._getResistantDefense(resistant, p, showSecondary);
+                resistant = this._getResistantDefense(resistant, p, character, showSecondary);
             }
         } else {
             if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
                 if (this._isResistent(power)) {
-                    resistant += power.levels;
+                    if (this.isCharacteristic(power) && power.levels === 0) {
+                        resistant += this.getCharacteristicTotal(power.xmlid, character);
+                    } else {
+                        resistant += power.levels;
+                    }
                 }
             }
         }
@@ -890,7 +894,7 @@ class HeroDesignerCharacter {
                 return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
             }).shift();
         }
-        
+
         return templateTrait;
     }
 

@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
-import { SKILL_ENHANCERS } from '../lib/HeroDesignerCharacter';
+import { heroDesignerCharacter, SKILL_ENHANCERS } from '../lib/HeroDesignerCharacter';
 import { modifierDecorator } from './modifiers/ModifierDecorator';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -35,6 +35,11 @@ export default class ModifierCalculator extends CharacterTrait {
     }
 
     activeCost() {
+        // Characteristics with 0 levels with advantages are calculated like naked advantages
+        if (heroDesignerCharacter.isCharacteristic(this.characterTrait.trait) && this.characterTrait.trait.levels === 0) {
+            return common.roundInPlayersFavor(this.cost() * (1 + this.advantages().reduce((a, b) => a + b.cost, 0))) - this.cost();
+        }
+
         let activeCost = this.cost() * (1 + this.advantages().reduce((a, b) => a + b.cost, 0));
 
         return common.roundInPlayersFavor(activeCost);
