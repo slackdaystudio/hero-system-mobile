@@ -45,6 +45,9 @@ class CharactersScreen extends Component {
         this.state = {
             characters: null,
             characterLoading: false,
+            dialogTitle: '',
+            dialogMessage: '',
+            dialogOnOkFn: null,
             deleteDialogVisible: false,
             toBeDeleted: null,
             slot: 0,
@@ -116,11 +119,19 @@ class CharactersScreen extends Component {
             file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
                 character.import(this.startLoad, this.endLoad).then(char => {
                     this._refreshCharacters();
+
+                    if (!character.isHeroDesignerCharacter(char)) {
+                        this._openWarningDialog();
+                    }
                 });
-            })
+            });
         } else {
             character.import(this.startLoad, this.endLoad).then(char => {
                 this._refreshCharacters();
+
+                if (!character.isHeroDesignerCharacter(char)) {
+                    this._openWarningDialog();
+                }
             });
         }
     }
@@ -164,9 +175,23 @@ class CharactersScreen extends Component {
         this.props.navigation.navigate(screen, {from: 'Characters'});
     }
 
+    _openWarningDialog() {
+        let newState = {...this.state};
+
+        newState.dialogTitle = `Old File Format Detected`;
+        newState.dialogMessage = `The XML file import format is going away!\n\nPlease load your character by selecting a Hero Designer file directly.`;
+        newState.dialogOnOkFn = null;
+        newState.deleteDialogVisible = true;
+
+        this.setState(newState);
+    }
+
     _openDeleteDialog(filename) {
         let newState = {...this.state};
 
+        newState.dialogTitle = `Delete ${filename.slice(0, -5)}?`;
+        newState.dialogMessage = `Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded`;
+        newState.dialogOnOkFn = this.onDeleteDialogOk;
         newState.deleteDialogVisible = true;
         newState.toBeDeleted = filename;
 
@@ -176,6 +201,9 @@ class CharactersScreen extends Component {
     _onDeleteDialogClose() {
         let newState = {...this.state};
 
+        newState.dialogTitle = '';
+        newState.dialogMessage = '';
+        newState.dialogOnOkFn = null;
         newState.deleteDialogVisible = false;
         newState.toBeDeleted = null;
 
@@ -285,9 +313,9 @@ class CharactersScreen extends Component {
                     <View style={{paddingBottom: verticalScale(20)}} />
                     <ConfirmationDialog
                         visible={this.state.deleteDialogVisible}
-                        title='Delete Character?'
-                        info={`Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded`}
-                        onOk={this.onDeleteDialogOk}
+                        title={this.state.dialogTitle}
+                        info={this.state.dialogMessage}
+                        onOk={this.state.dialogOnOkFn}
                         onClose={this.onDeleteDialogClose}
                     />
                 </Content>

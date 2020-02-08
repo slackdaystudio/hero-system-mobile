@@ -12,7 +12,7 @@ export default class ConfirmationDialog extends Component {
         visible: PropTypes.bool.isRequired,
         title: PropTypes.string.isRequired,
         info: PropTypes.string.isRequired,
-        onOk: PropTypes.func.isRequired,
+        onOk: PropTypes.func,
         onClose: PropTypes.func.isRequired
     }
 
@@ -36,6 +36,20 @@ export default class ConfirmationDialog extends Component {
         }
     }
 
+    _renderOkButton() {
+        if (typeof this.props.onOk === 'function') {
+            return (
+                <View style={styles.buttonContainer}>
+                    <Button style={styles.button}  onPress={() => this.props.onOk()}>
+                        <Text uppercase={false} style={styles.buttonText}>OK</Text>
+                    </Button>
+                </View>
+            );
+        }
+
+        return null;
+    }
+
     render() {
         return (
             <Modal
@@ -56,14 +70,10 @@ export default class ConfirmationDialog extends Component {
                             <Text style={styles.grey}>{this.props.info}</Text>
                         </ScrollView>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                            <View style={styles.buttonContainer}>
-                                <Button style={styles.button}  onPress={() => this.props.onOk()}>
-                                    <Text uppercase={false} style={styles.buttonText}>OK</Text>
-                                </Button>
-                            </View>
+                            {this._renderOkButton()}
                             <View style={styles.buttonContainer}>
                                 <Button style={styles.button}  onPress={() => this.props.onClose()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Cancel</Text>
+                                    <Text uppercase={false} style={styles.buttonText}>{this.props.onOk === null ? 'OK' : 'Cancel'}</Text>
                                 </Button>
                             </View>
                         </View>
