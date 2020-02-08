@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -26,34 +27,11 @@ export default class Barrier extends CharacterTrait {
     cost() {
         let cost = this.characterTrait.trait.basecost;
 
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.pdlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.edlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.mdlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.calculateDefenseCost(
-            this.characterTrait.trait.powdlevels,
-            this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
-        );
-
-        cost += this.characterTrait.trait.lengthlevels;
-        cost += this.characterTrait.trait.heightlevels;
-        cost += this.characterTrait.trait.bodylevels;
-        cost += this.characterTrait.trait.widthlevels * 4 / this.characterTrait.trait.template.costperinch;
+        if (heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
+            cost += this._getFifthEditionDefenseCost();
+        } else {
+            cost += this._getSixthEditionDefenseCost();
+        }
 
         cost += common.totalAdders(this.characterTrait.trait.adder);
 
@@ -137,22 +115,36 @@ export default class Barrier extends CharacterTrait {
         return this.characterTrait.limitations();
     }
 
-    calculateDefenseCost(levels, levelValue, levelCost) {
+    _getFifthEditionDefenseCost() {
         let cost = 0;
+        let totalDefense = 0;
 
-        if (levels === 0) {
-            return cost;
-        }
+        totalDefense += this.characterTrait.trait.pdlevels;
+        totalDefense += this.characterTrait.trait.edlevels;
+        totalDefense += this.characterTrait.trait.mdlevels;
+        totalDefense += this.characterTrait.trait.powdlevels;
 
-        if (levels === 1) {
-            cost += levelCost;
-        } else if (levels > 1) {
-            cost += common.getMultiplierCost(
-                levels,
-                levelValue,
-                levelCost
-            );
-        }
+        cost += totalDefense / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        cost += this.characterTrait.trait.lengthlevels * 2;
+        cost += this.characterTrait.trait.heightlevels * 2;
+
+        return cost;
+    }
+
+    _getSixthEditionDefenseCost() {
+        let cost = 0;
+        let totalDefense = 0;
+
+        totalDefense += this.characterTrait.trait.pdlevels;
+        totalDefense += this.characterTrait.trait.edlevels;
+        totalDefense += this.characterTrait.trait.mdlevels;
+        totalDefense += this.characterTrait.trait.powdlevels;
+
+        cost += totalDefense / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        cost += this.characterTrait.trait.lengthlevels;
+        cost += this.characterTrait.trait.heightlevels;
+        cost += this.characterTrait.trait.bodylevels;
+        cost += this.characterTrait.trait.widthlevels * 4 / this.characterTrait.trait.template.costperinch;
 
         return cost;
     }
