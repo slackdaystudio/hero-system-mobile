@@ -159,7 +159,7 @@ class HeroDesignerCharacter {
     }
 
     isFifth(character) {
-        if (character.characteristics[0].definition.startsWith('(Hero System Fifth Edition')) {
+        if (character !== null && Array.isArray(character.characteristics) && character.characteristics[0].definition.startsWith('(Hero System Fifth Edition')) {
             return true;
         }
 
@@ -793,11 +793,29 @@ class HeroDesignerCharacter {
         let powersMap = common.toMap(template.powers.power);
 
         if (compoundPower.hasOwnProperty('power')) {
-            compoundPower.powers = compoundPower.power;
+            if (Array.isArray(compoundPower.power)) {
+                compoundPower.powers = compoundPower.power.slice();
+            } else {
+                compoundPower.powers = [compoundPower.power];
+            }
 
             delete compoundPower.power;
         } else {
             compoundPower.powers = [];
+        }
+
+        const locations = ['skill', 'perk', 'talent'];
+
+        for (let subItemKey of locations) {
+            if (compoundPower.hasOwnProperty(subItemKey)) {
+                if (Array.isArray(compoundPower[subItemKey])) {
+                    compoundPower.powers = compoundPower.powers.concat(compoundPower[subItemKey]);
+                } else {
+                    compoundPower.powers.push(compoundPower[subItemKey]);
+                }
+
+                delete compoundPower[subItemKey];
+            }
         }
 
         for (let [key, value] of Object.entries(compoundPower)) {
@@ -820,24 +838,15 @@ class HeroDesignerCharacter {
     _getCompoundPower(compoundPower, template, traitKey, traitSubKey) {
         let templateTrait = null;
 
-        if (Array.isArray(compoundPower.powers)) {
-            for (let power of compoundPower.powers) {
-                templateTrait = this._getTemplateTrait(power, template, traitKey, traitSubKey);
 
-                this._addModifierTemplate(power.modifier, template);
+        for (let power of compoundPower.powers) {
+            templateTrait = this._getTemplateTrait(power, template, traitKey, traitSubKey);
 
-                power.type = traitSubKey;
-                power.template = templateTrait;
-                power.parentid = compoundPower.id;
-            }
-        } else {
-            templateTrait = this._getTemplateTrait(compoundPower.powers, template, traitKey, traitSubKey);
+            this._addModifierTemplate(power.modifier, template);
 
-            this._addModifierTemplate(compoundPower.powers.modifier, template);
-
-            compoundPower.powers.type = traitSubKey;
-            compoundPower.powers.template = templateTrait;
-            compoundPower.powers.parentid = compoundPower.id;
+            power.type = traitSubKey;
+            power.template = templateTrait;
+            power.parentid = compoundPower.id;
         }
     }
 
@@ -881,7 +890,7 @@ class HeroDesignerCharacter {
                 return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
             }).shift();
         }
-
+        
         return templateTrait;
     }
 

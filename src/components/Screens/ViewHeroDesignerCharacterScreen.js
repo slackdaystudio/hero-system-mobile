@@ -83,7 +83,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.character !== null && prevProps.character !== null && this.props.character.filename !== prevProps.character.filename) {
-            if (this.tabs !== null) {
+            if (this.tabs !== null && this.tabs !== undefined) {
                 this.tabs.goToPage(0);
             }
 
@@ -207,7 +207,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 {this._renderTab('Talents', 'talents', 'talents')}
                 {this._renderTab('Martial Arts', 'martialArts', 'maneuver')}
                 {this._renderTab('Powers', 'powers', 'powers')}
-                {this._renderTab('Equipment', 'equipment', 'power')}
+                {this._renderTab('Equipment', 'equipment', 'powers')}
                 {this._renderTab('Complications', 'disadvantages', 'disadvantages')}
                 <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Notes')}>
                     <View style={styles.tabContent}>

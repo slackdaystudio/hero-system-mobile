@@ -17,6 +17,7 @@ import {
     PARTIAL_DIE_MINUS_ONE,
 } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
+import CompoundPower from '../../decorators/CompoundPower';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -81,8 +82,6 @@ export default class Traits extends Component {
             character: props.character,
             listKey: props.listKey,
         }
-
-        this.getCharacter = this._getCharacter.bind(this);
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -99,10 +98,6 @@ export default class Traits extends Component {
         }
 
         return null;
-    }
-
-    _getCharacter() {
-        return this.props.character;
     }
 
     _toggleDefinitionShow(name) {
@@ -158,7 +153,7 @@ export default class Traits extends Component {
                     <Text style={styles.boldGrey}>{label}</Text>
                     {modifiers.map((modifier, index) => {
                         return (
-                            <View style={{flex: 1, flexDirection: 'row'}} key={'mod-' + index}>
+                            <View key={`mod-${index}`} style={{flex: 1, flexDirection: 'row'}}>
                                 <View>
                                     <Text style={styles.grey}> &bull; </Text>
                                 </View>
@@ -184,7 +179,7 @@ export default class Traits extends Component {
                         let separator = attribute.value !== '' ? ': ' : '';
 
                         return (
-                            <Text>
+                            <Text key={`attr-${index}`}>
                                 <Text style={labelStyle}>{attribute.label}{separator}</Text>
                                 <Text style={styles.grey}>{attribute.value}</Text>
                             </Text>
@@ -284,11 +279,11 @@ export default class Traits extends Component {
         // The "powers" field is only available if the last decorator was the CompoundPowerDecorator
         // so we have to check here and decorate them manually if the last decorator is not the
         // CompoundPowerDecorator
-        if (item.constructor.name === 'CompoundPower') {
+        if (item instanceof CompoundPower) {
             powers = item.powers;
         } else {
             for (let power of item.characterTrait.powers) {
-                powers.push(characterTraitDecorator.decorate(power.trait, this.props.subListKey, item.characterTrait.getCharacter));
+                powers.push(characterTraitDecorator.decorate(power.trait, this.props.subListKey, () => this.props.character));
             }
         }
 
@@ -314,7 +309,7 @@ export default class Traits extends Component {
                 </CardItem>
                 {powers.map((power, index) => {
                     return (
-                        <Fragment>
+                        <View key={`cp-${index}`}>
                             <View style={{flex: 1, alignSelf: 'center'}}>
                                 <Text style={styles.boldGrey}>{power.label()}</Text>
                             </View>
@@ -337,7 +332,7 @@ export default class Traits extends Component {
                                     </Text>
                                 </View>
                             </CardItem>
-                        </Fragment>
+                        </View>
                     );
                 })}
             </Fragment>
@@ -400,7 +395,7 @@ export default class Traits extends Component {
                 {this._renderItemDetails(decoratedTrait)}
                 <View style={{backgroundColor: '#0e0e0f', paddingTop: verticalScale(20)}} />
                 {decoratedTrait.trait[this.props.subListKey].map((item, index) => {
-                    let decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
+                    let decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
                     return (
                         <Fragment>
@@ -443,7 +438,7 @@ export default class Traits extends Component {
         return (
             <Fragment>
                 {items.map((item, index) => {
-                    let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, this.getCharacter);
+                    let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
                     if (decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
                         decoratedTrait.trait.hasOwnProperty(this.props.subListKey) &&
@@ -452,7 +447,7 @@ export default class Traits extends Component {
                     }
 
                     return (
-                        <Card style={styles.card} key={'item-' + decoratedTrait.trait.position}>
+                        <Card key={`trait-${index}`} style={styles.card}>
                             <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'}]} header>
                                 {this._renderTrait(decoratedTrait)}
                             </CardItem>

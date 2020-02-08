@@ -88,7 +88,6 @@ export default ScaledSheet.create({
     },
     tabHeading: {
         backgroundColor: '#000',
-        color: '#000', /* For iOS */
     },
     activeTabStyle: {
         backgroundColor: '#000',
