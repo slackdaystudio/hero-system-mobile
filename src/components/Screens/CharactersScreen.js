@@ -188,8 +188,8 @@ class CharactersScreen extends Component {
                 this.props.clearCharacter(this.state.toBeDeleted, this.props.character, this.props.characters, false);
             }
 
-            this._onDeleteDialogClose();
             this._refreshCharacters();
+            this._onDeleteDialogClose();
         });
     }
 
