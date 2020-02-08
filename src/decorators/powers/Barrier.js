@@ -90,11 +90,17 @@ export default class Barrier extends CharacterTrait {
             value: this.characterTrait.trait.bodylevels,
         });
 
-        attributes.push({
-            label: 'Dimensions',
-            value: `${this.characterTrait.trait.lengthlevels + 1}m x ${this.characterTrait.trait.widthlevels + 0.5}m x ${this.characterTrait.trait.heightlevels + 1}m`,
-        });
-
+        if (heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
+            attributes.push({
+                label: 'Dimensions',
+                value: `${this.characterTrait.trait.lengthlevels}" x ${this.characterTrait.trait.heightlevels}"`,
+            });
+        } else {
+            attributes.push({
+                label: 'Dimensions',
+                value: `${this.characterTrait.trait.lengthlevels + 1}m x ${this.characterTrait.trait.widthlevels + 0.5}m x ${this.characterTrait.trait.heightlevels + 1}m`,
+            });
+        }
 
         return attributes;
     }
