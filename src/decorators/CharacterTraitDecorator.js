@@ -5,6 +5,7 @@ import ModifierCalculator from './ModifierCalculator';
 import Skill from './Skill';
 import Maneuver from './Maneuver';
 import VariablePowerPool from './VariablePowerPool';
+import ElementalControlItem from './powers/ElementalControlItem';
 import MultipowerItem from './powers/MultipowerItem';
 import NakedModifier from './NakedModifier';
 import CompoundPower from './CompoundPower';
@@ -56,8 +57,10 @@ class CharacterTraitDecorator {
             decorated = new NakedModifier(decorated);
         }
 
-        if (heroDesignerCharacter.isMultipowerItem(decorated.trait, decorated.getCharacter())) {
+        if (heroDesignerCharacter.isPowerFrameworkItem(decorated.trait, decorated.getCharacter(), 'multipower')) {
             decorated = new MultipowerItem(decorated);
+        } else if (heroDesignerCharacter.isPowerFrameworkItem(decorated.trait, decorated.getCharacter(), 'elementalControl')) {
+            decorated = new ElementalControlItem(decorated);
         } else if (decorated.trait.hasOwnProperty('originalType') && decorated.trait.originalType.toUpperCase() === 'VPP') {
             decorated = new VariablePowerPool(decorated);
         }

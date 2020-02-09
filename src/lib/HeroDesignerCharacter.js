@@ -170,12 +170,12 @@ class HeroDesignerCharacter {
         return Object.keys(CHARACTERISTIC_NAMES).includes(item.xmlid.toLowerCase());
     }
 
-    isMultipowerItem(item, character) {
+    isPowerFrameworkItem(item, character, type) {
         if (item.hasOwnProperty('parentid') && character.powers.length > 0) {
             let powersMap = common.toMap(character.powers, 'id');
 
             if (powersMap.has(item.parentid)) {
-                return powersMap.get(item.parentid).originalType === 'multipower';
+                return powersMap.get(item.parentid).originalType === type;
             }
         }
 
