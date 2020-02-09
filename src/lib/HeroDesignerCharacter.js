@@ -798,8 +798,16 @@ class HeroDesignerCharacter {
 
         if (compoundPower.hasOwnProperty('power')) {
             if (Array.isArray(compoundPower.power)) {
-                compoundPower.powers = compoundPower.power.slice();
+                compoundPower.powers = [];
+
+                for (let power of compoundPower.power) {
+                    power.originalType = 'power';
+
+                    compoundPower.powers.push(power);
+                }
             } else {
+                compoundPower.power.originalType = 'power';
+
                 compoundPower.powers = [compoundPower.power];
             }
 
@@ -813,8 +821,14 @@ class HeroDesignerCharacter {
         for (let subItemKey of locations) {
             if (compoundPower.hasOwnProperty(subItemKey)) {
                 if (Array.isArray(compoundPower[subItemKey])) {
-                    compoundPower.powers = compoundPower.powers.concat(compoundPower[subItemKey]);
+                    for (let power of compoundPower[subItemKey]) {
+                        power.originalType = subItemKey;
+
+                        compoundPower.powers.push(power);
+                    }
                 } else {
+                    compoundPower[subItemKey].originalType = subItemKey;
+
                     compoundPower.powers.push(compoundPower[subItemKey]);
                 }
 
