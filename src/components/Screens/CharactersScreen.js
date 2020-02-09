@@ -120,7 +120,7 @@ class CharactersScreen extends Component {
                 character.import(this.startLoad, this.endLoad).then(char => {
                     this._refreshCharacters();
 
-                    if (!character.isHeroDesignerCharacter(char)) {
+                    if (char !== undefined && !character.isHeroDesignerCharacter(char)) {
                         this._openWarningDialog();
                     }
                 });
@@ -128,8 +128,8 @@ class CharactersScreen extends Component {
         } else {
             character.import(this.startLoad, this.endLoad).then(char => {
                 this._refreshCharacters();
-
-                if (!character.isHeroDesignerCharacter(char)) {
+                // Alert.alert(JSON.stringify(char));
+                if (char !== undefined && !character.isHeroDesignerCharacter(char)) {
                     this._openWarningDialog();
                 }
             });
