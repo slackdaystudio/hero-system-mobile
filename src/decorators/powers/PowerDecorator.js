@@ -42,6 +42,7 @@ import Skill from '../Skill';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 import { talentDecorator } from '../talents/TalentDecorator';
 import { perkDecorator } from '../perks/PerkDecorator';
+import { skillDecorator } from '../skills/SkillDecorator';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -347,7 +348,7 @@ class PowerDecorator {
                 } else if (decorated.trait.originalType === 'perk') {
                     decorated = perkDecorator.decorate(decorated);
                 } else if (decorated.trait.originalType === 'skill') {
-                    decorated = new Skill(decorated);
+                    decorated = skillDecorator.decorate(decorated);
                 }
         }
 
