@@ -271,7 +271,7 @@ export default class Combat extends Component {
         }
 
         return (
-            <View style={{paddingHorizontal: scale(5)}}>
+            <View key={`phase-${phase}`} style={{paddingHorizontal: scale(5)}}>
                 <TouchableHighlight underlayColor='#1b1d1f' onPress={() => this.usePhase(phase, this.props.character.showSecondary)} onLongPress={() => this.abortPhase(phase)}>
                     <CircleText title={phase} fontSize={18} size={40} color={color} />
                 </TouchableHighlight>
