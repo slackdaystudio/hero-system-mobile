@@ -13,7 +13,7 @@ import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import { combatDetails } from '../../lib/CombatDetails';
 import styles from '../../Styles';
-import { setCharacter, clearCharacter } from '../../reducers/character';
+import { setCharacter, clearCharacter, updateLoadedCharacters } from '../../reducers/character';
 import { MAX_CHARACTER_SLOTS } from '../../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -37,6 +37,7 @@ class CharactersScreen extends Component {
         characters: PropTypes.object,
         setCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
+        updateLoadedCharacters: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -118,21 +119,30 @@ class CharactersScreen extends Component {
         if (this.props.character !== null && this.props.character.hasOwnProperty('filename')) {
             file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
                 character.import(this.startLoad, this.endLoad).then(char => {
-                    this._refreshCharacters();
-
-                    if (char !== undefined && !character.isHeroDesignerCharacter(char)) {
-                        this._openWarningDialog();
-                    }
+                    this._postImport(char);
                 });
             });
         } else {
             character.import(this.startLoad, this.endLoad).then(char => {
-                this._refreshCharacters();
-                // Alert.alert(JSON.stringify(char));
-                if (char !== undefined && !character.isHeroDesignerCharacter(char)) {
-                    this._openWarningDialog();
-                }
+                this._postImport(char);
             });
+        }
+    }
+
+    _postImport(importedCharacter) {
+        this._refreshCharacters();
+
+        if (importedCharacter !== undefined && !character.isHeroDesignerCharacter(importedCharacter)) {
+            this._openWarningDialog();
+        }
+
+        if (Object.keys(this.props.characters).length === MAX_CHARACTER_SLOTS) {
+            for (let char of Object.values(this.props.characters)) {
+                if (char.filename === importedCharacter.filename) {
+                    this.props.updateLoadedCharacters(importedCharacter, this.props.character, this.props.characters);
+                    break;
+                }
+            }
         }
     }
 
@@ -334,6 +344,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     setCharacter,
     clearCharacter,
+    updateLoadedCharacters,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CharactersScreen);

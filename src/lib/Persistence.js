@@ -149,6 +149,30 @@ class Persistence {
         return characterData;
     }
 
+    async updateLoadedCharacters(newCharacter, character, characters) {
+        try {
+            if (newCharacter.filename === character.filename) {
+                character = {...newCharacter};
+            }
+
+            for (let [slot, char] of Object.entries(characters)) {
+                if (char.filename === newCharacter.filename) {
+                    characters[slot] = {...newCharacter};
+                    break;
+                }
+            }
+
+            this.saveCharacter(character, characters);
+        } catch (error) {
+            common.toast('Unable to update loaded characters');
+        }
+
+        return {
+            character: character,
+            characters: characters,
+        };
+    }
+
     async clearCharacter(filename, character, characters, saveCharacters = true) {
         try {
             if (saveCharacters) {

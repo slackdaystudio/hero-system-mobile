@@ -22,6 +22,8 @@ import { persistence, MAX_CHARACTER_SLOTS } from '../lib/Persistence';
 
 export const SET_CHARACTER = 'SET_CHARACTER';
 
+export const UPDATE_LOADED_CHARACTERS = 'UPDATE_LOADED_CHARACTERS';
+
 export const INITIALIZE_CHARACTER = 'INITIALIZE_CHARACTER';
 
 export const SAVE_CACHED_CHARACTER = 'SAVE_CACHED_CHARACTER';
@@ -51,6 +53,17 @@ export function setCharacter(character, slot) {
         persistence.saveCharacter(character, slot).then(characterData => {
             dispatch({
                 type: SET_CHARACTER,
+                payload: characterData,
+            });
+        });
+    };
+}
+
+export function updateLoadedCharacters(newCharacter, character, characters) {
+    return async (dispatch) => {
+        persistence.updateLoadedCharacters(newCharacter, character, characters).then(characterData => {
+            dispatch({
+                type: UPDATE_LOADED_CHARACTERS,
                 payload: characterData,
             });
         });
@@ -139,6 +152,7 @@ export default function character(state = characterState, action) {
     switch (action.type) {
         case SET_CHARACTER:
         case CLEAR_CHARACTER:
+        case UPDATE_LOADED_CHARACTERS:
             newState = {
                 ...state,
                 character: {
