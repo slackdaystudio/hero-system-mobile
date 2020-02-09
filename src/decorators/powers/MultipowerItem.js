@@ -48,10 +48,17 @@ export default class MultipowerItem extends CharacterTrait {
 
     attributes() {
         let attributes = this.characterTrait.attributes();
+        let slotType =  this.characterTrait.ultraSlot ? 'Variable' : 'Fixed';
+
+        if (heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
+            if (this.characterTrait.ultraSlot) {
+                slotType = 'Flexible';
+            }
+        }
 
         attributes.push({
             label: 'Slot Type',
-            value: this.characterTrait.ultraSlot ? 'Variable' : 'Fixed',
+            value: slotType,
         });
 
         return attributes;
