@@ -79,6 +79,27 @@ export default class CharacterTrait {
             this._addAttribute(this.trait.modifier, attributes);
         }
 
+        if (this.trait.hasOwnProperty('quantity') && this.trait.quantity > 1) {
+            attributes.push({
+                label: 'Quantity',
+                value: this.trait.quantity,
+            });
+        }
+
+        if (this.trait.hasOwnProperty('price')) {
+            attributes.push({
+                label: 'Price',
+                value: `$${this.trait.price}`,
+            });
+        }
+
+        if (this.trait.hasOwnProperty('weight')) {
+            attributes.push({
+                label: 'Weight',
+                value: `${common.toKg(this.trait.weight)} kg`,
+            });
+        }
+
         return attributes;
     }
 
