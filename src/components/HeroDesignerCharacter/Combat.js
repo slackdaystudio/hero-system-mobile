@@ -94,7 +94,7 @@ export default class Combat extends Component {
     _resetCombatState(key) {
         let combatDetails = {};
 
-        combatDetails[key] = heroDesignerCharacter.getCharacteristicTotal(key, this.props.character);
+        combatDetails[key] = heroDesignerCharacter.getCharacteristicTotal(key === 'endurance' ? 'end' : key, this.props.character);
 
         this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
     }
