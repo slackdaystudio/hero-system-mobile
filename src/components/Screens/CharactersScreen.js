@@ -136,7 +136,7 @@ class CharactersScreen extends Component {
             this._openWarningDialog();
         }
 
-        if (Object.keys(this.props.characters).length === MAX_CHARACTER_SLOTS) {
+        if (Object.keys(this.props.characters).length >= 1) {
             for (let char of Object.values(this.props.characters)) {
                 if (char.filename === importedCharacter.filename) {
                     this.props.updateLoadedCharacters(importedCharacter, this.props.character, this.props.characters);
