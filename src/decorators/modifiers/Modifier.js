@@ -17,9 +17,10 @@ import { common } from '../../lib/Common';
 // limitations under the License.
 
 export default class Modifier {
-    constructor(modifier, trait) {
+    constructor(modifier, trait, getCharacter) {
         this.modifier = modifier;
         this.trait = trait;
+        this.getCharacter = getCharacter;
     }
 
     cost() {

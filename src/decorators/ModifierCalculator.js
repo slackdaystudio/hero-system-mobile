@@ -93,7 +93,7 @@ export default class ModifierCalculator extends CharacterTrait {
 
             if (Array.isArray(trait.modifier)) {
                 for (let modifier of trait.modifier) {
-                    decorated = modifierDecorator.decorate(modifier, trait);
+                    decorated = modifierDecorator.decorate(modifier, trait, this.characterTrait.getCharacter);
 
                     totalModifiers.push({
                         label: decorated.label(),
@@ -101,7 +101,7 @@ export default class ModifierCalculator extends CharacterTrait {
                     });
                 }
             } else {
-                decorated = modifierDecorator.decorate(trait.modifier, trait);
+                decorated = modifierDecorator.decorate(trait.modifier, trait, this.characterTrait.getCharacter);
 
                 totalModifiers.push({
                     label: decorated.label(),

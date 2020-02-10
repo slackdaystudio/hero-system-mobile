@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import Modifier from './Modifier';
+import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -17,7 +18,7 @@ import Modifier from './Modifier';
 
 export default class Aoe extends Modifier {
     constructor(decorated) {
-        super(decorated.modifier, decorated.trait);
+        super(decorated.modifier, decorated.trait, decorated.getCharacter);
 
         this.decorated = decorated;
     }
@@ -33,7 +34,11 @@ export default class Aoe extends Modifier {
             }
         }
 
-        cost += this._getMultiplications(this.decorated.modifier.levels, template.lvlmultiplier, template.lvlpower) * template.lvlcost;
+        if (heroDesignerCharacter.isFifth(this.decorated.getCharacter())) {
+            cost += template.basecost;
+        } else {
+            cost += this._getMultiplications(this.decorated.modifier.levels, template.lvlmultiplier, template.lvlpower) * template.lvlcost;
+        }
 
         if (this.decorated.modifier.hasOwnProperty('adder')) {
             if (Array.isArray(this.decorated.modifier.adder)) {
@@ -53,7 +58,7 @@ export default class Aoe extends Modifier {
     }
 
     _getAoeAdderCost(adder, template) {
-        let stepAdders = ['DOUBLEHEIGHT', 'DOUBLEWIDTH', 'MOBILE'];
+        let stepAdders = ['DOUBLEAREA', 'DOUBLEHEIGHT', 'DOUBLEWIDTH', 'MOBILE'];
         let adderCost = 0;
 
         if (stepAdders.includes(adder.xmlid.toUpperCase())) {
@@ -70,7 +75,11 @@ export default class Aoe extends Modifier {
                 adderTemplate = template.adder;
             }
 
-            adderCost += this._getMultiplications(adder.levels, adderTemplate.lvlmultiplier + 1, adderTemplate.lvlpower) * adderTemplate.lvlcost;
+            if (heroDesignerCharacter.isFifth(this.decorated.getCharacter())) {
+                adderCost += adder.levels / adderTemplate.lvlval * adderTemplate.lvlcost;
+            } else {
+                adderCost += this._getMultiplications(adder.levels, adderTemplate.lvlmultiplier + 1, adderTemplate.lvlpower) * adderTemplate.lvlcost;
+            }
         } else {
             adderCost += adder.basecost;
         }

@@ -22,8 +22,8 @@ const AOE = 'AOE';
 const DAMAGEOVERTIME = 'DAMAGEOVERTIME';
 
 class ModifierDecorator {
-    decorate(modifier, trait) {
-        let decorated = new Modifier(modifier, trait);
+    decorate(modifier, trait, getCharacter) {
+        let decorated = new Modifier(modifier, trait, getCharacter);
 
         switch (modifier.xmlid.toUpperCase()) {
             case AOE:
@@ -33,7 +33,7 @@ class ModifierDecorator {
                 decorated = new Dot(decorated);
                 break;
             default:
-                    // do nothing
+                // do nothing
         }
 
         return decorated;
