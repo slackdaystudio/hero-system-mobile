@@ -93,7 +93,7 @@ export default class Barrier extends CharacterTrait {
         if (heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
             attributes.push({
                 label: 'Dimensions',
-                value: `${this.characterTrait.trait.lengthlevels}" x ${this.characterTrait.trait.heightlevels}"`,
+                value: `${this.characterTrait.trait.lengthlevels + 1}" x ${this.characterTrait.trait.heightlevels + 1}"`,
             });
         } else {
             attributes.push({
