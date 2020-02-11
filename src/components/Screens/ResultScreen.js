@@ -310,12 +310,33 @@ class ResultScreen extends Component {
         return <Text style={styles.grey}>{knockbackText}</Text>;
     }
 
+    _getRollPercentageColor(percentage) {
+        if (this.state.result.rollType === NORMAL_DAMAGE || this.state.result.rollType === KILLING_DAMAGE || this.state.result.rollType === EFFECT) {
+            return percentage < 0.0 ? 'red' : 'green';
+        }
+
+        return percentage < 0.0 ? 'green' : 'red';
+    }
+
     _renderRoll() {
         if (this.state.result.hasOwnProperty('results')) {
             return this.state.result.results.map((result, index) => {
+                let percentage = statistics.getPercentage(result);
+
                 return (
                     <View key={'roll-result-' + index}>
-                        <Text style={[styles.grey, localStyles.rollResult]}><AnimateNumber value={result.total} formatter={(val) => {return val.toFixed(0);}} interval={1} /></Text>
+                        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                            <View style={{flex: 1}}>
+                                <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
+                                    <AnimateNumber value={result.total} formatter={(val) => val.toFixed(0)} interval={1} />
+                                </Text>
+                            </View>
+                            <View style={{flex: 1, paddingTop: verticalScale(50)}}>
+                                <Text style={{color: this._getRollPercentageColor(percentage), fontSize: 40}}>
+                                    <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
+                                </Text>
+                            </View>
+                        </View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Dice Rolled: </Text>{result.rolls.length} ({result.rolls.join(', ')})
                         </Text>
@@ -328,9 +349,22 @@ class ResultScreen extends Component {
             });
         }
 
+        let percentage = statistics.getPercentage(this.state.result);
+
         return (
             <View>
-                <Text style={[styles.grey, localStyles.rollResult]}><AnimateNumber value={this.state.result.total} formatter={(val) => {return val.toFixed(0);}} /></Text>
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <View style={{flex: 1}}>
+                        <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
+                            <AnimateNumber value={this.state.result.total} formatter={(val) => val.toFixed(0)} />
+                        </Text>
+                    </View>
+                    <View style={{flex: 1, paddingTop: verticalScale(50)}}>
+                        <Text style={{color: this._getRollPercentageColor(percentage), fontSize: 40}}>
+                            <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
+                        </Text>
+                    </View>
+                </View>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dice Rolled: </Text>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
                 </Text>

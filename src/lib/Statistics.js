@@ -1,5 +1,5 @@
 import { Alert } from 'react-native';
-import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK } from './DieRoller';
+import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK, PARTIAL_DIE_HALF } from './DieRoller';
 import { persistence } from './Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -15,6 +15,10 @@ import { persistence } from './Persistence';
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+const AVERAGE_DIE_ROLL = 3.5;
+
+const AVERAGE_HALF_DIE_ROLL = 2.0;
 
 class Statistics {
     async add(resultRoll) {
@@ -70,6 +74,21 @@ class Statistics {
         }
 
         return location;
+    }
+
+    getPercentage(roll) {
+        let sum = roll.rolls.reduce((a, b) => a + b, 0);
+        let average = 0.0;
+
+        if (roll.partialDie === PARTIAL_DIE_HALF) {
+            let halfDie = roll.rolls.pop();
+
+            average += AVERAGE_HALF_DIE_ROLL;
+        }
+
+        average += roll.rolls.length * AVERAGE_DIE_ROLL;
+
+        return Math.round((sum / average - 1) * 100 * 10) / 10;
     }
 
     _updateDistributions(rolls, distributions) {
