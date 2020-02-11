@@ -70,8 +70,6 @@ class ResultScreen extends Component {
         this.backHandler.remove();
 
         RNShake.removeEventListener('ShakeEvent');
-
-        this.props.navigation.state.params = null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
