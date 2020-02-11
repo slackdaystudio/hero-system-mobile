@@ -326,14 +326,14 @@ class ResultScreen extends Component {
 
                 return (
                     <View key={'roll-result-' + index}>
-                        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                            <View style={{flex: 1}}>
+                        <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
+                            <View style={{flex: -1}}>
                                 <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
                                     <AnimateNumber value={result.total} formatter={(val) => val.toFixed(0)} interval={1} />
                                 </Text>
                             </View>
-                            <View style={{flex: 1, paddingTop: verticalScale(50)}}>
-                                <Text style={{color: this._getRollPercentageColor(percentage), fontSize: 40}}>
+                            <View style={{flex: 1}}>
+                                <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30)}}>
                                     <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
                                 </Text>
                             </View>
@@ -354,14 +354,14 @@ class ResultScreen extends Component {
 
         return (
             <View>
-                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <View style={{flex: 1}}>
-                        <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
+                    <View style={{flex: -1}}>
+                        <Text style={[styles.grey, localStyles.rollResult]}>
                             <AnimateNumber value={this.state.result.total} formatter={(val) => val.toFixed(0)} />
                         </Text>
                     </View>
-                    <View style={{flex: 1, paddingTop: verticalScale(50)}}>
-                        <Text style={{color: this._getRollPercentageColor(percentage), fontSize: 40}}>
+                    <View style={{flex: 1}}>
+                        <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30), alignSelf: 'flex-start'}}>
                             <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
                         </Text>
                     </View>
@@ -403,7 +403,7 @@ class ResultScreen extends Component {
 
 const localStyles = ScaledSheet.create({
     rollResult: {
-        fontSize: '100@vs',
+        fontSize: '80@vs',
         fontWeight: 'bold',
     },
     lineContainer: {
