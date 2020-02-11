@@ -246,6 +246,7 @@ class ResultScreen extends Component {
             case 'NONE':
                 return null;
             case 'AID':
+            case 'SUCCOR':
                 return <Text style={styles.grey}>You have added {result.total} AP to the target power/effect</Text>;
             case 'DISPEL':
                 return <Text style={styles.grey}>You have dispelled {result.total} AP</Text>;
