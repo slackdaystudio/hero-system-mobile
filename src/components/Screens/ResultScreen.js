@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Platform, BackHandler, StyleSheet, View, Image, Alert } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
-import AnimateNumber from 'react-native-animate-number';
+import AnimateNumber from '@bankify/react-native-animate-number';
 import { NavigationEvents } from 'react-navigation';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
@@ -331,7 +331,7 @@ class ResultScreen extends Component {
                                 </Text>
                             </View>
                             <View style={{flex: 1}}>
-                                <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30), paddingBottom: Platform.OS === 'ios' ? 0 : 15}}>
+                                <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30), paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13)}}>
                                     <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
                                 </Text>
                             </View>
@@ -359,7 +359,7 @@ class ResultScreen extends Component {
                         </Text>
                     </View>
                     <View style={{flex: 1}}>
-                        <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30), paddingBottom: Platform.OS === 'ios' ? 0 : 15}}>
+                        <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30), paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13)}}>
                             <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
                         </Text>
                     </View>
