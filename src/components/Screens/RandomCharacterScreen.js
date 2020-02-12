@@ -28,7 +28,7 @@ import { setRandomHero, setRandomHeroName } from '../../reducers/randomHero';
 class RandomCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        character: PropTypes.object.isRequired,
+        character: PropTypes.object,
         setRandomHero: PropTypes.func.isRequired,
         setRandomHeroName: PropTypes.func.isRequired,
     }
