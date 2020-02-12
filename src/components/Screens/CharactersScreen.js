@@ -138,7 +138,7 @@ class CharactersScreen extends Component {
 
         if (Object.keys(this.props.characters).length >= 1) {
             for (let char of Object.values(this.props.characters)) {
-                if (char.filename === importedCharacter.filename) {
+                if (char !== null && char.filename === importedCharacter.filename) {
                     this.props.updateLoadedCharacters(importedCharacter, this.props.character, this.props.characters);
                     break;
                 }
