@@ -215,7 +215,7 @@ class File {
                 character = await this._loadXmlExportCharacter(rawXml);
             }
         } catch (error) {
-            common.toast('Read Error: ' + error.message);
+            Alert.alert('Read Error: ' + error.message);
         } finally {
             endLoad();
         }
