@@ -60,7 +60,7 @@
     "react-native-modal": "^11.5.3",
     "react-native-pathjs-charts": "0.0.34",
     "react-native-pie-chart": "^1.0.13",
-    "react-native-reanimated": "^1.4.0",
+    "react-native-reanimated": "^1.7.0",
     "react-native-safe-area-context": "^0.6.2",
     "react-native-screens": "^2.0.0-alpha.22",
     "react-native-shake": "^3.4.0",
