@@ -43,6 +43,7 @@
     ]
   },
   "dependencies": {
+    "@bankify/react-native-animate-number": "^0.2.1",
     "@react-native-community/async-storage": "^1.7.1",
     "@react-native-community/masked-view": "^0.1.5",
     "buffer": "^5.4.3",
@@ -52,9 +53,9 @@
     "native-base": "2.13.8",
     "react": "16.8.6",
     "react-native": "0.60.6",
-    "@bankify/react-native-animate-number": "^0.2.1",
     "react-native-calculator": "^0.5.2",
     "react-native-document-picker": "^3.2.4",
+    "react-native-dropdown-autocomplete": "^1.0.18",
     "react-native-gesture-handler": "^1.5.3",
     "react-native-iphone-x-helper": "^1.2.1",
     "react-native-modal": "^11.5.3",

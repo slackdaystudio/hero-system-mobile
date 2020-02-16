@@ -6,6 +6,7 @@ import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
 import CalculatorInput from '../CalculatorInput/CalculatorInput';
+import StatusDialog from '../StatusDialog/StatusDialog';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
@@ -36,13 +37,16 @@ export default class Combat extends Component {
         usePhase: PropTypes.func.isRequired,
         forms: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+        resetForm: PropTypes.func.isRequired,
     }
 
     constructor(props) {
         super(props);
 
         this.state = {
-            combatDetails: this._getCombatDetails(props.character)
+            combatDetails: this._getCombatDetails(props.character),
+            statusDialogVisible: false,
         }
 
         this.updateCombatState = this._updateCombatState.bind(this);
@@ -53,6 +57,9 @@ export default class Combat extends Component {
         this.rollToHit = this._rollToHit.bind(this);
         this.usePhase = this._usePhase.bind(this);
         this.abortPhase = this._abortPhase.bind(this);
+        this.addStatus = this._addStatus.bind(this);
+        this.applyStatus = this._applyStatus.bind(this);
+        this.closeStatusDialog = this._closeStatusDialog.bind(this);
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -152,6 +159,24 @@ export default class Combat extends Component {
 
     _abortPhase(phase) {
         this.props.usePhase(phase, this.props.character.showSecondary, true);
+    }
+
+    _openStatusDialog() {
+        this.setState({statusDialogVisible: true});
+    }
+
+    _addStatus() {
+        this.props.navigation.navigate('Status');
+    }
+
+    _applyStatus() {
+        this.props.resetForm('status');
+
+        this._closeStatusDialog();
+    }
+
+    _closeStatusDialog() {
+        this.setState({statusDialogVisible: false});
     }
 
     _renderHealthItem(stateKey, label=null) {
@@ -376,6 +401,18 @@ export default class Combat extends Component {
         );
     }
 
+    _renderStatuses() {
+        if (this.props.character.hasOwnProperty('statuses') && this.props.character.statuses.length > 0) {
+            return <Text style={styles.grey}>Status</Text>;
+        }
+
+        return (
+            <View style={{flex: 1, alignSelf: 'flex-start'}}>
+                <Text style={styles.grey}>You have no active status effects</Text>
+            </View>
+        );
+    }
+
     render() {
         return (
             <View>
@@ -390,8 +427,17 @@ export default class Combat extends Component {
                         </Button>
                     </View>
                 </View>
+                <Heading text='Status Effects' />
+                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end'}}>
+                        <Button style={styles.buttonSmall} onPress={() => this._openStatusDialog()}>
+                            <Text uppercase={false} style={styles.buttonText}>Add</Text>
+                        </Button>
+                    </View>
+                    {this._renderStatuses()}
+                </View>
                 <Heading text='Defenses' />
-                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: 10}}>
+                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>
                     {this._renderDefenses()}
                 </View>
                 <Heading text='Phases' />
@@ -406,6 +452,14 @@ export default class Combat extends Component {
                     {this._renderCv('dmcv')}
                 </View>
                 {this._renderLevels()}
+                <StatusDialog
+                    character={this.props.character}
+                    statusForm={this.props.forms.status}
+                    updateFormValue={this.props.updateFormValue}
+                    visible={this.state.statusDialogVisible}
+                    onApply={this.applyStatus}
+                    onClose={this.closeStatusDialog}
+                />
             </View>
         );
     }

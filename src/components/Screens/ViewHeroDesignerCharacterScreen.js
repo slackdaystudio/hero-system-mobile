@@ -16,7 +16,7 @@ import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesi
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
-import { updateForm } from '../../reducers/forms';
+import { updateForm, updateFormValue, resetForm } from '../../reducers/forms';
 import { setShowSecondary, selectCharacter, setSparseCombatDetails, usePhase, updateNotes, clearCharacter } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -39,6 +39,8 @@ class ViewHeroDesignerCharacterScreen extends Component {
         character: PropTypes.object,
         characters: PropTypes.object,
         updateForm: PropTypes.func.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+        resetForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
@@ -188,6 +190,8 @@ class ViewHeroDesignerCharacterScreen extends Component {
                             setSparseCombatDetails={this.props.setSparseCombatDetails}
                             forms={this.props.forms}
                             updateForm={this.props.updateForm}
+                            updateFormValue={this.props.updateFormValue}
+                            resetForm={this.props.resetForm}
                             usePhase={this.props.usePhase}
                         />
                     </View>
@@ -251,6 +255,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     updateForm,
+    updateFormValue,
+    resetForm,
     setShowSecondary,
     selectCharacter,
     setSparseCombatDetails,
