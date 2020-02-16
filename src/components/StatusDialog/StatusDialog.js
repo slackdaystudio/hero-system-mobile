@@ -44,7 +44,7 @@ class StatusDialog extends Component {
             if (/^(-)?[0-9]*$/.test(value) === false) {
                 return;
             }
-        } else if (key !== 'name' && key !== 'label' || key !== 'targetTrait') {
+        } else if (key !== 'name' && key !== 'label') {
             if (/^[0-9]*$/.test(value) === false) {
                 return;
             }
