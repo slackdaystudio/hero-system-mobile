@@ -147,11 +147,14 @@ function _initializeStatusForm() {
         name: 'Aid',
         label: '',
         activePoints: 0,
+        targetTrait: null,
+        targetTraitType: null,
         fadeRate: 0,
         segments: 0,
         body: 0,
         pd: 0,
         ed: 0,
+        index: -1,
     };
 }
 

@@ -19,6 +19,7 @@ class StatusDialog extends Component {
     static propTypes = {
         character: PropTypes.object.isRequired,
         statusForm: PropTypes.object.isRequired,
+        updateForm: PropTypes.func.isRequired,
         updateFormValue: PropTypes.func.isRequired,
         visible: PropTypes.bool.isRequired,
         onApply: PropTypes.func.isRequired,
@@ -43,7 +44,7 @@ class StatusDialog extends Component {
             if (/^(-)?[0-9]*$/.test(value) === false) {
                 return;
             }
-        } else if (key !== 'name' && key !== 'label') {
+        } else if (key !== 'name' && key !== 'label' || key !== 'targetTrait') {
             if (/^[0-9]*$/.test(value) === false) {
                 return;
             }
@@ -90,6 +91,12 @@ class StatusDialog extends Component {
     }
 
     _handleSelectItem(item, index) {
+        let statusForm = {...this.props.statusForm};
+        statusForm.targetTrait = item.name;
+        statusForm.targetTraitType = item.type;
+
+        this.props.updateForm('status', statusForm);
+
         this.props.onDropdownClose();
     }
 

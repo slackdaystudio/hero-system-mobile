@@ -44,6 +44,12 @@ export const USE_PHASE = 'USE_PHASE';
 
 export const UPDATE_NOTES = 'UPDATE_NOTES';
 
+export const APPLY_STATUS = 'APPLY_STATUS';
+
+export const CLEAR_ALL_STATUSES = 'CLEAR_ALL_STATUSES';
+
+export const CLEAR_STATUS = 'CLEAR_STATUS';
+
 //////////////////////////////
 // ACTIONS                  //
 //////////////////////////////
@@ -141,6 +147,39 @@ export function updateNotes(notes) {
     };
 }
 
+export function applyStatus(character, characters, status) {
+    return async (dispatch) => {
+        persistence.applyStatus(character, characters, status).then((characterData) => {
+            dispatch({
+                type: APPLY_STATUS,
+                payload: characterData,
+            });
+        });
+    };
+}
+
+export function clearAllStatuses(character, characters) {
+    return async (dispatch) => {
+        persistence.clearAllStatuses(character, characters).then((characterData) => {
+            dispatch({
+                type: CLEAR_ALL_STATUSES,
+                payload: characterData,
+            });
+        });
+    };
+}
+
+export function clearStatus(character, characters, index) {
+    return async (dispatch) => {
+        persistence.clearStatus(character, characters, index).then((characterData) => {
+            dispatch({
+                type: CLEAR_STATUS,
+                payload: characterData,
+            });
+        });
+    };
+}
+
 let characterState = {
     character: null,
     characters: [],
@@ -153,6 +192,9 @@ export default function character(state = characterState, action) {
         case SET_CHARACTER:
         case CLEAR_CHARACTER:
         case UPDATE_LOADED_CHARACTERS:
+        case APPLY_STATUS:
+        case CLEAR_ALL_STATUSES:
+        case CLEAR_STATUS:
             newState = {
                 ...state,
                 character: {
