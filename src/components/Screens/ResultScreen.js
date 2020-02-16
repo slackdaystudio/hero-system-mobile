@@ -248,6 +248,8 @@ class ResultScreen extends Component {
                 return <Text style={styles.grey}>You have added {result.total} AP to the target power/effect</Text>;
             case 'DISPEL':
                 return <Text style={styles.grey}>You have dispelled {result.total} AP</Text>;
+            case 'DRAIN':
+                return <Text style={styles.grey}>You have subtracted {result.total} AP</Text>;
             case 'ENTANGLE':
                 return <Text style={styles.grey}>Your entangle has a BODY of {dieRoller.countNormalDamageBody(result)}</Text>;
             case 'FLASH':
