@@ -5,6 +5,7 @@ import { common } from './Common';
 import { file } from './File';
 import { character as libCharacter } from './Character';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
+import { combatDetails } from './CombatDetails';
 import speedTable from '../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -222,6 +223,81 @@ class Persistence {
         } catch (error) {
             common.toast('Unable to clear persisted character');
         }
+    }
+
+    async applyStatus(character, characters, status) {
+        try {
+            combatDetails.applyStatus(character, status);
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
+                    combatDetails.applyStatus(characters[i.toString()], status);
+                    break;
+                }
+            }
+
+            await AsyncStorage.setItem('character', JSON.stringify(character));
+            await AsyncStorage.setItem('characters', JSON.stringify(characters));
+
+            await this.saveCharacterData(character, characters);
+        } catch (error) {
+            common.toast('Unable to apply status to character');
+        }
+
+        return {
+            character: character,
+            characters: characters,
+        };
+    }
+
+    async clearAllStatuses(character, characters) {
+        try {
+            combatDetails.clearAllStatuses(character);
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
+                    combatDetails.clearAllStatuses(characters[i.toString()]);
+                    break;
+                }
+            }
+
+            await AsyncStorage.setItem('character', JSON.stringify(character));
+            await AsyncStorage.setItem('characters', JSON.stringify(characters));
+
+            await this.saveCharacterData(character, characters);
+        } catch (error) {
+            common.toast('Unable to clear all statuses for character');
+        }
+
+        return {
+            character: character,
+            characters: characters,
+        };
+    }
+
+    async clearStatus(character, characters, index) {
+        try {
+            combatDetails.clearStatus(character, index);
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
+                    combatDetails.clearStatus(characters[i.toString()], index);
+                    break;
+                }
+            }
+
+            await AsyncStorage.setItem('character', JSON.stringify(character));
+            await AsyncStorage.setItem('characters', JSON.stringify(characters));
+
+            await this.saveCharacterData(character, characters);
+        } catch (error) {
+            common.toast('Unable to clear status from character');
+        }
+
+        return {
+            character: character,
+            characters: characters,
+        };
     }
 
     async initializeApplicationSettings() {

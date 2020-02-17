@@ -125,12 +125,11 @@ export default ScaledSheet.create({
         backgroundColor: '#121212',
     },
     modal: {
+        flex: -1,
         borderRadius: 4,
         borderWidth: 1,
         borderColor: '#303030',
-        flex: 1,
         flexDirection: 'column',
-        maxHeight: '295@vs'
     },
     modalHeader: {
         fontSize: '20@vs',
@@ -146,10 +145,27 @@ export default ScaledSheet.create({
         borderTopWidth: 1,
     },
     modalContent: {
+        flex: -1,
         backgroundColor: '#1b1d1f',
-        padding: '22@s',
+        paddingHorizontal: '22@s',
+        paddingTop: '10@vs',
+        paddingBottom: '40@vs',
         justifyContent: 'center',
         alignItems: 'stretch',
-        height: '255@vs'
-    }
+    },
+    autocompletesContainer: {
+        paddingTop: 0,
+        width: '100%',
+    },
+    autocompleteInputContainer: {
+        display: 'flex',
+        flexShrink: 0,
+        flexGrow: 0,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        borderWidth: 0,
+        marginLeft: '-13@s',
+    },
 });

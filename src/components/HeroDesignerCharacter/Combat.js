@@ -6,6 +6,7 @@ import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
 import CalculatorInput from '../CalculatorInput/CalculatorInput';
+import StatusDialog from '../StatusDialog/StatusDialog';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
@@ -32,17 +33,24 @@ export default class Combat extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object.isRequired,
+        characters: PropTypes.object.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
         forms: PropTypes.object.isRequired,
         updateForm: PropTypes.func.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+        resetForm: PropTypes.func.isRequired,
+        applyStatus: PropTypes.func.isRequired,
+        clearAllStatuses: PropTypes.func.isRequired,
+        clearStatus: PropTypes.func.isRequired,
     }
 
     constructor(props) {
         super(props);
 
         this.state = {
-            combatDetails: this._getCombatDetails(props.character)
+            combatDetails: this._getCombatDetails(props.character),
+            statusDialogVisible: false,
         }
 
         this.updateCombatState = this._updateCombatState.bind(this);
@@ -53,6 +61,11 @@ export default class Combat extends Component {
         this.rollToHit = this._rollToHit.bind(this);
         this.usePhase = this._usePhase.bind(this);
         this.abortPhase = this._abortPhase.bind(this);
+        this.applyStatus = this._applyStatus.bind(this);
+        this.closeStatusDialog = this._closeStatusDialog.bind(this);
+        this.clearAllStatuses = this._clearAllStatuses.bind(this);
+        this.editStatus = this._editStatus.bind(this);
+        this.clearStatus = this._clearStatus.bind(this);
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -152,6 +165,62 @@ export default class Combat extends Component {
 
     _abortPhase(phase) {
         this.props.usePhase(phase, this.props.character.showSecondary, true);
+    }
+
+    _openStatusDialog() {
+        this.setState({statusDialogVisible: true});
+    }
+
+    _applyStatus() {
+        this.props.applyStatus(this.props.character, this.props.characters, this.props.forms.status);
+
+        this.props.resetForm('status');
+
+        this._closeStatusDialog();
+    }
+
+    _clearAllStatuses() {
+        this.props.clearAllStatuses(this.props.character, this.props.characters);
+    }
+
+    _editStatus(index) {
+        const key = this.props.character.showSecondary ? 'secondary' : 'primary';
+        const status = this.props.character.combatDetails[key].statuses[index];
+        let statusForm = {...this.props.forms.status};
+
+        statusForm.name = status.name;
+        statusForm.label = status.label || '';
+        statusForm.index = index;
+
+        switch (status.name) {
+            case 'Aid':
+            case 'Drain':
+                statusForm.activePoints = status.activePoints || 0;
+                statusForm.targetTrait = status.targetTrait || '';
+                break;
+            case 'Entangle':
+                statusForm.body = status.body || 0;
+                statusForm.pd = status.pd || 0;
+                statusForm.ed = status.ed || 0;
+                break;
+            case 'Flash':
+                statusForm.segments = status.segments || 0;
+                break;
+            default:
+                // Do nothing
+        }
+
+        this.props.updateForm('status', statusForm);
+
+        this._openStatusDialog();
+    }
+
+    _clearStatus(index) {
+        this.props.clearStatus(this.props.character, this.props.characters, index);
+    }
+
+    _closeStatusDialog() {
+        this.setState({statusDialogVisible: false});
     }
 
     _renderHealthItem(stateKey, label=null) {
@@ -376,6 +445,55 @@ export default class Combat extends Component {
         );
     }
 
+    _renderStatuses() {
+        const combatDetailsKey = this.props.character.showSecondary ? 'secondary' : 'primary';
+
+        if (this.props.character.combatDetails[combatDetailsKey].hasOwnProperty('statuses') &&
+            this.props.character.combatDetails[combatDetailsKey].statuses.length > 0) {
+            return (
+                <Fragment>
+                    {this.props.character.combatDetails[combatDetailsKey].statuses.map((status, index) => {
+                        let statusText = status.label === '' ? `${status.name} - ` : `${status.label} (${status.name})`;
+
+                        switch (status.name) {
+                            case 'Aid':
+                            case 'Drain':
+                                statusText += `: ${status.activePoints < 0 ? status.activePoints : `+${status.activePoints}`} AP to ${status.targetTrait}`;
+                                break;
+                            case 'Entangle':
+                                statusText += `: ${status.body} BODY, ${status.pd}/${status.ed}`;
+                                break;
+                            case 'Flash':
+                                statusText += `: For ${status.segments} segments`;
+                                break;
+                            default:
+                                // Do nothing
+                        }
+
+                        return (
+                            <View key={`status-${index}`} style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: verticalScale(10)}}>
+                                <View style={{flex: 1, flexGrow: 1, alignSelf: 'flex-start'}}>
+                                    <Text style={styles.grey}>•</Text>
+                                </View>
+                                <View style={{flex: 1, flexGrow: 20, alignSelf: 'center', justifyContent: 'center'}}>
+                                    <Text style={styles.grey}>{statusText}</Text>
+                                </View>
+                                <Icon type='FontAwesome' name="edit" style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10)}} onPress={() => this.editStatus(index)} />
+                                <Icon type='FontAwesome' name="trash" style={{fontSize: verticalScale(20), color: '#14354d'}} onPress={() => this.clearStatus(index)} />
+                            </View>
+                        );
+                    })}
+                </Fragment>
+            );
+        }
+
+        return (
+            <View style={{flex: 1, alignSelf: 'flex-start'}}>
+                <Text style={styles.grey}>You have no active status effects</Text>
+            </View>
+        );
+    }
+
     render() {
         return (
             <View>
@@ -390,8 +508,21 @@ export default class Combat extends Component {
                         </Button>
                     </View>
                 </View>
+                <Heading text='Status Effects' />
+                <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
+                        <Button style={styles.buttonSmall} onPress={() => this._openStatusDialog()}>
+                            <Text uppercase={false} style={styles.buttonText}>Add</Text>
+                        </Button>
+                        <View style={{paddingHorizontal: scale(5)}} />
+                        <Button style={styles.buttonSmall} onPress={() => this.clearAllStatuses()}>
+                            <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
+                        </Button>
+                    </View>
+                    {this._renderStatuses()}
+                </View>
                 <Heading text='Defenses' />
-                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: 10}}>
+                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>
                     {this._renderDefenses()}
                 </View>
                 <Heading text='Phases' />
@@ -406,6 +537,15 @@ export default class Combat extends Component {
                     {this._renderCv('dmcv')}
                 </View>
                 {this._renderLevels()}
+                <StatusDialog
+                    character={this.props.character}
+                    statusForm={this.props.forms.status}
+                    updateForm={this.props.updateForm}
+                    updateFormValue={this.props.updateFormValue}
+                    visible={this.state.statusDialogVisible}
+                    onApply={this.applyStatus}
+                    onClose={this.closeStatusDialog}
+                />
             </View>
         );
     }

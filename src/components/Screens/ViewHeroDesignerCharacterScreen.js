@@ -16,8 +16,18 @@ import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesi
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
-import { updateForm } from '../../reducers/forms';
-import { setShowSecondary, selectCharacter, setSparseCombatDetails, usePhase, updateNotes, clearCharacter } from '../../reducers/character';
+import { updateForm, updateFormValue, resetForm } from '../../reducers/forms';
+import {
+    setShowSecondary,
+    selectCharacter,
+    setSparseCombatDetails,
+    usePhase,
+    updateNotes,
+    clearCharacter,
+    applyStatus,
+    clearAllStatuses,
+    clearStatus
+} from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -39,12 +49,17 @@ class ViewHeroDesignerCharacterScreen extends Component {
         character: PropTypes.object,
         characters: PropTypes.object,
         updateForm: PropTypes.func.isRequired,
+        updateFormValue: PropTypes.func.isRequired,
+        resetForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
         usePhase: PropTypes.func.isRequired,
         updateNotes: PropTypes.func.isRequired,
         selectCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
+        applyStatus: PropTypes.func.isRequired,
+        clearAllStatuses: PropTypes.func.isRequired,
+        clearStatus: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -184,11 +199,17 @@ class ViewHeroDesignerCharacterScreen extends Component {
                         <Combat
                             navigation={this.props.navigation}
                             character={this.props.character}
+                            characters={this.props.characters}
                             combatDetails={this.props.character.combatDetails}
                             setSparseCombatDetails={this.props.setSparseCombatDetails}
                             forms={this.props.forms}
                             updateForm={this.props.updateForm}
+                            updateFormValue={this.props.updateFormValue}
+                            resetForm={this.props.resetForm}
                             usePhase={this.props.usePhase}
+                            applyStatus={this.props.applyStatus}
+                            clearAllStatuses={this.props.clearAllStatuses}
+                            clearStatus={this.props.clearStatus}
                         />
                     </View>
                 </Tab>
@@ -251,12 +272,17 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     updateForm,
+    updateFormValue,
+    resetForm,
     setShowSecondary,
     selectCharacter,
     setSparseCombatDetails,
     usePhase,
     updateNotes,
     clearCharacter,
+    applyStatus,
+    clearAllStatuses,
+    clearStatus,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewHeroDesignerCharacterScreen);

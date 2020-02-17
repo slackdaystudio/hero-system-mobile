@@ -32,6 +32,7 @@ const effectTypes = [
     'None',
     'Aid',
     'Dispel',
+    'Drain',
     'Entangle',
     'Flash',
     'Healing',

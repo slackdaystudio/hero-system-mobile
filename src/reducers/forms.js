@@ -82,6 +82,9 @@ function _copyState(state) {
         costCruncher: {
             ...state.costCruncher,
         },
+        status: {
+            ...state.status,
+        }
     };
 }
 
@@ -139,12 +142,29 @@ function _initializeCostCruncherForm() {
     };
 }
 
+function _initializeStatusForm() {
+    return {
+        name: 'Aid',
+        label: '',
+        activePoints: 0,
+        targetTrait: null,
+        targetTraitType: null,
+        fadeRate: 0,
+        segments: 0,
+        body: 0,
+        pd: 0,
+        ed: 0,
+        index: -1,
+    };
+}
+
 let formsState = {
     skill: _initializeSkillForm(),
     hit: _initializeHitForm(),
     damage: _initializeDamageForm(),
     effect: _initializeEffectForm(),
     costCruncher: _initializeCostCruncherForm(),
+    status: _initializeStatusForm(),
 };
 
 export default function forms(state = formsState, action) {
@@ -168,6 +188,9 @@ export default function forms(state = formsState, action) {
                     break;
                 case 'hit':
                     form = _initializeHitForm();
+                    break;
+                case 'status':
+                    form = _initializeStatusForm();
                     break;
                 default:
                     // Do nothing
@@ -205,6 +228,9 @@ export default function forms(state = formsState, action) {
                     break;
                 case 'costCruncher':
                     reinitializedForm = _initializeCostCruncherForm();
+                    break;
+                case 'status':
+                    reinitializedForm = _initializeStatusForm();
                     break;
                 default:
                     // Do nothing
