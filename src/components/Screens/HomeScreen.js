@@ -29,6 +29,7 @@ class HomeScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
+        groupPlayMode: PropTypes.number,
     }
 
     onDidFocus() {
@@ -88,7 +89,7 @@ class HomeScreen extends Component {
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
                 <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{ resizeMode: 'cover' }}>
-                    <Header navigation={this.props.navigation} backScreen={EXIT_APP} />
+                    <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen={EXIT_APP} />
                     <Content style={styles.content}>
                         <Heading text="Character" />
                         <Text style={[styles.grey, {textAlign: 'center'}]}>Import characters from Hero Designer and take them with you when you&apos;re on the go.</Text>
@@ -146,6 +147,7 @@ class HomeScreen extends Component {
 const mapStateToProps = state => {
     return {
         character: state.character.character,
+        groupPlayMode: state.groupPlay.mode,
     };
 };
 

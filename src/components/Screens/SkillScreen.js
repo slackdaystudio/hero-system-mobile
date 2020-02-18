@@ -31,6 +31,7 @@ class SkillScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         skillForm: PropTypes.object.isRequired,
+        groupPlayMode: PropTypes.number,
         skillCheck: PropTypes.bool,
         updateFormValue: PropTypes.func.isRequired,
     }
@@ -99,7 +100,7 @@ class SkillScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen='Home' />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll 3d6</Text>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
@@ -143,6 +144,7 @@ const localStyles = ScaledSheet.create({
 const mapStateToProps = state => {
     return {
         skillForm: state.forms.skill,
+        groupPlayMode: state.groupPlay.mode,
     };
 };
 

@@ -35,6 +35,7 @@ class CharactersScreen extends Component {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
         characters: PropTypes.object,
+        groupPlayMode: PropTypes.number,
         setCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
         updateLoadedCharacters: PropTypes.func.isRequired,
@@ -316,7 +317,7 @@ class CharactersScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen='Home' />
                 <Content style={styles.content}>
                     <Heading text="Characters" />
                     {this._renderCharacters()}
@@ -338,6 +339,7 @@ const mapStateToProps = state => {
     return {
         character: state.character.character,
         characters: state.character.characters,
+        groupPlayMode: state.groupPlay.mode,
     };
 };
 

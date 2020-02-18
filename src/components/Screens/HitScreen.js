@@ -31,6 +31,7 @@ import { updateFormValue } from '../../reducers/forms';
 class HitScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
+        groupPlayMode: PropTypes.number,
         hitForm: PropTypes.object.isRequired,
         updateFormValue: PropTypes.func.isRequired,
     }
@@ -139,7 +140,7 @@ class HitScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen='Home' />
                 <Content scrollEnable={false}>
                     <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
                         <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Roll To Hit')}>
@@ -361,6 +362,7 @@ const localStyles = ScaledSheet.create({
 const mapStateToProps = state => {
     return {
         hitForm: state.forms.hit,
+        groupPlayMode: state.groupPlay.mode,
     };
 };
 

@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import { Alert } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
@@ -26,10 +27,28 @@ import AppNavigator from './AppNavigator';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const GROUPPLAY_PORT = 49155;
+
+export const GROUPPLAY_CONNECT = 'CONNECT';
+
+export const GROUPPLAY_DISCONNECT = 'DISCONNECT';
+
 export let sounds = {};
+
+export let groupPlayServer = null;
+
+export let groupPlayClient = null;
 
 export function setSound(name, soundClip) {
     sounds[name] = soundClip;
+}
+
+export function setGroupPlayServer(server) {
+    groupPlayServer = server;
+}
+
+export function setGroupPlayClient(client) {
+    groupPlayClient = client;
 }
 
 export const store = createStore(

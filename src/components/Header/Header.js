@@ -1,8 +1,9 @@
-import React, { Component }  from 'react';
+import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { BackHandler, Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
 import { Button, Text, Header, Left, Right, Body, Icon } from 'native-base';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
+import Pulse from 'react-native-pulse';
 import { common } from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -25,6 +26,7 @@ export default class MyHeader extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hasTabs: PropTypes.bool,
+        groupPlayMode: PropTypes.number,
         backScreen: PropTypes.string,
     }
 
@@ -50,6 +52,24 @@ export default class MyHeader extends Component {
         );
     }
 
+    _renderGroupPlayStatus() {
+        if (this.props.groupPlayMode !== null && this.props.groupPlayMode !== undefined) {
+            return (
+                <Fragment>
+                    <View style={{flex: 1.25}}>
+                        <Icon name="wifi" style={{alignSelf: 'flex-end', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
+                    </View>
+                    <View style={{flex: 0.75}}>
+                        <Icon name="check-circle" type='FontAwesome' style={{alignSelf: 'center', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
+                        <Pulse color='green' numPulses={1} diameter={40} speed={50} duration={2000} />
+                    </View>
+                </Fragment>
+            );
+        }
+
+        return <View style={{flex: 1}} />;
+    }
+
     render() {
         return (
             <View>
@@ -58,12 +78,16 @@ export default class MyHeader extends Component {
                         <View style={{flex: 1}}>
                             {this._renderBackButton()}
                         </View>
-                        <View style={{flex: 4}}>
+                        <View style={{flex: 1}} />
+                        <View style={{flex: 2.2}}>
                             <View style={localStyles.logo}>
                                 <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
                                     <Image style={{height: scale(60), width: scale(138)}} source={require('../../../public/hero_mobile_logo.png')} />
                                 </TouchableHighlight>
                             </View>
+                        </View>
+                        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                            {this._renderGroupPlayStatus()}
                         </View>
                         <View style={{flex: 1}}>
                             <Button transparent underlayColor="#000" onPress={() => this.props.navigation.toggleDrawer()}>

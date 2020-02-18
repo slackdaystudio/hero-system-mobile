@@ -29,6 +29,7 @@ class RandomCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
+        groupPlay: PropTypes.number,
         setRandomHero: PropTypes.func.isRequired,
         setRandomHeroName: PropTypes.func.isRequired,
     }
@@ -107,7 +108,7 @@ class RandomCharacterScreen extends Component {
                         onDidFocus={(payload) => this.onDidFocus()}
                         onDidBlur={(payload) => this.onDidBlur()}
                     />
-                    <Header hasTabs={true} navigation={this.props.navigation} />
+                    <Header hasTabs={true} groupPlayMode={this.props.groupPlayMode} navigation={this.props.navigation} />
                     <Content style={styles.content}>
                         <Spinner color="#D0D1D3" />
                     </Content>
@@ -121,7 +122,7 @@ class RandomCharacterScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header hasTabs={true} navigation={this.props.navigation} backScreen='Home' />
+                <Header hasTabs={true} navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen='Home' />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1b1f'}}>
                     <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
                         <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('General')}>
@@ -289,6 +290,7 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         character: state.randomHero.hero,
+        groupPlayMode: state.groupPlay.mode,
     };
 };
 

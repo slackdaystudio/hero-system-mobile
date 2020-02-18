@@ -13,6 +13,7 @@ import EffectScreen from './src/components/Screens/EffectScreen';
 import CostCruncherScreen from './src/components/Screens/CostCruncherScreen';
 import StatisticsScreen from './src/components/Screens/StatisticsScreen';
 import SettingsScreen from './src/components/Screens/SettingsScreen';
+import GroupPlayScreen from './src/components/Screens/GroupPlayScreen';
 import Sidebar from './src/components/Sidebar/Sidebar';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -68,6 +69,9 @@ const AppNavigator = createDrawerNavigator({
     },
     Settings: {
         screen: SettingsScreen,
+    },
+    GroupPlay: {
+        screen: GroupPlayScreen,
     },
 }, {
     initialRouteName: 'Home',

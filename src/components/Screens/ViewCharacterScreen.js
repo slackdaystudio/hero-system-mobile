@@ -39,6 +39,7 @@ class ViewCharacterScreen extends Component {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
         characters: PropTypes.object,
+        groupPlayMode: PropTypes.number,
         updateForm: PropTypes.func.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         selectCharacter: PropTypes.func.isRequired,
@@ -181,7 +182,7 @@ class ViewCharacterScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header hasTabs={false} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
+                <Header hasTabs={false} groupPlayMode={this.props.groupPlayMode} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
                     {this._renderCharacter()}
                 </Content>
@@ -208,6 +209,7 @@ const mapStateToProps = state => {
     return {
         character: state.character.character,
         characters: state.character.characters,
+        groupPlayMode: state.groupPlay.mode,
     };
 };
 
