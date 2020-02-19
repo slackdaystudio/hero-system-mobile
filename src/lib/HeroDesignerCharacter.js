@@ -90,6 +90,7 @@ const CHARACTER_TRAITS = {
     'martialArts': 'maneuver',
     'powers': 'power',
     'equipment': 'powers',
+    'disadvantages': 'disad'
 };
 
 const FIGURED_CHARACTERISTCS = ['PD', 'ED', 'SPD', 'REC', 'END', 'STUN'];
@@ -135,7 +136,7 @@ class HeroDesignerCharacter {
         this._populateTrait(character, template, heroDesignerCharacter.talents, 'talents', 'talent', 'talents');
         this._populateTrait(character, template, heroDesignerCharacter.martialarts, 'martialArts', 'maneuver', 'maneuver');
         this._populateTrait(character, template, heroDesignerCharacter.powers, 'powers', 'power', 'powers');
-        this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disad');
+        this._populateTrait(character, template, heroDesignerCharacter.disadvantages, 'disadvantages', 'disad', 'disadvantages');
         this._populateTrait(character, template, heroDesignerCharacter.equipment, 'equipment', 'powers', 'power');
 
         if (heroDesignerCharacter.hasOwnProperty('portrait')) {
@@ -749,10 +750,14 @@ class HeroDesignerCharacter {
         if (trait === null) {
             return;
         } else if (!Array.isArray(trait[traitSubKey])) {
-            trait[traitSubKey] = [trait[traitSubKey]];
+            if (trait[traitSubKey] === undefined) {
+                trait[traitSubKey] = [];
+            } else {
+                trait[traitSubKey] = [trait[traitSubKey]];
+            }
         }
 
-        trait[traitSubKey] = trait[traitSubKey].concat(this._getLists(trait));
+        trait[traitSubKey] = this._getLists(trait, trait[traitSubKey]);
 
         for (let skillEnhancer of SKILL_ENHANCERS) {
             if (trait.hasOwnProperty(common.toCamelCase(skillEnhancer))) {
@@ -1109,18 +1114,16 @@ class HeroDesignerCharacter {
         }
     }
 
-    _getLists(data) {
-        let lists = [];
-
+    _getLists(data, list) {
         if (data.hasOwnProperty('list')) {
-            if (typeof data.list === 'string') {
-                lists.push(data.list);
+            if (Array.isArray(data.list)) {
+                list = list.concat(data.list);
             } else {
-                lists = lists.concat(data.list);
+                list.push(data.list);
             }
         }
 
-        return lists;
+        return list;
     }
 
     _buildVppTemplate(power, template) {
