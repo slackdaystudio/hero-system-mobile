@@ -28,7 +28,9 @@ const MAX_MESSAGES = 100;
 
 export const SET_MODE = 'SET_MODE';
 
-export const REGISTER_GROUPPLAY_USER = 'REGISTER_GROUPPLAY_USER';
+export const REGISTER_GROUPPLAY_SOCKET = 'REGISTER_GROUPPLAY_SOCKET';
+
+export const CLAIM_GROUPPLAY_SOCKET = 'CLAIM_GROUPPLAY_SOCKET';
 
 export const UNREGISTER_GROUPPLAY_USER = 'UNREGISTER_GROUPPLAY_USER';
 
@@ -49,20 +51,30 @@ export function setMode(mode) {
     };
 }
 
-export function registerGroupPlayUser(username, socket) {
+export function registerGroupPlaySocket(id, socket) {
     return {
-        type: REGISTER_GROUPPLAY_USER,
+        type: REGISTER_GROUPPLAY_SOCKET,
         payload: {
-            username: username,
+            id: id,
             socket: socket,
         },
     };
 }
 
-export function unregisterGroupPlayUser(username) {
+export function claimGroupPlaySocket(username, id) {
+    return {
+        type: CLAIM_GROUPPLAY_SOCKET,
+        payload: {
+            username: username,
+            id: id,
+        },
+    };
+}
+
+export function unregisterGroupPlayUser(id) {
     return {
         type: UNREGISTER_GROUPPLAY_USER,
-        payload: username,
+        payload: id,
     };
 }
 
@@ -91,7 +103,7 @@ let groupPlayState = {
     mode: null,
     username: null,
     messages: [],
-    connectedUsers: new Map(),
+    connectedUsers: [],
     activePlayer: 'All',
 };
 
@@ -107,33 +119,59 @@ export default function groupPlay(state = groupPlayState, action) {
             newState.mode = action.payload;
 
             return newState;
-        case REGISTER_GROUPPLAY_USER:
+        case REGISTER_GROUPPLAY_SOCKET:
             newState = {
-                ...state
+                ...state,
+                connectedUsers: [
+                    ...state.connectedUsers
+                ]
             };
 
-            newState.connectedUsers = new Map(state.connectedUsers);
+            newState.connectedUsers.push({
+                id: action.payload.id,
+                username: null,
+                socket: action.payload.socket
+            });
 
-            if (newState.connectedUsers.has(action.payload.username)) {
-                newState.connectedUsers.get(action.payload.username).destroy();
+            return newState;
+        case CLAIM_GROUPPLAY_SOCKET:
+            newState = {
+                ...state,
+                connectedUsers: [
+                    ...state.connectedUsers
+                ]
+            };
 
-                newState.connectedUsers.set(action.payload.username, action.payload.socket);
-            } else {
-                newState.connectedUsers.set(action.payload.username, action.payload.socket);
+            for (let connectedUser of newState.connectedUsers) {
+                if (connectedUser.id === action.payload.id) {
+                    connectedUser.username = action.payload.username;
+                    break;
+                }
             }
 
             return newState;
         case UNREGISTER_GROUPPLAY_USER:
             newState = {
                 ...state,
+                connectedUsers: [
+                    ...state.connectedUsers
+                ]
             };
 
-            newState.connectedUsers = new Map(state.connectedUsers);
+            let deleteIndex = -1;
 
-            if (newState.connectedUsers.has(action.payload)) {
-                newState.connectedUsers.get(action.payload).destroy();
+            for (let i = 0; i < newState.connectedUsers.length; i++) {
+                if (newState.connectedUsers[i].id === action.payload) {
+                    newState.connectedUsers[i].socket.destroy();
 
-                newState.connectedUsers.delete(action.payload);
+                    deleteIndex = i;
+
+                    break;
+                }
+            }
+
+            if (deleteIndex >= 0) {
+                newState.connectedUsers.splice(deleteIndex, 1);
             }
 
             return newState;

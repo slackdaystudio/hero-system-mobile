@@ -8,6 +8,7 @@ import { scale, verticalScale } from 'react-native-size-matters';
 import { NavigationEvents } from 'react-navigation';
 import { NetworkInfo } from 'react-native-network-info';
 import faker from 'faker';
+import uuidv4 from 'uuid/v4';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
@@ -22,7 +23,8 @@ import {
     MODE_CLIENT,
     MODE_SERVER,
     setMode,
-    registerGroupPlayUser,
+    registerGroupPlaySocket,
+    claimGroupPlaySocket,
     unregisterGroupPlayUser,
     updateUsername,
     setActivePlayer,
@@ -48,7 +50,7 @@ var net = require('react-native-tcp');
 
 const GROUPPLAY_PORT = 49155;
 
-const COMMAND_CONNECT = 'CONNECT';
+const COMMAND_CLAIM_SOCKET = 'CLAIM_SOCKET';
 
 const COMMAND_DISCONNECT = 'DISCONNECT';
 
@@ -69,7 +71,8 @@ class GroupPlayScreen extends Component {
         username: PropTypes.string,
         messages: PropTypes.array.isRequired,
         setMode: PropTypes.func.isRequired,
-        registerGroupPlayUser: PropTypes.func.isRequired,
+        registerGroupPlaySocket: PropTypes.func.isRequired,
+        claimGroupPlaySocket: PropTypes.func.isRequired,
         unregisterGroupPlayUser: PropTypes.func.isRequired,
         updateUsername: PropTypes.func.isRequired,
         setActivePlayer: PropTypes.func.isRequired,
@@ -162,7 +165,7 @@ class GroupPlayScreen extends Component {
                 client.write(JSON.stringify({
                     sender: this.props.username,
                     type: TYPE_GROUPPLAY_COMMAND,
-                    command: COMMAND_CONNECT
+                    command: COMMAND_CLAIM_SOCKET
                 }));
 
                 this.props.receiveMessage(JSON.stringify({
@@ -220,6 +223,8 @@ class GroupPlayScreen extends Component {
                 type: TYPE_GROUPPLAY_MESSAGE,
                 message: `${error}`
             }));
+
+            this.props.setMode(null);
         });
 
         client.on('close', () => {
@@ -245,18 +250,27 @@ class GroupPlayScreen extends Component {
 
     _hostGame() {
         NetworkInfo.getIPV4Address().then(ipv4Address => {
+            if (ipv4Address === null) {
+                common.toast('Unable to determine IP address');
+                return;
+            }
+
             const server = net.createServer((socket) => {
+                let socketId = uuidv4();
+
+                this.props.registerGroupPlaySocket(socketId, socket);
+
                 socket.on('data', (data) => {
                     let json = JSON.parse(data);
 
                     if (json.type === TYPE_GROUPPLAY_COMMAND) {
                         switch (json.command) {
-                            case COMMAND_CONNECT:
-                                this.props.registerGroupPlayUser(json.sender, socket);
+                            case COMMAND_CLAIM_SOCKET:
+                                this.props.claimGroupPlaySocket(json.sender, socketId);
                                 break;
                             case COMMAND_DISCONNECT:
                                 this.props.receiveMessage(data);
-                                this.props.unregisterGroupPlayUser(json.sender);
+                                this.props.unregisterGroupPlayUser(socketId);
                                 break;
                             default:
                                 // do nothing
@@ -280,6 +294,8 @@ class GroupPlayScreen extends Component {
                         type: TYPE_GROUPPLAY_MESSAGE,
                         message: `A player has left your game${error ? ` (${error})` : ''}`
                     }));
+
+                    this.props.unregisterGroupPlayUser(socketId);
                 });
 
                 this.props.receiveMessage(JSON.stringify({
@@ -324,17 +340,17 @@ class GroupPlayScreen extends Component {
     }
 
     _stopGame() {
-        for (const [username, socket] of this.props.connectedUsers.entries()) {
-            socket.write(JSON.stringify({
-                sender: this.props.username,
-                type: TYPE_GROUPPLAY_COMMAND,
-                command: COMMAND_END_GAME
-            }));
-
-            this.props.unregisterGroupPlayUser(username);
-        }
-
         groupPlayServer.close(() => {
+            for (const user of this.props.connectedUsers) {
+                user.socket.write(JSON.stringify({
+                    sender: this.props.username,
+                    type: TYPE_GROUPPLAY_COMMAND,
+                    command: COMMAND_END_GAME
+                }));
+
+                this.props.unregisterGroupPlayUser(user.id);
+            }
+
             setGroupPlayServer(null);
 
             this.props.setMode(null);
@@ -360,12 +376,12 @@ class GroupPlayScreen extends Component {
 
     _setActivePlayer(username) {
         this.setState({selectedUser: username}, () => {
-            for (const [uname, socket] of this.props.connectedUsers.entries()) {
-                socket.write(JSON.stringify({
+            for (const user of this.props.connectedUsers) {
+                user.socket.write(JSON.stringify({
                     sender: this.props.username,
                     type: TYPE_GROUPPLAY_COMMAND,
                     command: COMMAND_ACTIVE_PLAYER,
-                    username: username
+                    username: user.username
                 }));
             }
         })
@@ -433,8 +449,10 @@ class GroupPlayScreen extends Component {
     _renderUsernameOptions() {
         let options = [];
 
-        for (const [username, socket] of this.props.connectedUsers) {
-            options.push(<Item label={username} key={username} value={username} />);
+        for (const user of this.props.connectedUsers) {
+            if (user.username !== null) {
+                options.push(<Item label={user.username} key={user.username} value={user.username} />);
+            }
         }
 
         if (Platform.OS === 'android') {
@@ -445,7 +463,7 @@ class GroupPlayScreen extends Component {
     }
 
     _renderUserSelect() {
-        if (this.props.connectedUsers.size === 0) {
+        if (this.props.connectedUsers.length === 0) {
             return null;
         }
 
@@ -522,7 +540,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     setMode,
-    registerGroupPlayUser,
+    registerGroupPlaySocket,
+    claimGroupPlaySocket,
     unregisterGroupPlayUser,
     updateUsername,
     setActivePlayer,
