@@ -1,6 +1,6 @@
 {
   "name": "hero-system-mobile",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.6.2",
