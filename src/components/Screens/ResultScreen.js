@@ -31,7 +31,6 @@ import { addStatistics } from '../../reducers/statistics';
 class ResultScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        groupPlayMode: PropTypes.number,
         addStatistics: PropTypes.func.isRequired,
         useFifthEdition: PropTypes.bool.isRequired,
         playSounds: PropTypes.bool.isRequired,
@@ -385,7 +384,7 @@ class ResultScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen={this._getBackScreen()} />
+                <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll Result</Text>
                     <View>
@@ -418,7 +417,6 @@ const localStyles = ScaledSheet.create({
 
 const mapStateToProps = state => {
     return {
-        groupPlayMode: state.groupPlay.mode,
         useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,
         onlyDiceSounds: state.settings.onlyDiceSounds,

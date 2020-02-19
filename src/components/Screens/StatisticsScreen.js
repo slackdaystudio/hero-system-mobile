@@ -27,7 +27,6 @@ class StatisticsScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         statistics: PropTypes.object.isRequired,
-        groupPlayMode: PropTypes.number,
     }
 
     constructor(props) {
@@ -80,7 +79,7 @@ class StatisticsScreen extends Component {
         if (this.props.statistics === null) {
             return (
                 <Container style={styles.container}>
-                    <Header hasTabs={false} groupPlayMode={this.props.groupPlayMode} navigation={this.props.navigation} />
+                    <Header hasTabs={false} navigation={this.props.navigation} />
                     <Content style={styles.content}>
                         <Spinner color="#D0D1D3" />
                     </Content>
@@ -94,7 +93,7 @@ class StatisticsScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Statistics</Text>
                     {this._renderDieDistributionChart()}
@@ -233,7 +232,6 @@ const localStyles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         statistics: state.statistics,
-        groupPlayMode: state.groupPlay.mode
     };
 };
 

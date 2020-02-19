@@ -28,7 +28,13 @@ const MAX_MESSAGES = 100;
 
 export const SET_MODE = 'SET_MODE';
 
+export const REGISTER_GROUPPLAY_USER = 'REGISTER_GROUPPLAY_USER';
+
+export const UNREGISTER_GROUPPLAY_USER = 'UNREGISTER_GROUPPLAY_USER';
+
 export const UPDATE_USERNAME = 'UPDATE_USERNAME';
+
+export const SET_ACTIVE_PLAYER = 'SET_ACTIVE_PLAYER';
 
 export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
 
@@ -43,9 +49,33 @@ export function setMode(mode) {
     };
 }
 
+export function registerGroupPlayUser(username, socket) {
+    return {
+        type: REGISTER_GROUPPLAY_USER,
+        payload: {
+            username: username,
+            socket: socket,
+        },
+    };
+}
+
+export function unregisterGroupPlayUser(username) {
+    return {
+        type: UNREGISTER_GROUPPLAY_USER,
+        payload: username,
+    };
+}
+
 export function updateUsername(username) {
     return {
         type: UPDATE_USERNAME,
+        payload: username,
+    };
+}
+
+export function setActivePlayer(username) {
+    return {
+        type: SET_ACTIVE_PLAYER,
         payload: username,
     };
 }
@@ -61,7 +91,8 @@ let groupPlayState = {
     mode: null,
     username: null,
     messages: [],
-    connectedUsers: [],
+    connectedUsers: new Map(),
+    activePlayer: 'All',
 };
 
 export default function groupPlay(state = groupPlayState, action) {
@@ -76,12 +107,50 @@ export default function groupPlay(state = groupPlayState, action) {
             newState.mode = action.payload;
 
             return newState;
+        case REGISTER_GROUPPLAY_USER:
+            newState = {
+                ...state
+            };
+
+            newState.connectedUsers = new Map(state.connectedUsers);
+
+            if (newState.connectedUsers.has(action.payload.username)) {
+                newState.connectedUsers.get(action.payload.username).destroy();
+
+                newState.connectedUsers.set(action.payload.username, action.payload.socket);
+            } else {
+                newState.connectedUsers.set(action.payload.username, action.payload.socket);
+            }
+
+            return newState;
+        case UNREGISTER_GROUPPLAY_USER:
+            newState = {
+                ...state,
+            };
+
+            newState.connectedUsers = new Map(state.connectedUsers);
+
+            if (newState.connectedUsers.has(action.payload)) {
+                newState.connectedUsers.get(action.payload).destroy();
+
+                newState.connectedUsers.delete(action.payload);
+            }
+
+            return newState;
         case UPDATE_USERNAME:
             newState = {
                 ...state,
             };
 
             newState.username = action.payload;
+
+            return newState;
+        case SET_ACTIVE_PLAYER:
+            newState = {
+                ...state,
+            };
+
+            newState.activePlayer = action.payload;
 
             return newState;
         case RECEIVE_MESSAGE:

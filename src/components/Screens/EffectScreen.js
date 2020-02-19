@@ -43,7 +43,6 @@ const effectTypes = [
 class EffectScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        groupPlayMode: PropTypes.number,
         effectForm: PropTypes.object.isRequired,
         updateFormValue: PropTypes.func.isRequired,
     }
@@ -134,7 +133,7 @@ class EffectScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen={this._getBackScreen()} />
+                <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content style={styles.content}>
                     <Heading text='Effect Roll' />
                     <Slider
@@ -177,7 +176,6 @@ class EffectScreen extends Component {
 const mapStateToProps = state => {
     return {
         effectForm: state.forms.effect,
-        groupPlayMode: state.groupPlay.mode,
     };
 };
 

@@ -48,7 +48,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
         characters: PropTypes.object,
-        groupPlayMode: PropTypes.number,
         updateForm: PropTypes.func.isRequired,
         updateFormValue: PropTypes.func.isRequired,
         resetForm: PropTypes.func.isRequired,
@@ -247,7 +246,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header hasTabs={false} groupPlayMode={this.props.groupPlayMode} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
+                <Header hasTabs={false} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false} style={styles.content}>
                     {this._renderCharacter()}
                 </Content>
@@ -268,7 +267,6 @@ const mapStateToProps = state => {
         character: state.character.character,
         characters: state.character.characters,
         forms: state.forms,
-        groupPlayMode: state.groupPlay.mode,
     };
 };
 

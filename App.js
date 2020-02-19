@@ -27,12 +27,6 @@ import AppNavigator from './AppNavigator';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GROUPPLAY_PORT = 49155;
-
-export const GROUPPLAY_CONNECT = 'CONNECT';
-
-export const GROUPPLAY_DISCONNECT = 'DISCONNECT';
-
 export let sounds = {};
 
 export let groupPlayServer = null;

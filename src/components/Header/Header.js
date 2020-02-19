@@ -1,5 +1,6 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { BackHandler, Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
 import { Button, Text, Header, Left, Right, Body, Icon } from 'native-base';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
@@ -22,11 +23,13 @@ import { common } from '../../lib/Common';
 
 export const EXIT_APP = '0';
 
-export default class MyHeader extends Component {
+class MyHeader extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hasTabs: PropTypes.bool,
         groupPlayMode: PropTypes.number,
+        groupPlayUsername: PropTypes.string,
+        groupPlayActivePlayer: PropTypes.string.isRequired,
         backScreen: PropTypes.string,
     }
 
@@ -52,22 +55,34 @@ export default class MyHeader extends Component {
         );
     }
 
-    _renderGroupPlayStatus() {
-        if (this.props.groupPlayMode !== null && this.props.groupPlayMode !== undefined) {
+    _renderActivePlayerIndicator(isActivePlayer) {
+        if (isActivePlayer) {
             return (
-                <Fragment>
-                    <View style={{flex: 1.25}}>
-                        <Icon name="wifi" style={{alignSelf: 'flex-end', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
-                    </View>
-                    <View style={{flex: 0.75}}>
-                        <Icon name="check-circle" type='FontAwesome' style={{alignSelf: 'center', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
-                        <Pulse color='green' numPulses={1} diameter={40} speed={50} duration={2000} />
-                    </View>
-                </Fragment>
+                <View style={{flex: 0.75}}>
+                    <Icon name="check-circle" type='FontAwesome' style={{alignSelf: 'center', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
+                    <Pulse color='#2efc0f' numPulses={1} diameter={40} speed={30} duration={5000} />
+                </View>
             );
         }
 
-        return <View style={{flex: 1}} />;
+        return null;
+    }
+
+    _renderGroupPlayStatus() {
+        if (this.props.groupPlayMode === null || this.props.groupPlayMode === undefined) {
+            return <View style={{flex: 1}} />;
+        }
+
+        let isActivePlayer = this.props.groupPlayUsername === this.props.groupPlayActivePlayer;
+
+        return (
+            <Fragment>
+                <View style={{flex: (isActivePlayer ? 1.25 : 0.75)}}>
+                    <Icon name="wifi" style={{alignSelf: 'flex-end', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
+                </View>
+                {this._renderActivePlayerIndicator(isActivePlayer)}
+            </Fragment>
+        );
     }
 
     render() {
@@ -116,3 +131,15 @@ const localStyles = ScaledSheet.create({
         }),
     },
 });
+
+const mapStateToProps = state => {
+    return {
+        groupPlayUsername: state.groupPlay.username,
+        groupPlayMode: state.groupPlay.mode,
+        groupPlayActivePlayer: state.groupPlay.activePlayer,
+    };
+};
+
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MyHeader);

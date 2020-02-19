@@ -37,7 +37,6 @@ class SettingsScreen extends Component {
         navigation: PropTypes.object.isRequired,
         settings: PropTypes.object.isRequired,
         version: PropTypes.string.isRequired,
-        groupPlayMode: PropTypes.number,
         resetForm: PropTypes.func.isRequired,
         clearCharacterData: PropTypes.func.isRequired,
         clearRandomHero: PropTypes.func.isRequired,
@@ -110,7 +109,7 @@ class SettingsScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Heading text="App Version" />
                     <View style={{paddingLeft: 20, paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>
@@ -231,7 +230,6 @@ const mapStateToProps = state => {
     return {
         settings: state.settings,
         version: state.version.version,
-        groupPlayMode: state.groupPlay.mode,
     };
 };
 

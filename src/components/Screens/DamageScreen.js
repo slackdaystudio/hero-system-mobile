@@ -31,7 +31,6 @@ import { updateFormValue } from '../../reducers/forms';
 class DamageScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        groupPlayMode: PropTypes.number,
         damageForm: PropTypes.object.isRequired,
         updateFormValue: PropTypes.func.isRequired,
     }
@@ -138,7 +137,7 @@ class DamageScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} hasTabs={true} groupPlayMode={this.props.groupPlayMode} backScreen={this._getBackScreen()} />
+                <Header navigation={this.props.navigation} hasTabs={true} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false}>
                     <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
                         <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Roll For Damage')}>
@@ -369,7 +368,6 @@ const localStyles = ScaledSheet.create({
 const mapStateToProps = state => {
     return {
         damageForm: state.forms.damage,
-        groupPlayMode: state.groupPlay.mode,
     };
 };
 

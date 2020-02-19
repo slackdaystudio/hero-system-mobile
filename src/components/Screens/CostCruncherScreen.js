@@ -27,7 +27,6 @@ import { updateFormValue } from '../../reducers/forms';
 class CostCruncherScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        groupPlayMode: PropTypes.number,
         costCruncherForm: PropTypes.object.isRequired,
         updateFormValue: PropTypes.func.isRequired,
     }
@@ -83,7 +82,7 @@ class CostCruncherScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} groupPlayMode={this.props.groupPlayMode} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen='Home' />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Cruncher</Text>
                     <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>
@@ -131,7 +130,6 @@ class CostCruncherScreen extends Component {
 const mapStateToProps = state => {
     return {
         costCruncherForm: state.forms.costCruncher,
-        groupPlayMode: state.groupPlay.mode,
     };
 };
 
