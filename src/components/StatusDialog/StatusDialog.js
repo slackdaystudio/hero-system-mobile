@@ -69,7 +69,7 @@ class StatusDialog extends Component {
         let name = '';
 
         for (let power of this.props.character.powers) {
-            if (power.alias.search(regex) >= 0 || power.name.search(regex) >= 0) {
+            if ((power.alias !== null && power.alias.search(regex) >= 0) || (power.name !== null && power.name.search(regex) >= 0)) {
                 if (power.name === null) {
                     name = power.alias;
                 } else {
