@@ -62,7 +62,7 @@ class MyHeader extends Component {
                     <Icon
                         name="check-circle"
                         type='FontAwesome'
-                        style={{alignSelf: 'center', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}}
+                        style={{alignSelf: 'center', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : 0}}
                         onPress={() => this.props.navigation.navigate('GroupPlay')}
                     />
                     <Pulse color='#2efc0f' numPulses={1} diameter={40} speed={30} duration={5000} />
@@ -85,7 +85,7 @@ class MyHeader extends Component {
                 <View style={{flex: (isActivePlayer ? 1.25 : 0.75)}}>
                     <Icon
                         name="wifi"
-                        style={{alignSelf: 'flex-end', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}}
+                        style={{alignSelf: 'flex-end', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : 0}}
                         onPress={() => this.props.navigation.navigate('GroupPlay')}
                     />
                 </View>

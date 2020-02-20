@@ -458,9 +458,7 @@ class GroupPlayScreen extends Component {
             }
         }
 
-        if (Platform.OS === 'android') {
-            options.unshift(<Item label={PLAYER_OPTION_ALL} key={PLAYER_OPTION_ALL} value={PLAYER_OPTION_ALL} />);
-        }
+        options.unshift(<Item label={PLAYER_OPTION_ALL} key={PLAYER_OPTION_ALL} value={PLAYER_OPTION_ALL} />);
 
         return options;
     }
@@ -477,6 +475,7 @@ class GroupPlayScreen extends Component {
                     <Picker
                         style={{width: undefined, color: '#FFFFFF'}}
                         textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
+                        placeholder={PLAYER_OPTION_ALL}
                         iosHeader="Select Player"
                         mode="dropdown"
                         selectedValue={this.state.selectedUser}
