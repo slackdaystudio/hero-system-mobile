@@ -202,6 +202,137 @@ class DieRoller {
         return name;
     }
 
+    toMessages(result) {
+        let messages = [];
+
+        switch (result.rollType) {
+            case SKILL_CHECK:
+                messages = this._toSkillCheckMessage(result);
+                break;
+            case NORMAL_DAMAGE:
+            case KILLING_DAMAGE:
+                messages = this._toDamageMessage(result);
+                break;
+            case EFFECT:
+                messages = this._toEffectMessage(result);
+                break;
+            default:
+                if (result.hasOwnProperty('results')) {
+                    messages = this._toHitMessage(result);
+                } else {
+                    messages.push(`I rolled ${result.total} on ${result.rolls.length} dice`);
+                }
+        }
+
+        return messages;
+    }
+
+    _toSkillCheckMessage(result) {
+        let messages = [];
+
+        if (result.threshold > -1) {
+            if (result.total === 3) {
+                messages.push('I succeeded my skill check (rolled a 3)');
+            } else if (result.total === 18) {
+                messages.push('I failed my skill check (rolled an 18)');
+            } else {
+                let overUnder = result.threshold - result.total;
+
+                if (overUnder === 0) {
+                    messages.push('I made my skill check with no points to spare');
+                } else if (overUnder > 0) {
+                    messages.push(`I made my skill check by ${overUnder} points`);
+                } else {
+                    messages.push(`I failed my skill check by ${overUnder * -1} points`);
+                }
+            }
+        } else {
+            messages.push(`I rolled ${result.total} total on 3d6`);
+        }
+
+        return messages;
+    }
+
+    _toDamageMessage(result) {
+        let messages = [];
+        let knockback = result.knockback < 0 ? 0 : result.knockback;
+        let damageType = result.rollType === KILLING_DAMAGE ? 'Killing' : 'Normal';
+
+        if (result.useFifthEdition) {
+            knockback = `${result.knockback / 2}"`;
+        } else {
+            knockback = `${result.knockback}m`;
+        }
+
+        messages.push(`I inflicted ${result.stun} STUN and ${result.body} BODY of ${damageType} damage and knocked back the target ${knockback}`);
+
+        return messages;
+    }
+
+    _toEffectMessage(result) {
+        let messages = [];
+
+        switch (result.type.toUpperCase()) {
+            case 'NONE':
+                messages.push(`I rolled ${result.total} on ${result.rolls.length} dice`);
+                break;
+            case 'AID':
+            case 'SUCCOR':
+                messages.push(`I have added ${result.total} AP to the target power/effect`);
+                break;
+            case 'DISPEL':
+                messages.push(`I have dispelled ${result.total} AP of the target power/effect`);
+                break;
+            case 'DRAIN':
+                messages.push(`I have subtracted ${result.total} AP of the target power/effect`);
+                break;
+            case 'ENTANGLE':
+                messages.push(`My entangle has a BODY of ${this.countNormalDamageBody(result)}`);
+                break;
+            case 'FLASH':
+            case 'MARTIAL_FLASH':
+                messages.push(`I flashed my target for ${this.countNormalDamageBody(result)} segments`);
+                break;
+            case 'HEALING':
+                messages.push(`I healed my target for ${result.total} points`);
+                break;
+            case 'LUCK':
+                messages.push(`I have acquired ${this.countLuck(result)} points of Luck`);
+                break;
+            case 'UNLUCK':
+                messages.push(`I have acquired ${dieRoller.countLuck(result)} points of Unluck`);
+                break;
+            default:
+                messages.push(`I have scored ${result.total} points on my effect`);
+        }
+
+        return messages;
+    }
+
+    _toHitMessage(result) {
+        let messages = [];
+
+        for (const r of result.results) {
+            if (r.total === 3) {
+                messages.push(`I have critically hit my target!`);
+            } else if (r.total === 18) {
+                messages.push(`I have missed my target`);
+            }
+
+            if (r.isAutofire) {
+                if (r.hits > 0) {
+                    messages.push(`I can hit my target up to ${r.hits}x`);
+                } else {
+                    messages.push(`I have missed my target with all of my shots`);
+                }
+            }
+
+            messages.push(`I can hit a DCV/DMCV of ${r.hitCv} or less`);
+        }
+
+        return messages;
+    }
+
     _roll(dice, rollType, partialDieType) {
         let resultRoll = {
             rollType: rollType,

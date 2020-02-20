@@ -114,7 +114,7 @@ class ResultScreen extends Component {
 
     _messageGroupPlayServer() {
         if (this.props.groupPlayMode === MODE_CLIENT && groupPlayClient !== null) {
-            const messages = this._getMessages();
+            const messages = dieRoller.toMessages(this.state.result);
 
             for (const message of messages) {
                 groupPlayClient.write(JSON.stringify({
@@ -299,35 +299,6 @@ class ResultScreen extends Component {
         }
 
         return null;
-    }
-
-    _getMessages() {
-        let messages = [];
-
-        switch (this.state.result.rollType) {
-            case SKILL_CHECK:
-                messages.push(`I rolled ${this.state.result.total} on my skill check`);
-                break;
-            case NORMAL_DAMAGE:
-                messages.push(`I rolled ${this.state.result.stun} STUN and ${this.state.result.body} BODY on my damage roll (Normal Damage)`);
-                break;
-            case KILLING_DAMAGE:
-                messages.push(`I rolled ${this.state.result.stun} STUN and ${this.state.result.body} BODY on my damage roll (Killing Damage)`);
-                break;
-            case EFFECT:
-                messages.push(`I rolled ${this.state.result.total} on my effect roll`);
-                break;
-            default:
-                if (this.state.result.hasOwnProperty('results')) {
-                    for (const result of this.state.result.results) {
-                        messages.push(`I rolled ${result.total} on my roll to hit`);
-                    }
-                } else {
-                    messages.push(`I rolled ${this.state.result.total} total`);
-                }
-        }
-
-        return messages;
     }
 
     _renderDistance(distance, result) {
