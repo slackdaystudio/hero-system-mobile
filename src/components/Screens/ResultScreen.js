@@ -8,11 +8,14 @@ import AnimateNumber from '@bankify/react-native-animate-number';
 import { NavigationEvents } from 'react-navigation';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
+import { TYPE_GROUPPLAY_MESSAGE } from './GroupPlayScreen';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import { soundPlayer, DEFAULT_SOUND } from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import { addStatistics } from '../../reducers/statistics';
+import { MODE_CLIENT } from '../../reducers/groupPlay';
+import { groupPlayClient } from '../../../App';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -35,6 +38,8 @@ class ResultScreen extends Component {
         useFifthEdition: PropTypes.bool.isRequired,
         playSounds: PropTypes.bool.isRequired,
         onlyDiceSounds: PropTypes.bool.isRequired,
+        groupPlayMode: PropTypes.number,
+        groupPlayUsername: PropTypes.string,
     }
 
     constructor(props) {
@@ -51,6 +56,7 @@ class ResultScreen extends Component {
         this.setState({result: this.props.navigation.state.params.result}, () => {
             this._playSoundClip();
             this._updateStatistics();
+            this._messageGroupPlayServer();
         });
 
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -106,9 +112,24 @@ class ResultScreen extends Component {
         }
     }
 
+    _messageGroupPlayServer() {
+        if (this.props.groupPlayMode === MODE_CLIENT && groupPlayClient !== null) {
+            const messages = this._getMessages();
+
+            for (const message of messages) {
+                groupPlayClient.write(JSON.stringify({
+                    sender: this.props.groupPlayUsername,
+                    type: TYPE_GROUPPLAY_MESSAGE,
+                    message: message,
+                }));
+            }
+        }
+    }
+
     _reRoll() {
         this.setState({result: dieRoller.rollAgain(this.state.result)}, () => {
             this._updateStatistics();
+            this._messageGroupPlayServer();
         });
     }
 
@@ -239,7 +260,7 @@ class ResultScreen extends Component {
         );
     }
 
-    _renderEffectInfo(result) {
+    _renderEffectInfo(result, textOnly=false) {
         switch (result.type.toUpperCase()) {
             case 'NONE':
                 return null;
@@ -278,6 +299,35 @@ class ResultScreen extends Component {
         }
 
         return null;
+    }
+
+    _getMessages() {
+        let messages = [];
+
+        switch (this.state.result.rollType) {
+            case SKILL_CHECK:
+                messages.push(`I rolled ${this.state.result.total} on my skill check`);
+                break;
+            case NORMAL_DAMAGE:
+                messages.push(`I rolled ${this.state.result.stun} STUN and ${this.state.result.body} BODY on my damage roll (Normal Damage)`);
+                break;
+            case KILLING_DAMAGE:
+                messages.push(`I rolled ${this.state.result.stun} STUN and ${this.state.result.body} BODY on my damage roll (Killing Damage)`);
+                break;
+            case EFFECT:
+                messages.push(`I rolled ${this.state.result.total} on my effect roll`);
+                break;
+            default:
+                if (this.state.result.hasOwnProperty('results')) {
+                    for (const result of this.state.result.results) {
+                        messages.push(`I rolled ${result.total} on my roll to hit`);
+                    }
+                } else {
+                    messages.push(`I rolled ${this.state.result.total} total`);
+                }
+        }
+
+        return messages;
     }
 
     _renderDistance(distance, result) {
@@ -420,11 +470,14 @@ const mapStateToProps = state => {
         useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,
         onlyDiceSounds: state.settings.onlyDiceSounds,
+        groupPlayMode: state.groupPlay.mode,
+        groupPlayUsername: state.groupPlay.username,
     }
 };
 
 const mapDispatchToProps = {
     addStatistics,
+
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ResultScreen);

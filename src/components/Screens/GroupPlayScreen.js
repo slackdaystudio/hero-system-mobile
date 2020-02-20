@@ -60,7 +60,7 @@ const COMMAND_END_GAME = 'END_GAME';
 
 const TYPE_GROUPPLAY_COMMAND = 0;
 
-const TYPE_GROUPPLAY_MESSAGE = 1;
+export const TYPE_GROUPPLAY_MESSAGE = 1;
 
 const PLAYER_OPTION_ALL = 'All'
 
@@ -69,6 +69,7 @@ class GroupPlayScreen extends Component {
         navigation: PropTypes.object.isRequired,
         mode: PropTypes.number,
         username: PropTypes.string,
+        activePlayer: PropTypes.string.isRequired,
         messages: PropTypes.array.isRequired,
         setMode: PropTypes.func.isRequired,
         registerGroupPlaySocket: PropTypes.func.isRequired,
@@ -276,7 +277,9 @@ class GroupPlayScreen extends Component {
                                 // do nothing
                         }
                     } else if (json.type === TYPE_GROUPPLAY_MESSAGE) {
-                        this.props.receiveMessage(data);
+                        if (json.sender === this.props.activePlayer || this.props.activePlayer === PLAYER_OPTION_ALL) {
+                            this.props.receiveMessage(data);
+                        }
                     }
                 });
 
@@ -533,6 +536,7 @@ const mapStateToProps = state => {
     return {
         mode: state.groupPlay.mode,
         username: state.groupPlay.username,
+        activePlayer: state.groupPlay.activePlayer,
         messages: state.groupPlay.messages,
         connectedUsers: state.groupPlay.connectedUsers,
     };
