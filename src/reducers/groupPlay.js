@@ -36,6 +36,8 @@ export const UNREGISTER_GROUPPLAY_USER = 'UNREGISTER_GROUPPLAY_USER';
 
 export const UPDATE_USERNAME = 'UPDATE_USERNAME';
 
+export const UPDATE_IP = 'UPDATE_IP';
+
 export const SET_ACTIVE_PLAYER = 'SET_ACTIVE_PLAYER';
 
 export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
@@ -85,6 +87,13 @@ export function updateUsername(username) {
     };
 }
 
+export function updateIp(ip) {
+    return {
+        type: UPDATE_IP,
+        payload: ip,
+    };
+}
+
 export function setActivePlayer(username) {
     return {
         type: SET_ACTIVE_PLAYER,
@@ -102,6 +111,7 @@ export function receiveMessage(message) {
 let groupPlayState = {
     mode: null,
     username: null,
+    ip: null,
     messages: [],
     connectedUsers: [],
     activePlayer: 'All',
@@ -181,6 +191,14 @@ export default function groupPlay(state = groupPlayState, action) {
             };
 
             newState.username = action.payload;
+
+            return newState;
+        case UPDATE_IP:
+            newState = {
+                ...state,
+            };
+
+            newState.ip = action.payload;
 
             return newState;
         case SET_ACTIVE_PLAYER:

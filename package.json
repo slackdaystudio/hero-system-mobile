@@ -60,7 +60,6 @@
     "babel-plugin-react-native-nodeify-hack": "^1.0.1",
     "buffer": "^4.9.2",
     "camelcase": "^5.3.1",
-    "faker": "^4.1.0",
     "iconv-lite": "^0.5.1",
     "is-base64": "^1.0.0",
     "native-base": "2.13.8",
