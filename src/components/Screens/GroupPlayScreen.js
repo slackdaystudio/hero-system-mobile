@@ -17,7 +17,9 @@ import {
     groupPlayServer,
     groupPlayClient,
     setGroupPlayServer,
-    setGroupPlayClient
+    setGroupPlayClient,
+    leaveGame,
+    stopGame
 } from '../../../App';
 import {
     MODE_CLIENT,
@@ -52,13 +54,13 @@ const GROUPPLAY_PORT = 49155;
 
 const COMMAND_CLAIM_SOCKET = 'CLAIM_SOCKET';
 
-const COMMAND_DISCONNECT = 'DISCONNECT';
+export const COMMAND_DISCONNECT = 'DISCONNECT';
 
 const COMMAND_ACTIVE_PLAYER = 'ACTIVE_PLAYER';
 
-const COMMAND_END_GAME = 'END_GAME';
+export const COMMAND_END_GAME = 'END_GAME';
 
-const TYPE_GROUPPLAY_COMMAND = 0;
+export const TYPE_GROUPPLAY_COMMAND = 0;
 
 export const TYPE_GROUPPLAY_MESSAGE = 1;
 
@@ -132,7 +134,7 @@ class GroupPlayScreen extends Component {
     }
 
     _onLeaveGameDialogOk() {
-        this._leaveGame();
+        leaveGame(this.props.username, this.props.setMode);
 
         this.props.setMode(null);
 
@@ -149,7 +151,7 @@ class GroupPlayScreen extends Component {
     }
 
     _onStopGameDialogOk() {
-        this._stopGame();
+        stopGame(this.props.username, this.props.connectedUsers, this.props.unregisterGroupPlayUser, this.props.setMode);
 
         this.props.setMode(null);
 
@@ -186,7 +188,7 @@ class GroupPlayScreen extends Component {
         });
 
         client.on('data', (data) => {
-            let json = JSON.parse(data);
+            let json = JSON.parse(data.toString());
 
             if (json.type === TYPE_GROUPPLAY_COMMAND) {
                 switch (json.command) {
@@ -197,7 +199,7 @@ class GroupPlayScreen extends Component {
                             message: 'The session has ended, thanks for playing!'
                         }));
 
-                        this._leaveGame(false);
+                        leaveGame(this.props.username, this.props.setMode, false);
                         break;
                     case COMMAND_ACTIVE_PLAYER:
                         this.props.setActivePlayer(json.username);
@@ -225,7 +227,7 @@ class GroupPlayScreen extends Component {
                 message: `${error}`
             }));
 
-            this.props.setMode(null);
+            leaveGame(this.props.username, this.props.setMode, false);
         });
 
         client.on('close', () => {
@@ -234,6 +236,8 @@ class GroupPlayScreen extends Component {
                 type: TYPE_GROUPPLAY_MESSAGE,
                 message: 'Your connection has been closed'
             }));
+
+            leaveGame(this.props.username, this.props.setMode, false);
         });
 
         client.on('end', (error) => {
@@ -242,11 +246,13 @@ class GroupPlayScreen extends Component {
                 type: TYPE_GROUPPLAY_MESSAGE,
                 message: `You have left the game session${error ? ` (${error})` : ''}`
             }));
+
+            leaveGame(this.props.username, this.props.setMode, false);
         });
 
         this.props.setMode(MODE_CLIENT);
 
-        setGroupPlayClient(client);
+        setGroupPlayClient(client, this.props.setMode);
     }
 
     _hostGame() {
@@ -338,43 +344,8 @@ class GroupPlayScreen extends Component {
 
             this.props.setMode(MODE_SERVER);
 
-            setGroupPlayServer(server);
+            setGroupPlayServer(server, this.props.setMode);
         });
-    }
-
-    _stopGame() {
-        groupPlayServer.close(() => {
-            for (const user of this.props.connectedUsers) {
-                user.socket.write(JSON.stringify({
-                    sender: this.props.username,
-                    type: TYPE_GROUPPLAY_COMMAND,
-                    command: COMMAND_END_GAME
-                }));
-
-                this.props.unregisterGroupPlayUser(user.id);
-            }
-
-            setGroupPlayServer(null);
-
-            this.props.setMode(null);
-        });
-    }
-
-    _leaveGame(sayGoodbye = true) {
-        if (sayGoodbye) {
-            groupPlayClient.write(JSON.stringify({
-                sender: this.props.username,
-                type: TYPE_GROUPPLAY_COMMAND,
-                command: COMMAND_DISCONNECT,
-                message: 'Goodbye.'
-            }));
-        }
-
-        groupPlayClient.destroy();
-
-        setGroupPlayClient(null);
-
-        this.props.setMode(null);
     }
 
     _setActivePlayer(username) {

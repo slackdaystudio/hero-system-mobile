@@ -12,6 +12,7 @@ import { asyncDispatchMiddleware } from './src/middleware/AsyncDispatchMiddlewar
 import { soundPlayer, DEFAULT_SOUND } from './src/lib/SoundPlayer';
 import reducer from './src/reducers/index';
 import AppNavigator from './AppNavigator';
+import { TYPE_GROUPPLAY_COMMAND, COMMAND_END_GAME, COMMAND_DISCONNECT } from './src/components/Screens/GroupPlayScreen';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -33,6 +34,8 @@ export let groupPlayServer = null;
 
 export let groupPlayClient = null;
 
+let setGroupPlayMode = null;
+
 export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
@@ -41,8 +44,44 @@ export function setGroupPlayServer(server) {
     groupPlayServer = server;
 }
 
+export function stopGame(username, connectedUsers, unregisterGroupPlayUser, setMode) {
+    for (const user of connectedUsers) {
+        user.socket.write(JSON.stringify({
+            sender: username,
+            type: TYPE_GROUPPLAY_COMMAND,
+            command: COMMAND_END_GAME
+        }), 'utf8', () => {
+            unregisterGroupPlayUser(user.id);
+        });
+    }
+
+    groupPlayServer.close(() => {
+        setGroupPlayServer(null);
+        setMode(null);
+    });
+}
+
 export function setGroupPlayClient(client) {
     groupPlayClient = client;
+}
+
+export function leaveGame(username, setMode, sayGoodbye = true) {
+    if (sayGoodbye) {
+        groupPlayClient.write(JSON.stringify({
+            sender: username,
+            type: TYPE_GROUPPLAY_COMMAND,
+            command: COMMAND_DISCONNECT,
+            message: 'Goodbye.'
+        }));
+    }
+
+    if (groupPlayClient !== null) {
+        groupPlayClient.destroy();
+
+        setGroupPlayClient(null);
+
+        setMode(null);
+    }
 }
 
 export const store = createStore(
