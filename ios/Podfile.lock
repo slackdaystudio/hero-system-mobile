@@ -58,6 +58,8 @@ PODS:
   - React-jsinspector (0.60.6)
   - react-native-document-picker (3.2.4):
     - React
+  - react-native-network-info (5.2.1):
+    - React
   - react-native-safe-area-context (0.6.2):
     - React
   - react-native-shake (3.4.0):
@@ -114,6 +116,8 @@ PODS:
     - React
     - SSZipArchive (= 2.2.2)
   - SSZipArchive (2.2.2)
+  - TcpSockets (3.3.2):
+    - React
   - yoga (0.60.6.React)
 
 DEPENDENCIES:
@@ -128,6 +132,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
+  - react-native-network-info (from `../node_modules/react-native-network-info`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-shake (from `../node_modules/react-native-shake`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
@@ -150,6 +155,7 @@ DEPENDENCIES:
   - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
+  - TcpSockets (from `../node_modules/react-native-tcp`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -180,6 +186,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
+  react-native-network-info:
+    :path: "../node_modules/react-native-network-info"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-shake:
@@ -224,6 +232,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNZipArchive:
     :path: "../node_modules/react-native-zip-archive"
+  TcpSockets:
+    :path: "../node_modules/react-native-tcp"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -240,6 +250,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 2279e559b921d02dfc6253ebef3dcb3a9dc6c07e
   React-jsinspector: a58b86545a0185f69768e78ac96ca9fe43fa3694
   react-native-document-picker: c36bf5f067a581657ecaf7124dcd921a8be19061
+  react-native-network-info: d1290ffc0bd0709e11436f5b8d7f605dcc5c4530
   react-native-safe-area-context: a1d322930b8c5d04ebeb77cc47cc97575ad27203
   react-native-shake: 4ce03b12439f4b9fdf0acd40c5b0f476b8105f9f
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
@@ -263,6 +274,7 @@ SPEC CHECKSUMS:
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
   RNZipArchive: 5ec612981549e645d2dc11a6b79ca3806299b479
   SSZipArchive: fa16b8cc4cdeceb698e5e5d9f67e9558532fbf23
+  TcpSockets: 8d839b9b14f6f344d98e4642ded13ab3112b462d
   yoga: 5079887aa3e4c62142d6bcee493022643ee4d730
 
 PODFILE CHECKSUM: 297de0f44cd98948df0aea23302ecf16dc429daf
