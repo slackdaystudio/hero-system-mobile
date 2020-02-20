@@ -203,7 +203,7 @@ class GroupPlayScreen extends Component {
                         break;
                     case COMMAND_ACTIVE_PLAYER:
                         this.props.setActivePlayer(json.username);
-
+                        
                         if (this.props.username === json.username) {
                             this.props.receiveMessage(JSON.stringify({
                                 sender: json.sender,
@@ -355,7 +355,7 @@ class GroupPlayScreen extends Component {
                     sender: this.props.username,
                     type: TYPE_GROUPPLAY_COMMAND,
                     command: COMMAND_ACTIVE_PLAYER,
-                    username: user.username
+                    username: username
                 }));
             }
         })
