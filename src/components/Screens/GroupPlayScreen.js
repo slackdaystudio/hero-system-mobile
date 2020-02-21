@@ -1,4 +1,3 @@
-import '../../../shim'
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,21 +6,15 @@ import { Container, Content, Button, Spinner, Text, Form, Item, Label, Input, Pi
 import { scale, verticalScale } from 'react-native-size-matters';
 import { NavigationEvents } from 'react-navigation';
 import { NetworkInfo } from 'react-native-network-info';
-import uuidv4 from 'uuid/v4';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import HostGameDialog from '../GroupPlayDialogs/HostGameDialog';
 import JoinGameDialog from '../GroupPlayDialogs/JoinGameDialog';
 import { common } from '../../lib/Common';
-import {
-    groupPlayServer,
-    groupPlayClient,
-    setGroupPlayServer,
-    setGroupPlayClient,
-    leaveGame,
-    stopGame
-} from '../../../App';
+import { leaveGame, stopGame } from '../../../App';
+import { groupPlayServer, PLAYER_OPTION_ALL } from '../../groupPlay/GroupPlayServer';
+import { groupPlayClient } from '../../groupPlay/GroupPlayClient';
 import {
     MODE_CLIENT,
     MODE_SERVER,
@@ -36,8 +29,6 @@ import {
 } from '../../reducers/groupPlay';
 import styles from '../../Styles';
 
-var net = require('react-native-tcp');
-
 // Copyright 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,22 +42,6 @@ var net = require('react-native-tcp');
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-const GROUPPLAY_PORT = 49155;
-
-const COMMAND_CLAIM_SOCKET = 'CLAIM_SOCKET';
-
-export const COMMAND_DISCONNECT = 'DISCONNECT';
-
-const COMMAND_ACTIVE_PLAYER = 'ACTIVE_PLAYER';
-
-export const COMMAND_END_GAME = 'END_GAME';
-
-export const TYPE_GROUPPLAY_COMMAND = 0;
-
-export const TYPE_GROUPPLAY_MESSAGE = 1;
-
-const PLAYER_OPTION_ALL = 'All'
 
 class GroupPlayScreen extends Component {
     static propTypes = {
@@ -203,201 +178,33 @@ class GroupPlayScreen extends Component {
     }
 
     _joinGame() {
-        let client = net.createConnection(GROUPPLAY_PORT, this.props.ip, () => {
-            try {
-                client.write(JSON.stringify({
-                    sender: this.props.username,
-                    type: TYPE_GROUPPLAY_COMMAND,
-                    command: COMMAND_CLAIM_SOCKET
-                }));
-
-                this.props.receiveMessage(JSON.stringify({
-                    sender: 'Client',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: `Connected to ${this.props.ip}`
-                }));
-
-                client.write(JSON.stringify({
-                    sender: this.props.username,
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'Let\'s do this!'
-                }));
-            } catch (error) {
-                common.toast('Error connecting to GroupPlay game server');
-            }
-        });
-
-        client.on('data', (data) => {
-            let json = JSON.parse(data.toString());
-
-            if (json.type === TYPE_GROUPPLAY_COMMAND) {
-                switch (json.command) {
-                    case COMMAND_END_GAME:
-                        this.props.receiveMessage(JSON.stringify({
-                            sender: json.sender,
-                            type: TYPE_GROUPPLAY_MESSAGE,
-                            message: 'The session has ended, thanks for playing!'
-                        }));
-
-                        leaveGame(this.props.username, this.props.setMode, false);
-                        break;
-                    case COMMAND_ACTIVE_PLAYER:
-                        this.props.setActivePlayer(json.username);
-
-                        if (this.props.username === json.username) {
-                            this.props.receiveMessage(JSON.stringify({
-                                sender: json.sender,
-                                type: TYPE_GROUPPLAY_MESSAGE,
-                                message: 'It\s your turn to act, what do you want to do?'
-                            }));
-                        }
-                        break;
-                    default:
-                        // Do nothing
-                }
-            } else if (json.type === TYPE_GROUPPLAY_MESSAGE) {
-                this.props.receiveMessage(data);
-            }
-        });
-
-        client.on('error', (error) => {
-            this.props.receiveMessage(JSON.stringify({
-                sender: 'Client',
-                type: TYPE_GROUPPLAY_MESSAGE,
-                message: `${error}`
-            }));
-
-            leaveGame(this.props.username, this.props.setMode, false);
-        });
-
-        client.on('close', () => {
-            this.props.receiveMessage(JSON.stringify({
-                sender: 'Client',
-                type: TYPE_GROUPPLAY_MESSAGE,
-                message: 'Your connection has been closed'
-            }));
-
-            leaveGame(this.props.username, this.props.setMode, false);
-        });
-
-        client.on('end', (error) => {
-            this.props.receiveMessage(JSON.stringify({
-                sender: 'Client',
-                type: TYPE_GROUPPLAY_MESSAGE,
-                message: `You have left the game session${error ? ` (${error})` : ''}`
-            }));
-
-            leaveGame(this.props.username, this.props.setMode, false);
-        });
+        groupPlayClient.create(
+            this.props.receiveMessage,
+            this.props.username,
+            this.props.ip,
+            this.props.setActivePlayer,
+            this.props.setMode
+        );
 
         this.props.setMode(MODE_CLIENT);
-
-        setGroupPlayClient(client, this.props.setMode);
     }
 
     _hostGame() {
-        NetworkInfo.getIPV4Address().then(ipv4Address => {
-            if (ipv4Address === null) {
-                common.toast('Unable to determine IP address');
-                return;
-            }
+        groupPlayServer.create(
+            this.props.registerGroupPlaySocket,
+            this.props.claimGroupPlaySocket,
+            this.props.receiveMessage,
+            this.props.unregisterGroupPlayUser,
+            this.props.activePlayer,
+            this.props.username
+        );
 
-            const server = net.createServer((socket) => {
-                let socketId = uuidv4();
-
-                this.props.registerGroupPlaySocket(socketId, socket);
-
-                socket.on('data', (data) => {
-                    let json = JSON.parse(data);
-
-                    if (json.type === TYPE_GROUPPLAY_COMMAND) {
-                        switch (json.command) {
-                            case COMMAND_CLAIM_SOCKET:
-                                this.props.claimGroupPlaySocket(json.sender, socketId);
-                                break;
-                            case COMMAND_DISCONNECT:
-                                this.props.receiveMessage(data);
-                                this.props.unregisterGroupPlayUser(socketId);
-                                break;
-                            default:
-                                // do nothing
-                        }
-                    } else if (json.type === TYPE_GROUPPLAY_MESSAGE) {
-                        if (json.sender === this.props.activePlayer || this.props.activePlayer === PLAYER_OPTION_ALL) {
-                            this.props.receiveMessage(data);
-                        }
-                    }
-                });
-
-                socket.on('error', (error) => {
-                    this.props.receiveMessage(JSON.stringify({
-                        sender: 'Server',
-                        type: TYPE_GROUPPLAY_MESSAGE,
-                        message: `${error}`
-                    }));
-                });
-
-                socket.on('close', (error) => {
-                    this.props.receiveMessage(JSON.stringify({
-                        sender: 'Server',
-                        type: TYPE_GROUPPLAY_MESSAGE,
-                        message: `A player has left your game${error ? ` (${error})` : ''}`
-                    }));
-
-                    this.props.unregisterGroupPlayUser(socketId);
-                });
-
-                this.props.receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'A new connection has been created'
-                }));
-
-                socket.write(JSON.stringify({
-                    sender: this.props.username,
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'Welcome to my game session!'
-                }));
-            }).listen(GROUPPLAY_PORT, () => {
-                this.props.receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: `Your game session has started ask your players to connect to ${ipv4Address}`
-                }));
-            });
-
-            server.on('error', (error) => {
-                this.props.receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: `${error}`
-                }));
-            });
-
-            server.on('close', () => {
-                this.props.receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'Your game session has ended'
-                }));
-            });
-
-            this.props.setMode(MODE_SERVER);
-
-            setGroupPlayServer(server, this.props.setMode);
-        });
+        this.props.setMode(MODE_SERVER);
     }
 
     _setActivePlayer(username) {
         this.setState({selectedUser: username}, () => {
-            for (const user of this.props.connectedUsers) {
-                user.socket.write(JSON.stringify({
-                    sender: this.props.username,
-                    type: TYPE_GROUPPLAY_COMMAND,
-                    command: COMMAND_ACTIVE_PLAYER,
-                    username: username
-                }));
-            }
+            groupPlayServer.setActivePlayer(username, this.props.username, this.props.connectedUsers);
         })
     }
 

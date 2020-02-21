@@ -12,7 +12,7 @@ import { asyncDispatchMiddleware } from './src/middleware/AsyncDispatchMiddlewar
 import { soundPlayer, DEFAULT_SOUND } from './src/lib/SoundPlayer';
 import reducer from './src/reducers/index';
 import AppNavigator from './AppNavigator';
-import { TYPE_GROUPPLAY_COMMAND, COMMAND_END_GAME, COMMAND_DISCONNECT } from './src/components/Screens/GroupPlayScreen';
+import { TYPE_GROUPPLAY_COMMAND, COMMAND_END_GAME, COMMAND_DISCONNECT } from './src/groupPlay/GroupPlayServer';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

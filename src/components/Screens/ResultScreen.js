@@ -8,7 +8,7 @@ import AnimateNumber from '@bankify/react-native-animate-number';
 import { NavigationEvents } from 'react-navigation';
 import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import Header from '../Header/Header';
-import { TYPE_GROUPPLAY_MESSAGE } from './GroupPlayScreen';
+import { TYPE_GROUPPLAY_MESSAGE } from '../../groupPlay/GroupPlayServer';
 import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
 import { statistics } from '../../lib/Statistics';
 import { soundPlayer, DEFAULT_SOUND } from '../../lib/SoundPlayer';
