@@ -12,7 +12,12 @@ import { asyncDispatchMiddleware } from './src/middleware/AsyncDispatchMiddlewar
 import { soundPlayer, DEFAULT_SOUND } from './src/lib/SoundPlayer';
 import reducer from './src/reducers/index';
 import AppNavigator from './AppNavigator';
-import { TYPE_GROUPPLAY_COMMAND, COMMAND_END_GAME, COMMAND_DISCONNECT } from './src/groupPlay/GroupPlayServer';
+import {
+    TYPE_GROUPPLAY_MESSAGE,
+    TYPE_GROUPPLAY_COMMAND,
+    COMMAND_END_GAME,
+    COMMAND_DISCONNECT
+} from './src/groupPlay/GroupPlayServer';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -44,7 +49,7 @@ export function setGroupPlayServer(server) {
     groupPlayServer = server;
 }
 
-export function stopGame(username, connectedUsers, unregisterGroupPlayUser, setMode) {
+export function stopGame(username, connectedUsers, unregisterGroupPlayUser, setMode, receiveMessage) {
     for (const user of connectedUsers) {
         user.socket.write(JSON.stringify({
             sender: username,
@@ -56,8 +61,17 @@ export function stopGame(username, connectedUsers, unregisterGroupPlayUser, setM
     }
 
     groupPlayServer.close(() => {
+        groupPlayServer.unref();
+
         setGroupPlayServer(null);
+
         setMode(null);
+
+        receiveMessage(JSON.stringify({
+            sender: 'Server',
+            type: TYPE_GROUPPLAY_MESSAGE,
+            message: 'Your game session has ended.'
+        }));
     });
 }
 
@@ -98,7 +112,7 @@ const AppContainer = createAppContainer(AppNavigator);
 export default class App extends Component {
     componentDidMount() {
         soundPlayer.initialize(DEFAULT_SOUND, false);
-
+        
         // Adding a 100ms delay here gets rid of a white screen
         setTimeout(() => SplashScreen.hide(), 100);
     }

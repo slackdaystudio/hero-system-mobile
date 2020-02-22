@@ -146,7 +146,7 @@ class GroupPlayScreen extends Component {
     }
 
     _onStopGameDialogOk() {
-        stopGame(this.props.username, this.props.connectedUsers, this.props.unregisterGroupPlayUser, this.props.setMode);
+        stopGame(this.props.username, this.props.connectedUsers, this.props.unregisterGroupPlayUser, this.props.setMode, this.props.receiveMessage);
 
         this.props.setMode(null);
 

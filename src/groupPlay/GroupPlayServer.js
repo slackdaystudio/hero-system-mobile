@@ -117,11 +117,7 @@ class GroupPlayServer {
             });
 
             server.on('close', () => {
-                receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'Your game session has ended'
-                }));
+                console.log('Closing GroupPlay server')
             });
 
             setGroupPlayServer(server);
