@@ -134,6 +134,18 @@ class GroupPlayServer {
             }));
         }
     }
+
+    sendMessage(message, recipient, sender, connectedUsers) {
+        for (const user of connectedUsers) {
+            if (user.username === recipient || recipient === PLAYER_OPTION_ALL) {
+                user.socket.write(JSON.stringify({
+                    sender: sender,
+                    type: TYPE_GROUPPLAY_MESSAGE,
+                    message: message
+                }));
+            }
+        }
+    }
 }
 
 export let groupPlayServer = new GroupPlayServer();
