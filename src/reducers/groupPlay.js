@@ -20,7 +20,7 @@ export const MODE_SERVER = 0;
 
 export const MODE_CLIENT = 1;
 
-const MAX_MESSAGES = 100;
+const MAX_MESSAGES = 200;
 
 //////////////////////////////
 // ACTION TYPES             //
@@ -33,6 +33,8 @@ export const REGISTER_GROUPPLAY_SOCKET = 'REGISTER_GROUPPLAY_SOCKET';
 export const CLAIM_GROUPPLAY_SOCKET = 'CLAIM_GROUPPLAY_SOCKET';
 
 export const UNREGISTER_GROUPPLAY_USER = 'UNREGISTER_GROUPPLAY_USER';
+
+export const SET_GM = 'SET_GM';
 
 export const UPDATE_USERNAME = 'UPDATE_USERNAME';
 
@@ -80,6 +82,13 @@ export function unregisterGroupPlayUser(id) {
     };
 }
 
+export function setGm(username) {
+    return {
+        type: SET_GM,
+        payload: username,
+    };
+}
+
 export function updateUsername(username) {
     return {
         type: UPDATE_USERNAME,
@@ -110,6 +119,7 @@ export function receiveMessage(message) {
 
 let groupPlayState = {
     mode: null,
+    gm: null,
     username: null,
     ip: null,
     messages: [],
@@ -183,6 +193,14 @@ export default function groupPlay(state = groupPlayState, action) {
             if (deleteIndex >= 0) {
                 newState.connectedUsers.splice(deleteIndex, 1);
             }
+
+            return newState;
+        case SET_GM:
+            newState = {
+                ...state,
+            };
+
+            newState.gm = action.payload;
 
             return newState;
         case UPDATE_USERNAME:

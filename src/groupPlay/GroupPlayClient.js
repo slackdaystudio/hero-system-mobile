@@ -5,10 +5,11 @@ import {
     TYPE_GROUPPLAY_MESSAGE,
     COMMAND_CLAIM_SOCKET,
     COMMAND_END_GAME,
-    COMMAND_ACTIVE_PLAYER
+    COMMAND_ACTIVE_PLAYER,
+    COMMAND_SET_GM
 } from './GroupPlayServer';
 import { common } from '../lib/Common';
-import { setGroupPlayClient, leaveGame } from '../../App';
+import { groupPlayClient as playerClient, setGroupPlayClient, leaveGame } from '../../App';
 
 var net = require('react-native-tcp');
 
@@ -27,7 +28,7 @@ var net = require('react-native-tcp');
 // limitations under the License.
 
 class GroupPlayClient {
-    create(receiveMessage, username, ip, setActivePlayer, setMode) {
+    create(receiveMessage, username, ip, setActivePlayer, setGm, setMode) {
         let client = net.createConnection(GROUPPLAY_PORT, ip, () => {
             try {
                 client.write(JSON.stringify({
@@ -77,6 +78,9 @@ class GroupPlayClient {
                             }));
                         }
                         break;
+                    case COMMAND_SET_GM:
+                        setGm(json.sender);
+                        break;
                     default:
                         // Do nothing
                 }
@@ -116,6 +120,14 @@ class GroupPlayClient {
         });
 
         setGroupPlayClient(client);
+    }
+
+    sendMessage(message, sender) {
+        playerClient.write(JSON.stringify({
+            sender: sender,
+            type: TYPE_GROUPPLAY_MESSAGE,
+            message: message
+        }));
     }
 }
 

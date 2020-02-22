@@ -2,7 +2,7 @@ import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Platform, BackHandler, Alert, View, ScrollView } from 'react-native';
-import { Container, Content, Button, Spinner, Text, Form, Item, Label, Input, Picker, Icon } from 'native-base';
+import { Container, Content, Button, Spinner, Text, Form, Item, Label, Input, Picker, Icon, Fab } from 'native-base';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { NavigationEvents } from 'react-navigation';
 import { NetworkInfo } from 'react-native-network-info';
@@ -14,7 +14,7 @@ import JoinGameDialog from '../GroupPlayDialogs/JoinGameDialog';
 import MessagePlayerDialog from '../MessagePlayerDialog/MessagePlayerDialog';
 import { common } from '../../lib/Common';
 import { leaveGame, stopGame } from '../../../App';
-import { groupPlayServer, PLAYER_OPTION_ALL } from '../../groupPlay/GroupPlayServer';
+import { groupPlayServer, TYPE_GROUPPLAY_MESSAGE, PLAYER_OPTION_ALL } from '../../groupPlay/GroupPlayServer';
 import { groupPlayClient } from '../../groupPlay/GroupPlayClient';
 import {
     MODE_CLIENT,
@@ -26,6 +26,7 @@ import {
     updateUsername,
     updateIp,
     setActivePlayer,
+    setGm,
     receiveMessage
 } from '../../reducers/groupPlay';
 import styles from '../../Styles';
@@ -49,6 +50,7 @@ class GroupPlayScreen extends Component {
         navigation: PropTypes.object.isRequired,
         mode: PropTypes.number,
         username: PropTypes.string,
+        gm: PropTypes.string,
         ip: PropTypes.string,
         activePlayer: PropTypes.string.isRequired,
         messages: PropTypes.array.isRequired,
@@ -59,6 +61,7 @@ class GroupPlayScreen extends Component {
         updateUsername: PropTypes.func.isRequired,
         updateIp: PropTypes.func.isRequired,
         setActivePlayer: PropTypes.func.isRequired,
+        setGm: PropTypes.func.isRequired,
         receiveMessage: PropTypes.func.isRequired,
     }
 
@@ -79,7 +82,8 @@ class GroupPlayScreen extends Component {
 
         this.state = {
             selectedUser: PLAYER_OPTION_ALL,
-            messagePlayerDialogVisible: false,
+            sendMessageDialogVisible: false,
+            messageRecipient: null,
             hostGameDialogVisible: false,
             joinGameDialogVisible: false,
             dialogVisible: false,
@@ -97,8 +101,8 @@ class GroupPlayScreen extends Component {
         this.closeHostGameDialog = this._closeHostGameDialog.bind(this);
         this.saveJoinGameDetails = this._saveJoinGameDetails.bind(this);
         this.closeJoinGameDialog = this._closeJoinGameDialog.bind(this);
-        this.messagePlayer = this._messagePlayer.bind(this);
-        this.closeMessagePlayerDialog = this._closeMessagePlayerDialog.bind(this);
+        this.sendMessage = this._sendMessage.bind(this);
+        this.closeSendMessageDialog = this._closeSendMessageDialog.bind(this);
     }
 
     componentDidMount() {
@@ -123,16 +127,30 @@ class GroupPlayScreen extends Component {
         this.scrollView.scrollToEnd({animated: true});
     }
 
-    _closeMessagePlayerDialog() {
-        this.setState({messagePlayerDialogVisible: false});
+    _closeSendMessageDialog() {
+        this.setState({sendMessageDialogVisible: false});
     }
 
-    _messagePlayer(value) {
-        this.setState({messagePlayerDialogVisible: false}, () => {
+    _messageGm() {
+        if (this.props.mode === MODE_CLIENT && this.props.gm !== null) {
+            this.setState({sendMessageDialogVisible: true, messageRecipient: this.props.gm});
+        }
+    }
+
+    _sendMessage(value) {
+        this.setState({sendMessageDialogVisible: false}, () => {
             if (value.trim() !== '') {
                 if (this.props.mode === MODE_SERVER) {
                     groupPlayServer.sendMessage(value.trim(), this.props.activePlayer, this.props.username, this.props.connectedUsers);
+                } else if (this.props.mode === MODE_CLIENT) {
+                    groupPlayClient.sendMessage(value.trim(), this.props.username);
                 }
+
+                this.props.receiveMessage(JSON.stringify({
+                    sender: 'You',
+                    type: TYPE_GROUPPLAY_MESSAGE,
+                    message: value
+                }));
             }
         });
     }
@@ -201,6 +219,7 @@ class GroupPlayScreen extends Component {
             this.props.username,
             this.props.ip,
             this.props.setActivePlayer,
+            this.props.setGm,
             this.props.setMode
         );
 
@@ -309,12 +328,24 @@ class GroupPlayScreen extends Component {
                         {this._renderUsernameOptions()}
                     </Picker>
                     <View style={{width: scale(5)}} />
-                    <Button style={{backgroundColor: '#14354d'}} onPress={() => this.setState({messagePlayerDialogVisible: true})}>
+                    <Button style={{backgroundColor: '#14354d'}} onPress={() => this.setState({sendMessageDialogVisible: true, messageRecipient: this.state.selectedUser})}>
                         <Icon type='FontAwesome' name="comment" style={{fontSize: verticalScale(18), color: 'white'}} />
                     </Button>
                 </Item>
             </Form>
         )
+    }
+
+    _renderFab() {
+        if (this.props.mode === MODE_CLIENT) {
+            return (
+                <Fab style={{backgroundColor: '#14354d'}} position='bottomRight' onPress={() => this._messageGm()}>
+                    <Icon type='FontAwesome' name="comment" style={{fontSize: verticalScale(18), color: 'white'}} />
+                </Fab>
+            );
+        }
+
+        return null;
     }
 
     render() {
@@ -326,7 +357,7 @@ class GroupPlayScreen extends Component {
                 />
                 <Header navigation={this.props.navigation} backScreen={'Home'} />
                 <Content style={styles.content}>
-                    <Heading text='GroupPlay Status' />
+                    <Heading text='Game Status' />
                     {this._renderConnectionDetails()}
                     <Heading text='Messages' />
                     {this._renderUserSelect()}
@@ -346,7 +377,8 @@ class GroupPlayScreen extends Component {
                             <View style={{paddingBottom: verticalScale(5)}} />
                         </ScrollView>
                     </View>
-                    <View style={{paddingBottom: verticalScale(20)}} />
+                    <View style={{paddingBottom: verticalScale(60)}} />
+                    {this._renderFab()}
                     <ConfirmationDialog
                         visible={this.state.dialogVisible}
                         title={this.state.title}
@@ -371,10 +403,10 @@ class GroupPlayScreen extends Component {
                         onClose={this.closeJoinGameDialog}
                     />
                     <MessagePlayerDialog
-                        visible={this.state.messagePlayerDialogVisible}
-                        recipient={this.props.activePlayer}
-                        onSend={this.messagePlayer}
-                        onClose={this.closeMessagePlayerDialog}
+                        visible={this.state.sendMessageDialogVisible}
+                        recipient={this.state.messageRecipient}
+                        onSend={this.sendMessage}
+                        onClose={this.closeSendMessageDialog}
                     />
                 </Content>
             </Container>
@@ -386,6 +418,7 @@ const mapStateToProps = state => {
     return {
         mode: state.groupPlay.mode,
         username: state.groupPlay.username,
+        gm: state.groupPlay.gm,
         ip: state.groupPlay.ip,
         activePlayer: state.groupPlay.activePlayer,
         messages: state.groupPlay.messages,
@@ -401,6 +434,7 @@ const mapDispatchToProps = {
     updateUsername,
     updateIp,
     setActivePlayer,
+    setGm,
     receiveMessage,
 };
 

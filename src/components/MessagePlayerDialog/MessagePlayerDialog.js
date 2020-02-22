@@ -7,10 +7,12 @@ import { verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
 import Heading from '../Heading/Heading';
 
+const MAX_MESSAGE_LENGTH = 255;
+
 export default class MessagePlayerDialog extends Component {
     static propTypes = {
         visible: PropTypes.bool.isRequired,
-        recipient: PropTypes.string.isRequired,
+        recipient: PropTypes.string,
         onSend: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired
     }
@@ -21,6 +23,18 @@ export default class MessagePlayerDialog extends Component {
         this.state = {
             message: ''
         };
+    }
+
+    _setMessage(value) {
+        if (value.length <= MAX_MESSAGE_LENGTH) {
+            this.setState({message: value})
+        }
+    }
+
+    _sendMessage(message) {
+        this.setState({message: ''}, () => {
+            this.props.onSend(message);
+        });
     }
 
     render() {
@@ -39,11 +53,11 @@ export default class MessagePlayerDialog extends Component {
                             style={[styles.grey, {borderWidth: 0.5, borderColor: '#303030'}]}
                             rowSpan={4}
                             value={this.state.message}
-                            onChangeText={(value) => this.setState({message: value})}
+                            onChangeText={(value) => this._setMessage(value)}
                         />
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                             <View style={styles.buttonContainer}>
-                                <Button style={styles.button}  onPress={() => this.props.onSend(this.state.message)}>
+                                <Button style={styles.button}  onPress={() => this._sendMessage(this.state.message)}>
                                     <Text uppercase={false} style={styles.buttonText}>Send</Text>
                                 </Button>
                             </View>

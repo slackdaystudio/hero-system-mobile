@@ -22,13 +22,15 @@ var net = require('react-native-tcp');
 
 export const GROUPPLAY_PORT = 49155;
 
-export const COMMAND_DISCONNECT = 'DISCONNECT';
+export const COMMAND_DISCONNECT = 0;
 
-export const COMMAND_ACTIVE_PLAYER = 'ACTIVE_PLAYER';
+export const COMMAND_ACTIVE_PLAYER = 1;
 
-export const COMMAND_END_GAME = 'END_GAME';
+export const COMMAND_SET_GM = 2
 
-export const COMMAND_CLAIM_SOCKET = 'CLAIM_SOCKET';
+export const COMMAND_END_GAME = 3;
+
+export const COMMAND_CLAIM_SOCKET = 4;
 
 export const TYPE_GROUPPLAY_COMMAND = 0;
 
@@ -56,6 +58,12 @@ class GroupPlayServer {
                         switch (json.command) {
                             case COMMAND_CLAIM_SOCKET:
                                 claimGroupPlaySocket(json.sender, socketId);
+
+                                socket.write(JSON.stringify({
+                                    sender: username,
+                                    type: TYPE_GROUPPLAY_COMMAND,
+                                    command: COMMAND_SET_GM
+                                }));
                                 break;
                             case COMMAND_DISCONNECT:
                                 receiveMessage(data);
