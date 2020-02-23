@@ -2,7 +2,6 @@ import '../../shim';
 import { NetworkInfo } from 'react-native-network-info';
 import uuidv4 from 'uuid/v4';
 import { common } from '../lib/Common';
-import { setGroupPlayServer, stopGame } from '../../App';
 
 var net = require('react-native-tcp');
 
@@ -38,104 +37,24 @@ export const TYPE_GROUPPLAY_MESSAGE = 1;
 
 export const PLAYER_OPTION_ALL = 'All';
 
-class GroupPlayServer {
-    create(registerGroupPlaySocket, claimGroupPlaySocket, receiveMessage, unregisterGroupPlayUser, activePlayer, username) {
-        NetworkInfo.getIPV4Address().then(ipv4Address => {
-            if (ipv4Address === null) {
-                common.toast('Unable to determine IP address');
-                return;
-            }
+export default class GroupPlayServer {
+    constructor(username, receiveMessage, setServer) {
+        this.server = null;
+        this.username = username;
+        this.activePlayer = PLAYER_OPTION_ALL;
+        this.connectedUsers = [];
+        this.receiveMessage = receiveMessage;
+        this.setServer = setServer;
 
-            const server = net.createServer((socket) => {
-                let socketId = uuidv4();
-
-                registerGroupPlaySocket(socketId, socket);
-
-                socket.on('data', (data) => {
-                    let json = JSON.parse(data);
-
-                    if (json.type === TYPE_GROUPPLAY_COMMAND) {
-                        switch (json.command) {
-                            case COMMAND_CLAIM_SOCKET:
-                                claimGroupPlaySocket(json.sender, socketId);
-
-                                socket.write(JSON.stringify({
-                                    sender: username,
-                                    type: TYPE_GROUPPLAY_COMMAND,
-                                    command: COMMAND_SET_GM
-                                }));
-                                break;
-                            case COMMAND_DISCONNECT:
-                                receiveMessage(data);
-                                unregisterGroupPlayUser(socketId);
-                                break;
-                            default:
-                                // do nothing
-                        }
-                    } else if (json.type === TYPE_GROUPPLAY_MESSAGE) {
-                        if (json.sender === activePlayer || activePlayer === PLAYER_OPTION_ALL) {
-                            receiveMessage(data);
-                        }
-                    }
-                });
-
-                socket.on('error', (error) => {
-                    receiveMessage(JSON.stringify({
-                        sender: 'Server',
-                        type: TYPE_GROUPPLAY_MESSAGE,
-                        message: `${error}`
-                    }));
-                });
-
-                socket.on('close', (error) => {
-                    receiveMessage(JSON.stringify({
-                        sender: 'Server',
-                        type: TYPE_GROUPPLAY_MESSAGE,
-                        message: `A player has left your game${error ? ` (${error})` : ''}`
-                    }));
-
-                    unregisterGroupPlayUser(socketId);
-                });
-
-                receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'A new connection has been created'
-                }));
-
-                socket.write(JSON.stringify({
-                    sender: username,
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'Welcome to my game session!'
-                }));
-            }).listen(GROUPPLAY_PORT, () => {
-                receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: `Your game session has started ask your players to connect to ${ipv4Address}`
-                }));
-            });
-
-            server.on('error', (error) => {
-                receiveMessage(JSON.stringify({
-                    sender: 'Server',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: `${error}`
-                }));
-            });
-
-            server.on('close', () => {
-                console.log('Closing GroupPlay server')
-            });
-
-            setGroupPlayServer(server);
-        });
+        this._create();
     }
 
-    setActivePlayer(activePlayer, username, connectedUsers) {
-        for (const user of connectedUsers) {
+    setActivePlayer(activePlayer) {
+        this.activePlayer = activePlayer;
+        
+        for (const user of this.connectedUsers) {
             user.socket.write(JSON.stringify({
-                sender: username,
+                sender: this.username,
                 type: TYPE_GROUPPLAY_COMMAND,
                 command: COMMAND_ACTIVE_PLAYER,
                 username: activePlayer
@@ -143,17 +62,169 @@ class GroupPlayServer {
         }
     }
 
-    sendMessage(message, recipient, sender, connectedUsers) {
-        for (const user of connectedUsers) {
+    sendMessage(message, recipient) {
+        for (const user of this.connectedUsers) {
             if (user.username === recipient || recipient === PLAYER_OPTION_ALL) {
                 user.socket.write(JSON.stringify({
-                    sender: sender,
+                    sender: this.username,
                     type: TYPE_GROUPPLAY_MESSAGE,
                     message: message
                 }));
             }
         }
     }
-}
 
-export let groupPlayServer = new GroupPlayServer();
+    stopGame(onClose) {
+        for (const user of this.connectedUsers) {
+            user.socket.write(JSON.stringify({
+                sender: this.username,
+                type: TYPE_GROUPPLAY_COMMAND,
+                command: COMMAND_END_GAME
+            }), 'utf8', () => {
+                this._unregisterGroupPlayUser(user.id);
+            });
+        }
+
+        this.server.close(() => {
+            this.server.unref();
+
+            this.receiveMessage(JSON.stringify({
+                sender: 'Server',
+                type: TYPE_GROUPPLAY_MESSAGE,
+                message: 'Your game session has ended.'
+            }));
+
+            this.setServer(null);
+
+            onClose();
+        });
+    }
+
+    _create() {
+        NetworkInfo.getIPV4Address().then(ipv4Address => {
+            if (ipv4Address === null) {
+                common.toast('Unable to determine IP address');
+                return;
+            }
+
+            this.server = net.createServer((socket) => {
+                let socketId = uuidv4();
+
+                this._registerGroupPlaySocket(socketId, socket);
+
+                socket.on('data', (data) => {
+                    this._processMessage(data, socketId, socket);
+                });
+
+                socket.on('error', (error) => {
+                    this.receiveMessage(JSON.stringify({
+                        sender: 'Server',
+                        type: TYPE_GROUPPLAY_MESSAGE,
+                        message: `${error}`
+                    }));
+                });
+
+                socket.on('close', (error) => {
+                    this.receiveMessage(JSON.stringify({
+                        sender: 'Server',
+                        type: TYPE_GROUPPLAY_MESSAGE,
+                        message: `A player has left your game${error ? ` (${error})` : ''}`
+                    }));
+
+                    this._unregisterGroupPlayUser(socketId);
+                });
+
+                this.receiveMessage(JSON.stringify({
+                    sender: 'Server',
+                    type: TYPE_GROUPPLAY_MESSAGE,
+                    message: 'A new connection has been created'
+                }));
+
+                socket.write(JSON.stringify({
+                    sender: this.username,
+                    type: TYPE_GROUPPLAY_MESSAGE,
+                    message: 'Welcome to my game session!'
+                }));
+            }).listen(GROUPPLAY_PORT, () => {
+                this.receiveMessage(JSON.stringify({
+                    sender: 'Server',
+                    type: TYPE_GROUPPLAY_MESSAGE,
+                    message: `Your game session has started ask your players to connect to ${ipv4Address}`
+                }));
+            });
+
+            this.server.on('error', (error) => {
+                this.receiveMessage(JSON.stringify({
+                    sender: 'Server',
+                    type: TYPE_GROUPPLAY_MESSAGE,
+                    message: `${error}`
+                }));
+            });
+
+            this.server.on('close', () => {
+                console.log('Closing GroupPlay server');
+            });
+        });
+    }
+
+    _registerGroupPlaySocket(socketId, socket) {
+        this.connectedUsers.push({
+            id: socketId,
+            username: null,
+            socket: socket
+        });
+    }
+
+    _processMessage(data, socketId, socket) {
+        let json = JSON.parse(data);
+
+        if (json.type === TYPE_GROUPPLAY_COMMAND) {
+            switch (json.command) {
+                case COMMAND_CLAIM_SOCKET:
+                    this._claimGroupPlaySocket(json.sender, socketId);
+
+                    socket.write(JSON.stringify({
+                        sender: this.username,
+                        type: TYPE_GROUPPLAY_COMMAND,
+                        command: COMMAND_SET_GM
+                    }));
+                    break;
+                case COMMAND_DISCONNECT:
+                    this.receiveMessage(data);
+                    this._unregisterGroupPlayUser(socketId);
+                    break;
+                default:
+                    // do nothing
+            }
+        } else if (json.type === TYPE_GROUPPLAY_MESSAGE) {
+            if (json.sender === this.activePlayer || this.activePlayer === PLAYER_OPTION_ALL) {
+                this.receiveMessage(data);
+            }
+        }
+    }
+
+    _claimGroupPlaySocket(username, socketId) {
+        for (const user of this.connectedUsers) {
+            if (user.id === socketId) {
+                user.username = username;
+                break;
+            }
+        }
+    }
+
+    _unregisterGroupPlayUser(id) {
+        let index = -1;
+
+        for (let i = 0; i < this.connectedUsers.length; i++) {
+            if (this.connectedUsers[i].id === id) {
+                this.connectedUsers[i].socket.destroy();
+                index = i;
+                break;
+            }
+        }
+
+        if (index >= 0) {
+            this.connectedUsers.splice(index, 1);
+        }
+    }
+}

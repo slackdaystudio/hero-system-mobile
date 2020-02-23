@@ -6,10 +6,11 @@ import {
     COMMAND_CLAIM_SOCKET,
     COMMAND_END_GAME,
     COMMAND_ACTIVE_PLAYER,
-    COMMAND_SET_GM
+    COMMAND_SET_GM,
+    COMMAND_DISCONNECT,
+    PLAYER_OPTION_ALL
 } from './GroupPlayServer';
 import { common } from '../lib/Common';
-import { groupPlayClient as playerClient, setGroupPlayClient, leaveGame } from '../../App';
 
 var net = require('react-native-tcp');
 
@@ -27,108 +28,144 @@ var net = require('react-native-tcp');
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class GroupPlayClient {
-    create(receiveMessage, username, ip, setActivePlayer, setGm, setMode) {
-        let client = net.createConnection(GROUPPLAY_PORT, ip, () => {
-            try {
-                client.write(JSON.stringify({
-                    sender: username,
-                    type: TYPE_GROUPPLAY_COMMAND,
-                    command: COMMAND_CLAIM_SOCKET
-                }));
+export default class GroupPlayClient {
+    constructor(ip, username, receiveMessage, setClient, setActivePlayer) {
+        this.client = null;
+        this.ip = ip;
+        this.username = username;
+        this.gm = null;
+        this.activePlayer = PLAYER_OPTION_ALL;
+        this.receiveMessage = receiveMessage;
+        this.setClient = setClient;
+        this.setActivePlayer = setActivePlayer;
 
-                receiveMessage(JSON.stringify({
-                    sender: 'Client',
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: `Connected to ${ip}`
-                }));
+        this._create();
+    }
 
-                client.write(JSON.stringify({
-                    sender: username,
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: 'Let\'s do this!'
-                }));
-            } catch (error) {
-                common.toast('Error connecting to GroupPlay game server');
+    isActivePlayer() {
+        return this.username === this.activePlayer;
+    }
+
+    sendMessage(message) {
+        this.client.write(JSON.stringify({
+            sender: this.username,
+            type: TYPE_GROUPPLAY_MESSAGE,
+            message: message
+        }));
+    }
+
+    leaveGame(sayGoodbye = true) {
+        if (sayGoodbye) {
+            this.client.write(JSON.stringify({
+                sender: this.username,
+                type: TYPE_GROUPPLAY_COMMAND,
+                command: COMMAND_DISCONNECT,
+                message: 'Goodbye.'
+            }));
+        }
+
+        if (this.client !== null) {
+            if (!this.client.pending) {
+                this.client.destroy(() => {
+                    console.log('Unable to destroy client');
+                });
             }
+
+            this.setClient(null);
+        }
+    }
+
+    _create() {
+        this.client = net.createConnection(GROUPPLAY_PORT, this.ip);
+
+        this.client.on('connect', (client) => {
+            this.client.write(JSON.stringify({
+                sender: this.username,
+                type: TYPE_GROUPPLAY_COMMAND,
+                command: COMMAND_CLAIM_SOCKET
+            }));
+
+            this.receiveMessage(JSON.stringify({
+                sender: 'Client',
+                type: TYPE_GROUPPLAY_MESSAGE,
+                message: `Connected to ${this.ip}`
+            }));
+
+            this.client.write(JSON.stringify({
+                sender: this.username,
+                type: TYPE_GROUPPLAY_MESSAGE,
+                message: 'Let\'s do this!'
+            }));
         });
 
-        client.on('data', (data) => {
-            let json = JSON.parse(data.toString());
-
-            if (json.type === TYPE_GROUPPLAY_COMMAND) {
-                switch (json.command) {
-                    case COMMAND_END_GAME:
-                        receiveMessage(JSON.stringify({
-                            sender: json.sender,
-                            type: TYPE_GROUPPLAY_MESSAGE,
-                            message: 'The session has ended, thanks for playing!'
-                        }));
-
-                        leaveGame(username, setMode, false);
-                        break;
-                    case COMMAND_ACTIVE_PLAYER:
-                        setActivePlayer(json.username);
-
-                        if (username === json.username) {
-                            receiveMessage(JSON.stringify({
-                                sender: json.sender,
-                                type: TYPE_GROUPPLAY_MESSAGE,
-                                message: 'It\s your turn to act, what do you want to do?'
-                            }));
-                        }
-                        break;
-                    case COMMAND_SET_GM:
-                        setGm(json.sender);
-                        break;
-                    default:
-                        // Do nothing
-                }
-            } else if (json.type === TYPE_GROUPPLAY_MESSAGE) {
-                receiveMessage(data);
-            }
+        this.client.on('data', (data) => {
+            this._processMessage(data);
         });
 
-        client.on('error', (error) => {
-            receiveMessage(JSON.stringify({
+        this.client.on('error', (error) => {
+            this.receiveMessage(JSON.stringify({
                 sender: 'Client',
                 type: TYPE_GROUPPLAY_MESSAGE,
                 message: `${error}`
             }));
 
-            leaveGame(username, setMode, false);
+            this.leaveGame(false);
         });
 
-        client.on('close', () => {
-            receiveMessage(JSON.stringify({
+        this.client.on('close', () => {
+            this.receiveMessage(JSON.stringify({
                 sender: 'Client',
                 type: TYPE_GROUPPLAY_MESSAGE,
                 message: 'Your connection has been closed'
             }));
 
-            leaveGame(username, setMode, false);
+            this.leaveGame(false);
         });
 
-        client.on('end', (error) => {
-            receiveMessage(JSON.stringify({
+        this.client.on('end', (error) => {
+            this.receiveMessage(JSON.stringify({
                 sender: 'Client',
                 type: TYPE_GROUPPLAY_MESSAGE,
                 message: `You have left the game session${error ? ` (${error})` : ''}`
             }));
 
-            leaveGame(username, setMode, false);
+            // this.leaveGame(false);
         });
-
-        setGroupPlayClient(client);
     }
 
-    sendMessage(message, sender) {
-        playerClient.write(JSON.stringify({
-            sender: sender,
-            type: TYPE_GROUPPLAY_MESSAGE,
-            message: message
-        }));
+    _processMessage(data) {
+        let json = JSON.parse(data.toString());
+
+        if (json.type === TYPE_GROUPPLAY_COMMAND) {
+            switch (json.command) {
+                case COMMAND_END_GAME:
+                    this.receiveMessage(JSON.stringify({
+                        sender: json.sender,
+                        type: TYPE_GROUPPLAY_MESSAGE,
+                        message: 'The session has ended, thanks for playing!'
+                    }));
+
+                    this.leaveGame(false);
+                    break;
+                case COMMAND_ACTIVE_PLAYER:
+                    this.activePlayer = json.username;
+                    this.setActivePlayer(json.username);
+                    if (this.username === json.username) {
+                        this.receiveMessage(JSON.stringify({
+                            sender: json.sender,
+                            type: TYPE_GROUPPLAY_MESSAGE,
+                            message: 'It\s your turn to act, what do you want to do?'
+                        }));
+                    }
+                    break;
+                case COMMAND_SET_GM:
+                    this.gm = json.sender;
+                    break;
+                default:
+                    // Do nothing
+            }
+        } else if (json.type === TYPE_GROUPPLAY_MESSAGE) {
+            this.receiveMessage(data);
+        }
     }
 }
-
-export let groupPlayClient = new GroupPlayClient();

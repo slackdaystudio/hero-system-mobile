@@ -27,9 +27,9 @@ class MyHeader extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hasTabs: PropTypes.bool,
-        groupPlayMode: PropTypes.number,
-        groupPlayUsername: PropTypes.string,
-        groupPlayActivePlayer: PropTypes.string.isRequired,
+        activePlayer: PropTypes.bool.isRequired,
+        groupPlayClient: PropTypes.object,
+        groupPlayServer: PropTypes.object,
         backScreen: PropTypes.string,
     }
 
@@ -55,8 +55,8 @@ class MyHeader extends Component {
         );
     }
 
-    _renderActivePlayerIndicator(isActivePlayer) {
-        if (isActivePlayer) {
+    _renderActivePlayerIndicator() {
+        if (this.props.activePlayer) {
             return (
                 <View style={{flex: 0.75}}>
                     <Icon
@@ -74,22 +74,20 @@ class MyHeader extends Component {
     }
 
     _renderGroupPlayStatus() {
-        if (this.props.groupPlayMode === null || this.props.groupPlayMode === undefined) {
+        if (this.props.groupPlayClient === null && this.props.groupPlayServer === null) {
             return <View style={{flex: 1}} />;
         }
 
-        let isActivePlayer = this.props.groupPlayUsername === this.props.groupPlayActivePlayer;
-
         return (
             <Fragment>
-                <View style={{flex: (isActivePlayer ? 1.25 : 0.75)}}>
+                <View style={{flex: (this.props.activePlayer ? 1.25 : 0.75)}}>
                     <Icon
                         name="wifi"
                         style={{alignSelf: 'flex-end', fontSize: verticalScale(16), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : 0}}
                         onPress={() => this.props.navigation.navigate('GroupPlay')}
                     />
                 </View>
-                {this._renderActivePlayerIndicator(isActivePlayer)}
+                {this._renderActivePlayerIndicator()}
             </Fragment>
         );
     }
@@ -143,9 +141,9 @@ const localStyles = ScaledSheet.create({
 
 const mapStateToProps = state => {
     return {
-        groupPlayUsername: state.groupPlay.username,
-        groupPlayMode: state.groupPlay.mode,
-        groupPlayActivePlayer: state.groupPlay.activePlayer,
+        activePlayer: state.groupPlay.activePlayer,
+        groupPlayClient: state.groupPlay.client,
+        groupPlayServer: state.groupPlay.server,
     };
 };
 

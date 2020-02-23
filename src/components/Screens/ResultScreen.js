@@ -15,7 +15,6 @@ import { soundPlayer, DEFAULT_SOUND } from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import { addStatistics } from '../../reducers/statistics';
 import { MODE_CLIENT } from '../../reducers/groupPlay';
-import { groupPlayClient } from '../../../App';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -38,8 +37,7 @@ class ResultScreen extends Component {
         useFifthEdition: PropTypes.bool.isRequired,
         playSounds: PropTypes.bool.isRequired,
         onlyDiceSounds: PropTypes.bool.isRequired,
-        groupPlayMode: PropTypes.number,
-        groupPlayUsername: PropTypes.string,
+        groupPlayClient: PropTypes.object,
     }
 
     constructor(props) {
@@ -113,15 +111,11 @@ class ResultScreen extends Component {
     }
 
     _messageGroupPlayServer() {
-        if (this.props.groupPlayMode === MODE_CLIENT && groupPlayClient !== null) {
+        if (this.props.groupPlayClient !== null) {
             const messages = dieRoller.toMessages(this.state.result);
 
             for (const message of messages) {
-                groupPlayClient.write(JSON.stringify({
-                    sender: this.props.groupPlayUsername,
-                    type: TYPE_GROUPPLAY_MESSAGE,
-                    message: message,
-                }));
+                this.props.groupPlayClient.sendMessage(message);
             }
         }
     }
@@ -441,8 +435,7 @@ const mapStateToProps = state => {
         useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,
         onlyDiceSounds: state.settings.onlyDiceSounds,
-        groupPlayMode: state.groupPlay.mode,
-        groupPlayUsername: state.groupPlay.username,
+        groupPlayClient: state.groupPlay.client,
     }
 };
 

@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import { common } from '../lib/Common';
 import { persistence } from '../lib/Persistence';
+import { PLAYER_OPTION_ALL } from '../groupPlay/GroupPlayServer';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -16,29 +17,13 @@ import { persistence } from '../lib/Persistence';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const MODE_SERVER = 0;
-
-export const MODE_CLIENT = 1;
-
-const MAX_MESSAGES = 200;
-
 //////////////////////////////
 // ACTION TYPES             //
 //////////////////////////////
 
-export const SET_MODE = 'SET_MODE';
+export const SET_CLIENT = 'SET_CLIENT';
 
-export const REGISTER_GROUPPLAY_SOCKET = 'REGISTER_GROUPPLAY_SOCKET';
-
-export const CLAIM_GROUPPLAY_SOCKET = 'CLAIM_GROUPPLAY_SOCKET';
-
-export const UNREGISTER_GROUPPLAY_USER = 'UNREGISTER_GROUPPLAY_USER';
-
-export const SET_GM = 'SET_GM';
-
-export const UPDATE_USERNAME = 'UPDATE_USERNAME';
-
-export const UPDATE_IP = 'UPDATE_IP';
+export const SET_SERVER = 'SET_SERVER';
 
 export const SET_ACTIVE_PLAYER = 'SET_ACTIVE_PLAYER';
 
@@ -48,58 +33,17 @@ export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
 // ACTIONS                  //
 //////////////////////////////
 
-export function setMode(mode) {
+export function setClient(client) {
     return {
-        type: SET_MODE,
-        payload: mode,
+        type: SET_CLIENT,
+        payload: client,
     };
 }
 
-export function registerGroupPlaySocket(id, socket) {
+export function setServer(server) {
     return {
-        type: REGISTER_GROUPPLAY_SOCKET,
-        payload: {
-            id: id,
-            socket: socket,
-        },
-    };
-}
-
-export function claimGroupPlaySocket(username, id) {
-    return {
-        type: CLAIM_GROUPPLAY_SOCKET,
-        payload: {
-            username: username,
-            id: id,
-        },
-    };
-}
-
-export function unregisterGroupPlayUser(id) {
-    return {
-        type: UNREGISTER_GROUPPLAY_USER,
-        payload: id,
-    };
-}
-
-export function setGm(username) {
-    return {
-        type: SET_GM,
-        payload: username,
-    };
-}
-
-export function updateUsername(username) {
-    return {
-        type: UPDATE_USERNAME,
-        payload: username,
-    };
-}
-
-export function updateIp(ip) {
-    return {
-        type: UPDATE_IP,
-        payload: ip,
+        type: SET_SERVER,
+        payload: server,
     };
 }
 
@@ -110,6 +54,7 @@ export function setActivePlayer(username) {
     };
 }
 
+
 export function receiveMessage(message) {
     return {
         type: RECEIVE_MESSAGE,
@@ -118,113 +63,53 @@ export function receiveMessage(message) {
 }
 
 let groupPlayState = {
-    mode: null,
-    gm: null,
-    username: null,
-    ip: null,
+    client: null,
+    server: null,
+    activePlayer: false,
     messages: [],
-    connectedUsers: [],
-    activePlayer: 'All',
+    maxMessages: 200
 };
 
 export default function groupPlay(state = groupPlayState, action) {
     let newState = null;
 
     switch (action.type) {
-        case SET_MODE:
+        case SET_CLIENT:
             newState = {
                 ...state,
-            };
-
-            newState.mode = action.payload;
-
-            return newState;
-        case REGISTER_GROUPPLAY_SOCKET:
-            newState = {
-                ...state,
-                connectedUsers: [
-                    ...state.connectedUsers
+                messages: [
+                    ...state.messages
                 ]
             };
 
-            newState.connectedUsers.push({
-                id: action.payload.id,
-                username: null,
-                socket: action.payload.socket
-            });
+            newState.client = action.payload;
 
             return newState;
-        case CLAIM_GROUPPLAY_SOCKET:
+        case SET_SERVER:
             newState = {
                 ...state,
-                connectedUsers: [
-                    ...state.connectedUsers
+                messages: [
+                    ...state.messages
                 ]
             };
 
-            for (let connectedUser of newState.connectedUsers) {
-                if (connectedUser.id === action.payload.id) {
-                    connectedUser.username = action.payload.username;
-                    break;
-                }
-            }
-
-            return newState;
-        case UNREGISTER_GROUPPLAY_USER:
-            newState = {
-                ...state,
-                connectedUsers: [
-                    ...state.connectedUsers
-                ]
-            };
-
-            let deleteIndex = -1;
-
-            for (let i = 0; i < newState.connectedUsers.length; i++) {
-                if (newState.connectedUsers[i].id === action.payload) {
-                    newState.connectedUsers[i].socket.destroy();
-
-                    deleteIndex = i;
-
-                    break;
-                }
-            }
-
-            if (deleteIndex >= 0) {
-                newState.connectedUsers.splice(deleteIndex, 1);
-            }
-
-            return newState;
-        case SET_GM:
-            newState = {
-                ...state,
-            };
-
-            newState.gm = action.payload;
-
-            return newState;
-        case UPDATE_USERNAME:
-            newState = {
-                ...state,
-            };
-
-            newState.username = action.payload;
-
-            return newState;
-        case UPDATE_IP:
-            newState = {
-                ...state,
-            };
-
-            newState.ip = action.payload;
+            newState.server = action.payload;
 
             return newState;
         case SET_ACTIVE_PLAYER:
             newState = {
                 ...state,
+                messages: [
+                    ...state.messages
+                ]
             };
 
-            newState.activePlayer = action.payload;
+            newState.activePlayer = false;
+
+            // Cannot do a deep or shallow copy on state client/server
+            if (state.client !== null && typeof state.client === 'object') {
+                newState.activePlayer = state.client.isActivePlayer();
+            }
 
             return newState;
         case RECEIVE_MESSAGE:
@@ -235,7 +120,7 @@ export default function groupPlay(state = groupPlayState, action) {
                 ]
             };
 
-            if (newState.messages.length === MAX_MESSAGES) {
+            if (newState.messages.length === newState.maxMessages) {
                 newState.messages.splice(0, 1);
             }
 

@@ -13,22 +13,9 @@ import HostGameDialog from '../GroupPlayDialogs/HostGameDialog';
 import JoinGameDialog from '../GroupPlayDialogs/JoinGameDialog';
 import MessagePlayerDialog from '../MessagePlayerDialog/MessagePlayerDialog';
 import { common } from '../../lib/Common';
-import { leaveGame, stopGame } from '../../../App';
-import { groupPlayServer, TYPE_GROUPPLAY_MESSAGE, PLAYER_OPTION_ALL } from '../../groupPlay/GroupPlayServer';
-import { groupPlayClient } from '../../groupPlay/GroupPlayClient';
-import {
-    MODE_CLIENT,
-    MODE_SERVER,
-    setMode,
-    registerGroupPlaySocket,
-    claimGroupPlaySocket,
-    unregisterGroupPlayUser,
-    updateUsername,
-    updateIp,
-    setActivePlayer,
-    setGm,
-    receiveMessage
-} from '../../reducers/groupPlay';
+import GroupPlayServer, { TYPE_GROUPPLAY_MESSAGE, PLAYER_OPTION_ALL } from '../../groupPlay/GroupPlayServer';
+import GroupPlayClient from '../../groupPlay/GroupPlayClient';
+import { setClient, setServer, setActivePlayer, receiveMessage } from '../../reducers/groupPlay';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -48,20 +35,12 @@ import styles from '../../Styles';
 class GroupPlayScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        mode: PropTypes.number,
-        username: PropTypes.string,
-        gm: PropTypes.string,
-        ip: PropTypes.string,
-        activePlayer: PropTypes.string.isRequired,
+        groupPlayClient: PropTypes.object,
+        groupPlayServer: PropTypes.object,
         messages: PropTypes.array.isRequired,
-        setMode: PropTypes.func.isRequired,
-        registerGroupPlaySocket: PropTypes.func.isRequired,
-        claimGroupPlaySocket: PropTypes.func.isRequired,
-        unregisterGroupPlayUser: PropTypes.func.isRequired,
-        updateUsername: PropTypes.func.isRequired,
-        updateIp: PropTypes.func.isRequired,
+        setClient: PropTypes.func.isRequired,
+        setServer: PropTypes.func.isRequired,
         setActivePlayer: PropTypes.func.isRequired,
-        setGm: PropTypes.func.isRequired,
         receiveMessage: PropTypes.func.isRequired,
     }
 
@@ -81,6 +60,8 @@ class GroupPlayScreen extends Component {
         super(props);
 
         this.state = {
+            username: '',
+            ip: null,
             selectedUser: PLAYER_OPTION_ALL,
             sendMessageDialogVisible: false,
             messageRecipient: null,
@@ -94,6 +75,8 @@ class GroupPlayScreen extends Component {
 
         this.scrollView = null;
 
+        this.updateUsername = this._updateUsername.bind(this);
+        this.updateIp = this._updateIp.bind(this);
         this.onStopGameDialogOk = this._onStopGameDialogOk.bind(this);
         this.onLeaveGameDialogOk = this._onLeaveGameDialogOk.bind(this);
         this.onDialogClose = this._onDialogClose.bind(this);
@@ -103,10 +86,11 @@ class GroupPlayScreen extends Component {
         this.closeJoinGameDialog = this._closeJoinGameDialog.bind(this);
         this.sendMessage = this._sendMessage.bind(this);
         this.closeSendMessageDialog = this._closeSendMessageDialog.bind(this);
+        this.setActivePlayer = this._setActivePlayer.bind(this);
     }
 
     componentDidMount() {
-        if (this.props.ip === null) {
+        if (this.state.ip === null) {
             NetworkInfo.getIPV4Address().then(ipv4Address => {
                 if (ipv4Address === null) {
                     common.toast('Unable to determine IP address');
@@ -114,13 +98,17 @@ class GroupPlayScreen extends Component {
 
                 let octets = ipv4Address.split('.').splice(0, 3);
 
-                this.props.updateIp(`${octets.join('.')}.`);
+                this.updateIp(`${octets.join('.')}.`);
             });
         }
     }
 
     _updateUsername(value) {
-        this.props.updateUsername(value);
+        this.setState({username: value});
+    }
+
+    _updateIp(ip) {
+        this.setState({ip: ip});
     }
 
     _onMessageReceived() {
@@ -132,18 +120,18 @@ class GroupPlayScreen extends Component {
     }
 
     _messageGm() {
-        if (this.props.mode === MODE_CLIENT && this.props.gm !== null) {
-            this.setState({sendMessageDialogVisible: true, messageRecipient: this.props.gm});
+        if (this.props.groupPlayClient !== null && this.props.groupPlayClient.gm !== null) {
+            this.setState({sendMessageDialogVisible: true, messageRecipient: this.props.groupPlayClient.gm});
         }
     }
 
     _sendMessage(value) {
         this.setState({sendMessageDialogVisible: false}, () => {
             if (value.trim() !== '') {
-                if (this.props.mode === MODE_SERVER) {
-                    groupPlayServer.sendMessage(value.trim(), this.props.activePlayer, this.props.username, this.props.connectedUsers);
-                } else if (this.props.mode === MODE_CLIENT) {
-                    groupPlayClient.sendMessage(value.trim(), this.props.username);
+                if (this.props.groupPlayServer !== null) {
+                    this.props.groupPlayServer.sendMessage(value.trim(), this.state.selectedUser);
+                } else if (this.props.groupPlayClient !== null) {
+                    this.props.groupPlayClient.sendMessage(value.trim());
                 }
 
                 this.props.receiveMessage(JSON.stringify({
@@ -165,9 +153,7 @@ class GroupPlayScreen extends Component {
     }
 
     _onLeaveGameDialogOk() {
-        leaveGame(this.props.username, this.props.setMode);
-
-        this.props.setMode(null);
+        this.props.groupPlayClient.leaveGame();
 
         this._onDialogClose();
     }
@@ -182,11 +168,9 @@ class GroupPlayScreen extends Component {
     }
 
     _onStopGameDialogOk() {
-        stopGame(this.props.username, this.props.connectedUsers, this.props.unregisterGroupPlayUser, this.props.setMode, this.props.receiveMessage);
-
-        this.props.setMode(null);
-
-        this._onDialogClose();
+        this.props.groupPlayServer.stopGame(() => {
+            this._onDialogClose();
+        });
     }
 
     _onDialogClose() {
@@ -214,39 +198,22 @@ class GroupPlayScreen extends Component {
     }
 
     _joinGame() {
-        groupPlayClient.create(
-            this.props.receiveMessage,
-            this.props.username,
-            this.props.ip,
-            this.props.setActivePlayer,
-            this.props.setGm,
-            this.props.setMode
-        );
-
-        this.props.setMode(MODE_CLIENT);
+        this.props.setClient(new GroupPlayClient(this.state.ip, this.state.username, this.props.receiveMessage, this.props.setClient, this.props.setActivePlayer));
     }
 
     _hostGame() {
-        groupPlayServer.create(
-            this.props.registerGroupPlaySocket,
-            this.props.claimGroupPlaySocket,
-            this.props.receiveMessage,
-            this.props.unregisterGroupPlayUser,
-            this.props.activePlayer,
-            this.props.username
-        );
-
-        this.props.setMode(MODE_SERVER);
+        this.props.setServer(new GroupPlayServer(this.state.username, this.props.receiveMessage, this.props.setServer));
     }
 
     _setActivePlayer(username) {
         this.setState({selectedUser: username}, () => {
-            groupPlayServer.setActivePlayer(username, this.props.username, this.props.connectedUsers);
-        })
+            this.props.setActivePlayer(username);
+            this.props.groupPlayServer.setActivePlayer(username);
+        });
     }
 
     _renderConnectionDetails() {
-        if (this.props.mode === null) {
+        if (this.props.groupPlayServer === null && this.props.groupPlayClient === null) {
             return (
                 <Fragment>
                     <Text style={[styles.grey, {alignSelf: 'center'}]}>You are not hosting or particpating in a game</Text>
@@ -264,7 +231,7 @@ class GroupPlayScreen extends Component {
                     </View>
                 </Fragment>
             );
-        } else if (this.props.mode === MODE_SERVER) {
+        } else if (this.props.groupPlayServer !== null) {
             return (
                 <Fragment>
                     <Text style={[styles.grey, {alignSelf: 'center'}]}>You are currently hosting a game session.</Text>
@@ -277,7 +244,7 @@ class GroupPlayScreen extends Component {
                     </View>
                 </Fragment>
             );
-        } else if (this.props.mode === MODE_CLIENT) {
+        } else if (this.props.groupPlayClient !== null) {
             return (
                 <Fragment>
                     <Text style={[styles.grey, {alignSelf: 'center'}]}>You are currently participating in a game session.</Text>
@@ -296,9 +263,9 @@ class GroupPlayScreen extends Component {
     _renderUsernameOptions() {
         let options = [];
 
-        for (const user of this.props.connectedUsers) {
+        for (const user of this.props.groupPlayServer.connectedUsers) {
             if (user.username !== null) {
-                options.push(<Item label={user.username} key={user.username} value={user.username} />);
+                options.push(<Item label={user.username} key={user.id} value={user.username} />);
             }
         }
 
@@ -308,7 +275,7 @@ class GroupPlayScreen extends Component {
     }
 
     _renderUserSelect() {
-        if (this.props.connectedUsers.length === 0) {
+        if (this.props.groupPlayServer === null || this.props.groupPlayServer.connectedUsers.length === 0) {
             return null;
         }
 
@@ -323,7 +290,7 @@ class GroupPlayScreen extends Component {
                         iosHeader="Select Player"
                         mode="dropdown"
                         selectedValue={this.state.selectedUser}
-                        onValueChange={(value) => this._setActivePlayer(value)}
+                        onValueChange={(value) => this.setActivePlayer(value)}
                     >
                         {this._renderUsernameOptions()}
                     </Picker>
@@ -337,7 +304,7 @@ class GroupPlayScreen extends Component {
     }
 
     _renderFab() {
-        if (this.props.mode === MODE_CLIENT) {
+        if (this.props.groupPlayClient !== null) {
             return (
                 <Fab style={{backgroundColor: '#14354d'}} position='bottomRight' onPress={() => this._messageGm()}>
                     <Icon type='FontAwesome' name="comment" style={{fontSize: verticalScale(18), color: 'white'}} />
@@ -388,17 +355,17 @@ class GroupPlayScreen extends Component {
                     />
                     <HostGameDialog
                         visible={this.state.hostGameDialogVisible}
-                        username={this.props.username}
-                        updateUsername={this.props.updateUsername}
+                        username={this.state.username}
+                        updateUsername={this.updateUsername}
                         onSave={this.saveHostGameDetails}
                         onClose={this.closeHostGameDialog}
                     />
                     <JoinGameDialog
                         visible={this.state.joinGameDialogVisible}
-                        username={this.props.username}
-                        ip={this.props.ip}
-                        updateUsername={this.props.updateUsername}
-                        updateIp={this.props.updateIp}
+                        username={this.state.username}
+                        ip={this.state.ip}
+                        updateUsername={this.updateUsername}
+                        updateIp={this.updateIp}
                         onSave={this.saveJoinGameDetails}
                         onClose={this.closeJoinGameDialog}
                     />
@@ -416,25 +383,16 @@ class GroupPlayScreen extends Component {
 
 const mapStateToProps = state => {
     return {
-        mode: state.groupPlay.mode,
-        username: state.groupPlay.username,
-        gm: state.groupPlay.gm,
-        ip: state.groupPlay.ip,
-        activePlayer: state.groupPlay.activePlayer,
+        groupPlayClient: state.groupPlay.client,
+        groupPlayServer: state.groupPlay.server,
         messages: state.groupPlay.messages,
-        connectedUsers: state.groupPlay.connectedUsers,
     };
 };
 
 const mapDispatchToProps = {
-    setMode,
-    registerGroupPlaySocket,
-    claimGroupPlaySocket,
-    unregisterGroupPlayUser,
-    updateUsername,
-    updateIp,
+    setClient,
+    setServer,
     setActivePlayer,
-    setGm,
     receiveMessage,
 };
 
