@@ -26,6 +26,8 @@ const DEFAULT_SFX_NAME = 'Default';
 
 const DEFAULT_SOUND = 'dice';
 
+export const ACTION_NOTIFICATION_SOUND = 'action_notification';
+
 const VOLUME = {
     "electricity": 0.10
 }

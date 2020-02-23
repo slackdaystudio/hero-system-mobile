@@ -11,6 +11,7 @@ import {
     PLAYER_OPTION_ALL
 } from './GroupPlayServer';
 import { common } from '../lib/Common';
+import { ACTION_NOTIFICATION_SOUND, soundPlayer } from '../lib/SoundPlayer';
 import { setGroupPlayClient } from '../../App';
 
 var net = require('react-native-tcp');
@@ -155,6 +156,7 @@ export default class GroupPlayClient {
                 case COMMAND_ACTIVE_PLAYER:
                     this.activePlayer = json.username;
                     this.setActivePlayer(json.username);
+
                     if (this.username === json.username) {
                         this.receiveMessage(JSON.stringify({
                             sender: json.sender,
@@ -162,6 +164,11 @@ export default class GroupPlayClient {
                             message: 'It\s your turn to act, what do you want to do?'
                         }));
                     }
+
+                    if (this.isActivePlayer()) {
+                        soundPlayer.play(ACTION_NOTIFICATION_SOUND);
+                    }
+
                     break;
                 case COMMAND_SET_GM:
                     this.gm = json.sender;
