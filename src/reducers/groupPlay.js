@@ -2,6 +2,7 @@ import { Alert } from 'react-native';
 import { common } from '../lib/Common';
 import { persistence } from '../lib/Persistence';
 import { PLAYER_OPTION_ALL } from '../groupPlay/GroupPlayServer';
+import { groupPlayClient } from '../../App';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -21,9 +22,7 @@ import { PLAYER_OPTION_ALL } from '../groupPlay/GroupPlayServer';
 // ACTION TYPES             //
 //////////////////////////////
 
-export const SET_CLIENT = 'SET_CLIENT';
-
-export const SET_SERVER = 'SET_SERVER';
+export const SET_GROUPPLAY_ACTIVE = 'SET_GROUPPLAY_ACTIVE';
 
 export const SET_ACTIVE_PLAYER = 'SET_ACTIVE_PLAYER';
 
@@ -33,17 +32,10 @@ export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
 // ACTIONS                  //
 //////////////////////////////
 
-export function setClient(client) {
+export function setActive(active) {
     return {
-        type: SET_CLIENT,
-        payload: client,
-    };
-}
-
-export function setServer(server) {
-    return {
-        type: SET_SERVER,
-        payload: server,
+        type: SET_GROUPPLAY_ACTIVE,
+        payload: active,
     };
 }
 
@@ -63,8 +55,7 @@ export function receiveMessage(message) {
 }
 
 let groupPlayState = {
-    client: null,
-    server: null,
+    active: false,
     activePlayer: false,
     messages: [],
     maxMessages: 200
@@ -74,7 +65,7 @@ export default function groupPlay(state = groupPlayState, action) {
     let newState = null;
 
     switch (action.type) {
-        case SET_CLIENT:
+        case SET_GROUPPLAY_ACTIVE:
             newState = {
                 ...state,
                 messages: [
@@ -82,18 +73,7 @@ export default function groupPlay(state = groupPlayState, action) {
                 ]
             };
 
-            newState.client = action.payload;
-
-            return newState;
-        case SET_SERVER:
-            newState = {
-                ...state,
-                messages: [
-                    ...state.messages
-                ]
-            };
-
-            newState.server = action.payload;
+            newState.active = action.payload;
 
             return newState;
         case SET_ACTIVE_PLAYER:
@@ -106,9 +86,8 @@ export default function groupPlay(state = groupPlayState, action) {
 
             newState.activePlayer = false;
 
-            // Cannot do a deep or shallow copy on state client/server
-            if (state.client !== null && typeof state.client === 'object') {
-                newState.activePlayer = state.client.isActivePlayer();
+            if (groupPlayClient !== null && typeof groupPlayClient === 'object') {
+                newState.activePlayer = groupPlayClient.isActivePlayer();
             }
 
             return newState;

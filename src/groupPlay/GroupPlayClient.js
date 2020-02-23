@@ -11,6 +11,7 @@ import {
     PLAYER_OPTION_ALL
 } from './GroupPlayServer';
 import { common } from '../lib/Common';
+import { setGroupPlayClient } from '../../App';
 
 var net = require('react-native-tcp');
 
@@ -29,14 +30,14 @@ var net = require('react-native-tcp');
 // limitations under the License.
 
 export default class GroupPlayClient {
-    constructor(ip, username, receiveMessage, setClient, setActivePlayer) {
+    constructor(ip, username, receiveMessage, setActive, setActivePlayer) {
         this.client = null;
         this.ip = ip;
         this.username = username;
         this.gm = null;
         this.activePlayer = PLAYER_OPTION_ALL;
         this.receiveMessage = receiveMessage;
-        this.setClient = setClient;
+        this.setActive = setActive;
         this.setActivePlayer = setActivePlayer;
 
         this._create();
@@ -71,7 +72,9 @@ export default class GroupPlayClient {
                 });
             }
 
-            this.setClient(null);
+            setGroupPlayClient(null);
+
+            this.setActive(false);
         }
     }
 
@@ -131,6 +134,8 @@ export default class GroupPlayClient {
 
             // this.leaveGame(false);
         });
+
+        this.setActive(true);
     }
 
     _processMessage(data) {

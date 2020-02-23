@@ -27,9 +27,8 @@ class MyHeader extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hasTabs: PropTypes.bool,
+        active: PropTypes.bool.isRequired,
         activePlayer: PropTypes.bool.isRequired,
-        groupPlayClient: PropTypes.object,
-        groupPlayServer: PropTypes.object,
         backScreen: PropTypes.string,
     }
 
@@ -74,7 +73,7 @@ class MyHeader extends Component {
     }
 
     _renderGroupPlayStatus() {
-        if (this.props.groupPlayClient === null && this.props.groupPlayServer === null) {
+        if (!this.props.active) {
             return <View style={{flex: 1}} />;
         }
 
@@ -141,9 +140,8 @@ const localStyles = ScaledSheet.create({
 
 const mapStateToProps = state => {
     return {
+        active: state.groupPlay.active,
         activePlayer: state.groupPlay.activePlayer,
-        groupPlayClient: state.groupPlay.client,
-        groupPlayServer: state.groupPlay.server,
     };
 };
 

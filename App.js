@@ -29,10 +29,20 @@ import AppNavigator from './AppNavigator';
 
 export let sounds = {};
 
-let setGroupPlayMode = null;
+export let groupPlayServer = null;
+
+export let groupPlayClient = null;
 
 export function setSound(name, soundClip) {
     sounds[name] = soundClip;
+}
+
+export function setGroupPlayServer(server) {
+    groupPlayServer = server;
+}
+
+export function setGroupPlayClient(client) {
+    groupPlayClient = client;
 }
 
 export const store = createStore(

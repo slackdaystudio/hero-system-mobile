@@ -15,7 +15,8 @@ import MessagePlayerDialog from '../MessagePlayerDialog/MessagePlayerDialog';
 import { common } from '../../lib/Common';
 import GroupPlayServer, { TYPE_GROUPPLAY_MESSAGE, PLAYER_OPTION_ALL } from '../../groupPlay/GroupPlayServer';
 import GroupPlayClient from '../../groupPlay/GroupPlayClient';
-import { setClient, setServer, setActivePlayer, receiveMessage } from '../../reducers/groupPlay';
+import { setActive, setActivePlayer, receiveMessage } from '../../reducers/groupPlay';
+import { groupPlayClient, groupPlayServer, setGroupPlayClient, setGroupPlayServer } from '../../../App';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -35,11 +36,8 @@ import styles from '../../Styles';
 class GroupPlayScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
-        groupPlayClient: PropTypes.object,
-        groupPlayServer: PropTypes.object,
         messages: PropTypes.array.isRequired,
-        setClient: PropTypes.func.isRequired,
-        setServer: PropTypes.func.isRequired,
+        setActive: PropTypes.func.isRequired,
         setActivePlayer: PropTypes.func.isRequired,
         receiveMessage: PropTypes.func.isRequired,
     }
@@ -120,18 +118,18 @@ class GroupPlayScreen extends Component {
     }
 
     _messageGm() {
-        if (this.props.groupPlayClient !== null && this.props.groupPlayClient.gm !== null) {
-            this.setState({sendMessageDialogVisible: true, messageRecipient: this.props.groupPlayClient.gm});
+        if (groupPlayClient !== null && groupPlayClient.gm !== null) {
+            this.setState({sendMessageDialogVisible: true, messageRecipient: groupPlayClient.gm});
         }
     }
 
     _sendMessage(value) {
         this.setState({sendMessageDialogVisible: false}, () => {
             if (value.trim() !== '') {
-                if (this.props.groupPlayServer !== null) {
-                    this.props.groupPlayServer.sendMessage(value.trim(), this.state.selectedUser);
-                } else if (this.props.groupPlayClient !== null) {
-                    this.props.groupPlayClient.sendMessage(value.trim());
+                if (groupPlayServer !== null) {
+                    groupPlayServer.sendMessage(value.trim(), this.state.selectedUser);
+                } else if (groupPlayClient !== null) {
+                    groupPlayClient.sendMessage(value.trim());
                 }
 
                 this.props.receiveMessage(JSON.stringify({
@@ -153,7 +151,7 @@ class GroupPlayScreen extends Component {
     }
 
     _onLeaveGameDialogOk() {
-        this.props.groupPlayClient.leaveGame();
+        groupPlayClient.leaveGame();
 
         this._onDialogClose();
     }
@@ -168,7 +166,8 @@ class GroupPlayScreen extends Component {
     }
 
     _onStopGameDialogOk() {
-        this.props.groupPlayServer.stopGame(() => {
+        groupPlayServer.stopGame(() => {
+            this.props.setActive(false);
             this._onDialogClose();
         });
     }
@@ -198,22 +197,22 @@ class GroupPlayScreen extends Component {
     }
 
     _joinGame() {
-        this.props.setClient(new GroupPlayClient(this.state.ip, this.state.username, this.props.receiveMessage, this.props.setClient, this.props.setActivePlayer));
+        setGroupPlayClient(new GroupPlayClient(this.state.ip, this.state.username, this.props.receiveMessage, this.props.setActive, this.props.setActivePlayer));
     }
 
     _hostGame() {
-        this.props.setServer(new GroupPlayServer(this.state.username, this.props.receiveMessage, this.props.setServer));
+        setGroupPlayServer(new GroupPlayServer(this.state.username, this.props.receiveMessage, this.props.setActive));
     }
 
     _setActivePlayer(username) {
         this.setState({selectedUser: username}, () => {
             this.props.setActivePlayer(username);
-            this.props.groupPlayServer.setActivePlayer(username);
+            groupPlayServer.setActivePlayer(username);
         });
     }
 
     _renderConnectionDetails() {
-        if (this.props.groupPlayServer === null && this.props.groupPlayClient === null) {
+        if (groupPlayServer === null && groupPlayClient === null) {
             return (
                 <Fragment>
                     <Text style={[styles.grey, {alignSelf: 'center'}]}>You are not hosting or particpating in a game</Text>
@@ -231,7 +230,7 @@ class GroupPlayScreen extends Component {
                     </View>
                 </Fragment>
             );
-        } else if (this.props.groupPlayServer !== null) {
+        } else if (groupPlayServer !== null) {
             return (
                 <Fragment>
                     <Text style={[styles.grey, {alignSelf: 'center'}]}>You are currently hosting a game session.</Text>
@@ -244,7 +243,7 @@ class GroupPlayScreen extends Component {
                     </View>
                 </Fragment>
             );
-        } else if (this.props.groupPlayClient !== null) {
+        } else if (groupPlayClient !== null) {
             return (
                 <Fragment>
                     <Text style={[styles.grey, {alignSelf: 'center'}]}>You are currently participating in a game session.</Text>
@@ -263,7 +262,7 @@ class GroupPlayScreen extends Component {
     _renderUsernameOptions() {
         let options = [];
 
-        for (const user of this.props.groupPlayServer.connectedUsers) {
+        for (const user of groupPlayServer.connectedUsers) {
             if (user.username !== null) {
                 options.push(<Item label={user.username} key={user.id} value={user.username} />);
             }
@@ -275,7 +274,7 @@ class GroupPlayScreen extends Component {
     }
 
     _renderUserSelect() {
-        if (this.props.groupPlayServer === null || this.props.groupPlayServer.connectedUsers.length === 0) {
+        if (groupPlayServer === null || groupPlayServer.connectedUsers.length === 0) {
             return null;
         }
 
@@ -304,7 +303,7 @@ class GroupPlayScreen extends Component {
     }
 
     _renderFab() {
-        if (this.props.groupPlayClient !== null) {
+        if (groupPlayClient !== null) {
             return (
                 <Fab style={{backgroundColor: '#14354d'}} position='bottomRight' onPress={() => this._messageGm()}>
                     <Icon type='FontAwesome' name="comment" style={{fontSize: verticalScale(18), color: 'white'}} />
@@ -383,15 +382,12 @@ class GroupPlayScreen extends Component {
 
 const mapStateToProps = state => {
     return {
-        groupPlayClient: state.groupPlay.client,
-        groupPlayServer: state.groupPlay.server,
         messages: state.groupPlay.messages,
     };
 };
 
 const mapDispatchToProps = {
-    setClient,
-    setServer,
+    setActive,
     setActivePlayer,
     receiveMessage,
 };

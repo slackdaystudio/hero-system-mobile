@@ -2,6 +2,7 @@ import '../../shim';
 import { NetworkInfo } from 'react-native-network-info';
 import uuidv4 from 'uuid/v4';
 import { common } from '../lib/Common';
+import { setGroupPlayServer } from '../../App';
 
 var net = require('react-native-tcp');
 
@@ -38,20 +39,20 @@ export const TYPE_GROUPPLAY_MESSAGE = 1;
 export const PLAYER_OPTION_ALL = 'All';
 
 export default class GroupPlayServer {
-    constructor(username, receiveMessage, setServer) {
+    constructor(username, receiveMessage, setActive) {
         this.server = null;
         this.username = username;
         this.activePlayer = PLAYER_OPTION_ALL;
         this.connectedUsers = [];
         this.receiveMessage = receiveMessage;
-        this.setServer = setServer;
+        this.setActive = setActive;
 
         this._create();
     }
 
     setActivePlayer(activePlayer) {
         this.activePlayer = activePlayer;
-        
+
         for (const user of this.connectedUsers) {
             user.socket.write(JSON.stringify({
                 sender: this.username,
@@ -94,7 +95,9 @@ export default class GroupPlayServer {
                 message: 'Your game session has ended.'
             }));
 
-            this.setServer(null);
+            setGroupPlayServer(null);
+
+            this.setActive(false);
 
             onClose();
         });
@@ -159,12 +162,16 @@ export default class GroupPlayServer {
                     type: TYPE_GROUPPLAY_MESSAGE,
                     message: `${error}`
                 }));
+
+                this.stopGame(() => {});
             });
 
             this.server.on('close', () => {
                 console.log('Closing GroupPlay server');
             });
         });
+
+        this.setActive(true);
     }
 
     _registerGroupPlaySocket(socketId, socket) {
