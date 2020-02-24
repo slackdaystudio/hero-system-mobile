@@ -50,7 +50,7 @@ export default class MessagePlayerDialog extends Component {
                     <Text style={styles.modalHeader}>Message {this.props.recipient}</Text>
                     <View style={[styles.modalContent, {minHeight: verticalScale(170)}]}>
                         <Textarea
-                            style={[styles.grey, {borderWidth: 0.5, borderColor: '#303030'}]}
+                            style={[styles.grey, {borderWidth: 0.5, borderColor: '#303030', backgroundColor: '#000'}]}
                             rowSpan={4}
                             value={this.state.message}
                             onChangeText={(value) => this._setMessage(value)}

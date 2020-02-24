@@ -11,7 +11,7 @@ import Heading from '../Heading/Heading';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import HostGameDialog from '../GroupPlayDialogs/HostGameDialog';
 import JoinGameDialog from '../GroupPlayDialogs/JoinGameDialog';
-import MessagePlayerDialog from '../MessagePlayerDialog/MessagePlayerDialog';
+import MessagePlayerDialog from '../GroupPlayDialogs/MessagePlayerDialog';
 import { common } from '../../lib/Common';
 import GroupPlayServer, { TYPE_GROUPPLAY_MESSAGE, PLAYER_OPTION_ALL } from '../../groupPlay/GroupPlayServer';
 import GroupPlayClient from '../../groupPlay/GroupPlayClient';
@@ -279,7 +279,7 @@ class GroupPlayScreen extends Component {
         }
 
         return (
-            <Form style={{paddingHorizontal: scale(10)}}>
+            <Form style={{paddingHorizontal: scale(10), paddingBottom: verticalScale(10)}}>
                 <Item inlineLabel style={{marginLeft: 0}}>
                     <Label style={styles.grey}>Active Player:</Label>
                     <Picker
