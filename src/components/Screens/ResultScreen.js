@@ -14,7 +14,7 @@ import { statistics } from '../../lib/Statistics';
 import { soundPlayer, DEFAULT_SOUND } from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import { addStatistics } from '../../reducers/statistics';
-import { MODE_CLIENT } from '../../reducers/groupPlay';
+import { groupPlayClient } from '../../../App';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -37,7 +37,7 @@ class ResultScreen extends Component {
         useFifthEdition: PropTypes.bool.isRequired,
         playSounds: PropTypes.bool.isRequired,
         onlyDiceSounds: PropTypes.bool.isRequired,
-        groupPlayClient: PropTypes.object,
+        groupPlayActive: PropTypes.bool.isRequired,
     }
 
     constructor(props) {
@@ -111,11 +111,11 @@ class ResultScreen extends Component {
     }
 
     _messageGroupPlayServer() {
-        if (this.props.groupPlayClient !== null) {
+        if (this.props.groupPlayActive && groupPlayClient !== null) {
             const messages = dieRoller.toMessages(this.state.result);
 
             for (const message of messages) {
-                this.props.groupPlayClient.sendMessage(message);
+                groupPlayClient.sendMessage(message);
             }
         }
     }
@@ -435,7 +435,7 @@ const mapStateToProps = state => {
         useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,
         onlyDiceSounds: state.settings.onlyDiceSounds,
-        groupPlayClient: state.groupPlay.client,
+        groupPlayActive: state.groupPlay.active,
     }
 };
 
