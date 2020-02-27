@@ -76,6 +76,7 @@
 		882C172A23DAA8710002BDF9 /* air_wind.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FA23DAA8700002BDF9 /* air_wind.mp3 */; };
 		882C172B23DAA8710002BDF9 /* wood_plant.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FB23DAA8700002BDF9 /* wood_plant.mp3 */; };
 		882C172C23DAA8710002BDF9 /* telekinetic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FC23DAA8700002BDF9 /* telekinetic.mp3 */; };
+		882F27762407F82100499F9F /* action_notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882F27752407F82100499F9F /* action_notification.mp3 */; };
 		A97B10E5E96D4A538A48F2FD /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA78EEC83CBA4126A6B62A4B /* Octicons.ttf */; };
 		AE96D6E114EA4D62BCBB5E4F /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65CC709197BC4A0F8B59DE19 /* MaterialIcons.ttf */; };
 		D00BAE095B6E43DEA03B8771 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF0F5EED43C048A2928059D0 /* FontAwesome.ttf */; };
@@ -177,6 +178,7 @@
 		882C16FA23DAA8700002BDF9 /* air_wind.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = air_wind.mp3; path = ../../android/app/src/main/res/raw/air_wind.mp3; sourceTree = "<group>"; };
 		882C16FB23DAA8700002BDF9 /* wood_plant.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = wood_plant.mp3; path = ../../android/app/src/main/res/raw/wood_plant.mp3; sourceTree = "<group>"; };
 		882C16FC23DAA8700002BDF9 /* telekinetic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = telekinetic.mp3; path = ../../android/app/src/main/res/raw/telekinetic.mp3; sourceTree = "<group>"; };
+		882F27752407F82100499F9F /* action_notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = action_notification.mp3; path = ../../android/app/src/main/res/raw/action_notification.mp3; sourceTree = "<group>"; };
 		8877D15423C29BF400BD2AE0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		88E0EDE32212595C00EAE0BE /* herogmtools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = herogmtools.entitlements; path = herogmtools/herogmtools.entitlements; sourceTree = "<group>"; };
 		AAB0F2DA9740B3206EC1554B /* libPods-herogmtools-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -332,6 +334,7 @@
 		882C16CC23DAA7A20002BDF9 /* sounds */ = {
 			isa = PBXGroup;
 			children = (
+				882F27752407F82100499F9F /* action_notification.mp3 */,
 				882C16D823DAA86E0002BDF9 /* acid.mp3 */,
 				882C16FA23DAA8700002BDF9 /* air_wind.mp3 */,
 				882C16F523DAA8700002BDF9 /* alien.mp3 */,
@@ -591,6 +594,7 @@
 				6A75C6990E7F49F18C934B54 /* Roboto_medium.ttf in Resources */,
 				882C171123DAA8710002BDF9 /* matter_manipulation.mp3 in Resources */,
 				882C16FD23DAA8710002BDF9 /* mental_psionic.mp3 in Resources */,
+				882F27762407F82100499F9F /* action_notification.mp3 in Resources */,
 				882C172723DAA8710002BDF9 /* vibration.mp3 in Resources */,
 				82FC0DA23C064D1EB6C109D8 /* Roboto.ttf in Resources */,
 				319876A75DE8479EB7D55624 /* rubicon-icon-font.ttf in Resources */,
