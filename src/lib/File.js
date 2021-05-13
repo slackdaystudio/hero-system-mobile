@@ -1,12 +1,10 @@
 import { Platform, Alert } from 'react-native';
-import { Toast } from 'native-base';
 import DocumentPicker from 'react-native-document-picker';
-import RNFetchBlob from 'rn-fetch-blob';
+import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
 import { zip, unzip } from 'react-native-zip-archive';
 import { isBase64 } from 'is-base64';
 import { common } from './Common';
-import { character as characterLib } from './Character';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
 import { combatDetails } from './CombatDetails';
 import { permission } from './Permission';
@@ -27,17 +25,17 @@ import iconv from 'iconv-lite';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const DIR_CHARACTER = 'character'
+const DIR_CHARACTER = 'character';
 
 const DIR_SOUNDS = 'sounds';
 
-const ANDROID_ROOT_DIR = `${RNFetchBlob.fs.dirs.SDCardDir}/HEROSystemMobile`;
+const ANDROID_ROOT_DIR = `${RNFS.ExternalStorageDirectoryPath}/HEROSystemMobile`;
 
 const ANDROID_CHARACTER_DIR = `${ANDROID_ROOT_DIR}/${DIR_CHARACTER}`;
 
 const ANDROID_SOUND_DIR = `${ANDROID_ROOT_DIR}/${DIR_SOUNDS}`;
 
-const DEFAULT_ROOT_DIR = RNFetchBlob.fs.dirs.DocumentDir;
+const DEFAULT_ROOT_DIR = RNFS.DocumentDirectoryPath;
 
 const DEFAULT_CHARACTER_DIR = `${DEFAULT_ROOT_DIR}/${DIR_CHARACTER}`;
 
@@ -108,21 +106,23 @@ class File {
             }
 
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
-            characters = await RNFetchBlob.fs.ls(path);
+            characters = await RNFS.readDir(path);
 
-            characters.sort();
+            characters = characters.sort((a, b) => a.name < b.name);
         } catch (error) {
             Alert.alert(error.message);
         }
 
-        return characters;
+        return characters.map(c => {
+            return c.name;
+        });
     }
 
     async loadCharacter(characterName, startLoad, endLoad) {
         let character = null;
 
         try {
-	        startLoad();
+            startLoad();
 
             let writePermission = await permission.askForWrite();
 
@@ -138,9 +138,9 @@ class File {
 
             await unzip(canonicalFromName, canonicalToName);
 
-            character = await RNFetchBlob.fs.readFile(`${canonicalToName}/${characterName.slice(0, -5)}.${EXT_JSON}`);
+            character = await RNFS.readFile(`${canonicalToName}/${characterName.slice(0, -5)}.${EXT_JSON}`);
 
-            await RNFetchBlob.fs.unlink(canonicalToName);
+            await RNFS.unlink(canonicalToName);
 
             return JSON.parse(character);
         } catch (error) {
@@ -184,7 +184,7 @@ class File {
 
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
 
-            await RNFetchBlob.fs.unlink(`${path}/${filename}`);
+            await RNFS.unlink(`${path}/${filename}`);
         } catch (error) {
             Alert.alert(error.message)
         }
@@ -200,11 +200,11 @@ class File {
 
             if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools\-Inbox/.test(filePath) === false) {
                 let arr = uri.split('/');
-                const dirs = RNFetchBlob.fs.dirs;
+                const dirs = RNFS.dirs;
                 filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
             }
 
-            let data = await RNFetchBlob.fs.readFile(decodeURI(filePath), 'base64');
+            let data = await RNFS.readFile(decodeURI(filePath), 'base64');
             let rawXml = this._decode(data);
 
             if (isHdc) {
@@ -333,9 +333,9 @@ class File {
         let characterPath = await this._getFileName(filename, DEFAULT_CHARACTER_DIR);
         let zipPath = await this._getFileName(filename, DEFAULT_CHARACTER_DIR, EXT_CHARACTER);
 
-        await RNFetchBlob.fs.writeFile(characterPath, JSON.stringify(character));
+        await RNFS.writeFile(characterPath, JSON.stringify(character));
         await zip(characterPath, zipPath);
-        await RNFetchBlob.fs.unlink(characterPath);
+        await RNFS.unlink(characterPath);
     }
 
     _savePortrait(character) {
@@ -354,7 +354,7 @@ class File {
     async _initCharacterState(character, filename) {
         let hsmFilename = `${filename.slice(0, -4)}.hsmc`;
         let path = await this._getPath(DEFAULT_CHARACTER_DIR);
-        let exists = await RNFetchBlob.fs.exists(`${path}/${hsmFilename}`);
+        let exists = await RNFS.exists(`${path}/${hsmFilename}`);
 
         character.filename = hsmFilename;
 
@@ -384,7 +384,7 @@ class File {
             } else if (path === DEFAULT_ROOT_DIR) {
                 path = Platform.OS === 'android' ? ANDROID_ROOT_DIR : DEFAULT_ROOT_DIR;
             } else {
-                throw `Unknown path: {$path}`;
+                throw `Unknown path: ${path}`;
             }
         }
 
@@ -395,10 +395,10 @@ class File {
 
     async _makeSaveLocation(location) {
         try {
-            const exists =  await RNFetchBlob.fs.exists(location);
+            const exists =  await RNFS.exists(location);
 
             if (!exists) {
-                await RNFetchBlob.fs.mkdir(location);
+                await RNFS.mkdir(location);
             }
         } catch (error) {
             Alert.alert(error.message);

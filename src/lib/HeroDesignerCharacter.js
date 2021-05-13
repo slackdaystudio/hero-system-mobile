@@ -1,10 +1,6 @@
-import { Alert } from 'react-native';
-import RNFetchBlob from 'rn-fetch-blob';
 import { common } from './Common';
 import { heroDesignerTemplate } from './HeroDesignerTemplate';
-import { permission } from './Permission';
 import { SKILL_ROLL_BASE } from '../decorators/skills/Roll';
-import { store } from '../../App';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
