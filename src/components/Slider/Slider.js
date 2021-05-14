@@ -1,11 +1,12 @@
-import React, { Component }  from 'react';
+
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, Keyboard, Alert } from 'react-native';
-import { Text, Icon, Item, Input } from 'native-base';
-import { default as RNSlider } from 'react-native-slider';
-import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
-import { common } from '../../lib/Common';
+import {View, Keyboard} from 'react-native';
+import {Text, Item, Input} from 'native-base';
+import {default as RNSlider} from '@react-native-community/slider';
+import {ScaledSheet, scale} from 'react-native-size-matters';
 import styles from '../../Styles';
+
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,7 +33,8 @@ class Slider extends Component {
         valueKey: PropTypes.string,
         onValueChange: PropTypes.func.isRequired,
         toggleTabsLocked: PropTypes.func,
-    }
+        padLeft: PropTypes.bool,
+    };
 
     constructor(props) {
         super(props);
@@ -61,7 +63,7 @@ class Slider extends Component {
         return null;
     }
 
-    _keyboardDidHide () {
+    _keyboardDidHide() {
         if (this.state.textValue !== this.props.value) {
             this.setState({textValue: this.props.value});
         }
@@ -83,11 +85,11 @@ class Slider extends Component {
         if (this._isFraction()) {
             this.setState({textValue: value});
 
-            if (/^(\-)?[0-9]\.(25|50|75|0)$/.test(value) === false) {
+            if (/^(-)?[0-9]\.(25|50|75|0)$/.test(value) === false) {
                 return false;
             }
         } else {
-            if (/^(\-)?[0-9]*$/.test(value) === false) {
+            if (/^(-)?[0-9]*$/.test(value) === false) {
                 return false;
             }
         }
@@ -111,9 +113,9 @@ class Slider extends Component {
 
     _onValueChange(value) {
         if (typeof this.props.valueKey === 'string') {
-            this.props.onValueChange(this.props.valueKey, value);
+            this.props.onValueChange(this.props.valueKey, parseInt(value, 10));
         } else {
-            this.props.onValueChange(value);
+            this.props.onValueChange(parseInt(value, 10));
         }
     }
 
@@ -122,12 +124,12 @@ class Slider extends Component {
             <View>
                 <View style={localStyles.titleContainer}>
                     <Text style={styles.grey}>{this.props.label}</Text>
-                    <View style={{width: (this._isFraction() ? scale(50) : scale(40))}}>
+                    <View style={{width: this._isFraction() ? scale(50) : scale(40)}}>
                         <Item>
                             <Input
                                 style={styles.grey}
                                 keyboardType="numeric"
-                                maxLength={(this._isFraction() ? 5 : 3)}
+                                maxLength={this._isFraction() ? 5 : 3}
                                 value={this.state.textValue.toString()}
                                 onChangeText={(value) => this.onTextValueChange(value)}
                             />
@@ -144,9 +146,9 @@ class Slider extends Component {
                         onSlidingStart={() => this.props.toggleTabsLocked(true)}
                         onSlidingComplete={() => this.props.toggleTabsLocked(false)}
                         disabled={this.props.disabled}
-                        trackStyle={thumbStyles.track}
-                        thumbStyle={thumbStyles.thumb}
-                        minimumTrackTintColor="#14354d"
+                        minimumTrackTintColor="#ffffff"
+                        maximumTrackTintColor="#858889"
+                        thumbTintColor="#ffffff"
                     />
                 </View>
             </View>
@@ -165,24 +167,6 @@ const localStyles = ScaledSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingTop: '10@vs',
-    },
-});
-
-const thumbStyles = ScaledSheet.create({
-    track: {
-        height: '12@vs',
-        borderRadius: 10,
-        backgroundColor: '#01121E',
-        borderColor: '#062134',
-        borderWidth: 1,
-    },
-    thumb: {
-        width: '25@s',
-        height: '25@s',
-        borderRadius: scale(25) / 2,
-        backgroundColor: '#14354d',
-        borderColor: '#062134',
-        borderWidth: 2,
     },
 });
 

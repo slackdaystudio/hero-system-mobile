@@ -1,4 +1,3 @@
-import { StyleSheet, Platform } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
 
