@@ -35,6 +35,7 @@ export default ScaledSheet.create({
         textAlign: 'center',
         backgroundColor: '#121212',
         width: '100%',
+        height: '37@vs',
         borderColor: '#303030',
         borderBottomWidth: 1,
         borderTopWidth: 1,
