@@ -1,9 +1,9 @@
-import React, { Component }  from 'react';
+import React, {Component}  from 'react';
 import PropTypes from 'prop-types';
-import { BackHandler, Platform, StyleSheet, View, Image, TouchableHighlight, StatusBar } from 'react-native';
-import { Button, Text, Header, Left, Right, Body, Icon } from 'native-base';
-import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
-import { common } from '../../lib/Common';
+import {BackHandler, Platform, View, Image, TouchableHighlight, StatusBar} from 'react-native';
+import {Button, Header, Icon} from 'native-base';
+import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -45,7 +45,7 @@ export default class MyHeader extends Component {
 
         return (
             <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
-                <Icon type='FontAwesome' name="chevron-left" style={{fontSize: verticalScale(18), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : 0}} />
+                <Icon type="FontAwesome" name="chevron-left" style={{fontSize: verticalScale(18), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : 0}} />
             </Button>
         );
     }
@@ -67,7 +67,7 @@ export default class MyHeader extends Component {
                         </View>
                         <View style={{flex: 1}}>
                             <Button transparent underlayColor="#000" onPress={() => this.props.navigation.toggleDrawer()}>
-                                <Icon name="menu" style={{fontSize: verticalScale(24), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
+                                <Icon type="FontAwesome" name="bars" style={{fontSize: verticalScale(24), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
                             </Button>
                         </View>
                     </View>
