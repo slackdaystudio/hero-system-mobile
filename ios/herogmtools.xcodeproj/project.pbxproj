@@ -740,7 +740,7 @@
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 39;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -749,7 +749,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -776,7 +776,7 @@
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 39;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = herogmtools/Info.plist;
@@ -784,7 +784,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
