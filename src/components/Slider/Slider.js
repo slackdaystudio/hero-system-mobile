@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {View, Keyboard} from 'react-native';
 import {Text, Item, Input} from 'native-base';
 import {default as RNSlider} from '@react-native-community/slider';
-import {ScaledSheet, scale} from 'react-native-size-matters';
+import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
 
 
@@ -98,6 +98,7 @@ class Slider extends Component {
     }
 
     _onTextValueChange(value) {
+        console.log(value);
         if (this._isInputValid(value) && value % this.props.step === 0.0) {
             if (value < this.props.min) {
                 value = this.props.min;
@@ -113,15 +114,15 @@ class Slider extends Component {
 
     _onValueChange(value) {
         if (typeof this.props.valueKey === 'string') {
-            this.props.onValueChange(this.props.valueKey, parseInt(value, 10));
+            this.props.onValueChange(this.props.valueKey, value);
         } else {
-            this.props.onValueChange(parseInt(value, 10));
+            this.props.onValueChange(value);
         }
     }
 
     render() {
         return (
-            <View>
+            <View style={{paddingHorizontal: scale(20)}}>
                 <View style={localStyles.titleContainer}>
                     <Text style={styles.grey}>{this.props.label}</Text>
                     <View style={{width: this._isFraction() ? scale(50) : scale(40)}}>
@@ -138,6 +139,7 @@ class Slider extends Component {
                 </View>
                 <View>
                     <RNSlider
+                        style={{height: verticalScale(35)}}
                         value={this.props.value}
                         step={this.props.step}
                         minimumValue={this.props.min}
