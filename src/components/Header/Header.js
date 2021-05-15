@@ -45,7 +45,7 @@ export default class MyHeader extends Component {
 
         return (
             <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
-                <Icon type="FontAwesome" name="chevron-left" style={{fontSize: verticalScale(18), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(40) : 0}} />
+                <Icon type="FontAwesome" name="chevron-left" style={{fontSize: verticalScale(18), color: 'white'}} />
             </Button>
         );
     }
@@ -67,7 +67,7 @@ export default class MyHeader extends Component {
                         </View>
                         <View style={{flex: 1}}>
                             <Button transparent underlayColor="#000" onPress={() => this.props.navigation.toggleDrawer()}>
-                                <Icon type="FontAwesome" name="bars" style={{fontSize: verticalScale(24), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(50) : 0}} />
+                                <Icon type="FontAwesome" name="bars" style={{fontSize: verticalScale(24), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(30) : 0}} />
                             </Button>
                         </View>
                     </View>
@@ -81,14 +81,9 @@ export default class MyHeader extends Component {
 const localStyles = ScaledSheet.create({
     header: {
         backgroundColor: '#000',
-        height: Platform.OS === 'ios' ? common.isIPad() ? '75@vs' : '50@vs' : '60@vs',
+        height: Platform.OS === 'ios' ? '75@vs' : '60@vs',
     },
     logo: {
         alignSelf: 'center',
-        ...Platform.select({
-            ios: {
-                paddingBottom: '20@vs',
-            },
-        }),
     },
 });
