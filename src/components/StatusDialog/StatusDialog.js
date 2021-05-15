@@ -237,7 +237,7 @@ class StatusDialog extends Component {
                                 <Picker
                                     inlinelabel
                                     label='Status'
-                                    style={{width: undefined, color: '#FFFFFF'}}
+                                    style={{width: undefined}}
                                     textStyle={{fontSize: verticalScale(12), color: '#FFFFFF'}}
                                     iosHeader="Select one"
                                     mode="dropdown"
