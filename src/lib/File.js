@@ -160,13 +160,12 @@ class File {
                 return;
             }
 
-            let path = await this._getPath(DEFAULT_CHARACTER_DIR);
-
+            await this._getPath(DEFAULT_CHARACTER_DIR);
             await this._saveCharacter(character, filename);
 
             return true;
         } catch (error) {
-            Alert.alert(error.message)
+            Alert.alert(error.message);
         }
 
         return false;
@@ -198,7 +197,7 @@ class File {
 
             let filePath = uri.startsWith('file://') ? uri.substring(7) : uri;
 
-            if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools\-Inbox/.test(filePath) === false) {
+            if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools-Inbox/.test(filePath) === false) {
                 let arr = uri.split('/');
                 const dirs = RNFS.dirs;
                 filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
@@ -283,7 +282,7 @@ class File {
             }));
 
             if (character.hasOwnProperty('image')) {
-                await this._savePortrait(character);
+                this._savePortrait(character);
 
                 delete character.image;
             }
@@ -334,7 +333,7 @@ class File {
         let zipPath = await this._getFileName(filename, DEFAULT_CHARACTER_DIR, EXT_CHARACTER);
 
         await RNFS.writeFile(characterPath, JSON.stringify(character));
-        await zip(characterPath, zipPath);
+        await zip([characterPath], zipPath);
         await RNFS.unlink(characterPath);
     }
 
