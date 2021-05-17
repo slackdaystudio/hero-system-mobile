@@ -330,6 +330,13 @@ class File {
 
     async _saveCharacter(character, filename) {
         let characterPath = await this._getFileName(filename, DEFAULT_CHARACTER_DIR);
+        let exists = await RNFS.exists(characterPath);
+
+        // https://github.com/itinance/react-native-fs/issues/869
+        if (exists) {
+            await RNFS.unlink(characterPath);
+        }
+
         let zipPath = await this._getFileName(filename, DEFAULT_CHARACTER_DIR, EXT_CHARACTER);
 
         await RNFS.writeFile(characterPath, JSON.stringify(character));
