@@ -98,7 +98,6 @@ class Slider extends Component {
     }
 
     _onTextValueChange(value) {
-        console.log(value);
         if (this._isInputValid(value) && value % this.props.step === 0.0) {
             if (value < this.props.min) {
                 value = this.props.min;
