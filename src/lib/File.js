@@ -157,13 +157,7 @@ class File {
         try {
             startLoad();
 
-            const absoluteFilePath = getPath(uri);
-
-            // if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools-Inbox/.test(uri) === false) {
-            //     let arr = uri.split('/');
-            //     const dirs = RNFS.dirs;
-            //     uri = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
-            // }
+            const absoluteFilePath = Platform.OS === 'ios' ? decodeURIComponent(getPath(uri)) : getPath(uri);
 
             if (type === EXT_HD) {
                 let rawXml = await this._getRawXm(absoluteFilePath);
