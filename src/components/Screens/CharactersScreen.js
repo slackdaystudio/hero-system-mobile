@@ -104,6 +104,8 @@ class CharactersScreen extends Component {
     _refreshCharacters() {
         file.listCharacters().then((characters) => {
             this.setState({characters: characters});
+        }).catch(error => {
+            console.log(error.message);
         });
     }
 
@@ -120,11 +122,15 @@ class CharactersScreen extends Component {
             file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
                 character.import(this.startLoad, this.endLoad).then(char => {
                     this._postImport(char);
+                }).catch(error => {
+                    console.log(error.message);
                 });
             });
         } else {
             character.import(this.startLoad, this.endLoad).then(char => {
                 this._postImport(char);
+            }).catch(error => {
+                console.log(error.message);
             });
         }
     }
@@ -153,6 +159,8 @@ class CharactersScreen extends Component {
             if (!common.isEmptyObject(this.props.character) && this.props.character.hasOwnProperty('filename')) {
                 file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
                     this._loadCharacter(characterFilename);
+                }).catch(error => {
+                    console.log(error.message);
                 });
             } else {
                 this._loadCharacter(characterFilename);

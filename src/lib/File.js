@@ -3,11 +3,11 @@ import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
 import { zip, unzip } from 'react-native-zip-archive';
+import getPath from '@flyerhq/react-native-android-uri-path';
 import { isBase64 } from 'is-base64';
 import { common } from './Common';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
 import { combatDetails } from './CombatDetails';
-import { permission } from './Permission';
 import { Buffer } from 'buffer';
 import iconv from 'iconv-lite';
 
@@ -29,17 +29,15 @@ const DIR_CHARACTER = 'character';
 
 const DIR_SOUNDS = 'sounds';
 
-const ANDROID_ROOT_DIR = `${RNFS.ExternalStorageDirectoryPath}/HEROSystemMobile`;
-
-const ANDROID_CHARACTER_DIR = `${ANDROID_ROOT_DIR}/${DIR_CHARACTER}`;
-
-const ANDROID_SOUND_DIR = `${ANDROID_ROOT_DIR}/${DIR_SOUNDS}`;
-
 const DEFAULT_ROOT_DIR = RNFS.DocumentDirectoryPath;
 
 const DEFAULT_CHARACTER_DIR = `${DEFAULT_ROOT_DIR}/${DIR_CHARACTER}`;
 
-const DEFAULT_SOUND_DIR = `${DEFAULT_ROOT_DIR}/DIR_SOUNDS`;
+const DEFAULT_SOUND_DIR = `${DEFAULT_ROOT_DIR}/${DIR_SOUNDS}`;
+
+const EXT_XML = 'xml';
+
+const EXT_HD = 'hdc';
 
 const EXT_CHARACTER = 'hsmc';
 
@@ -50,14 +48,6 @@ class File {
         let character = null;
 
         try {
-            let writePermission = await permission.askForWrite();
-
-            if (!writePermission) {
-                common.toast('Unable to import character: write permission is denied.');
-
-                return;
-            }
-
             const result = await DocumentPicker.pick({
                 type: [
                     DocumentPicker.types.allFiles,
@@ -69,22 +59,26 @@ class File {
                 return;
             }
 
-            if (result.name.toLowerCase().endsWith('.xml')) {
-                character = await this._read(result.uri, startLoad, endLoad);
-            } else if (result.name.toLowerCase().endsWith('.hdc')) {
-                character = await this._read(result.uri, startLoad, endLoad, true);
+            if (result.name.toLowerCase().endsWith(`.${EXT_XML}`)) {
+                character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_XML);
+            } else if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
+                character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_HD);
+            } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_CHARACTER);
             } else {
                 common.toast('Unsupported file type: ' + result.type);
 
                 return;
             }
 
-            await this._initCharacterState(character, result.name);
-            await this._saveCharacter(character, result.name);
+            if (!result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                await this._initCharacterState(character, result.name);
+                await this._saveCharacter(character, result.name);
+            }
 
             return character;
         } catch (error) {
-            const isCancel = await DocumentPicker.isCancel(error);
+            const isCancel = DocumentPicker.isCancel(error);
 
             if (!isCancel) {
                 common.toast(error.message);
@@ -97,18 +91,10 @@ class File {
         let characters = null;
 
         try {
-            let writePermission = await permission.askForWrite();
-
-            if (!writePermission) {
-                common.toast('Unable to list characters: read permission is denied.');
-
-                return [];
-            }
-
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
             characters = await RNFS.readDir(path);
 
-            characters = characters.sort((a, b) => a.name < b.name);
+            characters = characters.filter(f => f.name.endsWith(EXT_CHARACTER)).sort((a, b) => a.name > b.name);
         } catch (error) {
             Alert.alert(error.message);
         }
@@ -124,14 +110,6 @@ class File {
         try {
             startLoad();
 
-            let writePermission = await permission.askForWrite();
-
-            if (!writePermission) {
-                common.toast('Unable to load character: write permission is denied.');
-
-                return;
-            }
-
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
             let canonicalFromName = `${path}/${characterName}`;
             let canonicalToName = `${path}/tmp`;
@@ -144,7 +122,7 @@ class File {
 
             return JSON.parse(character);
         } catch (error) {
-            common.toast(error.message)
+            common.toast(error.message);
         } finally {
             endLoad(character);
         }
@@ -152,14 +130,6 @@ class File {
 
     async saveCharacter(character, filename) {
         try {
-            let writePermission = await permission.askForWrite();
-
-            if (!writePermission) {
-                common.toast('Unable to save character: write permission is denied.');
-
-                return;
-            }
-
             await this._getPath(DEFAULT_CHARACTER_DIR);
             await this._saveCharacter(character, filename);
 
@@ -173,45 +143,40 @@ class File {
 
     async deleteCharacter(filename) {
         try {
-            let writePermission = await permission.askForWrite();
-
-            if (!writePermission) {
-                common.toast('Unable to delete character: write permission is denied.');
-
-                return;
-            }
-
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
 
             await RNFS.unlink(`${path}/${filename}`);
         } catch (error) {
-            Alert.alert(error.message)
+            Alert.alert(error.message);
         }
     }
 
-    async _read(uri, startLoad, endLoad, isHdc = false) {
+    async _read(name, uri, startLoad, endLoad, type) {
         let character = null;
 
         try {
             startLoad();
 
-            let filePath = uri.startsWith('file://') ? uri.substring(7) : uri;
+            const absoluteFilePath = getPath(uri);
 
-            if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools-Inbox/.test(filePath) === false) {
-                let arr = uri.split('/');
-                const dirs = RNFS.dirs;
-                filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
-            }
+            // if (Platform.OS === 'ios' && !common.isIPad() && /\/org\.diceless\.herogmtools-Inbox/.test(uri) === false) {
+            //     let arr = uri.split('/');
+            //     const dirs = RNFS.dirs;
+            //     uri = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
+            // }
 
-            let data = await RNFS.readFile(decodeURI(filePath), 'base64');
-            let rawXml = this._decode(data);
+            if (type === EXT_HD) {
+                let rawXml = await this._getRawXm(absoluteFilePath);
 
-            if (isHdc) {
                 character = await this._loadHdcCharacter(rawXml);
 
                 this._savePortrait(character);
-            } else {
+            } else if (type === EXT_XML) {
+                let rawXml = await this._getRawXm(absoluteFilePath);
+
                 character = await this._loadXmlExportCharacter(rawXml);
+            } else if (type === EXT_CHARACTER) {
+                character = this._importCharacter(name, absoluteFilePath);
             }
         } catch (error) {
             Alert.alert('Read Error: ' + error.message);
@@ -220,6 +185,12 @@ class File {
         }
 
         return character;
+    }
+
+    async _getRawXm(uri) {
+        let data = await RNFS.readFile(uri, 'base64');
+
+        return this._decode(data);
     }
 
     async _loadXmlExportCharacter(rawXml) {
@@ -297,6 +268,21 @@ class File {
         return character;
     }
 
+    async _importCharacter(name, filepath) {
+        let importPath = await this._getPath(DEFAULT_CHARACTER_DIR);
+        let importFilename = `file://${importPath}/${name}`;
+        let exists = await RNFS.exists(importFilename);
+
+        // https://github.com/itinance/react-native-fs/issues/869
+        if (exists) {
+            await RNFS.unlink(importFilename);
+        }
+
+        await RNFS.copyFile(filepath, importFilename);
+
+        return await this.loadCharacter(name, () => {}, () => {});
+    }
+
     _decode(base64Payload) {
         let buffer = Buffer.from(base64Payload, 'base64');
         let decoded = iconv.decode(buffer, 'utf-16');
@@ -319,7 +305,7 @@ class File {
             return parseInt(value, 10);
         } else if (common.isFloat(value)) {
             return parseFloat(value);
-        } else if (value === 'true' || value === 'false' || value.toLowerCase() == 'yes' || value.toLowerCase() === 'no') {
+        } else if (value === 'true' || value === 'false' || value.toLowerCase() === 'yes' || value.toLowerCase() === 'no') {
             return value === 'true' || value.toLowerCase() === 'yes' ? true : false;
         } else if (isBase64(value)) {
             return value;
@@ -380,18 +366,15 @@ class File {
 
     async _getPath(defaultPath) {
         let path = defaultPath;
-        let writePermission = await permission.askForWrite();
 
-        if (writePermission) {
-            if (path === DEFAULT_CHARACTER_DIR) {
-                path = Platform.OS === 'android' ? ANDROID_CHARACTER_DIR : DEFAULT_CHARACTER_DIR;
-            } else if (path === DEFAULT_SOUND_DIR) {
-                path = Platform.OS === 'android' ? ANDROID_SOUND_DIR : DEFAULT_SOUND_DIR;
-            } else if (path === DEFAULT_ROOT_DIR) {
-                path = Platform.OS === 'android' ? ANDROID_ROOT_DIR : DEFAULT_ROOT_DIR;
-            } else {
-                throw `Unknown path: ${path}`;
-            }
+        if (path === DEFAULT_CHARACTER_DIR) {
+            path = DEFAULT_CHARACTER_DIR;
+        } else if (path === DEFAULT_SOUND_DIR) {
+            path = DEFAULT_SOUND_DIR;
+        } else if (path === DEFAULT_ROOT_DIR) {
+            path = DEFAULT_ROOT_DIR;
+        } else {
+            throw `Unknown path: ${path}`;
         }
 
         await this._makeSaveLocation(path);
@@ -411,7 +394,7 @@ class File {
         }
     }
 
-    async _getFileName(filename, directoryName, extension=EXT_JSON) {
+    async _getFileName(filename, directoryName, extension = EXT_JSON) {
         let validExtensions = ['xml', 'hdc'];
         let path = await this._getPath(directoryName);
 

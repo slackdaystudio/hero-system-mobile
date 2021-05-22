@@ -93,18 +93,6 @@ const FIGURED_CHARACTERISTCS = ['PD', 'ED', 'SPD', 'REC', 'END', 'STUN'];
 
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
-        // if (__DEV__) {
-        //     permission.askForWrite().then(granted => {
-        //         if (granted) {
-        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdc.json', JSON.stringify(heroDesignerCharacter));
-        //         } else {
-        //             common.toast('Unable to write file: Write permission has not been granted');
-        //         }
-        //     }).catch(error => {
-        //         common.toast(error.message);
-        //     });
-        // }
-
         const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
 
         let character = {
@@ -138,19 +126,6 @@ class HeroDesignerCharacter {
         if (heroDesignerCharacter.hasOwnProperty('portrait')) {
             character.portrait = heroDesignerCharacter.portrait;
         }
-
-        // if (__DEV__) {
-        //     permission.askForWrite().then(granted => {
-        //         if (granted) {
-        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
-        //         } else {
-        //             common.toast('Unable to write file: Write permission has not been granted');
-        //         }
-        //     }).catch(error => {
-        //         common.toast(error.message);
-        //     });
-        // }
 
         return character;
     }

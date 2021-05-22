@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@bankify/react-native-animate-number": "^0.2.1",
+    "@flyerhq/react-native-android-uri-path": "^2.0.1",
     "@react-native-async-storage/async-storage": "^1.15.4",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-community/picker": "^1.8.1",
