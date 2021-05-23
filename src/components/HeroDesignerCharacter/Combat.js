@@ -1,19 +1,18 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native';
-import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Icon } from 'native-base';
+import { View, TouchableHighlight } from 'react-native';
+import { Text, Button, Icon } from 'native-base';
+import { scale, verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
 import CalculatorInput from '../CalculatorInput/CalculatorInput';
 import StatusDialog from '../StatusDialog/StatusDialog';
-import { scale, verticalScale } from 'react-native-size-matters';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 import { dieRoller } from '../../lib/DieRoller';
 import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';
 import styles from '../../Styles';
-import speedTable from '../../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -51,7 +50,7 @@ export default class Combat extends Component {
         this.state = {
             combatDetails: this._getCombatDetails(props.character),
             statusDialogVisible: false,
-        }
+        };
 
         this.updateCombatState = this._updateCombatState.bind(this);
         this.resetCombatState = this._resetCombatState.bind(this);
@@ -62,6 +61,7 @@ export default class Combat extends Component {
         this.usePhase = this._usePhase.bind(this);
         this.abortPhase = this._abortPhase.bind(this);
         this.applyStatus = this._applyStatus.bind(this);
+        this.openStatusDialog = this._openStatusDialog.bind(this);
         this.closeStatusDialog = this._closeStatusDialog.bind(this);
         this.clearAllStatuses = this._clearAllStatuses.bind(this);
         this.editStatus = this._editStatus.bind(this);
@@ -168,7 +168,10 @@ export default class Combat extends Component {
     }
 
     _openStatusDialog() {
-        this.setState({statusDialogVisible: true});
+        let newState = {...this.state};
+        newState.statusDialogVisible = true;
+
+        this.setState(newState);
     }
 
     _applyStatus() {
@@ -212,7 +215,7 @@ export default class Combat extends Component {
 
         this.props.updateForm('status', statusForm);
 
-        this._openStatusDialog();
+        this.openStatusDialog();
     }
 
     _clearStatus(index) {
@@ -396,7 +399,7 @@ export default class Combat extends Component {
                 </View>
                 {this._renderCvRollButton(stateKey, renderRollButton)}
             </View>
-        )
+        );
     }
 
     _renderLevels() {
@@ -511,7 +514,7 @@ export default class Combat extends Component {
                 <Heading text='Status Effects' />
                 <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
-                        <Button style={styles.buttonSmall} onPress={() => this._openStatusDialog()}>
+                        <Button style={styles.buttonSmall} onPress={() => this.openStatusDialog()}>
                             <Text uppercase={false} style={styles.buttonText}>Add</Text>
                         </Button>
                         <View style={{paddingHorizontal: scale(5)}} />

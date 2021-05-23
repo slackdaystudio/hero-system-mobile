@@ -148,7 +148,7 @@ class EffectScreen extends Component {
                     <Picker
                         inlinelabel
                         label='Partial Die'
-                        style={{width: undefined}}
+                        style={{width: undefined, color: '#FFFFFF'}}
                         textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
                         iosHeader="Select one"
                         mode="dropdown"

@@ -1,12 +1,12 @@
 import React, { Component, Fragment }  from 'react';
-import PropTypes from 'prop-types'
-import { Alert, StyleSheet, View, ScrollView, SafeAreaView } from 'react-native';
-import { Container, Content, Button, Text, Form, Input, Picker, Item, Label, Icon } from 'native-base';
+import PropTypes from 'prop-types';
+import { View } from 'react-native';
+import { Button, Text, Form, Input, Picker, Item, Label } from 'native-base';
 import Modal from 'react-native-modal';
 import { scale, verticalScale } from 'react-native-size-matters';
-import { Autocomplete, withKeyboardAwareScrollView } from "react-native-dropdown-autocomplete";
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from '../../Styles';
-import Heading from '../Heading/Heading';
 
 export const STATUSES = [
     'Aid',
@@ -32,9 +32,10 @@ class StatusDialog extends Component {
         super(props);
 
         this.state = {
-            scrollOffset: 0,
-            query: '',
+            selectedItems: [],
         };
+
+        this.items = this._getItems();
 
         this.updateFormValue = this._updateFormValue.bind(this);
     }
@@ -53,55 +54,63 @@ class StatusDialog extends Component {
         this.props.updateFormValue('status', key, value);
     }
 
-    _searchTraits(query) {
-        let matches = [];
-        let regex = RegExp(`${this.state.query.trim()}`,'ig');
+    _getItems() {
+        let items = [
+            {
+                id: 0,
+                name: 'Characteristics',
+                children: [],
+            }, {
+                id: 1,
+                name: 'Powers',
+                children: [],
+            },
+        ];
 
-        for (let characteristic of this.props.character.characteristics) {
-            if (characteristic.name.search(regex) >= 0) {
-                matches.push({
-                    name: characteristic.name,
-                    type: 'Characteristic',
-                });
-            }
-        }
+        let id = 1;
 
-        let name = '';
+        items[0].children = this.props.character.characteristics.map((c) => {
+            id++;
 
-        for (let power of this.props.character.powers) {
-            if ((power.alias !== null && power.alias.search(regex) >= 0) || (power.name !== null && power.name.search(regex) >= 0)) {
-                if (power.name === null) {
-                    name = power.alias;
-                } else {
-                    name = `${power.name} (${power.alias})`;
-                }
+            return {
+                id: id,
+                name: c.name,
+            };
+        }).slice();
 
-                matches.push({
-                    name: name,
-                    type: 'Power',
-                });
-            }
-        }
+        items[1].children = this.props.character.powers.map((p) => {
+            id++;
 
-        if (matches.length > 0) {
-            matches.sort((a, b) => a.name > b.name);
-        }
+            return {
+                id: id,
+                name: p.name,
+            };
+        }).slice();
 
-        return matches;
+        return items;
     }
 
-    _handleSelectItem(item, index) {
-        let statusForm = {...this.props.statusForm};
-        statusForm.targetTrait = item.name;
-        statusForm.targetTraitType = item.type;
+    _onSelectedItemsChange(selectedItems) {
+        this.setState({selectedItems: selectedItems}, () => {
+            let statusForm = {...this.props.statusForm};
+            let itemLabels = [];
 
-        this.props.updateForm('status', statusForm);
+            for (const category of this.items) {
+                for (const item of category.children) {
+                    if (selectedItems.includes(item.id)) {
+                        itemLabels.push(item.name);
+                    }
+                }
+            }
 
-        this.props.onDropdownClose();
+            statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
+
+            this.props.updateForm('status', statusForm);
+        });
     }
 
     _renderSecondaryControls() {
-        switch(this.props.statusForm.name) {
+        switch (this.props.statusForm.name) {
             case 'Aid':
             case 'Drain':
                 return this._renderAdjustmentControls();
@@ -114,47 +123,31 @@ class StatusDialog extends Component {
         }
     }
 
-    _renderMatch(matches) {
-        if (matches.length > 0) {
-            return <Text style={styles.grey}>{matches[0]}</Text>
-        }
-
-        return <Text style={styles.grey}>Enter a character trait name</Text>;
-    }
-
     _renderAdjustmentControls() {
-        const matches = this._searchTraits();
-
         return (
             <Fragment>
                 <Item inlineLabel style={{marginLeft: 0}}>
                     <Label style={styles.grey}>Active Points:</Label>
                     <Input
                         style={styles.grey}
-                        keyboardType='numeric'
+                        keyboardType="numeric"
                         maxLength={3}
                         value={this.props.statusForm.activePoints.toString()}
                         onChangeText={(value) => this.updateFormValue('activePoints', value)}
                     />
                 </Item>
-                <Autocomplete
-                    placeholder='Search characteristics and powers'
-                    handleSelectItem={(item, id) => this._handleSelectItem(item, id)}
-                    onDropdownClose={() => this.props.onDropdownClose()}
-                    onDropdownShow={() => this.props.onDropdownShow()}
-                    data={matches}
-                    minimumCharactersCount={1}
-                    renderIcon={() => <Icon type='FontAwesome' name="search" style={{position: 'absolute', left: scale(12), top: verticalScale(12), fontSize: verticalScale(12), color: '#e8e8e8'}} />}
-                    highlightText
-                    highLightColor='yellow'
-                    spinnerColor='#e8e8e8'
-                    valueExtractor={item => item.name}
-                    rightContent
-                    rightTextExtractor={item => item.type}
-                    inputContainerStyle={[styles.grey, styles.autocompleteInputContainer]}
-                    inputStyle={[styles.grey, {borderWidth: 0}]}
-                    pickerStyle={{backgroundColor: '#121212'}}
-                    scrollStyle={[styles.grey, {borderColor: '#e8e8e8', width: '89%'}]}
+                <SectionedMultiSelect
+                    styles={{selectToggleText: [styles.grey, {marginLeft: scale(-7)}]}}
+                    colors={{selectToggleTextColor: '#FFFFFF', chipColor: '#e8e8e8'}}
+                    items={this.items}
+                    IconRenderer={Icon}
+                    uniqueKey="id"
+                    subKey="children"
+                    selectText="Select affected..."
+                    showDropDowns={true}
+                    readOnlyHeadings={true}
+                    onSelectedItemsChange={(selected) => this._onSelectedItemsChange(selected)}
+                    selectedItems={this.state.selectedItems}
                 />
             </Fragment>
         );
@@ -167,7 +160,7 @@ class StatusDialog extends Component {
                     <Label style={styles.grey}>BODY:</Label>
                     <Input
                         style={styles.grey}
-                        keyboardType='numeric'
+                        keyboardType="numeric"
                         maxLength={3}
                         value={this.props.statusForm.body.toString()}
                         onChangeText={(value) => this.updateFormValue('body', value)}
@@ -177,7 +170,7 @@ class StatusDialog extends Component {
                     <Label style={styles.grey}>PD:     </Label>
                     <Input
                         style={styles.grey}
-                        keyboardType='numeric'
+                        keyboardType="numeric"
                         maxLength={3}
                         value={this.props.statusForm.pd.toString()}
                         onChangeText={(value) => this.updateFormValue('pd', value)}
@@ -187,7 +180,7 @@ class StatusDialog extends Component {
                     <Label style={styles.grey}>ED:     </Label>
                     <Input
                         style={styles.grey}
-                        keyboardType='numeric'
+                        keyboardType="numeric"
                         maxLength={3}
                         value={this.props.statusForm.ed.toString()}
                         onChangeText={(value) => this.updateFormValue('ed', value)}
@@ -203,7 +196,7 @@ class StatusDialog extends Component {
                 <Label style={styles.grey}>Segments:</Label>
                 <Input
                     style={styles.grey}
-                    keyboardType='numeric'
+                    keyboardType="numeric"
                     maxLength={3}
                     value={this.props.statusForm.segments.toString()}
                     onChangeText={(value) => this.updateFormValue('segments', value)}
@@ -236,8 +229,8 @@ class StatusDialog extends Component {
                                 <Label style={styles.grey}>Status:</Label>
                                 <Picker
                                     inlinelabel
-                                    label='Status'
-                                    style={{width: undefined}}
+                                    label="Status"
+                                    style={{width: undefined, color: '#FFFFFF'}}
                                     textStyle={{fontSize: verticalScale(12), color: '#FFFFFF'}}
                                     iosHeader="Select one"
                                     mode="dropdown"
@@ -245,7 +238,7 @@ class StatusDialog extends Component {
                                     onValueChange={(value) => this.updateFormValue('name', value)}
                                 >
                                     {STATUSES.map((status, index) => {
-                                        return <Item key={`status-${index}`} label={status} value={status} />
+                                        return <Item key={`status-${index}`} label={status} value={status} />;
                                     })}
                                 </Picker>
                             </Item>
@@ -266,4 +259,4 @@ class StatusDialog extends Component {
     }
 }
 
-export default withKeyboardAwareScrollView(StatusDialog);
+export default StatusDialog;

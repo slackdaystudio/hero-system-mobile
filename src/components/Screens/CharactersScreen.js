@@ -266,7 +266,7 @@ class CharactersScreen extends Component {
                     </View>
                     <View style={{flex: 1}}>
                         <Picker
-                            style={{width: undefined}}
+                            style={{width: undefined, color: '#FFFFFF'}}
                             textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
                             iosHeader="Select one"
                             mode="dropdown"
@@ -274,7 +274,7 @@ class CharactersScreen extends Component {
                             onValueChange={(value) => this.updateSlot(value)}
                         >
                             {this.slots.map((slot, index) => {
-                                return <Item key={'slot-' + slot} label={`Slot ${slot + 1}`} value={slot} />
+                                return <Item key={'slot-' + slot} label={`Slot ${slot + 1}`} value={slot} />;
                             })}
                         </Picker>
                     </View>
