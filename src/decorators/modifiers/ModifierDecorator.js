@@ -32,7 +32,7 @@ class ModifierDecorator {
                 decorated = new Dot(decorated);
                 break;
             default:
-                // do nothing
+            // do nothing
         }
 
         return decorated;

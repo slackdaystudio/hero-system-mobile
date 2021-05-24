@@ -1,5 +1,5 @@
 import CharacterTrait from './CharacterTrait';
-import { SKILL_CHECK } from '../lib/DieRoller';
+import {SKILL_CHECK} from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

@@ -1,19 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class EnduranceReserve extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
@@ -22,8 +8,11 @@ export default class EnduranceReserve extends CharacterTrait {
     }
 
     cost() {
-        let cost = Math.ceil(this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost);
-        cost += Math.ceil(this.characterTrait.trait.power.levels / this.characterTrait.trait.template.endurancereserverec.lvlval * this.characterTrait.trait.template.endurancereserverec.lvlcost);
+        let cost = Math.ceil((this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost);
+        cost += Math.ceil(
+            (this.characterTrait.trait.power.levels / this.characterTrait.trait.template.endurancereserverec.lvlval) *
+                this.characterTrait.trait.template.endurancereserverec.lvlcost,
+        );
 
         return cost;
     }

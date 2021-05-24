@@ -1,8 +1,8 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Text } from 'native-base';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {View} from 'react-native';
+import {Text} from 'native-base';
+import {scale, verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -22,7 +22,7 @@ import styles from '../../Styles';
 export default class Movement extends Component {
     static propTypes = {
         movement: PropTypes.object.isRequired,
-    }
+    };
 
     _renderUnusualMovement(label, distance) {
         if (distance === '') {
@@ -31,8 +31,12 @@ export default class Movement extends Component {
 
         return (
             <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{label}</Text></View>
-                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{distance}</Text></View>
+                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                    <Text style={styles.grey}>{label}</Text>
+                </View>
+                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                    <Text style={styles.grey}>{distance}</Text>
+                </View>
             </View>
         );
     }
@@ -42,20 +46,36 @@ export default class Movement extends Component {
             <View style={{paddingBottom: verticalScale(20), paddingHorizontal: scale(10)}}>
                 <Text style={styles.subHeading}>Movement</Text>
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>Running</Text></View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this.props.movement.running}</Text></View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>Running</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>{this.props.movement.running}</Text>
+                    </View>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>Swimming</Text></View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this.props.movement.swimming}</Text></View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>Swimming</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>{this.props.movement.swimming}</Text>
+                    </View>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>Leaping (H)</Text></View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this.props.movement.leaping.horizontal}</Text></View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>Leaping (H)</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>{this.props.movement.leaping.horizontal}</Text>
+                    </View>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>Leaping (V)</Text></View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this.props.movement.leaping.vertical}</Text></View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>Leaping (V)</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={styles.grey}>{this.props.movement.leaping.vertical}</Text>
+                    </View>
                 </View>
                 {this._renderUnusualMovement('Flight', this.props.movement.flight)}
                 {this._renderUnusualMovement('Gliding', this.props.movement.gliding)}

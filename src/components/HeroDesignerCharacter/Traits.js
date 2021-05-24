@@ -1,18 +1,13 @@
-import React, { Component, Fragment }  from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight } from 'react-native';
-import { Text, Icon, Card, CardItem, Body } from 'native-base';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {View, TouchableHighlight} from 'react-native';
+import {Text, Icon, Card, CardItem, Body} from 'native-base';
+import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
-import { dieRoller } from '../../lib/DieRoller';
-import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';
-import {
-    SKILL_CHECK,
-    NORMAL_DAMAGE,
-    KILLING_DAMAGE,
-    EFFECT,
-} from '../../lib/DieRoller';
-import { common } from '../../lib/Common';
+import {dieRoller} from '../../lib/DieRoller';
+import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
+import {SKILL_CHECK, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
+import {common} from '../../lib/Common';
 import CompoundPower from '../../decorators/CompoundPower';
 import styles from '../../Styles';
 
@@ -65,7 +60,7 @@ export default class Traits extends Component {
         listKey: PropTypes.string.isRequired,
         subListKey: PropTypes.string.isRequired,
         updateForm: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -176,7 +171,10 @@ export default class Traits extends Component {
 
                         return (
                             <Text key={`attr-${index}`}>
-                                <Text style={labelStyle}>{attribute.label}{separator}</Text>
+                                <Text style={labelStyle}>
+                                    {attribute.label}
+                                    {separator}
+                                </Text>
                                 <Text style={styles.grey}>{attribute.value}</Text>
                             </Text>
                         );
@@ -252,11 +250,15 @@ export default class Traits extends Component {
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
                             </Text>
-                            <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                            <View style={{width: scale(30), alignItems: 'center'}}>
+                                <Text style={styles.grey}>—</Text>
+                            </View>
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Active:</Text> {item.activeCost()}
                             </Text>
-                            <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                            <View style={{width: scale(30), alignItems: 'center'}}>
+                                <Text style={styles.grey}>—</Text>
+                            </View>
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
                             </Text>
@@ -293,11 +295,15 @@ export default class Traits extends Component {
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
                         </Text>
-                        <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                        <View style={{width: scale(30), alignItems: 'center'}}>
+                            <Text style={styles.grey}>—</Text>
+                        </View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Active:</Text> {item.activeCost()}
                         </Text>
-                        <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                        <View style={{width: scale(30), alignItems: 'center'}}>
+                            <Text style={styles.grey}>—</Text>
+                        </View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
                         </Text>
@@ -318,11 +324,15 @@ export default class Traits extends Component {
                                     <Text style={styles.grey}>
                                         <Text style={styles.boldGrey}>Base:</Text> {power.cost()}
                                     </Text>
-                                    <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                                    <View style={{width: scale(30), alignItems: 'center'}}>
+                                        <Text style={styles.grey}>—</Text>
+                                    </View>
                                     <Text style={styles.grey}>
                                         <Text style={styles.boldGrey}>Active:</Text> {power.activeCost()}
                                     </Text>
-                                    <View style={{width: scale(30), alignItems: 'center'}}><Text style={styles.grey}>—</Text></View>
+                                    <View style={{width: scale(30), alignItems: 'center'}}>
+                                        <Text style={styles.grey}>—</Text>
+                                    </View>
                                     <Text style={styles.grey}>
                                         <Text style={styles.boldGrey}>Real:</Text> {power.realCost()}
                                     </Text>
@@ -339,10 +349,7 @@ export default class Traits extends Component {
         if (power.roll() !== null && power.roll() !== undefined) {
             return (
                 <CardItem style={styles.cardItem}>
-                    <TouchableHighlight
-                        underlayColor="#121212"
-                        onPress={() => this._roll(power.roll(), power)}
-                    >
+                    <TouchableHighlight underlayColor="#121212" onPress={() => this._roll(power.roll(), power)}>
                         <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
                     </TouchableHighlight>
                 </CardItem>
@@ -355,10 +362,7 @@ export default class Traits extends Component {
     _renderRoll(item) {
         if (item.roll() !== null && item.roll() !== undefined) {
             return (
-                <TouchableHighlight
-                    underlayColor="#121212"
-                    onPress={() => this._roll(item.roll(), item)}
-                >
+                <TouchableHighlight underlayColor="#121212" onPress={() => this._roll(item.roll(), item)}>
                     <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.roll().roll}</Text>
                 </TouchableHighlight>
             );
@@ -370,14 +374,18 @@ export default class Traits extends Component {
     _renderTraitList(decoratedTrait) {
         return (
             <Card style={[styles.card, {paddingBottom: 0}]} key={'item-' + decoratedTrait.trait.position}>
-                <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'}]} header>
+                <CardItem
+                    style={[
+                        styles.cardItem,
+                        {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'},
+                    ]}
+                    header
+                >
                     <View style={{flex: 3, alignSelf: 'center'}}>
                         <Text style={[styles.boldGrey, {fontSize: verticalScale(16)}]}>{decoratedTrait.label()}</Text>
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                        <View style={{flex: 2, alignItems: 'flex-end'}}>
-                            {this._renderRoll(decoratedTrait)}
-                        </View>
+                        <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
                         <View style={{flex: 1}}>
                             <Icon
                                 type="FontAwesome"
@@ -395,7 +403,13 @@ export default class Traits extends Component {
 
                     return (
                         <Fragment>
-                            <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: verticalScale(5), paddingBottom: verticalScale(5)}]} header>
+                            <CardItem
+                                style={[
+                                    styles.cardItem,
+                                    {flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: verticalScale(5), paddingBottom: verticalScale(5)},
+                                ]}
+                                header
+                            >
                                 {this._renderTrait(decoratedSubTrait, true)}
                             </CardItem>
                             {this._renderItemDetails(decoratedSubTrait)}
@@ -411,12 +425,13 @@ export default class Traits extends Component {
         return (
             <Fragment>
                 <View style={{flex: 3, alignSelf: 'center'}}>
-                    <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 14 : 16)}]}>{isListItem ? ' ‣ ' : ''}{decoratedTrait.label()}</Text>
+                    <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 14 : 16)}]}>
+                        {isListItem ? ' ‣ ' : ''}
+                        {decoratedTrait.label()}
+                    </Text>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                    <View style={{flex: 2, alignItems: 'flex-end'}}>
-                        {this._renderRoll(decoratedTrait)}
-                    </View>
+                    <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
                     <View style={{flex: 1}}>
                         <Icon
                             type="FontAwesome"
@@ -436,15 +451,23 @@ export default class Traits extends Component {
                 {items.map((item, index) => {
                     let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
-                    if (decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
+                    if (
+                        decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
                         decoratedTrait.trait.hasOwnProperty(this.props.subListKey) &&
-                        decoratedTrait.trait[this.props.subListKey].length > 0) {
+                        decoratedTrait.trait[this.props.subListKey].length > 0
+                    ) {
                         return this._renderTraitList(decoratedTrait);
                     }
 
                     return (
                         <Card key={`trait-${index}`} style={styles.card}>
-                            <CardItem style={[styles.cardItem, {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'}]} header>
+                            <CardItem
+                                style={[
+                                    styles.cardItem,
+                                    {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'},
+                                ]}
+                                header
+                            >
                                 {this._renderTrait(decoratedTrait)}
                             </CardItem>
                             {this._renderItemDetails(decoratedTrait)}

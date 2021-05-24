@@ -1,13 +1,13 @@
-import React, { Component }  from 'react';
-import { createAppContainer } from 'react-navigation';
-import { createStore, applyMiddleware, compose } from 'redux';
-import { Provider } from 'react-redux';
+import React, {Component} from 'react';
+import {createAppContainer} from 'react-navigation';
+import {createStore, applyMiddleware, compose} from 'redux';
+import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import applyAppStateListener from 'redux-enhancer-react-native-appstate';
 import thunk from 'redux-thunk';
-import { Root } from 'native-base';
-import { asyncDispatchMiddleware } from './src/middleware/AsyncDispatchMiddleware';
-import { soundPlayer, DEFAULT_SOUND } from './src/lib/SoundPlayer';
+import {Root} from 'native-base';
+import {asyncDispatchMiddleware} from './src/middleware/AsyncDispatchMiddleware';
+import {soundPlayer, DEFAULT_SOUND} from './src/lib/SoundPlayer';
 import reducer from './src/reducers/index';
 import AppNavigator from './AppNavigator';
 
@@ -31,14 +31,7 @@ export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
 
-export const store = createStore(
-    reducer,
-    compose(
-        applyAppStateListener(),
-        applyMiddleware(thunk),
-        applyMiddleware(asyncDispatchMiddleware)
-    )
-);
+export const store = createStore(reducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
 
 const AppContainer = createAppContainer(AppNavigator);
 

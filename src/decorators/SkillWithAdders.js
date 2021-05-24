@@ -32,7 +32,9 @@ export default class SkillWithAdders extends CharacterTrait {
             }
         }
 
-        cost += this.characterTrait.trait.levels / this.characterTrait.trait.template.characteristicChoice.item.lvlval * this.characterTrait.trait.template.characteristicChoice.item.lvlcost;
+        cost +=
+            (this.characterTrait.trait.levels / this.characterTrait.trait.template.characteristicChoice.item.lvlval) *
+            this.characterTrait.trait.template.characteristicChoice.item.lvlcost;
 
         return cost;
     }

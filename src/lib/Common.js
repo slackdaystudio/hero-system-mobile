@@ -1,12 +1,8 @@
-import { Dimensions, Platform } from 'react-native';
-import { Toast } from 'native-base';
+import {Dimensions, Platform} from 'react-native';
+import {Toast} from 'native-base';
 import camelCase from 'camelcase';
 import snakeCase from 'snake-case';
-import {
-    PARTIAL_DIE_PLUS_ONE,
-    PARTIAL_DIE_HALF,
-    PARTIAL_DIE_MINUS_ONE,
-} from './DieRoller';
+import {PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from './DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -79,7 +75,7 @@ class Common {
 
     isFloat(value) {
         if (!isNaN(value)) {
-            return (value % 1 !== 0);
+            return value % 1 !== 0;
         }
 
         return false;
@@ -91,7 +87,7 @@ class Common {
 
     getMultiplierCost(total, step, cost) {
         if (step === 1) {
-            return total / step * cost;
+            return (total / step) * cost;
         }
 
         return this.getMultiplications(total, step) * cost;
@@ -112,7 +108,7 @@ class Common {
             total += adder.basecost;
 
             if (adder.levels > 0) {
-                total += Math.round(adder.levels / adder.lvlval * adder.lvlcost);
+                total += Math.round((adder.levels / adder.lvlval) * adder.lvlcost);
             }
         }
 

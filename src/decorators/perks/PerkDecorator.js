@@ -44,7 +44,7 @@ class PerkDecorator {
                 decorated = new TraitWithSkillRoll(decorated);
                 break;
             default:
-                // do nothing
+            // do nothing
         }
 
         return decorated;

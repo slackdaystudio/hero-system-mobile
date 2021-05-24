@@ -1,10 +1,10 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon, Footer, FooterTab } from 'native-base';
-import { verticalScale } from 'react-native-size-matters';
+import {Button, Icon, Footer, FooterTab} from 'native-base';
+import {verticalScale} from 'react-native-size-matters';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
-import { MAX_CHARACTER_SLOTS } from '../../lib/Persistence';
-import { character as libCharacter } from '../../lib/Character';
+import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
+import {character as libCharacter} from '../../lib/Character';
 
 export default class HeroDesignerCharacterFooter extends Component {
     static propTypes = {
@@ -13,7 +13,7 @@ export default class HeroDesignerCharacterFooter extends Component {
         characters: PropTypes.object.isRequired,
         selectCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -123,7 +123,10 @@ export default class HeroDesignerCharacterFooter extends Component {
                 <ConfirmationDialog
                     visible={this.state.deleteDialogVisible}
                     title="Remove Character?"
-                    info={'Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.'}
+                    info={
+                        // eslint-disable-next-line max-len
+                        'Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.'
+                    }
                     onOk={this.onDeleteDialogOk}
                     onClose={this.onDeleteDialogClose}
                 />

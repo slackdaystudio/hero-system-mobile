@@ -1,13 +1,13 @@
-import React, { Component, Fragment }  from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight, Switch } from 'react-native';
-import { Text, Icon, Card, CardItem, Right, Body } from 'native-base';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {View, TouchableHighlight, Switch} from 'react-native';
+import {Text, Icon, Card, CardItem, Right, Body} from 'native-base';
+import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
-import { dieRoller } from '../../lib/DieRoller';
-import { common } from '../../lib/Common';
-import { heroDesignerCharacter, TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
+import {dieRoller} from '../../lib/DieRoller';
+import {common} from '../../lib/Common';
+import {heroDesignerCharacter, TYPE_MOVEMENT} from '../../lib/HeroDesignerCharacter';
 import styles from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
 import speedTable from '../../../public/speed.json';
@@ -40,7 +40,6 @@ function initCharacteristicsShow(characteristics, movement) {
         characteristicsButtonsShow[move.shortName] = 'plus-circle';
     });
 
-
     return {
         characteristicsShow: characteristicsShow,
         characteristicsButtonsShow: characteristicsButtonsShow,
@@ -53,7 +52,7 @@ export default class Characteristics extends Component {
         character: PropTypes.object.isRequired,
         setShowSecondary: PropTypes.func.isRequired,
         updateForm: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -236,7 +235,9 @@ export default class Characteristics extends Component {
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
                             </Text>
-                            <View style={{width: scale(20), alignItems: 'center'}}><Text style={styles.grey}>&bull;</Text></View>
+                            <View style={{width: scale(20), alignItems: 'center'}}>
+                                <Text style={styles.grey}>&bull;</Text>
+                            </View>
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Cost:</Text> {characteristic.cost}
                             </Text>
@@ -256,7 +257,6 @@ export default class Characteristics extends Component {
             let meters = movement;
             let unit = 'm';
             let ncm = 2;
-            let power = null;
 
             if (heroDesignerCharacter.isFifth(this.props.character)) {
                 unit = '"';
@@ -267,13 +267,14 @@ export default class Characteristics extends Component {
                 ncm = this._getTotalNcm(this.state.powersMap.get(characteristic.shortName.toUpperCase()), ncm);
             }
 
-            let combatKph = meters * speed * 5 * 60 / 1000;
-            let nonCombatKph = meters * ncm * speed * 5 * 60 / 1000;
+            let combatKph = (meters * speed * 5 * 60) / 1000;
+            let nonCombatKph = (meters * ncm * speed * 5 * 60) / 1000;
 
             return (
                 <View style={{flex: 1, paddingBottom: verticalScale(10)}}>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>NCM:</Text> {movement * ncm}{unit} (x{ncm})
+                        <Text style={styles.boldGrey}>NCM:</Text> {movement * ncm}
+                        {unit} (x{ncm})
                     </Text>
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>Max Combat:</Text> {combatKph.toFixed(1)} km/h
@@ -294,8 +295,10 @@ export default class Characteristics extends Component {
                 ncm += this._getTotalNcm(move, ncm);
             }
         } else {
-            if ((movementMode.affectsPrimary && movementMode.affectsTotal) ||
-                (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.character.showSecondary)) {
+            if (
+                (movementMode.affectsPrimary && movementMode.affectsTotal) ||
+                (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.character.showSecondary)
+            ) {
                 let adderMap = common.toMap(movementMode.adder);
 
                 if (adderMap.has('IMPROVEDNONCOMBAT')) {
@@ -335,7 +338,7 @@ export default class Characteristics extends Component {
                     }
 
                     if (common.isFloat(doublings) && (doublings % 1).toFixed(1) !== '0.0') {
-                        lift += lift / 5 * (parseFloat(doublings % 1).toFixed(1) * 10 / 2);
+                        lift += (lift / 5) * ((parseFloat(doublings % 1).toFixed(1) * 10) / 2);
                     }
                 } else {
                     let previousKey = null;
@@ -350,9 +353,9 @@ export default class Characteristics extends Component {
                             let remainder = parseFloat(((totalStrength / divisor) % 1).toFixed(1));
 
                             if (remainder === 0.0) {
-                                lift += (entry.lift - lift) / divisor * (remainder + 1);
+                                lift += ((entry.lift - lift) / divisor) * (remainder + 1);
                             } else {
-                                lift += (entry.lift - lift) / divisor * (totalStrength - previousKey);
+                                lift += ((entry.lift - lift) / divisor) * (totalStrength - previousKey);
                             }
 
                             break;
@@ -368,10 +371,7 @@ export default class Characteristics extends Component {
 
             return (
                 <View style={{flex: 1, paddingBottom: verticalScale(10)}}>
-                    <TouchableHighlight
-                        underlayColor="#121212"
-                        onPress={() => this._rollStrengthDamage(strengthDamage)}
-                    >
+                    <TouchableHighlight underlayColor="#121212" onPress={() => this._rollStrengthDamage(strengthDamage)}>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Damage:</Text> {strengthDamage}
                         </Text>
@@ -392,13 +392,13 @@ export default class Characteristics extends Component {
 
     _renderLift(lift) {
         if (lift >= 1000000000000) {
-            return `${Math.round(lift / 1000000000000 * 10) / 10} Gigatonnes`;
+            return `${Math.round((lift / 1000000000000) * 10) / 10} Gigatonnes`;
         } else if (lift >= 1000000000) {
-            return `${Math.round(lift / 1000000000 * 10) / 10} Megatonnes`;
+            return `${Math.round((lift / 1000000000) * 10) / 10} Megatonnes`;
         } else if (lift >= 1000000) {
-            return `${Math.round(lift / 1000000 * 10) / 10} Kilotonnes`;
+            return `${Math.round((lift / 1000000) * 10) / 10} Kilotonnes`;
         } else if (lift >= 1000.0) {
-            return `${Math.round(lift / 1000 * 10) / 10} Tonnes`;
+            return `${Math.round((lift / 1000) * 10) / 10} Tonnes`;
         } else {
             return `${Math.round(lift * 10) / 10} kg`;
         }
@@ -415,7 +415,14 @@ export default class Characteristics extends Component {
             return <CircleText title={this._getMovementTotal(characteristic, true) + unit} fontSize={18} size={55} color="#303030" />;
         }
 
-        return <CircleText title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()} fontSize={18} size={45} color="#303030" />;
+        return (
+            <CircleText
+                title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()}
+                fontSize={18}
+                size={45}
+                color="#303030"
+            />
+        );
     }
 
     _renderCharacteristics(characteristics) {
@@ -436,9 +443,16 @@ export default class Characteristics extends Component {
                                 <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                     <TouchableHighlight
                                         underlayColor="#121212"
-                                        onPress={() => this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character))})}
+                                        onPress={() =>
+                                            this.props.navigation.navigate('Result', {
+                                                from: 'ViewHeroDesignerCharacter',
+                                                result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character)),
+                                            })
+                                        }
                                     >
-                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>{heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}</Text>
+                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>
+                                            {heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}
+                                        </Text>
                                     </TouchableHighlight>
                                     <Icon
                                         type="FontAwesome"

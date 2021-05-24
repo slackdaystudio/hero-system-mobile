@@ -1,6 +1,6 @@
 import Sound from 'react-native-sound';
-import { common } from './Common';
-import { sounds, setSound } from '../../App.js';
+import {common} from './Common';
+import {sounds, setSound} from '../../App.js';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -25,7 +25,7 @@ const DEFAULT_SFX_NAME = 'Default';
 const DEFAULT_SOUND = 'dice';
 
 const VOLUME = {
-    'electricity': 0.10,
+    electricity: 0.1,
 };
 
 class SoundPlayer {

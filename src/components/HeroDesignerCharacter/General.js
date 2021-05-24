@@ -1,10 +1,10 @@
-import React, { Component, Fragment }  from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { View, Image } from 'react-native';
-import { Text } from 'native-base';
-import { verticalScale } from 'react-native-size-matters';
+import {View, Image} from 'react-native';
+import {Text} from 'native-base';
+import {verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -27,7 +27,7 @@ export default class General extends Component {
         portrait: PropTypes.string,
         portraitWidth: PropTypes.number,
         portraitHeight: PropTypes.number,
-    }
+    };
 
     _renderPortrait() {
         if (this.props.portrait === null || this.props.portrait === undefined) {
@@ -37,7 +37,7 @@ export default class General extends Component {
         return (
             <Fragment>
                 <Heading text="Portrait" />
-                <Image style={{width: this.props.portraitWidth, height: this.props.portraitHeight, alignSelf: 'center'}} source={{ uri: this.props.portrait}} />
+                <Image style={{width: this.props.portraitWidth, height: this.props.portraitHeight, alignSelf: 'center'}} source={{uri: this.props.portrait}} />
             </Fragment>
         );
     }

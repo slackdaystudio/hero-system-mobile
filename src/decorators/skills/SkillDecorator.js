@@ -110,7 +110,7 @@ class SkillDecorator {
                 decorated = new WeaponFamiliarity(decorated);
                 break;
             default:
-                // do nothing
+            // do nothing
         }
 
         if (decorated.characterTrait.trait.levelsonly) {

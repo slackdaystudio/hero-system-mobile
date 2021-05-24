@@ -1,9 +1,9 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { BackHandler, StyleSheet, View } from 'react-native';
-import { Container, Content, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
-import { NavigationEvents } from 'react-navigation';
+import {connect} from 'react-redux';
+import {BackHandler, View} from 'react-native';
+import {Container, Content, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text} from 'native-base';
+import {NavigationEvents} from 'react-navigation';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
 import Characteristics from '../Character/Characteristics';
@@ -13,11 +13,11 @@ import TextList from '../Character/TextList';
 import Equipment from '../Character/Equipment';
 import Header from '../Header/Header';
 import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
-import { character } from '../../lib/Character';
-import { common } from '../../lib/Common';
+import {character} from '../../lib/Character';
+import {common} from '../../lib/Common';
 import styles from '../../Styles';
-import { updateForm } from '../../reducers/forms';
-import { setSparseCombatDetails, selectCharacter, clearCharacter } from '../../reducers/character';
+import {updateForm} from '../../reducers/forms';
+import {setSparseCombatDetails, selectCharacter, clearCharacter} from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -42,7 +42,7 @@ class ViewCharacterScreen extends Component {
         setSparseCombatDetails: PropTypes.func.isRequired,
         selectCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -86,9 +86,19 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Powers')}>
+            <Tab
+                tabStyle={styles.tabHeading}
+                activeTabStyle={styles.activeTabStyle}
+                activeTextStyle={styles.activeTextStyle}
+                heading={this._renderTabHeading('Powers')}
+            >
                 <View style={styles.tabContent}>
-                    <Powers navigation={this.props.navigation} powers={powers} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
+                    <Powers
+                        navigation={this.props.navigation}
+                        powers={powers}
+                        strengthDamage={character.getStrengthDamage(this.props.character)}
+                        updateForm={this.props.updateForm}
+                    />
                 </View>
             </Tab>
         );
@@ -100,9 +110,19 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Equipment')}>
+            <Tab
+                tabStyle={styles.tabHeading}
+                activeTabStyle={styles.activeTabStyle}
+                activeTextStyle={styles.activeTextStyle}
+                heading={this._renderTabHeading('Equipment')}
+            >
                 <View style={styles.tabContent}>
-                    <Equipment navigation={this.props.navigation} equipment={equipment} strengthDamage={character.getStrengthDamage(this.props.character)} updateForm={this.props.updateForm}/>
+                    <Equipment
+                        navigation={this.props.navigation}
+                        equipment={equipment}
+                        strengthDamage={character.getStrengthDamage(this.props.character)}
+                        updateForm={this.props.updateForm}
+                    />
                 </View>
             </Tab>
         );
@@ -114,7 +134,12 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading(tabTitle === null ? columnHeading + 's' : tabTitle)}>
+            <Tab
+                tabStyle={styles.tabHeading}
+                activeTabStyle={styles.activeTabStyle}
+                activeTextStyle={styles.activeTextStyle}
+                heading={this._renderTabHeading(tabTitle === null ? columnHeading + 's' : tabTitle)}
+            >
                 <View style={styles.tabContent}>
                     <TextList text={text} columnHeading={columnHeading} navigation={this.props.navigation} />
                 </View>
@@ -125,9 +150,7 @@ class ViewCharacterScreen extends Component {
     _renderTabHeading(headingText) {
         return (
             <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
-                <Text style={styles.tabStyle}>
-                    {headingText}
-                </Text>
+                <Text style={styles.tabStyle}>{headingText}</Text>
             </TabHeading>
         );
     }
@@ -140,13 +163,28 @@ class ViewCharacterScreen extends Component {
         }
 
         return (
-            <Tabs locked={true} ref={component => this.tabs = component} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
-                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('General')}>
+            <Tabs
+                locked={true}
+                ref={(component) => (this.tabs = component)}
+                tabBarUnderlineStyle={styles.tabBarUnderline}
+                renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}
+            >
+                <Tab
+                    tabStyle={styles.tabHeading}
+                    activeTabStyle={styles.activeTabStyle}
+                    activeTextStyle={styles.activeTextStyle}
+                    heading={this._renderTabHeading('General')}
+                >
                     <View style={styles.tabContent}>
                         <General character={this.props.character} />
                     </View>
                 </Tab>
-                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Combat')}>
+                <Tab
+                    tabStyle={styles.tabHeading}
+                    activeTabStyle={styles.activeTabStyle}
+                    activeTextStyle={styles.activeTextStyle}
+                    heading={this._renderTabHeading('Combat')}
+                >
                     <View style={styles.tabContent}>
                         <Combat
                             navigation={this.props.navigation}
@@ -156,7 +194,12 @@ class ViewCharacterScreen extends Component {
                         />
                     </View>
                 </Tab>
-                <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Characteristics')}>
+                <Tab
+                    tabStyle={styles.tabHeading}
+                    activeTabStyle={styles.activeTabStyle}
+                    activeTextStyle={styles.activeTextStyle}
+                    heading={this._renderTabHeading('Characteristics')}
+                >
                     <View style={styles.tabContent}>
                         <Characteristics characteristics={this.props.character.characteristics.characteristic} navigation={this.props.navigation} />
                         <Movement movement={this.props.character.movement} />
@@ -176,10 +219,7 @@ class ViewCharacterScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                 <Header hasTabs={false} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1d1f'}}>
                     {this._renderCharacter()}
@@ -196,14 +236,7 @@ class ViewCharacterScreen extends Component {
     }
 }
 
-const localStyles = StyleSheet.create({
-    pointCostsHeader: {
-        alignSelf: 'center',
-        textDecorationLine: 'underline',
-    },
-});
-
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         character: state.character.character,
         characters: state.character.characters,

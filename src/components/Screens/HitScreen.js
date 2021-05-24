@@ -1,17 +1,17 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { BackHandler, View, Switch, TouchableHighlight } from 'react-native';
-import { Container, Content, Button, Text, Tabs, Tab, TabHeading, ScrollableTab, Icon } from 'native-base';
+import {connect} from 'react-redux';
+import {BackHandler, View, Switch, TouchableHighlight} from 'react-native';
+import {Container, Content, Button, Text, Tabs, Tab, TabHeading, ScrollableTab, Icon} from 'native-base';
 import RNShake from 'react-native-shake';
-import { NavigationEvents } from 'react-navigation';
-import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
+import {NavigationEvents} from 'react-navigation';
+import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
-import { dieRoller } from '../../lib/DieRoller';
+import {dieRoller} from '../../lib/DieRoller';
 import styles from '../../Styles';
 import hitLocations from '../../../public/hitLocations.json';
-import { updateFormValue } from '../../reducers/forms';
+import {updateFormValue} from '../../reducers/forms';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,7 +32,7 @@ class HitScreen extends Component {
         navigation: PropTypes.object.isRequired,
         hitForm: PropTypes.object.isRequired,
         updateFormValue: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -60,7 +60,10 @@ class HitScreen extends Component {
     }
 
     _roll() {
-        this.props.navigation.navigate('Result', {from: 'Hit', result: dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv)});
+        this.props.navigation.navigate('Result', {
+            from: 'Hit',
+            result: dieRoller.rollToHit(this.props.hitForm.ocv, this.props.hitForm.numberOfRolls, this.props.hitForm.isAutofire, this.props.hitForm.targetDcv),
+        });
     }
 
     _updateFormValue(key, value) {
@@ -107,14 +110,26 @@ class HitScreen extends Component {
                 <Text style={[styles.grey, styles.subHeading]}>Damage Multipliers</Text>
                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>STUNx</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>NSTUN</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>BODYx</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.boldGrey}>STUNx</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.boldGrey}>NSTUN</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.boldGrey}>BODYx</Text>
+                        </View>
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].stunX}</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].nStun}</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].bodyX}</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].stunX}</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].nStun}</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.boldGrey}>x{hitLocations[this.props.hitForm.selectedLocation].bodyX}</Text>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -124,9 +139,7 @@ class HitScreen extends Component {
     _renderTabHeading(headingText) {
         return (
             <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
-                <Text style={styles.tabStyle}>
-                    {headingText}
-                </Text>
+                <Text style={styles.tabStyle}>{headingText}</Text>
             </TabHeading>
         );
     }
@@ -134,14 +147,16 @@ class HitScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                 <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content scrollEnable={false}>
-                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
-                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Roll To Hit')}>
+                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}>
+                        <Tab
+                            tabStyle={styles.tabHeading}
+                            activeTabStyle={styles.activeTabStyle}
+                            activeTextStyle={styles.activeTextStyle}
+                            heading={this._renderTabHeading('Roll To Hit')}
+                        >
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <Slider
                                     label="Total OCV/OMCV:"
@@ -177,17 +192,26 @@ class HitScreen extends Component {
                                     </View>
                                 </View>
                                 {this._renderDcvSlider()}
-                                <Button block style={styles.button}  onPress={this.roll}>
+                                <Button block style={styles.button} onPress={this.roll}>
                                     <Text uppercase={false}>Roll</Text>
                                 </Button>
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Range Mods')}>
+                        <Tab
+                            tabStyle={styles.tabHeading}
+                            activeTabStyle={styles.activeTabStyle}
+                            activeTextStyle={styles.activeTextStyle}
+                            heading={this._renderTabHeading('Range Mods')}
+                        >
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text></View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text>
+                                        </View>
                                     </View>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                                         <View style={{flex: 1, alignSelf: 'stretch'}}>
@@ -240,24 +264,44 @@ class HitScreen extends Component {
                                 </View>
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Hit Locations')}>
+                        <Tab
+                            tabStyle={styles.tabHeading}
+                            activeTabStyle={styles.activeTabStyle}
+                            activeTextStyle={styles.activeTextStyle}
+                            heading={this._renderTabHeading('Hit Locations')}
+                        >
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Roll</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text></View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Damage</Text></View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Roll</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
+                                        </View>
+                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Damage</Text>
+                                        </View>
                                     </View>
                                     {hitLocations.map((hitLocation, index) => {
                                         let stars = [];
 
                                         for (let i = 0; i < hitLocation.stunX; i++) {
-                                            stars.push(<Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: verticalScale(14)}]} />);
+                                            stars.push(
+                                                <Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: verticalScale(14)}]} />,
+                                            );
                                         }
 
                                         return (
-                                            <TouchableHighlight key={'hit-location-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}} underlayColor="#3da0ff" onPress={() => this.setLocation(index)}>
+                                            <TouchableHighlight
+                                                key={'hit-location-' + index}
+                                                style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}
+                                                underlayColor="#3da0ff"
+                                                onPress={() => this.setLocation(index)}
+                                            >
                                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                                                     <View style={{flex: 1, alignSelf: 'stretch'}}>
                                                         <Text style={styles.grey}>{hitLocation.location}</Text>
@@ -281,14 +325,25 @@ class HitScreen extends Component {
                                 {this._renderLocationDetails()}
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Targeted Shots')}>
+                        <Tab
+                            tabStyle={styles.tabHeading}
+                            activeTabStyle={styles.activeTabStyle}
+                            activeTextStyle={styles.activeTextStyle}
+                            heading={this._renderTabHeading('Targeted Shots')}
+                        >
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View>
                                     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: verticalScale(5)}}>
                                         <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text></View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text></View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text></View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
+                                            </View>
+                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+                                            </View>
                                         </View>
                                         <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                                             <View style={{flex: 1, alignSelf: 'stretch'}}>
@@ -357,7 +412,7 @@ const localStyles = ScaledSheet.create({
     },
 });
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         hitForm: state.forms.hit,
     };

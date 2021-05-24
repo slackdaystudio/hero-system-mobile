@@ -1,19 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class SenseAffectingPower extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
@@ -22,10 +8,13 @@ export default class SenseAffectingPower extends CharacterTrait {
     }
 
     cost() {
-        let cost = 0;
         let counts = this._getCounts();
 
-        return ((counts.group * this.characterTrait.trait.template.groupcost) + (counts.sense * this.characterTrait.trait.template.sensecost)) * this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval;
+        return (
+            ((counts.group * this.characterTrait.trait.template.groupcost + counts.sense * this.characterTrait.trait.template.sensecost) *
+                this.characterTrait.trait.levels) /
+            this.characterTrait.trait.template.lvlval
+        );
     }
 
     costMultiplier() {

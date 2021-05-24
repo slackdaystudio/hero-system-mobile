@@ -1,5 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -104,11 +104,7 @@ export default class ResistantProtection extends CharacterTrait {
         if (levels === 1) {
             cost += this.characterTrait.trait.template.lvlcost;
         } else if (levels > 1) {
-            cost += common.getMultiplierCost(
-                levels,
-                this.characterTrait.trait.template.lvlval,
-                this.characterTrait.trait.template.lvlcost
-            );
+            cost += common.getMultiplierCost(levels, this.characterTrait.trait.template.lvlval, this.characterTrait.trait.template.lvlcost);
         }
 
         return cost;

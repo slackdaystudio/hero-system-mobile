@@ -1,6 +1,6 @@
-import { heroDesignerCharacter } from './HeroDesignerCharacter';
-import { character as libCharacter } from './Character';
-import { common } from './Common';
+import {heroDesignerCharacter} from './HeroDesignerCharacter';
+import {character as libCharacter} from './Character';
+import {common} from './Common';
 import speedTable from '../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -146,7 +146,7 @@ class CombatDetails {
             speed = speedCharacteristic === null ? 1 : speedCharacteristic.value;
         }
 
-        for (let phase of speedTable[(speed > 12 ? '12' : speed.toString())].phases) {
+        for (let phase of speedTable[speed > 12 ? '12' : speed.toString()].phases) {
             phases[phase.toString()] = {
                 used: false,
                 aborted: false,

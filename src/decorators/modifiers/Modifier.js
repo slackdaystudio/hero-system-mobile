@@ -1,4 +1,4 @@
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -26,7 +26,7 @@ export default class Modifier {
 
         if (this.modifier.levels > 0) {
             if (this.modifier.hasOwnProperty('template') && this.modifier.template.hasOwnProperty('lvlcost')) {
-                basecost += this.modifier.template.lvlcost / this.modifier.template.lvlval * this.modifier.levels;
+                basecost += (this.modifier.template.lvlcost / this.modifier.template.lvlval) * this.modifier.levels;
             } else if (this.trait.hasOwnProperty('template') && this.trait.template.hasOwnProperty('modifier')) {
                 let templateModifier = null;
 
@@ -42,7 +42,7 @@ export default class Modifier {
                 }
 
                 if (templateModifier !== null) {
-                    basecost += templateModifier.lvlcost / templateModifier.lvlval * this.modifier.levels;
+                    basecost += (templateModifier.lvlcost / templateModifier.lvlval) * this.modifier.levels;
                 }
             }
         }

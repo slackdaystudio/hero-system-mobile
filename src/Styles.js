@@ -1,5 +1,5 @@
-import { ScaledSheet } from 'react-native-size-matters';
-import { ifIphoneX } from 'react-native-iphone-x-helper';
+import {ScaledSheet} from 'react-native-size-matters';
+import {ifIphoneX} from 'react-native-iphone-x-helper';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

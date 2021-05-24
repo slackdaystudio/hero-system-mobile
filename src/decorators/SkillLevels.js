@@ -33,7 +33,7 @@ export default class SkillLevels extends CharacterTrait {
             }
         }
 
-        return this.characterTrait.trait.levels / levelValue * levelCost;
+        return (this.characterTrait.trait.levels / levelValue) * levelCost;
     }
 
     costMultiplier() {

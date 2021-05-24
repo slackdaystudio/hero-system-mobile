@@ -1,19 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class ElementalControlItem extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);

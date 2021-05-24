@@ -1,7 +1,7 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { Text, List, ListItem, Left } from 'native-base';
-import { character } from '../../lib/Character';
+import {Text, List, ListItem, Left} from 'native-base';
+import {character} from '../../lib/Character';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -40,7 +40,7 @@ export default class Equipment extends Component {
         equipment: PropTypes.string.isRequired,
         strengthDamage: PropTypes.string.isRequired,
         updateForm: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -92,7 +92,12 @@ export default class Equipment extends Component {
         }
 
         return (
-            <ListItem key={'equipment-' + index} underlayColor="#3da0ff" onPress={() => this._toggleFullText(index)} onLongPress={() => this._rollDamage(index)}>
+            <ListItem
+                key={'equipment-' + index}
+                underlayColor="#3da0ff"
+                onPress={() => this._toggleFullText(index)}
+                onLongPress={() => this._rollDamage(index)}
+            >
                 <Left>
                     <Text style={styles.grey}>{item}</Text>
                 </Left>

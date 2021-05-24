@@ -1,7 +1,7 @@
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
-import { NORMAL_DAMAGE } from '../../lib/DieRoller';
+import {common} from '../../lib/Common';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
+import {NORMAL_DAMAGE} from '../../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

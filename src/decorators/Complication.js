@@ -1,6 +1,6 @@
 import CharacterTrait from './CharacterTrait';
-import { common } from '../lib/Common';
-import { EFFECT } from '../lib/DieRoller';
+import {common} from '../lib/Common';
+import {EFFECT} from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

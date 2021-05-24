@@ -1,14 +1,14 @@
-import { Platform, Alert } from 'react-native';
+import {Platform, Alert} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
-import { zip, unzip } from 'react-native-zip-archive';
+import {zip, unzip} from 'react-native-zip-archive';
 import getPath from '@flyerhq/react-native-android-uri-path';
-import { isBase64 } from 'is-base64';
-import { common } from './Common';
-import { heroDesignerCharacter } from './HeroDesignerCharacter';
-import { combatDetails } from './CombatDetails';
-import { Buffer } from 'buffer';
+import {isBase64} from 'is-base64';
+import {common} from './Common';
+import {heroDesignerCharacter} from './HeroDesignerCharacter';
+import {combatDetails} from './CombatDetails';
+import {Buffer} from 'buffer';
 import iconv from 'iconv-lite';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -49,10 +49,7 @@ class File {
 
         try {
             const result = await DocumentPicker.pick({
-                type: [
-                    DocumentPicker.types.allFiles,
-                    'public.item',
-                ],
+                type: [DocumentPicker.types.allFiles, 'public.item'],
             });
 
             if (result === null) {
@@ -94,12 +91,12 @@ class File {
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
             characters = await RNFS.readDir(path);
 
-            characters = characters.filter(f => f.name.endsWith(EXT_CHARACTER)).sort((a, b) => a.name > b.name);
+            characters = characters.filter((f) => f.name.endsWith(EXT_CHARACTER)).sort((a, b) => a.name > b.name);
         } catch (error) {
             Alert.alert(error.message);
         }
 
-        return characters.map(c => {
+        return characters.map((c) => {
             return c.name;
         });
     }
@@ -192,13 +189,15 @@ class File {
         let character = null;
 
         try {
-            character = await new Promise((resolve, reject) => parser.parseString(rawXml, (error, result) => {
-                if (error) {
-                    reject(error);
-                }
+            character = await new Promise((resolve, reject) =>
+                parser.parseString(rawXml, (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
 
-                resolve(result);
-            }));
+                    resolve(result);
+                }),
+            );
 
             common.toast('Character successfully loaded');
         } catch (error) {
@@ -238,13 +237,15 @@ class File {
         let character = null;
 
         try {
-            character = await new Promise((resolve, reject) => parser.parseString(rawXml, (error, result) => {
-                if (error) {
-                    reject(error);
-                }
+            character = await new Promise((resolve, reject) =>
+                parser.parseString(rawXml, (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
 
-                resolve(result);
-            }));
+                    resolve(result);
+                }),
+            );
 
             if (character.hasOwnProperty('image')) {
                 this._savePortrait(character);
@@ -274,7 +275,11 @@ class File {
 
         await RNFS.copyFile(filepath, importFilename);
 
-        return await this.loadCharacter(name, () => {}, () => {});
+        return await this.loadCharacter(
+            name,
+            () => {},
+            () => {},
+        );
     }
 
     _decode(base64Payload) {
@@ -345,7 +350,11 @@ class File {
         character.filename = hsmFilename;
 
         if (exists) {
-            let oldCharacter = await this.loadCharacter(hsmFilename, () => {}, () => {});
+            let oldCharacter = await this.loadCharacter(
+                hsmFilename,
+                () => {},
+                () => {},
+            );
 
             character.showSecondary = oldCharacter.showSecondary;
             character.notes = oldCharacter.notes;
@@ -378,7 +387,7 @@ class File {
 
     async _makeSaveLocation(location) {
         try {
-            const exists =  await RNFS.exists(location);
+            const exists = await RNFS.exists(location);
 
             if (!exists) {
                 await RNFS.mkdir(location);

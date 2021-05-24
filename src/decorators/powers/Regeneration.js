@@ -1,19 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class Regeneration extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);

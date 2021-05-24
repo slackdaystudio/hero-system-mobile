@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import {combineReducers} from 'redux';
 import appState from './appState';
 import character from './character';
 import forms from './forms';

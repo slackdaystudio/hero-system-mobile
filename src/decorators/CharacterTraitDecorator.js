@@ -9,11 +9,11 @@ import MultipowerItem from './powers/MultipowerItem';
 import NakedModifier from './NakedModifier';
 import CompoundPower from './CompoundPower';
 import Complication from './Complication';
-import { skillDecorator } from './skills/SkillDecorator';
-import { perkDecorator } from './perks/PerkDecorator';
-import { talentDecorator } from './talents/TalentDecorator';
-import { powerDecorator } from './powers/PowerDecorator';
-import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
+import {skillDecorator} from './skills/SkillDecorator';
+import {perkDecorator} from './perks/PerkDecorator';
+import {talentDecorator} from './talents/TalentDecorator';
+import {powerDecorator} from './powers/PowerDecorator';
+import {heroDesignerCharacter} from '../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

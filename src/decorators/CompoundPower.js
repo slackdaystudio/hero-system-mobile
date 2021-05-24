@@ -1,19 +1,5 @@
 import CharacterTrait from './CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class CompoundPower extends CharacterTrait {
     constructor(characterTrait, characterTraitDecorator) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);

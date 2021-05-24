@@ -1,8 +1,8 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Text, Icon } from 'native-base';
-import { ScaledSheet, verticalScale } from 'react-native-size-matters';
+import {View} from 'react-native';
+import {Text, Icon} from 'native-base';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -28,7 +28,7 @@ export default class NumberPicker extends Component {
         stateKey: PropTypes.string.isRequired,
         min: PropTypes.number,
         max: PropTypes.number,
-    }
+    };
 
     render() {
         return (
@@ -65,8 +65,8 @@ NumberPicker.defaultProps = {
 
 const localStyles = ScaledSheet.create({
     row: {
-	    alignSelf: 'center',
-	    alignItems:'center',
+        alignSelf: 'center',
+        alignItems: 'center',
         width: '30@s',
         height: '25@vs',
     },

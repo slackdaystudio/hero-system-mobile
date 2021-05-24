@@ -1,6 +1,6 @@
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import {common} from '../../lib/Common';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -54,7 +54,7 @@ export default class Barrier extends CharacterTrait {
     }
 
     attributes() {
-        let attributes =  this.characterTrait.attributes();
+        let attributes = this.characterTrait.attributes();
 
         if (this.characterTrait.trait.pdlevels > 0) {
             attributes.push({
@@ -97,7 +97,9 @@ export default class Barrier extends CharacterTrait {
         } else {
             attributes.push({
                 label: 'Dimensions',
-                value: `${this.characterTrait.trait.lengthlevels + 1}m x ${this.characterTrait.trait.widthlevels + 0.5}m x ${this.characterTrait.trait.heightlevels + 1}m`,
+                value: `${this.characterTrait.trait.lengthlevels + 1}m x ${this.characterTrait.trait.widthlevels + 0.5}m x ${
+                    this.characterTrait.trait.heightlevels + 1
+                }m`,
             });
         }
 
@@ -129,7 +131,7 @@ export default class Barrier extends CharacterTrait {
         totalDefense += this.characterTrait.trait.mdlevels;
         totalDefense += this.characterTrait.trait.powdlevels;
 
-        cost += totalDefense / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        cost += (totalDefense / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost;
         cost += this.characterTrait.trait.lengthlevels * 2;
         cost += this.characterTrait.trait.heightlevels * 2;
 
@@ -145,11 +147,11 @@ export default class Barrier extends CharacterTrait {
         totalDefense += this.characterTrait.trait.mdlevels;
         totalDefense += this.characterTrait.trait.powdlevels;
 
-        cost += totalDefense / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        cost += (totalDefense / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost;
         cost += this.characterTrait.trait.lengthlevels;
         cost += this.characterTrait.trait.heightlevels;
         cost += this.characterTrait.trait.bodylevels;
-        cost += this.characterTrait.trait.widthlevels * 4 / this.characterTrait.trait.template.costperinch;
+        cost += (this.characterTrait.trait.widthlevels * 4) / this.characterTrait.trait.template.costperinch;
 
         return cost;
     }

@@ -1,8 +1,8 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Text } from 'native-base';
-import { verticalScale } from 'react-native-size-matters';
+import {View} from 'react-native';
+import {Text} from 'native-base';
+import {verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -22,7 +22,7 @@ import styles from '../../Styles';
 export default class Heading extends Component {
     static propTypes = {
         text: PropTypes.string.isRequired,
-    }
+    };
 
     render() {
         return (

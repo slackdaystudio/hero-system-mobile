@@ -39,10 +39,13 @@ export default class SkillLevelsOnly extends CharacterTrait {
         }
 
         if (this.characterTrait.trait.hasOwnProperty('adder')) {
-            return this.characterTrait.trait.levels / levelValue * levelCost + (this.characterTrait.cost() - this.characterTrait.trait.levels / levelValue * levelCost);
+            return (
+                (this.characterTrait.trait.levels / levelValue) * levelCost +
+                (this.characterTrait.cost() - (this.characterTrait.trait.levels / levelValue) * levelCost)
+            );
         }
 
-        return this.characterTrait.trait.levels / levelValue * levelCost;
+        return (this.characterTrait.trait.levels / levelValue) * levelCost;
     }
 
     costMultiplier() {

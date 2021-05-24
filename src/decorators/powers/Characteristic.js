@@ -1,6 +1,6 @@
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import {common} from '../../lib/Common';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -27,10 +27,10 @@ export default class Characteristic extends CharacterTrait {
         if (this.characterTrait.trait.levels === 0) {
             let value = heroDesignerCharacter.getCharacteristicTotal(this.characterTrait.trait.xmlid, this.characterTrait.getCharacter());
 
-            return common.roundInPlayersFavor(value / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost);
+            return common.roundInPlayersFavor((value / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost);
         }
 
-        let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        let cost = (this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost;
 
         cost += common.totalAdders(this.characterTrait.trait.adder);
 

@@ -1,9 +1,9 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Text, List, ListItem, Left, Right, Item, Input, Button } from 'native-base';
-import { scale, verticalScale } from 'react-native-size-matters';
-import { character } from '../../lib/Character';
+import {View} from 'react-native';
+import {Text, List, ListItem, Left, Right, Item, Input, Button} from 'native-base';
+import {scale, verticalScale} from 'react-native-size-matters';
+import {character} from '../../lib/Character';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -26,7 +26,7 @@ export default class Combat extends Component {
         character: PropTypes.object.isRequired,
         setSparseCombatDetails: PropTypes.func.isRequired,
         updateForm: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -183,12 +183,15 @@ export default class Combat extends Component {
                                     keyboardType="numeric"
                                     maxLength={3}
                                     value={this.props.character.combatDetails.secondary.stun.toString()}
-                                    onChangeText={(text) => this.updateCombatState('stun', text)} />
+                                    onChangeText={(text) => this.updateCombatState('stun', text)}
+                                />
                             </Item>
                         </View>
                         <View style={{flex: 2}}>
                             <Button style={styles.buttonSmall} onPress={() => this.resetCombatState('stun')}>
-                                <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Reset
+                                </Text>
                             </Button>
                         </View>
                     </View>
@@ -203,12 +206,15 @@ export default class Combat extends Component {
                                     keyboardType="numeric"
                                     maxLength={3}
                                     value={this.props.character.combatDetails.secondary.body.toString()}
-                                    onChangeText={(text) => this.updateCombatState('body', text)} />
+                                    onChangeText={(text) => this.updateCombatState('body', text)}
+                                />
                             </Item>
                         </View>
                         <View style={{flex: 2}}>
                             <Button style={styles.buttonSmall} onPress={() => this.resetCombatState('body')}>
-                                <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Reset
+                                </Text>
                             </Button>
                         </View>
                     </View>
@@ -223,19 +229,24 @@ export default class Combat extends Component {
                                     keyboardType="numeric"
                                     maxLength={3}
                                     value={this.props.character.combatDetails.secondary.endurance.toString()}
-                                    onChangeText={(text) => this.updateCombatState('endurance', text)} />
+                                    onChangeText={(text) => this.updateCombatState('endurance', text)}
+                                />
                             </Item>
                         </View>
                         <View style={{flex: 2}}>
                             <Button style={styles.buttonSmall} onPress={() => this.resetCombatState('endurance')}>
-                                <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Reset
+                                </Text>
                             </Button>
                         </View>
                     </View>
                 </View>
                 <View style={[styles.buttonContainer, {alignSelf: 'center', paddingTop: verticalScale(10)}]}>
                     <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
-                        <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
+                        <Text uppercase={false} style={styles.buttonText}>
+                            Recovery
+                        </Text>
                     </Button>
                 </View>
                 <View style={{paddingBottom: verticalScale(20)}} />

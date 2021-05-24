@@ -11,7 +11,7 @@ import mainSixth from '../../public/HERODesigner/Main6E.json';
 import normal from '../../public/HERODesigner/Normal.json';
 import superheroic from '../../public/HERODesigner/Superheroic.json';
 import superheroicSixth from '../../public/HERODesigner/Superheroic6E.json';
-import { common } from './Common';
+import {common} from './Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

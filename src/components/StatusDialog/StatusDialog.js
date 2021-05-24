@@ -1,19 +1,14 @@
-import React, { Component, Fragment }  from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Button, Text, Form, Input, Picker, Item, Label } from 'native-base';
+import {View} from 'react-native';
+import {Button, Text, Form, Input, Picker, Item, Label} from 'native-base';
 import Modal from 'react-native-modal';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {scale, verticalScale} from 'react-native-size-matters';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from '../../Styles';
 
-export const STATUSES = [
-    'Aid',
-    'Drain',
-    'Entangle',
-    'Flash',
-];
+export const STATUSES = ['Aid', 'Drain', 'Entangle', 'Flash'];
 
 class StatusDialog extends Component {
     static propTypes = {
@@ -24,7 +19,7 @@ class StatusDialog extends Component {
         visible: PropTypes.bool.isRequired,
         onApply: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -77,26 +72,31 @@ class StatusDialog extends Component {
                 id: 0,
                 name: 'Characteristics',
                 children: [],
-            }, {
+            },
+            {
                 id: 1,
                 name: 'Powers',
                 children: [],
             },
         ];
 
-        items[0].children = this.props.character.characteristics.map((c) => {
-            return {
-                id: c.shortName,
-                name: c.name,
-            };
-        }).slice();
+        items[0].children = this.props.character.characteristics
+            .map((c) => {
+                return {
+                    id: c.shortName,
+                    name: c.name,
+                };
+            })
+            .slice();
 
-        items[1].children = this.props.character.powers.map((p) => {
-            return {
-                id: p.id,
-                name: p.name,
-            };
-        }).slice();
+        items[1].children = this.props.character.powers
+            .map((p) => {
+                return {
+                    id: p.id,
+                    name: p.name,
+                };
+            })
+            .slice();
 
         return items;
     }
@@ -185,7 +185,7 @@ class StatusDialog extends Component {
                     />
                 </Item>
                 <Item inlineLabel style={{marginLeft: 0}}>
-                    <Label style={styles.grey}>PD:     </Label>
+                    <Label style={styles.grey}>PD: </Label>
                     <Input
                         style={styles.grey}
                         keyboardType="numeric"
@@ -195,7 +195,7 @@ class StatusDialog extends Component {
                     />
                 </Item>
                 <Item inlineLabel style={{marginLeft: 0}}>
-                    <Label style={styles.grey}>ED:     </Label>
+                    <Label style={styles.grey}>ED: </Label>
                     <Input
                         style={styles.grey}
                         keyboardType="numeric"
@@ -225,11 +225,7 @@ class StatusDialog extends Component {
 
     render() {
         return (
-            <Modal
-                isVisible={this.props.visible}
-                onBackButtonPress={() => this.props.onClose()}
-                onBackdropPress={() => this.props.onClose()}
-            >
+            <Modal isVisible={this.props.visible} onBackButtonPress={() => this.props.onClose()} onBackdropPress={() => this.props.onClose()}>
                 <View style={styles.modal}>
                     <Text style={styles.modalHeader}>Apply Status</Text>
                     <View style={styles.modalContent}>
@@ -263,11 +259,15 @@ class StatusDialog extends Component {
                             {this._renderSecondaryControls()}
                         </Form>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
-                            <Button style={styles.button}  onPress={() => this._onApply()}>
-                                <Text uppercase={false} style={styles.buttonText}>Apply</Text>
+                            <Button style={styles.button} onPress={() => this._onApply()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Apply
+                                </Text>
                             </Button>
-                            <Button style={styles.button}  onPress={() => this.props.onClose()}>
-                                <Text uppercase={false} style={styles.buttonText}>Cancel</Text>
+                            <Button style={styles.button} onPress={() => this.props.onClose()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Cancel
+                                </Text>
                             </Button>
                         </View>
                     </View>

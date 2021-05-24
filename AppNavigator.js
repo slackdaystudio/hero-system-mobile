@@ -1,5 +1,5 @@
-import { createDrawerNavigator } from 'react-navigation-drawer';
-import { scale } from 'react-native-size-matters';
+import {createDrawerNavigator} from 'react-navigation-drawer';
+import {scale} from 'react-native-size-matters';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import CharactersScreen from './src/components/Screens/CharactersScreen';
 import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
@@ -29,51 +29,54 @@ import Sidebar from './src/components/Sidebar/Sidebar';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const AppNavigator = createDrawerNavigator({
-    Home: {
-        screen: HomeScreen,
+const AppNavigator = createDrawerNavigator(
+    {
+        Home: {
+            screen: HomeScreen,
+        },
+        Characters: {
+            screen: CharactersScreen,
+        },
+        ViewCharacter: {
+            screen: ViewCharacterScreen,
+        },
+        ViewHeroDesignerCharacter: {
+            screen: ViewHeroDesignerCharacterScreen,
+        },
+        RandomCharacter: {
+            screen: RandomCharacterScreen,
+        },
+        Result: {
+            screen: ResultScreen,
+        },
+        Skill: {
+            screen: SkillScreen,
+        },
+        Hit: {
+            screen: HitScreen,
+        },
+        Damage: {
+            screen: DamageScreen,
+        },
+        Effect: {
+            screen: EffectScreen,
+        },
+        CostCruncher: {
+            screen: CostCruncherScreen,
+        },
+        Statistics: {
+            screen: StatisticsScreen,
+        },
+        Settings: {
+            screen: SettingsScreen,
+        },
     },
-    Characters: {
-        screen: CharactersScreen,
+    {
+        initialRouteName: 'Home',
+        drawerPosition: 'right',
+        contentComponent: Sidebar,
+        drawerWidth: scale(210),
     },
-    ViewCharacter: {
-        screen: ViewCharacterScreen,
-    },
-    ViewHeroDesignerCharacter: {
-        screen: ViewHeroDesignerCharacterScreen,
-    },
-    RandomCharacter: {
-        screen: RandomCharacterScreen,
-    },
-    Result: {
-        screen: ResultScreen,
-    },
-    Skill: {
-        screen: SkillScreen,
-    },
-    Hit: {
-        screen: HitScreen,
-    },
-    Damage: {
-        screen: DamageScreen,
-    },
-    Effect: {
-        screen: EffectScreen,
-    },
-    CostCruncher: {
-        screen: CostCruncherScreen,
-    },
-    Statistics: {
-        screen: StatisticsScreen,
-    },
-    Settings: {
-        screen: SettingsScreen,
-    },
-}, {
-    initialRouteName: 'Home',
-    drawerPosition: 'right',
-    contentComponent: Sidebar,
-    drawerWidth: scale(210),
-});
+);
 
 export default AppNavigator;

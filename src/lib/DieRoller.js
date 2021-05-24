@@ -1,18 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const SKILL_CHECK = 1;
 
 export const TO_HIT = 2;
@@ -35,13 +20,7 @@ export const PARTIAL_DIE_MINUS_ONE = 3;
 
 class DieRoller {
     constructor() {
-        this.validLastRollTypes = [
-            SKILL_CHECK,
-            TO_HIT,
-            NORMAL_DAMAGE,
-            KILLING_DAMAGE,
-            EFFECT,
-        ];
+        this.validLastRollTypes = [SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT];
     }
 
     rollCheck(threshold = null) {
@@ -84,7 +63,7 @@ class DieRoller {
             results.push(result);
         }
 
-        return {'results': results};
+        return {results: results};
     }
 
     rollDamage(damageForm) {
@@ -107,17 +86,19 @@ class DieRoller {
             damageForm.isTargetInZeroG,
             damageForm.isTargetUnderwater,
             damageForm.rollWithPunch,
-            damageForm.isUsingClinging
+            damageForm.isUsingClinging,
         );
 
         if (damageForm.isExplosion) {
             resultRoll.rolls.sort((a, b) => a - b).reverse();
-            resultRoll.explosion = [{
-                distance: 0,
-                stun: resultRoll.stun,
-                body: resultRoll.body,
-                knockback: resultRoll.knockback,
-            }];
+            resultRoll.explosion = [
+                {
+                    distance: 0,
+                    stun: resultRoll.stun,
+                    body: resultRoll.body,
+                    knockback: resultRoll.knockback,
+                },
+            ];
 
             let newResultRoll = {...resultRoll};
             newResultRoll.rolls = resultRoll.rolls.slice();

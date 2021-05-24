@@ -1,17 +1,17 @@
-import React, { Component, Fragment }  from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight } from 'react-native';
-import { Text, Button, Icon } from 'native-base';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {View, TouchableHighlight} from 'react-native';
+import {Text, Button, Icon} from 'native-base';
+import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
 import CalculatorInput from '../CalculatorInput/CalculatorInput';
 import StatusDialog from '../StatusDialog/StatusDialog';
-import { common } from '../../lib/Common';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
-import { dieRoller } from '../../lib/DieRoller';
-import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';
+import {common} from '../../lib/Common';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
+import {dieRoller} from '../../lib/DieRoller';
+import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -42,7 +42,7 @@ export default class Combat extends Component {
         applyStatus: PropTypes.func.isRequired,
         clearAllStatuses: PropTypes.func.isRequired,
         clearStatus: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -210,7 +210,7 @@ export default class Combat extends Component {
                 statusForm.segments = status.segments || 0;
                 break;
             default:
-                // Do nothing
+            // Do nothing
         }
 
         this.props.updateForm('status', statusForm);
@@ -244,7 +244,9 @@ export default class Combat extends Component {
                 </View>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <Button style={styles.buttonSmall} onPress={() => this.resetCombatState(stateKey)}>
-                        <Text uppercase={false} style={styles.buttonText}>Reset</Text>
+                        <Text uppercase={false} style={styles.buttonText}>
+                            Reset
+                        </Text>
                     </Button>
                 </View>
             </View>
@@ -256,13 +258,16 @@ export default class Combat extends Component {
             {
                 label: 'PD',
                 value: heroDesignerCharacter.getTotalDefense(this.props.character, 'PD'),
-            }, {
+            },
+            {
                 label: 'ED',
                 value: heroDesignerCharacter.getTotalDefense(this.props.character, 'ED'),
-            }, {
+            },
+            {
                 label: 'MD',
                 value: heroDesignerCharacter.getTotalUnusualDefense(this.props.character, 'MENTALDEFENSE'),
-            }, {
+            },
+            {
                 label: 'PwD',
                 value: heroDesignerCharacter.getTotalUnusualDefense(this.props.character, 'POWERDEFENSE'),
             },
@@ -344,7 +349,11 @@ export default class Combat extends Component {
 
         return (
             <View key={`phase-${phase}`} style={{paddingHorizontal: scale(5)}}>
-                <TouchableHighlight underlayColor="#1b1d1f" onPress={() => this.usePhase(phase, this.props.character.showSecondary)} onLongPress={() => this.abortPhase(phase)}>
+                <TouchableHighlight
+                    underlayColor="#1b1d1f"
+                    onPress={() => this.usePhase(phase, this.props.character.showSecondary)}
+                    onLongPress={() => this.abortPhase(phase)}
+                >
                     <CircleText title={phase} fontSize={18} size={40} color={color} />
                 </TouchableHighlight>
             </View>
@@ -370,13 +379,15 @@ export default class Combat extends Component {
             return (
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <Button style={styles.buttonSmall} onPress={() => this.rollToHit(stateKey)}>
-                        <Text uppercase={false} style={styles.buttonText}>Roll</Text>
+                        <Text uppercase={false} style={styles.buttonText}>
+                            Roll
+                        </Text>
                     </Button>
                 </View>
             );
         }
 
-        return <View style={{flex: 1}}/>;
+        return <View style={{flex: 1}} />;
     }
 
     _renderCv(stateKey, renderRollButton = false) {
@@ -451,8 +462,10 @@ export default class Combat extends Component {
     _renderStatuses() {
         const combatDetailsKey = this.props.character.showSecondary ? 'secondary' : 'primary';
 
-        if (this.props.character.combatDetails[combatDetailsKey].hasOwnProperty('statuses') &&
-            this.props.character.combatDetails[combatDetailsKey].statuses.length > 0) {
+        if (
+            this.props.character.combatDetails[combatDetailsKey].hasOwnProperty('statuses') &&
+            this.props.character.combatDetails[combatDetailsKey].statuses.length > 0
+        ) {
             return (
                 <Fragment>
                     {this.props.character.combatDetails[combatDetailsKey].statuses.map((status, index) => {
@@ -470,19 +483,32 @@ export default class Combat extends Component {
                                 statusText += `: For ${status.segments} segments`;
                                 break;
                             default:
-                                // Do nothing
+                            // Do nothing
                         }
 
                         return (
-                            <View key={`status-${index}`} style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: verticalScale(10)}}>
+                            <View
+                                key={`status-${index}`}
+                                style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: verticalScale(10)}}
+                            >
                                 <View style={{flex: 1, flexGrow: 1, alignSelf: 'flex-start'}}>
                                     <Text style={styles.grey}>•</Text>
                                 </View>
                                 <View style={{flex: 1, flexGrow: 20, alignSelf: 'center', justifyContent: 'center'}}>
                                     <Text style={styles.grey}>{statusText}</Text>
                                 </View>
-                                <Icon type="FontAwesome" name="edit" style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10), paddingTop: verticalScale(3)}} onPress={() => this.editStatus(index)} />
-                                <Icon type="FontAwesome" name="trash" style={{fontSize: verticalScale(20), color: '#14354d'}} onPress={() => this.clearStatus(index)} />
+                                <Icon
+                                    type="FontAwesome"
+                                    name="edit"
+                                    style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10), paddingTop: verticalScale(3)}}
+                                    onPress={() => this.editStatus(index)}
+                                />
+                                <Icon
+                                    type="FontAwesome"
+                                    name="trash"
+                                    style={{fontSize: verticalScale(20), color: '#14354d'}}
+                                    onPress={() => this.clearStatus(index)}
+                                />
                             </View>
                         );
                     })}
@@ -507,7 +533,9 @@ export default class Combat extends Component {
                     {this._renderHealthItem('endurance', 'END')}
                     <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
                         <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
-                            <Text uppercase={false} style={styles.buttonText}>Recovery</Text>
+                            <Text uppercase={false} style={styles.buttonText}>
+                                Recovery
+                            </Text>
                         </Button>
                     </View>
                 </View>
@@ -515,11 +543,15 @@ export default class Combat extends Component {
                 <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
                         <Button style={styles.buttonSmall} onPress={() => this.openStatusDialog()}>
-                            <Text uppercase={false} style={styles.buttonText}>Add</Text>
+                            <Text uppercase={false} style={styles.buttonText}>
+                                Add
+                            </Text>
                         </Button>
                         <View style={{paddingHorizontal: scale(5)}} />
                         <Button style={styles.buttonSmall} onPress={() => this.clearAllStatuses()}>
-                            <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
+                            <Text uppercase={false} style={styles.buttonText}>
+                                Clear All
+                            </Text>
                         </Button>
                     </View>
                     {this._renderStatuses()}
@@ -529,9 +561,7 @@ export default class Combat extends Component {
                     {this._renderDefenses()}
                 </View>
                 <Heading text="Phases" />
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>
-                    {this._renderPhases()}
-                </View>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>{this._renderPhases()}</View>
                 <Heading text="Combat Values" />
                 <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                     {this._renderCv('ocv', true)}

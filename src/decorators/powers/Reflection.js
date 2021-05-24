@@ -1,19 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class Reflection extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
@@ -89,7 +75,7 @@ export default class Reflection extends CharacterTrait {
             cost += adder.basecost;
 
             if (adder.levels > 0) {
-                cost = adder.levels / adder.lvlval * adder.lvlcost;
+                cost = (adder.levels / adder.lvlval) * adder.lvlcost;
             }
         }
 

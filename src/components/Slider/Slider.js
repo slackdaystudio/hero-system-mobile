@@ -1,4 +1,3 @@
-
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {View, Keyboard} from 'react-native';
@@ -6,7 +5,6 @@ import {Text, Item, Input} from 'native-base';
 import {default as RNSlider} from '@react-native-community/slider';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
-
 
 // Copyright 2018-Present Philip J. Guinchard
 //

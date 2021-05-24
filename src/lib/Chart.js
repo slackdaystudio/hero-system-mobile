@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import {PieChart} from 'react-native-svg-charts';
 import {Circle, G, Line, Text} from 'react-native-svg';
 
@@ -93,14 +93,5 @@ class Chart {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5fcff',
-    },
-});
 
 export let chart = new Chart();

@@ -1,19 +1,5 @@
 import CharacterTrait from './CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class EffectRoll extends CharacterTrait {
     constructor(characterTrait, rollType) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);

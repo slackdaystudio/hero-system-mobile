@@ -1,5 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 import senses from '../../../public/Senses.json';
 
 // Copyright 2018-Present Philip J. Guinchard

@@ -1,7 +1,7 @@
 import CharacterTrait from './CharacterTrait';
-import { common } from '../lib/Common';
-import { heroDesignerCharacter, SKILL_ENHANCERS } from '../lib/HeroDesignerCharacter';
-import { modifierDecorator } from './modifiers/ModifierDecorator';
+import {common} from '../lib/Common';
+import {heroDesignerCharacter, SKILL_ENHANCERS} from '../lib/HeroDesignerCharacter';
+import {modifierDecorator} from './modifiers/ModifierDecorator';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -47,8 +47,7 @@ export default class ModifierCalculator extends CharacterTrait {
     realCost() {
         let realCost = common.roundInPlayersFavor(this.activeCost() / (1 - this.limitations().reduce((a, b) => a + b.cost, 0)));
 
-        if (this.characterTrait.parentTrait !== undefined &&
-            SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlid.toUpperCase())) {
+        if (this.characterTrait.parentTrait !== undefined && SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlid.toUpperCase())) {
             realCost = realCost - 1 <= 0 ? 1 : realCost - 1;
         }
 
@@ -72,16 +71,15 @@ export default class ModifierCalculator extends CharacterTrait {
     }
 
     advantages() {
-        return this.modifiers.filter(m => m.cost >= 0);
+        return this.modifiers.filter((m) => m.cost >= 0);
     }
 
     limitations() {
-        return this.modifiers.filter(m => m.cost < 0);
+        return this.modifiers.filter((m) => m.cost < 0);
     }
 
     _getItemTotalModifiers(trait) {
         let totalModifiers = [];
-        let modifierCost = 0;
 
         if (trait === null || trait === undefined || !trait.hasOwnProperty('modifier')) {
             return totalModifiers;

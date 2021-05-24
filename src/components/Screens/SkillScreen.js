@@ -1,16 +1,16 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { NavigationEvents } from 'react-navigation';
-import { BackHandler, View, Switch } from 'react-native';
-import { Container, Content, Button, Text } from 'native-base';
-import { ScaledSheet, scale } from 'react-native-size-matters';
+import {connect} from 'react-redux';
+import {NavigationEvents} from 'react-navigation';
+import {BackHandler, View, Switch} from 'react-native';
+import {Container, Content, Button, Text} from 'native-base';
+import {ScaledSheet, scale} from 'react-native-size-matters';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
-import { dieRoller } from '../../lib/DieRoller';
+import {dieRoller} from '../../lib/DieRoller';
 import styles from '../../Styles';
-import { updateFormValue } from '../../reducers/forms';
+import {updateFormValue} from '../../reducers/forms';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,7 +32,7 @@ class SkillScreen extends Component {
         skillForm: PropTypes.object.isRequired,
         skillCheck: PropTypes.bool,
         updateFormValue: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -94,10 +94,7 @@ class SkillScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                 <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll 3d6</Text>
@@ -117,7 +114,7 @@ class SkillScreen extends Component {
                     </View>
                     {this._renderSlider()}
                     <View style={styles.buttonContainer}>
-                        <Button block style={styles.button}  onPress={this.roll}>
+                        <Button block style={styles.button} onPress={this.roll}>
                             <Text uppercase={false}>Roll</Text>
                         </Button>
                     </View>
@@ -139,7 +136,7 @@ const localStyles = ScaledSheet.create({
     },
 });
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         skillForm: state.forms.skill,
     };

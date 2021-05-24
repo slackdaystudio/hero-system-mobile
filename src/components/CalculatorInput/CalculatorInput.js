@@ -1,9 +1,9 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Icon, Item } from 'native-base';
-import { CalculatorInput as BaseCalculatorInput } from 'react-native-calculator';
-import { verticalScale } from 'react-native-size-matters';
+import {View} from 'react-native';
+import {Icon, Item} from 'native-base';
+import {CalculatorInput as BaseCalculatorInput} from 'react-native-calculator';
+import {verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
 
 export default class CalculatorInput extends Component {
@@ -13,7 +13,7 @@ export default class CalculatorInput extends Component {
         onAccept: PropTypes.func.isRequired,
         width: PropTypes.number,
         iconPaddingTop: PropTypes.number,
-    }
+    };
 
     _onAccept(value) {
         this.props.onAccept(this.props.itemKey, value);
@@ -27,7 +27,7 @@ export default class CalculatorInput extends Component {
                 <View style={{flex: 1}}>
                     <Item>
                         <BaseCalculatorInput
-                            ref={(ref) => this.currentBodyPointsCalculator = ref}
+                            ref={(ref) => (this.currentBodyPointsCalculator = ref)}
                             fieldContainerStyle={{borderBottomWidth: 0}}
                             fieldTextStyle={[styles.grey, {textAlign: 'left', alignSelf: 'baseline'}]}
                             value={this.props.value.toString()}

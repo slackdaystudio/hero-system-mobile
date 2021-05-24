@@ -1,20 +1,6 @@
 import CharacterTrait from '../CharacterTrait';
-import { SKILL_CHECK } from '../../lib/DieRoller';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import {SKILL_CHECK} from '../../lib/DieRoller';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 
 export const SKILL_ROLL_BASE = 9;
 
@@ -75,7 +61,10 @@ export default class Roll extends CharacterTrait {
                 roll = SKILL_GENERAL_CHARACTERISTIC;
             }
         } else if (this.characterTrait.trait.hasOwnProperty('characteristic')) {
-            let characteristic = this.characterTrait.getCharacter().characteristics.filter(c => c.shortName.toLowerCase() === this.characterTrait.trait.characteristic.toLowerCase()).shift();
+            let characteristic = this.characterTrait
+                .getCharacter()
+                .characteristics.filter((c) => c.shortName.toLowerCase() === this.characterTrait.trait.characteristic.toLowerCase())
+                .shift();
 
             roll = parseInt(heroDesignerCharacter.getRollTotal(characteristic, this.characterTrait.getCharacter()).slice(0, -1), 10);
         }

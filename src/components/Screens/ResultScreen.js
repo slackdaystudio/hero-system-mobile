@@ -1,18 +1,18 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { Platform, BackHandler, View } from 'react-native';
-import { Container, Content, Button, Text } from 'native-base';
+import {connect} from 'react-redux';
+import {Platform, BackHandler, View} from 'react-native';
+import {Container, Content, Button, Text} from 'native-base';
 import RNShake from 'react-native-shake';
 import AnimateNumber from '@bankify/react-native-animate-number';
-import { NavigationEvents } from 'react-navigation';
-import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
+import {NavigationEvents} from 'react-navigation';
+import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
-import { dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../../lib/DieRoller';
-import { statistics } from '../../lib/Statistics';
-import { soundPlayer, DEFAULT_SOUND } from '../../lib/SoundPlayer';
+import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
+import {statistics} from '../../lib/Statistics';
+import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import styles from '../../Styles';
-import { addStatistics } from '../../reducers/statistics';
+import {addStatistics} from '../../reducers/statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -35,7 +35,7 @@ class ResultScreen extends Component {
         useFifthEdition: PropTypes.bool.isRequired,
         playSounds: PropTypes.bool.isRequired,
         onlyDiceSounds: PropTypes.bool.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -161,18 +161,34 @@ class ResultScreen extends Component {
             return (
                 <View style={{paddingBottom: verticalScale(20)}}>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: scale(5)}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Distance</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>STUN</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>BODY</Text></View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>KB</Text></View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Distance</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>STUN</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>BODY</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>KB</Text>
+                        </View>
                     </View>
                     {result.explosion.map((entry, index) => {
                         return (
                             <View key={'exp-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
-                                <View style={{flex: 1, alignSelf: 'flex-end'}}><Text style={styles.grey}>{this._renderDistance(entry.distance, result)}</Text></View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderStun(entry.stun)}</Text></View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{entry.body}</Text></View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{this._renderKnockback(entry.knockback, result)}</Text></View>
+                                <View style={{flex: 1, alignSelf: 'flex-end'}}>
+                                    <Text style={styles.grey}>{this._renderDistance(entry.distance, result)}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{this._renderStun(entry.stun)}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{entry.body}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{this._renderKnockback(entry.knockback, result)}</Text>
+                                </View>
                             </View>
                         );
                     })}
@@ -224,18 +240,16 @@ class ResultScreen extends Component {
 
         if (overUnder >= 0) {
             if (overUnder === 0) {
-                return (
-                    <Text style={styles.grey}>You made your check with no points to spare</Text>
-                );
+                return <Text style={styles.grey}>You made your check with no points to spare</Text>;
             }
 
-            return (
-                <Text style={styles.grey}>You made your check by {overUnder} points</Text>
-            );
+            return <Text style={styles.grey}>You made your check by {overUnder} points</Text>;
         }
 
         return (
-            <Text style={styles.grey}>You <Text style={{color: 'red'}}>failed</Text> your check by {overUnder * -1} points</Text>
+            <Text style={styles.grey}>
+                You <Text style={{color: 'red'}}>failed</Text> your check by {overUnder * -1} points
+            </Text>
         );
     }
 
@@ -258,9 +272,17 @@ class ResultScreen extends Component {
             case 'HEALING':
                 return <Text style={styles.grey}>You healed your target for {result.total} points</Text>;
             case 'LUCK':
-                return <Text style={styles.grey}>You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'green'}}>Luck</Text></Text>;
+                return (
+                    <Text style={styles.grey}>
+                        You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'green'}}>Luck</Text>
+                    </Text>
+                );
             case 'UNLUCK':
-                return <Text style={styles.grey}>You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'red'}}>Unluck</Text></Text>;
+                return (
+                    <Text style={styles.grey}>
+                        You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'red'}}>Unluck</Text>
+                    </Text>
+                );
             default:
                 return <Text style={styles.grey}>You have scored {result.total} points on your effect</Text>;
         }
@@ -333,16 +355,24 @@ class ResultScreen extends Component {
                                 </Text>
                             </View>
                             <View style={{flex: 1}}>
-                                <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30), paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13)}}>
-                                    <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
+                                <Text
+                                    style={{
+                                        color: this._getRollPercentageColor(percentage),
+                                        fontSize: verticalScale(30),
+                                        paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13),
+                                    }}
+                                >
+                                    <AnimateNumber value={percentage} formatter={(val) => (val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`)} />
                                 </Text>
                             </View>
                         </View>
                         <Text style={styles.grey}>
-                            <Text style={styles.boldGrey}>Dice Rolled: </Text>{result.rolls.length} ({result.rolls.join(', ')})
+                            <Text style={styles.boldGrey}>Dice Rolled: </Text>
+                            {result.rolls.length} ({result.rolls.join(', ')})
                         </Text>
                         <Text style={styles.grey}>
-                            <Text style={styles.boldGrey}>Partial Die: </Text>{dieRoller.getPartialDieName(result.partialDieType)}
+                            <Text style={styles.boldGrey}>Partial Die: </Text>
+                            {dieRoller.getPartialDieName(result.partialDieType)}
                         </Text>
                         {this._renderAdditionalRollInfo(result)}
                     </View>
@@ -361,16 +391,24 @@ class ResultScreen extends Component {
                         </Text>
                     </View>
                     <View style={{flex: 1}}>
-                        <Text style={{color: this._getRollPercentageColor(percentage), fontSize: verticalScale(30), paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13)}}>
-                            <AnimateNumber value={percentage} formatter={(val) => val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`} />
+                        <Text
+                            style={{
+                                color: this._getRollPercentageColor(percentage),
+                                fontSize: verticalScale(30),
+                                paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13),
+                            }}
+                        >
+                            <AnimateNumber value={percentage} formatter={(val) => (val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`)} />
                         </Text>
                     </View>
                 </View>
                 <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Dice Rolled: </Text>{this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
+                    <Text style={styles.boldGrey}>Dice Rolled: </Text>
+                    {this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
                 </Text>
                 <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Partial Die: </Text>{dieRoller.getPartialDieName(this.state.result.partialDieType)}
+                    <Text style={styles.boldGrey}>Partial Die: </Text>
+                    {dieRoller.getPartialDieName(this.state.result.partialDieType)}
                 </Text>
                 {this._renderAdditionalRollInfo(this.state.result)}
             </View>
@@ -380,17 +418,14 @@ class ResultScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                 <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll Result</Text>
                     <View>
                         {this._renderRoll()}
                         <View style={styles.buttonContainer}>
-                            <Button block style={styles.button}  onPress={this.reRoll}>
+                            <Button block style={styles.button} onPress={this.reRoll}>
                                 <Text uppercase={false}>Roll Again</Text>
                             </Button>
                         </View>
@@ -415,7 +450,7 @@ const localStyles = ScaledSheet.create({
     },
 });
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,

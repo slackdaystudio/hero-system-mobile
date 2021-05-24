@@ -1,8 +1,8 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Text, List, ListItem, Left, Body } from 'native-base';
-import { verticalScale } from 'react-native-size-matters';
+import {View} from 'react-native';
+import {Text, List, ListItem, Left, Body} from 'native-base';
+import {verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -22,7 +22,7 @@ import styles from '../../Styles';
 export default class General extends Component {
     static propTypes = {
         character: PropTypes.object.isRequired,
-    }
+    };
 
     render() {
         return (
@@ -85,32 +85,38 @@ export default class General extends Component {
                 </ListItem>
                 <ListItem>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Description: </Text>{this.props.character.description}
+                        <Text style={styles.boldGrey}>Description: </Text>
+                        {this.props.character.description}
                     </Text>
                 </ListItem>
                 <ListItem>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Background: </Text>{this.props.character.background}
+                        <Text style={styles.boldGrey}>Background: </Text>
+                        {this.props.character.background}
                     </Text>
                 </ListItem>
                 <ListItem>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Personality: </Text>{this.props.character.personality}
+                        <Text style={styles.boldGrey}>Personality: </Text>
+                        {this.props.character.personality}
                     </Text>
                 </ListItem>
                 <ListItem>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Quote: </Text>{this.props.character.quote}
+                        <Text style={styles.boldGrey}>Quote: </Text>
+                        {this.props.character.quote}
                     </Text>
                 </ListItem>
                 <ListItem>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Tactics: </Text>{this.props.character.tactics}
+                        <Text style={styles.boldGrey}>Tactics: </Text>
+                        {this.props.character.tactics}
                     </Text>
                 </ListItem>
                 <ListItem>
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Campaign Use: </Text>{this.props.character.campaignUse}
+                        <Text style={styles.boldGrey}>Campaign Use: </Text>
+                        {this.props.character.campaignUse}
                     </Text>
                 </ListItem>
                 <View style={{paddingBottom: verticalScale(20)}} />

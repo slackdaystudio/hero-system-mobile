@@ -31,7 +31,7 @@ export default class Skill extends CharacterTrait {
         if (this.characterTrait.trait.xmlid.toUpperCase() === 'CRAMMING') {
             cost = this.characterTrait.trait.basecost;
         } else if (this.characterTrait.trait.xmlid.toUpperCase() === 'CUSTOMSKILL') {
-            cost = this.characterTrait.trait.basecost + (this.characterTrait.trait.levels * this.characterTrait.trait.template.lvlcost);
+            cost = this.characterTrait.trait.basecost + this.characterTrait.trait.levels * this.characterTrait.trait.template.lvlcost;
         } else if (this.characterTrait.trait.proficiency) {
             cost = 2;
         } else if (this.characterTrait.trait.familiarity || this.characterTrait.trait.everyman || this.characterTrait.trait.nativeTongue) {
@@ -107,7 +107,7 @@ export default class Skill extends CharacterTrait {
             skillLevelCost = this.characterTrait.trait.template.characteristicChoice.item.lvlcost;
         }
 
-        cost = basecost + (this.characterTrait.trait.levels * skillLevelCost);
+        cost = basecost + this.characterTrait.trait.levels * skillLevelCost;
 
         return cost;
     }

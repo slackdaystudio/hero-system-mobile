@@ -1,4 +1,4 @@
-import { persistence, MAX_CHARACTER_SLOTS } from '../lib/Persistence';
+import {persistence, MAX_CHARACTER_SLOTS} from '../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -54,7 +54,7 @@ export const CLEAR_STATUS = 'CLEAR_STATUS';
 
 export function setCharacter(character, slot) {
     return async (dispatch) => {
-        persistence.saveCharacter(character, slot).then(characterData => {
+        persistence.saveCharacter(character, slot).then((characterData) => {
             dispatch({
                 type: SET_CHARACTER,
                 payload: characterData,
@@ -65,7 +65,7 @@ export function setCharacter(character, slot) {
 
 export function updateLoadedCharacters(newCharacter, character, characters) {
     return async (dispatch) => {
-        persistence.updateLoadedCharacters(newCharacter, character, characters).then(characterData => {
+        persistence.updateLoadedCharacters(newCharacter, character, characters).then((characterData) => {
             dispatch({
                 type: UPDATE_LOADED_CHARACTERS,
                 payload: characterData,

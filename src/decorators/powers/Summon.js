@@ -1,5 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -23,7 +23,7 @@ export default class Summon extends CharacterTrait {
     }
 
     cost() {
-        let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        let cost = (this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost;
 
         cost += common.totalAdders(this.characterTrait.trait.adder);
 

@@ -1,20 +1,6 @@
 import CharacterTrait from '../CharacterTrait';
-import { SKILL_CHECK } from '../../lib/DieRoller';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import {SKILL_CHECK} from '../../lib/DieRoller';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 
 export default class EnhancedPerception extends CharacterTrait {
     constructor(characterTrait) {
@@ -66,7 +52,7 @@ export default class EnhancedPerception extends CharacterTrait {
             if (characteristic.shortName === 'INT') {
                 let totalRoll = heroDesignerCharacter.getRollTotal(characteristic, this.characterTrait.getCharacter());
 
-                base += parseInt(totalRoll.substring(0, (totalRoll.length - 1)), 10);
+                base += parseInt(totalRoll.substring(0, totalRoll.length - 1), 10);
 
                 break;
             }

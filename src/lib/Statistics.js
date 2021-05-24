@@ -1,5 +1,5 @@
-import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK, PARTIAL_DIE_HALF } from './DieRoller';
-import { persistence } from './Persistence';
+import {NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK, PARTIAL_DIE_HALF} from './DieRoller';
+import {persistence} from './Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -80,7 +80,8 @@ class Statistics {
         let average = 0.0;
 
         if (roll.partialDie === PARTIAL_DIE_HALF) {
-            let halfDie = roll.rolls.pop();
+            // The last entry on the rolls array is the half die
+            roll.rolls.pop();
 
             average += AVERAGE_HALF_DIE_ROLL;
         }
@@ -112,7 +113,7 @@ class Statistics {
                     distributions.six++;
                     break;
                 default:
-                    // do nothing
+                // do nothing
             }
         }
     }

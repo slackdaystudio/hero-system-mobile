@@ -1,19 +1,5 @@
 import CharacterTrait from '../CharacterTrait';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default class Leaping extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
@@ -22,7 +8,7 @@ export default class Leaping extends CharacterTrait {
     }
 
     cost() {
-        let cost = this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * this.characterTrait.trait.template.lvlcost;
+        let cost = (this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval) * this.characterTrait.trait.template.lvlcost;
 
         cost += this._addAdder(this.characterTrait.trait.adder);
 
@@ -80,7 +66,7 @@ export default class Leaping extends CharacterTrait {
             cost += adder.basecost;
 
             if (adder.levels > 0) {
-                cost = adder.levels / adder.lvlval * adder.lvlcost;
+                cost = (adder.levels / adder.lvlval) * adder.lvlcost;
             }
         }
 

@@ -1,22 +1,4 @@
-import { persistence } from '../lib/Persistence';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import {persistence} from '../lib/Persistence';
 
 export const INITIALIZE_SETTINGS = 'INITIALIZE_SETTINGS';
 
@@ -30,7 +12,7 @@ export const TOGGLE_SETTING = 'TOGGLE_SETTING';
 
 export function initializeApplicationSettings() {
     return async (dispatch) => {
-        persistence.initializeApplicationSettings().then(settings => {
+        persistence.initializeApplicationSettings().then((settings) => {
             dispatch({
                 type: INITIALIZE_SETTINGS,
                 payload: settings,
@@ -41,7 +23,7 @@ export function initializeApplicationSettings() {
 
 export function clearApplicationSettings() {
     return async (dispatch) => {
-        persistence.clearApplicationSettings().then(settings => {
+        persistence.clearApplicationSettings().then((settings) => {
             dispatch({
                 type: CLEAR_SETTINGS,
                 payload: settings,
@@ -52,7 +34,7 @@ export function clearApplicationSettings() {
 
 export function toggleSetting(key, value) {
     return async (dispatch) => {
-        persistence.toggleSetting(key, value).then(settingValue => {
+        persistence.toggleSetting(key, value).then((settingValue) => {
             dispatch({
                 type: TOGGLE_SETTING,
                 payload: {

@@ -1,5 +1,5 @@
 import CharacterTrait from './CharacterTrait';
-import { common } from './../lib/Common';
+import {common} from './../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -87,7 +87,7 @@ export default class VariablePowerPool extends CharacterTrait {
             cost += adder.basecost;
 
             if (adder.levels > 0) {
-                cost = adder.levels / adder.lvlval * adder.lvlcost;
+                cost = (adder.levels / adder.lvlval) * adder.lvlcost;
             }
         }
 
@@ -100,12 +100,12 @@ export default class VariablePowerPool extends CharacterTrait {
         if (Array.isArray(this.characterTrait.trait.adder)) {
             for (let adder of this.characterTrait.trait.adder) {
                 if (adder.xmlid.toUpperCase() === 'CONTROLCOST') {
-                    cost = adder.levels / adder.lvlval * adder.lvlcost;
+                    cost = (adder.levels / adder.lvlval) * adder.lvlcost;
                     break;
                 }
             }
         } else {
-            cost = this.characterTrait.trait.adder.levels / this.characterTrait.trait.adder.lvlval * this.characterTrait.trait.adder.lvlcost;
+            cost = (this.characterTrait.trait.adder.levels / this.characterTrait.trait.adder.lvlval) * this.characterTrait.trait.adder.lvlcost;
         }
 
         return cost;

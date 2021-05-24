@@ -1,17 +1,17 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { BackHandler, Platform, View, Switch} from 'react-native';
-import { Container, Content, Button, Text, Tabs, Tab, TabHeading, Picker, Item, ScrollableTab } from 'native-base';
+import {connect} from 'react-redux';
+import {BackHandler, Platform, View, Switch} from 'react-native';
+import {Container, Content, Button, Text, Tabs, Tab, TabHeading, Picker, Item, ScrollableTab} from 'native-base';
 import RNShake from 'react-native-shake';
-import { NavigationEvents } from 'react-navigation';
-import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
+import {NavigationEvents} from 'react-navigation';
+import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
-import { dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE } from '../../lib/DieRoller';
+import {dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
 import styles from '../../Styles';
 import moves from '../../../public/moves.json';
-import { updateFormValue } from '../../reducers/forms';
+import {updateFormValue} from '../../reducers/forms';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,7 +32,7 @@ class DamageScreen extends Component {
         navigation: PropTypes.object.isRequired,
         damageForm: PropTypes.object.isRequired,
         updateFormValue: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -122,9 +122,7 @@ class DamageScreen extends Component {
     _renderTabHeading(headingText) {
         return (
             <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
-                <Text style={styles.tabStyle}>
-                    {headingText}
-                </Text>
+                <Text style={styles.tabStyle}>{headingText}</Text>
             </TabHeading>
         );
     }
@@ -132,14 +130,16 @@ class DamageScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                 <Header navigation={this.props.navigation} hasTabs={true} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false}>
-                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
-                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Roll For Damage')}>
+                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}>
+                        <Tab
+                            tabStyle={styles.tabHeading}
+                            activeTabStyle={styles.activeTabStyle}
+                            activeTextStyle={styles.activeTextStyle}
+                            heading={this._renderTabHeading('Roll For Damage')}
+                        >
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View>
                                     <Slider
@@ -295,32 +295,63 @@ class DamageScreen extends Component {
                                         </View>
                                     </View>
                                     <View style={{paddingBottom: 30}} />
-                                    <Button block style={styles.button}  onPress={this.roll}>
+                                    <Button block style={styles.button} onPress={this.roll}>
                                         <Text uppercase={false}>Roll</Text>
                                     </Button>
                                 </View>
                                 <View style={{paddingBottom: 30}} />
                             </View>
                         </Tab>
-                        <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Maneuvers')}>
+                        <Tab
+                            tabStyle={styles.tabHeading}
+                            activeTabStyle={styles.activeTabStyle}
+                            activeTextStyle={styles.activeTextStyle}
+                            heading={this._renderTabHeading('Maneuvers')}
+                        >
                             <View style={[styles.tabContent, {paddingBottom: scale(20), paddingHorizontal: scale(10)}]}>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text></View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text></View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text></View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text></View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
+                                    </View>
                                 </View>
                                 {moves.map((move, index) => {
                                     return (
                                         <View key={'move-' + index}>
                                             <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.name}</Text></View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.phase}</Text></View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.ocv}</Text></View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}><Text style={styles.grey}>{move.dcv}</Text></View>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                    <Text style={styles.grey}>{move.name}</Text>
+                                                </View>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                    <Text style={styles.grey}>{move.phase}</Text>
+                                                </View>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                    <Text style={styles.grey}>{move.ocv}</Text>
+                                                </View>
+                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                                    <Text style={styles.grey}>{move.dcv}</Text>
+                                                </View>
                                             </View>
-                                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingBottom: verticalScale(5)}}>
-                                                <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}><Text style={styles.grey} /></View>
+                                            <View
+                                                style={{
+                                                    flex: 1,
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'flex-start',
+                                                    alignSelf: 'flex-start',
+                                                    paddingBottom: verticalScale(5),
+                                                }}
+                                            >
+                                                <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                                                    <Text style={styles.grey} />
+                                                </View>
                                                 <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
                                                     <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
                                                 </View>
@@ -362,7 +393,7 @@ const localStyles = ScaledSheet.create({
     },
 });
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         damageForm: state.forms.damage,
     };

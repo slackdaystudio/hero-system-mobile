@@ -28,7 +28,9 @@ export default class SkillWithSubAdders extends CharacterTrait {
             cost = this._totalAdders(this.characterTrait.trait.adder);
         }
 
-        cost += this.characterTrait.trait.levels / this.characterTrait.trait.template.characteristicChoice.item.lvlval * this.characterTrait.trait.template.characteristicChoice.item.lvlcost;
+        cost +=
+            (this.characterTrait.trait.levels / this.characterTrait.trait.template.characteristicChoice.item.lvlval) *
+            this.characterTrait.trait.template.characteristicChoice.item.lvlcost;
 
         return cost;
     }

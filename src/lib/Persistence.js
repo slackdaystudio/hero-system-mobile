@@ -1,21 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { common } from './Common';
-import { file } from './File';
-import { combatDetails } from './CombatDetails';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import {common} from './Common';
+import {file} from './File';
+import {combatDetails} from './CombatDetails';
 
 export const MAX_CHARACTER_SLOTS = 5;
 

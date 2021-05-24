@@ -1,8 +1,8 @@
-import React, { Component, Fragment }  from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Textarea } from 'native-base';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {View} from 'react-native';
+import {Textarea} from 'native-base';
+import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import styles from '../../Styles';
 
@@ -24,7 +24,7 @@ export default class Notes extends Component {
     static propTypes = {
         notes: PropTypes.string,
         updateNotes: PropTypes.func.isRequired,
-    }
+    };
 
     render() {
         return (

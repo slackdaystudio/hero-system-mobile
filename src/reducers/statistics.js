@@ -1,5 +1,5 @@
-import { persistence } from '../lib/Persistence';
-import { statistics as libStatistics } from '../lib/Statistics';
+import {persistence} from '../lib/Persistence';
+import {statistics as libStatistics} from '../lib/Statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,7 +29,7 @@ export const ADD_STATISTICS = 'ADD_STATISTICS';
 
 export function initializeStatistics() {
     return async (dispatch) => {
-        persistence.initializeStatistics().then(stats => {
+        persistence.initializeStatistics().then((stats) => {
             dispatch({
                 type: INITIALIZE_STATISTICS,
                 payload: stats,

@@ -1,4 +1,4 @@
-import { persistence } from '../lib/Persistence';
+import {persistence} from '../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

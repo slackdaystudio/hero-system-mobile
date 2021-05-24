@@ -1,6 +1,4 @@
-import {
-    NORMAL_DAMAGE,
-} from '../lib/DieRoller';
+import {NORMAL_DAMAGE} from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -187,7 +185,7 @@ export default function forms(state = formsState, action) {
                     form = _initializeStatusForm();
                     break;
                 default:
-                    // Do nothing
+                // Do nothing
             }
 
             if (form !== null) {
@@ -227,7 +225,7 @@ export default function forms(state = formsState, action) {
                     reinitializedForm = _initializeStatusForm();
                     break;
                 default:
-                    // Do nothing
+                // Do nothing
             }
 
             if (reinitializedForm !== null) {
