@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, Platform, StyleSheet, View, Image, Alert } from 'react-native';
+import { BackHandler, StyleSheet, View } from 'react-native';
 import { Container, Content, Button, Text, List, ListItem, Left, Right, Body, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Form, Item, Input } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
@@ -121,7 +121,7 @@ class RandomCharacterScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header hasTabs={true} navigation={this.props.navigation} backScreen='Home' />
+                <Header hasTabs={true} navigation={this.props.navigation} backScreen="Home" />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1b1f'}}>
                     <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
                         <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('General')}>

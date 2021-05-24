@@ -1,8 +1,8 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, StyleSheet, View } from 'react-native';
-import { Container, Content, Button, Text, Form, Item, Label, Input } from 'native-base';
+import { BackHandler, View } from 'react-native';
+import { Container, Content, Text, Form, Item, Label, Input } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import { verticalScale } from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
@@ -82,7 +82,7 @@ class CostCruncherScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Cruncher</Text>
                     <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>

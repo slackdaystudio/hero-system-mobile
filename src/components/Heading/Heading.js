@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
-import { Platform, StyleSheet, View, Image, TouchableHighlight } from 'react-native';
-import { Button, Text, Header, Left, Right, Icon } from 'native-base';
+import { View } from 'react-native';
+import { Text } from 'native-base';
 import { verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
 

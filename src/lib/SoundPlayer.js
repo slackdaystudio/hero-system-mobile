@@ -1,5 +1,3 @@
-import React from 'react';
-import { Alert } from 'react-native';
 import Sound from 'react-native-sound';
 import { common } from './Common';
 import { sounds, setSound } from '../../App.js';
@@ -27,8 +25,8 @@ const DEFAULT_SFX_NAME = 'Default';
 const DEFAULT_SOUND = 'dice';
 
 const VOLUME = {
-    "electricity": 0.10
-}
+    'electricity': 0.10,
+};
 
 class SoundPlayer {
     play(name) {
@@ -57,7 +55,7 @@ class SoundPlayer {
         }
     }
 
-    initialize(name, playOnLoad=true) {
+    initialize(name, playOnLoad = true) {
         if (name === null || name === undefined || name === '') {
             return null;
         }
@@ -94,11 +92,11 @@ class SoundPlayer {
         });
     }
 
-    _playClip(clip, attempts=0) {
+    _playClip(clip, attempts = 0) {
         try {
             // Attempt to load the clip up to 50x, sleeping for 5ms in between attempts
             if (attempts < MAX_PLAY_SOUND_ATTEMPTS && !clip.sound.isLoaded()) {
-                attempts++
+                attempts++;
 
                 setTimeout(() => this._playClip(clip, attempts), PLAY_SOUND_ATTEMPT_DELAY);
             } else {

@@ -1,7 +1,6 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { Text, List, ListItem, Left, Right } from 'native-base';
-import { dieRoller } from '../../lib/DieRoller';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
@@ -32,7 +31,7 @@ function initPowersShow(powers) {
     return {
         showFullTexts: showFullTexts,
         items: items,
-    }
+    };
 }
 
 export default class Powers extends Component {

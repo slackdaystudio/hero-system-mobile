@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { SKILL_CHECK } from '../lib/DieRoller';
 
@@ -52,10 +51,10 @@ export default class TraitWithSkillRoll extends CharacterTrait {
     }
 
     roll() {
-        let roll = null
+        let roll = null;
 
         if (this.characterTrait.trait.hasOwnProperty('roll') && this.characterTrait.trait.roll > 0) {
-            roll = `${this.characterTrait.trait.roll}-`
+            roll = `${this.characterTrait.trait.roll}-`;
         }
 
         return {

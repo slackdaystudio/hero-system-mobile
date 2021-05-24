@@ -1,11 +1,10 @@
 import React, { Component }  from 'react';
-import PropTypes from 'prop-types'
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { Container, Content, Button, Text } from 'native-base';
+import PropTypes from 'prop-types';
+import { View, ScrollView } from 'react-native';
+import { Button, Text } from 'native-base';
 import Modal from 'react-native-modal';
 import { verticalScale } from 'react-native-size-matters';
 import styles from '../../Styles';
-import Heading from '../Heading/Heading';
 
 export default class ConfirmationDialog extends Component {
     static propTypes = {
@@ -13,20 +12,20 @@ export default class ConfirmationDialog extends Component {
         title: PropTypes.string.isRequired,
         info: PropTypes.string.isRequired,
         onOk: PropTypes.func,
-        onClose: PropTypes.func.isRequired
+        onClose: PropTypes.func.isRequired,
     }
 
     constructor(props) {
         super(props);
 
         this.state = {
-            scrollOffset: 0
-        }
+            scrollOffset: 0,
+        };
     }
 
     _handleOnScroll = event => {
         this.setState({
-            scrollOffset: event.nativeEvent.contentOffset.y
+            scrollOffset: event.nativeEvent.contentOffset.y,
         });
     };
 

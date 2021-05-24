@@ -1,7 +1,7 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
-import { Alert, View } from 'react-native';
-import { Textarea, Form } from 'native-base';
+import { View } from 'react-native';
+import { Textarea } from 'native-base';
 import { scale, verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import styles from '../../Styles';
@@ -35,7 +35,7 @@ export default class Notes extends Component {
                         rowSpan={15}
                         maxLength={10000}
                         bordered
-                        placeholder='Campaign notes, miscellaneous equipment, etc'
+                        placeholder="Campaign notes, miscellaneous equipment, etc"
                         style={[styles.grey, {backgroundColor: '#121212', borderColor: '#303030', fontSize: verticalScale(14)}]}
                         value={this.props.notes}
                         onChangeText={(value) => this.props.updateNotes(value)}

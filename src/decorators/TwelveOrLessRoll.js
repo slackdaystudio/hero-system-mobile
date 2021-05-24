@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { SKILL_CHECK } from '../lib/DieRoller';
 

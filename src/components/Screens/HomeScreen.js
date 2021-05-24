@@ -1,8 +1,8 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, Alert, View, ImageBackground } from 'react-native';
-import { Container, Content, Button, Spinner, Text } from 'native-base';
+import { BackHandler, View, ImageBackground } from 'react-native';
+import { Container, Content, Button, Text } from 'native-base';
 import { verticalScale } from 'react-native-size-matters';
 import { NavigationEvents } from 'react-navigation';
 import Header, { EXIT_APP } from '../Header/Header';

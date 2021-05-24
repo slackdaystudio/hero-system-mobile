@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import { NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK, PARTIAL_DIE_HALF } from './DieRoller';
 import { persistence } from './Persistence';
 

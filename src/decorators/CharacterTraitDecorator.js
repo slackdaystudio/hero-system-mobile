@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import BaseCost from './BaseCost';
 import CharacterTrait from './CharacterTrait';
 import ModifierCalculator from './ModifierCalculator';

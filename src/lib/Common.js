@@ -1,10 +1,8 @@
-import { Dimensions, Platform, Alert } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 import { Toast } from 'native-base';
 import camelCase from 'camelcase';
 import snakeCase from 'snake-case';
 import {
-    KILLING_DAMAGE,
-    NORMAL_DAMAGE,
     PARTIAL_DIE_PLUS_ONE,
     PARTIAL_DIE_HALF,
     PARTIAL_DIE_MINUS_ONE,

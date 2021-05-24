@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
-import { Alert, View, TouchableHighlight } from 'react-native';
-import { Text, Card, CardItem, Left, Right, Body } from 'native-base';
+import { View, TouchableHighlight } from 'react-native';
+import { Text } from 'native-base';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { character } from '../../lib/Character';
 import { dieRoller } from '../../lib/DieRoller';

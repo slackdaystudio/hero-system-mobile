@@ -1,15 +1,13 @@
 import React, { Component, Fragment }  from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight, Alert, Switch } from 'react-native';
-import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
+import { View, TouchableHighlight, Switch } from 'react-native';
+import { Text, Icon, Card, CardItem, Right, Body } from 'native-base';
 import { scale, verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
-import { dieRoller, NORMAL_DAMAGE } from '../../lib/DieRoller';
+import { dieRoller } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import { heroDesignerCharacter, TYPE_MOVEMENT } from '../../lib/HeroDesignerCharacter';
-import { SKILL_ROLL_BASE } from '../../decorators/skills/Roll';
 import styles from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
 import speedTable from '../../../public/speed.json';
@@ -140,7 +138,7 @@ export default class Characteristics extends Component {
             }
         }
 
-        return meters
+        return meters;
     }
 
     _getStrengthDamage(strength) {
@@ -175,7 +173,7 @@ export default class Characteristics extends Component {
         if (whitelistedCharacteristics.includes(characteristic.shortName.toUpperCase())) {
             let note = {
                 label: '',
-                text: ''
+                text: '',
             };
 
             if (characteristic.shortName.toUpperCase() === 'INT') {
@@ -195,7 +193,7 @@ export default class Characteristics extends Component {
                     note.text = `${cv}/${cv}`;
                 } else if (characteristic.shortName.toUpperCase() === 'EGO') {
                     note.label = 'ECV';
-                    note.text = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', this.props.character) / 3);;
+                    note.text = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', this.props.character) / 3);
                 }
             }
 
@@ -473,11 +471,11 @@ export default class Characteristics extends Component {
                         <Switch
                             value={this.props.character.showSecondary}
                             onValueChange={() => this._toggleSecondaryCharacteristics()}
-                            minimumTrackTintColor='#14354d'
-                            maximumTrackTintColor='#14354d'
-                            thumbColor='#14354d'
+                            minimumTrackTintColor="#14354d"
+                            maximumTrackTintColor="#14354d"
+                            thumbColor="#14354d"
                             trackColor={{false: '#000', true: '#01121E'}}
-                            ios_backgroundColor='#01121E'
+                            ios_backgroundColor="#01121E"
                         />
                     </View>
                 </View>

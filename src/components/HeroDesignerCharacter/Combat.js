@@ -190,7 +190,7 @@ export default class Combat extends Component {
         const key = this.props.character.showSecondary ? 'secondary' : 'primary';
         const status = this.props.character.combatDetails[key].statuses[index];
         let statusForm = {...this.props.forms.status};
-        console.log(statusForm);
+
         statusForm.name = status.name;
         statusForm.label = status.label || '';
         statusForm.index = index;
@@ -226,7 +226,7 @@ export default class Combat extends Component {
         this.setState({statusDialogVisible: false});
     }
 
-    _renderHealthItem(stateKey, label=null) {
+    _renderHealthItem(stateKey, label = null) {
         return (
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
                 <View style={{flex: 1, alignSelf: 'center'}}>
@@ -238,7 +238,7 @@ export default class Combat extends Component {
                             itemKey={stateKey}
                             value={this.state.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, this.props.character)}
                             onAccept={this.updateCombatState}
-                            alignment='flex-end'
+                            alignment="flex-end"
                         />
                     </View>
                 </View>
@@ -344,7 +344,7 @@ export default class Combat extends Component {
 
         return (
             <View key={`phase-${phase}`} style={{paddingHorizontal: scale(5)}}>
-                <TouchableHighlight underlayColor='#1b1d1f' onPress={() => this.usePhase(phase, this.props.character.showSecondary)} onLongPress={() => this.abortPhase(phase)}>
+                <TouchableHighlight underlayColor="#1b1d1f" onPress={() => this.usePhase(phase, this.props.character.showSecondary)} onLongPress={() => this.abortPhase(phase)}>
                     <CircleText title={phase} fontSize={18} size={40} color={color} />
                 </TouchableHighlight>
             </View>
@@ -379,7 +379,7 @@ export default class Combat extends Component {
         return <View style={{flex: 1}}/>;
     }
 
-    _renderCv(stateKey, renderRollButton=false) {
+    _renderCv(stateKey, renderRollButton = false) {
         if (!this.state.combatDetails.hasOwnProperty(stateKey)) {
             return null;
         }
@@ -481,8 +481,8 @@ export default class Combat extends Component {
                                 <View style={{flex: 1, flexGrow: 20, alignSelf: 'center', justifyContent: 'center'}}>
                                     <Text style={styles.grey}>{statusText}</Text>
                                 </View>
-                                <Icon type='FontAwesome' name="edit" style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10)}} onPress={() => this.editStatus(index)} />
-                                <Icon type='FontAwesome' name="trash" style={{fontSize: verticalScale(20), color: '#14354d'}} onPress={() => this.clearStatus(index)} />
+                                <Icon type="FontAwesome" name="edit" style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10)}} onPress={() => this.editStatus(index)} />
+                                <Icon type="FontAwesome" name="trash" style={{fontSize: verticalScale(20), color: '#14354d'}} onPress={() => this.clearStatus(index)} />
                             </View>
                         );
                     })}
@@ -500,7 +500,7 @@ export default class Combat extends Component {
     render() {
         return (
             <View>
-                <Heading text='Health' />
+                <Heading text="Health" />
                 <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                     {this._renderHealthItem('stun')}
                     {this._renderHealthItem('body')}
@@ -511,7 +511,7 @@ export default class Combat extends Component {
                         </Button>
                     </View>
                 </View>
-                <Heading text='Status Effects' />
+                <Heading text="Status Effects" />
                 <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
                         <Button style={styles.buttonSmall} onPress={() => this.openStatusDialog()}>
@@ -524,15 +524,15 @@ export default class Combat extends Component {
                     </View>
                     {this._renderStatuses()}
                 </View>
-                <Heading text='Defenses' />
+                <Heading text="Defenses" />
                 <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>
                     {this._renderDefenses()}
                 </View>
-                <Heading text='Phases' />
+                <Heading text="Phases" />
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>
                     {this._renderPhases()}
                 </View>
-                <Heading text='Combat Values' />
+                <Heading text="Combat Values" />
                 <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                     {this._renderCv('ocv', true)}
                     {this._renderCv('dcv')}

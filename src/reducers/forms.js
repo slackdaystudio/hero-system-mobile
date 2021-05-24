@@ -1,11 +1,5 @@
-import { Alert } from 'react-native';
-import { common } from '../lib/Common';
 import {
-    KILLING_DAMAGE,
     NORMAL_DAMAGE,
-    PARTIAL_DIE_PLUS_ONE,
-    PARTIAL_DIE_HALF,
-    PARTIAL_DIE_MINUS_ONE,
 } from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -84,7 +78,7 @@ function _copyState(state) {
         },
         status: {
             ...state.status,
-        }
+        },
     };
 }
 

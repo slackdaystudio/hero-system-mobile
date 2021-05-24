@@ -1,8 +1,8 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, Platform, StyleSheet, View, ScrollView } from 'react-native';
-import { Container, Content, Toast, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
+import { BackHandler, StyleSheet, View } from 'react-native';
+import { Container, Content, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import General from '../Character/General';
 import Combat from '../Character/Combat';
@@ -12,7 +12,6 @@ import Movement from '../Character/Movement';
 import TextList from '../Character/TextList';
 import Equipment from '../Character/Equipment';
 import Header from '../Header/Header';
-import Slider from '../Slider/Slider';
 import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';

@@ -1,7 +1,6 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
-import { ScrollView, Alert } from 'react-native';
-import { Text, List, ListItem, Left, Right, Icon } from 'native-base';
+import { Text, List, ListItem, Left } from 'native-base';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';
 
@@ -32,7 +31,7 @@ function initEquipmentShow(equipment) {
     return {
         items: items,
         showFullTexts: showFullTexts,
-    }
+    };
 }
 
 export default class Equipment extends Component {

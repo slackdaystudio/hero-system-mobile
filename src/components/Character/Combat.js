@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native';
-import { Text, List, ListItem, Left, Right, Body, Item, Input, Button, Spinner } from 'native-base';
+import { View } from 'react-native';
+import { Text, List, ListItem, Left, Right, Item, Input, Button } from 'native-base';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { character } from '../../lib/Character';
 import styles from '../../Styles';

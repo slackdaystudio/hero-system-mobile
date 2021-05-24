@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, StyleSheet, View, Image } from 'react-native';
+import { BackHandler, View } from 'react-native';
 import { Container, Content, List, ListItem, Left, Right, Button, Text, Radio, Picker, Item } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
@@ -10,7 +10,6 @@ import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import { dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE } from '../../lib/DieRoller';
-import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateFormValue } from '../../reducers/forms';
 
@@ -86,7 +85,7 @@ class EffectScreen extends Component {
     _roll() {
         this.props.navigation.navigate('Result', {
             from: 'Effect',
-            result: dieRoller.effectRoll(this.props.effectForm.dice, this.props.effectForm.partialDie, this.props.effectForm.effectType, this.props.effectForm.sfx)
+            result: dieRoller.effectRoll(this.props.effectForm.dice, this.props.effectForm.partialDie, this.props.effectForm.effectType, this.props.effectForm.sfx),
         });
     }
 
@@ -113,8 +112,8 @@ class EffectScreen extends Component {
                             </Left>
                             <Right>
                                 <Radio
-                                    color='#14354d'
-                                    selectedColor='#14354d'
+                                    color="#14354d"
+                                    selectedColor="#14354d"
                                     selected={this.props.effectForm.effectType === type}
                                     onPress={() => this.selectEffect(type)}
                                 />
@@ -135,7 +134,7 @@ class EffectScreen extends Component {
                 />
                 <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content style={styles.content}>
-                    <Heading text='Effect Roll' />
+                    <Heading text="Effect Roll" />
                     <Slider
                         label="Dice:"
                         value={this.props.effectForm.dice}
@@ -147,7 +146,7 @@ class EffectScreen extends Component {
                     />
                     <Picker
                         inlinelabel
-                        label='Partial Die'
+                        label="Partial Die"
                         style={{width: undefined, color: '#FFFFFF'}}
                         textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
                         iosHeader="Select one"
@@ -160,7 +159,7 @@ class EffectScreen extends Component {
                         <Item label="+½ die" value={PARTIAL_DIE_HALF} />
                         <Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
                     </Picker>
-                    <Heading text='Effect' />
+                    <Heading text="Effect" />
                     {this._renderEffects()}
                     <View style={{paddingBottom: verticalScale(20)}} />
                     <Button block style={styles.button}  onPress={this.roll}>

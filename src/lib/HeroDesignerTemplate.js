@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import ai from '../../public/HERODesigner/AI.json';
 import aiSixth from '../../public/HERODesigner/AI6E.json';
 import automaton from '../../public/HERODesigner/Automaton.json';

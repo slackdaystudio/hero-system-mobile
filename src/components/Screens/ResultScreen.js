@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Platform, BackHandler, StyleSheet, View, Image, Alert } from 'react-native';
+import { Platform, BackHandler, View } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import RNShake from 'react-native-shake';
 import AnimateNumber from '@bankify/react-native-animate-number';
@@ -420,7 +420,7 @@ const mapStateToProps = state => {
         useFifthEdition: state.settings.useFifthEdition,
         playSounds: state.settings.playSounds,
         onlyDiceSounds: state.settings.onlyDiceSounds,
-    }
+    };
 };
 
 const mapDispatchToProps = {

@@ -1,20 +1,16 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableHighlight, Alert } from 'react-native';
-import { Text, Icon, Card, CardItem, Left, Right, Body } from 'native-base';
+import { View, TouchableHighlight } from 'react-native';
+import { Text, Icon, Card, CardItem, Body } from 'native-base';
 import { scale, verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import { dieRoller } from '../../lib/DieRoller';
-import { TYPE_MOVEMENT, GENERIC_OBJECT } from '../../lib/HeroDesignerCharacter';
 import { characterTraitDecorator } from '../../decorators/CharacterTraitDecorator';
 import {
     SKILL_CHECK,
     NORMAL_DAMAGE,
     KILLING_DAMAGE,
     EFFECT,
-    PARTIAL_DIE_PLUS_ONE,
-    PARTIAL_DIE_HALF,
-    PARTIAL_DIE_MINUS_ONE,
 } from '../../lib/DieRoller';
 import { common } from '../../lib/Common';
 import CompoundPower from '../../decorators/CompoundPower';
@@ -81,7 +77,7 @@ export default class Traits extends Component {
             itemButtonShow: displayOptions.itemButtonShow,
             character: props.character,
             listKey: props.listKey,
-        }
+        };
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {

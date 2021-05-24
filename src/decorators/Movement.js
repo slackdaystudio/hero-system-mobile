@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
 import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
@@ -50,7 +49,7 @@ export default class Movement extends CharacterTrait {
         let attributes = this.characterTrait.attributes();
         let baseMove = this.characterTrait.trait.levels + this._getBaseMove();
         let ncm = this._getNcm();
-        let unit = heroDesignerCharacter.isFifth(this.characterTrait.getCharacter()) ? '"' : 'm'
+        let unit = heroDesignerCharacter.isFifth(this.characterTrait.getCharacter()) ? '"' : 'm';
 
         attributes.push({
             label: 'Combat Move',

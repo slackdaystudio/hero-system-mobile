@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Platform, StyleSheet, Image, StatusBar, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { Container, Content, Text, List, ListItem } from 'native-base';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
-import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
-import { dieRoller } from '../../lib/DieRoller';
+import { ScaledSheet, scale } from 'react-native-size-matters';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';

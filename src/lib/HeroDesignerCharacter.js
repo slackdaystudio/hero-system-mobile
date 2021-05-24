@@ -86,7 +86,7 @@ const CHARACTER_TRAITS = {
     'martialArts': 'maneuver',
     'powers': 'power',
     'equipment': 'powers',
-    'disadvantages': 'disad'
+    'disadvantages': 'disad',
 };
 
 const FIGURED_CHARACTERISTCS = ['PD', 'ED', 'SPD', 'REC', 'END', 'STUN'];
@@ -108,7 +108,7 @@ class HeroDesignerCharacter {
             powers: [],
             equipment: [],
             disadvantages: [],
-            portrait: null
+            portrait: null,
         };
 
         this._normalizeCharacterData(heroDesignerCharacter);
@@ -170,7 +170,7 @@ class HeroDesignerCharacter {
         return false;
     }
 
-    getTotalDefense(character, type, withResistant=true) {
+    getTotalDefense(character, type, withResistant = true) {
         if (type === null || type === undefined) {
             return withResistant ? '0/0' : '0';
         }
@@ -209,7 +209,7 @@ class HeroDesignerCharacter {
         return `${nonResistant}/${resistant}`;
     }
 
-    getTotalUnusualDefense(character, powerXmlId, withResistant=true) {
+    getTotalUnusualDefense(character, powerXmlId, withResistant = true) {
         let nonResistant = 0;
         let resistant = 0;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
@@ -325,7 +325,7 @@ class HeroDesignerCharacter {
             if (FIGURED_CHARACTERISTCS.includes(characteristic.shortName.toUpperCase())) {
                 let total = 0;
 
-                switch(characteristic.shortName.toUpperCase()) {
+                switch (characteristic.shortName.toUpperCase()) {
                     case 'PD':
                         total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
                         value += total;
@@ -363,7 +363,7 @@ class HeroDesignerCharacter {
     _getTotalCharacteristicPoints(characteristic, value, showSecondary) {
         if (Array.isArray(characteristic)) {
             for (let char of characteristic) {
-                value += this._getTotalCharacteristicPoints(char, value, showSecondary)
+                value += this._getTotalCharacteristicPoints(char, value, showSecondary);
             }
         } else {
             if ((characteristic.affectsPrimary && characteristic.affectsTotal) ||
@@ -646,7 +646,7 @@ class HeroDesignerCharacter {
         let cost = Math.round(characteristic.levels / templateCharacteristic.lvlval * templateCharacteristic.lvlcost);
         let base = templateCharacteristic.base;
 
-        switch(characteristic.alias.toUpperCase()) {
+        switch (characteristic.alias.toUpperCase()) {
             case 'PD':
                 bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('STR', character) / 5);
                 value += bonus;

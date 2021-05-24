@@ -2,14 +2,13 @@ import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { NavigationEvents } from 'react-navigation';
-import { BackHandler, StyleSheet, View, Image, Switch, Alert } from 'react-native';
+import { BackHandler, View, Switch } from 'react-native';
 import { Container, Content, Button, Text } from 'native-base';
 import { ScaledSheet, scale } from 'react-native-size-matters';
 import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
-import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import { updateFormValue } from '../../reducers/forms';
 
@@ -99,7 +98,7 @@ class SkillScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll 3d6</Text>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
@@ -108,11 +107,11 @@ class SkillScreen extends Component {
                             <Switch
                                 value={this.props.skillForm.skillCheck}
                                 onValueChange={() => this.updateFormValue('skillCheck', !this.props.skillForm.skillCheck)}
-                                minimumTrackTintColor='#14354d'
-                                maximumTrackTintColor='#14354d'
-                                thumbColor='#14354d'
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
                                 trackColor={{false: '#000', true: '#01121E'}}
-                                ios_backgroundColor='#01121E'
+                                ios_backgroundColor="#01121E"
                             />
                         </View>
                     </View>

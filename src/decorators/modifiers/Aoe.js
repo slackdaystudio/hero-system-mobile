@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import Modifier from './Modifier';
 import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
 

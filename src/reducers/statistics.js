@@ -1,5 +1,3 @@
-import { Alert } from 'react-native';
-import { common } from '../lib/Common';
 import { persistence } from '../lib/Persistence';
 import { statistics as libStatistics } from '../lib/Statistics';
 

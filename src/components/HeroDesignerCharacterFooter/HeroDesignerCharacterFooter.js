@@ -1,12 +1,10 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
-import { View, Alert } from 'react-native';
-import { Button, Text, Icon, Footer, FooterTab } from 'native-base';
+import { Button, Icon, Footer, FooterTab } from 'native-base';
 import { verticalScale } from 'react-native-size-matters';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { MAX_CHARACTER_SLOTS } from '../../lib/Persistence';
 import { character as libCharacter } from '../../lib/Character';
-import styles from '../../Styles';
 
 export default class HeroDesignerCharacterFooter extends Component {
     static propTypes = {
@@ -117,15 +115,15 @@ export default class HeroDesignerCharacterFooter extends Component {
                                 onPress={() => this._activateSlot(slot.toString())}
                                 onLongPress={() => this._emptySlot(slot.toString())}
                             >
-                                <Icon type='FontAwesome' name={this._getIcon(slot.toString())} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
+                                <Icon type="FontAwesome" name={this._getIcon(slot.toString())} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
                             </Button>
                         );
                     })}
                 </FooterTab>
                 <ConfirmationDialog
                     visible={this.state.deleteDialogVisible}
-                    title='Remove Character?'
-                    info={`Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.`}
+                    title="Remove Character?"
+                    info={'Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.'}
                     onOk={this.onDeleteDialogOk}
                     onClose={this.onDeleteDialogClose}
                 />

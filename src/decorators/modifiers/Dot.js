@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import Modifier from './Modifier';
 
 // Copyright 2018-Present Philip J. Guinchard

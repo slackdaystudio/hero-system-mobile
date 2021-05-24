@@ -1,8 +1,8 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
-import { Alert, View, Image, Dimensions } from 'react-native';
-import { Text, List, ListItem, Left, Body } from 'native-base';
-import { scale, verticalScale } from 'react-native-size-matters';
+import { View, Image } from 'react-native';
+import { Text } from 'native-base';
+import { verticalScale } from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import { common } from '../../lib/Common';
 import styles from '../../Styles';
@@ -39,7 +39,7 @@ export default class General extends Component {
                 <Heading text="Portrait" />
                 <Image style={{width: this.props.portraitWidth, height: this.props.portraitHeight, alignSelf: 'center'}} source={{ uri: this.props.portrait}} />
             </Fragment>
-        )
+        );
     }
 
     render() {

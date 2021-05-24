@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, Platform, StyleSheet, View, Switch, Alert, TouchableHighlight } from 'react-native';
+import { BackHandler, View, Switch, TouchableHighlight } from 'react-native';
 import { Container, Content, Button, Text, Tabs, Tab, TabHeading, ScrollableTab, Icon } from 'native-base';
 import RNShake from 'react-native-shake';
 import { NavigationEvents } from 'react-navigation';
@@ -9,7 +9,6 @@ import { ScaledSheet, scale, verticalScale } from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import { dieRoller } from '../../lib/DieRoller';
-import { common } from '../../lib/Common';
 import styles from '../../Styles';
 import hitLocations from '../../../public/hitLocations.json';
 import { updateFormValue } from '../../reducers/forms';
@@ -139,7 +138,7 @@ class HitScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content scrollEnable={false}>
                     <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={()=> <ScrollableTab style={styles.scrollableTab} />}>
                         <Tab tabStyle={styles.tabHeading} activeTabStyle={styles.activeTabStyle} activeTextStyle={styles.activeTextStyle} heading={this._renderTabHeading('Roll To Hit')}>
@@ -169,11 +168,11 @@ class HitScreen extends Component {
                                             value={this.props.hitForm.isAutofire}
                                             onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
                                             color="#3da0ff"
-                                            minimumTrackTintColor='#14354d'
-                                            maximumTrackTintColor='#14354d'
-                                            thumbColor='#14354d'
+                                            minimumTrackTintColor="#14354d"
+                                            maximumTrackTintColor="#14354d"
+                                            thumbColor="#14354d"
                                             trackColor={{false: '#000', true: '#01121E'}}
-                                            ios_backgroundColor='#01121E'
+                                            ios_backgroundColor="#01121E"
                                         />
                                     </View>
                                 </View>

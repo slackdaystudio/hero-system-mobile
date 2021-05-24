@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 import { common } from '../../lib/Common';
 import senses from '../../../public/Senses.json';

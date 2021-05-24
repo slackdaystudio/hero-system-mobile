@@ -1,17 +1,15 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Dimensions, BackHandler, Platform, StyleSheet, View, ScrollView, Alert, Image } from 'react-native';
-import { Container, Content, Toast, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
+import { Dimensions, BackHandler, View, Image } from 'react-native';
+import { Container, Content, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
-import { verticalScale } from 'react-native-size-matters';
 import General from '../HeroDesignerCharacter/General';
 import Combat from '../HeroDesignerCharacter/Combat';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
 import Traits from '../HeroDesignerCharacter/Traits';
 import Notes from '../HeroDesignerCharacter/Notes';
 import Header from '../Header/Header';
-import Slider from '../Slider/Slider';
 import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
 import { character } from '../../lib/Character';
 import { common } from '../../lib/Common';
@@ -26,7 +24,7 @@ import {
     clearCharacter,
     applyStatus,
     clearAllStatuses,
-    clearStatus
+    clearStatus,
 } from '../../reducers/character';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -67,7 +65,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
         this.state = {
             width: 300,
-            height: 400
+            height: 400,
         };
 
         this.tabs = null;

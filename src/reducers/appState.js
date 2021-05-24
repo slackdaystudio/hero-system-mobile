@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
 import { INITIALIZE_SETTINGS } from './settings';
 import { INITIALIZE_STATISTICS } from './statistics';
@@ -86,6 +85,6 @@ export default function appState(state = '', action) {
 
             return state;
         default:
-            return state
+            return state;
     }
 }

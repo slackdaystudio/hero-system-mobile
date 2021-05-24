@@ -1,8 +1,8 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {BackHandler, StyleSheet, View, ScrollView } from 'react-native';
-import { Container, Content, Text, List, ListItem, Left, Right, Spinner, Tabs, Tab, ScrollableTab } from 'native-base';
+import {BackHandler, StyleSheet } from 'react-native';
+import { Container, Content, Text, List, ListItem, Left, Right, Spinner } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import Header from '../Header/Header';
 import { statistics } from '../../lib/Statistics';
@@ -93,7 +93,7 @@ class StatisticsScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Statistics</Text>
                     {this._renderDieDistributionChart()}

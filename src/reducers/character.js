@@ -1,5 +1,3 @@
-import { Alert } from 'react-native';
-import { common } from '../lib/Common';
 import { persistence, MAX_CHARACTER_SLOTS } from '../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -125,7 +123,7 @@ export function setSparseCombatDetails(sparseCombatDetails, secondary) {
         payload: {
             secondary: secondary,
             sparseCombatDetails: sparseCombatDetails,
-        }
+        },
     };
 }
 
@@ -201,8 +199,8 @@ export default function character(state = characterState, action) {
                     ...state.character,
                 },
                 characters: {
-                    ...state.characters
-                }
+                    ...state.characters,
+                },
             };
 
             newState.character = {...action.payload.character};
@@ -220,8 +218,8 @@ export default function character(state = characterState, action) {
                     ...action.payload.character,
                 },
                 characters: {
-                    ...action.payload.characters
-                }
+                    ...action.payload.characters,
+                },
             };
 
             return newState;
@@ -249,7 +247,7 @@ export default function character(state = characterState, action) {
                     ...state.character,
                 },
                 characters: {
-                    ...state.characters
+                    ...state.characters,
                 },
             };
 
@@ -268,7 +266,7 @@ export default function character(state = characterState, action) {
                     ...state.character,
                 },
                 characters: {
-                    ...state.characters
+                    ...state.characters,
                 },
             };
 

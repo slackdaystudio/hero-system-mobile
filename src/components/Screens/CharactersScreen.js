@@ -1,7 +1,7 @@
 import React, { Component, Fragment }  from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BackHandler, Alert, View, ImageBackground } from 'react-native';
+import { BackHandler, View } from 'react-native';
 import { Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon, Picker, Item } from 'native-base';
 import { NavigationEvents } from 'react-navigation';
 import { scale, verticalScale } from 'react-native-size-matters';
@@ -196,8 +196,8 @@ class CharactersScreen extends Component {
     _openWarningDialog() {
         let newState = {...this.state};
 
-        newState.dialogTitle = `Old File Format Detected`;
-        newState.dialogMessage = `The XML file import format is going away!\n\nPlease load your character by selecting a Hero Designer file directly.`;
+        newState.dialogTitle = 'Old File Format Detected';
+        newState.dialogMessage = 'The XML file import format is going away!\n\nPlease load your character by selecting a Hero Designer file directly.';
         newState.dialogOnOkFn = null;
         newState.deleteDialogVisible = true;
 
@@ -208,7 +208,7 @@ class CharactersScreen extends Component {
         let newState = {...this.state};
 
         newState.dialogTitle = `Delete ${filename.slice(0, -5)}?`;
-        newState.dialogMessage = `Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded`;
+        newState.dialogMessage = 'Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded';
         newState.dialogOnOkFn = this.onDeleteDialogOk;
         newState.deleteDialogVisible = true;
         newState.toBeDeleted = filename;
@@ -287,8 +287,8 @@ class CharactersScreen extends Component {
                             <ListItem icon key={name}>
                                 <Left>
                                     <Icon
-                                        type='FontAwesome'
-                                        name='trash'
+                                        type="FontAwesome"
+                                        name="trash"
                                         style={{fontSize: verticalScale(25), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => this.openDeleteDialog(characterName)}
                                     />
@@ -298,8 +298,8 @@ class CharactersScreen extends Component {
                                 </Body>
                                 <Right>
                                     <Icon
-                                        type='FontAwesome'
-                                        name='chevron-right'
+                                        type="FontAwesome"
+                                        name="chevron-right"
                                         style={{fontSize: verticalScale(20), color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => this.onViewCharacterPress(characterName)}
                                     />
@@ -324,7 +324,7 @@ class CharactersScreen extends Component {
                     onDidFocus={(payload) => this.onDidFocus()}
                     onDidBlur={(payload) => this.onDidBlur()}
                 />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Heading text="Characters" />
                     {this._renderCharacters()}

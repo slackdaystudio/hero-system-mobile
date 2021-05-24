@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 import { common } from '../lib/Common';
 import { EFFECT } from '../lib/DieRoller';
@@ -128,7 +127,7 @@ export default class Complication extends CharacterTrait {
             return {
                 roll: `${this.characterTrait.trait.levels}d6`,
                 type: EFFECT,
-            }
+            };
         }
 
         return this.characterTrait.roll();

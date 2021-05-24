@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import Aoe from './Aoe';
 import Dot from './Dot';
 import Modifier from './Modifier';

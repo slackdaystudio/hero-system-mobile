@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import { heroDesignerCharacter } from './HeroDesignerCharacter';
 import { character as libCharacter } from './Character';
 import { common } from './Common';
@@ -77,8 +76,8 @@ class CombatDetails {
         let combatDetails = {
             stun: 0,
             body: 0,
-            endurance: 0
-        }
+            endurance: 0,
+        };
 
         if (libCharacter.isHeroDesignerCharacter(character)) {
             if (heroDesignerCharacter.isFifth(character)) {
@@ -127,7 +126,7 @@ class CombatDetails {
 
     _getCharacteristic(character, shortName) {
         if (character.showSecondary) {
-            return heroDesignerCharacter.getCharacteristicTotal(shortName, character)
+            return heroDesignerCharacter.getCharacteristicTotal(shortName, character);
         }
 
         let characteristic = heroDesignerCharacter.getCharacteristicByShortName(shortName, character);
@@ -151,7 +150,7 @@ class CombatDetails {
             phases[phase.toString()] = {
                 used: false,
                 aborted: false,
-            }
+            };
         }
 
         return phases;
