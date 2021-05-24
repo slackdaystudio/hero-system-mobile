@@ -249,14 +249,14 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 <Header hasTabs={false} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content scrollEnable={false} style={styles.content}>
                     {this._renderCharacter()}
+                    <HeroDesignerCharacterFooter
+                        navigation={this.props.navigation}
+                        character={this.props.character}
+                        characters={this.props.characters}
+                        selectCharacter={this.props.selectCharacter}
+                        clearCharacter={this.props.clearCharacter}
+                    />
                 </Content>
-                <HeroDesignerCharacterFooter
-                    navigation={this.props.navigation}
-                    character={this.props.character}
-                    characters={this.props.characters}
-                    selectCharacter={this.props.selectCharacter}
-                    clearCharacter={this.props.clearCharacter}
-                />
             </Container>
         );
     }
