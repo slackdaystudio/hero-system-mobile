@@ -84,22 +84,16 @@ class StatusDialog extends Component {
             },
         ];
 
-        let id = 1;
-
         items[0].children = this.props.character.characteristics.map((c) => {
-            id++;
-
             return {
-                id: id,
+                id: c.shortName,
                 name: c.name,
             };
         }).slice();
 
         items[1].children = this.props.character.powers.map((p) => {
-            id++;
-
             return {
-                id: id,
+                id: p.id,
                 name: p.name,
             };
         }).slice();

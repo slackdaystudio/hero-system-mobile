@@ -481,7 +481,7 @@ export default class Combat extends Component {
                                 <View style={{flex: 1, flexGrow: 20, alignSelf: 'center', justifyContent: 'center'}}>
                                     <Text style={styles.grey}>{statusText}</Text>
                                 </View>
-                                <Icon type="FontAwesome" name="edit" style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10)}} onPress={() => this.editStatus(index)} />
+                                <Icon type="FontAwesome" name="edit" style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10), paddingTop: verticalScale(3)}} onPress={() => this.editStatus(index)} />
                                 <Icon type="FontAwesome" name="trash" style={{fontSize: verticalScale(20), color: '#14354d'}} onPress={() => this.clearStatus(index)} />
                             </View>
                         );
