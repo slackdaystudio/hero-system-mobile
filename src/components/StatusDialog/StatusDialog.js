@@ -24,8 +24,6 @@ class StatusDialog extends Component {
         visible: PropTypes.bool.isRequired,
         onApply: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
-        onDropdownShow: PropTypes.func.isRequired,
-        onDropdownClose: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -91,21 +89,29 @@ class StatusDialog extends Component {
     }
 
     _onSelectedItemsChange(selectedItems) {
-        this.setState({selectedItems: selectedItems}, () => {
-            let statusForm = {...this.props.statusForm};
-            let itemLabels = [];
+        this.setState({selectedItems: selectedItems});
+    }
 
-            for (const category of this.items) {
-                for (const item of category.children) {
-                    if (selectedItems.includes(item.id)) {
-                        itemLabels.push(item.name);
-                    }
+    _onConfirm() {
+        let statusForm = {...this.props.statusForm};
+        let itemLabels = [];
+
+        for (const category of this.items) {
+            for (const item of category.children) {
+                if (this.state.selectedItems.includes(item.id)) {
+                    itemLabels.push(item.name);
                 }
             }
+        }
 
-            statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
+        statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
 
-            this.props.updateForm('status', statusForm);
+        this.props.updateForm('status', statusForm);
+    }
+
+    _onApply() {
+        this.setState({selectedItems: []}, () => {
+            this.props.onApply();
         });
     }
 
@@ -147,6 +153,7 @@ class StatusDialog extends Component {
                     showDropDowns={true}
                     readOnlyHeadings={true}
                     onSelectedItemsChange={(selected) => this._onSelectedItemsChange(selected)}
+                    onConfirm={() => this._onConfirm()}
                     selectedItems={this.state.selectedItems}
                 />
             </Fragment>
@@ -245,7 +252,7 @@ class StatusDialog extends Component {
                             {this._renderSecondaryControls()}
                         </Form>
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
-                            <Button style={styles.button}  onPress={() => this.props.onApply()}>
+                            <Button style={styles.button}  onPress={() => this._onApply()}>
                                 <Text uppercase={false} style={styles.buttonText}>Apply</Text>
                             </Button>
                             <Button style={styles.button}  onPress={() => this.props.onClose()}>
