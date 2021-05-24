@@ -190,7 +190,7 @@ export default class Combat extends Component {
         const key = this.props.character.showSecondary ? 'secondary' : 'primary';
         const status = this.props.character.combatDetails[key].statuses[index];
         let statusForm = {...this.props.forms.status};
-
+        console.log(statusForm);
         statusForm.name = status.name;
         statusForm.label = status.label || '';
         statusForm.index = index;
@@ -199,7 +199,7 @@ export default class Combat extends Component {
             case 'Aid':
             case 'Drain':
                 statusForm.activePoints = status.activePoints || 0;
-                statusForm.targetTrait = status.targetTrait || '';
+                statusForm.targetTrait = status.targetTrait || null;
                 break;
             case 'Entangle':
                 statusForm.body = status.body || 0;

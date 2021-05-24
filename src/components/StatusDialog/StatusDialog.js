@@ -38,6 +38,25 @@ class StatusDialog extends Component {
         this.updateFormValue = this._updateFormValue.bind(this);
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.visible !== prevProps.visible && this.props.visible) {
+            if (this.props.statusForm.targetTrait !== null) {
+                let itemIds = [];
+
+                for (const category of this.items) {
+                    for (const item of category.children) {
+                        if (this.props.statusForm.targetTrait.includes(item.name)) {
+                            itemIds.push(item.id);
+                        }
+                    }
+                }
+
+                // eslint-disable-next-line react/no-did-update-set-state
+                this.setState({selectedItems: itemIds});
+            }
+        }
+    }
+
     _updateFormValue(key, value) {
         if (key === 'activePoints') {
             if (/^(-)?[0-9]*$/.test(value) === false) {
@@ -89,24 +108,22 @@ class StatusDialog extends Component {
     }
 
     _onSelectedItemsChange(selectedItems) {
-        this.setState({selectedItems: selectedItems});
-    }
+        this.setState({selectedItems: selectedItems}, () => {
+            let statusForm = {...this.props.statusForm};
+            let itemLabels = [];
 
-    _onConfirm() {
-        let statusForm = {...this.props.statusForm};
-        let itemLabels = [];
-
-        for (const category of this.items) {
-            for (const item of category.children) {
-                if (this.state.selectedItems.includes(item.id)) {
-                    itemLabels.push(item.name);
+            for (const category of this.items) {
+                for (const item of category.children) {
+                    if (this.state.selectedItems.includes(item.id)) {
+                        itemLabels.push(item.name);
+                    }
                 }
             }
-        }
 
-        statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
+            statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
 
-        this.props.updateForm('status', statusForm);
+            this.props.updateForm('status', statusForm);
+        });
     }
 
     _onApply() {
@@ -151,9 +168,9 @@ class StatusDialog extends Component {
                     subKey="children"
                     selectText="Select affected..."
                     showDropDowns={true}
+                    showCancelButton={true}
                     readOnlyHeadings={true}
                     onSelectedItemsChange={(selected) => this._onSelectedItemsChange(selected)}
-                    onConfirm={() => this._onConfirm()}
                     selectedItems={this.state.selectedItems}
                 />
             </Fragment>
