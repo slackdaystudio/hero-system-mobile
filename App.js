@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {SafeAreaView} from 'react-native';
 import {createAppContainer} from 'react-navigation';
 import {createStore, applyMiddleware, compose} from 'redux';
 import {Provider} from 'react-redux';
@@ -47,7 +48,9 @@ export default class App extends Component {
         return (
             <Provider store={store}>
                 <Root>
-                    <AppContainer />
+                    <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
+                        <AppContainer />
+                    </SafeAreaView>
                 </Root>
             </Provider>
         );
