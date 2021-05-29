@@ -161,16 +161,18 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 activeTextStyle={styles.activeTextStyle}
                 heading={this._renderTabHeading(title)}
             >
-                <View style={styles.tabContent}>
-                    <Traits
-                        navigation={this.props.navigation}
-                        headingText={title}
-                        character={this.props.character}
-                        listKey={listKey}
-                        subListKey={subListKey}
-                        updateForm={this.props.updateForm}
-                    />
-                </View>
+                <Content scrollEnable={false} style={styles.content}>
+                    <View style={styles.tabContent}>
+                        <Traits
+                            navigation={this.props.navigation}
+                            headingText={title}
+                            character={this.props.character}
+                            listKey={listKey}
+                            subListKey={subListKey}
+                            updateForm={this.props.updateForm}
+                        />
+                    </View>
+                </Content>
             </Tab>
         );
     }
@@ -195,14 +197,16 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     activeTextStyle={styles.activeTextStyle}
                     heading={this._renderTabHeading('General')}
                 >
-                    <View style={styles.tabContent}>
-                        <General
-                            characterInfo={this.props.character.characterInfo}
-                            portrait={this.props.character.portrait}
-                            portraitWidth={this.state.width}
-                            portraitHeight={this.state.height}
-                        />
-                    </View>
+                    <Content scrollEnable={false} style={styles.content}>
+                        <View style={styles.tabContent}>
+                            <General
+                                characterInfo={this.props.character.characterInfo}
+                                portrait={this.props.character.portrait}
+                                portraitWidth={this.state.width}
+                                portraitHeight={this.state.height}
+                            />
+                        </View>
+                    </Content>
                 </Tab>
                 <Tab
                     tabStyle={styles.tabHeading}
@@ -210,23 +214,25 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     activeTextStyle={styles.activeTextStyle}
                     heading={this._renderTabHeading('Combat')}
                 >
-                    <View style={styles.tabContent}>
-                        <Combat
-                            navigation={this.props.navigation}
-                            character={this.props.character}
-                            characters={this.props.characters}
-                            combatDetails={this.props.character.combatDetails}
-                            setSparseCombatDetails={this.props.setSparseCombatDetails}
-                            forms={this.props.forms}
-                            updateForm={this.props.updateForm}
-                            updateFormValue={this.props.updateFormValue}
-                            resetForm={this.props.resetForm}
-                            usePhase={this.props.usePhase}
-                            applyStatus={this.props.applyStatus}
-                            clearAllStatuses={this.props.clearAllStatuses}
-                            clearStatus={this.props.clearStatus}
-                        />
-                    </View>
+                    <Content scrollEnable={false} style={styles.content}>
+                        <View style={styles.tabContent}>
+                            <Combat
+                                navigation={this.props.navigation}
+                                character={this.props.character}
+                                characters={this.props.characters}
+                                combatDetails={this.props.character.combatDetails}
+                                setSparseCombatDetails={this.props.setSparseCombatDetails}
+                                forms={this.props.forms}
+                                updateForm={this.props.updateForm}
+                                updateFormValue={this.props.updateFormValue}
+                                resetForm={this.props.resetForm}
+                                usePhase={this.props.usePhase}
+                                applyStatus={this.props.applyStatus}
+                                clearAllStatuses={this.props.clearAllStatuses}
+                                clearStatus={this.props.clearStatus}
+                            />
+                        </View>
+                    </Content>
                 </Tab>
                 <Tab
                     tabStyle={styles.tabHeading}
@@ -234,14 +240,16 @@ class ViewHeroDesignerCharacterScreen extends Component {
                     activeTextStyle={styles.activeTextStyle}
                     heading={this._renderTabHeading('Characteristics')}
                 >
-                    <View style={styles.tabContent}>
-                        <Characteristics
-                            navigation={this.props.navigation}
-                            character={this.props.character}
-                            setShowSecondary={this.props.setShowSecondary}
-                            updateForm={this.props.updateForm}
-                        />
-                    </View>
+                    <Content scrollEnable={false} style={styles.content}>
+                        <View style={styles.tabContent}>
+                            <Characteristics
+                                navigation={this.props.navigation}
+                                character={this.props.character}
+                                setShowSecondary={this.props.setShowSecondary}
+                                updateForm={this.props.updateForm}
+                            />
+                        </View>
+                    </Content>
                 </Tab>
                 {this._renderTab('Skills', 'skills', 'skills')}
                 {this._renderTab('Perks', 'perks', 'perks')}
@@ -269,16 +277,14 @@ class ViewHeroDesignerCharacterScreen extends Component {
             <Container style={styles.container}>
                 <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                 <Header hasTabs={false} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
-                <Content scrollEnable={false} style={styles.content}>
-                    {this._renderCharacter()}
-                    <HeroDesignerCharacterFooter
-                        navigation={this.props.navigation}
-                        character={this.props.character}
-                        characters={this.props.characters}
-                        selectCharacter={this.props.selectCharacter}
-                        clearCharacter={this.props.clearCharacter}
-                    />
-                </Content>
+                {this._renderCharacter()}
+                <HeroDesignerCharacterFooter
+                    navigation={this.props.navigation}
+                    character={this.props.character}
+                    characters={this.props.characters}
+                    selectCharacter={this.props.selectCharacter}
+                    clearCharacter={this.props.clearCharacter}
+                />
             </Container>
         );
     }
