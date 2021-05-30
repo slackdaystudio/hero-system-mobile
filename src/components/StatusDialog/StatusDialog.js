@@ -154,10 +154,27 @@ class StatusDialog extends Component {
                     />
                 </Item>
                 <SectionedMultiSelect
-                    styles={{selectToggleText: [styles.grey, {marginLeft: scale(-7)}]}}
-                    colors={{selectToggleTextColor: '#FFFFFF', chipColor: '#e8e8e8'}}
+                    styles={{
+                        selectToggleText: [styles.grey, {marginLeft: scale(-7)}],
+                        container: {backgroundColor: '#1b1d1f', borderWidth: 1, borderColor: '#303030'},
+                        searchBar: {backgroundColor: '#000000'},
+                        searchTextInput: {color: '#ffffff'},
+                        separator: {color: '#e8e8e8'},
+                    }}
+                    colors={{
+                        selectToggleTextColor: '#ffffff',
+                        chipColor: '#e8e8e8',
+                        primary: '#14354d',
+                        cancel: '#14354d',
+                        text: '#e8e8e8',
+                        subText: '#e8e8e8',
+                        itemBackground: '#1b1d1f',
+                        subItemBackground: '#1b1d1f',
+                        searchSelectionColor: '#ffffff',
+                    }}
                     items={this.items}
                     IconRenderer={Icon}
+                    searchIconComponent={() => <Icon name="search" color="white" size={18} style={{paddingLeft: scale(5)}} />}
                     uniqueKey="id"
                     subKey="children"
                     selectText="Select affected..."
