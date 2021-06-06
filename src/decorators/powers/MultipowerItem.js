@@ -1,7 +1,6 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import {common} from '../../lib/Common';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -48,7 +47,7 @@ export default class MultipowerItem extends CharacterTrait {
 
     attributes() {
         let attributes = this.characterTrait.attributes();
-        let slotType =  this.characterTrait.ultraSlot ? 'Variable' : 'Fixed';
+        let slotType = this.characterTrait.ultraSlot ? 'Variable' : 'Fixed';
 
         if (heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
             if (this.characterTrait.ultraSlot) {

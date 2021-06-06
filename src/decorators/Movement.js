@@ -1,7 +1,6 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
-import { common } from '../lib/Common';
-import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
+import {common} from '../lib/Common';
+import {heroDesignerCharacter} from '../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -50,7 +49,7 @@ export default class Movement extends CharacterTrait {
         let attributes = this.characterTrait.attributes();
         let baseMove = this.characterTrait.trait.levels + this._getBaseMove();
         let ncm = this._getNcm();
-        let unit = heroDesignerCharacter.isFifth(this.characterTrait.getCharacter()) ? '"' : 'm'
+        let unit = heroDesignerCharacter.isFifth(this.characterTrait.getCharacter()) ? '"' : 'm';
 
         attributes.push({
             label: 'Combat Move',
@@ -68,12 +67,12 @@ export default class Movement extends CharacterTrait {
 
         attributes.push({
             label: 'Max Combat',
-            value: `${(baseMove * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`,
+            value: `${((baseMove * this._getSpeed() * 5 * 60) / 1000).toFixed(1)} km/h`,
         });
 
         attributes.push({
             label: 'Max Non-Combat',
-            value: `${(baseMove * ncm * this._getSpeed() * 5 * 60 / 1000).toFixed(1)} km/h`,
+            value: `${((baseMove * ncm * this._getSpeed() * 5 * 60) / 1000).toFixed(1)} km/h`,
         });
 
         return attributes;

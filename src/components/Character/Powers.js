@@ -1,8 +1,7 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { Text, List, ListItem, Left, Right } from 'native-base';
-import { dieRoller } from '../../lib/DieRoller';
-import { character } from '../../lib/Character';
+import {Text, List, ListItem, Left, Right} from 'native-base';
+import {character} from '../../lib/Character';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -32,7 +31,7 @@ function initPowersShow(powers) {
     return {
         showFullTexts: showFullTexts,
         items: items,
-    }
+    };
 }
 
 export default class Powers extends Component {
@@ -40,7 +39,7 @@ export default class Powers extends Component {
         navigation: PropTypes.object.isRequired,
         strengthDamage: PropTypes.string.isRequired,
         updateForm: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -86,10 +85,7 @@ export default class Powers extends Component {
             return ['', text];
         }
 
-        return [
-            '    ' + text.slice(0, end + 1),
-            text.substring(end + 3),
-        ];
+        return ['    ' + text.slice(0, end + 1), text.substring(end + 3)];
     }
 
     _rollDamage(index) {

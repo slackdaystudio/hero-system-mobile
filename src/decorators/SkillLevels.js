@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -34,7 +33,7 @@ export default class SkillLevels extends CharacterTrait {
             }
         }
 
-        return this.characterTrait.trait.levels / levelValue * levelCost;
+        return (this.characterTrait.trait.levels / levelValue) * levelCost;
     }
 
     costMultiplier() {

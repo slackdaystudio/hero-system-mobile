@@ -1,8 +1,8 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { Platform, View } from 'react-native';
-import { Text } from 'native-base';
-import { verticalScale } from 'react-native-size-matters';
+import {Platform, View} from 'react-native';
+import {Text} from 'native-base';
+import {verticalScale} from 'react-native-size-matters';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -24,7 +24,7 @@ export default class CircleText extends Component {
         size: PropTypes.number.isRequired,
         fontSize: PropTypes.number.isRequired,
         color: PropTypes.string.isRequired,
-    }
+    };
 
     render() {
         const size = verticalScale(this.props.size);
@@ -32,27 +32,31 @@ export default class CircleText extends Component {
         const borderWidth = 1;
 
         return (
-            <View style = {{
-                alignItems:'center',
-                justifyContent:'center',
-                backgroundColor:'#000',
-                borderColor: this.props.color,
-                width: size,
-                height: size,
-                borderRadius: size / 2,
-                borderWidth: borderWidth,
-                marginTop: verticalScale(2),
-            }}>
-                <Text style = {{
-                    textAlign: 'center',
-                    alignSelf: 'center',
+            <View
+                style={{
+                    alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: fontSize - 2 * borderWidth,
-                    lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
-                    paddingTop: verticalScale(3),
-                    fontWeight: 'bold',
-                    color: '#F3EDE9',
-                }}>
+                    backgroundColor: '#000',
+                    borderColor: this.props.color,
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
+                    borderWidth: borderWidth,
+                    marginTop: verticalScale(2),
+                }}
+            >
+                <Text
+                    style={{
+                        textAlign: 'center',
+                        alignSelf: 'center',
+                        justifyContent: 'center',
+                        fontSize: fontSize - 2 * borderWidth,
+                        lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
+                        paddingTop: verticalScale(3),
+                        fontWeight: 'bold',
+                        color: '#F3EDE9',
+                    }}
+                >
                     {this.props.title}
                 </Text>
             </View>

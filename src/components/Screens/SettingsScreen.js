@@ -1,22 +1,19 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { BackHandler, StyleSheet, View, Switch, Alert } from 'react-native';
-import { Container, Content, Button, Text, Toast, List, ListItem, Left, Right, Body, Spinner } from 'native-base';
-import { NavigationEvents } from 'react-navigation';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {connect} from 'react-redux';
+import {BackHandler, View, Switch} from 'react-native';
+import {Container, Content, Button, Text, List, ListItem, Left, Right} from 'native-base';
+import {NavigationEvents} from 'react-navigation';
+import {verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
-import { NORMAL_DAMAGE } from '../../lib/DieRoller';
-import { statistics } from '../../lib/Statistics';
-import { common } from '../../lib/Common';
-import { persistence } from '../../lib/Persistence';
+import {common} from '../../lib/Common';
 import styles from '../../Styles';
-import { resetForm } from '../../reducers/forms';
-import { clearCharacterData } from '../../reducers/character';
-import { clearRandomHero } from '../../reducers/randomHero';
-import { clearApplicationSettings, toggleSetting } from '../../reducers/settings';
-import { clearStatistics } from '../../reducers/statistics';
+import {resetForm} from '../../reducers/forms';
+import {clearCharacterData} from '../../reducers/character';
+import {clearRandomHero} from '../../reducers/randomHero';
+import {clearApplicationSettings, toggleSetting} from '../../reducers/settings';
+import {clearStatistics} from '../../reducers/statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -42,7 +39,7 @@ class SettingsScreen extends Component {
         clearRandomHero: PropTypes.func.isRequired,
         clearStatistics: PropTypes.func.isRequired,
         clearApplicationSettings: PropTypes.func.isRequired,
-    }
+    };
 
     onDidFocus() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -93,7 +90,7 @@ class SettingsScreen extends Component {
     }
 
     async _clearAll() {
-        await this.props.clearApplicationSettings()
+        await this.props.clearApplicationSettings();
         await this._clearFormData(false);
         await this._clearCharacterData(false);
         await this._clearHeroData(false);
@@ -105,16 +102,14 @@ class SettingsScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Heading text="App Version" />
                     <View style={{paddingLeft: 20, paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>
                         <Text style={styles.grey}>
-                            <Text style={styles.boldGrey}>HERO System Mobile v</Text>{this.props.version}
+                            <Text style={styles.boldGrey}>HERO System Mobile v</Text>
+                            {this.props.version}
                         </Text>
                     </View>
                     <Heading text="Game" />
@@ -127,11 +122,11 @@ class SettingsScreen extends Component {
                                 <Switch
                                     value={this.props.settings.useFifthEdition}
                                     onValueChange={() => this.props.toggleSetting('useFifthEdition', !this.props.settings.useFifthEdition)}
-                                    minimumTrackTintColor='#14354d'
-                                    maximumTrackTintColor='#14354d'
-                                    thumbColor='#14354d'
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbColor="#14354d"
                                     trackColor={{false: '#000', true: '#01121E'}}
-                                    ios_backgroundColor='#01121E'
+                                    ios_backgroundColor="#01121E"
                                 />
                             </Right>
                         </ListItem>
@@ -146,11 +141,11 @@ class SettingsScreen extends Component {
                                 <Switch
                                     value={this.props.settings.playSounds}
                                     onValueChange={() => this.props.toggleSetting('playSounds', !this.props.settings.playSounds)}
-                                    minimumTrackTintColor='#14354d'
-                                    maximumTrackTintColor='#14354d'
-                                    thumbColor='#14354d'
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbColor="#14354d"
                                     trackColor={{false: '#000', true: '#01121E'}}
-                                    ios_backgroundColor='#01121E'
+                                    ios_backgroundColor="#01121E"
                                 />
                             </Right>
                         </ListItem>
@@ -162,11 +157,11 @@ class SettingsScreen extends Component {
                                 <Switch
                                     value={this.props.settings.onlyDiceSounds}
                                     onValueChange={() => this.props.toggleSetting('onlyDiceSounds', !this.props.settings.onlyDiceSounds)}
-                                    minimumTrackTintColor='#14354d'
-                                    maximumTrackTintColor='#14354d'
-                                    thumbColor='#14354d'
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbColor="#14354d"
                                     trackColor={{false: '#000', true: '#01121E'}}
-                                    ios_backgroundColor='#01121E'
+                                    ios_backgroundColor="#01121E"
                                     disabled={!this.props.settings.playSounds}
                                 />
                             </Right>
@@ -180,7 +175,9 @@ class SettingsScreen extends Component {
                             </Left>
                             <Right>
                                 <Button style={styles.buttonSmall} onPress={() => this._clearFormData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Clear
+                                    </Text>
                                 </Button>
                             </Right>
                         </ListItem>
@@ -190,7 +187,9 @@ class SettingsScreen extends Component {
                             </Left>
                             <Right>
                                 <Button style={styles.buttonSmall} onPress={() => this._clearCharacterData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Clear
+                                    </Text>
                                 </Button>
                             </Right>
                         </ListItem>
@@ -200,7 +199,9 @@ class SettingsScreen extends Component {
                             </Left>
                             <Right>
                                 <Button style={styles.buttonSmall} onPress={() => this._clearHeroData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Clear
+                                    </Text>
                                 </Button>
                             </Right>
                         </ListItem>
@@ -210,14 +211,18 @@ class SettingsScreen extends Component {
                             </Left>
                             <Right>
                                 <Button style={styles.buttonSmall} onPress={() => this._clearStatisticsData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>Clear</Text>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Clear
+                                    </Text>
                                 </Button>
                             </Right>
                         </ListItem>
                     </List>
                     <View style={{paddingTop: verticalScale(20), paddingBottom: verticalScale(20)}}>
                         <Button block style={styles.button} onPress={() => this._clearAll()}>
-                            <Text uppercase={false} style={styles.buttonText}>Clear All</Text>
+                            <Text uppercase={false} style={styles.buttonText}>
+                                Clear All
+                            </Text>
                         </Button>
                     </View>
                 </Content>
@@ -226,7 +231,7 @@ class SettingsScreen extends Component {
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         settings: state.settings,
         version: state.version.version,

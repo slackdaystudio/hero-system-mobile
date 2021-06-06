@@ -1,6 +1,5 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -39,7 +38,7 @@ export default class Duplication extends CharacterTrait {
         cost += common.getMultiplierCost(
             this.characterTrait.trait.number,
             this.characterTrait.trait.template.multiplierval,
-            this.characterTrait.trait.template.multipliercost
+            this.characterTrait.trait.template.multipliercost,
         );
 
         return cost;
@@ -62,7 +61,7 @@ export default class Duplication extends CharacterTrait {
     }
 
     attributes() {
-        let attributes =  this.characterTrait.attributes();
+        let attributes = this.characterTrait.attributes();
 
         attributes.push({
             label: 'Points',

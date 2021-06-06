@@ -1,6 +1,4 @@
-import { Alert } from 'react-native';
-import { common } from '../lib/Common';
-import { persistence } from '../lib/Persistence';
+import {persistence} from '../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

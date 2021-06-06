@@ -1,10 +1,6 @@
-import { Alert } from 'react-native';
-import RNFetchBlob from 'rn-fetch-blob';
-import { common } from './Common';
-import { heroDesignerTemplate } from './HeroDesignerTemplate';
-import { permission } from './Permission';
-import { SKILL_ROLL_BASE } from '../decorators/skills/Roll';
-import { store } from '../../App';
+import {common} from './Common';
+import {heroDesignerTemplate} from './HeroDesignerTemplate';
+import {SKILL_ROLL_BASE} from '../decorators/skills/Roll';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -24,91 +20,72 @@ export const TYPE_CHARACTERISTIC = 1;
 
 export const TYPE_MOVEMENT = 2;
 
-export const GENERIC_OBJECT =  'GENERIC_OBJECT';
+export const GENERIC_OBJECT = 'GENERIC_OBJECT';
 
 export const TYPE_ADVANTAGES = 0;
 
 export const TYPE_LIMITATIONS = 1;
 
-export const SKILL_ENHANCERS = [
-    'SCIENTIST',
-    'JACK_OF_ALL_TRADES',
-    'LINGUIST',
-    'SCHOLAR',
-    'TRAVELER',
-    'WELL_CONNECTED',
-];
+export const SKILL_ENHANCERS = ['SCIENTIST', 'JACK_OF_ALL_TRADES', 'LINGUIST', 'SCHOLAR', 'TRAVELER', 'WELL_CONNECTED'];
 
 const MISSING_CHARACTERISTIC_DESCRIPTIONS = {
-    'ocv': 'Offensive Combat Value represents a character’s general accuracy in combat.',
-    'dcv': 'Defensive Combat Value represents how difficult it is to hit a character in combat.',
-    'omcv': 'Offensive Mental Combat Value represents a character’s general accuracy in Mental Combat.',
-    'dmcv': 'Defensive Mental Combat Value represents how difficult it is to hit a character in Mental Combat.',
+    ocv: 'Offensive Combat Value represents a character’s general accuracy in combat.',
+    dcv: 'Defensive Combat Value represents how difficult it is to hit a character in combat.',
+    omcv: 'Offensive Mental Combat Value represents a character’s general accuracy in Mental Combat.',
+    dmcv: 'Defensive Mental Combat Value represents how difficult it is to hit a character in Mental Combat.',
 };
 
 const CHARACTERISTIC_NAMES = {
-    'str': 'Strength',
-    'dex': 'Dexterity',
-    'con': 'Constitution',
-    'int': 'Intelligence',
-    'ego': 'Ego',
-    'pre': 'Presence',
-    'com': 'Comeliness',
-    'ocv': 'OCV',
-    'dcv': 'DCV',
-    'omcv': 'OMCV',
-    'dmcv': 'DMCV',
-    'spd': 'Speed',
-    'pd': 'PD',
-    'ed': 'ED',
-    'rec': 'Recovery',
-    'end': 'Endurance',
-    'body': 'Body',
-    'stun': 'Stun',
-    'custom1': 'Custom1',
-    'custom2': 'Custom2',
-    'custom3': 'Custom3',
-    'custom4': 'Custom4',
-    'custom5': 'Custom5',
-    'custom6': 'Custom6',
-    'custom7': 'Custom7',
-    'custom8': 'Custom8',
-    'custom9': 'Custom9',
-    'custom10': 'Custom10',
+    str: 'Strength',
+    dex: 'Dexterity',
+    con: 'Constitution',
+    int: 'Intelligence',
+    ego: 'Ego',
+    pre: 'Presence',
+    com: 'Comeliness',
+    ocv: 'OCV',
+    dcv: 'DCV',
+    omcv: 'OMCV',
+    dmcv: 'DMCV',
+    spd: 'Speed',
+    pd: 'PD',
+    ed: 'ED',
+    rec: 'Recovery',
+    end: 'Endurance',
+    body: 'Body',
+    stun: 'Stun',
+    custom1: 'Custom1',
+    custom2: 'Custom2',
+    custom3: 'Custom3',
+    custom4: 'Custom4',
+    custom5: 'Custom5',
+    custom6: 'Custom6',
+    custom7: 'Custom7',
+    custom8: 'Custom8',
+    custom9: 'Custom9',
+    custom10: 'Custom10',
 };
 
 const BASE_MOVEMENT_MODES = {
-    'running': 'Running',
-    'swimming': 'Swimming',
-    'leaping': 'Leaping',
+    running: 'Running',
+    swimming: 'Swimming',
+    leaping: 'Leaping',
 };
 
 const CHARACTER_TRAITS = {
-    'skills': 'skill',
-    'perks': 'perk',
-    'talents': 'talent',
-    'martialArts': 'maneuver',
-    'powers': 'power',
-    'equipment': 'powers',
-    'disadvantages': 'disad'
+    skills: 'skill',
+    perks: 'perk',
+    talents: 'talent',
+    martialArts: 'maneuver',
+    powers: 'power',
+    equipment: 'powers',
+    disadvantages: 'disad',
 };
 
 const FIGURED_CHARACTERISTCS = ['PD', 'ED', 'SPD', 'REC', 'END', 'STUN'];
 
 class HeroDesignerCharacter {
     getCharacter(heroDesignerCharacter) {
-        // if (__DEV__) {
-        //     permission.askForWrite().then(granted => {
-        //         if (granted) {
-        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/hdc.json', JSON.stringify(heroDesignerCharacter));
-        //         } else {
-        //             common.toast('Unable to write file: Write permission has not been granted');
-        //         }
-        //     }).catch(error => {
-        //         common.toast(error.message);
-        //     });
-        // }
-
         const template = heroDesignerTemplate.getTemplate(heroDesignerCharacter.template);
 
         let character = {
@@ -124,7 +101,7 @@ class HeroDesignerCharacter {
             powers: [],
             equipment: [],
             disadvantages: [],
-            portrait: null
+            portrait: null,
         };
 
         this._normalizeCharacterData(heroDesignerCharacter);
@@ -143,24 +120,15 @@ class HeroDesignerCharacter {
             character.portrait = heroDesignerCharacter.portrait;
         }
 
-        // if (__DEV__) {
-        //     permission.askForWrite().then(granted => {
-        //         if (granted) {
-        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/test.json', JSON.stringify(character));
-        //             RNFetchBlob.fs.writeFile(RNFetchBlob.fs.dirs.DownloadDir + '/template.json', JSON.stringify(template));
-        //         } else {
-        //             common.toast('Unable to write file: Write permission has not been granted');
-        //         }
-        //     }).catch(error => {
-        //         common.toast(error.message);
-        //     });
-        // }
-
         return character;
     }
 
     isFifth(character) {
-        if (character !== null && Array.isArray(character.characteristics) && character.characteristics[0].definition.startsWith('(Hero System Fifth Edition')) {
+        if (
+            character !== null &&
+            Array.isArray(character.characteristics) &&
+            character.characteristics[0].definition.startsWith('(Hero System Fifth Edition')
+        ) {
             return true;
         }
 
@@ -199,7 +167,7 @@ class HeroDesignerCharacter {
         return false;
     }
 
-    getTotalDefense(character, type, withResistant=true) {
+    getTotalDefense(character, type, withResistant = true) {
         if (type === null || type === undefined) {
             return withResistant ? '0/0' : '0';
         }
@@ -238,7 +206,7 @@ class HeroDesignerCharacter {
         return `${nonResistant}/${resistant}`;
     }
 
-    getTotalUnusualDefense(character, powerXmlId, withResistant=true) {
+    getTotalUnusualDefense(character, powerXmlId) {
         let nonResistant = 0;
         let resistant = 0;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
@@ -305,7 +273,6 @@ class HeroDesignerCharacter {
     }
 
     getCharacteristicTotal(shortName, character) {
-        let characteristic = null;
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
 
         for (let characteristic of character.characteristics) {
@@ -354,7 +321,7 @@ class HeroDesignerCharacter {
             if (FIGURED_CHARACTERISTCS.includes(characteristic.shortName.toUpperCase())) {
                 let total = 0;
 
-                switch(characteristic.shortName.toUpperCase()) {
+                switch (characteristic.shortName.toUpperCase()) {
                     case 'PD':
                         total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
                         value += total;
@@ -392,11 +359,13 @@ class HeroDesignerCharacter {
     _getTotalCharacteristicPoints(characteristic, value, showSecondary) {
         if (Array.isArray(characteristic)) {
             for (let char of characteristic) {
-                value += this._getTotalCharacteristicPoints(char, value, showSecondary)
+                value += this._getTotalCharacteristicPoints(char, value, showSecondary);
             }
         } else {
-            if ((characteristic.affectsPrimary && characteristic.affectsTotal) ||
-                (!characteristic.affectsPrimary && characteristic.affectsTotal && showSecondary)) {
+            if (
+                (characteristic.affectsPrimary && characteristic.affectsTotal) ||
+                (!characteristic.affectsPrimary && characteristic.affectsTotal && showSecondary)
+            ) {
                 value += characteristic.levels;
             }
         }
@@ -410,8 +379,10 @@ class HeroDesignerCharacter {
                 value += this._getTotalDensityIncreaseCharacteristcs(characteristic, di, value, showSecondary);
             }
         } else {
-            if ((densityIncrease.affectsPrimary && densityIncrease.affectsTotal) ||
-                 (!densityIncrease.affectsPrimary && densityIncrease.affectsTotal && showSecondary)) {
+            if (
+                (densityIncrease.affectsPrimary && densityIncrease.affectsTotal) ||
+                (!densityIncrease.affectsPrimary && densityIncrease.affectsTotal && showSecondary)
+            ) {
                 switch (characteristic.shortName.toUpperCase()) {
                     case 'STR':
                         value += densityIncrease.levels * 5;
@@ -421,7 +392,7 @@ class HeroDesignerCharacter {
                         value += densityIncrease.levels;
                         break;
                     default:
-                         // Do nothing
+                    // Do nothing
                 }
             }
         }
@@ -435,8 +406,10 @@ class HeroDesignerCharacter {
                 value += this._getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
             }
         } else {
-            if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
-                 (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
+            if (
+                (resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)
+            ) {
                 switch (type.toUpperCase()) {
                     case 'PD':
                         value += resistantDefence.pdlevels;
@@ -445,7 +418,7 @@ class HeroDesignerCharacter {
                         value += resistantDefence.edlevels;
                         break;
                     default:
-                         // Do nothing
+                    // Do nothing
                 }
             }
         }
@@ -459,8 +432,10 @@ class HeroDesignerCharacter {
                 value = this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
             }
         } else {
-            if ((resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
-                 (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)) {
+            if (
+                (resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)
+            ) {
                 switch (type.toUpperCase()) {
                     case 'PD':
                         value += resistantDefence.pdlevels;
@@ -475,7 +450,7 @@ class HeroDesignerCharacter {
                         value += resistantDefence.powdlevels;
                         break;
                     default:
-                         // Do nothing
+                    // Do nothing
                 }
             }
         }
@@ -614,16 +589,12 @@ class HeroDesignerCharacter {
         let formattedCharacteristic = null;
         let type = null;
         let name = null;
-        let definition = null;
-        let value = 0;
-        let cost = 0;
-        let roll = null;
 
         for (let [key, characteristic] of Object.entries(characteristics)) {
             type = CHARACTERISTIC_NAMES.hasOwnProperty(key.toLowerCase()) ? TYPE_CHARACTERISTIC : TYPE_MOVEMENT;
             templateCharacteristic = template.characteristics[key.toLowerCase()];
             name = type === TYPE_CHARACTERISTIC ? CHARACTERISTIC_NAMES[key.toLowerCase()] : BASE_MOVEMENT_MODES[key.toLowerCase()];
-            let { definition, roll, value, cost, base } = this._getCharacteristicFields(characteristic, templateCharacteristic, character);
+            let {definition, roll, value, cost, base} = this._getCharacteristicFields(characteristic, templateCharacteristic, character);
 
             if (base === 10 && name.toLowerCase() !== 'body') {
                 roll = true;
@@ -664,7 +635,7 @@ class HeroDesignerCharacter {
             definition: templateCharacteristic.definition,
             roll: false,
             value: characteristic.levels + templateCharacteristic.base,
-            cost: Math.round(characteristic.levels / templateCharacteristic.lvlval * templateCharacteristic.lvlcost),
+            cost: Math.round((characteristic.levels / templateCharacteristic.lvlval) * templateCharacteristic.lvlcost),
             base: templateCharacteristic.base,
         };
     }
@@ -672,10 +643,10 @@ class HeroDesignerCharacter {
     _updateCharacteristic(characteristic, templateCharacteristic, character) {
         let bonus = 0;
         let value = characteristic.levels + templateCharacteristic.base;
-        let cost = Math.round(characteristic.levels / templateCharacteristic.lvlval * templateCharacteristic.lvlcost);
+        let cost = Math.round((characteristic.levels / templateCharacteristic.lvlval) * templateCharacteristic.lvlcost);
         let base = templateCharacteristic.base;
 
-        switch(characteristic.alias.toUpperCase()) {
+        switch (characteristic.alias.toUpperCase()) {
             case 'PD':
                 bonus = common.roundInPlayersFavor(this.getCharacteristicBaseValue('STR', character) / 5);
                 value += bonus;
@@ -724,7 +695,7 @@ class HeroDesignerCharacter {
                 base += bonus;
                 break;
             default:
-                // do nothing
+            // do nothing
         }
 
         return {
@@ -738,7 +709,7 @@ class HeroDesignerCharacter {
 
     _getCharacteristicNcm(templateCharacteristic) {
         if (Array.isArray(templateCharacteristic.adder)) {
-            let adder = templateCharacteristic.adder.filter(adder => adder.xmlid === 'IMPROVEDNONCOMBAT')[0];
+            let adder = templateCharacteristic.adder.filter((adder) => adder.xmlid === 'IMPROVEDNONCOMBAT')[0];
 
             return adder.lvlval * adder.lvlmultiplier;
         }
@@ -791,7 +762,10 @@ class HeroDesignerCharacter {
             value.template = templateTrait;
 
             if (value.hasOwnProperty('parentid')) {
-                character[traitKey].filter(t => t.id === value.parentid).shift()[characterSubTrait].push(value);
+                character[traitKey]
+                    .filter((t) => t.id === value.parentid)
+                    .shift()
+                    [characterSubTrait].push(value);
             } else {
                 character[traitKey].push(value);
             }
@@ -861,7 +835,6 @@ class HeroDesignerCharacter {
     _getCompoundPower(compoundPower, template, traitKey, traitSubKey) {
         let templateTrait = null;
 
-
         for (let power of compoundPower.powers) {
             templateTrait = this._getTemplateTrait(power, template, traitKey, traitSubKey);
 
@@ -891,13 +864,15 @@ class HeroDesignerCharacter {
                         subKey = 'power';
                     }
 
-                    templateTrait = template[key][subKey].filter(t => {
-                        if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
-                            return false;
-                        }
+                    templateTrait = template[key][subKey]
+                        .filter((t) => {
+                            if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                                return false;
+                            }
 
-                        return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
-                    }).shift();
+                            return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
+                        })
+                        .shift();
 
                     if (templateTrait !== undefined) {
                         break;
@@ -905,13 +880,15 @@ class HeroDesignerCharacter {
                 }
             }
         } else {
-            templateTrait = template[traitKey][traitSubKey].filter(t => {
-                if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
-                    return false;
-                }
+            templateTrait = template[traitKey][traitSubKey]
+                .filter((t) => {
+                    if (t.xmlid.toUpperCase() === GENERIC_OBJECT) {
+                        return false;
+                    }
 
-                return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
-            }).shift();
+                    return t.xmlid.toLowerCase() === value.xmlid.toLowerCase();
+                })
+                .shift();
         }
 
         return templateTrait;
@@ -945,7 +922,8 @@ class HeroDesignerCharacter {
             if (listKey === 'powers') {
                 this._normalizeTemplatePowers(template);
                 continue;
-            } if (listKey === 'equipment') {
+            }
+            if (listKey === 'equipment') {
                 continue;
             }
 
@@ -968,7 +946,6 @@ class HeroDesignerCharacter {
             template[listKey][subListKey] = template[listKey][subListKey].concat(normalizedEntries);
         }
     }
-
 
     _normalizeTemplateItem(normalizedEntries, key, item) {
         if (Array.isArray(item)) {
@@ -1128,13 +1105,15 @@ class HeroDesignerCharacter {
 
     _buildVppTemplate(power, template) {
         let mods = [];
-        let adds = [{
-            'xmlid': 'CONTROLCOST',
-            'basecost': power.adder.baseCost,
-            'levels': power.adder.levels,
-            'lvlcost': power.adder.lvlcost,
-            'lvlval': power.adder.lvlval,
-        }];
+        let adds = [
+            {
+                xmlid: 'CONTROLCOST',
+                basecost: power.adder.baseCost,
+                levels: power.adder.levels,
+                lvlcost: power.adder.lvlcost,
+                lvlval: power.adder.lvlval,
+            },
+        ];
 
         for (let modifier of template.modifiers.modifier) {
             if (modifier.hasOwnProperty('type') && modifier.type.toUpperCase() === 'VPP') {

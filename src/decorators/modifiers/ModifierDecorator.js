@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import Aoe from './Aoe';
 import Dot from './Dot';
 import Modifier from './Modifier';
@@ -33,7 +32,7 @@ class ModifierDecorator {
                 decorated = new Dot(decorated);
                 break;
             default:
-                // do nothing
+            // do nothing
         }
 
         return decorated;

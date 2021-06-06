@@ -1,6 +1,5 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
-import { common } from '../lib/Common';
+import {common} from '../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -47,7 +46,7 @@ export default class BaseCost extends CharacterTrait {
             }
 
             if (this.characterTrait.trait.template.hasOwnProperty('lvlval') && this.characterTrait.trait.template.lvlval !== 0) {
-                cost += this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval * levelCost;
+                cost += (this.characterTrait.trait.levels / this.characterTrait.trait.template.lvlval) * levelCost;
             }
         }
 
@@ -132,11 +131,7 @@ export default class BaseCost extends CharacterTrait {
             }
         } else {
             if (adder.levels > 0) {
-                adderTotal += common.getMultiplierCost(
-                    adder.levels,
-                    adder.lvlval,
-                    adder.lvlcost
-                );
+                adderTotal += common.getMultiplierCost(adder.levels, adder.lvlval, adder.lvlcost);
             } else {
                 adderTotal += adder.basecost;
             }
@@ -159,7 +154,6 @@ export default class BaseCost extends CharacterTrait {
         } else {
             subTotal += subAdder.basecost;
         }
-
 
         return subTotal;
     }

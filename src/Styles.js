@@ -1,6 +1,4 @@
-import { StyleSheet, Platform } from 'react-native';
-import { ScaledSheet } from 'react-native-size-matters';
-import { ifIphoneX } from 'react-native-iphone-x-helper';
+import {ScaledSheet} from 'react-native-size-matters';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -19,13 +17,11 @@ import { ifIphoneX } from 'react-native-iphone-x-helper';
 export default ScaledSheet.create({
     container: {
         backgroundColor: '#1b1d1f',
-        ...ifIphoneX({
-            paddingTop: '50@vs',
-        }),
     },
     content: {
         paddingTop: 0,
         paddingHorizontal: 0,
+        backgroundColor: '#1b1d1f',
     },
     heading: {
         fontSize: '20@vs',
@@ -36,6 +32,7 @@ export default ScaledSheet.create({
         textAlign: 'center',
         backgroundColor: '#121212',
         width: '100%',
+        height: '37@vs',
         borderColor: '#303030',
         borderBottomWidth: 1,
         borderTopWidth: 1,

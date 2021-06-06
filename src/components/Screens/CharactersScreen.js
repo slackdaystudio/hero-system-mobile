@@ -1,20 +1,20 @@
-import React, { Component, Fragment }  from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { BackHandler, Alert, View, ImageBackground } from 'react-native';
-import { Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon, Picker, Item } from 'native-base';
-import { NavigationEvents } from 'react-navigation';
-import { scale, verticalScale } from 'react-native-size-matters';
+import {connect} from 'react-redux';
+import {BackHandler, View} from 'react-native';
+import {Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon, Picker, Item} from 'native-base';
+import {NavigationEvents} from 'react-navigation';
+import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
-import { file } from '../../lib/File';
-import { character } from '../../lib/Character';
-import { common } from '../../lib/Common';
-import { combatDetails } from '../../lib/CombatDetails';
+import {file} from '../../lib/File';
+import {character} from '../../lib/Character';
+import {common} from '../../lib/Common';
+import {combatDetails} from '../../lib/CombatDetails';
 import styles from '../../Styles';
-import { setCharacter, clearCharacter, updateLoadedCharacters } from '../../reducers/character';
-import { MAX_CHARACTER_SLOTS } from '../../lib/Persistence';
+import {setCharacter, clearCharacter, updateLoadedCharacters} from '../../reducers/character';
+import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -38,7 +38,7 @@ class CharactersScreen extends Component {
         setCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
         updateLoadedCharacters: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -102,9 +102,13 @@ class CharactersScreen extends Component {
     }
 
     _refreshCharacters() {
-        file.listCharacters().then((characters) => {
-            this.setState({characters: characters});
-        });
+        file.listCharacters()
+            .then((characters) => {
+                this.setState({characters: characters});
+            })
+            .catch((error) => {
+                console.log(error.message);
+            });
     }
 
     _startLoad() {
@@ -118,14 +122,24 @@ class CharactersScreen extends Component {
     _importCharacter() {
         if (this.props.character !== null && this.props.character.hasOwnProperty('filename')) {
             file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
-                character.import(this.startLoad, this.endLoad).then(char => {
-                    this._postImport(char);
-                });
+                character
+                    .import(this.startLoad, this.endLoad)
+                    .then((char) => {
+                        this._postImport(char);
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
             });
         } else {
-            character.import(this.startLoad, this.endLoad).then(char => {
-                this._postImport(char);
-            });
+            character
+                .import(this.startLoad, this.endLoad)
+                .then((char) => {
+                    this._postImport(char);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                });
         }
     }
 
@@ -151,9 +165,13 @@ class CharactersScreen extends Component {
             this._goToCharacterScreen(this.props.character);
         } else {
             if (!common.isEmptyObject(this.props.character) && this.props.character.hasOwnProperty('filename')) {
-                file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
-                    this._loadCharacter(characterFilename);
-                });
+                file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5))
+                    .then(() => {
+                        this._loadCharacter(characterFilename);
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
             } else {
                 this._loadCharacter(characterFilename);
             }
@@ -188,8 +206,8 @@ class CharactersScreen extends Component {
     _openWarningDialog() {
         let newState = {...this.state};
 
-        newState.dialogTitle = `Old File Format Detected`;
-        newState.dialogMessage = `The XML file import format is going away!\n\nPlease load your character by selecting a Hero Designer file directly.`;
+        newState.dialogTitle = 'Old File Format Detected';
+        newState.dialogMessage = 'The XML file import format is going away!\n\nPlease load your character by selecting a Hero Designer file directly.';
         newState.dialogOnOkFn = null;
         newState.deleteDialogVisible = true;
 
@@ -200,7 +218,8 @@ class CharactersScreen extends Component {
         let newState = {...this.state};
 
         newState.dialogTitle = `Delete ${filename.slice(0, -5)}?`;
-        newState.dialogMessage = `Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded`;
+        newState.dialogMessage =
+            'Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded';
         newState.dialogOnOkFn = this.onDeleteDialogOk;
         newState.deleteDialogVisible = true;
         newState.toBeDeleted = filename;
@@ -238,7 +257,9 @@ class CharactersScreen extends Component {
 
         return (
             <Button style={styles.button} onPress={() => this.onLoadPress()}>
-                <Text uppercase={false} style={styles.buttonText}>View</Text>
+                <Text uppercase={false} style={styles.buttonText}>
+                    View
+                </Text>
             </Button>
         );
     }
@@ -266,7 +287,7 @@ class CharactersScreen extends Component {
                             onValueChange={(value) => this.updateSlot(value)}
                         >
                             {this.slots.map((slot, index) => {
-                                return <Item key={'slot-' + slot} label={`Slot ${slot + 1}`} value={slot} />
+                                return <Item key={'slot-' + slot} label={`Slot ${slot + 1}`} value={slot} />;
                             })}
                         </Picker>
                     </View>
@@ -279,8 +300,8 @@ class CharactersScreen extends Component {
                             <ListItem icon key={name}>
                                 <Left>
                                     <Icon
-                                        type='FontAwesome'
-                                        name='trash'
+                                        type="FontAwesome"
+                                        name="trash"
                                         style={{fontSize: verticalScale(25), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => this.openDeleteDialog(characterName)}
                                     />
@@ -290,8 +311,8 @@ class CharactersScreen extends Component {
                                 </Body>
                                 <Right>
                                     <Icon
-                                        type='FontAwesome'
-                                        name='chevron-right'
+                                        type="FontAwesome"
+                                        name="chevron-right"
                                         style={{fontSize: verticalScale(20), color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => this.onViewCharacterPress(characterName)}
                                     />
@@ -301,8 +322,10 @@ class CharactersScreen extends Component {
                     })}
                 </List>
                 <View style={[styles.buttonContainer, {paddingTop: verticalScale(20)}]}>
-                    <Button style={styles.button}  onPress={() => this._importCharacter()}>
-                        <Text uppercase={false} style={styles.buttonText}>Import</Text>
+                    <Button style={styles.button} onPress={() => this._importCharacter()}>
+                        <Text uppercase={false} style={styles.buttonText}>
+                            Import
+                        </Text>
                     </Button>
                 </View>
             </Fragment>
@@ -312,11 +335,8 @@ class CharactersScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Heading text="Characters" />
                     {this._renderCharacters()}
@@ -334,7 +354,7 @@ class CharactersScreen extends Component {
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         character: state.character.character,
         characters: state.character.characters,

@@ -1,12 +1,10 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { View, Alert } from 'react-native';
-import { Button, Text, Icon, Footer, FooterTab } from 'native-base';
-import { verticalScale } from 'react-native-size-matters';
+import {Button, Icon, Footer, FooterTab} from 'native-base';
+import {verticalScale} from 'react-native-size-matters';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
-import { MAX_CHARACTER_SLOTS } from '../../lib/Persistence';
-import { character as libCharacter } from '../../lib/Character';
-import styles from '../../Styles';
+import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
+import {character as libCharacter} from '../../lib/Character';
 
 export default class HeroDesignerCharacterFooter extends Component {
     static propTypes = {
@@ -15,7 +13,7 @@ export default class HeroDesignerCharacterFooter extends Component {
         characters: PropTypes.object.isRequired,
         selectCharacter: PropTypes.func.isRequired,
         clearCharacter: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -117,15 +115,18 @@ export default class HeroDesignerCharacterFooter extends Component {
                                 onPress={() => this._activateSlot(slot.toString())}
                                 onLongPress={() => this._emptySlot(slot.toString())}
                             >
-                                <Icon type='FontAwesome' name={this._getIcon(slot.toString())} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
+                                <Icon type="FontAwesome" name={this._getIcon(slot.toString())} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
                             </Button>
                         );
                     })}
                 </FooterTab>
                 <ConfirmationDialog
                     visible={this.state.deleteDialogVisible}
-                    title='Remove Character?'
-                    info={`Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.`}
+                    title="Remove Character?"
+                    info={
+                        // eslint-disable-next-line max-len
+                        'Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.'
+                    }
                     onOk={this.onDeleteDialogOk}
                     onClose={this.onDeleteDialogClose}
                 />

@@ -1,10 +1,10 @@
 // https://stackoverflow.com/a/41260990/1170235
-export const asyncDispatchMiddleware = store => next => action => {
+export const asyncDispatchMiddleware = (store) => (next) => (action) => {
     let syncActivityFinished = false;
     let actionQueue = [];
 
     function flushQueue() {
-        actionQueue.forEach(a => store.dispatch(a)); // flush queue
+        actionQueue.forEach((a) => store.dispatch(a)); // flush queue
         actionQueue = [];
     }
 
@@ -16,7 +16,7 @@ export const asyncDispatchMiddleware = store => next => action => {
         }
     }
 
-    const actionWithAsyncDispatch = Object.assign({}, action, { asyncDispatch });
+    const actionWithAsyncDispatch = Object.assign({}, action, {asyncDispatch});
     const res = next(actionWithAsyncDispatch);
 
     syncActivityFinished = true;

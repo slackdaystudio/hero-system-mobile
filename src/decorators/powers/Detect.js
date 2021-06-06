@@ -1,7 +1,6 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
-import { SKILL_CHECK } from '../../lib/DieRoller';
+import {common} from '../../lib/Common';
+import {SKILL_CHECK} from '../../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

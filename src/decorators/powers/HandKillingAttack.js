@@ -1,9 +1,8 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
-import { modifierDecorator } from '../modifiers/ModifierDecorator';
-import { KILLING_DAMAGE } from '../../lib/DieRoller';
+import {common} from '../../lib/Common';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
+import {modifierDecorator} from '../modifiers/ModifierDecorator';
+import {KILLING_DAMAGE} from '../../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -73,7 +72,6 @@ export default class HandKillingAttack extends CharacterTrait {
             type: KILLING_DAMAGE,
         };
         let damageClasses = this.characterTrait.trait.levels * 3;
-        let partialDie = false;
         let remainder = 0;
 
         if (!modifierMap.has('STRMINIMUM')) {

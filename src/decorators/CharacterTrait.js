@@ -1,5 +1,4 @@
-import { Alert } from 'react-native';
-import { common } from '../lib/Common';
+import {common} from '../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -132,7 +131,7 @@ export default class CharacterTrait {
             if (!attribute.hasOwnProperty('template')) {
                 let value = attribute.optionAlias || '';
 
-                if (typeof value === 'string' && value !== '' && (value.startsWith('(') && !value.endsWith(')'))) {
+                if (typeof value === 'string' && value !== '' && value.startsWith('(') && !value.endsWith(')')) {
                     value = value.substr(1);
                 }
 

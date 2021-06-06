@@ -1,20 +1,3 @@
-import { Alert } from 'react-native';
-import { common } from './Common';
-
-// Copyright 2018-Present Philip J. Guinchard
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 export const SKILL_CHECK = 1;
 
 export const TO_HIT = 2;
@@ -37,13 +20,7 @@ export const PARTIAL_DIE_MINUS_ONE = 3;
 
 class DieRoller {
     constructor() {
-        this.validLastRollTypes = [
-            SKILL_CHECK,
-            TO_HIT,
-            NORMAL_DAMAGE,
-            KILLING_DAMAGE,
-            EFFECT,
-        ];
+        this.validLastRollTypes = [SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT];
     }
 
     rollCheck(threshold = null) {
@@ -86,7 +63,7 @@ class DieRoller {
             results.push(result);
         }
 
-        return {'results': results};
+        return {results: results};
     }
 
     rollDamage(damageForm) {
@@ -109,17 +86,19 @@ class DieRoller {
             damageForm.isTargetInZeroG,
             damageForm.isTargetUnderwater,
             damageForm.rollWithPunch,
-            damageForm.isUsingClinging
+            damageForm.isUsingClinging,
         );
 
         if (damageForm.isExplosion) {
             resultRoll.rolls.sort((a, b) => a - b).reverse();
-            resultRoll.explosion = [{
-                distance: 0,
-                stun: resultRoll.stun,
-                body: resultRoll.body,
-                knockback: resultRoll.knockback,
-            }];
+            resultRoll.explosion = [
+                {
+                    distance: 0,
+                    stun: resultRoll.stun,
+                    body: resultRoll.body,
+                    knockback: resultRoll.knockback,
+                },
+            ];
 
             let newResultRoll = {...resultRoll};
             newResultRoll.rolls = resultRoll.rolls.slice();
@@ -192,9 +171,9 @@ class DieRoller {
         let name = 'None';
 
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
-            name = '+1 pip'
+            name = '+1 pip';
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            name = '-1 pip'
+            name = '-1 pip';
         } else if (partialDieType === PARTIAL_DIE_HALF) {
             name = '½d6';
         }

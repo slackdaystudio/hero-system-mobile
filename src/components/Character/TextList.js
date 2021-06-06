@@ -1,8 +1,7 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { Text, List, ListItem, Left, Right } from 'native-base';
-import { dieRoller } from '../../lib/DieRoller';
-import { character } from '../../lib/Character';
+import {Text, List, ListItem, Left, Right} from 'native-base';
+import {dieRoller} from '../../lib/DieRoller';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -24,7 +23,7 @@ export default class TextList extends Component {
         navigation: PropTypes.object.isRequired,
         text: PropTypes.string.isRequired,
         columnHeading: PropTypes.string.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -61,10 +60,7 @@ export default class TextList extends Component {
             return ['', text];
         }
 
-        return [
-            '    ' + text.slice(0, end + 1),
-            text.substring(end + 3),
-        ];
+        return ['    ' + text.slice(0, end + 1), text.substring(end + 3)];
     }
 
     render() {
@@ -89,7 +85,11 @@ export default class TextList extends Component {
                     let costEndPosition = lineItem[1].indexOf(')');
 
                     return (
-                        <ListItem key={this.props.columnHeading + '-' + index} underlayColor="#3da0ff" onLongPress={() => this.onSkillCheckLongPress(this.props.columnHeading, lineItem[1].substring(costEndPosition + 1))}>
+                        <ListItem
+                            key={this.props.columnHeading + '-' + index}
+                            underlayColor="#3da0ff"
+                            onLongPress={() => this.onSkillCheckLongPress(this.props.columnHeading, lineItem[1].substring(costEndPosition + 1))}
+                        >
                             <Left>
                                 <Text style={styles.grey}>{lineItem[0] + ' ' + lineItem[1].substring(costEndPosition + 1)}</Text>
                             </Left>

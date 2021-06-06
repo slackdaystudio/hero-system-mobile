@@ -1,6 +1,5 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -37,11 +36,7 @@ export default class LightningReflexes extends CharacterTrait {
         if (this.characterTrait.trait.option.toUpperCase() === 'ALL') {
             cost += this.characterTrait.trait.levels * option.lvlcost;
         } else {
-            cost += common.getMultiplierCost(
-                this.characterTrait.trait.levels,
-                option.lvlval,
-                option.lvlcost
-            );
+            cost += common.getMultiplierCost(this.characterTrait.trait.levels, option.lvlval, option.lvlcost);
         }
 
         return cost < 1 ? 1 : cost;

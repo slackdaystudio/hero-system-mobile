@@ -1,12 +1,12 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import {BackHandler, StyleSheet, View, ScrollView } from 'react-native';
-import { Container, Content, Text, List, ListItem, Left, Right, Spinner, Tabs, Tab, ScrollableTab } from 'native-base';
-import { NavigationEvents } from 'react-navigation';
+import {connect} from 'react-redux';
+import {BackHandler} from 'react-native';
+import {Container, Content, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
+import {NavigationEvents} from 'react-navigation';
 import Header from '../Header/Header';
-import { statistics } from '../../lib/Statistics';
-import { chart } from '../../lib/Chart';
+import {statistics} from '../../lib/Statistics';
+import {chart} from '../../lib/Chart';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -27,7 +27,7 @@ class StatisticsScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         statistics: PropTypes.object.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -60,11 +60,7 @@ class StatisticsScreen extends Component {
             return <Text style={styles.grey}>-</Text>;
         }
 
-        return (
-            <Text style={styles.grey}>
-                {(this.props.statistics.sum / this.props.statistics.totals.diceRolled).toFixed(1)}
-            </Text>
-        );
+        return <Text style={styles.grey}>{(this.props.statistics.sum / this.props.statistics.totals.diceRolled).toFixed(1)}</Text>;
     }
 
     _renderDieDistributionChart() {
@@ -89,11 +85,8 @@ class StatisticsScreen extends Component {
 
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
-                <Header navigation={this.props.navigation} backScreen='Home' />
+                <NavigationEvents onDidFocus={() => this.onDidFocus()} onDidBlur={() => this.onDidBlur()} />
+                <Header navigation={this.props.navigation} backScreen="Home" />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Statistics</Text>
                     {this._renderDieDistributionChart()}
@@ -151,7 +144,9 @@ class StatisticsScreen extends Component {
                                 <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
                             </Left>
                             <Right>
-                                <Text style={styles.grey}>{this.props.statistics.totals.normalDamage.rolls + this.props.statistics.totals.killingDamage.rolls}</Text>
+                                <Text style={styles.grey}>
+                                    {this.props.statistics.totals.normalDamage.rolls + this.props.statistics.totals.killingDamage.rolls}
+                                </Text>
                             </Right>
                         </ListItem>
                         <ListItem>
@@ -167,7 +162,9 @@ class StatisticsScreen extends Component {
                                 <Text style={styles.boldGrey}>Total Stun:</Text>
                             </Left>
                             <Right>
-                                <Text style={styles.grey}>{this.props.statistics.totals.normalDamage.stun + this.props.statistics.totals.killingDamage.stun}</Text>
+                                <Text style={styles.grey}>
+                                    {this.props.statistics.totals.normalDamage.stun + this.props.statistics.totals.killingDamage.stun}
+                                </Text>
                             </Right>
                         </ListItem>
                         <ListItem>
@@ -175,7 +172,9 @@ class StatisticsScreen extends Component {
                                 <Text style={styles.boldGrey}>Total Body:</Text>
                             </Left>
                             <Right>
-                                <Text style={styles.grey}>{this.props.statistics.totals.normalDamage.body + this.props.statistics.totals.killingDamage.body}</Text>
+                                <Text style={styles.grey}>
+                                    {this.props.statistics.totals.normalDamage.body + this.props.statistics.totals.killingDamage.body}
+                                </Text>
                             </Right>
                         </ListItem>
                         <ListItem>
@@ -190,19 +189,17 @@ class StatisticsScreen extends Component {
                             <Left>
                                 <Text style={styles.boldGrey}>Most Frequent Hit Location:</Text>
                             </Left>
-                            <Right>
-                                {this._renderHitLocationStat()}
-                            </Right>
+                            <Right>{this._renderHitLocationStat()}</Right>
                         </ListItem>
                         <ListItem>
                             <Left>
                                 <Text style={styles.boldGrey}>Average Roll:</Text>
                             </Left>
-                            <Right>
-                                {this._renderAverageRoll()}
-                            </Right>
+                            <Right>{this._renderAverageRoll()}</Right>
                         </ListItem>
-                        <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>*Does not include hit location or knockback rolls</Text>
+                        <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>
+                            *Does not include hit location or knockback rolls
+                        </Text>
                     </List>
                 </Content>
             </Container>
@@ -210,26 +207,7 @@ class StatisticsScreen extends Component {
     }
 }
 
-const localStyles = StyleSheet.create({
-    tabInactive: {
-        backgroundColor: '#3a557f',
-    },
-    tabActive: {
-        backgroundColor: '#476ead',
-    },
-    tabBarUnderline: {
-        backgroundColor: '#3da0ff',
-    },
-    tabContent: {
-        backgroundColor: '#375476',
-    },
-    pointCostsHeader: {
-        alignSelf: 'center',
-        textDecorationLine: 'underline',
-    },
-});
-
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         statistics: state.statistics,
     };

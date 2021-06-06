@@ -1,24 +1,5 @@
-import { Platform, Alert } from 'react-native';
-import { Toast } from 'native-base';
-import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
-import { common } from './Common';
-import { NORMAL_DAMAGE, KILLING_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF } from './DieRoller';
-import { file } from './File';
-import { store } from '../../App';
-
-// Copyright 2018-Present Philip J. Guinchard
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+import {NORMAL_DAMAGE, KILLING_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF} from './DieRoller';
+import {file} from './File';
 
 class Character {
     constructor() {
@@ -77,15 +58,18 @@ class Character {
             {
                 label: 'Physical Defense',
                 value: this._getDefense(pd[0]),
-            }, {
+            },
+            {
                 label: 'R. Physical Defense',
-                value: this._getDefense((pd.length === 4 ? pd[2].slice(1) : 0)),
-            }, {
+                value: this._getDefense(pd.length === 4 ? pd[2].slice(1) : 0),
+            },
+            {
                 label: 'Energy Defense',
                 value: this._getDefense(ed[0]),
-            }, {
+            },
+            {
                 label: 'R. Energy Defense',
-                value: this._getDefense((ed.length === 4 ? ed[2].slice(1) : 0)),
+                value: this._getDefense(ed.length === 4 ? ed[2].slice(1) : 0),
             },
         ];
     }
@@ -131,10 +115,12 @@ class Character {
     }
 
     isAttackPower(text) {
-        if (/(Killing\sAttack\s\-\sHand\-To\-Hand|HKA)/.test(text) ||
+        if (
+            /(Killing\sAttack\s\-\sHand\-To\-Hand|HKA)/.test(text) ||
             /(Killing\sAttack\s\-\sRanged|RKA)/.test(text) ||
             /(Energy\sBlast|EB|Blast)/.test(text) ||
-            /(Hand\-To\-Hand\sAttack|HA)/.test(text)) {
+            /(Hand\-To\-Hand\sAttack|HA)/.test(text)
+        ) {
             return true;
         }
 
@@ -215,7 +201,7 @@ class Character {
         if (match !== null) {
             let damage = {};
             let damageParts = match[0].split(' ');
-            let damageDice = this._getDamageDice(damageParts[(damageParts.length - 1)]);
+            let damageDice = this._getDamageDice(damageParts[damageParts.length - 1]);
 
             damage.dice = damageDice.dice;
             damage.partialDie = damageDice.partialDie;
@@ -234,7 +220,7 @@ class Character {
         if (match !== null) {
             let damage = {};
             let damageParts = match[0].split(' ');
-            let damageDice = this._getDamageDice(damageParts[(damageParts.length - 1)]);
+            let damageDice = this._getDamageDice(damageParts[damageParts.length - 1]);
 
             damage.dice = damageDice.dice;
             damage.partialDie = damageDice.partialDie;
@@ -365,7 +351,7 @@ class Character {
                     itemText += this._getPower(powers[i]);
                 }
 
-                if ((i + 1) !== powers.length) {
+                if (i + 1 !== powers.length) {
                     itemText += ' ';
                 }
             }

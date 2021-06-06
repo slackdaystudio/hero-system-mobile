@@ -1,11 +1,10 @@
-import { Alert } from 'react-native';
-import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
-import { INITIALIZE_SETTINGS } from './settings';
-import { INITIALIZE_STATISTICS } from './statistics';
-import { INITIALIZE_CHARACTER, SAVE_CACHED_CHARACTER } from './character';
-import { INITIALIZE_RANDOM_HERO } from './randomHero';
-import { INITIALIZE_VERSION } from './version';
-import { persistence } from '../lib/Persistence';
+import {FOREGROUND, BACKGROUND, INACTIVE} from 'redux-enhancer-react-native-appstate';
+import {INITIALIZE_SETTINGS} from './settings';
+import {INITIALIZE_STATISTICS} from './statistics';
+import {INITIALIZE_CHARACTER, SAVE_CACHED_CHARACTER} from './character';
+import {INITIALIZE_RANDOM_HERO} from './randomHero';
+import {INITIALIZE_VERSION} from './version';
+import {persistence} from '../lib/Persistence';
 import currentVersion from '../../public/version.json';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -86,6 +85,6 @@ export default function appState(state = '', action) {
 
             return state;
         default:
-            return state
+            return state;
     }
 }

@@ -1,18 +1,17 @@
-import React, { Component }  from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { BackHandler, StyleSheet, View, Image } from 'react-native';
-import { Container, Content, List, ListItem, Left, Right, Button, Text, Radio, Picker, Item } from 'native-base';
+import {connect} from 'react-redux';
+import {BackHandler, View} from 'react-native';
+import {Container, Content, List, ListItem, Left, Right, Button, Text, Radio, Picker, Item} from 'native-base';
 import RNShake from 'react-native-shake';
-import { NavigationEvents } from 'react-navigation';
-import { verticalScale } from 'react-native-size-matters';
+import {NavigationEvents} from 'react-navigation';
+import {verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
-import { dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE } from '../../lib/DieRoller';
-import { common } from '../../lib/Common';
+import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
 import styles from '../../Styles';
-import { updateFormValue } from '../../reducers/forms';
+import {updateFormValue} from '../../reducers/forms';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -28,24 +27,14 @@ import { updateFormValue } from '../../reducers/forms';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const effectTypes = [
-    'None',
-    'Aid',
-    'Dispel',
-    'Drain',
-    'Entangle',
-    'Flash',
-    'Healing',
-    'Luck',
-    'Unluck',
-];
+const effectTypes = ['None', 'Aid', 'Dispel', 'Drain', 'Entangle', 'Flash', 'Healing', 'Luck', 'Unluck'];
 
 class EffectScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         effectForm: PropTypes.object.isRequired,
         updateFormValue: PropTypes.func.isRequired,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -86,7 +75,12 @@ class EffectScreen extends Component {
     _roll() {
         this.props.navigation.navigate('Result', {
             from: 'Effect',
-            result: dieRoller.effectRoll(this.props.effectForm.dice, this.props.effectForm.partialDie, this.props.effectForm.effectType, this.props.effectForm.sfx)
+            result: dieRoller.effectRoll(
+                this.props.effectForm.dice,
+                this.props.effectForm.partialDie,
+                this.props.effectForm.effectType,
+                this.props.effectForm.sfx,
+            ),
         });
     }
 
@@ -107,14 +101,20 @@ class EffectScreen extends Component {
             <List>
                 {effectTypes.map((type, index) => {
                     return (
-                        <ListItem key={`effect-${index}`} noIndent underlayColor="#1b1d1f" style={{borderBottomWidth: 0, paddingBottom: 0}} onPress={() => this.selectEffect(type)}>
+                        <ListItem
+                            key={`effect-${index}`}
+                            noIndent
+                            underlayColor="#1b1d1f"
+                            style={{borderBottomWidth: 0, paddingBottom: 0}}
+                            onPress={() => this.selectEffect(type)}
+                        >
                             <Left>
                                 <Text style={styles.grey}>{type}</Text>
                             </Left>
                             <Right>
                                 <Radio
-                                    color='#14354d'
-                                    selectedColor='#14354d'
+                                    color="#14354d"
+                                    selectedColor="#14354d"
                                     selected={this.props.effectForm.effectType === type}
                                     onPress={() => this.selectEffect(type)}
                                 />
@@ -129,25 +129,14 @@ class EffectScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents
-                    onDidFocus={(payload) => this.onDidFocus()}
-                    onDidBlur={(payload) => this.onDidBlur()}
-                />
+                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                 <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
                 <Content style={styles.content}>
-                    <Heading text='Effect Roll' />
-                    <Slider
-                        label="Dice:"
-                        value={this.props.effectForm.dice}
-                        step={1}
-                        min={0}
-                        max={50}
-                        onValueChange={this.setSliderState}
-                        valueKey="dice"
-                    />
+                    <Heading text="Effect Roll" />
+                    <Slider label="Dice:" value={this.props.effectForm.dice} step={1} min={0} max={50} onValueChange={this.setSliderState} valueKey="dice" />
                     <Picker
                         inlinelabel
-                        label='Partial Die'
+                        label="Partial Die"
                         style={{width: undefined, color: '#FFFFFF'}}
                         textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
                         iosHeader="Select one"
@@ -160,10 +149,10 @@ class EffectScreen extends Component {
                         <Item label="+½ die" value={PARTIAL_DIE_HALF} />
                         <Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
                     </Picker>
-                    <Heading text='Effect' />
+                    <Heading text="Effect" />
                     {this._renderEffects()}
                     <View style={{paddingBottom: verticalScale(20)}} />
-                    <Button block style={styles.button}  onPress={this.roll}>
+                    <Button block style={styles.button} onPress={this.roll}>
                         <Text uppercase={false}>Roll</Text>
                     </Button>
                     <View style={{paddingBottom: verticalScale(20)}} />
@@ -173,7 +162,7 @@ class EffectScreen extends Component {
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         effectForm: state.forms.effect,
     };

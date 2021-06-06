@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -34,7 +33,10 @@ export default class RapidAttack extends CharacterTrait {
                     }
                 }
             } else {
-                if (this.characterTrait.trait.modifier.xmlid.toUpperCase() === 'HTHONLY' || this.characterTrait.trait.modifier.xmlid.toUpperCase() === 'RANGEDONLY') {
+                if (
+                    this.characterTrait.trait.modifier.xmlid.toUpperCase() === 'HTHONLY' ||
+                    this.characterTrait.trait.modifier.xmlid.toUpperCase() === 'RANGEDONLY'
+                ) {
                     cost--;
                 }
             }

@@ -1,7 +1,6 @@
-import { Alert } from 'react-native';
-import { heroDesignerCharacter } from './HeroDesignerCharacter';
-import { character as libCharacter } from './Character';
-import { common } from './Common';
+import {heroDesignerCharacter} from './HeroDesignerCharacter';
+import {character as libCharacter} from './Character';
+import {common} from './Common';
 import speedTable from '../../public/speed.json';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -77,8 +76,8 @@ class CombatDetails {
         let combatDetails = {
             stun: 0,
             body: 0,
-            endurance: 0
-        }
+            endurance: 0,
+        };
 
         if (libCharacter.isHeroDesignerCharacter(character)) {
             if (heroDesignerCharacter.isFifth(character)) {
@@ -127,7 +126,7 @@ class CombatDetails {
 
     _getCharacteristic(character, shortName) {
         if (character.showSecondary) {
-            return heroDesignerCharacter.getCharacteristicTotal(shortName, character)
+            return heroDesignerCharacter.getCharacteristicTotal(shortName, character);
         }
 
         let characteristic = heroDesignerCharacter.getCharacteristicByShortName(shortName, character);
@@ -147,11 +146,11 @@ class CombatDetails {
             speed = speedCharacteristic === null ? 1 : speedCharacteristic.value;
         }
 
-        for (let phase of speedTable[(speed > 12 ? '12' : speed.toString())].phases) {
+        for (let phase of speedTable[speed > 12 ? '12' : speed.toString()].phases) {
             phases[phase.toString()] = {
                 used: false,
                 aborted: false,
-            }
+            };
         }
 
         return phases;

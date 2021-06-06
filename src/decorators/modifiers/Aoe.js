@@ -1,6 +1,5 @@
-import { Alert } from 'react-native';
 import Modifier from './Modifier';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -76,7 +75,7 @@ export default class Aoe extends Modifier {
             }
 
             if (heroDesignerCharacter.isFifth(this.decorated.getCharacter())) {
-                adderCost += adder.levels / adderTemplate.lvlval * adderTemplate.lvlcost;
+                adderCost += (adder.levels / adderTemplate.lvlval) * adderTemplate.lvlcost;
             } else {
                 adderCost += this._getMultiplications(adder.levels, adderTemplate.lvlmultiplier + 1, adderTemplate.lvlpower) * adderTemplate.lvlcost;
             }
@@ -88,7 +87,7 @@ export default class Aoe extends Modifier {
     }
 
     _getMultiplications(levels, levelMultiplier, levelPower) {
-        let multiplications = Math.ceil(Math.log((levels / levelMultiplier)) / Math.log(levelPower));
+        let multiplications = Math.ceil(Math.log(levels / levelMultiplier) / Math.log(levelPower));
         multiplications = multiplications < 1 ? 1 : multiplications;
 
         return multiplications;

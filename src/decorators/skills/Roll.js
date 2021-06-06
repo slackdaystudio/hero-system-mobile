@@ -1,22 +1,6 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { SKILL_CHECK } from '../../lib/DieRoller';
-import { heroDesignerCharacter } from '../../lib/HeroDesignerCharacter';
-import { common } from '../../lib/Common';
-
-// Copyright 2018-Present Philip J. Guinchard
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+import {SKILL_CHECK} from '../../lib/DieRoller';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 
 export const SKILL_ROLL_BASE = 9;
 
@@ -77,7 +61,10 @@ export default class Roll extends CharacterTrait {
                 roll = SKILL_GENERAL_CHARACTERISTIC;
             }
         } else if (this.characterTrait.trait.hasOwnProperty('characteristic')) {
-            let characteristic = this.characterTrait.getCharacter().characteristics.filter(c => c.shortName.toLowerCase() === this.characterTrait.trait.characteristic.toLowerCase()).shift();
+            let characteristic = this.characterTrait
+                .getCharacter()
+                .characteristics.filter((c) => c.shortName.toLowerCase() === this.characterTrait.trait.characteristic.toLowerCase())
+                .shift();
 
             roll = parseInt(heroDesignerCharacter.getRollTotal(characteristic, this.characterTrait.getCharacter()).slice(0, -1), 10);
         }

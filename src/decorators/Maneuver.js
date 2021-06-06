@@ -1,8 +1,7 @@
-import { Alert } from 'react-native';
 import CharacterTrait from './CharacterTrait';
-import { common } from '../lib/Common';
-import { heroDesignerCharacter } from '../lib/HeroDesignerCharacter';
-import { NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT } from '../lib/DieRoller';
+import {common} from '../lib/Common';
+import {heroDesignerCharacter} from '../lib/HeroDesignerCharacter';
+import {NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -108,7 +107,11 @@ export default class Maneuver extends CharacterTrait {
         }
 
         if (this.characterTrait.trait.hasOwnProperty('effect') && this.characterTrait.trait.hasOwnProperty('template')) {
-            if (this.characterTrait.trait.template.doesdamage && this.characterTrait.trait.category === 'Hand To Hand' && !this.characterTrait.trait.useweapon) {
+            if (
+                this.characterTrait.trait.template.doesdamage &&
+                this.characterTrait.trait.category === 'Hand To Hand' &&
+                !this.characterTrait.trait.useweapon
+            ) {
                 if (this.characterTrait.trait.effect.indexOf('[KILLINGDC]') > -1) {
                     return {
                         roll: this._getUnarmedKillingDamage(),
@@ -201,7 +204,7 @@ export default class Maneuver extends CharacterTrait {
             }
         }
 
-        if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
+        if (parseFloat((dice % 1).toFixed(1)) !== 0.0) {
             partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.6 ? true : false;
             dice = Math.trunc(dice);
         }
@@ -221,7 +224,7 @@ export default class Maneuver extends CharacterTrait {
             }
         }
 
-        if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
+        if (parseFloat((dice % 1).toFixed(1)) !== 0.0) {
             partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.5 ? true : false;
             dice = Math.trunc(dice);
         }
@@ -233,7 +236,6 @@ export default class Maneuver extends CharacterTrait {
         let character = this.characterTrait.getCharacter();
         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
         let dice = this.characterTrait.trait.dc;
-        let partialDie = false;
 
         if (this.characterTrait.trait.category === 'Hand To Hand') {
             if (martialArtsMap.has('EXTRADC')) {
@@ -249,7 +251,6 @@ export default class Maneuver extends CharacterTrait {
         let martialArtsMap = common.toMap(common.flatten(character.martialArts, 'maneuver'));
         let dice = '';
         let damageClasses = this.characterTrait.trait.dc;
-        let partialDie = false;
         let remainder = 0;
         let damageString = '';
 

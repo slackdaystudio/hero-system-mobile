@@ -5,7 +5,6 @@ import TransportFamiliarity from './TransportFamiliarity';
 import TwoWeaponFighting from './TwoWeaponFighting';
 import WeaponFamiliarity from './WeaponFamiliarity';
 import Roll from './Roll';
-import Skill from '../Skill';
 import SkillLevels from '../SkillLevels';
 import SkillLevelsOnly from '../SkillLevelsOnly';
 import SkillWithAdders from '../SkillWithAdders';
@@ -111,7 +110,7 @@ class SkillDecorator {
                 decorated = new WeaponFamiliarity(decorated);
                 break;
             default:
-                // do nothing
+            // do nothing
         }
 
         if (decorated.characterTrait.trait.levelsonly) {

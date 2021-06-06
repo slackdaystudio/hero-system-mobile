@@ -1,6 +1,5 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -99,26 +98,27 @@ export default class Shrinking extends CharacterTrait {
             common.toCm(character.characterInfo.height),
             this.characterTrait.trait.template.heightincrease,
             this.characterTrait.trait.levels,
-            this.characterTrait.trait.template.heightincreaselevels
+            this.characterTrait.trait.template.heightincreaselevels,
         );
         let mass = this._getAlteredMass(
             common.toKg(character.characterInfo.weight),
             this.characterTrait.trait.template.massmultiplier,
             this.characterTrait.trait.levels,
-            this.characterTrait.trait.template.massmultiplierlevels
+            this.characterTrait.trait.template.massmultiplierlevels,
         );
 
         return {
             height: height,
             mass: mass,
-            perception: this.characterTrait.trait.levels / this.characterTrait.trait.template.perincreaselevels * this.characterTrait.trait.template.perincrease,
+            perception:
+                (this.characterTrait.trait.levels / this.characterTrait.trait.template.perincreaselevels) * this.characterTrait.trait.template.perincrease,
             dcv: this.characterTrait.trait.template.dcvincrease * (this.characterTrait.trait.levels / this.characterTrait.trait.template.dcvincreaselevels),
             knockback: this.characterTrait.trait.template.kbincrease * (this.characterTrait.trait.levels / this.characterTrait.trait.template.kbincreaselevels),
         };
     }
 
     _getAlteredMass(kg, massMultiplier, shrinkingLevels, massMultiplierLevels) {
-        let weight = kg * 1000 * massMultiplier ** (shrinkingLevels / massMultiplierLevels) / 1000;
+        let weight = (kg * 1000 * massMultiplier ** (shrinkingLevels / massMultiplierLevels)) / 1000;
 
         return weight > CUT_OFF_POINT ? Math.round(weight * 10000) / 10000 : weight.toExponential(3);
     }

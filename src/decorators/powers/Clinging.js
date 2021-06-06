@@ -1,6 +1,5 @@
-import { Alert } from 'react-native';
 import CharacterTrait from '../CharacterTrait';
-import { common } from '../../lib/Common';
+import {common} from '../../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,7 +28,7 @@ export default class Clinging extends CharacterTrait {
         cost += common.getMultiplierCost(
             this.characterTrait.trait.levels,
             this.characterTrait.trait.template.lvlval,
-            this.characterTrait.trait.template.lvlcost
+            this.characterTrait.trait.template.lvlcost,
         );
 
         return cost + 1;

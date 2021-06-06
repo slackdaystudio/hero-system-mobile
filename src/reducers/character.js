@@ -1,6 +1,4 @@
-import { Alert } from 'react-native';
-import { common } from '../lib/Common';
-import { persistence, MAX_CHARACTER_SLOTS } from '../lib/Persistence';
+import {persistence, MAX_CHARACTER_SLOTS} from '../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -56,7 +54,7 @@ export const CLEAR_STATUS = 'CLEAR_STATUS';
 
 export function setCharacter(character, slot) {
     return async (dispatch) => {
-        persistence.saveCharacter(character, slot).then(characterData => {
+        persistence.saveCharacter(character, slot).then((characterData) => {
             dispatch({
                 type: SET_CHARACTER,
                 payload: characterData,
@@ -67,7 +65,7 @@ export function setCharacter(character, slot) {
 
 export function updateLoadedCharacters(newCharacter, character, characters) {
     return async (dispatch) => {
-        persistence.updateLoadedCharacters(newCharacter, character, characters).then(characterData => {
+        persistence.updateLoadedCharacters(newCharacter, character, characters).then((characterData) => {
             dispatch({
                 type: UPDATE_LOADED_CHARACTERS,
                 payload: characterData,
@@ -125,7 +123,7 @@ export function setSparseCombatDetails(sparseCombatDetails, secondary) {
         payload: {
             secondary: secondary,
             sparseCombatDetails: sparseCombatDetails,
-        }
+        },
     };
 }
 
@@ -201,8 +199,8 @@ export default function character(state = characterState, action) {
                     ...state.character,
                 },
                 characters: {
-                    ...state.characters
-                }
+                    ...state.characters,
+                },
             };
 
             newState.character = {...action.payload.character};
@@ -220,8 +218,8 @@ export default function character(state = characterState, action) {
                     ...action.payload.character,
                 },
                 characters: {
-                    ...action.payload.characters
-                }
+                    ...action.payload.characters,
+                },
             };
 
             return newState;
@@ -249,7 +247,7 @@ export default function character(state = characterState, action) {
                     ...state.character,
                 },
                 characters: {
-                    ...state.characters
+                    ...state.characters,
                 },
             };
 
@@ -268,7 +266,7 @@ export default function character(state = characterState, action) {
                     ...state.character,
                 },
                 characters: {
-                    ...state.characters
+                    ...state.characters,
                 },
             };
 
