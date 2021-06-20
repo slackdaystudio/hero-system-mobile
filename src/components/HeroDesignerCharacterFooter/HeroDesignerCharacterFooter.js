@@ -4,7 +4,6 @@ import {Button, Icon, Footer, FooterTab} from 'native-base';
 import {verticalScale} from 'react-native-size-matters';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
-import {character as libCharacter} from '../../lib/Character';
 
 export default class HeroDesignerCharacterFooter extends Component {
     static propTypes = {
@@ -33,13 +32,9 @@ export default class HeroDesignerCharacterFooter extends Component {
         this.onDeleteDialogClose = this._onDeleteDialogClose.bind(this);
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps) {
         if (this.props.character !== null && prevProps.character !== null && prevProps.character.filename !== this.props.character.filename) {
-            if (libCharacter.isHeroDesignerCharacter(this.props.character)) {
-                this.props.navigation.navigate('ViewHeroDesignerCharacter');
-            } else {
-                this.props.navigation.navigate('ViewCharacter');
-            }
+            this.props.navigation.navigate('ViewHeroDesignerCharacter');
         }
     }
 

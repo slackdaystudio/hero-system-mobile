@@ -11,7 +11,6 @@ import Traits from '../HeroDesignerCharacter/Traits';
 import Notes from '../HeroDesignerCharacter/Notes';
 import Header from '../Header/Header';
 import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
-import {character} from '../../lib/Character';
 import {common} from '../../lib/Common';
 import styles from '../../Styles';
 import {updateForm, updateFormValue, resetForm} from '../../reducers/forms';
@@ -94,7 +93,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
         Dimensions.removeEventListener('change', this.screenOrientationHandler);
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps) {
         if (this.props.character !== null && prevProps.character !== null && this.props.character.filename !== prevProps.character.filename) {
             if (this.tabs !== null && this.tabs !== undefined) {
                 this.tabs.goToPage(0);
@@ -180,7 +179,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
     _renderCharacter() {
         // The Drawer navigator can sometimes pass in an old character to this view by mistake, this
         // guards against a error
-        if (common.isEmptyObject(this.props.character) || !character.isHeroDesignerCharacter(this.props.character)) {
+        if (common.isEmptyObject(this.props.character)) {
             return <Spinner color="#D0D1D3" />;
         }
 

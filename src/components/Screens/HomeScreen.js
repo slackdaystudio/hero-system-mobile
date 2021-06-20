@@ -7,7 +7,6 @@ import {verticalScale} from 'react-native-size-matters';
 import {NavigationEvents} from 'react-navigation';
 import Header, {EXIT_APP} from '../Header/Header';
 import Heading from '../Heading/Heading';
-import {character} from '../../lib/Character';
 import {common} from '../../lib/Common';
 import styles from '../../Styles';
 
@@ -44,13 +43,7 @@ class HomeScreen extends Component {
     }
 
     _onViewPress() {
-        let screen = 'ViewCharacter';
-
-        if (character.isHeroDesignerCharacter(this.props.character)) {
-            screen = 'ViewHeroDesignerCharacter';
-        }
-
-        this.props.navigation.navigate(screen, {from: 'Home'});
+        this.props.navigation.navigate('ViewHeroDesignerCharacter', {from: 'Home'});
     }
 
     _renderCharacterButtons() {

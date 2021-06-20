@@ -146,10 +146,6 @@ class CharactersScreen extends Component {
     _postImport(importedCharacter) {
         this._refreshCharacters();
 
-        if (importedCharacter !== undefined && !character.isHeroDesignerCharacter(importedCharacter)) {
-            this._openWarningDialog();
-        }
-
         if (Object.keys(this.props.characters).length >= 1) {
             for (let char of Object.values(this.props.characters)) {
                 if (char !== null && char.filename === importedCharacter.filename) {
@@ -162,7 +158,7 @@ class CharactersScreen extends Component {
 
     _onViewCharacterPress(characterFilename) {
         if (!common.isEmptyObject(this.props.character) && this.props.character.filename === characterFilename) {
-            this._goToCharacterScreen(this.props.character);
+            this._goToCharacterScreen();
         } else {
             if (!common.isEmptyObject(this.props.character) && this.props.character.hasOwnProperty('filename')) {
                 file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5))
@@ -189,29 +185,12 @@ class CharactersScreen extends Component {
 
             this.props.setCharacter(char, this.state.slot.toString());
 
-            this._goToCharacterScreen(char);
+            this._goToCharacterScreen();
         });
     }
 
-    _goToCharacterScreen(char) {
-        let screen = 'ViewCharacter';
-
-        if (character.isHeroDesignerCharacter(char)) {
-            screen = 'ViewHeroDesignerCharacter';
-        }
-
-        this.props.navigation.navigate(screen, {from: 'Characters'});
-    }
-
-    _openWarningDialog() {
-        let newState = {...this.state};
-
-        newState.dialogTitle = 'Old File Format Detected';
-        newState.dialogMessage = 'The XML file import format is going away!\n\nPlease load your character by selecting a Hero Designer file directly.';
-        newState.dialogOnOkFn = null;
-        newState.deleteDialogVisible = true;
-
-        this.setState(newState);
+    _goToCharacterScreen() {
+        this.props.navigation.navigate('ViewHeroDesignerCharacter', {from: 'Characters'});
     }
 
     _openDeleteDialog(filename) {

@@ -2,7 +2,6 @@ import {createDrawerNavigator} from 'react-navigation-drawer';
 import {scale} from 'react-native-size-matters';
 import HomeScreen from './src/components/Screens/HomeScreen';
 import CharactersScreen from './src/components/Screens/CharactersScreen';
-import ViewCharacterScreen from './src/components/Screens/ViewCharacterScreen';
 import ViewHeroDesignerCharacterScreen from './src/components/Screens/ViewHeroDesignerCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
@@ -36,9 +35,6 @@ const AppNavigator = createDrawerNavigator(
         },
         Characters: {
             screen: CharactersScreen,
-        },
-        ViewCharacter: {
-            screen: ViewCharacterScreen,
         },
         ViewHeroDesignerCharacter: {
             screen: ViewHeroDesignerCharacterScreen,

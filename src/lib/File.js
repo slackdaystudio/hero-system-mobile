@@ -35,8 +35,6 @@ const DEFAULT_CHARACTER_DIR = `${DEFAULT_ROOT_DIR}/${DIR_CHARACTER}`;
 
 const DEFAULT_SOUND_DIR = `${DEFAULT_ROOT_DIR}/${DIR_SOUNDS}`;
 
-const EXT_XML = 'xml';
-
 const EXT_HD = 'hdc';
 
 const EXT_CHARACTER = 'hsmc';
@@ -56,9 +54,7 @@ class File {
                 return;
             }
 
-            if (result.name.toLowerCase().endsWith(`.${EXT_XML}`)) {
-                character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_XML);
-            } else if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
+            if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
                 character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_HD);
             } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
                 character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_CHARACTER);
@@ -162,10 +158,6 @@ class File {
                 character = await this._loadHdcCharacter(rawXml);
 
                 this._savePortrait(character);
-            } else if (type === EXT_XML) {
-                let rawXml = await this._getRawXm(absoluteFilePath);
-
-                character = await this._loadXmlExportCharacter(rawXml);
             } else if (type === EXT_CHARACTER) {
                 character = this._importCharacter(name, absoluteFilePath);
             }
@@ -182,29 +174,6 @@ class File {
         let data = await RNFS.readFile(uri, 'base64');
 
         return this._decode(data);
-    }
-
-    async _loadXmlExportCharacter(rawXml) {
-        let parser = xml2js.Parser({explicitArray: false});
-        let character = null;
-
-        try {
-            character = await new Promise((resolve, reject) =>
-                parser.parseString(rawXml, (error, result) => {
-                    if (error) {
-                        reject(error);
-                    }
-
-                    resolve(result);
-                }),
-            );
-
-            common.toast('Character successfully loaded');
-        } catch (error) {
-            common.toast(error.message);
-        }
-
-        return character.character;
     }
 
     async _loadHdcCharacter(rawXml) {

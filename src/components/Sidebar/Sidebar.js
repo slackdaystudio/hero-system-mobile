@@ -5,7 +5,6 @@ import {Image, View} from 'react-native';
 import {Container, Content, Text, List, ListItem} from 'native-base';
 import {ifIphoneX} from 'react-native-iphone-x-helper';
 import {ScaledSheet, scale} from 'react-native-size-matters';
-import {character} from '../../lib/Character';
 import {common} from '../../lib/Common';
 import styles from '../../Styles';
 
@@ -33,13 +32,7 @@ class Sidebar extends Component {
         if (common.isEmptyObject(this.props.character)) {
             common.toast('Please load a character first');
         } else {
-            let screen = 'ViewCharacter';
-
-            if (character.isHeroDesignerCharacter(this.props.character)) {
-                screen = 'ViewHeroDesignerCharacter';
-            }
-
-            this.props.navigation.navigate(screen);
+            this.props.navigation.navigate('ViewHeroDesignerCharacter');
         }
     }
 
