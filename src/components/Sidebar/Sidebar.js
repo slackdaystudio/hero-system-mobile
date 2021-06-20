@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Image, View} from 'react-native';
 import {Container, Content, Text, List, ListItem} from 'native-base';
-import {ifIphoneX} from 'react-native-iphone-x-helper';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import {common} from '../../lib/Common';
 import styles from '../../Styles';
@@ -60,7 +59,7 @@ class Sidebar extends Component {
                             <Text style={styles.grey}>Damage</Text>
                         </ListItem>
                         <ListItem onPress={() => this.props.navigation.navigate('Effect')}>
-                            <Text style={styles.grey}>Free Form</Text>
+                            <Text style={styles.grey}>Effect</Text>
                         </ListItem>
                         <ListItem itemDivider style={{backgroundColor: '#242424'}} />
                         <ListItem onPress={() => this.props.navigation.navigate('RandomCharacter')}>
@@ -87,9 +86,6 @@ class Sidebar extends Component {
 const localStyles = ScaledSheet.create({
     container: {
         backgroundColor: '#242424',
-        ...ifIphoneX({
-            paddingTop: '50@vs',
-        }),
     },
 });
 
