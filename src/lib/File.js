@@ -7,6 +7,7 @@ import getPath from '@flyerhq/react-native-android-uri-path';
 import {isBase64} from 'is-base64';
 import {common} from './Common';
 import {heroDesignerCharacter} from './HeroDesignerCharacter';
+import {character as libCharacter} from './Character';
 import {combatDetails} from './CombatDetails';
 import {Buffer} from 'buffer';
 import iconv from 'iconv-lite';
@@ -87,14 +88,17 @@ class File {
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
             characters = await RNFS.readDir(path);
 
-            characters = characters.filter((f) => f.name.endsWith(EXT_CHARACTER)).sort((a, b) => a.name > b.name);
+            // Users may have old XML exported characters in thier dir, filter them out but leave them in place
+            characters = await this._filterCharacters(characters);
         } catch (error) {
             Alert.alert(error.message);
         }
 
-        return characters.map((c) => {
-            return c.name;
-        });
+        return characters
+            .sort((a, b) => a.name > b.name)
+            .map((c) => {
+                return c.name;
+            });
     }
 
     async loadCharacter(characterName, startLoad, endLoad) {
@@ -142,6 +146,33 @@ class File {
         } catch (error) {
             Alert.alert(error.message);
         }
+    }
+
+    async _filterCharacters(characters) {
+        let filtered = [];
+        let char = null;
+        let path = await this._getPath(DEFAULT_CHARACTER_DIR);
+        let canonicalToName = null;
+        let canonicalFromName = null;
+
+        for (const character of characters) {
+            canonicalFromName = `${path}/${character.name}`;
+            canonicalToName = `${path}/tmp`;
+
+            await unzip(canonicalFromName, canonicalToName);
+
+            char = await RNFS.readFile(`${canonicalToName}/${character.name.slice(0, -5)}.${EXT_JSON}`);
+
+            if (libCharacter.isHeroDesignerCharacter(JSON.parse(char))) {
+                filtered.push(character);
+            }
+        }
+
+        if (canonicalToName) {
+            await RNFS.unlink(canonicalToName);
+        }
+
+        return filtered;
     }
 
     async _read(name, uri, startLoad, endLoad, type) {
