@@ -1108,10 +1108,10 @@ class HeroDesignerCharacter {
         let adds = [
             {
                 xmlid: 'CONTROLCOST',
-                basecost: power.adder.baseCost,
-                levels: power.adder.levels,
-                lvlcost: power.adder.lvlcost,
-                lvlval: power.adder.lvlval,
+                basecost: power.adder ? power.adder.baseCost : 0.0,
+                levels: power.adder ? power.adder.levels : 0,
+                lvlcost: power.adder ? power.adder.lvlcost : 0,
+                lvlval: power.adder ? power.adder.lvlval : 0,
             },
         ];
 
