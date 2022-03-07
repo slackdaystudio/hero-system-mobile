@@ -55,19 +55,19 @@ class File {
                 return;
             }
 
-            if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
-                character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_HD);
-            } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
-                character = await this._read(result.name, result.uri, startLoad, endLoad, EXT_CHARACTER);
+            if (result[0].name.toLowerCase().endsWith(`.${EXT_HD}`)) {
+                character = await this._read(result[0].name, result[0].uri, startLoad, endLoad, EXT_HD);
+            } else if (result[0].name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                character = await this._read(result[0].name, result[0].uri, startLoad, endLoad, EXT_CHARACTER);
             } else {
-                common.toast('Unsupported file type: ' + result.type);
+                common.toast('Unsupported file type: ' + result[0].type);
 
                 return;
             }
 
-            if (!result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
-                await this._initCharacterState(character, result.name);
-                await this._saveCharacter(character, result.name);
+            if (!result[0].name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                await this._initCharacterState(character, result[0].name);
+                await this._saveCharacter(character, result[0].name);
             }
 
             return character;

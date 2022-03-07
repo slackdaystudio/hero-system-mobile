@@ -97,10 +97,12 @@ export default class VariablePowerPool extends CharacterTrait {
     _getControlCost() {
         let cost = Math.round(this.characterTrait.trait.levels * 0.5);
 
-        for (const adder of this.characterTrait.trait.adder) {
-            if (adder.xmlid.toUpperCase() === 'CONTROLCOST') {
-                cost = (adder.levels / adder.lvlval) * adder.lvlcost;
-                break;
+        if (this.characterTrait.trait.adder) {
+            for (const adder of this.characterTrait.trait.adder) {
+                if (adder.xmlid.toUpperCase() === 'CONTROLCOST') {
+                    cost = (adder.levels / adder.lvlval) * adder.lvlcost;
+                    break;
+                }
             }
         }
 
