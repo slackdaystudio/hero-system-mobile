@@ -323,30 +323,30 @@ class HeroDesignerCharacter {
 
                 switch (characteristic.shortName.toUpperCase()) {
                     case 'PD':
-                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
+                        total = common.roundInPlayersFavor(this._getFiguredCharacteristicContribution('STR', powersMap, character) / 5);
                         value += total;
                         break;
                     case 'ED':
-                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
+                        total = common.roundInPlayersFavor(this._getFiguredCharacteristicContribution('CON', powersMap, character) / 5);
                         value += total;
                         break;
                     case 'SPD':
-                        total = this.getAdditionalCharacteristicPoints('DEX', character) / 10;
+                        total = this._getFiguredCharacteristicContribution('DEX', powersMap, character) / 10;
                         value += Math.floor(total);
                         break;
                     case 'REC':
-                        total = common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('STR', character) / 5);
-                        total += common.roundInPlayersFavor(this.getAdditionalCharacteristicPoints('CON', character) / 5);
+                        total = common.roundInPlayersFavor(this._getFiguredCharacteristicContribution('STR', powersMap, character) / 5);
+                        total += common.roundInPlayersFavor(this._getFiguredCharacteristicContribution('CON', powersMap, character) / 5);
                         value += total;
                         break;
                     case 'END':
-                        total = this.getAdditionalCharacteristicPoints('CON', character) * 2;
+                        total = this._getFiguredCharacteristicContribution('CON', powersMap, character) * 2;
                         value += total;
                         break;
                     case 'STUN':
-                        total = this.getAdditionalCharacteristicPoints('BODY', character);
-                        total += this.getAdditionalCharacteristicPoints('STR', character) / 2;
-                        total += this.getAdditionalCharacteristicPoints('CON', character) / 2;
+                        total = this._getFiguredCharacteristicContribution('BODY', powersMap, character);
+                        total += this._getFiguredCharacteristicContribution('STR', powersMap, character) / 2;
+                        total += this._getFiguredCharacteristicContribution('CON', powersMap, character) / 2;
                         value += total;
                         break;
                 }
@@ -354,6 +354,24 @@ class HeroDesignerCharacter {
         }
 
         return Math.round(value);
+    }
+
+    _getFiguredCharacteristicContribution(shortName, powersMap, character) {
+        const powerCharacteristic = powersMap.get(shortName.toUpperCase());
+
+        if (powerCharacteristic !== undefined) {
+            if (powerCharacteristic.hasOwnProperty('modifier') && Array.isArray(powerCharacteristic.modifier)) {
+                if (powerCharacteristic.modifier.some((m) => m.xmlid === 'NOFIGURED')) {
+                    return 0;
+                }
+            } else if (powerCharacteristic.hasOwnProperty('modifier') && powerCharacteristic.modifier.xmlid === 'NOFIGURED') {
+                return 0;
+            } else {
+                return this.getAdditionalCharacteristicPoints(shortName, character);
+            }
+        }
+
+        return 0;
     }
 
     _getTotalCharacteristicPoints(characteristic, value, showSecondary) {
