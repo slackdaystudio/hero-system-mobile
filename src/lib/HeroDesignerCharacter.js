@@ -360,13 +360,7 @@ class HeroDesignerCharacter {
         const powerCharacteristic = powersMap.get(shortName.toUpperCase());
 
         if (powerCharacteristic !== undefined) {
-            if (powerCharacteristic.hasOwnProperty('modifier') && Array.isArray(powerCharacteristic.modifier)) {
-                if (powerCharacteristic.modifier.some((m) => m.xmlid === 'NOFIGURED')) {
-                    return 0;
-                }
-            } else if (powerCharacteristic.hasOwnProperty('modifier') && powerCharacteristic.modifier.xmlid === 'NOFIGURED') {
-                return 0;
-            } else {
+            if (!common.hasModifier('NOFIGURED', powerCharacteristic)) {
                 return this.getAdditionalCharacteristicPoints(shortName, character);
             }
         }

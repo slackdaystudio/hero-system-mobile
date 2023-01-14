@@ -115,6 +115,20 @@ class Common {
         return total;
     }
 
+    hasModifier(modifierXmlid, power) {
+        if (power.hasOwnProperty('type') && power.type === 'power') {
+            if (power.modifier !== undefined && power.modifier !== null) {
+                if (Array.isArray(power.modifier)) {
+                    return power.modifier.some((m) => m.xmlid === modifierXmlid);
+                } else {
+                    return power.modifier.xmlid === modifierXmlid;
+                }
+            }
+        }
+
+        return false;
+    }
+
     flatten(items, key) {
         let flattened = [];
 
