@@ -53,7 +53,7 @@
     "react-native-modal": "^13.0.0",
     "react-native-pathjs-charts": "0.0.34",
     "react-native-pie-chart": "^1.0.13",
-    "react-native-reanimated": "^1.13.4",
+    "react-native-reanimated": "^2.14.1",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.18.2",
     "react-native-sectioned-multi-select": "^0.8.1",
