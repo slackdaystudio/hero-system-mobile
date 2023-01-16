@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable unused-imports/no-unused-imports */
-import React, {Component} from 'react';
-import {SafeAreaView} from 'react-native';
+import React, {Component, Fragment} from 'react';
+import {Image, Pressable, SafeAreaView, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@react-navigation/drawer';
 import {createStore, configureStore, applyMiddleware, compose} from 'redux';
 import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
-import {ScaledSheet} from 'react-native-size-matters';
+import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
 import applyAppStateListener from 'redux-enhancer-react-native-appstate';
 import thunk from 'redux-thunk';
 import {Root} from 'native-base';
@@ -26,7 +26,7 @@ import EffectScreen from './src/components/Screens/EffectScreen';
 import CostCruncherScreen from './src/components/Screens/CostCruncherScreen';
 import StatisticsScreen from './src/components/Screens/StatisticsScreen';
 import SettingsScreen from './src/components/Screens/SettingsScreen';
-import Sidebar from './src/components/Sidebar/Sidebar';
+import {TEXT_COLOR} from './src/Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -49,6 +49,14 @@ const Drawer = createDrawerNavigator();
 const HIDDEN_SCREENS = ['Result'];
 
 const CustomDrawerContent = (props) => {
+    if (props.spacer) {
+        return (
+            <Pressable onPress={() => null}>
+                <DrawerContentScrollView {...props} />
+            </Pressable>
+        );
+    }
+
     const {state, ...rest} = props;
     const newState = {...state};
     const {index, routes} = props.navigation.getState();
@@ -78,13 +86,15 @@ const CustomDrawerContent = (props) => {
     );
 };
 
+const Spacer = ({}) => {
+    return <View backgroundColor="red" />;
+};
+
 export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
 
 export const store = createStore(reducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
-
-// const AppContainer = createAppContainer(AppNavigator);
 
 export default class App extends Component {
     componentDidMount() {
@@ -106,22 +116,34 @@ export default class App extends Component {
                                     drawerPosition: 'right',
                                     drawerContentOptions: drawerContentOptions,
                                     drawerStyle: localStyles.drawer,
+                                    drawerLabelStyle: {color: '#F3EDE9'},
                                 }}
                                 initialRoute="Home"
-                                drawerContent={(props) => <CustomDrawerContent {...props} />}
+                                drawerContent={(props) => <CustomDrawerContent spacer={props.spacer === true} {...props} />}
                             >
-                                <Drawer.Screen options={{drawerLabel: 'Home'}} name="Home" component={HomeScreen} />
                                 <Drawer.Screen
-                                    options={{drawerLabel: 'View Character'}}
+                                    options={{
+                                        drawerLabel: () => (
+                                            <Image style={{height: scale(50), width: scale(115)}} source={require('./public/hero_mobile_logo.png')} />
+                                        ),
+                                    }}
+                                    name="Home"
+                                    component={HomeScreen}
+                                />
+                                <Drawer.Screen
+                                    options={{spacer: true, drawerLabel: 'View Character'}}
                                     name="ViewHeroDesignerCharacter"
                                     component={ViewHeroDesignerCharacterScreen}
                                 />
                                 <Drawer.Screen name="Characters" component={CharactersScreen} />
+                                {/* <Drawer.Screen options={{drawerLabel: ''}} name="RollSpacer" getComponent={() => HomeScreen} /> */}
                                 <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" component={SkillScreen} />
                                 <Drawer.Screen name="Hit" component={HitScreen} />
                                 <Drawer.Screen name="Damage" component={DamageScreen} />
                                 <Drawer.Screen name="Effect" component={EffectScreen} />
+
                                 <Drawer.Screen name="Result" component={ResultScreen} />
+
                                 <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
                                 <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
                                 <Drawer.Screen name="Statistics" component={StatisticsScreen} />
@@ -137,13 +159,14 @@ export default class App extends Component {
 
 const localStyles = ScaledSheet.create({
     drawer: {
-        backgroundColor: 'rgb(81, 111, 148)',
+        backgroundColor: '#1b1d1f',
         borderWidth: 0.5,
-        borderLeftColor: '#fff',
+        borderLeftColor: '#303030',
         width: '220@vs',
+        color: '#F3EDE9',
     },
     label: {
-        color: '#AFC0D4',
+        color: '#F3EDE9',
         fontSize: '14@vs',
     },
 });
