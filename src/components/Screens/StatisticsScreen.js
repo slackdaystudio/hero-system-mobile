@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {BackHandler} from 'react-native';
 import {Container, Content, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
-import {NavigationEvents} from 'react-navigation';
 import Header from '../Header/Header';
 import {statistics} from '../../lib/Statistics';
 import {chart} from '../../lib/Chart';
@@ -31,18 +29,6 @@ class StatisticsScreen extends Component {
 
     constructor(props) {
         super(props);
-    }
-
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
-
-            return true;
-        });
-    }
-
-    onDidBlur() {
-        this.backHandler.remove();
     }
 
     _renderHitLocationStat() {
@@ -85,8 +71,7 @@ class StatisticsScreen extends Component {
 
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={() => this.onDidFocus()} onDidBlur={() => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen="Home" />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Statistics</Text>
                     {this._renderDieDistributionChart()}

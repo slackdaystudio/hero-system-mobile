@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Dimensions, BackHandler, View, Image} from 'react-native';
+import {Dimensions, View, Image} from 'react-native';
 import {Container, Content, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text} from 'native-base';
-import {NavigationEvents} from 'react-navigation';
 import General from '../HeroDesignerCharacter/General';
 import Combat from '../HeroDesignerCharacter/Combat';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
@@ -42,6 +41,7 @@ import {
 
 class ViewHeroDesignerCharacterScreen extends Component {
     static propTypes = {
+        route: PropTypes.object.isRequired,
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
         characters: PropTypes.object,
@@ -73,22 +73,18 @@ class ViewHeroDesignerCharacterScreen extends Component {
         this.screenOrientationHandler = null;
     }
 
-    onDidFocus() {
-        this._setPortraitDimensions();
-
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate(this._getBackScreen());
-
-            return true;
-        });
-
-        this.screenOrientationHandler = Dimensions.addEventListener('change', () => {
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
             this._setPortraitDimensions();
+
+            this.screenOrientationHandler = Dimensions.addEventListener('change', () => {
+                this._setPortraitDimensions();
+            });
         });
     }
 
-    onDidBlur() {
-        this.backHandler.remove();
+    componentWillUnmount() {
+        this._unsubscribe();
 
         Dimensions.removeEventListener('change', this.screenOrientationHandler);
     }
@@ -128,16 +124,6 @@ class ViewHeroDesignerCharacterScreen extends Component {
 
             this.setState({width: imageWidth, height: imageHeight});
         });
-    }
-
-    _getBackScreen() {
-        let backScreen = 'Home';
-
-        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
-            backScreen = this.props.navigation.state.params.from;
-        }
-
-        return backScreen;
     }
 
     _renderTabHeading(headingText) {
@@ -274,8 +260,7 @@ class ViewHeroDesignerCharacterScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header hasTabs={false} navigation={this.props.navigation} backScreen={this._getBackScreen()} />
+                <Header hasTabs={false} navigation={this.props.navigation} />
                 {this._renderCharacter()}
                 <HeroDesignerCharacterFooter
                     navigation={this.props.navigation}

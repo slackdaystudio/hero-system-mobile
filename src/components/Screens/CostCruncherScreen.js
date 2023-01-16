@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {BackHandler, View} from 'react-native';
+import {View} from 'react-native';
 import {Container, Content, Text, Form, Item, Label, Input} from 'native-base';
-import {NavigationEvents} from 'react-navigation';
 import {verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -37,18 +36,6 @@ class CostCruncherScreen extends Component {
         this.updateFormValue = this._updateFormValue.bind(this);
     }
 
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
-
-            return true;
-        });
-    }
-
-    onDidBlur() {
-        this.backHandler.remove();
-    }
-
     _updateFormValue(key, value) {
         if (key === 'cost') {
             if (/^[0-9]*$/.test(value) === false) {
@@ -80,8 +67,7 @@ class CostCruncherScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen="Home" />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Cruncher</Text>
                     <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>

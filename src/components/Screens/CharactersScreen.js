@@ -1,9 +1,8 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {BackHandler, View} from 'react-native';
+import {View} from 'react-native';
 import {Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon, Picker, Item} from 'native-base';
-import {NavigationEvents} from 'react-navigation';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
@@ -32,6 +31,7 @@ import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 
 class CharactersScreen extends Component {
     static propTypes = {
+        route: PropTypes.object.isRequired,
         navigation: PropTypes.object.isRequired,
         character: PropTypes.object,
         characters: PropTypes.object,
@@ -69,32 +69,18 @@ class CharactersScreen extends Component {
         this.updateSlot = this._updateSlot.bind(this);
     }
 
-    onDidFocus() {
-        this._refreshCharacters();
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            this._refreshCharacters();
 
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate(this._getBackScreen());
-
-            return true;
+            if (this.props.route.params !== undefined && this.props.route.params.hasOwnProperty('slot')) {
+                this.setState({slot: this.props.route.params.slot});
+            }
         });
-
-        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('slot')) {
-            this.setState({slot: this.props.navigation.state.params.slot});
-        }
     }
 
-    onDidBlur() {
-        this.backHandler.remove();
-    }
-
-    _getBackScreen() {
-        let backScreen = 'Home';
-
-        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
-            backScreen = this.props.navigation.state.params.from;
-        }
-
-        return backScreen;
+    componentWillUnmount() {
+        this._unsubscribe();
     }
 
     _updateSlot(slot) {
@@ -314,8 +300,7 @@ class CharactersScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen="Home" />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Heading text="Characters" />
                     {this._renderCharacters()}

@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {NavigationEvents} from 'react-navigation';
-import {BackHandler, View, Switch} from 'react-native';
+import {View, Switch} from 'react-native';
 import {Container, Content, Button, Text} from 'native-base';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import RNShake from 'react-native-shake';
@@ -41,21 +40,17 @@ class SkillScreen extends Component {
         this.roll = this._roll.bind(this);
     }
 
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
-
-            return true;
-        });
-
-        RNShake.addEventListener('ShakeEvent', () => {
-            this.roll();
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            RNShake.addEventListener('ShakeEvent', () => {
+                this.roll();
+            });
         });
     }
 
-    onDidBlur() {
+    componentWillUnmount() {
+        this._unsubscribe();
         RNShake.removeEventListener('ShakeEvent');
-        this.backHandler.remove();
     }
 
     _roll() {
@@ -94,8 +89,7 @@ class SkillScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen="Home" />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll 3d6</Text>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>

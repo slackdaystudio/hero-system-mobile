@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import {SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@react-navigation/drawer';
-import {configureStore, applyMiddleware, compose} from 'redux';
+import {createStore, configureStore, applyMiddleware, compose} from 'redux';
 import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -46,12 +46,12 @@ export let sounds = {};
 
 const Drawer = createDrawerNavigator();
 
-const HIDDEN_SCREENS = [];
+const HIDDEN_SCREENS = ['Result'];
 
 const CustomDrawerContent = (props) => {
     const {state, ...rest} = props;
     const newState = {...state};
-    const {index, routes} = props.navigation.dangerouslyGetState();
+    const {index, routes} = props.navigation.getState();
     const currentRoute = routes[index].name;
 
     // Filter out routes that are hidden either all the time or contextually
@@ -82,7 +82,7 @@ export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
 
-export const store = configureStore(reducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
+export const store = createStore(reducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
 
 // const AppContainer = createAppContainer(AppNavigator);
 
@@ -101,21 +101,31 @@ export default class App extends Component {
                     <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
                         <NavigationContainer>
                             <Drawer.Navigator
-                                drawerStyle={localStyles.drawer}
-                                drawerContentOptions={drawerContentOptions}
-                                screenOptions={{headerShown: false}}
+                                screenOptions={{
+                                    headerShown: false,
+                                    drawerPosition: 'right',
+                                    drawerContentOptions: drawerContentOptions,
+                                    drawerStyle: localStyles.drawer,
+                                }}
                                 initialRoute="Home"
-                                drawerPosition="right"
                                 drawerContent={(props) => <CustomDrawerContent {...props} />}
                             >
                                 <Drawer.Screen options={{drawerLabel: 'Home'}} name="Home" component={HomeScreen} />
                                 <Drawer.Screen
-                                    options={{drawerLabel: 'View Characteer'}}
+                                    options={{drawerLabel: 'View Character'}}
                                     name="ViewHeroDesignerCharacter"
                                     component={ViewHeroDesignerCharacterScreen}
                                 />
                                 <Drawer.Screen name="Characters" component={CharactersScreen} />
-                                <Drawer.Screen name="3D6" component={SkillScreen} />
+                                <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" component={SkillScreen} />
+                                <Drawer.Screen name="Hit" component={HitScreen} />
+                                <Drawer.Screen name="Damage" component={DamageScreen} />
+                                <Drawer.Screen name="Effect" component={EffectScreen} />
+                                <Drawer.Screen name="Result" component={ResultScreen} />
+                                <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
+                                <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
+                                <Drawer.Screen name="Statistics" component={StatisticsScreen} />
+                                <Drawer.Screen name="Settings" component={SettingsScreen} />
                             </Drawer.Navigator>
                         </NavigationContainer>
                     </SafeAreaView>

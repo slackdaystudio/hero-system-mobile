@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Platform, BackHandler, View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {Container, Content, Button, Text} from 'native-base';
 import RNShake from 'react-native-shake';
 import AnimateNumber from '@bankify/react-native-animate-number';
-import {NavigationEvents} from 'react-navigation';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
@@ -30,6 +29,7 @@ import {addStatistics} from '../../reducers/statistics';
 
 class ResultScreen extends Component {
     static propTypes = {
+        route: PropTypes.object.isRequired,
         navigation: PropTypes.object.isRequired,
         addStatistics: PropTypes.func.isRequired,
         useFifthEdition: PropTypes.bool.isRequired,
@@ -41,51 +41,35 @@ class ResultScreen extends Component {
         super(props);
 
         this.state = {
-            result: props.navigation.state.params.result,
+            result: props.route.params.result || null,
         };
 
         this.reRoll = this._reRoll.bind(this);
     }
 
-    onDidFocus() {
-        this.setState({result: this.props.navigation.state.params.result}, () => {
-            this._playSoundClip();
-            this._updateStatistics();
-        });
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            this.setState({result: this.props.route.params.result}, () => {
+                this._playSoundClip();
+                this._updateStatistics();
+            });
 
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate(this._getBackScreen());
-
-            return true;
-        });
-
-        RNShake.addEventListener('ShakeEvent', () => {
-            this.reRoll();
+            RNShake.addEventListener('ShakeEvent', () => {
+                this.reRoll();
+            });
         });
     }
 
-    onDidBlur() {
+    componentWillUnmount() {
+        this._unsubscribe();
         soundPlayer.stop(this.state.result.sfx);
-
-        this.backHandler.remove();
-
         RNShake.removeEventListener('ShakeEvent');
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(_prevProps, prevState, _snapshot) {
         if (prevState.result !== this.state.result) {
             this._playSoundClip();
         }
-    }
-
-    _getBackScreen() {
-        let backScreen = 'Home';
-
-        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
-            backScreen = this.props.navigation.state.params.from;
-        }
-
-        return backScreen;
     }
 
     _playSoundClip() {
@@ -418,8 +402,7 @@ class ResultScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Text style={styles.heading}>Roll Result</Text>
                     <View>

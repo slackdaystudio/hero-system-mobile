@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {BackHandler, View, Switch, TouchableHighlight} from 'react-native';
+import {View, Switch, TouchableHighlight} from 'react-native';
 import {Container, Content, Button, Text, Tabs, Tab, TabHeading, ScrollableTab, Icon} from 'native-base';
 import RNShake from 'react-native-shake';
-import {NavigationEvents} from 'react-navigation';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -42,21 +41,17 @@ class HitScreen extends Component {
         this.setLocation = this._setLocation.bind(this);
     }
 
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
-
-            return true;
-        });
-
-        RNShake.addEventListener('ShakeEvent', () => {
-            this.roll();
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            RNShake.addEventListener('ShakeEvent', () => {
+                this.roll();
+            });
         });
     }
 
-    onDidBlur() {
+    componentWillUnmount() {
+        this._unsubscribe();
         RNShake.removeEventListener('ShakeEvent');
-        this.backHandler.remove();
     }
 
     _roll() {
@@ -147,8 +142,7 @@ class HitScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen="Home" />
+                <Header navigation={this.props.navigation} />
                 <Content scrollEnable={false}>
                     <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}>
                         <Tab

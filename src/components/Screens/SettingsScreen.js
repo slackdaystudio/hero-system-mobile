@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {BackHandler, View, Switch} from 'react-native';
+import {View, Switch} from 'react-native';
 import {Container, Content, Button, Text, List, ListItem, Left, Right} from 'native-base';
-import {NavigationEvents} from 'react-navigation';
 import {verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
@@ -40,18 +39,6 @@ class SettingsScreen extends Component {
         clearStatistics: PropTypes.func.isRequired,
         clearApplicationSettings: PropTypes.func.isRequired,
     };
-
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
-
-            return true;
-        });
-    }
-
-    onDidBlur() {
-        this.backHandler.remove();
-    }
 
     _clearFormData(showToast = true) {
         this.props.resetForm('skill');
@@ -102,8 +89,7 @@ class SettingsScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen="Home" />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Heading text="App Version" />
                     <View style={{paddingLeft: 20, paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>

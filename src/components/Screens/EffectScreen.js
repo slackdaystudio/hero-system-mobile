@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {BackHandler, View} from 'react-native';
+import {View} from 'react-native';
 import {Container, Content, List, ListItem, Left, Right, Button, Text, Radio, Picker, Item} from 'native-base';
 import RNShake from 'react-native-shake';
-import {NavigationEvents} from 'react-navigation';
 import {verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -45,31 +44,17 @@ class EffectScreen extends Component {
         this.roll = this._roll.bind(this);
     }
 
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate(this._getBackScreen());
-
-            return true;
-        });
-
-        RNShake.addEventListener('ShakeEvent', () => {
-            this.roll();
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            RNShake.addEventListener('ShakeEvent', () => {
+                this.roll();
+            });
         });
     }
 
-    onDidBlur() {
+    componentWillUnmount() {
+        this._unsubscribe();
         RNShake.removeEventListener('ShakeEvent');
-        this.backHandler.remove();
-    }
-
-    _getBackScreen() {
-        let backScreen = 'Home';
-
-        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty('from')) {
-            backScreen = this.props.navigation.state.params.from;
-        }
-
-        return backScreen;
     }
 
     _roll() {
@@ -93,7 +78,7 @@ class EffectScreen extends Component {
     }
 
     _updatePartialDie(value) {
-        this.props.updateFormValue('effect', 'partialDie', parseInt(value));
+        this.props.updateFormValue('effect', 'partialDie', parseInt(value, 10));
     }
 
     _renderEffects() {
@@ -129,8 +114,7 @@ class EffectScreen extends Component {
     render() {
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header navigation={this.props.navigation} backScreen={this._getBackScreen()} />
+                <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Heading text="Effect Roll" />
                     <Slider label="Dice:" value={this.props.effectForm.dice} step={1} min={0} max={50} onValueChange={this.setSliderState} valueKey="dice" />

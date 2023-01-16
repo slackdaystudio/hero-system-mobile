@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {BackHandler, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {
     Container,
     Content,
@@ -22,7 +22,6 @@ import {
     Input,
 } from 'native-base';
 import RNShake from 'react-native-shake';
-import {NavigationEvents} from 'react-navigation';
 import {verticalScale} from 'react-native-size-matters';
 import {randomCharacter} from '../../lib/RandomCharacter';
 import Header from '../Header/Header';
@@ -57,25 +56,21 @@ class RandomCharacterScreen extends Component {
         this.reRoll = this._reRoll.bind(this);
     }
 
-    onDidFocus() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            this.props.navigation.navigate('Home');
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            if (this.props.character === null) {
+                this.props.setRandomHero(randomCharacter.generate());
+            }
 
-            return true;
-        });
-
-        if (this.props.character === null) {
-            this.props.setRandomHero(randomCharacter.generate());
-        }
-
-        RNShake.addEventListener('ShakeEvent', () => {
-            this._reRoll();
+            RNShake.addEventListener('ShakeEvent', () => {
+                this._reRoll();
+            });
         });
     }
 
-    onDidBlur() {
+    componentWillUnmount() {
+        this._unsubscribe();
         RNShake.removeEventListener('ShakeEvent');
-        this.backHandler.remove();
     }
 
     _reRoll() {
@@ -119,7 +114,6 @@ class RandomCharacterScreen extends Component {
         if (this.props.character === null) {
             return (
                 <Container style={styles.container}>
-                    <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
                     <Header hasTabs={true} navigation={this.props.navigation} />
                     <Content style={styles.content}>
                         <Spinner color="#D0D1D3" />
@@ -130,8 +124,7 @@ class RandomCharacterScreen extends Component {
 
         return (
             <Container style={styles.container}>
-                <NavigationEvents onDidFocus={(payload) => this.onDidFocus()} onDidBlur={(payload) => this.onDidBlur()} />
-                <Header hasTabs={true} navigation={this.props.navigation} backScreen="Home" />
+                <Header hasTabs={true} navigation={this.props.navigation} />
                 <Content scrollEnable={false} style={{backgroundColor: '#1b1b1f'}}>
                     <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}>
                         <Tab

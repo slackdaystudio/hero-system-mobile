@@ -20,19 +20,13 @@ export default class MyHeader extends Component {
             return true;
         }
 
-        this.props.navigation.navigate(this.props.backScreen);
-    }
-
-    _renderBackButton() {
         if (this.props.backScreen === null || this.props.backScreen === undefined) {
-            return null;
+            this.props.navigation.goBack();
+
+            return true;
         }
 
-        return (
-            <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
-                <Icon type="FontAwesome" name="chevron-left" style={{fontSize: verticalScale(18), color: 'white'}} />
-            </Button>
-        );
+        this.props.navigation.navigate(this.props.backScreen);
     }
 
     render() {
@@ -40,7 +34,11 @@ export default class MyHeader extends Component {
             <View>
                 <Header hasTabs={this.props.hasTabs || false} style={localStyles.header}>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                        <View style={{flex: 1}}>{this._renderBackButton()}</View>
+                        <View style={{flex: 1}}>
+                            <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
+                                <Icon type="FontAwesome" name="chevron-left" style={{fontSize: verticalScale(18), color: 'white'}} />
+                            </Button>
+                        </View>
                         <View style={{flex: 4}}>
                             <View style={localStyles.logo}>
                                 <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
