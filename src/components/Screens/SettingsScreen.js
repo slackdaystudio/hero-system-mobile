@@ -111,8 +111,8 @@ class SettingsScreen extends Component {
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbColor="#14354d"
-                                    trackColor={{false: '#000', true: '#01121E'}}
-                                    ios_backgroundColor="#01121E"
+                                    trackColor={{false: '#000', true: '#3d5478'}}
+                                    ios_backgroundColor="#3d5478"
                                 />
                             </Right>
                         </ListItem>
@@ -130,8 +130,8 @@ class SettingsScreen extends Component {
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbColor="#14354d"
-                                    trackColor={{false: '#000', true: '#01121E'}}
-                                    ios_backgroundColor="#01121E"
+                                    trackColor={{false: '#000', true: '#3d5478'}}
+                                    ios_backgroundColor="#3d5478"
                                 />
                             </Right>
                         </ListItem>
@@ -146,8 +146,8 @@ class SettingsScreen extends Component {
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbColor="#14354d"
-                                    trackColor={{false: '#000', true: '#01121E'}}
-                                    ios_backgroundColor="#01121E"
+                                    trackColor={{false: '#000', true: '#3d5478'}}
+                                    ios_backgroundColor="#3d5478"
                                     disabled={!this.props.settings.playSounds}
                                 />
                             </Right>
