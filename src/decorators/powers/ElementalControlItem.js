@@ -23,9 +23,13 @@ export default class ElementalControlItem extends CharacterTrait {
     realCost() {
         const itemLimitationsTotal = this._totalModifiers(this.limitations());
         const itemAdvantagesTotal = this._totalModifiers(this.advantages());
-        const basecost = this.activeCost();
+        const parentBasecost = this.characterTrait.parentTrait.basecost;
 
-        return common.roundInPlayersFavor((basecost * (1 + itemAdvantagesTotal)) / (1 - itemLimitationsTotal));
+        if (itemAdvantagesTotal > 0) {
+            return common.roundInPlayersFavor((this.cost() * (1 + itemAdvantagesTotal) - parentBasecost) / (1 - itemLimitationsTotal));
+        }
+
+        return common.roundInPlayersFavor((this.activeCost() - parentBasecost) / (1 - itemLimitationsTotal));
     }
 
     label() {
