@@ -207,8 +207,7 @@ class HeroDesignerCharacter {
     }
 
     getTotalUnusualDefense(character, powerXmlId) {
-        let nonResistant = 0;
-        let resistant = 0;
+        const defenses = {nonResistant: 0, resistant: 0};
         let powersMap = common.toMap(common.flatten(character.powers, 'powers'));
         let unusualDefense = null;
         let showSecondary = character.showSecondary;
@@ -216,34 +215,20 @@ class HeroDesignerCharacter {
         if (powersMap.has(powerXmlId)) {
             unusualDefense = powersMap.get(powerXmlId);
 
-            if (Array.isArray(unusualDefense)) {
-                for (let ud of unusualDefense) {
-                    nonResistant += ud.levels;
-
-                    if (this._isResistent(ud)) {
-                        resistant += ud.levels;
-                    }
-                }
-            } else {
-                nonResistant = unusualDefense.levels;
-
-                if (this._isResistent(unusualDefense)) {
-                    resistant = unusualDefense.levels;
-                }
-            }
+            this._getUnusualDefensePoints(defenses, unusualDefense, character);
         }
 
         if (powersMap.has('FORCEFIELD')) {
-            nonResistant += powersMap.get('FORCEFIELD').mdlevels || 0;
-            resistant += powersMap.get('FORCEFIELD').mdlevels || 0;
+            defenses.nonResistant += powersMap.get('FORCEFIELD').mdlevels || 0;
+            defenses.resistant += powersMap.get('FORCEFIELD').mdlevels || 0;
         }
 
         if (powersMap.has('COMPOUNDPOWER')) {
-            nonResistant = this._getDefenseFromCompoundPower(nonResistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, false, showSecondary);
-            resistant = this._getDefenseFromCompoundPower(resistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, true, showSecondary);
+            defenses.nonResistant = this._getDefenseFromCompoundPower(defenses.nonResistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, false, showSecondary);
+            defenses.resistant = this._getDefenseFromCompoundPower(defenses.resistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, true, showSecondary);
         }
 
-        return `${nonResistant}/${resistant}`;
+        return `${defenses.nonResistant}/${defenses.resistant}`;
     }
 
     getCharacteristicByShortName(shortName, character) {
@@ -1137,6 +1122,22 @@ class HeroDesignerCharacter {
             modifier: mods,
             adder: adds,
         };
+    }
+
+    _getUnusualDefensePoints(defenses, unusualDefense, character) {
+        let points = unusualDefense.levels;
+
+        if (unusualDefense.xmlid === 'MENTALDEFENSE' && heroDesignerCharacter.isFifth(character)) {
+            points += common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', character) / 5);
+        }
+
+        defenses.nonResistant = points;
+
+        if (this._isResistent(unusualDefense)) {
+            defenses.resistant = points;
+        }
+
+        return points;
     }
 }
 

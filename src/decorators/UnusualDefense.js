@@ -1,4 +1,6 @@
 import CharacterTrait from './CharacterTrait';
+import {heroDesignerCharacter} from '../lib/HeroDesignerCharacter';
+import {common} from '../lib/Common';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -42,11 +44,16 @@ export default class UnusualDefense extends CharacterTrait {
     }
 
     attributes() {
-        let attributes = this.characterTrait.attributes();
+        const attributes = this.characterTrait.attributes();
+        let points = this.characterTrait.trait.levels;
+
+        if (this.characterTrait.trait.xmlid === 'MENTALDEFENSE' && heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
+            points += common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', this.getCharacter()) / 5);
+        }
 
         attributes.push({
             label: 'Points',
-            value: this.characterTrait.trait.levels,
+            value: points,
         });
 
         return attributes;
