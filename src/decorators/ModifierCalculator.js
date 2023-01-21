@@ -22,7 +22,8 @@ export default class ModifierCalculator extends CharacterTrait {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
 
         this.characterTrait = characterTrait;
-        this.modifiers = this._getItemTotalModifiers(this.characterTrait.trait).concat(this._getItemTotalModifiers(this.characterTrait.parentTrait));
+
+        this.modifiers = this._getItemTotalModifiers(characterTrait);
     }
 
     cost() {
@@ -78,35 +79,70 @@ export default class ModifierCalculator extends CharacterTrait {
         return this.modifiers.filter((m) => m.cost < 0);
     }
 
-    _getItemTotalModifiers(trait) {
-        let totalModifiers = [];
-
-        if (trait === null || trait === undefined || !trait.hasOwnProperty('modifier')) {
+    _getItemTotalModifiers(trait, totalModifiers = []) {
+        if (common.isEmptyObject(trait.trait)) {
             return totalModifiers;
         }
 
-        if (trait.hasOwnProperty('modifier')) {
-            let decorated = null;
+        const rawModifiers = new Map();
 
-            if (Array.isArray(trait.modifier)) {
-                for (let modifier of trait.modifier) {
-                    decorated = modifierDecorator.decorate(modifier, trait, this.characterTrait.getCharacter);
+        this._addModifier(trait.trait.modifier, trait, rawModifiers);
 
-                    totalModifiers.push({
-                        label: decorated.label(),
-                        cost: decorated.cost(),
-                    });
-                }
-            } else {
-                decorated = modifierDecorator.decorate(trait.modifier, trait, this.characterTrait.getCharacter);
+        if (trait.hasOwnProperty('parentTrait') && trait.parentTrait && trait.parentTrait.type === 'list') {
+            this._addModifier(trait.parentTrait.modifier, trait.parentTrait, rawModifiers);
+        }
 
-                totalModifiers.push({
-                    label: decorated.label(),
-                    cost: decorated.cost(),
-                });
+        let decorated = null;
+
+        for (const [owningTrait, modifiers] of rawModifiers) {
+            for (const modifier of modifiers) {
+                decorated = modifierDecorator.decorate(modifier, owningTrait, this.characterTrait.getCharacter);
+
+                this._filterDuplicateModifiers(decorated, modifier.xmlid, totalModifiers);
             }
         }
 
         return totalModifiers;
+    }
+
+    _filterDuplicateModifiers(newModifier, xmlid, totalModifiers) {
+        let isExclusive = true;
+
+        if (newModifier.modifier.template !== undefined) {
+            isExclusive = newModifier.modifier.template.exclusive;
+        }
+
+        const existingModifier = totalModifiers.find((m) => m.xmlid === xmlid && isExclusive);
+
+        if (existingModifier === undefined) {
+            totalModifiers.push({
+                xmlid: xmlid,
+                label: newModifier.label(),
+                cost: newModifier.cost(),
+            });
+        } else {
+            if (newModifier.cost() > existingModifier.cost) {
+                existingModifier.label = newModifier.label();
+                existingModifier.cost = newModifier.cost();
+            }
+        }
+    }
+
+    _addModifier(modifier, trait, rawModifiers) {
+        if (common.isEmptyObject(modifier)) {
+            return;
+        }
+
+        const modifiers = rawModifiers.get(trait);
+
+        if (modifiers === undefined) {
+            if (Array.isArray(modifier)) {
+                rawModifiers.set(trait, modifier);
+            } else if (modifier !== undefined) {
+                rawModifiers.set(trait, [modifier]);
+            }
+        } else {
+            modifiers.push(modifier);
+        }
     }
 }

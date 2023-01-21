@@ -132,7 +132,7 @@ export default class CharacterTrait {
                 let value = attribute.optionAlias || '';
 
                 if (typeof value === 'string' && value !== '' && value.startsWith('(') && !value.endsWith(')')) {
-                    value = value.substr(1);
+                    value = value.substring(1);
                 }
 
                 if (attribute.hasOwnProperty('adder')) {

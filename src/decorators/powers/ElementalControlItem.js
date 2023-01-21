@@ -1,5 +1,4 @@
 import CharacterTrait from '../CharacterTrait';
-import {common} from '../../lib/Common';
 
 export default class ElementalControlItem extends CharacterTrait {
     constructor(characterTrait) {
@@ -21,15 +20,7 @@ export default class ElementalControlItem extends CharacterTrait {
     }
 
     realCost() {
-        const itemLimitationsTotal = this._totalModifiers(this.limitations());
-        const itemAdvantagesTotal = this._totalModifiers(this.advantages());
-        const parentBasecost = this.characterTrait.parentTrait.basecost;
-
-        if (itemAdvantagesTotal > 0) {
-            return common.roundInPlayersFavor((this.cost() * (1 + itemAdvantagesTotal) - parentBasecost) / (1 - itemLimitationsTotal));
-        }
-
-        return common.roundInPlayersFavor((this.activeCost() - parentBasecost) / (1 - itemLimitationsTotal));
+        return Math.floor((this.activeCost() - this.characterTrait.parentTrait.basecost) / (1 - this.limitations().reduce((a, b) => a + b.cost, 0)));
     }
 
     label() {
@@ -54,13 +45,5 @@ export default class ElementalControlItem extends CharacterTrait {
 
     limitations() {
         return this.characterTrait.limitations();
-    }
-
-    _totalModifiers(modifiers) {
-        if (modifiers === undefined) {
-            return 0;
-        }
-
-        return modifiers.reduce((a, b) => a + (b.cost ? b.cost : b.basecost), 0);
     }
 }

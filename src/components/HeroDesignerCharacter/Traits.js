@@ -445,7 +445,7 @@ export default class Traits extends Component {
         );
     }
 
-    _renderTraits(items, indentItem = false) {
+    _renderTraits(items) {
         return (
             <Fragment>
                 {items.map((item, index) => {
