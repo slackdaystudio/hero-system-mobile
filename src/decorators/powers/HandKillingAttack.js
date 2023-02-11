@@ -20,6 +20,31 @@ import {KILLING_DAMAGE} from '../../lib/DieRoller';
 
 const DC_BASE_COST = 5;
 
+const DAMAGE_AFFECTING_ADVANATGES = [
+    'AOE',
+    'ARMORPIERCING',
+    'AVAD',
+    'AUTOFIRE',
+    'CHARGES',
+    'CONSTANT',
+    'CUMULATIVE',
+    'DAMAGEOVERTIME',
+    'DOESBODY',
+    'DOESKB',
+    'DOUBLEKB',
+    'INCREASEDSTUNMULTIPLIER',
+    'MEGASCALE',
+    'PENETRATING',
+    'STICKY',
+    'TIMELIMIT',
+    'TRANSDIMENSIONAL',
+    'TRIGGER',
+    'UNCONTROLLED',
+    'UAA',
+    'VARIABLEADVANTAGE',
+    'VARIABLESFX',
+];
+
 export default class HandKillingAttack extends CharacterTrait {
     constructor(characterTrait) {
         super(characterTrait.trait, characterTrait.listKey, characterTrait.getCharacter);
@@ -145,11 +170,31 @@ export default class HandKillingAttack extends CharacterTrait {
                 total += this._totalAdvantages(modifier);
             }
         } else {
-            let decorated = modifierDecorator.decorate(modifiers, this.characterTrait.trait);
+            if (this._affectsDamageCalc(modifiers)) {
+                let decorated = modifierDecorator.decorate(modifiers, this.characterTrait.trait);
 
-            total += decorated.cost() > 0 ? decorated.cost() : 0;
+                total += decorated.cost() > 0 ? decorated.cost() : 0;
+            }
         }
 
         return total;
+    }
+
+    _affectsDamageCalc(modifiers) {
+        if (DAMAGE_AFFECTING_ADVANATGES.includes(modifiers.xmlid)) {
+            if (modifiers.xmlid === 'CHARGES') {
+                if (modifiers.hasOwnProperty('adder')) {
+                    if (Array.isArray(modifiers.adder)) {
+                        return modifiers.adder.includes('BOOSTABLE');
+                    } else {
+                        return modifiers.adder.xmlid === 'BOOSTABLE';
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
