@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable unused-imports/no-unused-imports */
 import React, {Component, Fragment} from 'react';
 import {Image, Pressable, SafeAreaView, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
