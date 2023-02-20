@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Platform, View} from 'react-native';
 import {Container, Content, Button, Text} from 'native-base';
 import RNShake from 'react-native-shake';
-import AnimateNumber from '@bankify/react-native-animate-number';
+import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
@@ -54,7 +54,7 @@ class ResultScreen extends Component {
                 this._updateStatistics();
             });
 
-            RNShake.addEventListener('ShakeEvent', () => {
+            RNShake.addListener('ShakeEvent', () => {
                 this.reRoll();
             });
         });
@@ -335,7 +335,7 @@ class ResultScreen extends Component {
                         <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
                             <View style={{flex: -1}}>
                                 <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
-                                    <AnimateNumber value={result.total} formatter={(val) => val.toFixed(0)} interval={1} />
+                                    <CountUp isCounting end={result.total} key={result.total} formatter={(val) => val.toFixed(0)} duration={1} />
                                 </Text>
                             </View>
                             <View style={{flex: 1}}>
@@ -346,7 +346,13 @@ class ResultScreen extends Component {
                                         paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13),
                                     }}
                                 >
-                                    <AnimateNumber value={percentage} formatter={(val) => (val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`)} />
+                                    <CountUp
+                                        isCounting
+                                        end={percentage}
+                                        key={percentage}
+                                        formatter={(val) => (val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`)}
+                                        duration={1}
+                                    />
                                 </Text>
                             </View>
                         </View>
@@ -371,7 +377,7 @@ class ResultScreen extends Component {
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
                     <View style={{flex: -1}}>
                         <Text style={[styles.grey, localStyles.rollResult]}>
-                            <AnimateNumber value={this.state.result.total} formatter={(val) => val.toFixed(0)} />
+                            <CountUp isCounting end={this.state.result.total} key={this.state.result.total} formatter={(val) => val.toFixed(0)} />
                         </Text>
                     </View>
                     <View style={{flex: 1}}>
@@ -382,7 +388,12 @@ class ResultScreen extends Component {
                                 paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13),
                             }}
                         >
-                            <AnimateNumber value={percentage} formatter={(val) => (val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`)} />
+                            <CountUp
+                                isCounting
+                                end={percentage}
+                                key={percentage}
+                                formatter={(val) => (val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`)}
+                            />
                         </Text>
                     </View>
                 </View>

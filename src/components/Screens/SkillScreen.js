@@ -42,7 +42,7 @@ class SkillScreen extends Component {
 
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addEventListener('ShakeEvent', () => {
+            RNShake.addListener('ShakeEvent', () => {
                 this.roll();
             });
         });

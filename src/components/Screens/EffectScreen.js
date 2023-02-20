@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {View} from 'react-native';
-import {Container, Content, List, ListItem, Left, Right, Button, Text, Radio, Picker, Item} from 'native-base';
+import {Container, Content, List, ListItem, Left, Right, Button, Text, Radio} from 'native-base';
+import DropDownPicker from 'react-native-dropdown-picker';
 import RNShake from 'react-native-shake';
 import {verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
@@ -38,6 +39,17 @@ class EffectScreen extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            open: false,
+            value: 0,
+            items: [
+                {label: 'No partial die', value: 0},
+                {label: '+1 pip', value: PARTIAL_DIE_PLUS_ONE},
+                {label: '+½ die', value: PARTIAL_DIE_HALF},
+                {label: '-1 pip', value: PARTIAL_DIE_MINUS_ONE},
+            ],
+        };
+
         this.setSliderState = this._setSliderState.bind(this);
         this.updatePartialDie = this._updatePartialDie.bind(this);
         this.selectEffect = this._selectEffect.bind(this);
@@ -46,7 +58,7 @@ class EffectScreen extends Component {
 
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addEventListener('ShakeEvent', () => {
+            RNShake.addListener('ShakeEvent', () => {
                 this.roll();
             });
         });
@@ -117,22 +129,42 @@ class EffectScreen extends Component {
                 <Header navigation={this.props.navigation} />
                 <Content style={styles.content}>
                     <Heading text="Effect Roll" />
-                    <Slider label="Dice:" value={this.props.effectForm.dice} step={1} min={0} max={50} onValueChange={this.setSliderState} valueKey="dice" />
-                    <Picker
-                        inlinelabel
-                        label="Partial Die"
-                        style={{width: undefined, color: '#FFFFFF'}}
-                        textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
-                        iosHeader="Select one"
-                        mode="dropdown"
-                        selectedValue={this.props.effectForm.partialDie}
-                        onValueChange={(value) => this.updatePartialDie(value)}
-                    >
-                        <Item label="No partial die" value={0} />
-                        <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-                        <Item label="+½ die" value={PARTIAL_DIE_HALF} />
-                        <Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
-                    </Picker>
+                    <View>
+                        <Slider
+                            label="Dice:"
+                            value={this.props.effectForm.dice}
+                            step={1}
+                            min={0}
+                            max={50}
+                            onValueChange={this.setSliderState}
+                            valueKey="dice"
+                        />
+                    </View>
+                    <View>
+                        <DropDownPicker
+                            theme="DARK"
+                            listMode="MODAL"
+                            open={this.state.open}
+                            value={this.state.value}
+                            items={this.state.items}
+                            setOpen={(open) => {
+                                const newState = {...this.state};
+
+                                newState.open = open;
+
+                                this.setState(newState);
+                            }}
+                            setValue={(callback) => {
+                                const newState = {...this.state};
+
+                                newState.value = callback(this.state.value);
+
+                                this.setState(newState);
+
+                                this.props.updateFormValue('effect', 'partialDie', parseInt(newState.value, 10));
+                            }}
+                        />
+                    </View>
                     <Heading text="Effect" />
                     {this._renderEffects()}
                     <View style={{paddingBottom: verticalScale(20)}} />

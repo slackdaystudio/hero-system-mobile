@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Dimensions, View, Image} from 'react-native';
-import {Container, Content, Tabs, Tab, TabHeading, ScrollableTab, Spinner, Text} from 'native-base';
+import {Container, Content, Spinner, TabHeading, Tabs, Tab, ScrollableTabBar, Text, ScrollableTab} from 'native-base';
 import General from '../HeroDesignerCharacter/General';
 import Combat from '../HeroDesignerCharacter/Combat';
 import Characteristics from '../HeroDesignerCharacter/Characteristics';
@@ -160,6 +160,12 @@ class ViewHeroDesignerCharacterScreen extends Component {
                 </Content>
             </Tab>
         );
+    }
+
+    _renderTabBar(props) {
+        props.tabStyle = Object.create(props.tabStyle);
+
+        return <ScrollableTabBar {...props} style={styles.scrollableTab} />;
     }
 
     _renderCharacter() {

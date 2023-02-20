@@ -62,7 +62,7 @@ class RandomCharacterScreen extends Component {
                 this.props.setRandomHero(randomCharacter.generate());
             }
 
-            RNShake.addEventListener('ShakeEvent', () => {
+            RNShake.addListener('ShakeEvent', () => {
                 this._reRoll();
             });
         });

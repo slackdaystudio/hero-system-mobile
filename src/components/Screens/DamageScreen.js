@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Platform, View, Switch} from 'react-native';
-import {Container, Content, Button, Text, Tabs, Tab, TabHeading, Picker, Item, ScrollableTab} from 'native-base';
+import {Container, Content, Button, Text, Tabs, Tab, TabHeading, DefaultTabBar} from 'native-base';
+import DropDownPicker from 'react-native-dropdown-picker';
 import RNShake from 'react-native-shake';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
@@ -36,13 +37,26 @@ class DamageScreen extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            open: false,
+            value: props.damageForm === undefined ? 0 : props.damageForm.partialDie,
+            items: [
+                {label: 'No partial die', value: 0},
+                {label: '+1 pip', value: PARTIAL_DIE_PLUS_ONE},
+                {label: '+½ die', value: PARTIAL_DIE_HALF},
+                {label: '-1 pip', value: PARTIAL_DIE_MINUS_ONE},
+            ],
+        };
+
         this.updateFormValue = this._updateFormValue.bind(this);
         this.roll = this._roll.bind(this);
+
+        this.setValue = this._setValue.bind(this);
     }
 
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addEventListener('ShakeEvent', () => {
+            RNShake.addListener(() => {
                 this.roll();
             });
         });
@@ -50,7 +64,26 @@ class DamageScreen extends Component {
 
     componentWillUnmount() {
         this._unsubscribe();
-        RNShake.removeEventListener('ShakeEvent');
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.damageForm === undefined || state.damage === undefined) {
+            return null;
+        }
+
+        if (props.damageForm.partialDie !== state.damageForm.partialDie) {
+            return {
+                value: props.damageForm.partialDie,
+            };
+        }
+
+        return null;
+    }
+
+    _setValue(callback) {
+        this.setState((state) => ({
+            value: callback(state.value),
+        }));
     }
 
     _roll() {
@@ -112,18 +145,24 @@ class DamageScreen extends Component {
         );
     }
 
+    _renderTabBar(props) {
+        props.tabStyle = Object.create(props.tabStyle);
+
+        return <DefaultTabBar {...props} />;
+    }
+
     render() {
         return (
             <Container style={styles.container}>
                 <Header navigation={this.props.navigation} hasTabs={true} />
-                <Content scrollEnable={false}>
-                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Roll For Damage')}
-                        >
+                <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} tabContainerStyle={styles.scrollableTab} renderTabBar={this._renderTabBar}>
+                    <Tab
+                        tabStyle={styles.tabHeading}
+                        activeTabStyle={styles.activeTabStyle}
+                        activeTextStyle={styles.activeTextStyle}
+                        heading={this._renderTabHeading('Roll For Damage')}
+                    >
+                        <Content scrollEnable={false}>
                             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                                 <View>
                                     <Slider
@@ -135,19 +174,15 @@ class DamageScreen extends Component {
                                         onValueChange={this.updateFormValue}
                                         valueKey="dice"
                                     />
-                                    <Picker
-                                        style={{width: undefined, color: '#FFFFFF'}}
-                                        textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
-                                        iosHeader="Select one"
-                                        mode="dropdown"
-                                        selectedValue={this.props.damageForm.partialDie}
-                                        onValueChange={(value) => this.updateFormValue('partialDie', value)}
-                                    >
-                                        <Item label="No partial die" value="0" />
-                                        <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-                                        <Item label="+½ die" value={PARTIAL_DIE_HALF} />
-                                        <Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
-                                    </Picker>
+                                    <DropDownPicker
+                                        theme="DARK"
+                                        listMode="MODAL"
+                                        open={this.state.open}
+                                        value={this.state.value}
+                                        items={this.state.items}
+                                        setOpen={(open) => this.setState({open})}
+                                        setValue={this.setValue}
+                                    />
                                     <View style={{paddingBottom: scale(30)}} />
                                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                                         <Text style={styles.grey}>Is this a killing attack?</Text>
@@ -285,13 +320,15 @@ class DamageScreen extends Component {
                                 </View>
                                 <View style={{paddingBottom: 30}} />
                             </View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Maneuvers')}
-                        >
+                        </Content>
+                    </Tab>
+                    <Tab
+                        tabStyle={styles.tabHeading}
+                        activeTabStyle={styles.activeTabStyle}
+                        activeTextStyle={styles.activeTextStyle}
+                        heading={this._renderTabHeading('Maneuvers')}
+                    >
+                        <Content>
                             <View style={[styles.tabContent, {paddingBottom: scale(20), paddingHorizontal: scale(10)}]}>
                                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                                     <View style={{flex: 1, alignSelf: 'stretch'}}>
@@ -344,9 +381,9 @@ class DamageScreen extends Component {
                                     );
                                 })}
                             </View>
-                        </Tab>
-                    </Tabs>
-                </Content>
+                        </Content>
+                    </Tab>
+                </Tabs>
             </Container>
         );
     }
