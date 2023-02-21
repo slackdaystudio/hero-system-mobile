@@ -19,7 +19,8 @@
   },
   "lint-staged": {
     "*{.js,test.js}": [
-      "npm run lint --"
+      "eslint",
+      "prettier"
     ]
   },
   "jest": {
