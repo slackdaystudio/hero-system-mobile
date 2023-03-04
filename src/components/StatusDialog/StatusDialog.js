@@ -25,63 +25,43 @@ class StatusDialog extends Component {
     constructor(props) {
         super(props);
 
+        this.items = this._getItems();
+
         this.state = {
             open: props.visible,
             value: props.statusForm.name,
             items: STATUSES.map((status) => ({label: status, value: status})),
-            selectedItems: [],
+            selectedItems: this._getItemIds(props.statusForm.targetTrait, this.items),
         };
-
-        this.items = this._getItems();
 
         this.updateFormValue = this._updateFormValue.bind(this);
         this.setValue = this._setValue.bind(this);
     }
 
-    // componentDidUpdate(prevProps) {
-    //     if (this.props.visible !== prevProps.visible && this.props.visible) {
-    //         if (this.props.statusForm.targetTrait !== null) {
-    //             let itemIds = [];
-
-    //             for (const category of this.items) {
-    //                 for (const item of category.children) {
-    //                     if (this.props.statusForm.targetTrait.includes(item.name)) {
-    //                         itemIds.push(item.id);
-    //                     }
-    //                 }
-    //             }
-
-    //             this.setState({selectedItems: itemIds});
-    //         }
-    //     }
-    // }
-
-    static getDerivedStateFromProps(props, state) {
-        if (props === undefined || state === undefined) {
-            return null;
+    componentDidUpdate(prevProps) {
+        if (this.props.visible !== prevProps.visible && this.props.visible) {
+            this.setState((state) => ({
+                ...state,
+                value: this.props.statusForm.name,
+                selectedItems: this._getItemIds(this.props.statusForm.targetTrait, this.items),
+            }));
         }
+    }
 
-        if (props.open !== state.open && props.statusForm) {
-            if (props.statusForm.targetTrait !== null) {
-                let itemIds = [];
+    _getItemIds(targetTrait, items) {
+        const itemIds = [];
 
-                for (const category of this.items) {
-                    for (const item of category.children) {
-                        if (props.statusForm.targetTrait.includes(item.name)) {
-                            itemIds.push(item.id);
-                        }
+        if (targetTrait !== null) {
+            for (const category of items) {
+                for (const item of category.children) {
+                    if (targetTrait.includes(item.name)) {
+                        itemIds.push(item.id);
                     }
                 }
-
-                const newState = {...state};
-
-                newState.selectedItems = itemIds;
-                console.log(JSON.stringify(newState));
-                return newState;
             }
         }
 
-        return null;
+        return itemIds;
     }
 
     _setValue(callback) {
