@@ -1,16 +1,17 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {View, Switch, TouchableHighlight} from 'react-native';
-import {Container, Content, Button, Text, Tabs, Tab, TabHeading, ScrollableTab, Icon} from 'native-base';
-import RNShake from 'react-native-shake';
+import {Dimensions, View, Switch, TouchableHighlight} from 'react-native';
+import {Button, Text, TabHeading, Icon} from 'native-base';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
+import {TabView} from 'react-native-tab-view';
+import {Tab, RouteBuilder} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
-import styles from '../../Styles';
 import hitLocations from '../../../public/hitLocations.json';
 import {updateFormValue} from '../../reducers/forms';
+import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -26,6 +27,10 @@ import {updateFormValue} from '../../reducers/forms';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const windowWidth = Dimensions.get('window').width;
+
+const windowHeight = Dimensions.get('window').height;
+
 class HitScreen extends PureComponent {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
@@ -36,22 +41,28 @@ class HitScreen extends PureComponent {
     constructor(props) {
         super(props);
 
+        this.state = {
+            index: 0,
+            routes: [
+                {key: 'roll', title: 'Roll To Hit'},
+                {key: 'range', title: 'Range Mods'},
+                {key: 'hit', title: 'Hit Locations'},
+                {key: 'targeted', title: 'Targeted Shots'},
+            ],
+        };
+
         this.updateFormValue = this._updateFormValue.bind(this);
         this.roll = this._roll.bind(this);
         this.setLocation = this._setLocation.bind(this);
+        this.setIndex = this._setIndex.bind(this);
+        this.renderScene = this._renderScene.bind(this);
     }
 
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addListener('ShakeEvent', () => {
-                this.roll();
-            });
-        });
-    }
-
-    componentWillUnmount() {
-        this._unsubscribe();
-        RNShake.removeEventListener('ShakeEvent');
+    _setIndex(index) {
+        this.setState((state) => ({
+            ...state,
+            index: index,
+        }));
     }
 
     _roll() {
@@ -139,257 +150,273 @@ class HitScreen extends PureComponent {
         );
     }
 
+    RollRoute() {
+        const tab = (
+            <>
+                <Slider
+                    label="Total OCV/OMCV:"
+                    value={this.props.hitForm.ocv}
+                    step={1}
+                    min={-30}
+                    max={30}
+                    onValueChange={this.updateFormValue}
+                    valueKey="ocv"
+                />
+                <Slider
+                    label="Rolls:"
+                    value={this.props.hitForm.numberOfRolls}
+                    step={1}
+                    min={1}
+                    max={20}
+                    onValueChange={this.updateFormValue}
+                    valueKey="numberOfRolls"
+                />
+                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                    <Text style={styles.grey}>Is this an autofire attack?</Text>
+                    <View style={{paddingRight: scale(10)}}>
+                        <Switch
+                            value={this.props.hitForm.isAutofire}
+                            onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
+                            color="#3da0ff"
+                            minimumTrackTintColor="#14354d"
+                            maximumTrackTintColor="#14354d"
+                            thumbColor="#14354d"
+                            trackColor={{false: '#000', true: '#3d5478'}}
+                            ios_backgroundColor="#3d5478"
+                        />
+                    </View>
+                </View>
+                {this._renderDcvSlider()}
+                <Button block style={styles.button} onPress={this.roll}>
+                    <Text uppercase={false}>Roll</Text>
+                </Button>
+            </>
+        );
+
+        return RouteBuilder('Roll To Hit', tab, false);
+    }
+
+    RangeModsRoute() {
+        const tab = (
+            <>
+                <View>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text>
+                        </View>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>0-8</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>0</Text>
+                        </View>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>9-16</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>-2</Text>
+                        </View>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>17-32</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>-4</Text>
+                        </View>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>33-64</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>-6</Text>
+                        </View>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>65-128</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>-8</Text>
+                        </View>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>129-250</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={styles.grey}>-10</Text>
+                        </View>
+                    </View>
+                </View>
+            </>
+        );
+
+        return RouteBuilder('Range Mods', tab, false);
+    }
+
+    HitLocationsRoute() {
+        const tab = (
+            <>
+                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Roll</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Damage</Text>
+                        </View>
+                    </View>
+                    {hitLocations.map((hitLocation, index) => {
+                        let stars = [];
+
+                        for (let i = 0; i < hitLocation.stunX; i++) {
+                            stars.push(<Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: verticalScale(14)}]} />);
+                        }
+
+                        return (
+                            <TouchableHighlight
+                                key={'hit-location-' + index}
+                                style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}
+                                underlayColor="#3da0ff"
+                                onPress={() => this.setLocation(index)}
+                            >
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>{hitLocation.location}</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'center'}}>
+                                        <Text style={styles.grey}>{hitLocation.roll}</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>{hitLocation.penalty}</Text>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        {stars.map((star) => {
+                                            return star;
+                                        })}
+                                    </View>
+                                </View>
+                            </TouchableHighlight>
+                        );
+                    })}
+                </View>
+                {this._renderLocationDetails()}
+            </>
+        );
+
+        return RouteBuilder('Hit Locations', tab, false);
+    }
+
+    TargetedShotsRoute() {
+        const tab = (
+            <>
+                <View>
+                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: verticalScale(5)}}>
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+                            </View>
+                        </View>
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>Head Shot</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>-4</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>1d6+3</Text>
+                            </View>
+                        </View>
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>High Shot</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>-2</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>2d6+1</Text>
+                            </View>
+                        </View>
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>Low Shot</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>-2</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>2d6+7 (19=foot)</Text>
+                            </View>
+                        </View>
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>Leg Shot</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>-4</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>1d6+12</Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </>
+        );
+
+        return RouteBuilder('Targeted Shots', tab, false);
+    }
+
+    _renderScene() {
+        switch (this.state.index) {
+            case 0:
+                return this.RollRoute();
+            case 1:
+                return this.RangeModsRoute();
+            case 2:
+                return this.HitLocationsRoute();
+            case 3:
+                return this.TargetedShotsRoute();
+            default:
+                return null;
+        }
+    }
+
     render() {
         return (
-            <Container style={styles.container}>
-                <Header navigation={this.props.navigation} />
-                <Content scrollEnable={false}>
-                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Roll To Hit')}
-                        >
-                            <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
-                                <Slider
-                                    label="Total OCV/OMCV:"
-                                    value={this.props.hitForm.ocv}
-                                    step={1}
-                                    min={-30}
-                                    max={30}
-                                    onValueChange={this.updateFormValue}
-                                    valueKey="ocv"
-                                />
-                                <Slider
-                                    label="Rolls:"
-                                    value={this.props.hitForm.numberOfRolls}
-                                    step={1}
-                                    min={1}
-                                    max={20}
-                                    onValueChange={this.updateFormValue}
-                                    valueKey="numberOfRolls"
-                                />
-                                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                    <Text style={styles.grey}>Is this an autofire attack?</Text>
-                                    <View style={{paddingRight: scale(10)}}>
-                                        <Switch
-                                            value={this.props.hitForm.isAutofire}
-                                            onValueChange={() => this.updateFormValue('isAutofire', !this.props.hitForm.isAutofire)}
-                                            color="#3da0ff"
-                                            minimumTrackTintColor="#14354d"
-                                            maximumTrackTintColor="#14354d"
-                                            thumbColor="#14354d"
-                                            trackColor={{false: '#000', true: '#3d5478'}}
-                                            ios_backgroundColor="#3d5478"
-                                        />
-                                    </View>
-                                </View>
-                                {this._renderDcvSlider()}
-                                <Button block style={styles.button} onPress={this.roll}>
-                                    <Text uppercase={false}>Roll</Text>
-                                </Button>
-                            </View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Range Mods')}
-                        >
-                            <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
-                                <View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>0-8</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>0</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>9-16</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-2</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>17-32</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-4</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>33-64</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-6</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>65-128</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-8</Text>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>129-250</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={styles.grey}>-10</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Hit Locations')}
-                        >
-                            <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
-                                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Roll</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
-                                        </View>
-                                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Damage</Text>
-                                        </View>
-                                    </View>
-                                    {hitLocations.map((hitLocation, index) => {
-                                        let stars = [];
-
-                                        for (let i = 0; i < hitLocation.stunX; i++) {
-                                            stars.push(
-                                                <Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: verticalScale(14)}]} />,
-                                            );
-                                        }
-
-                                        return (
-                                            <TouchableHighlight
-                                                key={'hit-location-' + index}
-                                                style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}
-                                                underlayColor="#3da0ff"
-                                                onPress={() => this.setLocation(index)}
-                                            >
-                                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                        <Text style={styles.grey}>{hitLocation.location}</Text>
-                                                    </View>
-                                                    <View style={{flex: 1, alignSelf: 'center'}}>
-                                                        <Text style={styles.grey}>{hitLocation.roll}</Text>
-                                                    </View>
-                                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                        <Text style={styles.grey}>{hitLocation.penalty}</Text>
-                                                    </View>
-                                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
-                                                        {stars.map((star, index) => {
-                                                            return star;
-                                                        })}
-                                                    </View>
-                                                </View>
-                                            </TouchableHighlight>
-                                        );
-                                    })}
-                                </View>
-                                {this._renderLocationDetails()}
-                            </View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Targeted Shots')}
-                        >
-                            <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
-                                <View>
-                                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: verticalScale(5)}}>
-                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
-                                            </View>
-                                        </View>
-                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>Head Shot</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>-4</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>1d6+3</Text>
-                                            </View>
-                                        </View>
-                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>High Shot</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>-2</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>2d6+1</Text>
-                                            </View>
-                                        </View>
-                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>Low Shot</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>-2</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>2d6+7 (19=foot)</Text>
-                                            </View>
-                                        </View>
-                                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>Leg Shot</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>-4</Text>
-                                            </View>
-                                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                <Text style={styles.grey}>1d6+12</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                        </Tab>
-                    </Tabs>
-                </Content>
-            </Container>
+            <>
+                <Header navigation={this.props.navigation} hasTabs={true} />
+                <TabView
+                    navigationState={{index: this.state.index, routes: this.state.routes, setIndex: this.setIndex}}
+                    renderScene={this.renderScene}
+                    renderTabBar={Tab}
+                    onIndexChange={this.setIndex}
+                    initialLayout={{height: windowHeight, width: windowWidth}}
+                />
+            </>
         );
     }
 }
