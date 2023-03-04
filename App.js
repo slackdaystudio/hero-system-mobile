@@ -2,6 +2,7 @@
 import React, {Component, Fragment} from 'react';
 import {Image, Pressable, SafeAreaView, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@react-navigation/drawer';
 import {createStore, configureStore, applyMiddleware, compose} from 'redux';
 import {Provider} from 'react-redux';
@@ -41,21 +42,17 @@ import {TEXT_COLOR} from './src/Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export let sounds = {};
+export const sounds = {};
 
 const Drawer = createDrawerNavigator();
 
 const HIDDEN_SCREENS = ['Result'];
 
-const CustomDrawerContent = (props) => {
-    if (props.spacer) {
-        return (
-            <Pressable onPress={() => null}>
-                <DrawerContentScrollView {...props} />
-            </Pressable>
-        );
-    }
+const drawerContent = (props) => <CustomDrawerContent {...props} />;
 
+const hsmIcon = () => <Image style={{height: scale(50), width: scale(115)}} source={require('./public/hero_mobile_logo.png')} />;
+
+const CustomDrawerContent = (props) => {
     const {state, ...rest} = props;
     const newState = {...state};
     const {index, routes} = props.navigation.getState();
@@ -63,7 +60,7 @@ const CustomDrawerContent = (props) => {
 
     // Filter out routes that are hidden either all the time or contextually
     newState.routes = newState.routes.filter((item, i) => {
-        if (store.getState().character.workingCharacter === null && (item.name === 'ViewHeroDesignerCharacterScreen' || item.name === 'CharactersScreen')) {
+        if (store.getState().character.workingCharacter === undefined && (item.name === 'ViewHeroDesignerCharacter' || item.name === 'Characters')) {
             return false;
         }
 
@@ -72,6 +69,7 @@ const CustomDrawerContent = (props) => {
 
     // Loop over the remaining routes and set the selected index based on the current route name (for highlighting)
     for (let i = 0; i < newState.routes.length; i++) {
+        console.log(`Current Route: ${currentRoute}, Loop Route: ${newState.routes[i].name}`);
         if (currentRoute === newState.routes[i].name) {
             newState.index = i;
             break;
@@ -85,15 +83,15 @@ const CustomDrawerContent = (props) => {
     );
 };
 
-const Spacer = ({}) => {
-    return <View backgroundColor="red" />;
-};
-
 export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
 
 export const store = createStore(reducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
+
+const Home = (props) => {
+    return <HomeScreen {...props} />;
+};
 
 export default class App extends Component {
     componentDidMount() {
@@ -106,51 +104,43 @@ export default class App extends Component {
     render() {
         return (
             <Provider store={store}>
-                <Root>
-                    <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
+                <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
+                    <GestureHandlerRootView style={{flex: 1}}>
                         <NavigationContainer>
-                            <Drawer.Navigator
-                                screenOptions={{
-                                    headerShown: false,
-                                    drawerPosition: 'right',
-                                    drawerContentOptions: drawerContentOptions,
-                                    drawerStyle: localStyles.drawer,
-                                    drawerLabelStyle: {color: '#F3EDE9'},
-                                }}
-                                initialRoute="Home"
-                                drawerContent={(props) => <CustomDrawerContent spacer={props.spacer === true} {...props} />}
-                            >
-                                <Drawer.Screen
-                                    options={{
-                                        drawerLabel: () => (
-                                            <Image style={{height: scale(50), width: scale(115)}} source={require('./public/hero_mobile_logo.png')} />
-                                        ),
+                            <Root>
+                                <Drawer.Navigator
+                                    screenOptions={{
+                                        headerShown: false,
+                                        drawerPosition: 'right',
+                                        drawerContentOptions: drawerContentOptions,
+                                        drawerStyle: localStyles.drawer,
+                                        drawerLabelStyle: {color: '#F3EDE9'},
                                     }}
-                                    name="Home"
-                                    component={HomeScreen}
-                                />
-                                <Drawer.Screen
-                                    options={{spacer: true, drawerLabel: 'View Character'}}
-                                    name="ViewHeroDesignerCharacter"
-                                    component={ViewHeroDesignerCharacterScreen}
-                                />
-                                <Drawer.Screen name="Characters" component={CharactersScreen} />
-                                {/* <Drawer.Screen options={{drawerLabel: ''}} name="RollSpacer" getComponent={() => HomeScreen} /> */}
-                                <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" component={SkillScreen} />
-                                <Drawer.Screen name="Hit" component={HitScreen} />
-                                <Drawer.Screen name="Damage" component={DamageScreen} />
-                                <Drawer.Screen name="Effect" component={EffectScreen} />
-
-                                <Drawer.Screen name="Result" component={ResultScreen} />
-
-                                <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
-                                <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
-                                <Drawer.Screen name="Statistics" component={StatisticsScreen} />
-                                <Drawer.Screen name="Settings" component={SettingsScreen} />
-                            </Drawer.Navigator>
+                                    initialRouteName="Home"
+                                    backBehavior="history"
+                                    drawerContent={(props) => drawerContent(props)}
+                                >
+                                    <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={Home} />
+                                    <Drawer.Screen
+                                        options={{drawerLabel: 'View Character'}}
+                                        name="ViewHeroDesignerCharacter"
+                                        component={ViewHeroDesignerCharacterScreen}
+                                    />
+                                    <Drawer.Screen name="Characters" component={CharactersScreen} />
+                                    <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" children={(props) => <SkillScreen {...props} />} />
+                                    <Drawer.Screen name="Hit" component={HitScreen} />
+                                    <Drawer.Screen name="Damage" component={DamageScreen} />
+                                    <Drawer.Screen name="Effect" component={EffectScreen} />
+                                    <Drawer.Screen name="Result" component={ResultScreen} />
+                                    <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
+                                    <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
+                                    <Drawer.Screen name="Statistics" component={StatisticsScreen} />
+                                    <Drawer.Screen name="Settings" component={SettingsScreen} />
+                                </Drawer.Navigator>
+                            </Root>
                         </NavigationContainer>
-                    </SafeAreaView>
-                </Root>
+                    </GestureHandlerRootView>
+                </SafeAreaView>
             </Provider>
         );
     }

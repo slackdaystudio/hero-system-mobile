@@ -1,7 +1,8 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {View} from 'react-native';
-import {Button, Text, Form, Input, Picker, Item, Label} from 'native-base';
+import {Button, Text, Form, Input, Item, Label} from 'native-base';
+import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
 import {scale, verticalScale} from 'react-native-size-matters';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
@@ -25,31 +26,75 @@ class StatusDialog extends Component {
         super(props);
 
         this.state = {
+            open: props.visible,
+            value: props.statusForm.name,
+            items: STATUSES.map((status) => ({label: status, value: status})),
             selectedItems: [],
         };
 
         this.items = this._getItems();
 
         this.updateFormValue = this._updateFormValue.bind(this);
+        this.setValue = this._setValue.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.visible !== prevProps.visible && this.props.visible) {
-            if (this.props.statusForm.targetTrait !== null) {
+    // componentDidUpdate(prevProps) {
+    //     if (this.props.visible !== prevProps.visible && this.props.visible) {
+    //         if (this.props.statusForm.targetTrait !== null) {
+    //             let itemIds = [];
+
+    //             for (const category of this.items) {
+    //                 for (const item of category.children) {
+    //                     if (this.props.statusForm.targetTrait.includes(item.name)) {
+    //                         itemIds.push(item.id);
+    //                     }
+    //                 }
+    //             }
+
+    //             this.setState({selectedItems: itemIds});
+    //         }
+    //     }
+    // }
+
+    static getDerivedStateFromProps(props, state) {
+        if (props === undefined || state === undefined) {
+            return null;
+        }
+
+        if (props.open !== state.open && props.statusForm) {
+            if (props.statusForm.targetTrait !== null) {
                 let itemIds = [];
 
                 for (const category of this.items) {
                     for (const item of category.children) {
-                        if (this.props.statusForm.targetTrait.includes(item.name)) {
+                        if (props.statusForm.targetTrait.includes(item.name)) {
                             itemIds.push(item.id);
                         }
                     }
                 }
 
-                // eslint-disable-next-line react/no-did-update-set-state
-                this.setState({selectedItems: itemIds});
+                const newState = {...state};
+
+                newState.selectedItems = itemIds;
+                console.log(JSON.stringify(newState));
+                return newState;
             }
         }
+
+        return null;
+    }
+
+    _setValue(callback) {
+        console.log(JSON.stringify(this.props.statusForm));
+        this.setState((state) => {
+            const newState = {...state};
+
+            newState.value = callback(state.value);
+
+            this.updateFormValue('name', newState.value);
+
+            return newState;
+        });
     }
 
     _updateFormValue(key, value) {
@@ -258,20 +303,16 @@ class StatusDialog extends Component {
                             </Item>
                             <Item inlineLabel style={{marginLeft: 0}}>
                                 <Label style={styles.grey}>Status:</Label>
-                                <Picker
-                                    inlinelabel
-                                    label="Status"
-                                    style={{width: undefined, color: '#FFFFFF'}}
-                                    textStyle={{fontSize: verticalScale(12), color: '#FFFFFF'}}
-                                    iosHeader="Select one"
-                                    mode="dropdown"
-                                    selectedValue={this.props.statusForm.name}
-                                    onValueChange={(value) => this.updateFormValue('name', value)}
-                                >
-                                    {STATUSES.map((status, index) => {
-                                        return <Item key={`status-${index}`} label={status} value={status} />;
-                                    })}
-                                </Picker>
+                                <DropDownPicker
+                                    containerStyle={{maxWidth: '80%'}}
+                                    theme="DARK"
+                                    listMode="MODAL"
+                                    open={this.state.open}
+                                    value={this.state.value}
+                                    items={this.state.items}
+                                    setOpen={(open) => this.setState({open})}
+                                    setValue={this.setValue}
+                                />
                             </Item>
                             {this._renderSecondaryControls()}
                         </Form>

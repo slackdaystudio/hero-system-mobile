@@ -1,17 +1,19 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Platform, View, Switch} from 'react-native';
-import {Container, Content, Button, Text, Tabs, Tab, TabHeading, DefaultTabBar} from 'native-base';
+import {Dimensions, Platform, View, Switch} from 'react-native';
+import {Button, Text} from 'native-base';
+import {TabView} from 'react-native-tab-view';
 import DropDownPicker from 'react-native-dropdown-picker';
-import RNShake from 'react-native-shake';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
+import {RouteBuilder, Tab} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import {dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
-import styles from '../../Styles';
-import moves from '../../../public/moves.json';
+import {common as libCommon} from '../../lib/Common';
 import {updateFormValue} from '../../reducers/forms';
+import moves from '../../../public/moves.json';
+import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -27,6 +29,10 @@ import {updateFormValue} from '../../reducers/forms';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const windowWidth = Dimensions.get('window').width;
+
+const windowHeight = Dimensions.get('window').height;
+
 class DamageScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
@@ -38,6 +44,11 @@ class DamageScreen extends Component {
         super(props);
 
         this.state = {
+            index: 0,
+            routes: [
+                {key: 'damage', title: 'Damage'},
+                {key: 'maneuvers', title: 'Maneuvers'},
+            ],
             open: false,
             value: props.damageForm === undefined ? 0 : props.damageForm.partialDie,
             items: [
@@ -50,39 +61,278 @@ class DamageScreen extends Component {
 
         this.updateFormValue = this._updateFormValue.bind(this);
         this.roll = this._roll.bind(this);
-
+        this.setOpen = this._setOpen.bind(this);
         this.setValue = this._setValue.bind(this);
+        this.setIndex = this._setIndex.bind(this);
+        this.renderStunMultiplier = this._renderStunMultiplier.bind(this);
+        this.renderFadeRate = this._renderFadeRate.bind(this);
+        this.renderScene = this._renderScene.bind(this);
     }
 
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addListener(() => {
-                this.roll();
-            });
-        });
-    }
-
-    componentWillUnmount() {
-        this._unsubscribe();
-    }
-
-    static getDerivedStateFromProps(props, state) {
-        if (props.damageForm === undefined || state.damage === undefined) {
-            return null;
+    componentDidUpdate(prevProps) {
+        if (!libCommon.isEmptyObject(this.props.damageForm)) {
+            if (libCommon.isEmptyObject(prevProps.damageForm) || this.props.damageForm.partialDie !== prevProps.damageForm.partialDie) {
+                this.setState((state) => ({...state, value: this.props.damageForm.partialDie}));
+            }
         }
+    }
 
-        if (props.damageForm.partialDie !== state.damageForm.partialDie) {
-            return {
-                value: props.damageForm.partialDie,
-            };
+    DamageRoute() {
+        const tab = (
+            <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
+                <View>
+                    <Slider
+                        label="Dice:"
+                        value={parseInt(this.props.damageForm.dice, 10)}
+                        step={1}
+                        min={0}
+                        max={50}
+                        onValueChange={(value) => this.props.updateFormValue('damage', 'dice', value)}
+                    />
+                    <DropDownPicker
+                        theme="DARK"
+                        listMode="MODAL"
+                        open={this.state.open}
+                        value={this.state.value}
+                        items={this.state.items}
+                        setOpen={this.setOpen}
+                        setValue={this.setValue}
+                    />
+                    <View style={{paddingBottom: scale(30)}} />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Is this a killing attack?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.killingToggled}
+                                onValueChange={() => this.props.updateFormValue('damage', 'killingToggled', !this.props.damageForm.killingToggled)}
+                                color="#3da0ff"
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    {this.renderStunMultiplier()}
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Is this an explosion?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.isExplosion}
+                                onValueChange={() => this.props.updateFormValue('damage', 'isExplosion', !this.props.damageForm.isExplosion)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    {this.renderFadeRate()}
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Use hit locations?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.useHitLocations}
+                                onValueChange={() => this.props.updateFormValue('damage', 'useHitLocations', !this.props.damageForm.useHitLocations)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Attack is a martial maneuver?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.isMartialManeuver}
+                                onValueChange={() => this.props.updateFormValue('damage', 'isMartialManeuver', !this.props.damageForm.isMartialManeuver)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is in the air?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.isTargetFlying}
+                                onValueChange={() => this.props.updateFormValue('damage', 'isTargetFlying', !this.props.damageForm.isTargetFlying)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is in zero gravity?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.isTargetInZeroG}
+                                onValueChange={() => this.props.updateFormValue('damage', 'isTargetInZeroG', !this.props.damageForm.isTargetInZeroG)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is underwater?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.isTargetUnderwater}
+                                onValueChange={() => this.props.updateFormValue('damage', 'isTargetUnderwater', !this.props.damageForm.isTargetUnderwater)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target rolled with a punch?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.rollWithPunch}
+                                onValueChange={() => this.props.updateFormValue('damage', 'rollWithPunch', !this.props.damageForm.rollWithPunch)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is using clinging?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={this.props.damageForm.isUsingClinging}
+                                onValueChange={() => this.props.updateFormValue('damage', 'isUsingClinging', !this.props.damageForm.isUsingClinging)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    <View style={{paddingBottom: 30}} />
+                    <Button block style={styles.button} onPress={this.roll}>
+                        <Text uppercase={false}>Roll</Text>
+                    </Button>
+                </View>
+                <View style={{paddingBottom: 30}} />
+            </View>
+        );
+
+        return RouteBuilder('Damage', tab, false);
+    }
+
+    ManeuversRoute() {
+        const tab = (
+            <View style={[styles.tabContent, {paddingBottom: scale(20), paddingHorizontal: scale(10)}]}>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
+                    </View>
+                </View>
+                {moves.map((move, index) => {
+                    return (
+                        <View key={'move-' + index}>
+                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.name}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.phase}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.ocv}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.dcv}</Text>
+                                </View>
+                            </View>
+                            <View
+                                style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    justifyContent: 'flex-start',
+                                    alignSelf: 'flex-start',
+                                    paddingBottom: verticalScale(5),
+                                }}
+                            >
+                                <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                                    <Text style={styles.grey} />
+                                </View>
+                                <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                                    <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    );
+                })}
+            </View>
+        );
+
+        return RouteBuilder('Maneuvers', tab, false);
+    }
+
+    _renderScene() {
+        switch (this.state.index) {
+            case 0:
+                return this.DamageRoute();
+            case 1:
+                return this.ManeuversRoute();
+            default:
+                return null;
         }
+    }
 
-        return null;
+    _setOpen(open) {
+        this.setState((state) => ({
+            ...state,
+            open: open,
+        }));
     }
 
     _setValue(callback) {
+        this.setState((state) => {
+            const newState = {...state};
+
+            newState.value = callback(state.value);
+
+            this.props.updateFormValue('damage', 'partialDie', newState.value);
+
+            return state;
+        });
+    }
+
+    _setIndex(index) {
         this.setState((state) => ({
-            value: callback(state.value),
+            ...state,
+            index: index,
         }));
     }
 
@@ -96,9 +346,9 @@ class DamageScreen extends Component {
             this.props.updateFormValue('damage', 'damageType', value ? KILLING_DAMAGE : NORMAL_DAMAGE);
         } else {
             value = ['dice', 'stunMultiplier', 'fadeRate'].includes(key) ? parseInt(value, 10) : value;
-
-            this.props.updateFormValue('damage', key, value);
         }
+
+        this.props.updateFormValue('damage', key, value);
     }
 
     _renderFadeRate() {
@@ -137,254 +387,18 @@ class DamageScreen extends Component {
         return null;
     }
 
-    _renderTabHeading(headingText) {
-        return (
-            <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
-                <Text style={styles.tabStyle}>{headingText}</Text>
-            </TabHeading>
-        );
-    }
-
-    _renderTabBar(props) {
-        props.tabStyle = Object.create(props.tabStyle);
-
-        return <DefaultTabBar {...props} />;
-    }
-
     render() {
         return (
-            <Container style={styles.container}>
+            <>
                 <Header navigation={this.props.navigation} hasTabs={true} />
-                <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} tabContainerStyle={styles.scrollableTab} renderTabBar={this._renderTabBar}>
-                    <Tab
-                        tabStyle={styles.tabHeading}
-                        activeTabStyle={styles.activeTabStyle}
-                        activeTextStyle={styles.activeTextStyle}
-                        heading={this._renderTabHeading('Roll For Damage')}
-                    >
-                        <Content scrollEnable={false}>
-                            <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
-                                <View>
-                                    <Slider
-                                        label="Dice:"
-                                        value={this.props.damageForm.dice}
-                                        step={1}
-                                        min={0}
-                                        max={50}
-                                        onValueChange={this.updateFormValue}
-                                        valueKey="dice"
-                                    />
-                                    <DropDownPicker
-                                        theme="DARK"
-                                        listMode="MODAL"
-                                        open={this.state.open}
-                                        value={this.state.value}
-                                        items={this.state.items}
-                                        setOpen={(open) => this.setState({open})}
-                                        setValue={this.setValue}
-                                    />
-                                    <View style={{paddingBottom: scale(30)}} />
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Is this a killing attack?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.killingToggled}
-                                                onValueChange={() => this.updateFormValue('killingToggled', !this.props.damageForm.killingToggled)}
-                                                color="#3da0ff"
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    {this._renderStunMultiplier()}
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Is this an explosion?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.isExplosion}
-                                                onValueChange={() => this.updateFormValue('isExplosion', !this.props.damageForm.isExplosion)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    {this._renderFadeRate()}
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Use hit locations?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.useHitLocations}
-                                                onValueChange={() => this.updateFormValue('useHitLocations', !this.props.damageForm.useHitLocations)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Attack is a martial maneuver?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.isMartialManeuver}
-                                                onValueChange={() => this.updateFormValue('isMartialManeuver', !this.props.damageForm.isMartialManeuver)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Target is in the air?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.isTargetFlying}
-                                                onValueChange={() => this.updateFormValue('isTargetFlying', !this.props.damageForm.isTargetFlying)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Target is in zero gravity?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.isTargetInZeroG}
-                                                onValueChange={() => this.updateFormValue('isTargetInZeroG', !this.props.damageForm.isTargetInZeroG)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Target is underwater?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.isTargetUnderwater}
-                                                onValueChange={() => this.updateFormValue('isTargetUnderwater', !this.props.damageForm.isTargetUnderwater)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Target rolled with a punch?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.rollWithPunch}
-                                                onValueChange={() => this.updateFormValue('rollWithPunch', !this.props.damageForm.rollWithPunch)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                                        <Text style={styles.grey}>Target is using clinging?</Text>
-                                        <View style={{paddingRight: scale(10)}}>
-                                            <Switch
-                                                value={this.props.damageForm.isUsingClinging}
-                                                onValueChange={() => this.updateFormValue('isUsingClinging', !this.props.damageForm.isUsingClinging)}
-                                                minimumTrackTintColor="#14354d"
-                                                maximumTrackTintColor="#14354d"
-                                                thumbColor="#14354d"
-                                                trackColor={{false: '#000', true: '#3d5478'}}
-                                                ios_backgroundColor="#3d5478"
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={{paddingBottom: 30}} />
-                                    <Button block style={styles.button} onPress={this.roll}>
-                                        <Text uppercase={false}>Roll</Text>
-                                    </Button>
-                                </View>
-                                <View style={{paddingBottom: 30}} />
-                            </View>
-                        </Content>
-                    </Tab>
-                    <Tab
-                        tabStyle={styles.tabHeading}
-                        activeTabStyle={styles.activeTabStyle}
-                        activeTextStyle={styles.activeTextStyle}
-                        heading={this._renderTabHeading('Maneuvers')}
-                    >
-                        <Content>
-                            <View style={[styles.tabContent, {paddingBottom: scale(20), paddingHorizontal: scale(10)}]}>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
-                                    </View>
-                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
-                                    </View>
-                                </View>
-                                {moves.map((move, index) => {
-                                    return (
-                                        <View key={'move-' + index}>
-                                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{move.name}</Text>
-                                                </View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{move.phase}</Text>
-                                                </View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{move.ocv}</Text>
-                                                </View>
-                                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                                    <Text style={styles.grey}>{move.dcv}</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                    flexDirection: 'row',
-                                                    justifyContent: 'flex-start',
-                                                    alignSelf: 'flex-start',
-                                                    paddingBottom: verticalScale(5),
-                                                }}
-                                            >
-                                                <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                                                    <Text style={styles.grey} />
-                                                </View>
-                                                <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                                                    <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    );
-                                })}
-                            </View>
-                        </Content>
-                    </Tab>
-                </Tabs>
-            </Container>
+                <TabView
+                    navigationState={{index: this.state.index, routes: this.state.routes, setIndex: this.setIndex}}
+                    renderScene={this.renderScene}
+                    renderTabBar={Tab}
+                    onIndexChange={this.setIndex}
+                    initialLayout={{height: windowHeight, width: windowWidth}}
+                />
+            </>
         );
     }
 }

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {View, Switch, TouchableHighlight} from 'react-native';
@@ -26,7 +26,7 @@ import {updateFormValue} from '../../reducers/forms';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class HitScreen extends Component {
+class HitScreen extends PureComponent {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hitForm: PropTypes.object.isRequired,

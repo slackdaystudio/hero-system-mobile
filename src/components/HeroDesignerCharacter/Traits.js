@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {View, TouchableHighlight} from 'react-native';
 import {Text, Icon, Card, CardItem, Body} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
-import Heading from '../Heading/Heading';
 import {dieRoller} from '../../lib/DieRoller';
 import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
 import {SKILL_CHECK, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
@@ -481,7 +480,6 @@ export default class Traits extends Component {
     render() {
         return (
             <View>
-                <Heading text={this.props.headingText} />
                 {this._renderTraits(this.props.character[this.props.listKey])}
                 <View style={{paddingTop: verticalScale(20)}} />
             </View>

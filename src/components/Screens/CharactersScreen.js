@@ -60,7 +60,7 @@ class CharactersScreen extends Component {
             toBeDeleted: null,
             picker: {
                 open: false,
-                value: null,
+                value: 0,
                 items: this.slots.map((slot, _index) => {
                     return {
                         label: `Slot ${slot + 1}`,

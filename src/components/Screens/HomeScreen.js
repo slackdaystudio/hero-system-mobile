@@ -136,6 +136,16 @@ class HomeScreen extends Component {
                                 </Button>
                             </View>
                         </View>
+                        <Heading text="Settings" />
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                            <View style={[styles.buttonContainer, {paddingBottom: verticalScale(20)}]}>
+                                <Button style={styles.button} onPress={() => this.props.navigation.navigate('Settings')}>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Settings
+                                    </Text>
+                                </Button>
+                            </View>
+                        </View>
                         <View style={{paddingBottom: verticalScale(20)}} />
                     </Content>
                 </ImageBackground>

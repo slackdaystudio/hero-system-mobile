@@ -502,7 +502,6 @@ export default class Characteristics extends Component {
     render() {
         return (
             <View>
-                <Heading text="Characteristics" />
                 {this._renderSecondaryCharacteristicToggle()}
                 {this._renderCharacteristics(this.props.character.characteristics)}
                 <View style={{paddingTop: verticalScale(20)}} />

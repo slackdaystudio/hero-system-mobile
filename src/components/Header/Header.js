@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {BackHandler, Platform, View, Image, TouchableHighlight, StatusBar} from 'react-native';
-import {Button, Header, Icon} from 'native-base';
+import {Button, Header as NBHeader, Icon} from 'native-base';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 
 export const EXIT_APP = '0';
 
-export default class MyHeader extends Component {
+export default class Header extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         hasTabs: PropTypes.bool,
@@ -32,7 +32,7 @@ export default class MyHeader extends Component {
     render() {
         return (
             <View>
-                <Header hasTabs={this.props.hasTabs || false} style={localStyles.header}>
+                <NBHeader hasTabs={this.props.hasTabs || false} style={localStyles.header}>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={{flex: 1}}>
                             <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
@@ -56,7 +56,7 @@ export default class MyHeader extends Component {
                             </Button>
                         </View>
                     </View>
-                </Header>
+                </NBHeader>
                 <StatusBar backgroundColor="#000" barStyle="light-content" />
             </View>
         );

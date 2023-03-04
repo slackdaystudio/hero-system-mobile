@@ -3,7 +3,6 @@ import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
 import {zip, unzip} from 'react-native-zip-archive';
-import getPath from '@flyerhq/react-native-android-uri-path';
 import {isBase64} from 'is-base64';
 import {common} from './Common';
 import {heroDesignerCharacter} from './HeroDesignerCharacter';
@@ -47,27 +46,34 @@ class File {
         let character = null;
 
         try {
-            const result = await DocumentPicker.pick({
+            const result = await DocumentPicker.pickSingle({
                 type: [DocumentPicker.types.allFiles, 'public.item'],
+                copyTo: 'documentDirectory',
             });
 
             if (result === null) {
                 return;
             }
 
-            if (result[0].name.toLowerCase().endsWith(`.${EXT_HD}`)) {
-                character = await this._read(result[0].name, result[0].uri, startLoad, endLoad, EXT_HD);
-            } else if (result[0].name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
-                character = await this._read(result[0].name, result[0].uri, startLoad, endLoad, EXT_CHARACTER);
+            if (!result.fileCopyUri.startsWith('file://')) {
+                result.fileCopyUri = `file://${Platform.OS === 'ios' ? result.fileCopyUri : decodeURIComponent(result.fileCopyUri)}`;
+            }
+
+            console.log(result);
+
+            if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
+                character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_HD);
+            } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_CHARACTER);
             } else {
-                common.toast('Unsupported file type: ' + result[0].type);
+                common.toast('Unsupported file type: ' + result.type);
 
                 return;
             }
 
-            if (!result[0].name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
-                await this._initCharacterState(character, result[0].name);
-                await this._saveCharacter(character, result[0].name);
+            if (!result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                await this._initCharacterState(character, result.name);
+                await this._saveCharacter(character, result.name);
             }
 
             return character;
@@ -181,7 +187,7 @@ class File {
         try {
             startLoad();
 
-            const absoluteFilePath = Platform.OS === 'ios' ? decodeURIComponent(getPath(uri)) : getPath(uri);
+            const absoluteFilePath = uri;
 
             if (type === EXT_HD) {
                 let rawXml = await this._getRawXm(absoluteFilePath);
@@ -265,7 +271,7 @@ class File {
 
     async _importCharacter(name, filepath) {
         let importPath = await this._getPath(DEFAULT_CHARACTER_DIR);
-        let importFilename = `file://${importPath}/${name}`;
+        let importFilename = `file://${Platform.OS === 'ios' ? importPath : decodeURIComponent(importPath)}/${name}`;
         let exists = await RNFS.exists(importFilename);
 
         // https://github.com/itinance/react-native-fs/issues/869
