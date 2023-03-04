@@ -1,32 +1,16 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {StyleSheet, View} from 'react-native';
-import {
-    Container,
-    Content,
-    Button,
-    Text,
-    List,
-    ListItem,
-    Left,
-    Right,
-    Body,
-    Tabs,
-    Tab,
-    TabHeading,
-    ScrollableTab,
-    Spinner,
-    Form,
-    Item,
-    Input,
-} from 'native-base';
-import RNShake from 'react-native-shake';
+import {Dimensions, StyleSheet, View} from 'react-native';
+import {Container, Content, Button, Text, List, ListItem, Left, Right, Body, Spinner, Form, Item, Input} from 'native-base';
 import {verticalScale} from 'react-native-size-matters';
+import {TabView} from 'react-native-tab-view';
 import {randomCharacter} from '../../lib/RandomCharacter';
+import {common as libCommon} from '../../lib/Common';
 import Header from '../Header/Header';
 import styles from '../../Styles';
 import {setRandomHero, setRandomHeroName} from '../../reducers/randomHero';
+import {RouteBuilder, Tab} from '../Tab/Tab';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -42,6 +26,10 @@ import {setRandomHero, setRandomHeroName} from '../../reducers/randomHero';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const windowWidth = Dimensions.get('window').width;
+
+const windowHeight = Dimensions.get('window').height;
+
 class RandomCharacterScreen extends Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
@@ -53,7 +41,20 @@ class RandomCharacterScreen extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            index: 0,
+            routes: [
+                {key: 'general', title: 'General'},
+                {key: 'characteristics', title: 'Characteristics'},
+                {key: 'powers', title: 'Powers'},
+                {key: 'skills', title: 'Skills'},
+                {key: 'disadvantages', title: 'Disadvantages'},
+            ],
+        };
+
         this.reRoll = this._reRoll.bind(this);
+        this.setIndex = this._setIndex.bind(this);
+        this.renderScene = this._renderScene.bind(this);
     }
 
     componentDidMount() {
@@ -61,16 +62,35 @@ class RandomCharacterScreen extends Component {
             if (this.props.character === null) {
                 this.props.setRandomHero(randomCharacter.generate());
             }
-
-            RNShake.addListener('ShakeEvent', () => {
-                this._reRoll();
-            });
         });
     }
 
     componentWillUnmount() {
         this._unsubscribe();
-        RNShake.removeEventListener('ShakeEvent');
+    }
+
+    _renderScene() {
+        switch (this.state.index) {
+            case 0:
+                return this.GeneralRoute();
+            case 1:
+                return this.CharacteristicsRoute();
+            case 2:
+                return this.PowersRoute();
+            case 3:
+                return this.SkillsRoute();
+            case 4:
+                return this.DisadvantagesRoute();
+            default:
+                return null;
+        }
+    }
+
+    _setIndex(index) {
+        this.setState((state) => ({
+            ...state,
+            index: index,
+        }));
     }
 
     _reRoll() {
@@ -102,12 +122,171 @@ class RandomCharacterScreen extends Component {
         );
     }
 
-    _renderTabHeading(headingText) {
-        return (
-            <TabHeading style={styles.tabHeading} activeTextStyle={styles.activeTextStyle}>
-                <Text style={styles.tabStyle}>{headingText}</Text>
-            </TabHeading>
+    GeneralRoute() {
+        const tab = (
+            <>
+                <List>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Name:</Text>
+                        </Left>
+                        <Body>
+                            <Form>
+                                <Item>
+                                    <Input
+                                        style={{borderColor: '#D0D1D3', color: '#D0D1D3'}}
+                                        onChangeText={(text) => this.props.setRandomHeroName(text)}
+                                        value={this.props.character.name}
+                                    />
+                                </Item>
+                            </Form>
+                        </Body>
+                    </ListItem>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Archetype:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.archtype.name}</Text>
+                        </Body>
+                    </ListItem>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Gender:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.gender}</Text>
+                        </Body>
+                    </ListItem>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Special FX:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.specialFx}</Text>
+                        </Body>
+                    </ListItem>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Profession:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.skills.profession}</Text>
+                        </Body>
+                    </ListItem>
+                </List>
+                <View style={{paddingBottom: verticalScale(20)}} />
+                <Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
+                <List>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Characteristics:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.archtype.characteristicsCost}</Text>
+                        </Body>
+                    </ListItem>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Powers:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.powers.powersCost}</Text>
+                        </Body>
+                    </ListItem>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Skills:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.skills.cost}</Text>
+                        </Body>
+                    </ListItem>
+                    <ListItem>
+                        <Left>
+                            <Text style={styles.boldGrey}>Disadvantages:</Text>
+                        </Left>
+                        <Body>
+                            <Text style={styles.grey}>{this.props.character.disadvantages.disadvantagesCost}</Text>
+                        </Body>
+                    </ListItem>
+                </List>
+                <View style={{paddingBottom: verticalScale(20)}} />
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
+                    <View style={styles.buttonContainer}>
+                        <Button block style={styles.button} onPress={this.reRoll}>
+                            <Text uppercase={false}>Roll Again</Text>
+                        </Button>
+                    </View>
+                </View>
+            </>
         );
+
+        return RouteBuilder('General', tab, libCommon.isEmptyObject(this.props.character));
+    }
+
+    CharacteristicsRoute() {
+        return RouteBuilder('Characteristics', this._renderCharacteristics(), libCommon.isEmptyObject(this.props.character));
+    }
+
+    PowersRoute() {
+        const tab = (
+            <>
+                {this.props.character.powers.powers.map((power, index) => {
+                    return (
+                        <ListItem key={'power-' + index}>
+                            <Left>
+                                <Text style={styles.grey}>{power.power}</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{power.cost}</Text>
+                            </Right>
+                        </ListItem>
+                    );
+                })}
+            </>
+        );
+
+        return RouteBuilder('Powers', tab, libCommon.isEmptyObject(this.props.character));
+    }
+
+    SkillsRoute() {
+        const tab = (
+            <>
+                {this.props.character.skills.skills.map((skill, index) => {
+                    return (
+                        <ListItem key={'skill-' + index}>
+                            <Body>
+                                <Text style={styles.grey}>{skill}</Text>
+                            </Body>
+                        </ListItem>
+                    );
+                })}
+            </>
+        );
+
+        return RouteBuilder('Skills', tab, libCommon.isEmptyObject(this.props.character));
+    }
+
+    DisadvantagesRoute() {
+        const tab = (
+            <>
+                {this.props.character.disadvantages.disadvantages.map((disad, index) => {
+                    return (
+                        <ListItem key={'disad-' + index}>
+                            <Left>
+                                <Text style={styles.grey}>{disad.description}</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{disad.cost}</Text>
+                            </Right>
+                        </ListItem>
+                    );
+                })}
+            </>
+        );
+
+        return RouteBuilder('Disadvantages', tab, libCommon.isEmptyObject(this.props.character));
     }
 
     render() {
@@ -123,184 +302,16 @@ class RandomCharacterScreen extends Component {
         }
 
         return (
-            <Container style={styles.container}>
-                <Header hasTabs={true} navigation={this.props.navigation} />
-                <Content scrollEnable={false} style={{backgroundColor: '#1b1b1f'}}>
-                    <Tabs locked={true} tabBarUnderlineStyle={styles.tabBarUnderline} renderTabBar={() => <ScrollableTab style={styles.scrollableTab} />}>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('General')}
-                        >
-                            <View style={styles.tabContent}>
-                                <List>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Name:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Form>
-                                                <Item>
-                                                    <Input
-                                                        style={{borderColor: '#D0D1D3', color: '#D0D1D3'}}
-                                                        onChangeText={(text) => this.props.setRandomHeroName(text)}
-                                                        value={this.props.character.name}
-                                                    />
-                                                </Item>
-                                            </Form>
-                                        </Body>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Archetype:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.archtype.name}</Text>
-                                        </Body>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Gender:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.gender}</Text>
-                                        </Body>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Special FX:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.specialFx}</Text>
-                                        </Body>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Profession:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.skills.profession}</Text>
-                                        </Body>
-                                    </ListItem>
-                                </List>
-                                <View style={{paddingBottom: verticalScale(20)}} />
-                                <Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
-                                <List>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Characteristics:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.archtype.characteristicsCost}</Text>
-                                        </Body>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Powers:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.powers.powersCost}</Text>
-                                        </Body>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Skills:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.skills.cost}</Text>
-                                        </Body>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Left>
-                                            <Text style={styles.boldGrey}>Disadvantages:</Text>
-                                        </Left>
-                                        <Body>
-                                            <Text style={styles.grey}>{this.props.character.disadvantages.disadvantagesCost}</Text>
-                                        </Body>
-                                    </ListItem>
-                                </List>
-                                <View style={{paddingBottom: verticalScale(20)}} />
-                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
-                                    <View style={styles.buttonContainer}>
-                                        <Button block style={styles.button} onPress={this.reRoll}>
-                                            <Text uppercase={false}>Roll Again</Text>
-                                        </Button>
-                                    </View>
-                                </View>
-                            </View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Characteristics')}
-                        >
-                            <View style={styles.tabContent}>{this._renderCharacteristics()}</View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Powers')}
-                        >
-                            <View style={styles.tabContent}>
-                                {this.props.character.powers.powers.map((power, index) => {
-                                    return (
-                                        <ListItem key={'power-' + index}>
-                                            <Left>
-                                                <Text style={styles.grey}>{power.power}</Text>
-                                            </Left>
-                                            <Right>
-                                                <Text style={styles.grey}>{power.cost}</Text>
-                                            </Right>
-                                        </ListItem>
-                                    );
-                                })}
-                            </View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Skills')}
-                        >
-                            <View style={styles.tabContent}>
-                                {this.props.character.skills.skills.map((skill, index) => {
-                                    return (
-                                        <ListItem key={'skill-' + index}>
-                                            <Body>
-                                                <Text style={styles.grey}>{skill}</Text>
-                                            </Body>
-                                        </ListItem>
-                                    );
-                                })}
-                            </View>
-                        </Tab>
-                        <Tab
-                            tabStyle={styles.tabHeading}
-                            activeTabStyle={styles.activeTabStyle}
-                            activeTextStyle={styles.activeTextStyle}
-                            heading={this._renderTabHeading('Disadvantages')}
-                        >
-                            <View style={styles.tabContent}>
-                                {this.props.character.disadvantages.disadvantages.map((disad, index) => {
-                                    return (
-                                        <ListItem key={'disad-' + index}>
-                                            <Left>
-                                                <Text style={styles.grey}>{disad.description}</Text>
-                                            </Left>
-                                            <Right>
-                                                <Text style={styles.grey}>{disad.cost}</Text>
-                                            </Right>
-                                        </ListItem>
-                                    );
-                                })}
-                            </View>
-                        </Tab>
-                    </Tabs>
-                </Content>
-            </Container>
+            <>
+                <Header navigation={this.props.navigation} hasTabs={true} />
+                <TabView
+                    navigationState={{index: this.state.index, routes: this.state.routes, setIndex: this.setIndex}}
+                    renderScene={this.renderScene}
+                    renderTabBar={Tab}
+                    onIndexChange={this.setIndex}
+                    initialLayout={{height: windowHeight, width: windowWidth}}
+                />
+            </>
         );
     }
 }
