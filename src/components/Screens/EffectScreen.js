@@ -4,12 +4,12 @@ import {connect} from 'react-redux';
 import {View} from 'react-native';
 import {Container, Content, List, ListItem, Left, Right, Button, Text, Radio} from 'native-base';
 import DropDownPicker from 'react-native-dropdown-picker';
-import RNShake from 'react-native-shake';
 import {verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
+import {common as libCommon} from '../../lib/Common';
 import styles from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
 
@@ -51,22 +51,37 @@ class EffectScreen extends Component {
         };
 
         this.setSliderState = this._setSliderState.bind(this);
-        this.updatePartialDie = this._updatePartialDie.bind(this);
         this.selectEffect = this._selectEffect.bind(this);
         this.roll = this._roll.bind(this);
+        this.setOpen = this._setOpen.bind(this);
+        this.setValue = this._setValue.bind(this);
     }
 
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addListener('ShakeEvent', () => {
-                this.roll();
-            });
+    componentDidUpdate(prevProps) {
+        if (!libCommon.isEmptyObject(this.props.effectForm)) {
+            if (libCommon.isEmptyObject(prevProps.effectForm) || this.props.effectForm.partialDie !== prevProps.effectForm.partialDie) {
+                this.setState((state) => ({...state, value: this.props.effectForm.partialDie}));
+            }
+        }
+    }
+
+    _setOpen(open) {
+        this.setState((state) => ({
+            ...state,
+            open: open,
+        }));
+    }
+
+    _setValue(callback) {
+        this.setState((state) => {
+            const newState = {...state};
+
+            newState.value = callback(state.value);
+
+            this.props.updateFormValue('effect', 'partialDie', newState.value);
+
+            return state;
         });
-    }
-
-    componentWillUnmount() {
-        this._unsubscribe();
-        RNShake.removeEventListener('ShakeEvent');
     }
 
     _roll() {
@@ -87,10 +102,6 @@ class EffectScreen extends Component {
 
     _setSliderState(key, value) {
         this.props.updateFormValue('effect', key, parseInt(value, 10));
-    }
-
-    _updatePartialDie(value) {
-        this.props.updateFormValue('effect', 'partialDie', parseInt(value, 10));
     }
 
     _renderEffects() {
@@ -147,22 +158,8 @@ class EffectScreen extends Component {
                             open={this.state.open}
                             value={this.state.value}
                             items={this.state.items}
-                            setOpen={(open) => {
-                                const newState = {...this.state};
-
-                                newState.open = open;
-
-                                this.setState(newState);
-                            }}
-                            setValue={(callback) => {
-                                const newState = {...this.state};
-
-                                newState.value = callback(this.state.value);
-
-                                this.setState(newState);
-
-                                this.props.updateFormValue('effect', 'partialDie', parseInt(newState.value, 10));
-                            }}
+                            setOpen={this.setOpen}
+                            setValue={this.setValue}
                         />
                     </View>
                     <Heading text="Effect" />
