@@ -64,7 +64,7 @@ class SkillScreen extends Component {
             value = parseInt(value, 10);
         }
 
-        this.props.updateFormValue('skill', key, value);
+        this.props.updateFormValue({formName: 'skill', key, value});
     }
 
     _renderSlider() {

@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {View, Switch} from 'react-native';
 import {Container, Content, Button, Text, List, ListItem, Left, Right} from 'native-base';
 import {verticalScale} from 'react-native-size-matters';
@@ -12,7 +12,7 @@ import {resetForm} from '../../reducers/forms';
 import {clearCharacterData} from '../../reducers/character';
 import {clearRandomHero} from '../../reducers/randomHero';
 import {clearApplicationSettings, toggleSetting} from '../../reducers/settings';
-import {clearStatistics} from '../../reducers/statistics';
+import {initializeStatistics} from '../../reducers/statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -28,209 +28,188 @@ import {clearStatistics} from '../../reducers/statistics';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class SettingsScreen extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        settings: PropTypes.object.isRequired,
-        version: PropTypes.string.isRequired,
-        resetForm: PropTypes.func.isRequired,
-        clearCharacterData: PropTypes.func.isRequired,
-        clearRandomHero: PropTypes.func.isRequired,
-        clearStatistics: PropTypes.func.isRequired,
-        clearApplicationSettings: PropTypes.func.isRequired,
-    };
+export const SettingsScreen = ({navigation}) => {
+    const dispatch = useDispatch();
 
-    _clearFormData(showToast = true) {
-        this.props.resetForm('skill');
-        this.props.resetForm('hit');
-        this.props.resetForm('damage');
-        this.props.resetForm('effect');
-        this.props.resetForm('costCruncher');
+    const {settings, version} = useSelector((state) => state);
+
+    const clearFormData = (showToast = true) => {
+        dispatch(resetForm({formName: 'skill'}));
+        dispatch(resetForm({formName: 'hit'}));
+        dispatch(resetForm({formName: 'damage'}));
+        dispatch(resetForm({formName: 'effect'}));
+        dispatch(resetForm({formName: 'costCruncher'}));
+        dispatch(resetForm({formName: 'status'}));
 
         if (showToast) {
             common.toast('Form data has been cleared');
         }
-    }
+    };
 
-    _clearCharacterData(showToast = true) {
-        this.props.clearCharacterData();
+    const _clearCharacterData = (showToast = true) => {
+        dispatch(clearCharacterData());
 
         if (showToast) {
             common.toast('Loaded characters have been cleared');
         }
-    }
+    };
 
-    async _clearHeroData(showToast = true) {
-        this.props.clearRandomHero();
+    const clearHeroData = (showToast = true) => {
+        dispatch(clearRandomHero());
 
         if (showToast) {
             common.toast('H.E.R.O. character has been cleared');
         }
-    }
+    };
 
-    async _clearStatisticsData(showToast = true) {
-        this.props.clearStatistics();
+    const clearStatisticsData = (showToast = true) => {
+        dispatch(initializeStatistics());
 
         if (showToast) {
             common.toast('Statistical data has been cleared');
         }
-    }
+    };
 
-    async _clearAll() {
-        await this.props.clearApplicationSettings();
-        await this._clearFormData(false);
-        await this._clearCharacterData(false);
-        await this._clearHeroData(false);
-        await this._clearStatisticsData(false);
+    const clearAll = () => {
+        dispatch(clearApplicationSettings());
+
+        clearFormData(false);
+        _clearCharacterData(false);
+        clearHeroData(false);
+        clearStatisticsData(false);
 
         common.toast('Everything has been cleared');
-    }
-
-    render() {
-        return (
-            <Container style={styles.container}>
-                <Header navigation={this.props.navigation} />
-                <Content style={styles.content}>
-                    <Heading text="App Version" />
-                    <View style={{paddingLeft: 20, paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>
-                        <Text style={styles.grey}>
-                            <Text style={styles.boldGrey}>HERO System Mobile v</Text>
-                            {this.props.version}
-                        </Text>
-                    </View>
-                    <Heading text="Game" />
-                    <List>
-                        <ListItem noIndent style={{borderBottomWidth: 0}}>
-                            <Left>
-                                <Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
-                            </Left>
-                            <Right>
-                                <Switch
-                                    value={this.props.settings.useFifthEdition}
-                                    onValueChange={() => this.props.toggleSetting('useFifthEdition', !this.props.settings.useFifthEdition)}
-                                    minimumTrackTintColor="#14354d"
-                                    maximumTrackTintColor="#14354d"
-                                    thumbColor="#14354d"
-                                    trackColor={{false: '#000', true: '#3d5478'}}
-                                    ios_backgroundColor="#3d5478"
-                                />
-                            </Right>
-                        </ListItem>
-                    </List>
-                    <Heading text="Sound" />
-                    <List>
-                        <ListItem noIndent>
-                            <Left>
-                                <Text style={styles.boldGrey}>Play rolling sounds?</Text>
-                            </Left>
-                            <Right>
-                                <Switch
-                                    value={this.props.settings.playSounds}
-                                    onValueChange={() => this.props.toggleSetting('playSounds', !this.props.settings.playSounds)}
-                                    minimumTrackTintColor="#14354d"
-                                    maximumTrackTintColor="#14354d"
-                                    thumbColor="#14354d"
-                                    trackColor={{false: '#000', true: '#3d5478'}}
-                                    ios_backgroundColor="#3d5478"
-                                />
-                            </Right>
-                        </ListItem>
-                        <ListItem noIndent style={{borderBottomWidth: 0}}>
-                            <Left>
-                                <Text style={styles.boldGrey}>Play dice sounds only?</Text>
-                            </Left>
-                            <Right>
-                                <Switch
-                                    value={this.props.settings.onlyDiceSounds}
-                                    onValueChange={() => this.props.toggleSetting('onlyDiceSounds', !this.props.settings.onlyDiceSounds)}
-                                    minimumTrackTintColor="#14354d"
-                                    maximumTrackTintColor="#14354d"
-                                    thumbColor="#14354d"
-                                    trackColor={{false: '#000', true: '#3d5478'}}
-                                    ios_backgroundColor="#3d5478"
-                                    disabled={!this.props.settings.playSounds}
-                                />
-                            </Right>
-                        </ListItem>
-                    </List>
-                    <Heading text="Cache" />
-                    <List>
-                        <ListItem noIndent>
-                            <Left>
-                                <Text style={styles.boldGrey}>Form data</Text>
-                            </Left>
-                            <Right>
-                                <Button style={styles.buttonSmall} onPress={() => this._clearFormData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>
-                                        Clear
-                                    </Text>
-                                </Button>
-                            </Right>
-                        </ListItem>
-                        <ListItem noIndent>
-                            <Left>
-                                <Text style={styles.boldGrey}>Loaded characters</Text>
-                            </Left>
-                            <Right>
-                                <Button style={styles.buttonSmall} onPress={() => this._clearCharacterData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>
-                                        Clear
-                                    </Text>
-                                </Button>
-                            </Right>
-                        </ListItem>
-                        <ListItem noIndent>
-                            <Left>
-                                <Text style={styles.boldGrey}>H.E.R.O.</Text>
-                            </Left>
-                            <Right>
-                                <Button style={styles.buttonSmall} onPress={() => this._clearHeroData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>
-                                        Clear
-                                    </Text>
-                                </Button>
-                            </Right>
-                        </ListItem>
-                        <ListItem noIndent>
-                            <Left>
-                                <Text style={styles.boldGrey}>Statistics</Text>
-                            </Left>
-                            <Right>
-                                <Button style={styles.buttonSmall} onPress={() => this._clearStatisticsData()}>
-                                    <Text uppercase={false} style={styles.buttonText}>
-                                        Clear
-                                    </Text>
-                                </Button>
-                            </Right>
-                        </ListItem>
-                    </List>
-                    <View style={{paddingTop: verticalScale(20), paddingBottom: verticalScale(20)}}>
-                        <Button block style={styles.button} onPress={() => this._clearAll()}>
-                            <Text uppercase={false} style={styles.buttonText}>
-                                Clear All
-                            </Text>
-                        </Button>
-                    </View>
-                </Content>
-            </Container>
-        );
-    }
-}
-
-const mapStateToProps = (state) => {
-    return {
-        settings: state.settings,
-        version: state.version.version,
     };
+
+    return (
+        <Container style={styles.container}>
+            <Header navigation={navigation} />
+            <Content style={styles.content}>
+                <Heading text="App Version" />
+                <View style={{paddingLeft: 20, paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>HERO System Mobile v</Text>
+                        {version.version}
+                    </Text>
+                </View>
+                <Heading text="Game" />
+                <List>
+                    <ListItem noIndent style={{borderBottomWidth: 0}}>
+                        <Left>
+                            <Text style={styles.boldGrey}>Use 5th Edition rules?</Text>
+                        </Left>
+                        <Right>
+                            <Switch
+                                value={settings.useFifthEdition}
+                                onValueChange={() => dispatch(toggleSetting({key: 'useFifthEdition', value: !settings.useFifthEdition}))}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </Right>
+                    </ListItem>
+                </List>
+                <Heading text="Sound" />
+                <List>
+                    <ListItem noIndent>
+                        <Left>
+                            <Text style={styles.boldGrey}>Play rolling sounds?</Text>
+                        </Left>
+                        <Right>
+                            <Switch
+                                value={settings.playSounds}
+                                onValueChange={() => dispatch(toggleSetting({key: 'playSounds', value: !settings.playSounds}))}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </Right>
+                    </ListItem>
+                    <ListItem noIndent style={{borderBottomWidth: 0}}>
+                        <Left>
+                            <Text style={styles.boldGrey}>Play dice sounds only?</Text>
+                        </Left>
+                        <Right>
+                            <Switch
+                                value={settings.onlyDiceSounds}
+                                onValueChange={() => dispatch(toggleSetting({key: 'onlyDiceSounds', value: !settings.onlyDiceSounds}))}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                                disabled={!settings.playSounds}
+                            />
+                        </Right>
+                    </ListItem>
+                </List>
+                <Heading text="Cache" />
+                <List>
+                    <ListItem noIndent>
+                        <Left>
+                            <Text style={styles.boldGrey}>Form data</Text>
+                        </Left>
+                        <Right>
+                            <Button style={styles.buttonSmall} onPress={() => clearFormData()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Clear
+                                </Text>
+                            </Button>
+                        </Right>
+                    </ListItem>
+                    <ListItem noIndent>
+                        <Left>
+                            <Text style={styles.boldGrey}>Loaded characters</Text>
+                        </Left>
+                        <Right>
+                            <Button style={styles.buttonSmall} onPress={() => _clearCharacterData()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Clear
+                                </Text>
+                            </Button>
+                        </Right>
+                    </ListItem>
+                    <ListItem noIndent>
+                        <Left>
+                            <Text style={styles.boldGrey}>H.E.R.O.</Text>
+                        </Left>
+                        <Right>
+                            <Button style={styles.buttonSmall} onPress={() => clearHeroData()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Clear
+                                </Text>
+                            </Button>
+                        </Right>
+                    </ListItem>
+                    <ListItem noIndent>
+                        <Left>
+                            <Text style={styles.boldGrey}>Statistics</Text>
+                        </Left>
+                        <Right>
+                            <Button style={styles.buttonSmall} onPress={() => clearStatisticsData()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Clear
+                                </Text>
+                            </Button>
+                        </Right>
+                    </ListItem>
+                </List>
+                <View style={{paddingTop: verticalScale(20), paddingBottom: verticalScale(20)}}>
+                    <Button block style={styles.button} onPress={() => clearAll()}>
+                        <Text uppercase={false} style={styles.buttonText}>
+                            Clear All
+                        </Text>
+                    </Button>
+                </View>
+            </Content>
+        </Container>
+    );
 };
 
-const mapDispatchToProps = {
-    clearApplicationSettings,
-    toggleSetting,
-    resetForm,
-    clearCharacterData,
-    clearRandomHero,
-    clearStatistics,
+SettingsScreen.propTypes = {
+    navigation: PropTypes.object.isRequired,
 };
-
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen);

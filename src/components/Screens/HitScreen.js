@@ -77,7 +77,7 @@ class HitScreen extends PureComponent {
             value = parseInt(value, 10);
         }
 
-        this.props.updateFormValue('hit', key, value);
+        this.props.updateFormValue({formName: 'hit', key, value});
     }
 
     _setLocation(location) {

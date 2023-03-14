@@ -1,22 +1,21 @@
 /* eslint-disable no-unused-vars */
-import React, {Component, Fragment} from 'react';
-import {Image, Pressable, SafeAreaView, View} from 'react-native';
+import React, {useRef, useEffect} from 'react';
+import {AppState, Image, SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@react-navigation/drawer';
-import {createStore, configureStore, applyMiddleware, compose} from 'redux';
-import {Provider} from 'react-redux';
+import {applyMiddleware, thunk} from 'redux';
+import {configureStore} from '@reduxjs/toolkit';
+import {Provider, useDispatch} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
-import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
-import applyAppStateListener from 'redux-enhancer-react-native-appstate';
-import thunk from 'redux-thunk';
+import {scale, ScaledSheet} from 'react-native-size-matters';
 import {Root} from 'native-base';
 import {asyncDispatchMiddleware} from './src/middleware/AsyncDispatchMiddleware';
 import {soundPlayer, DEFAULT_SOUND} from './src/lib/SoundPlayer';
-import reducer from './src/reducers/index';
-import HomeScreen from './src/components/Screens/HomeScreen';
-import CharactersScreen from './src/components/Screens/CharactersScreen';
-import ViewHeroDesignerCharacterScreen from './src/components/Screens/ViewHeroDesignerCharacterScreen';
+import rootReducer from './src/reducers';
+import {HomeScreen} from './src/components/Screens/HomeScreen';
+import {CharactersScreen} from './src/components/Screens/CharactersScreen';
+import {ViewHeroDesignerCharacterScreen} from './src/components/Screens/ViewHeroDesignerCharacterScreen';
 import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
 import ResultScreen from './src/components/Screens/ResultScreen';
 import SkillScreen from './src/components/Screens/SkillScreen';
@@ -25,7 +24,11 @@ import DamageScreen from './src/components/Screens/DamageScreen';
 import EffectScreen from './src/components/Screens/EffectScreen';
 import CostCruncherScreen from './src/components/Screens/CostCruncherScreen';
 import StatisticsScreen from './src/components/Screens/StatisticsScreen';
-import SettingsScreen from './src/components/Screens/SettingsScreen';
+import {SettingsScreen} from './src/components/Screens/SettingsScreen';
+import {persistence} from './src/lib/Persistence';
+import {initialize} from './src/reducers/appState';
+import {initializeCharacter, saveCachedCharacter} from './src/reducers/character';
+import currentVersion from './public/version.json';
 import {TEXT_COLOR} from './src/Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -87,64 +90,110 @@ export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
 
-export const store = createStore(reducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
+// export const store = createStore(rootReducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
+
+export const store = configureStore({
+    reducer: rootReducer,
+    // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+    // enhancers: [applyAppStateListener()],
+});
 
 const Home = (props) => {
     return <HomeScreen {...props} />;
 };
 
-export default class App extends Component {
-    componentDidMount() {
-        soundPlayer.initialize(DEFAULT_SOUND, false);
+export const App = () => {
+    soundPlayer.initialize(DEFAULT_SOUND, false);
+    SplashScreen.hide();
 
-        // Adding a 100ms delay here gets rid of a white screen
-        setTimeout(() => SplashScreen.hide(), 100);
-    }
+    const appState = useRef(AppState.currentState);
 
-    render() {
-        return (
-            <Provider store={store}>
-                <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', (nextAppState) => {
+            switch (appState.current) {
+                case 'active':
+                    persistence.getVersion().then((version) => {
+                        if (version === null) {
+                            persistence.setVersion(currentVersion.current).then(() => {
+                                persistence.clearCaches().then(() => {
+                                    store.dispatch(initialize());
+                                });
+                            });
+                        } else if (version !== currentVersion.current) {
+                            persistence.setVersion(currentVersion.current).then(() => {
+                                if (currentVersion.onFirstLoad === 'flush') {
+                                    persistence.clearCaches().then(() => {
+                                        store.dispatch(initialize());
+                                    });
+                                } else {
+                                    store.dispatch(initialize());
+                                }
+                            });
+                        } else {
+                            store.dispatch(initialize());
+                        }
+                    });
+
+                    break;
+                case 'background':
+                case 'inactive':
+                    saveCachedCharacter();
+                    break;
+                default:
+                // Do nothing
+            }
+
+            appState.current = nextAppState;
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
+    return (
+        <Provider store={store}>
+            <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
+                <Root>
                     <GestureHandlerRootView style={{flex: 1}}>
                         <NavigationContainer>
-                            <Root>
-                                <Drawer.Navigator
-                                    screenOptions={{
-                                        headerShown: false,
-                                        drawerPosition: 'right',
-                                        drawerContentOptions: drawerContentOptions,
-                                        drawerStyle: localStyles.drawer,
-                                        drawerLabelStyle: {color: '#F3EDE9'},
-                                    }}
-                                    initialRouteName="Home"
-                                    backBehavior="history"
-                                    drawerContent={(props) => drawerContent(props)}
-                                >
-                                    <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={Home} />
-                                    <Drawer.Screen
-                                        options={{drawerLabel: 'View Character'}}
-                                        name="ViewHeroDesignerCharacter"
-                                        component={ViewHeroDesignerCharacterScreen}
-                                    />
-                                    <Drawer.Screen name="Characters" component={CharactersScreen} />
-                                    <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" children={(props) => <SkillScreen {...props} />} />
-                                    <Drawer.Screen name="Hit" component={HitScreen} />
-                                    <Drawer.Screen name="Damage" component={DamageScreen} />
-                                    <Drawer.Screen name="Effect" component={EffectScreen} />
-                                    <Drawer.Screen name="Result" component={ResultScreen} />
-                                    <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
-                                    <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
-                                    <Drawer.Screen name="Statistics" component={StatisticsScreen} />
-                                    <Drawer.Screen name="Settings" component={SettingsScreen} />
-                                </Drawer.Navigator>
-                            </Root>
+                            <Drawer.Navigator
+                                screenOptions={{
+                                    headerShown: false,
+                                    drawerPosition: 'right',
+                                    drawerContentOptions: drawerContentOptions,
+                                    drawerStyle: localStyles.drawer,
+                                    drawerLabelStyle: {color: '#F3EDE9'},
+                                }}
+                                initialRouteName="Home"
+                                backBehavior="history"
+                                // drawerContent={(props) => drawerContent(props)}
+                            >
+                                <Drawer.Screen name="Home" component={Home} />
+                                {/* <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={HomeScreen} /> */}
+                                <Drawer.Screen
+                                    options={{drawerLabel: 'View Character'}}
+                                    name="ViewHeroDesignerCharacter"
+                                    component={ViewHeroDesignerCharacterScreen}
+                                />
+                                <Drawer.Screen name="Characters" component={CharactersScreen} />
+                                <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" children={(props) => <SkillScreen {...props} />} />
+                                <Drawer.Screen name="Hit" component={HitScreen} />
+                                <Drawer.Screen name="Damage" component={DamageScreen} />
+                                <Drawer.Screen name="Effect" component={EffectScreen} />
+                                <Drawer.Screen name="Result" component={ResultScreen} />
+                                <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
+                                <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
+                                <Drawer.Screen name="Statistics" component={StatisticsScreen} />
+                                <Drawer.Screen name="Settings" component={SettingsScreen} />
+                            </Drawer.Navigator>
                         </NavigationContainer>
                     </GestureHandlerRootView>
-                </SafeAreaView>
-            </Provider>
-        );
-    }
-}
+                </Root>
+            </SafeAreaView>
+        </Provider>
+    );
+};
 
 const localStyles = ScaledSheet.create({
     drawer: {

@@ -1,3 +1,4 @@
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {persistence} from '../lib/Persistence';
 import {statistics as libStatistics} from '../lib/Statistics';
 
@@ -15,64 +16,60 @@ import {statistics as libStatistics} from '../lib/Statistics';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//////////////////////////////
-// ACTION TYPES             //
-//////////////////////////////
+export const initializeStatistics = createAsyncThunk('statistic/initializeStatistics', async () => {
+    return await persistence.initializeStatistics();
+});
 
-export const INITIALIZE_STATISTICS = 'INITIALIZE_STATISTICS';
+export const addStatistics = createAsyncThunk('statistic/addStatistics', async ({statistics}) => {
+    return await libStatistics.add(statistics);
+});
 
-export const ADD_STATISTICS = 'ADD_STATISTICS';
+export const toggleSetting = createAsyncThunk('statistic/toggleSetting', async ({key, value}) => {
+    return await persistence.toggleSetting(key, value);
+});
 
-//////////////////////////////
-// ACTIONS                  //
-//////////////////////////////
+const statisticsSlice = createSlice({
+    name: 'statistic',
+    initialState: {},
+    reducers: {
+        initializeStatistics: (state, action) => {
+            const {statistics} = action.payload;
 
-export function initializeStatistics() {
-    return async (dispatch) => {
-        persistence.initializeStatistics().then((stats) => {
-            dispatch({
-                type: INITIALIZE_STATISTICS,
-                payload: stats,
+            state = {...statistics};
+        },
+        addStatistics: (state, action) => {
+            const {statistics} = action.payload.statistics;
+
+            libStatistics.add(statistics).then((stats) => {});
+        },
+        toggleSetting: (state, action) => {
+            const {key, value} = action.payload;
+
+            persistence.toggleSetting(key, value).then((settingValue) => {
+                state[key] = settingValue;
             });
-        });
-    };
-}
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(initializeStatistics.fulfilled, (state, action) => {
+                const {statistics} = action.payload;
 
-export function addStatistics(statistics) {
-    return async (dispatch) => {
-        libStatistics.add(statistics).then((stats) => {
-            dispatch({
-                type: ADD_STATISTICS,
-                payload: stats,
+                state = {...statistics};
+            })
+            .addCase(addStatistics.fulfilled, (state, action) => {
+                console.log('Logged die roll statistics.');
+            })
+            .addCase(toggleSetting.fulfilled, (state, action) => {
+                const settings = {...action.payload};
+
+                state.useFifthEdition = settings.useFifthEdition;
+                state.playSounds = settings.playSounds;
+                state.onlyDiceSounds = settings.onlyDiceSounds;
             });
-        });
-    };
-}
+    },
+});
 
-export function clearStatistics() {
-    return async (dispatch) => {
-        persistence.clearStatistics().then((stats) => {
-            dispatch({
-                type: INITIALIZE_STATISTICS,
-                payload: stats,
-            });
-        });
-    };
-}
+// export const {} = statisticsSlice.actions;
 
-let statisticsState = {};
-
-export default function statistics(state = statisticsState, action) {
-    let newState = null;
-
-    switch (action.type) {
-        case INITIALIZE_STATISTICS:
-        case ADD_STATISTICS:
-            newState = {...state};
-            newState = action.payload;
-
-            return newState;
-        default:
-            return state;
-    }
-}
+export default statisticsSlice.reducer;

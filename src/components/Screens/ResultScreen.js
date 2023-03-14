@@ -83,10 +83,10 @@ class ResultScreen extends Component {
     _updateStatistics() {
         if (this.state.result.hasOwnProperty('results')) {
             for (let i = 0; i < this.state.result.results.length; i++) {
-                this.props.addStatistics(this.state.result.results[i]);
+                this.props.addStatistics({statistics: this.state.result.results[i]});
             }
         } else {
-            this.props.addStatistics(this.state.result);
+            this.props.addStatistics({statistics: this.state.result});
         }
     }
 

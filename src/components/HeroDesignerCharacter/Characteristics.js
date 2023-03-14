@@ -471,7 +471,7 @@ export default class Characteristics extends Component {
     }
 
     _toggleSecondaryCharacteristics() {
-        this.props.setShowSecondary(!this.props.character.showSecondary);
+        this.props.setShowSecondary({showSecondary: !this.props.character.showSecondary});
     }
 
     _renderSecondaryCharacteristicToggle() {

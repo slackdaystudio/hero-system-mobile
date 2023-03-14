@@ -45,7 +45,7 @@ class CostCruncherScreen extends Component {
             value = parseFloat(value);
         }
 
-        this.props.updateFormValue('costCruncher', key, value);
+        this.props.updateFormValue({formName: 'costCruncher', key, value});
     }
 
     _renderActiveCost() {

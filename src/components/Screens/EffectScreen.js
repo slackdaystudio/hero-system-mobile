@@ -78,7 +78,7 @@ class EffectScreen extends Component {
 
             newState.value = callback(state.value);
 
-            this.props.updateFormValue('effect', 'partialDie', newState.value);
+            this.props.updateFormValue({formName: 'effect', key: 'partialDie', value: newState.value});
 
             return state;
         });
@@ -97,11 +97,11 @@ class EffectScreen extends Component {
     }
 
     _selectEffect(effect) {
-        this.props.updateFormValue('effect', 'effectType', effect);
+        this.props.updateFormValue({formName: 'effect', key: 'effectType', value: effect});
     }
 
     _setSliderState(key, value) {
-        this.props.updateFormValue('effect', key, parseInt(value, 10));
+        this.props.updateFormValue({formName: 'effect', key, value: parseInt(value, 10)});
     }
 
     _renderEffects() {

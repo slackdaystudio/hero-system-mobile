@@ -43,7 +43,7 @@ export default class HeroDesignerCharacterFooter extends Component {
             return false;
         }
 
-        return this.props.character.filename === this.props.characters[slot].filename;
+        return this.props.character.filename === this.props.characters[slot]?.filename;
     }
 
     _isSlotFilled(slot) {
@@ -75,7 +75,7 @@ export default class HeroDesignerCharacterFooter extends Component {
     _activateSlot(slot) {
         if (this._isSlotFilled(slot)) {
             if (this.props.character.filename !== this.props.characters[slot].filename) {
-                this.props.selectCharacter(this.props.characters[slot]);
+                this.props.selectCharacter({character: this.props.characters[slot]});
             }
         } else {
             this.props.navigation.navigate('Characters', {from: 'ViewHeroDesignerCharacter', slot: parseInt(slot, 10)});
@@ -89,7 +89,12 @@ export default class HeroDesignerCharacterFooter extends Component {
     }
 
     _onDeleteDialogOk() {
-        this.props.clearCharacter(this.props.characters[this.state.selectedSlot].filename, this.props.character, this.props.characters);
+        this.props.clearCharacter({
+            filename: this.props.characters[this.state.selectedSlot].filename,
+            character: this.props.character,
+            characters: this.props.characters,
+            saveCharacter: false,
+        });
 
         this._onDeleteDialogClose();
     }

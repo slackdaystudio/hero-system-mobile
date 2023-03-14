@@ -60,7 +60,7 @@ class RandomCharacterScreen extends Component {
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             if (this.props.character === null) {
-                this.props.setRandomHero(randomCharacter.generate());
+                this.props.setRandomHero({randomHero: randomCharacter.generate()});
             }
         });
     }
@@ -94,7 +94,7 @@ class RandomCharacterScreen extends Component {
     }
 
     _reRoll() {
-        this.props.setRandomHero(randomCharacter.generate());
+        this.props.setRandomHero({randomHero: randomCharacter.generate()});
     }
 
     _renderCharacteristics() {
@@ -135,7 +135,7 @@ class RandomCharacterScreen extends Component {
                                 <Item>
                                     <Input
                                         style={{borderColor: '#D0D1D3', color: '#D0D1D3'}}
-                                        onChangeText={(text) => this.props.setRandomHeroName(text)}
+                                        onChangeText={(text) => this.props.setRandomHeroName({name: text})}
                                         value={this.props.character.name}
                                     />
                                 </Item>

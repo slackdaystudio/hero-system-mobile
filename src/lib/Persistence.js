@@ -132,27 +132,26 @@ class Persistence {
     }
 
     async updateLoadedCharacters(newCharacter, character, characters) {
+        let data;
+
         try {
             if (newCharacter.filename === character.filename) {
                 character = {...newCharacter};
             }
 
-            for (let [slot, char] of Object.entries(characters)) {
+            for (const [slot, char] of Object.entries(characters)) {
                 if (char.filename === newCharacter.filename) {
                     characters[slot] = {...newCharacter};
                     break;
                 }
             }
 
-            this.saveCharacter(character, characters);
+            data = await this.saveCharacter(character, characters);
         } catch (error) {
             common.toast('Unable to update loaded characters');
         }
 
-        return {
-            character: character,
-            characters: characters,
-        };
+        return data;
     }
 
     async clearCharacter(filename, character, characters, saveCharacters = true) {

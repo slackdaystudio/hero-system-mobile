@@ -59,8 +59,6 @@ class File {
                 result.fileCopyUri = `file://${Platform.OS === 'ios' ? result.fileCopyUri : decodeURIComponent(result.fileCopyUri)}`;
             }
 
-            console.log(result);
-
             if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
                 character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_HD);
             } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
@@ -147,7 +145,7 @@ class File {
     async deleteCharacter(filename) {
         try {
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
-
+            console.log(`${path}/${filename}`);
             await RNFS.unlink(`${path}/${filename}`);
         } catch (error) {
             Alert.alert(error.message);

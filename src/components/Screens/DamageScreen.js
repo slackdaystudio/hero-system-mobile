@@ -87,7 +87,7 @@ class DamageScreen extends Component {
                         step={1}
                         min={0}
                         max={50}
-                        onValueChange={(value) => this.props.updateFormValue('damage', 'dice', value)}
+                        onValueChange={(value) => this.props.updateFormValue({formName: 'damage', key: 'dice', value})}
                     />
                     <DropDownPicker
                         theme="DARK"
@@ -104,7 +104,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.killingToggled}
-                                onValueChange={() => this.props.updateFormValue('damage', 'killingToggled', !this.props.damageForm.killingToggled)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'killingToggled', value: !this.props.damageForm.killingToggled})
+                                }
                                 color="#3da0ff"
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
@@ -120,7 +122,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.isExplosion}
-                                onValueChange={() => this.props.updateFormValue('damage', 'isExplosion', !this.props.damageForm.isExplosion)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'isExplosion', value: !this.props.damageForm.isExplosion})
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -135,7 +139,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.useHitLocations}
-                                onValueChange={() => this.props.updateFormValue('damage', 'useHitLocations', !this.props.damageForm.useHitLocations)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'useHitLocations', value: !this.props.damageForm.useHitLocations})
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -149,7 +155,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.isMartialManeuver}
-                                onValueChange={() => this.props.updateFormValue('damage', 'isMartialManeuver', !this.props.damageForm.isMartialManeuver)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'isMartialManeuver', value: !this.props.damageForm.isMartialManeuver})
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -163,7 +171,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.isTargetFlying}
-                                onValueChange={() => this.props.updateFormValue('damage', 'isTargetFlying', !this.props.damageForm.isTargetFlying)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'isTargetFlying', value: !this.props.damageForm.isTargetFlying})
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -177,7 +187,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.isTargetInZeroG}
-                                onValueChange={() => this.props.updateFormValue('damage', 'isTargetInZeroG', !this.props.damageForm.isTargetInZeroG)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'isTargetInZeroG', value: !this.props.damageForm.isTargetInZeroG})
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -191,7 +203,13 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.isTargetUnderwater}
-                                onValueChange={() => this.props.updateFormValue('damage', 'isTargetUnderwater', !this.props.damageForm.isTargetUnderwater)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({
+                                        formName: 'damage',
+                                        key: 'isTargetUnderwater',
+                                        value: !this.props.damageForm.isTargetUnderwater,
+                                    })
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -205,7 +223,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.rollWithPunch}
-                                onValueChange={() => this.props.updateFormValue('damage', 'rollWithPunch', !this.props.damageForm.rollWithPunch)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'rollWithPunch', value: !this.props.damageForm.rollWithPunch})
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -219,7 +239,9 @@ class DamageScreen extends Component {
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
                                 value={this.props.damageForm.isUsingClinging}
-                                onValueChange={() => this.props.updateFormValue('damage', 'isUsingClinging', !this.props.damageForm.isUsingClinging)}
+                                onValueChange={() =>
+                                    this.props.updateFormValue({formName: 'damage', key: 'isUsingClinging', value: !this.props.damageForm.isUsingClinging})
+                                }
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -323,7 +345,7 @@ class DamageScreen extends Component {
 
             newState.value = callback(state.value);
 
-            this.props.updateFormValue('damage', 'partialDie', newState.value);
+            this.props.updateFormValue({formName: 'damage', key: 'partialDie', value: newState.value});
 
             return state;
         });
@@ -342,13 +364,13 @@ class DamageScreen extends Component {
 
     _updateFormValue(key, value) {
         if (key === 'killingToggled') {
-            this.props.updateFormValue('damage', 'killingToggled', value);
-            this.props.updateFormValue('damage', 'damageType', value ? KILLING_DAMAGE : NORMAL_DAMAGE);
+            this.props.updateFormValue({formName: 'damage', key: 'killingToggled', value});
+            this.props.updateFormValue({formName: 'damage', key: 'damageType', valye: value ? KILLING_DAMAGE : NORMAL_DAMAGE});
         } else {
             value = ['dice', 'stunMultiplier', 'fadeRate'].includes(key) ? parseInt(value, 10) : value;
         }
 
-        this.props.updateFormValue('damage', key, value);
+        this.props.updateFormValue({formName: 'damage', key, value});
     }
 
     _renderFadeRate() {

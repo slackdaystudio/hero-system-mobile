@@ -65,7 +65,6 @@ class StatusDialog extends Component {
     }
 
     _setValue(callback) {
-        console.log(JSON.stringify(this.props.statusForm));
         this.setState((state) => {
             const newState = {...state};
 
@@ -88,7 +87,7 @@ class StatusDialog extends Component {
             }
         }
 
-        this.props.updateFormValue('status', key, value);
+        this.props.updateFormValue({formName: 'status', key, value});
     }
 
     _getItems() {

@@ -48,7 +48,13 @@ export const Tab = ({navigationState}) => {
         );
     };
 
-    const data = navigationState.routes.map((route) => {
+    let routes = navigationState.routes;
+
+    if (typeof routes === 'function') {
+        routes = routes();
+    }
+
+    const data = routes.map((route) => {
         return {
             id: route.key,
             title: route.title,

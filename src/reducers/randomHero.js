@@ -1,4 +1,6 @@
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {persistence} from '../lib/Persistence';
+import {randomCharacter} from '../lib/RandomCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -14,89 +16,48 @@ import {persistence} from '../lib/Persistence';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//////////////////////////////
-// ACTION TYPES             //
-//////////////////////////////
+export const setRandomHero = createAsyncThunk('randomHero/setRandomHero', async ({randomHero}) => {
+    return await persistence.setRandomHero(randomHero);
+});
 
-export const INITIALIZE_RANDOM_HERO = 'INITIALIZE_RANDOM_HERO';
+export const setRandomHeroName = createAsyncThunk('randomHero/setRandomHeroName', async ({name}) => {
+    return await persistence.setRandomHeroName(name);
+});
 
-export const SET_RANDOM_HERO = 'SET_RANDOM_HERO';
+export const clearRandomHero = createAsyncThunk('randomHero/clearRandomHero', async () => {
+    await persistence.clearRandomHero();
 
-export const SET_RANDOM_HERO_NAME = 'SET_RANDOM_HERO_NAME';
+    return null;
+});
 
-export const CLEAR_HERO = 'CLEAR_HERO';
+const randomHeroSlice = createSlice({
+    name: 'randomHero',
+    initialState: {},
+    reducers: {
+        initializeRandomHero: (state, action) => {
+            const {randomHero} = action.payload;
 
-//////////////////////////////
-// ACTIONS                  //
-//////////////////////////////
+            state.hero = randomHero;
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(setRandomHero.fulfilled, (state, action) => {
+                const {randomHero} = action.payload;
 
-export function initializeRandomHero() {
-    return async (dispatch) => {
-        persistence.initializeRandomHero().then((randomHero) => {
-            dispatch({
-                type: INITIALIZE_RANDOM_HERO,
-                payload: randomHero,
+                state.hero = randomHero;
+            })
+            .addCase(setRandomHeroName.fulfilled, (state, action) => {
+                const {randomHero} = action.payload;
+
+                state.hero = randomHero;
+            })
+            .addCase(clearRandomHero.fulfilled, (state, action) => {
+                state.hero = randomCharacter.generate();
             });
-        });
-    };
-}
+    },
+});
 
-export function setRandomHero(randomHero) {
-    return async (dispatch) => {
-        persistence.setRandomHero(randomHero).then((randomHero) => {
-            dispatch({
-                type: SET_RANDOM_HERO,
-                payload: randomHero,
-            });
-        });
-    };
-}
+export const {initializeRandomHero} = randomHeroSlice.actions;
 
-export function setRandomHeroName(name) {
-    return async (dispatch) => {
-        persistence.setRandomHeroName(name).then((randomHero) => {
-            dispatch({
-                type: SET_RANDOM_HERO_NAME,
-                payload: randomHero,
-            });
-        });
-    };
-}
-
-export function clearRandomHero() {
-    return async (dispatch) => {
-        persistence.clearRandomHero().then(() => {
-            dispatch({
-                type: CLEAR_HERO,
-                payload: null,
-            });
-        });
-    };
-}
-
-let heroState = {
-    hero: null,
-};
-
-export default function randomHero(state = heroState, action) {
-    let newState = null;
-
-    switch (action.type) {
-        case INITIALIZE_RANDOM_HERO:
-        case SET_RANDOM_HERO:
-        case SET_RANDOM_HERO_NAME:
-        case CLEAR_HERO:
-            newState = {
-                ...state,
-                hero: {
-                    ...state.hero,
-                },
-            };
-
-            newState.hero = action.payload;
-
-            return newState;
-        default:
-            return state;
-    }
-}
+export default randomHeroSlice.reducer;
