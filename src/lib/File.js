@@ -145,7 +145,7 @@ class File {
     async deleteCharacter(filename) {
         try {
             let path = await this._getPath(DEFAULT_CHARACTER_DIR);
-            console.log(`${path}/${filename}`);
+
             await RNFS.unlink(`${path}/${filename}`);
         } catch (error) {
             Alert.alert(error.message);

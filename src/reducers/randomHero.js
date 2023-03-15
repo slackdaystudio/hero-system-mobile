@@ -43,14 +43,12 @@ const randomHeroSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(setRandomHero.fulfilled, (state, action) => {
-                const {randomHero} = action.payload;
-
-                state.hero = randomHero;
+                state.hero = {...action.payload};
             })
             .addCase(setRandomHeroName.fulfilled, (state, action) => {
-                const {randomHero} = action.payload;
+                const {name} = action.payload;
 
-                state.hero = randomHero;
+                state.hero.name = name;
             })
             .addCase(clearRandomHero.fulfilled, (state, action) => {
                 state.hero = randomCharacter.generate();
