@@ -90,12 +90,8 @@ export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
 
-// export const store = createStore(rootReducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
-
 export const store = configureStore({
     reducer: rootReducer,
-    // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
-    // enhancers: [applyAppStateListener()],
 });
 
 const Home = (props) => {
@@ -110,7 +106,7 @@ export const App = () => {
 
     useEffect(() => {
         const subscription = AppState.addEventListener('change', (nextAppState) => {
-            switch (appState.current) {
+            switch (nextAppState) {
                 case 'active':
                     persistence.getVersion().then((version) => {
                         if (version === null) {
@@ -137,7 +133,7 @@ export const App = () => {
                     break;
                 case 'background':
                 case 'inactive':
-                    saveCachedCharacter();
+                    store.dispatch(saveCachedCharacter({character: store.getState().character.character, characters: store.getState().character.characters}));
                     break;
                 default:
                 // Do nothing
