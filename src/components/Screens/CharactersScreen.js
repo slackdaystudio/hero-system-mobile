@@ -179,7 +179,7 @@ export const CharactersScreen = ({navigation, route}) => {
                 char.combatDetails = combatDetails.init(char);
             }
 
-            dispatch(setCharacter(char, picker.value.toString()));
+            dispatch(setCharacter({character: char, slot: picker.value.toString()}));
 
             goToCharacterScreen();
         });
