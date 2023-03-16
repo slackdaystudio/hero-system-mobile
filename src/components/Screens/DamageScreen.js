@@ -304,14 +304,14 @@ export const DamageScreen = ({navigation}) => {
     };
 
     const _updateFormValue = (key, val) => {
+        val = ['dice', 'stunMultiplier', 'fadeRate'].includes(key) ? parseInt(val, 10) : val;
+
         if (key === 'killingToggled') {
-            dispatch(updateFormValue({formName: 'damage', key: 'killingToggled', val}));
+            dispatch(updateFormValue({formName: 'damage', key: 'killingToggled', value: val}));
             dispatch(updateFormValue({formName: 'damage', key: 'damageType', value: val ? KILLING_DAMAGE : NORMAL_DAMAGE}));
         } else {
-            val = ['dice', 'stunMultiplier', 'fadeRate'].includes(key) ? parseInt(val, 10) : value;
+            dispatch(updateFormValue({formName: 'damage', key, value: val}));
         }
-
-        dispatch(updateFormValue({formName: 'damage', key, value: val}));
     };
 
     const renderFadeRate = () => {

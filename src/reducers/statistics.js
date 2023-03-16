@@ -24,32 +24,10 @@ export const addStatistics = createAsyncThunk('statistic/addStatistics', async (
     return await libStatistics.add(statistics);
 });
 
-export const toggleSetting = createAsyncThunk('statistic/toggleSetting', async ({key, value}) => {
-    return await persistence.toggleSetting(key, value);
-});
-
 const statisticsSlice = createSlice({
     name: 'statistic',
     initialState: {},
-    reducers: {
-        initializeStatistics: (state, action) => {
-            const {statistics} = action.payload;
-
-            state = {...statistics};
-        },
-        addStatistics: (state, action) => {
-            const {statistics} = action.payload.statistics;
-
-            libStatistics.add(statistics).then((stats) => {});
-        },
-        toggleSetting: (state, action) => {
-            const {key, value} = action.payload;
-
-            persistence.toggleSetting(key, value).then((settingValue) => {
-                state[key] = settingValue;
-            });
-        },
-    },
+    reducers: null,
     extraReducers: (builder) => {
         builder
             .addCase(initializeStatistics.fulfilled, (state, action) => {
@@ -59,13 +37,6 @@ const statisticsSlice = createSlice({
             })
             .addCase(addStatistics.fulfilled, (state, action) => {
                 console.log('Logged die roll statistics.');
-            })
-            .addCase(toggleSetting.fulfilled, (state, action) => {
-                const settings = {...action.payload};
-
-                state.useFifthEdition = settings.useFifthEdition;
-                state.playSounds = settings.playSounds;
-                state.onlyDiceSounds = settings.onlyDiceSounds;
             });
     },
 });
