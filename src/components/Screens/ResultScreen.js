@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Platform, View} from 'react-native';
-import {Container, Content, Button, Text} from 'native-base';
-import RNShake from 'react-native-shake';
+import {Container, Content, Button, Text, Spinner} from 'native-base';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
 import {statistics} from '../../lib/Statistics';
+import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import {addStatistics} from '../../reducers/statistics';
@@ -27,79 +27,50 @@ import {addStatistics} from '../../reducers/statistics';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class ResultScreen extends Component {
-    static propTypes = {
-        route: PropTypes.object.isRequired,
-        navigation: PropTypes.object.isRequired,
-        addStatistics: PropTypes.func.isRequired,
-        useFifthEdition: PropTypes.bool.isRequired,
-        playSounds: PropTypes.bool.isRequired,
-        onlyDiceSounds: PropTypes.bool.isRequired,
-    };
+export const ResultScreen = ({route, navigation}) => {
+    const dispatch = useDispatch();
 
-    constructor(props) {
-        super(props);
+    const {playSounds, onlyDiceSounds, useFifthEdition} = useSelector((state) => ({
+        playSounds: state.settings.playSounds,
+        onlyDiceSounds: state.settings.onlyDiceSounds,
+        useFifthEdition: state.settings.useFifthEdition,
+    }));
 
-        this.state = {
-            result: props.route.params.result || null,
-        };
+    const [result, setResult] = useState(null);
 
-        this.reRoll = this._reRoll.bind(this);
-    }
+    useEffect(() => {
+        setResult(route.params.result);
+        playSoundClip();
+        updateStatistics();
+    }, [playSoundClip, route.params.result, updateStatistics]);
 
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            this.setState({result: this.props.route.params.result}, () => {
-                this._playSoundClip();
-                this._updateStatistics();
-            });
-
-            RNShake.addListener('ShakeEvent', () => {
-                this.reRoll();
-            });
-        });
-    }
-
-    componentWillUnmount() {
-        this._unsubscribe();
-        soundPlayer.stop(this.state.result.sfx);
-        RNShake.removeEventListener('ShakeEvent');
-    }
-
-    componentDidUpdate(_prevProps, prevState, _snapshot) {
-        if (prevState.result !== this.state.result) {
-            this._playSoundClip();
-        }
-    }
-
-    _playSoundClip() {
-        if (this.props.playSounds) {
-            let soundName = this.props.onlyDiceSounds ? DEFAULT_SOUND : this.state.result.sfx;
+    const playSoundClip = useCallback(() => {
+        if (playSounds) {
+            let soundName = onlyDiceSounds ? DEFAULT_SOUND : result.sfx;
 
             soundPlayer.play(soundName);
         }
-    }
+    }, [onlyDiceSounds, playSounds, result?.sfx]);
 
-    _updateStatistics() {
-        if (this.state.result.hasOwnProperty('results')) {
-            for (let i = 0; i < this.state.result.results.length; i++) {
-                this.props.addStatistics({statistics: this.state.result.results[i]});
+    const updateStatistics = useCallback(() => {
+        if (!common.isEmptyObject(result) && result.hasOwnProperty('results')) {
+            for (let i = 0; i < result.results.length; i++) {
+                dispatch(addStatistics({statistics: result.results[i]}));
             }
         } else {
-            this.props.addStatistics({statistics: this.state.result});
+            dispatch(addStatistics({statistics: result}));
         }
-    }
+    }, [dispatch, result]);
 
-    _reRoll() {
-        this.setState({result: dieRoller.rollAgain(this.state.result)}, () => {
-            this._updateStatistics();
-        });
-    }
+    const reRoll = () => {
+        setResult(dieRoller.rollAgain(result));
+        updateStatistics();
+    };
 
-    _renderToHitInfo(result) {
-        if (result.total === 3) {
+    const renderToHitInfo = (hitResult) => {
+        if (hitResult.total === 3) {
             return <Text style={styles.grey}>You have critically hit your target</Text>;
-        } else if (result.total === 18) {
+        } else if (hitResult.total === 18) {
             return <Text style={styles.grey}>You have missed your target</Text>;
         }
 
@@ -112,19 +83,19 @@ class ResultScreen extends Component {
         }
 
         return <Text style={styles.grey}>You can hit a DCV/DMCV of {result.hitCv} or less</Text>;
-    }
+    };
 
-    _renderHitLocation() {
-        if (this.state.result.damageForm.useHitLocations) {
-            let hitLocation = this.state.result.hitLocationDetails;
+    const renderHitLocation = () => {
+        if (result.damageForm.useHitLocations) {
+            let hitLocation = result.hitLocationDetails;
 
-            if (this.state.result.rollType === NORMAL_DAMAGE) {
+            if (result.rollType === NORMAL_DAMAGE) {
                 return (
                     <Text style={styles.grey}>
                         {hitLocation.location} (NSTUN: x{hitLocation.nStun})
                     </Text>
                 );
-            } else if (this.state.result.rollType === KILLING_DAMAGE) {
+            } else if (result.rollType === KILLING_DAMAGE) {
                 return (
                     <Text style={styles.grey}>
                         {hitLocation.location} (STUNx: x{hitLocation.stunX}, BODYx: x{hitLocation.bodyX})
@@ -133,15 +104,15 @@ class ResultScreen extends Component {
             }
         }
 
-        if (this.state.result.rollType === KILLING_DAMAGE) {
-            return <Text style={styles.grey}>x{this.state.result.stunModifier}</Text>;
+        if (result.rollType === KILLING_DAMAGE) {
+            return <Text style={styles.grey}>x{result.stunModifier}</Text>;
         }
 
         return <Text />;
-    }
+    };
 
-    _renderDamageInfo(result) {
-        if (result.damageForm.isExplosion) {
+    const renderDamageInfo = (rollResult) => {
+        if (rollResult.damageForm.isExplosion) {
             return (
                 <View style={{paddingBottom: verticalScale(20)}}>
                     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: scale(5)}}>
@@ -158,20 +129,20 @@ class ResultScreen extends Component {
                             <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>KB</Text>
                         </View>
                     </View>
-                    {result.explosion.map((entry, index) => {
+                    {rollResult.explosion.map((entry, index) => {
                         return (
                             <View key={'exp-' + index} style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
                                 <View style={{flex: 1, alignSelf: 'flex-end'}}>
-                                    <Text style={styles.grey}>{this._renderDistance(entry.distance, result)}</Text>
+                                    <Text style={styles.grey}>{renderDistance(entry.distance, rollResult)}</Text>
                                 </View>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{this._renderStun(entry.stun)}</Text>
+                                    <Text style={styles.grey}>{renderStun(entry.stun)}</Text>
                                 </View>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
                                     <Text style={styles.grey}>{entry.body}</Text>
                                 </View>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{this._renderKnockback(entry.knockback, result)}</Text>
+                                    <Text style={styles.grey}>{renderKnockback(entry.knockback, rollResult)}</Text>
                                 </View>
                             </View>
                         );
@@ -182,10 +153,10 @@ class ResultScreen extends Component {
 
         return (
             <View style={{paddingBottom: verticalScale(20)}}>
-                {this._renderHitLocations()}
+                {renderHitLocations()}
                 <View style={localStyles.lineContainer}>
                     <Text style={[styles.boldGrey, localStyles.alignStart]}>Stun: </Text>
-                    {this._renderStun(result.stun)}
+                    {renderStun(result.stun)}
                 </View>
                 <View style={localStyles.lineContainer}>
                     <Text style={[styles.boldGrey, localStyles.alignStart]}>Body: </Text>
@@ -193,34 +164,34 @@ class ResultScreen extends Component {
                 </View>
                 <View style={localStyles.lineContainer}>
                     <Text style={[styles.boldGrey, localStyles.alignStart]}>Knockback: </Text>
-                    {this._renderKnockback(result.knockback, result)}
+                    {renderKnockback(result.knockback, result)}
                 </View>
             </View>
         );
-    }
+    };
 
-    _renderHitLocations() {
-        if (this.state.result.damageForm.useHitLocations) {
+    const renderHitLocations = () => {
+        if (result.damageForm.useHitLocations) {
             return (
                 <View style={localStyles.lineContainer}>
                     <Text style={[styles.boldGrey, localStyles.alignStart]}>Hit Location: </Text>
-                    {this._renderHitLocation()}
+                    {renderHitLocation()}
                 </View>
             );
-        } else if (!this.state.result.damageForm.useHitLocations && this.state.result.rollType === KILLING_DAMAGE) {
+        } else if (!result.damageForm.useHitLocations && result.rollType === KILLING_DAMAGE) {
             return (
                 <View style={localStyles.lineContainer}>
                     <Text style={[styles.boldGrey, localStyles.alignStart]}>Stun Multiplier: </Text>
-                    {this._renderHitLocation()}
+                    {renderHitLocation()}
                 </View>
             );
         }
 
         return null;
-    }
+    };
 
-    _renderSkillCheckInfo(result) {
-        let overUnder = result.threshold - result.total;
+    const renderSkillCheckInfo = (rollResult) => {
+        let overUnder = rollResult.threshold - rollResult.total;
 
         if (overUnder >= 0) {
             if (overUnder === 0) {
@@ -235,113 +206,117 @@ class ResultScreen extends Component {
                 You <Text style={{color: 'red'}}>failed</Text> your check by {overUnder * -1} points
             </Text>
         );
-    }
+    };
 
-    _renderEffectInfo(result) {
-        switch (result.type.toUpperCase()) {
+    const renderEffectInfo = (rollResult) => {
+        switch (rollResult.type.toUpperCase()) {
             case 'NONE':
                 return null;
             case 'AID':
             case 'SUCCOR':
-                return <Text style={styles.grey}>You have added {result.total} AP to the target power/effect</Text>;
+                return <Text style={styles.grey}>You have added {rollResult.total} AP to the target power/effect</Text>;
             case 'DISPEL':
-                return <Text style={styles.grey}>You have dispelled {result.total} AP</Text>;
+                return <Text style={styles.grey}>You have dispelled {rollResult.total} AP</Text>;
             case 'DRAIN':
-                return <Text style={styles.grey}>You have subtracted {result.total} AP</Text>;
+                return <Text style={styles.grey}>You have subtracted {rollResult.total} AP</Text>;
             case 'ENTANGLE':
-                return <Text style={styles.grey}>Your entangle has a BODY of {dieRoller.countNormalDamageBody(result)}</Text>;
+                return <Text style={styles.grey}>Your entangle has a BODY of {dieRoller.countNormalDamageBody(rollResult)}</Text>;
             case 'FLASH':
             case 'MARTIAL_FLASH':
-                return <Text style={styles.grey}>You flashed your target for {dieRoller.countNormalDamageBody(result)} segments</Text>;
+                return <Text style={styles.grey}>You flashed your target for {dieRoller.countNormalDamageBody(rollResult)} segments</Text>;
             case 'HEALING':
-                return <Text style={styles.grey}>You healed your target for {result.total} points</Text>;
+                return <Text style={styles.grey}>You healed your target for {rollResult.total} points</Text>;
             case 'LUCK':
                 return (
                     <Text style={styles.grey}>
-                        You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'green'}}>Luck</Text>
+                        You have acquired {dieRoller.countLuck(rollResult)} points of <Text style={{color: 'green'}}>Luck</Text>
                     </Text>
                 );
             case 'UNLUCK':
                 return (
                     <Text style={styles.grey}>
-                        You have acquired {dieRoller.countLuck(result)} points of <Text style={{color: 'red'}}>Unluck</Text>
+                        You have acquired {dieRoller.countLuck(rollResult)} points of <Text style={{color: 'red'}}>Unluck</Text>
                     </Text>
                 );
             default:
-                return <Text style={styles.grey}>You have scored {result.total} points on your effect</Text>;
+                return <Text style={styles.grey}>You have scored {rollResult.total} points on your effect</Text>;
         }
-    }
+    };
 
-    _renderAdditionalRollInfo(result) {
-        if (result.rollType === TO_HIT) {
-            return this._renderToHitInfo(result);
-        } else if (result.rollType === NORMAL_DAMAGE || result.rollType === KILLING_DAMAGE) {
-            return this._renderDamageInfo(result);
-        } else if (result.rollType === SKILL_CHECK && result.threshold !== -1) {
-            return this._renderSkillCheckInfo(result);
-        } else if (result.rollType === EFFECT) {
-            return this._renderEffectInfo(result);
+    const renderAdditionalRollInfo = (rollResult) => {
+        if (rollResult.rollType === TO_HIT) {
+            return renderToHitInfo(rollResult);
+        } else if (rollResult.rollType === NORMAL_DAMAGE || rollResult.rollType === KILLING_DAMAGE) {
+            return renderDamageInfo(result);
+        } else if (rollResult.rollType === SKILL_CHECK && rollResult.threshold !== -1) {
+            return renderSkillCheckInfo(rollResult);
+        } else if (rollResult.rollType === EFFECT) {
+            return renderEffectInfo(rollResult);
         }
 
         return null;
-    }
+    };
 
-    _renderDistance(distance, result) {
+    const renderDistance = (distance) => {
         let distanceText = '';
 
-        if (this.props.useFifthEdition) {
+        if (useFifthEdition) {
             distanceText = distance / 2 + '"';
         } else {
             distanceText = distance + 'm';
         }
 
         return <Text style={styles.grey}>{distanceText}</Text>;
-    }
+    };
 
-    _renderStun(stun) {
+    const renderStun = (stun) => {
         stun = stun < 0 ? 0 : stun;
 
         return <Text style={styles.grey}>{stun}</Text>;
-    }
+    };
 
-    _renderKnockback(knockback, result) {
+    const renderKnockback = (knockback) => {
         knockback = knockback < 0 ? 0 : knockback;
         let knockbackText = '';
 
-        if (this.props.useFifthEdition) {
+        if (useFifthEdition) {
             knockbackText = knockback / 2 + '"';
         } else {
             knockbackText = knockback + 'm';
         }
 
         return <Text style={styles.grey}>{knockbackText}</Text>;
-    }
+    };
 
-    _getRollPercentageColor(percentage) {
-        if (this.state.result.rollType === NORMAL_DAMAGE || this.state.result.rollType === KILLING_DAMAGE || this.state.result.rollType === EFFECT) {
+    const getRollPercentageColor = (percentage) => {
+        if (result.rollType === NORMAL_DAMAGE || result.rollType === KILLING_DAMAGE || result.rollType === EFFECT) {
             return percentage < 0.0 ? 'red' : 'green';
         }
 
         return percentage < 0.0 ? 'green' : 'red';
-    }
+    };
 
-    _renderRoll() {
-        if (this.state.result.hasOwnProperty('results')) {
-            return this.state.result.results.map((result, index) => {
-                let percentage = statistics.getPercentage(result);
+    const renderRoll = () => {
+        if (common.isEmptyObject(result)) {
+            return <Spinner color="#D0D1D3" />;
+        }
+
+        if (result.hasOwnProperty('results')) {
+            return result.results.map((r, index) => {
+                let percentage = statistics.getPercentage(r);
 
                 return (
                     <View key={'roll-result-' + index}>
                         <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
                             <View style={{flex: -1}}>
                                 <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
-                                    <CountUp isCounting end={result.total} key={result.total} formatter={(val) => val.toFixed(0)} duration={1} />
+                                    <CountUp isCounting end={r.total} key={r.total} formatter={(val) => val.toFixed(0)} duration={1} />
                                 </Text>
                             </View>
                             <View style={{flex: 1}}>
                                 <Text
                                     style={{
-                                        color: this._getRollPercentageColor(percentage),
+                                        color: getRollPercentageColor(percentage),
                                         fontSize: verticalScale(30),
                                         paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13),
                                     }}
@@ -358,32 +333,32 @@ class ResultScreen extends Component {
                         </View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                            {result.rolls.length} ({result.rolls.join(', ')})
+                            {r.rolls.length} ({r.rolls.join(', ')})
                         </Text>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Partial Die: </Text>
-                            {dieRoller.getPartialDieName(result.partialDieType)}
+                            {dieRoller.getPartialDieName(r.partialDieType)}
                         </Text>
-                        {this._renderAdditionalRollInfo(result)}
+                        {renderAdditionalRollInfo(r)}
                     </View>
                 );
             });
         }
 
-        let percentage = statistics.getPercentage(this.state.result);
+        let percentage = statistics.getPercentage(result);
 
         return (
             <View>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
                     <View style={{flex: -1}}>
                         <Text style={[styles.grey, localStyles.rollResult]}>
-                            <CountUp isCounting end={this.state.result.total} key={this.state.result.total} formatter={(val) => val.toFixed(0)} />
+                            <CountUp isCounting end={result.total} key={result.total} formatter={(val) => val.toFixed(0)} />
                         </Text>
                     </View>
                     <View style={{flex: 1}}>
                         <Text
                             style={{
-                                color: this._getRollPercentageColor(percentage),
+                                color: getRollPercentageColor(percentage),
                                 fontSize: verticalScale(30),
                                 paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13),
                             }}
@@ -399,36 +374,39 @@ class ResultScreen extends Component {
                 </View>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                    {this.state.result.rolls.length} ({this.state.result.rolls.join(', ')})
+                    {result.rolls.length} ({result.rolls.join(', ')})
                 </Text>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Partial Die: </Text>
-                    {dieRoller.getPartialDieName(this.state.result.partialDieType)}
+                    {dieRoller.getPartialDieName(result.partialDieType)}
                 </Text>
-                {this._renderAdditionalRollInfo(this.state.result)}
+                {renderAdditionalRollInfo(result)}
             </View>
         );
-    }
+    };
 
-    render() {
-        return (
-            <Container style={styles.container}>
-                <Header navigation={this.props.navigation} />
-                <Content style={styles.content}>
-                    <Text style={styles.heading}>Roll Result</Text>
-                    <View>
-                        {this._renderRoll()}
-                        <View style={styles.buttonContainer}>
-                            <Button block style={styles.button} onPress={this.reRoll}>
-                                <Text uppercase={false}>Roll Again</Text>
-                            </Button>
-                        </View>
+    return (
+        <Container style={styles.container}>
+            <Header navigation={navigation} />
+            <Content style={styles.content}>
+                <Text style={styles.heading}>Roll Result</Text>
+                <View>
+                    {renderRoll()}
+                    <View style={styles.buttonContainer}>
+                        <Button block style={styles.button} onPress={reRoll}>
+                            <Text uppercase={false}>Roll Again</Text>
+                        </Button>
                     </View>
-                </Content>
-            </Container>
-        );
-    }
-}
+                </View>
+            </Content>
+        </Container>
+    );
+};
+
+ResultScreen.propTypes = {
+    route: PropTypes.object.isRequired,
+    navigation: PropTypes.object.isRequired,
+};
 
 const localStyles = ScaledSheet.create({
     rollResult: {
@@ -443,17 +421,3 @@ const localStyles = ScaledSheet.create({
         alignSelf: 'flex-start',
     },
 });
-
-const mapStateToProps = (state) => {
-    return {
-        useFifthEdition: state.settings.useFifthEdition,
-        playSounds: state.settings.playSounds,
-        onlyDiceSounds: state.settings.onlyDiceSounds,
-    };
-};
-
-const mapDispatchToProps = {
-    addStatistics,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ResultScreen);

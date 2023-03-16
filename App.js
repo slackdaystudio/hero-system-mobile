@@ -1,23 +1,20 @@
-/* eslint-disable no-unused-vars */
 import React, {useRef, useEffect} from 'react';
 import {AppState, Image, SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@react-navigation/drawer';
-import {applyMiddleware, thunk} from 'redux';
 import {configureStore} from '@reduxjs/toolkit';
-import {Provider, useDispatch} from 'react-redux';
+import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {scale, ScaledSheet} from 'react-native-size-matters';
 import {Root} from 'native-base';
-import {asyncDispatchMiddleware} from './src/middleware/AsyncDispatchMiddleware';
 import {soundPlayer, DEFAULT_SOUND} from './src/lib/SoundPlayer';
 import rootReducer from './src/reducers';
 import {HomeScreen} from './src/components/Screens/HomeScreen';
 import {CharactersScreen} from './src/components/Screens/CharactersScreen';
 import {ViewHeroDesignerCharacterScreen} from './src/components/Screens/ViewHeroDesignerCharacterScreen';
 import {RandomCharacterScreen} from './src/components/Screens/RandomCharacterScreen';
-import ResultScreen from './src/components/Screens/ResultScreen';
+import {ResultScreen} from './src/components/Screens/ResultScreen';
 import {SkillScreen} from './src/components/Screens/SkillScreen';
 import {HitScreen} from './src/components/Screens/HitScreen';
 import {DamageScreen} from './src/components/Screens/DamageScreen';
@@ -27,9 +24,8 @@ import {StatisticsScreen} from './src/components/Screens/StatisticsScreen';
 import {SettingsScreen} from './src/components/Screens/SettingsScreen';
 import {persistence} from './src/lib/Persistence';
 import {initialize} from './src/reducers/appState';
-import {initializeCharacter, saveCachedCharacter} from './src/reducers/character';
+import {saveCachedCharacter} from './src/reducers/character';
 import currentVersion from './public/version.json';
-import {TEXT_COLOR} from './src/Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -51,8 +47,6 @@ const Drawer = createDrawerNavigator();
 
 const HIDDEN_SCREENS = ['Result'];
 
-const drawerContent = (props) => <CustomDrawerContent {...props} />;
-
 const hsmIcon = () => <Image style={{height: scale(50), width: scale(115)}} source={require('./public/hero_mobile_logo.png')} />;
 
 const CustomDrawerContent = (props) => {
@@ -63,7 +57,7 @@ const CustomDrawerContent = (props) => {
 
     // Filter out routes that are hidden either all the time or contextually
     newState.routes = newState.routes.filter((item, i) => {
-        if (store.getState().character.workingCharacter === undefined && (item.name === 'ViewHeroDesignerCharacter' || item.name === 'Characters')) {
+        if (store.getState().character.character === undefined && (item.name === 'ViewHeroDesignerCharacter' || item.name === 'Characters')) {
             return false;
         }
 
@@ -72,7 +66,6 @@ const CustomDrawerContent = (props) => {
 
     // Loop over the remaining routes and set the selected index based on the current route name (for highlighting)
     for (let i = 0; i < newState.routes.length; i++) {
-        console.log(`Current Route: ${currentRoute}, Loop Route: ${newState.routes[i].name}`);
         if (currentRoute === newState.routes[i].name) {
             newState.index = i;
             break;
@@ -93,10 +86,6 @@ export function setSound(name, soundClip) {
 export const store = configureStore({
     reducer: rootReducer,
 });
-
-const Home = (props) => {
-    return <HomeScreen {...props} />;
-};
 
 export const App = () => {
     soundPlayer.initialize(DEFAULT_SOUND, false);
@@ -163,10 +152,10 @@ export const App = () => {
                                 }}
                                 initialRouteName="Home"
                                 backBehavior="history"
-                                // drawerContent={(props) => drawerContent(props)}
+                                drawerContent={CustomDrawerContent}
                             >
-                                <Drawer.Screen name="Home" component={Home} />
-                                {/* <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={HomeScreen} /> */}
+                                {/* <Drawer.Screen name="Home" component={Home} /> */}
+                                <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={HomeScreen} />
                                 <Drawer.Screen
                                     options={{drawerLabel: 'View Character'}}
                                     name="ViewHeroDesignerCharacter"
