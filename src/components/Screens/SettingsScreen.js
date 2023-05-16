@@ -12,7 +12,7 @@ import {resetForm} from '../../reducers/forms';
 import {clearCharacterData} from '../../reducers/character';
 import {clearRandomHero} from '../../reducers/randomHero';
 import {clearApplicationSettings, toggleSetting} from '../../reducers/settings';
-import {initializeStatistics} from '../../reducers/statistics';
+import {clearStatistics} from '../../reducers/statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -63,7 +63,7 @@ export const SettingsScreen = ({navigation}) => {
     };
 
     const clearStatisticsData = (showToast = true) => {
-        dispatch(initializeStatistics());
+        dispatch(clearStatistics());
 
         if (showToast) {
             common.toast('Statistical data has been cleared');

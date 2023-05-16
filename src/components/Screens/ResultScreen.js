@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {Platform, View} from 'react-native';
@@ -36,21 +36,20 @@ export const ResultScreen = ({route, navigation}) => {
         useFifthEdition: state.settings.useFifthEdition,
     }));
 
-    const [result, setResult] = useState(null);
+    const [result, setResult] = useState(route.params.result);
 
     useEffect(() => {
-        setResult(route.params.result);
         playSoundClip();
         updateStatistics();
     }, [playSoundClip, route.params.result, updateStatistics]);
 
     const playSoundClip = useCallback(() => {
-        if (playSounds) {
-            let soundName = onlyDiceSounds ? DEFAULT_SOUND : result.sfx;
+        if (!common.isEmptyObject(result) && playSounds) {
+            const soundName = onlyDiceSounds ? DEFAULT_SOUND : result.sfx;
 
             soundPlayer.play(soundName);
         }
-    }, [onlyDiceSounds, playSounds, result?.sfx]);
+    }, [onlyDiceSounds, playSounds, result]);
 
     const updateStatistics = useCallback(() => {
         if (!common.isEmptyObject(result) && result.hasOwnProperty('results')) {
@@ -64,6 +63,7 @@ export const ResultScreen = ({route, navigation}) => {
 
     const reRoll = () => {
         setResult(dieRoller.rollAgain(result));
+        playSoundClip();
         updateStatistics();
     };
 

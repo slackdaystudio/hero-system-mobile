@@ -4,6 +4,8 @@ import {useSelector} from 'react-redux';
 import {Container, Content, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
 import Header from '../Header/Header';
 import {chart} from '../../lib/Chart';
+import {common} from '../../lib/Common';
+import {statistics as libStatistics} from '../../lib/Statistics';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -21,10 +23,10 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export const StatisticsScreen = ({navigation}) => {
-    const statistics = useSelector((state) => state.statistics);
-
+    const {statistics} = useSelector((state) => console.log(state));
+    // console.log(statistics);
     const renderHitLocationStat = () => {
-        let mostFrequentHitLocation = statistics.getMostFrequentHitLocation(statistics.totals.hitLocations);
+        const mostFrequentHitLocation = libStatistics.getMostFrequentHitLocation(statistics.totals.hitLocations);
 
         if (mostFrequentHitLocation.location === '') {
             return <Text style={styles.grey}>-</Text>;
@@ -49,7 +51,7 @@ export const StatisticsScreen = ({navigation}) => {
         return chart.renderDieDistributionChart(statistics.distributions);
     };
 
-    if (statistics === null) {
+    if (common.isEmptyObject(statistics)) {
         return (
             <Container style={styles.container}>
                 <Header hasTabs={false} navigation={navigation} />

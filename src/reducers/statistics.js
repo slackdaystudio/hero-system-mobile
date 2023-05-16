@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {persistence} from '../lib/Persistence';
+import {DEFAULT_STATS, persistence} from '../lib/Persistence';
 import {statistics as libStatistics} from '../lib/Statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -16,31 +16,35 @@ import {statistics as libStatistics} from '../lib/Statistics';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const initializeStatistics = createAsyncThunk('statistic/initializeStatistics', async () => {
-    return await persistence.initializeStatistics();
-});
-
-export const addStatistics = createAsyncThunk('statistic/addStatistics', async ({statistics}) => {
+export const addStatistics = createAsyncThunk('statistics/addStatistics', async ({statistics}) => {
     return await libStatistics.add(statistics);
 });
 
+export const clearStatistics = createAsyncThunk('statistics/clearStatistics', async () => {
+    return await persistence.clearStatistics();
+});
+
 const statisticsSlice = createSlice({
-    name: 'statistic',
-    initialState: {},
-    reducers: null,
+    name: 'statistics',
+    initialState: DEFAULT_STATS,
+    reducers: {
+        initializeStatistics: (state, action) => {
+            const {statistics} = action.payload;
+
+            state = statistics;
+        },
+    },
     extraReducers: (builder) => {
         builder
-            .addCase(initializeStatistics.fulfilled, (state, action) => {
-                const {statistics} = action.payload;
-
-                state = {...statistics};
-            })
             .addCase(addStatistics.fulfilled, (state, action) => {
-                console.log('Logged die roll statistics.');
+                state = action.payload;
+            })
+            .addCase(clearStatistics.fulfilled, (_state, _action) => {
+                console.log('Cleared and reset statistics.');
             });
     },
 });
 
-// export const {} = statisticsSlice.actions;
+export const {initializeStatistics} = statisticsSlice.actions;
 
 export default statisticsSlice.reducer;
