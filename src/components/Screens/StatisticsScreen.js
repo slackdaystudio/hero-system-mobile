@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
-import {useSelector} from 'react-redux';
+import {useFocusEffect} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Container, Content, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
 import Header from '../Header/Header';
 import {chart} from '../../lib/Chart';
@@ -23,8 +24,26 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export const StatisticsScreen = ({navigation}) => {
-    const {statistics} = useSelector((state) => console.log(state));
-    // console.log(statistics);
+    const [statistics, setStatistics] = useState(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            _loadStats();
+
+            return () => {};
+        }, []),
+    );
+
+    const _loadStats = () => {
+        AsyncStorage.getItem('statistics')
+            .then((s) => {
+                setStatistics(JSON.parse(s));
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
     const renderHitLocationStat = () => {
         const mostFrequentHitLocation = libStatistics.getMostFrequentHitLocation(statistics.totals.hitLocations);
 

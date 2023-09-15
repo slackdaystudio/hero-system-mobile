@@ -205,7 +205,7 @@ class Persistence {
             let toBeRemoved = null;
 
             for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === filename) {
+                if (characters[i.toString()] !== undefined && characters[i.toString()].filename === filename) {
                     toBeRemoved = i.toString();
                     break;
                 }

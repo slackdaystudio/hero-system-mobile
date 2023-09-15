@@ -1,6 +1,6 @@
 import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {Dimensions, Image} from 'react-native';
 import {View, Text} from 'native-base';
@@ -26,6 +26,7 @@ import {
     clearAllStatuses,
     clearStatus,
 } from '../../reducers/character';
+import {selectCharacterData} from '../../reducers/selectors';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -161,11 +162,9 @@ const LazyPlaceholder = ({route}) => (
 );
 
 export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
-    const {character, characters, forms} = useSelector((state) => ({
-        character: state.character.character,
-        characters: state.character.characters,
-        forms: state.forms,
-    }));
+    const dispatch = useDispatch();
+
+    const {character, characters, forms} = useSelector((state) => selectCharacterData(state));
 
     const [index, setIndex] = useState(0);
 
@@ -263,8 +262,17 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
                 navigation={navigation}
                 character={character}
                 characters={characters}
-                selectCharacter={selectCharacter}
-                clearCharacter={clearCharacter}
+                selectCharacter={(c) => dispatch(selectCharacter({character: c}))}
+                clearCharacter={(filename, char, chars, saveCharacter) =>
+                    dispatch(
+                        clearCharacter({
+                            filename,
+                            character: char,
+                            characters: {...chars},
+                            saveCharacter,
+                        }),
+                    )
+                }
             />
         </>
     );

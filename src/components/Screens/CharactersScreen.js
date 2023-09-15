@@ -1,5 +1,6 @@
 import React, {Fragment, useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
+import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {View} from 'react-native';
 import {Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon} from 'native-base';
@@ -15,7 +16,6 @@ import {setCharacter, clearCharacter, updateLoadedCharacters} from '../../reduce
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 import {character as libCharacter} from '../../lib/Character';
 import styles from '../../Styles';
-import {useDispatch, useSelector} from 'react-redux';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -34,14 +34,18 @@ import {useDispatch, useSelector} from 'react-redux';
 export const CharactersScreen = ({navigation, route}) => {
     const dispatch = useDispatch();
 
-    const getSlots = useCallback(() => {
-        return slots.map((slot, _index) => {
-            return {
-                label: `Slot ${slot + 1}`,
-                value: slot,
+    const getSlots = () => {
+        const slots = [];
+
+        for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+            slots[i] = {
+                label: `Slot ${i + 1}`,
+                value: i,
             };
-        });
-    }, [slots]);
+        }
+
+        return slots;
+    };
 
     const refreshCharacters = useCallback(() => {
         setCharactersLoading(true);
@@ -63,26 +67,20 @@ export const CharactersScreen = ({navigation, route}) => {
             refreshCharacters();
 
             if (route.params !== undefined && route.params.hasOwnProperty('slot')) {
-                setPicker({
-                    open: false,
-                    value: route.params.slot,
-                    items: getSlots(),
-                });
+                setValue(route.params.slot);
             }
-        }, [route, setPicker, refreshCharacters, getSlots]),
+        }, [route, refreshCharacters]),
     );
 
     const {character, characters} = useSelector((state) => state.character);
 
-    const slots = [...Array(MAX_CHARACTER_SLOTS)].map((_, i) => i);
-
     const [loadedCharacters, setLoadedCharacters] = useState(null);
 
-    const [picker, setPicker] = useState({
-        open: false,
-        value: 0,
-        items: getSlots(),
-    });
+    const [open, setOpen] = useState(false);
+
+    const [value, setValue] = useState(0);
+
+    const [items, setItems] = useState(getSlots());
 
     const [charactersLoading, setCharactersLoading] = useState(true);
 
@@ -92,20 +90,6 @@ export const CharactersScreen = ({navigation, route}) => {
         dialogOnOkFn: null,
         deleteDialogVisible: false,
     });
-
-    const setValue = (callback) => {
-        setPicker({
-            ...picker,
-            value: callback(dialogProps.value),
-        });
-    };
-
-    const setOpen = (open) => {
-        setPicker({
-            ...picker,
-            open,
-        });
-    };
 
     const startLoad = () => {
         setCharactersLoading(true);
@@ -179,7 +163,7 @@ export const CharactersScreen = ({navigation, route}) => {
                 char.combatDetails = combatDetails.init(char);
             }
 
-            dispatch(setCharacter({character: char, slot: picker.value.toString()}));
+            dispatch(setCharacter({character: char, slot: value.toString()}));
 
             goToCharacterScreen();
         });
@@ -245,11 +229,12 @@ export const CharactersScreen = ({navigation, route}) => {
                         <DropDownPicker
                             theme="DARK"
                             listMode="MODAL"
-                            open={picker.open}
-                            value={picker.value}
-                            items={picker.items}
+                            open={open}
+                            value={value}
+                            items={items}
                             setOpen={setOpen}
                             setValue={setValue}
+                            setItems={setItems}
                         />
                     </View>
                 </View>

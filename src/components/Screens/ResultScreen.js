@@ -1,6 +1,7 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
+import {useFocusEffect} from '@react-navigation/native';
 import {Platform, View} from 'react-native';
 import {Container, Content, Button, Text, Spinner} from 'native-base';
 import {CountUp} from 'use-count-up';
@@ -8,10 +9,11 @@ import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
 import {statistics} from '../../lib/Statistics';
+import {addStatistics} from '../../reducers/statistics';
+import {selectResultData} from '../../reducers/selectors';
 import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import styles from '../../Styles';
-import {addStatistics} from '../../reducers/statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -30,18 +32,20 @@ import {addStatistics} from '../../reducers/statistics';
 export const ResultScreen = ({route, navigation}) => {
     const dispatch = useDispatch();
 
-    const {playSounds, onlyDiceSounds, useFifthEdition} = useSelector((state) => ({
-        playSounds: state.settings.playSounds,
-        onlyDiceSounds: state.settings.onlyDiceSounds,
-        useFifthEdition: state.settings.useFifthEdition,
-    }));
+    const {playSounds, onlyDiceSounds, useFifthEdition} = useSelector((state) => selectResultData(state));
 
     const [result, setResult] = useState(route.params.result);
 
-    useEffect(() => {
-        playSoundClip();
-        updateStatistics();
-    }, [playSoundClip, route.params.result, updateStatistics]);
+    useFocusEffect(
+        useCallback(() => {
+            if (route.params !== undefined && route.params.hasOwnProperty('result')) {
+                setResult(route.params.result);
+
+                playSoundClip();
+                updateStatistics();
+            }
+        }, [playSoundClip, route.params, updateStatistics]),
+    );
 
     const playSoundClip = useCallback(() => {
         if (!common.isEmptyObject(result) && playSounds) {

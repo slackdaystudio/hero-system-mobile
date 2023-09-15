@@ -51,8 +51,13 @@ const characterSlice = createSlice({
     },
     reducers: {
         initializeCharacter: (state, action) => {
-            state.character = {...action.payload.character};
-            state.characters = {...action.payload.characters};
+            if (action.payload === null) {
+                state.character = null;
+                state.characters = [];
+            } else {
+                state.character = {...action.payload.character};
+                state.characters = {...action.payload.characters};
+            }
         },
         setShowSecondary: (state, action) => {
             state.showSecondary = action.payload.showSecondary;

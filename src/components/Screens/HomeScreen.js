@@ -130,24 +130,6 @@ export const HomeScreen = ({navigation}) => {
                             </Button>
                         </View>
                     </View>
-                    <Heading text="Miscellaneous" />
-                    <Text style={[styles.grey, {textAlign: 'center'}]}>Tools and settings to manage the app.</Text>
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                        <View style={[styles.buttonContainer, {paddingBottom: verticalScale(20)}]}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('Statistics')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Statistics
-                                </Text>
-                            </Button>
-                        </View>
-                        <View style={[styles.buttonContainer, {paddingBottom: verticalScale(20)}]}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('Settings')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Settings
-                                </Text>
-                            </Button>
-                        </View>
-                    </View>
                     <View style={{paddingBottom: verticalScale(20)}} />
                 </Content>
             </ImageBackground>
