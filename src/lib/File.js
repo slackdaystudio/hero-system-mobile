@@ -1,4 +1,4 @@
-import {Platform, Alert} from 'react-native';
+import {Platform} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
@@ -79,7 +79,7 @@ class File {
             const isCancel = DocumentPicker.isCancel(error);
 
             if (!isCancel) {
-                common.toast(error.message);
+                console.error(error.message);
             }
         }
     }
@@ -95,7 +95,7 @@ class File {
             // Users may have old XML exported characters in thier dir, filter them out but leave them in place
             characters = await this._filterCharacters(characters);
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
 
         return characters
@@ -123,7 +123,7 @@ class File {
 
             return JSON.parse(character);
         } catch (error) {
-            common.toast(error.message);
+            console.error(error.message);
         } finally {
             endLoad(character);
         }
@@ -136,7 +136,7 @@ class File {
 
             return true;
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
 
         return false;
@@ -148,7 +148,7 @@ class File {
 
             await RNFS.unlink(`${path}/${filename}`);
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
     }
 
@@ -197,7 +197,7 @@ class File {
                 character = this._importCharacter(name, absoluteFilePath);
             }
         } catch (error) {
-            Alert.alert('Read Error: ' + error.message);
+            console.error('Read Error: ' + error.message);
         } finally {
             endLoad();
         }
@@ -244,6 +244,8 @@ class File {
             character = await new Promise((resolve, reject) =>
                 parser.parseString(rawXml, (error, result) => {
                     if (error) {
+                        console.error(error);
+
                         reject(error);
                     }
 
@@ -261,7 +263,7 @@ class File {
 
             common.toast('Character successfully loaded');
         } catch (error) {
-            common.toast(error.message);
+            console.error(error.message);
         }
 
         return character;
@@ -397,7 +399,7 @@ class File {
                 await RNFS.mkdir(location);
             }
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
     }
 

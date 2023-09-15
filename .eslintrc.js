@@ -1,6 +1,6 @@
 module.exports = {
     root: true,
-    extends: '@react-native-community',
+    extends: '@react-native',
     plugins: [],
     rules: {
         indent: ['error', 4, {SwitchCase: 1}],

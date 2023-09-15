@@ -1,7 +1,7 @@
 import {Dimensions, Platform} from 'react-native';
 import {Toast} from 'native-base';
 import camelCase from 'camelcase';
-import {snakeCase} from 'snake-case';
+import snakeCase from 'snake-case';
 import merge from 'deepmerge';
 import {PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from './DieRoller';
 
