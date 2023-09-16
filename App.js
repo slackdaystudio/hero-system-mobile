@@ -23,6 +23,7 @@ import {CostCruncherScreen} from './src/components/Screens/CostCruncherScreen';
 import {StatisticsScreen} from './src/components/Screens/StatisticsScreen';
 import {SettingsScreen} from './src/components/Screens/SettingsScreen';
 import {persistence} from './src/lib/Persistence';
+import {common} from './src/lib/Common';
 import {initialize} from './src/reducers/appState';
 import {saveCachedCharacter} from './src/reducers/character';
 import currentVersion from './public/version.json';
@@ -89,7 +90,8 @@ export const store = configureStore({
 
 export const App = () => {
     soundPlayer.initialize(DEFAULT_SOUND, false);
-    SplashScreen.hide();
+
+    setTimeout(() => SplashScreen.hide(), 200);
 
     const appState = useRef(AppState.currentState);
 
@@ -122,7 +124,14 @@ export const App = () => {
                     break;
                 case 'background':
                 case 'inactive':
-                    store.dispatch(saveCachedCharacter({character: store.getState().character.character, characters: store.getState().character.characters}));
+                    if (!common.isEmptyObject(store.getState().character.character)) {
+                        console.log('Found character');
+                        console.log(store.getState().character.character);
+                        store.dispatch(
+                            saveCachedCharacter({character: store.getState().character.character, characters: store.getState().character.characters}),
+                        );
+                    }
+
                     break;
                 default:
                 // Do nothing
