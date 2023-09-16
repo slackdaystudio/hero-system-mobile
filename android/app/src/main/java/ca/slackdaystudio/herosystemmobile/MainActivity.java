@@ -10,7 +10,8 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate;
 public class MainActivity extends ReactActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen.show(this);
+        androidx.core.splashscreen.SplashScreen.installSplashScreen(this);
+        SplashScreen.show(this, true);
         super.onCreate(null);
     }
 
