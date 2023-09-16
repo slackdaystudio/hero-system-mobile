@@ -33,11 +33,9 @@ export const CostCruncherScreen = ({navigation}) => {
             if (/^[0-9]*$/.test(value) === false) {
                 return;
             }
-        } else if (key === 'advantages' || key === 'limitations') {
-            value = parseFloat(value);
         }
 
-        dispatch(updateFormValue({formName: 'costCruncher', key, value}));
+        dispatch(updateFormValue({formName: 'costCruncher', key, value: key === 'cost' ? parseInt(value, 10) : parseFloat(value)}));
     };
 
     const renderActiveCost = () => {
@@ -71,8 +69,8 @@ export const CostCruncherScreen = ({navigation}) => {
                             style={styles.grey}
                             keyboardType="numeric"
                             maxLength={3}
-                            value={costCruncherForm.cost.toString()}
-                            onChangeText={(text) => _updateFormValue('cost', text)}
+                            defaultValue={costCruncherForm.cost.toString()}
+                            onEndEditing={(event) => _updateFormValue('cost', event.nativeEvent.text)}
                         />
                     </Item>
                 </Form>
@@ -82,8 +80,7 @@ export const CostCruncherScreen = ({navigation}) => {
                     step={0.25}
                     min={0}
                     max={5}
-                    onValueChange={_updateFormValue}
-                    valueKey="advantages"
+                    onValueChange={(val) => _updateFormValue('advantages', val)}
                 />
                 <Slider
                     label="Limitations:"
@@ -91,8 +88,7 @@ export const CostCruncherScreen = ({navigation}) => {
                     step={0.25}
                     min={-5}
                     max={0}
-                    onValueChange={_updateFormValue}
-                    valueKey="limitations"
+                    onValueChange={(val) => _updateFormValue('limitations', val)}
                 />
             </Content>
         </Container>
