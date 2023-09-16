@@ -55,7 +55,7 @@ class File {
                 return;
             }
 
-            result.fileCopyUri = decodeURIComponent(result.fileCopyUri);
+            result.fileCopyUri = Platform.OS === 'ios' ? decodeURIComponent(result.fileCopyUri) : result.fileCopyUri;
 
             if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
                 const rawXml = await this._getRawXm(result.fileCopyUri);
@@ -335,7 +335,7 @@ class File {
         let extensionParts = character.image.fileName.split('.');
         let extension = extensionParts[extensionParts.length - 1];
 
-        return `data:image/${extension};base64,${{...character.image}._.replaceAll(/\n/g, '')}`;
+        return `data:image/${extension};base64,${{...character.image}._.replace(/\n/g, '')}`;
     }
 
     async _initCharacterState(character, filename) {
@@ -401,7 +401,7 @@ class File {
             filename = filename.slice(0, -4);
         }
 
-        return `${path}/${filename.replaceAll(/[/\\?%*:|"<>\s]/g, '_')}.${extension}`;
+        return `${path}/${filename.replace(/[/\\?%*:|"<>\s]/g, '_')}.${extension}`;
     }
 }
 
