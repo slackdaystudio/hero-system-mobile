@@ -1,4 +1,4 @@
-package com.herogmtools;
+package ca.slackdaystudio.herosystemmobile;
 
 import android.os.Bundle;
 import org.devio.rn.splashscreen.SplashScreen;
@@ -20,7 +20,7 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-        return "herogmtools";
+        return "Hero System Mobile";
     }
 
     /**

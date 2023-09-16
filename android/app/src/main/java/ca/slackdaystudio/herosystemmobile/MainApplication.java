@@ -1,4 +1,4 @@
-package com.herogmtools;
+package ca.slackdaystudio.herosystemmobile;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
