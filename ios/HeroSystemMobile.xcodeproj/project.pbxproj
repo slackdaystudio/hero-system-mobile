@@ -786,10 +786,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ca.slackdaystudio.herosystemmobile;
+				PRODUCT_BUNDLE_IDENTIFIER = org.diceless.herogmtools;
 				PRODUCT_NAME = HeroSystemMobile;
 				PROVISIONING_PROFILE_SPECIFIER = "HERO System Mobile";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "HERO System Mobile";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Hero System Mobile - SDS";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -810,6 +810,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 47;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GM2P6R5MBL;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = HeroSystemMobile/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Hero System Mobile";
@@ -824,9 +825,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ca.slackdaystudio.herosystemmobile;
+				PRODUCT_BUNDLE_IDENTIFIER = org.diceless.herogmtools;
 				PRODUCT_NAME = HeroSystemMobile;
 				PROVISIONING_PROFILE_SPECIFIER = "HERO System Mobile";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Hero System Mobile - SDS";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_WORKSPACE = NO;
