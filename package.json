@@ -1,6 +1,6 @@
 {
   "name": "herosystemmobile",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "scripts": {
     "start": "react-native start",
@@ -94,5 +94,10 @@
       "eslint",
       "prettier"
     ]
+  },
+  "overrides": {
+    "native-base": {
+      "@codler/react-native-keyboard-aware-scroll-view": "2.0.1"
+    }
   }
 }
