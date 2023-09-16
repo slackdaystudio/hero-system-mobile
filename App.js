@@ -44,6 +44,15 @@ import currentVersion from './public/version.json';
 
 export const sounds = {};
 
+const MyTheme = {
+    dark: true,
+    colors: {
+        primary: '#1b1d1f',
+        background: '#1b1d1f',
+        card: '#1b1d1f',
+    },
+};
+
 const Drawer = createDrawerNavigator();
 
 const HIDDEN_SCREENS = ['Result'];
@@ -148,7 +157,7 @@ export const App = () => {
             <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
                 <Root>
                     <GestureHandlerRootView style={{flex: 1}}>
-                        <NavigationContainer>
+                        <NavigationContainer theme={MyTheme}>
                             <Drawer.Navigator
                                 screenOptions={{
                                     headerShown: false,
@@ -156,6 +165,9 @@ export const App = () => {
                                     drawerContentOptions: drawerContentOptions,
                                     drawerStyle: localStyles.drawer,
                                     drawerLabelStyle: {color: '#F3EDE9'},
+                                    contentStyle: {
+                                        backgroundColor: '#000000',
+                                    },
                                 }}
                                 initialRouteName="Home"
                                 backBehavior="history"

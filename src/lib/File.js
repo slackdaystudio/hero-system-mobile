@@ -48,19 +48,30 @@ class File {
         try {
             const result = await DocumentPicker.pickSingle({
                 type: [DocumentPicker.types.allFiles, 'public.item'],
-                copyTo: 'documentDirectory',
+                copyTo: 'cachesDirectory',
             });
 
             if (result === null) {
                 return;
             }
 
-            if (!result.fileCopyUri.startsWith('file://')) {
-                result.fileCopyUri = `file://${Platform.OS === 'ios' ? result.fileCopyUri : decodeURIComponent(result.fileCopyUri)}`;
-            }
+            result.fileCopyUri = decodeURIComponent(result.fileCopyUri);
 
             if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
-                character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_HD);
+                const rawXml = await this._getRawXm(result.fileCopyUri);
+                const parsedXml = await this._loadHdcCharacter(rawXml);
+
+                if (parsedXml.hasOwnProperty('image')) {
+                    parsedXml.portrait = this._getDataUri(parsedXml);
+
+                    delete parsedXml.image;
+                }
+
+                character = heroDesignerCharacter.getCharacter(parsedXml);
+
+                await this._saveCharacter(character, result.name);
+
+                return character;
             } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
                 character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_CHARACTER);
             } else {
@@ -160,6 +171,10 @@ class File {
         let canonicalFromName = null;
 
         for (const character of characters) {
+            if (!character.name.endsWith('hsmc')) {
+                continue;
+            }
+
             canonicalFromName = `${path}/${character.name}`;
             canonicalToName = `${path}/tmp`;
 
@@ -185,16 +200,8 @@ class File {
         try {
             startLoad();
 
-            const absoluteFilePath = uri;
-
-            if (type === EXT_HD) {
-                let rawXml = await this._getRawXm(absoluteFilePath);
-
-                character = await this._loadHdcCharacter(rawXml);
-
-                this._savePortrait(character);
-            } else if (type === EXT_CHARACTER) {
-                character = this._importCharacter(name, absoluteFilePath);
+            if (type === EXT_CHARACTER) {
+                character = this._importCharacter(name, uri);
             }
         } catch (error) {
             console.error('Read Error: ' + error.message);
@@ -212,7 +219,7 @@ class File {
     }
 
     async _loadHdcCharacter(rawXml) {
-        let parser = xml2js.Parser({
+        let parser = new xml2js.Parser({
             explicitArray: false,
             mergeAttrs: true,
             emptyTag: null,
@@ -238,35 +245,16 @@ class File {
                 },
             ],
         });
-        let character = null;
 
-        try {
-            character = await new Promise((resolve, reject) =>
-                parser.parseString(rawXml, (error, result) => {
-                    if (error) {
-                        console.error(error);
-
-                        reject(error);
-                    }
-
-                    resolve(result);
-                }),
-            );
-
-            if (character.hasOwnProperty('image')) {
-                this._savePortrait(character);
-
-                delete character.image;
-            }
-
-            character = heroDesignerCharacter.getCharacter(character);
-
-            common.toast('Character successfully loaded');
-        } catch (error) {
-            console.error(error.message);
-        }
-
-        return character;
+        return new Promise((resolve, reject) => {
+            parser.parseString(rawXml, (error, character) => {
+                if (error) {
+                    return reject(error);
+                } else {
+                    return resolve(character);
+                }
+            });
+        });
     }
 
     async _importCharacter(name, filepath) {
@@ -330,12 +318,16 @@ class File {
 
         let zipPath = await this._getFileName(filename, DEFAULT_CHARACTER_DIR, EXT_CHARACTER);
 
+        character.filename = zipPath.split('/').slice(-1)[0];
+
         await RNFS.writeFile(characterPath, JSON.stringify(character));
         await zip([characterPath], zipPath);
         await RNFS.unlink(characterPath);
+
+        return characterPath;
     }
 
-    _savePortrait(character) {
+    _getDataUri(character) {
         if (!character.hasOwnProperty('image')) {
             return;
         }
@@ -343,9 +335,7 @@ class File {
         let extensionParts = character.image.fileName.split('.');
         let extension = extensionParts[extensionParts.length - 1];
 
-        character.portrait = `data:image/${extension};base64,${character.image._}`;
-
-        delete character.image;
+        return `data:image/${extension};base64,${{...character.image}._.replaceAll(/\n/g, '')}`;
     }
 
     async _initCharacterState(character, filename) {
@@ -411,7 +401,7 @@ class File {
             filename = filename.slice(0, -4);
         }
 
-        return `${path}/${filename.replace(/[/\\?%*:|"<>]/g, '_')}.${extension}`;
+        return `${path}/${filename.replaceAll(/[/\\?%*:|"<>\s]/g, '_')}.${extension}`;
     }
 }
 

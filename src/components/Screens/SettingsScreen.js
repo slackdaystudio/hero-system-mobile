@@ -9,10 +9,11 @@ import Heading from '../Heading/Heading';
 import {common} from '../../lib/Common';
 import styles from '../../Styles';
 import {resetForm} from '../../reducers/forms';
-import {clearCharacterData} from '../../reducers/character';
+import {clearAllCharacters} from '../../reducers/character';
 import {clearRandomHero} from '../../reducers/randomHero';
 import {clearApplicationSettings, toggleSetting} from '../../reducers/settings';
 import {clearStatistics} from '../../reducers/statistics';
+import {selectSettingsData} from '../../reducers/selectors';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -31,7 +32,7 @@ import {clearStatistics} from '../../reducers/statistics';
 export const SettingsScreen = ({navigation}) => {
     const dispatch = useDispatch();
 
-    const {settings, version} = useSelector((state) => state);
+    const {settings, version} = useSelector((state) => selectSettingsData(state));
 
     const clearFormData = (showToast = true) => {
         dispatch(resetForm({formName: 'skill'}));
@@ -47,7 +48,7 @@ export const SettingsScreen = ({navigation}) => {
     };
 
     const _clearCharacterData = (showToast = true) => {
-        dispatch(clearCharacterData());
+        dispatch(clearAllCharacters());
 
         if (showToast) {
             common.toast('Loaded characters have been cleared');

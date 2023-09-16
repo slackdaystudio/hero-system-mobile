@@ -2,8 +2,8 @@ import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {Dimensions, Image} from 'react-native';
-import {View, Text} from 'native-base';
+import {Dimensions, Image, useWindowDimensions} from 'react-native';
+import {View, Text, Spinner} from 'native-base';
 import {TabView} from 'react-native-tab-view';
 import {Tab, RouteBuilder} from '../Tab/Tab';
 import General from '../HeroDesignerCharacter/General';
@@ -164,36 +164,24 @@ const LazyPlaceholder = ({route}) => (
 export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
     const dispatch = useDispatch();
 
+    const {width} = useWindowDimensions();
+
     const {character, characters, forms} = useSelector((state) => selectCharacterData(state));
 
     const [index, setIndex] = useState(0);
 
     const routes = useCallback(() => buildRoutes(character), [character]);
 
-    const [width, setWidth] = useState(300);
+    const [portraitWidth, setPortraitWidth] = useState(width);
 
-    const [height, setHeight] = useState(400);
-
-    useFocusEffect(
-        useCallback(() => {
-            const unsubFocus = navigation.addListener('focus', setPortraitDimensions);
-            const unsubChange = Dimensions.addEventListener('change', setPortraitDimensions);
-
-            return () => {
-                unsubFocus();
-                unsubChange?.remove();
-            };
-        }, [navigation, setPortraitDimensions]),
-    );
+    const [portraitHeight, setPortraitHeight] = useState(width * 1.2);
 
     const setPortraitDimensions = useCallback(() => {
-        if (common.isEmptyObject(character) || common.isEmptyObject(character.portrait)) {
+        if (common.isEmptyObject(character) || common.isEmptyObject(character.portrait || null)) {
             return;
         }
 
         Image.getSize(character.portrait, (imageWidth, imageHeight) => {
-            // eslint-disable-next-line no-shadow
-            const {width} = Dimensions.get('window');
             const paddedWidth = width - 40;
 
             if (imageWidth - paddedWidth > 0) {
@@ -203,10 +191,22 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
                 imageHeight = imageHeight * percentageDecrease;
             }
 
-            setWidth(imageWidth);
-            setHeight(imageHeight);
+            setPortraitWidth(imageWidth);
+            setPortraitHeight(imageHeight);
         });
-    }, [character]);
+    }, [character, width]);
+
+    useFocusEffect(
+        useCallback(() => {
+            setPortraitDimensions();
+
+            const unsubChange = Dimensions.addEventListener('change', setPortraitDimensions);
+
+            return () => {
+                unsubChange.remove();
+            };
+        }, [setPortraitDimensions]),
+    );
 
     const renderTab = (title, listKey, subListKey) => {
         if (character[listKey].length === 0) {
@@ -219,7 +219,7 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
     const renderScene = ({route}) => {
         switch (route.key) {
             case 'general':
-                return <GeneralRoute character={character} width={width} height={height} />;
+                return <GeneralRoute character={character} width={portraitWidth} height={portraitHeight} />;
             case 'combat':
                 return <CombatRoute navigation={navigation} character={character} characters={characters} forms={forms} />;
             case 'characteristics':
@@ -244,6 +244,15 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
                 return null;
         }
     };
+
+    if (common.isEmptyObject(character)) {
+        return (
+            <>
+                <Header hasTabs={false} navigation={navigation} />
+                <Spinner color="#F3EDE9" />
+            </>
+        );
+    }
 
     return (
         <>

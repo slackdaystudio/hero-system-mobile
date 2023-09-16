@@ -47,12 +47,16 @@ export const CharactersScreen = ({navigation, route}) => {
         return slots;
     };
 
-    const refreshCharacters = useCallback(() => {
+    const refreshCharacters = useCallback((onComplete) => {
         setCharactersLoading(true);
 
         file.listCharacters()
             .then((chars) => {
                 setLoadedCharacters(chars);
+
+                if (typeof onComplete === 'function') {
+                    onComplete();
+                }
             })
             .catch((error) => {
                 console.error(error.message);
@@ -124,16 +128,16 @@ export const CharactersScreen = ({navigation, route}) => {
     };
 
     const postImport = (newCharacter) => {
-        refreshCharacters();
-
-        if (Object.keys(characters).length >= 1) {
-            for (let char of Object.values(loadedCharacters)) {
-                if (char !== null && char.filename === newCharacter.filename) {
-                    dispatch(updateLoadedCharacters({newCharacter, character, characters}));
-                    break;
+        refreshCharacters(() => {
+            if (Object.keys(characters).length >= 1) {
+                for (let char of Object.values(loadedCharacters)) {
+                    if (char !== null && char.filename === newCharacter.filename) {
+                        dispatch(updateLoadedCharacters({newCharacter, character, characters}));
+                        break;
+                    }
                 }
             }
-        }
+        });
     };
 
     const onViewCharacterPress = (characterFilename) => {
@@ -155,18 +159,20 @@ export const CharactersScreen = ({navigation, route}) => {
     };
 
     const loadCharacter = (characterFilename) => {
-        file.loadCharacter(characterFilename, startLoad, endLoad).then((char) => {
-            // Legacy: done on character load now, do not touch
-            if (!char.hasOwnProperty('filename')) {
-                char.filename = characterFilename;
-                char.showSecondary = true;
-                char.combatDetails = combatDetails.init(char);
-            }
+        file.loadCharacter(characterFilename, startLoad, endLoad)
+            .then((char) => {
+                // Legacy: done on character load now, do not touch
+                if (!char.hasOwnProperty('filename')) {
+                    char.filename = characterFilename;
+                    char.showSecondary = true;
+                    char.combatDetails = combatDetails.init(char);
+                }
 
-            dispatch(setCharacter({character: char, slot: value.toString()}));
+                dispatch(setCharacter({character: char, slot: value.toString()}));
 
-            goToCharacterScreen();
-        });
+                goToCharacterScreen();
+            })
+            .catch((error) => console.log(error));
     };
 
     const goToCharacterScreen = () => {

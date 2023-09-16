@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {persistence, MAX_CHARACTER_SLOTS} from '../lib/Persistence';
+import {persistence} from '../lib/Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -21,6 +21,10 @@ export const setCharacter = createAsyncThunk('character/setCharacter', async ({c
 
 export const clearCharacter = createAsyncThunk('character/clearCharacter', async ({filename, character, characters, saveCharacter}) => {
     return await persistence.clearCharacter(filename, character, characters, saveCharacter);
+});
+
+export const clearAllCharacters = createAsyncThunk('character/clearAllCharacters', async () => {
+    return await persistence.clearCharacterData();
 });
 
 export const updateLoadedCharacters = createAsyncThunk('character/updateLoadedCharacters', async ({newCharacter, character, characters}) => {
@@ -61,14 +65,6 @@ const characterSlice = createSlice({
         },
         setShowSecondary: (state, action) => {
             state.showSecondary = action.payload.showSecondary;
-        },
-        clearCharacterData: (state, _action) => {
-            state.character = null;
-            state.characters = {};
-
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                state.characters[i.toString()] = null;
-            }
         },
         selectCharacter: (state, action) => {
             for (const [k, v] of Object.entries(state.characters)) {
@@ -126,6 +122,10 @@ const characterSlice = createSlice({
                 state.character = {...action.payload.character};
                 state.characters = {...action.payload.characters};
             })
+            .addCase(clearAllCharacters.fulfilled, (state, _action) => {
+                state.character = null;
+                state.characters = {};
+            })
             .addCase(updateLoadedCharacters.fulfilled, (state, action) => {
                 state.character = {...action.payload.character};
                 state.characters = {...action.payload.characters};
@@ -148,7 +148,6 @@ const characterSlice = createSlice({
     },
 });
 
-export const {initializeCharacter, setShowSecondary, clearCharacterData, selectCharacter, setCombatDetails, setSparseCombatDetails, usePhase, updateNotes} =
-    characterSlice.actions;
+export const {initializeCharacter, setShowSecondary, selectCharacter, setCombatDetails, setSparseCombatDetails, usePhase, updateNotes} = characterSlice.actions;
 
 export default characterSlice.reducer;

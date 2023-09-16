@@ -12,6 +12,13 @@ const selectCharacter = (state) => ({
     forms: state.forms,
 });
 
+const selectSettings = (state) => ({
+    settings: state.settings,
+    version: state.version,
+});
+
 export const selectResultData = createSelector([selectResult], (data) => data);
 
 export const selectCharacterData = createSelector([selectCharacter], (data) => data);
+
+export const selectSettingsData = createSelector([selectSettings], (data) => data);
