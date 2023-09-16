@@ -1,4 +1,4 @@
-package ca.slackdaystudio.herosystemmobile;
+package com.herogmtools;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -16,4 +16,4 @@ import {App} from './App';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-AppRegistry.registerComponent('Hero System Mobile', () => App);
+AppRegistry.registerComponent('herogmtools', () => App);

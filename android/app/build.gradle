@@ -93,9 +93,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "ca.slackdaystudio.herosystemmobile"
+    namespace "com.herogmtools"
     defaultConfig {
-        applicationId "ca.slackdaystudio.herosystemmobile"
+        applicationId "com.herogmtools"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 47
