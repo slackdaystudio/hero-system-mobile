@@ -125,8 +125,6 @@ export const App = () => {
                 case 'background':
                 case 'inactive':
                     if (!common.isEmptyObject(store.getState().character.character)) {
-                        console.log('Found character');
-                        console.log(store.getState().character.character);
                         store.dispatch(
                             saveCachedCharacter({character: store.getState().character.character, characters: store.getState().character.characters}),
                         );
