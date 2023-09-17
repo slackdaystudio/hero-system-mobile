@@ -64,7 +64,7 @@ const characterSlice = createSlice({
             }
         },
         setShowSecondary: (state, action) => {
-            state.showSecondary = action.payload.showSecondary;
+            state.character.showSecondary = action.payload.showSecondary;
         },
         selectCharacter: (state, action) => {
             for (const [k, v] of Object.entries(state.characters)) {

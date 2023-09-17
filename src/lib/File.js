@@ -68,10 +68,6 @@ class File {
                 }
 
                 character = heroDesignerCharacter.getCharacter(parsedXml);
-
-                await this._saveCharacter(character, result.name);
-
-                return character;
             } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
                 character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_CHARACTER);
             } else {

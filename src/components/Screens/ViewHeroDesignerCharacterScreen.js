@@ -115,40 +115,40 @@ const CombatRoute = ({navigation, character, characters, forms}) => {
     );
 };
 
-const CharacteristicsRoute = ({navigation, character}) => {
+const CharacteristicsRoute = ({navigation, character, toggleSecondary, update}) => {
     return RouteBuilder(
         'Characteristics',
-        <Characteristics navigation={navigation} character={character} setShowSecondary={setShowSecondary} updateForm={updateForm} />,
+        <Characteristics navigation={navigation} character={character} setShowSecondary={toggleSecondary} updateForm={update} />,
         common.isEmptyObject(character),
     );
 };
 
 const SkillsRoute = ({character, render}) => {
-    return RouteBuilder('Skills', render('Skills', 'skills', 'skills'), common.isEmptyObject(character));
+    return RouteBuilder('Skills', render(), common.isEmptyObject(character));
 };
 
 const PerksRoute = ({character, render}) => {
-    return RouteBuilder('Perks', render('Perks', 'perks', 'perks'), common.isEmptyObject(character));
+    return RouteBuilder('Perks', render(), common.isEmptyObject(character));
 };
 
 const TalentsRoute = ({character, render}) => {
-    return RouteBuilder('Talents', render('Talents', 'talents', 'talents'), common.isEmptyObject(character));
+    return RouteBuilder('Talents', render(), common.isEmptyObject(character));
 };
 
 const MartialArtsRoute = ({character, render}) => {
-    return RouteBuilder('Martial Arts', render('Martial Arts', 'martialArts', 'maneuver'), common.isEmptyObject(character));
+    return RouteBuilder('Martial Arts', render(), common.isEmptyObject(character));
 };
 
 const PowersRoute = ({character, render}) => {
-    return RouteBuilder('Powers', render('Powers', 'powers', 'talents'), common.isEmptyObject(character));
+    return RouteBuilder('Powers', render(), common.isEmptyObject(character));
 };
 
 const EquipmentRoute = ({character, render}) => {
-    return RouteBuilder('Equipment', render('Equipment', 'equipment', 'powers'), common.isEmptyObject(character));
+    return RouteBuilder('Equipment', render(), common.isEmptyObject(character));
 };
 
 const ComplicationsRoute = ({character, render}) => {
-    return RouteBuilder('Complications', render('Complications', 'disadvantages', 'disadvantages'), common.isEmptyObject(character));
+    return RouteBuilder('Complications', render(), common.isEmptyObject(character));
 };
 
 const NotesRoute = ({character}) => {
@@ -223,21 +223,28 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
             case 'combat':
                 return <CombatRoute navigation={navigation} character={character} characters={characters} forms={forms} />;
             case 'characteristics':
-                return <CharacteristicsRoute navigation={navigation} character={character} />;
+                return (
+                    <CharacteristicsRoute
+                        navigation={navigation}
+                        character={character}
+                        toggleSecondary={(val) => dispatch(setShowSecondary({showSecondary: val}))}
+                        update={(type, form) => dispatch(updateForm({type, json: form}))}
+                    />
+                );
             case 'skills':
-                return <SkillsRoute character={character} render={renderTab} />;
+                return <SkillsRoute character={character} render={() => renderTab('Skills', 'skills', 'skills')} />;
             case 'perks':
-                return <PerksRoute character={character} render={renderTab} />;
+                return <PerksRoute character={character} render={() => renderTab('Perks', 'perks', 'perks')} />;
             case 'talents':
-                return <TalentsRoute character={character} render={renderTab} />;
+                return <TalentsRoute character={character} render={() => renderTab('Talents', 'talents', 'talents')} />;
             case 'martialArts':
-                return <MartialArtsRoute character={character} render={renderTab} />;
+                return <MartialArtsRoute character={character} render={() => renderTab('Martial Arts', 'martialArts', 'maneuver')} />;
             case 'powers':
-                return <PowersRoute character={character} render={renderTab} />;
+                return <PowersRoute character={character} render={() => renderTab('Powers', 'powers', 'powers')} />;
             case 'equipment':
-                return <EquipmentRoute character={character} render={renderTab} />;
+                return <EquipmentRoute character={character} render={() => renderTab('Equipment', 'equipment', 'powers')} />;
             case 'complications':
-                return <ComplicationsRoute character={character} render={renderTab} />;
+                return <ComplicationsRoute character={character} render={() => renderTab('Complications', 'disadvantages', 'disadvantages')} />;
             case 'notes':
                 return <NotesRoute character={character} />;
             default:

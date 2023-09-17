@@ -172,7 +172,7 @@ export const CharactersScreen = ({navigation, route}) => {
 
                 goToCharacterScreen();
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.error(error));
     };
 
     const goToCharacterScreen = () => {
