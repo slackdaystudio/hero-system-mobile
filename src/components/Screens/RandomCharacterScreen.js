@@ -44,8 +44,8 @@ const GeneralRoute = ({character, dispatch, reRoll}) => {
                             <Item>
                                 <Input
                                     style={{borderColor: '#D0D1D3', color: '#D0D1D3'}}
-                                    onChangeText={(text) => dispatch(setRandomHeroName({name: text}))}
-                                    value={character.name}
+                                    onEndEditing={(event) => dispatch(setRandomHeroName({name: event.nativeEvent.text}))}
+                                    defaultValue={character.name}
                                 />
                             </Item>
                         </Form>
