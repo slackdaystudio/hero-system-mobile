@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Text, View} from 'react-native';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 import {Icon} from 'native-base';
-import {verticalScale} from 'react-native-size-matters';
+import {scale, verticalScale} from 'react-native-size-matters';
 import {PRIMARY_COLOR} from '../../Styles';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
@@ -23,13 +23,18 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
     switch (textPos) {
         case TEXT_LEFT:
             return (
-                <TouchableHighlight onPress={onPress} onLongPress={onLongPress} underlayColor={PRIMARY_COLOR} style={{borderRadius: 10}}>
-                    <View flex={1} flexDirection="row" alignContent="center" alignItems="center" textAlign="center">
+                <TouchableHighlight
+                    onPress={onPress}
+                    onLongPress={onLongPress}
+                    underlayColor={PRIMARY_COLOR}
+                    style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
+                >
+                    <View flex={1} flexDirection="row" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">
                         <Text style={[textStyle, {textAlign: 'center'}]}>{label}</Text>
                         <Icon
                             solid
                             size={verticalScale(64)}
-                            style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor}}
+                            style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor, paddingBottom: verticalScale(5)}}
                             type="FontAwesome5"
                             name={icon}
                         />
@@ -38,12 +43,17 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
             );
         case TEXT_RIGHT:
             return (
-                <TouchableHighlight onPress={onPress} onLongPress={onLongPress} underlayColor={PRIMARY_COLOR} style={{borderRadius: 10}}>
-                    <View flex={1} flexDirection="row" alignContent="center" alignItems="center" textAlign="center">
+                <TouchableHighlight
+                    onPress={onPress}
+                    onLongPress={onLongPress}
+                    underlayColor={PRIMARY_COLOR}
+                    style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
+                >
+                    <View flex={1} flexDirection="row" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">
                         <Icon
                             solid
                             size={verticalScale(64)}
-                            style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor}}
+                            style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor, paddingBottom: verticalScale(5)}}
                             type="FontAwesome5"
                             name={icon}
                         />
@@ -53,13 +63,18 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
             );
         case TEXT_TOP:
             return (
-                <TouchableHighlight onPress={onPress} onLongPress={onLongPress} underlayColor={PRIMARY_COLOR} style={{borderRadius: 10}}>
-                    <View flex={1} flexDirection="column" alignContent="center" alignItems="center" textAlign="center">
+                <TouchableHighlight
+                    onPress={onPress}
+                    onLongPress={onLongPress}
+                    underlayColor={PRIMARY_COLOR}
+                    style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
+                >
+                    <View flex={1} flexDirection="column" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">
                         <Text style={[textStyle, {textAlign: 'center'}]}>{label}</Text>
                         <Icon
                             solid
                             size={verticalScale(64)}
-                            style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor}}
+                            style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor, paddingBottom: verticalScale(5)}}
                             type="FontAwesome5"
                             name={icon}
                         />
@@ -68,18 +83,25 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
             );
         default:
             return (
-                <TouchableHighlight onPress={onPress} onLongPress={onLongPress} underlayColor={PRIMARY_COLOR} style={{borderRadius: 10}}>
-                    <View flex={1} flexDirection="column" alignContent="center" alignItems="center" textAlign="center">
-                        <Icon
-                            solid
-                            size={verticalScale(64)}
-                            style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor}}
-                            type="FontAwesome5"
-                            name={icon}
-                        />
-                        <Text style={[textStyle, {textAlign: 'center'}]}>{label}</Text>
-                    </View>
-                </TouchableHighlight>
+                <View alignItems="center">
+                    <TouchableHighlight
+                        onPress={onPress}
+                        onLongPress={onLongPress}
+                        underlayColor={PRIMARY_COLOR}
+                        style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
+                    >
+                        <View flex={1} flexDirection="column" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">
+                            <Icon
+                                solid
+                                size={verticalScale(64)}
+                                style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor, paddingBottom: verticalScale(5)}}
+                                type="FontAwesome5"
+                                name={icon}
+                            />
+                            <Text style={[textStyle, {textAlign: 'center'}]}>{label}</Text>
+                        </View>
+                    </TouchableHighlight>
+                </View>
             );
     }
 };

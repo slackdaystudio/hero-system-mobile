@@ -34,7 +34,7 @@ export const HomeScreen = ({navigation}) => {
     const renderCharacterButtons = () => {
         if (common.isEmptyObject(character)) {
             return (
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(20)}}>
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
                     <IconButton
                         label="Characters"
                         textPos={TEXT_BOTTOM}
@@ -48,7 +48,7 @@ export const HomeScreen = ({navigation}) => {
         }
 
         return (
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(20)}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
                 <View flex={1}>
                     <IconButton
                         label="View"
@@ -82,7 +82,7 @@ export const HomeScreen = ({navigation}) => {
                     <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
                         {renderCharacterButtons()}
                         <Heading text="Dice Rollers" />
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(30)}}>
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
                             <View flex={1}>
                                 <IconButton
                                     label="3d6"
@@ -104,7 +104,7 @@ export const HomeScreen = ({navigation}) => {
                                 />
                             </View>
                         </View>
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(50)}}>
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
                             <View flex={1}>
                                 <IconButton
                                     label="Damage"
@@ -119,7 +119,7 @@ export const HomeScreen = ({navigation}) => {
                                 <IconButton
                                     label="Effect"
                                     textPos={TEXT_BOTTOM}
-                                    icon="virus"
+                                    icon="shield-virus"
                                     iconColor="#e8e8e8"
                                     textStyle={{color: '#e8e8e8'}}
                                     onPress={() => navigation.navigate('Effect')}
@@ -127,7 +127,7 @@ export const HomeScreen = ({navigation}) => {
                             </View>
                         </View>
                         <Heading text="Game Aids" />
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(20)}}>
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
                             <View flex={1}>
                                 <IconButton
                                     label="H.E.R.O."
