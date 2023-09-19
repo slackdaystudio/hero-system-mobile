@@ -2,7 +2,7 @@ import {file} from './File';
 
 class Character {
     async import(startLoad, endLoad) {
-        return file.importCharacter(startLoad, endLoad);
+        return await file.importCharacter(startLoad, endLoad);
     }
 
     isHeroDesignerCharacter(character) {

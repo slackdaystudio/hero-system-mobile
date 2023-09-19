@@ -94,22 +94,21 @@ class File {
     async listCharacters() {
         let path = null;
         let characters = null;
+        let charData = null;
 
         try {
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
             characters = await RNFS.readDir(path);
 
             // Users may have old XML exported characters in thier dir, filter them out but leave them in place
-            characters = await this._filterCharacters(characters);
+            charData = await this._filterCharacters(characters);
         } catch (error) {
             console.error(error.message);
         }
 
-        return characters
-            .sort((a, b) => a.name > b.name)
-            .map((c) => {
-                return c.name;
-            });
+        charData.sort((a, b) => a.name > b.name);
+
+        return charData;
     }
 
     async loadCharacter(characterName, startLoad, endLoad) {
@@ -178,8 +177,13 @@ class File {
 
             char = await RNFS.readFile(`${canonicalToName}/${character.name.slice(0, -5)}.${EXT_JSON}`);
 
-            if (libCharacter.isHeroDesignerCharacter(JSON.parse(char))) {
-                filtered.push(character);
+            char = JSON.parse(char);
+
+            if (libCharacter.isHeroDesignerCharacter(char)) {
+                filtered.push({
+                    name: char.characterInfo.characterName,
+                    fileName: character.name,
+                });
             }
         }
 

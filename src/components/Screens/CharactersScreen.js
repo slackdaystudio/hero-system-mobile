@@ -179,10 +179,10 @@ export const CharactersScreen = ({navigation, route}) => {
         navigation.navigate('ViewHeroDesignerCharacter', {from: 'Characters'});
     };
 
-    const openDeleteDialog = (filename) => {
+    const openDeleteDialog = (name, filename) => {
         const newState = {...dialogProps};
 
-        newState.dialogTitle = `Delete ${filename.slice(0, -5)}?`;
+        newState.dialogTitle = `Delete ${name}?`;
         newState.dialogMessage =
             'Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded';
         newState.dialogOnOkFn = () => onDeleteDialogOk(filename);
@@ -191,39 +191,42 @@ export const CharactersScreen = ({navigation, route}) => {
         setDialogProps(newState);
     };
 
-    const onDeleteDialogClose = () => {
+    const onDeleteDialogClose = (callback) => {
         setDialogProps({
             dialogTitle: '',
             dialogMessage: '',
             dialogOnOkFn: null,
             deleteDialogVisible: false,
         });
+
+        if (typeof callback === 'function') {
+            callback();
+        }
     };
 
     const onDeleteDialogOk = (filename) => {
-        file.deleteCharacter(filename).then(() => {
-            if (!common.isEmptyObject(character)) {
-                dispatch(
-                    clearCharacter({
-                        toBeDeleted: filename,
-                        character: character,
-                        characters: loadedCharacters,
-                        saveCharacter: false,
-                    }),
-                );
-
-                refreshCharacters();
-                onDeleteDialogClose();
-            }
-        });
+        file.deleteCharacter(filename)
+            .then(() => {
+                if (!common.isEmptyObject(character)) {
+                    dispatch(
+                        clearCharacter({
+                            toBeDeleted: filename,
+                            character: character,
+                            characters: loadedCharacters,
+                            saveCharacter: false,
+                        }),
+                    );
+                }
+            })
+            .finally(() => {
+                onDeleteDialogClose(refreshCharacters());
+            });
     };
 
     const renderCharacters = () => {
-        if (loadedCharacters === null || charactersLoading) {
+        if (common.isEmptyObject(loadedCharacters) || charactersLoading) {
             return <Spinner color="#D0D1D3" />;
         }
-
-        let name = null;
 
         return (
             <Fragment>
@@ -245,28 +248,26 @@ export const CharactersScreen = ({navigation, route}) => {
                     </View>
                 </View>
                 <List>
-                    {loadedCharacters.map((characterName) => {
-                        name = characterName.slice(0, -5);
-
+                    {loadedCharacters.map((char) => {
                         return (
-                            <ListItem icon key={name}>
+                            <ListItem icon key={char.fileName}>
                                 <Left>
                                     <Icon
                                         type="FontAwesome"
                                         name="trash"
                                         style={{fontSize: verticalScale(25), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
-                                        onPress={() => openDeleteDialog(characterName)}
+                                        onPress={() => openDeleteDialog(char.name, char.fileName)}
                                     />
                                 </Left>
                                 <Body>
-                                    <Text style={styles.grey}>{name}</Text>
+                                    <Text style={styles.grey}>{char.name}</Text>
                                 </Body>
                                 <Right>
                                     <Icon
                                         type="FontAwesome"
                                         name="chevron-right"
                                         style={{fontSize: verticalScale(20), color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
-                                        onPress={() => onViewCharacterPress(characterName)}
+                                        onPress={() => onViewCharacterPress(char.fileName)}
                                     />
                                 </Right>
                             </ListItem>
