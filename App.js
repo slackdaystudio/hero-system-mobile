@@ -95,6 +95,10 @@ export function setSound(name, soundClip) {
 
 export const store = configureStore({
     reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
 });
 
 export const App = () => {
