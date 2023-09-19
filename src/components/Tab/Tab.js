@@ -17,7 +17,6 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
 
     return (
         <ScrollView contentContainerStyle={{flexGrow: 1, backgroundColor: '#1b1d1f'}}>
-            <Heading text={headingText} />
             <View flex={1}>{tab}</View>
         </ScrollView>
     );
