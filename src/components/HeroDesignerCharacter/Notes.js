@@ -35,8 +35,8 @@ export default class Notes extends Component {
                         bordered
                         placeholder="Campaign notes, miscellaneous equipment, etc"
                         style={[styles.grey, {backgroundColor: '#121212', borderColor: '#303030', fontSize: verticalScale(14)}]}
-                        value={this.props.notes}
-                        onChangeText={(value) => this.props.updateNotes({notes: value})}
+                        defaultValue={this.props.notes}
+                        onEndEditing={(event) => this.props.updateNotes(event.nativeEvent.text)}
                     />
                 </View>
             </Fragment>
