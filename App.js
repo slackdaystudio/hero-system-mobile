@@ -6,8 +6,8 @@ import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@r
 import {configureStore} from '@reduxjs/toolkit';
 import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
-import {scale, ScaledSheet} from 'react-native-size-matters';
-import {Root} from 'native-base';
+import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {Icon, Root} from 'native-base';
 import {soundPlayer, DEFAULT_SOUND} from './src/lib/SoundPlayer';
 import rootReducer from './src/reducers';
 import {HomeScreen} from './src/components/Screens/HomeScreen';
@@ -67,7 +67,7 @@ const CustomDrawerContent = (props) => {
 
     // Filter out routes that are hidden either all the time or contextually
     newState.routes = newState.routes.filter((item, i) => {
-        if (store.getState().character.character === undefined && (item.name === 'ViewHeroDesignerCharacter' || item.name === 'Characters')) {
+        if (common.isEmptyObject(store.getState().character.character) && item.name === 'ViewHeroDesignerCharacter') {
             return false;
         }
 
@@ -100,6 +100,10 @@ export const store = configureStore({
             serializableCheck: false,
         }),
 });
+
+const drawerIcon = (name) => {
+    return <Icon solid type="FontAwesome5" name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: scale(-20)}} />;
+};
 
 export const App = () => {
     soundPlayer.initialize(DEFAULT_SOUND, false);
@@ -177,23 +181,64 @@ export const App = () => {
                                 backBehavior="history"
                                 drawerContent={CustomDrawerContent}
                             >
-                                {/* <Drawer.Screen name="Home" component={Home} /> */}
                                 <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={HomeScreen} />
                                 <Drawer.Screen
-                                    options={{drawerLabel: 'View Character'}}
+                                    options={{drawerLabel: 'View Character', drawerIcon: () => drawerIcon('user')}}
                                     name="ViewHeroDesignerCharacter"
                                     component={ViewHeroDesignerCharacterScreen}
                                 />
-                                <Drawer.Screen name="Characters" component={CharactersScreen} />
-                                <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" children={(props) => <SkillScreen {...props} />} />
-                                <Drawer.Screen name="Hit" component={HitScreen} />
-                                <Drawer.Screen name="Damage" component={DamageScreen} />
-                                <Drawer.Screen name="Effect" component={EffectScreen} />
-                                <Drawer.Screen name="Result" component={ResultScreen} />
-                                <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
-                                <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
-                                <Drawer.Screen name="Statistics" component={StatisticsScreen} />
-                                <Drawer.Screen name="Settings" component={SettingsScreen} />
+                                <Drawer.Screen
+                                    name="Characters"
+                                    options={{
+                                        drawerIcon: () => drawerIcon('users'),
+                                    }}
+                                    component={CharactersScreen}
+                                />
+                                <Drawer.Screen
+                                    options={{drawerLabel: '3D6', drawerIcon: () => drawerIcon('check-circle')}}
+                                    name="Skill"
+                                    children={(props) => <SkillScreen {...props} />}
+                                />
+                                <Drawer.Screen
+                                    name="Hit"
+                                    component={HitScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('bullseye'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    name="Damage"
+                                    component={DamageScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('medkit'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    name="Effect"
+                                    component={EffectScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('shield-virus'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    name="Result"
+                                    component={ResultScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('dice'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    options={{drawerLabel: 'H.E.R.O.', drawerIcon: () => drawerIcon('mask')}}
+                                    name="RandomCharacter"
+                                    component={RandomCharacterScreen}
+                                />
+                                <Drawer.Screen
+                                    options={{drawerLabel: 'Cruncher', drawerIcon: () => drawerIcon('square-root-alt')}}
+                                    name="CostCruncher"
+                                    component={CostCruncherScreen}
+                                />
+                                <Drawer.Screen name="Statistics" component={StatisticsScreen} options={{drawerIcon: () => drawerIcon('chart-pie')}} />
+                                <Drawer.Screen name="Settings" component={SettingsScreen} options={{drawerIcon: () => drawerIcon('cogs')}} />
                             </Drawer.Navigator>
                         </NavigationContainer>
                     </GestureHandlerRootView>
