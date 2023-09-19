@@ -42,7 +42,7 @@ export const Tab = ({navigationState}) => {
                 paddingHorizontal={scale(10)}
             >
                 <Pressable onPress={() => navigationState.setIndex(item.index)}>
-                    <Animated.Text style={{color}}>{item.item.title}</Animated.Text>
+                    <Animated.Text style={{color, fontSize: verticalScale(15)}}>{item.item.title}</Animated.Text>
                 </Pressable>
             </View>
         );
@@ -62,7 +62,7 @@ export const Tab = ({navigationState}) => {
     });
 
     return (
-        <View alignSelf="stretch" alignItems="center" maxHeight={verticalScale(40)} backgroundColor={'#1b1d1f'}>
+        <View alignSelf="stretch" alignItems="center" backgroundColor="#1b1d1f">
             <FlatList
                 backgroundColor={'#1b1d1f'}
                 horizontal
@@ -72,8 +72,13 @@ export const Tab = ({navigationState}) => {
                 data={data}
                 renderItem={(item, i) => _renderItem(item, i)}
                 keyExtractor={(item) => item.id}
-                style={{backgroundColor: '#1b1d1f'}}
-                contentContainerStyle={{alignSelf: 'center', justifyContent: 'space-around', backgroundColor: '#1b1d1f'}}
+                style={{fontSize: verticalScale(30), backgroundColor: '#1b1d1f'}}
+                contentContainerStyle={{
+                    alignSelf: 'center',
+                    justifyContent: 'space-around',
+                    backgroundColor: '#1b1d1f',
+                    height: verticalScale(25),
+                }}
             />
         </View>
     );
