@@ -1,6 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {View, SafeAreaView, KeyboardAvoidingView} from 'react-native';
+import {View, KeyboardAvoidingView} from 'react-native';
 import {Button, Text, Form, Item, Label, Input} from 'native-base';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
@@ -179,7 +179,7 @@ class StatusDialog extends Component {
                 </Item>
                 <SectionedMultiSelect
                     styles={{
-                        selectToggleText: [styles.grey, {marginLeft: scale(-7)}],
+                        selectToggleText: [styles.grey, {marginLeft: scale(-7), width: 50}],
                         container: {backgroundColor: '#1b1d1f', borderWidth: 1, borderColor: '#303030'},
                         searchBar: {backgroundColor: '#000000'},
                         searchTextInput: {color: '#ffffff'},
@@ -266,54 +266,57 @@ class StatusDialog extends Component {
 
     render() {
         return (
-            <Modal isVisible={this.props.visible} onBackButtonPress={() => this.props.onClose()} onBackdropPress={() => this.props.onClose()}>
-                <SafeAreaView style={styles.fill}>
-                    <KeyboardAvoidingView style={styles.fill} behavior="padding">
-                        <View style={styles.modal}>
-                            <Text style={styles.modalHeader}>Apply Status</Text>
-                            <View style={styles.modalContent}>
-                                <Form>
-                                    <Item inlineLabel style={{marginLeft: 0}}>
-                                        <Label style={styles.grey}>Name:</Label>
-                                        <Input
-                                            editable
-                                            style={styles.grey}
-                                            maxLength={32}
-                                            defaultValue={this.props.statusForm.label}
-                                            onEndEditing={(event) => this.updateFormValue('label', event.nativeEvent.text)}
-                                        />
-                                    </Item>
-                                    <Item inlineLabel style={{marginLeft: 0}}>
-                                        <Label style={styles.grey}>Status:</Label>
-                                        <DropDownPicker
-                                            containerStyle={{maxWidth: '80%'}}
-                                            theme="DARK"
-                                            listMode="MODAL"
-                                            open={this.state.open}
-                                            value={this.state.value}
-                                            items={this.state.items}
-                                            setOpen={(open) => this.setState({open})}
-                                            setValue={this.setValue}
-                                        />
-                                    </Item>
-                                    {this._renderSecondaryControls()}
-                                </Form>
-                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
-                                    <Button style={styles.button} onPress={() => this._onApply()}>
-                                        <Text uppercase={false} style={styles.buttonText}>
-                                            Apply
-                                        </Text>
-                                    </Button>
-                                    <Button style={styles.button} onPress={() => this.props.onClose()}>
-                                        <Text uppercase={false} style={styles.buttonText}>
-                                            Cancel
-                                        </Text>
-                                    </Button>
-                                </View>
+            <Modal
+                style={{paddingBottom: verticalScale(200)}}
+                isVisible={this.props.visible}
+                onBackButtonPress={() => this.props.onClose()}
+                onBackdropPress={() => this.props.onClose()}
+            >
+                <KeyboardAvoidingView behavior="padding">
+                    <View style={styles.modal}>
+                        <Text style={styles.modalHeader}>Apply Status</Text>
+                        <View style={styles.modalContent}>
+                            <Form>
+                                <Item inlineLabel style={{marginLeft: 0}}>
+                                    <Label style={styles.grey}>Name:</Label>
+                                    <Input
+                                        editable
+                                        style={styles.grey}
+                                        maxLength={32}
+                                        defaultValue={this.props.statusForm.label}
+                                        onEndEditing={(event) => this.updateFormValue('label', event.nativeEvent.text)}
+                                    />
+                                </Item>
+                                <Item inlineLabel style={{marginLeft: 0}}>
+                                    <Label style={styles.grey}>Status:</Label>
+                                    <DropDownPicker
+                                        containerStyle={{maxWidth: '75%'}}
+                                        theme="DARK"
+                                        listMode="MODAL"
+                                        open={this.state.open}
+                                        value={this.state.value}
+                                        items={this.state.items}
+                                        setOpen={(open) => this.setState({open})}
+                                        setValue={this.setValue}
+                                    />
+                                </Item>
+                                {this._renderSecondaryControls()}
+                            </Form>
+                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
+                                <Button style={styles.button} onPress={() => this._onApply()}>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Apply
+                                    </Text>
+                                </Button>
+                                <Button style={styles.button} onPress={() => this.props.onClose()}>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Cancel
+                                    </Text>
+                                </Button>
                             </View>
                         </View>
-                    </KeyboardAvoidingView>
-                </SafeAreaView>
+                    </View>
+                </KeyboardAvoidingView>
             </Modal>
         );
     }
