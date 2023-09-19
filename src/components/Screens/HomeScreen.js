@@ -2,10 +2,11 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
 import {View, ImageBackground} from 'react-native';
-import {Container, Content, Button, Text} from 'native-base';
+import {Container, Content} from 'native-base';
 import {verticalScale} from 'react-native-size-matters';
 import Header, {EXIT_APP} from '../Header/Header';
 import Heading from '../Heading/Heading';
+import {IconButton, TEXT_BOTTOM} from '../IconButton/IconButton';
 import {common} from '../../lib/Common';
 import styles from '../../Styles';
 
@@ -33,31 +34,40 @@ export const HomeScreen = ({navigation}) => {
     const renderCharacterButtons = () => {
         if (common.isEmptyObject(character)) {
             return (
-                <View style={styles.buttonContainer}>
-                    <Button style={styles.button} onPress={() => navigation.navigate('Characters')}>
-                        <Text uppercase={false} style={styles.buttonText}>
-                            Characters
-                        </Text>
-                    </Button>
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(20)}}>
+                    <IconButton
+                        label="Characters"
+                        textPos={TEXT_BOTTOM}
+                        icon="users"
+                        iconColor="#e8e8e8"
+                        textStyle={{color: '#e8e8e8'}}
+                        onPress={() => navigation.navigate('Characters')}
+                    />
                 </View>
             );
         }
 
         return (
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                <View style={styles.buttonContainer}>
-                    <Button style={styles.button} onPress={() => onViewPress()}>
-                        <Text uppercase={false} style={styles.buttonText}>
-                            View
-                        </Text>
-                    </Button>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(20)}}>
+                <View flex={1}>
+                    <IconButton
+                        label="View"
+                        textPos={TEXT_BOTTOM}
+                        icon="user"
+                        iconColor="#e8e8e8"
+                        textStyle={{color: '#e8e8e8'}}
+                        onPress={() => onViewPress()}
+                    />
                 </View>
-                <View style={styles.buttonContainer}>
-                    <Button style={styles.button} onPress={() => navigation.navigate('Characters')}>
-                        <Text uppercase={false} style={styles.buttonText}>
-                            Characters
-                        </Text>
-                    </Button>
+                <View flex={1}>
+                    <IconButton
+                        label="Characters"
+                        textPos={TEXT_BOTTOM}
+                        icon="users"
+                        iconColor="#e8e8e8"
+                        textStyle={{color: '#e8e8e8'}}
+                        onPress={() => navigation.navigate('Characters')}
+                    />
                 </View>
             </View>
         );
@@ -65,74 +75,84 @@ export const HomeScreen = ({navigation}) => {
 
     return (
         <Container style={styles.container}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{resizeMode: 'cover'}}>
-                <Header navigation={navigation} backScreen={EXIT_APP} />
-                <Content style={styles.content}>
-                    <Heading text="Character" />
-                    <Text style={[styles.grey, {textAlign: 'center'}]}>
-                        Import characters from Hero Designer and take them with you when you&apos;re on the go.
-                    </Text>
-                    {renderCharacterButtons()}
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Rolls" />
-                    <Text style={[styles.grey, {textAlign: 'center'}]}>Use these tools for rolling dice and doing common tasks within the Hero system.</Text>
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                        <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('Skill')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    3d6
-                                </Text>
-                            </Button>
+            <Header navigation={navigation} backScreen={EXIT_APP} />
+            <Content style={styles.content}>
+                <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{resizeMode: 'cover'}}>
+                    <Heading text="Library" />
+                    <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
+                        {renderCharacterButtons()}
+                        <Heading text="Dice Rollers" />
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(30)}}>
+                            <View flex={1}>
+                                <IconButton
+                                    label="3d6"
+                                    textPos={TEXT_BOTTOM}
+                                    icon="check-circle"
+                                    iconColor="#e8e8e8"
+                                    textStyle={{color: '#e8e8e8'}}
+                                    onPress={() => navigation.navigate('Skill')}
+                                />
+                            </View>
+                            <View flex={1}>
+                                <IconButton
+                                    label="Hit"
+                                    textPos={TEXT_BOTTOM}
+                                    icon="bullseye"
+                                    iconColor="#e8e8e8"
+                                    textStyle={{color: '#e8e8e8'}}
+                                    onPress={() => navigation.navigate('Hit')}
+                                />
+                            </View>
                         </View>
-                        <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('Hit')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Hit
-                                </Text>
-                            </Button>
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(50)}}>
+                            <View flex={1}>
+                                <IconButton
+                                    label="Damage"
+                                    textPos={TEXT_BOTTOM}
+                                    icon="medkit"
+                                    iconColor="#e8e8e8"
+                                    textStyle={{color: '#e8e8e8'}}
+                                    onPress={() => navigation.navigate('Damage')}
+                                />
+                            </View>
+                            <View flex={1}>
+                                <IconButton
+                                    label="Effect"
+                                    textPos={TEXT_BOTTOM}
+                                    icon="virus"
+                                    iconColor="#e8e8e8"
+                                    textStyle={{color: '#e8e8e8'}}
+                                    onPress={() => navigation.navigate('Effect')}
+                                />
+                            </View>
+                        </View>
+                        <Heading text="Game Aids" />
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: verticalScale(20)}}>
+                            <View flex={1}>
+                                <IconButton
+                                    label="H.E.R.O."
+                                    textPos={TEXT_BOTTOM}
+                                    icon="mask"
+                                    iconColor="#e8e8e8"
+                                    textStyle={{color: '#e8e8e8'}}
+                                    onPress={() => navigation.navigate('RandomCharacter')}
+                                />
+                            </View>
+                            <View flex={1}>
+                                <IconButton
+                                    label="Cruncher"
+                                    textPos={TEXT_BOTTOM}
+                                    icon="square-root-alt"
+                                    iconColor="#e8e8e8"
+                                    textStyle={{color: '#e8e8e8'}}
+                                    onPress={() => navigation.navigate('CostCruncher')}
+                                />
+                            </View>
                         </View>
                     </View>
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                        <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('Damage')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Damage
-                                </Text>
-                            </Button>
-                        </View>
-                        <View style={styles.buttonContainer}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('Effect')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Effect
-                                </Text>
-                            </Button>
-                        </View>
-                    </View>
                     <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Tools" />
-                    <Text style={[styles.grey, {textAlign: 'center'}]}>
-                        Generate a random 5e character using the Heroic Empowerment Resource Organizer (H.E.R.O.) tool or use the cruncher to calculate power
-                        costs.
-                    </Text>
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                        <View style={[styles.buttonContainer, {paddingBottom: verticalScale(20)}]}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('RandomCharacter')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    H.E.R.O.
-                                </Text>
-                            </Button>
-                        </View>
-                        <View style={[styles.buttonContainer, {paddingBottom: verticalScale(20)}]}>
-                            <Button style={styles.button} onPress={() => navigation.navigate('CostCruncher')}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Cruncher
-                                </Text>
-                            </Button>
-                        </View>
-                    </View>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                </Content>
-            </ImageBackground>
+                </ImageBackground>
+            </Content>
         </Container>
     );
 };
