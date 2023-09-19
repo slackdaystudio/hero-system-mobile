@@ -18,11 +18,7 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
     return (
         <ScrollView contentContainerStyle={{flexGrow: 1, backgroundColor: '#1b1d1f'}}>
             <Heading text={headingText} />
-            <View flex={1}>
-                {/* <Content scrollEnable={false} style={styles.content}> */}
-                {tab}
-                {/* </Content> */}
-            </View>
+            <View flex={1}>{tab}</View>
         </ScrollView>
     );
 };
@@ -30,7 +26,7 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
 export const Tab = ({navigationState}) => {
     const _renderItem = (item, _i) => {
         const color = navigationState.index === item.index ? '#F3EDE9' : 'rgba(193, 235, 255, 0.4)';
-        const borderBottomWidth = navigationState.index === item.index ? 3 : 1;
+        const borderBottomWidth = navigationState.index === item.index ? 5 : 1;
 
         return (
             <View
@@ -41,8 +37,10 @@ export const Tab = ({navigationState}) => {
                 cursor="pointer"
                 paddingHorizontal={scale(10)}
             >
-                <Pressable onPress={() => navigationState.setIndex(item.index)}>
-                    <Animated.Text style={{color, fontSize: verticalScale(15)}}>{item.item.title}</Animated.Text>
+                <Pressable onPress={() => navigationState.setIndex(item.index)} style={{minHeight: verticalScale(40), paddingTop: verticalScale(10)}}>
+                    <Animated.Text style={{color, fontSize: verticalScale(12), lineHeight: verticalScale(15 * 1.35)}}>
+                        {item.item.title.toUpperCase()}
+                    </Animated.Text>
                 </Pressable>
             </View>
         );
@@ -77,7 +75,6 @@ export const Tab = ({navigationState}) => {
                     alignSelf: 'center',
                     justifyContent: 'space-around',
                     backgroundColor: '#1b1d1f',
-                    height: verticalScale(25),
                 }}
             />
         </View>
