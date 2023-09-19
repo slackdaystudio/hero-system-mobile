@@ -87,7 +87,7 @@ class StatusDialog extends Component {
             }
         }
 
-        this.props.updateFormValue({formName: 'status', key, value});
+        this.props.updateFormValue('status', key, value);
     }
 
     _getItems() {

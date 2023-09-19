@@ -41,34 +41,6 @@ class CombatDetails {
         }
     }
 
-    applyStatus(character, status) {
-        const combatDetailsKey = character.showSecondary ? 'secondary' : 'primary';
-
-        if (character.combatDetails[combatDetailsKey].hasOwnProperty('statuses')) {
-            if (status.index === -1) {
-                character.combatDetails[combatDetailsKey].statuses.push(status);
-            } else {
-                character.combatDetails[combatDetailsKey].statuses[status.index] = status;
-            }
-        } else {
-            character.combatDetails[combatDetailsKey].statuses = [status];
-        }
-    }
-
-    clearAllStatuses(character) {
-        const combatDetailsKey = character.showSecondary ? 'secondary' : 'primary';
-
-        character.combatDetails[combatDetailsKey].statuses = [];
-    }
-
-    clearStatus(character, index) {
-        const combatDetailsKey = character.showSecondary ? 'secondary' : 'primary';
-
-        if (character.combatDetails[combatDetailsKey].statuses.length >= index) {
-            character.combatDetails[combatDetailsKey].statuses.splice(index, 1);
-        }
-    }
-
     _init(character) {
         let combatDetails = {
             stun: 0,

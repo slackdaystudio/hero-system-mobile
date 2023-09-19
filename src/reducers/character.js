@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {persistence} from '../lib/Persistence';
+import {MAX_CHARACTER_SLOTS} from '../lib/Character';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,18 +30,6 @@ export const clearAllCharacters = createAsyncThunk('character/clearAllCharacters
 
 export const updateLoadedCharacters = createAsyncThunk('character/updateLoadedCharacters', async ({newCharacter, character, characters}) => {
     return await persistence.updateLoadedCharacters(newCharacter, character, characters);
-});
-
-export const applyStatus = createAsyncThunk('character/applyStatus', async ({character, characters, status}) => {
-    return await persistence.applyStatus(character, characters, status);
-});
-
-export const clearStatus = createAsyncThunk('character/clearStatus', async ({character, characters, status}) => {
-    return await persistence.applyStatus(character, characters, status);
-});
-
-export const clearAllStatuses = createAsyncThunk('character/clearAllStatuses', async ({character, characters, index}) => {
-    return await persistence.clearStatus(character, characters, index);
 });
 
 export const saveCachedCharacter = createAsyncThunk('character/saveCachedCharacter', async ({character, characters}) => {
@@ -111,6 +100,60 @@ const characterSlice = createSlice({
         updateNotes: (state, action) => {
             state.character.notes = action.payload.notes;
         },
+        applyStatus: (state, action) => {
+            const {status} = action.payload;
+            const combatDetailsKey = state.character.showSecondary ? 'secondary' : 'primary';
+            const apply = (char) => {
+                if (char.combatDetails[combatDetailsKey].hasOwnProperty('statuses')) {
+                    if (status.index === -1) {
+                        char.combatDetails[combatDetailsKey].statuses.push(status);
+                    } else {
+                        char.combatDetails[combatDetailsKey].statuses[status.index] = status;
+                    }
+                } else {
+                    char.combatDetails[combatDetailsKey].statuses = [status];
+                }
+            };
+
+            apply(state.character);
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                if (state.characters[i.toString()] !== null && state.characters[i.toString()].filename === state.character.filename) {
+                    apply(state.characters[i.toString()], status);
+                    break;
+                }
+            }
+        },
+        clearStatus: (state, action) => {
+            const {index} = action.payload;
+            const combatDetailsKey = state.character.showSecondary ? 'secondary' : 'primary';
+            const clear = (char) => {
+                if (char.combatDetails[combatDetailsKey].statuses.length >= index) {
+                    char.combatDetails[combatDetailsKey].statuses.splice(index, 1);
+                }
+            };
+
+            clear(state.character);
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                if (state.characters[i.toString()] !== null && state.characters[i.toString()].filename === state.character.filename) {
+                    clear(state.characters[i.toString()]);
+                    break;
+                }
+            }
+        },
+        clearAllStatuses: (state, action) => {
+            const combatDetailsKey = state.character.showSecondary ? 'secondary' : 'primary';
+
+            state.character.combatDetails[combatDetailsKey].statuses = [];
+
+            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+                if (state.characters[i.toString()] !== null && state.characters[i.toString()].filename === state.character.filename) {
+                    state.combatDetails.clearAllStatuses(state.characters[i.toString()]);
+                    break;
+                }
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -130,24 +173,23 @@ const characterSlice = createSlice({
                 state.character = {...action.payload.character};
                 state.characters = {...action.payload.characters};
             })
-            .addCase(applyStatus.fulfilled, (state, action) => {
-                state.character = {...action.payload.character};
-                state.characters = {...action.payload.characters};
-            })
-            .addCase(clearStatus.fulfilled, (state, action) => {
-                state.character = {...action.payload.character};
-                state.characters = {...action.payload.characters};
-            })
-            .addCase(clearAllStatuses.fulfilled, (state, action) => {
-                state.character = {...action.payload.character};
-                state.characters = {...action.payload.characters};
-            })
             .addCase(saveCachedCharacter.fulfilled, (_state, _action) => {
                 console.log('Saved cached characters');
             });
     },
 });
 
-export const {initializeCharacter, setShowSecondary, selectCharacter, setCombatDetails, setSparseCombatDetails, usePhase, updateNotes} = characterSlice.actions;
+export const {
+    initializeCharacter,
+    setShowSecondary,
+    selectCharacter,
+    setCombatDetails,
+    setSparseCombatDetails,
+    usePhase,
+    updateNotes,
+    applyStatus,
+    clearStatus,
+    clearAllStatuses,
+} = characterSlice.actions;
 
 export default characterSlice.reducer;

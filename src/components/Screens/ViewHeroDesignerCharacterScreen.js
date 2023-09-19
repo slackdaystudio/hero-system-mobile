@@ -19,7 +19,7 @@ import {
     setShowSecondary,
     selectCharacter,
     setSparseCombatDetails,
-    usePhase,
+    usePhase as hsmUsePhase,
     updateNotes,
     clearCharacter,
     applyStatus,
@@ -93,7 +93,27 @@ const GeneralRoute = ({character, width, height}) => {
     );
 };
 
-const CombatRoute = ({navigation, character, characters, forms}) => {
+const CombatRoute = ({
+    navigation,
+    character,
+    characters,
+    forms,
+    // eslint-disable-next-line no-shadow
+    setSparseCombatDetails,
+    // eslint-disable-next-line no-shadow
+    updateForm,
+    // eslint-disable-next-line no-shadow
+    updateFormValue,
+    // eslint-disable-next-line no-shadow
+    resetForm,
+    usePhase,
+    // eslint-disable-next-line no-shadow
+    applyStatus,
+    // eslint-disable-next-line no-shadow
+    clearAllStatuses,
+    // eslint-disable-next-line no-shadow
+    clearStatus,
+}) => {
     return RouteBuilder(
         'Combat',
         <Combat
@@ -221,7 +241,22 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
             case 'general':
                 return <GeneralRoute character={character} width={portraitWidth} height={portraitHeight} />;
             case 'combat':
-                return <CombatRoute navigation={navigation} character={character} characters={characters} forms={forms} />;
+                return (
+                    <CombatRoute
+                        navigation={navigation}
+                        character={character}
+                        characters={characters}
+                        forms={forms}
+                        setSparseCombatDetails={(sparseCombatDetails, secondary) => dispatch(setSparseCombatDetails({sparseCombatDetails, secondary}))}
+                        usePhase={(phase, secondary, abort) => dispatch(hsmUsePhase({phase, secondary, abort}))}
+                        updateForm={(type, json) => dispatch(updateForm({type, json}))}
+                        updateFormValue={(formName, key, value) => dispatch(updateFormValue({formName, key, value}))}
+                        resetForm={(formName) => dispatch(resetForm({formName}))}
+                        applyStatus={(status) => dispatch(applyStatus({status}))}
+                        clearAllStatuses={() => dispatch(clearAllStatuses())}
+                        clearStatus={(i) => dispatch(clearStatus({index: i}))}
+                    />
+                );
             case 'characteristics':
                 return (
                     <CharacteristicsRoute

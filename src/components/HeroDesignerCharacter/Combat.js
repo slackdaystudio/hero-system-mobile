@@ -133,7 +133,7 @@ export default class Combat extends Component {
         combatDetails.stun = stun;
         combatDetails.endurance = endurance;
 
-        this.props.setSparseCombatDetails({combatDetails, showSecondary: this.props.character.showSecondary});
+        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
     }
 
     _incrementCv(key, step) {
@@ -160,11 +160,11 @@ export default class Combat extends Component {
     }
 
     _usePhase(phase) {
-        this.props.usePhase({phase, secondary: this.props.character.showSecondary});
+        this.props.usePhase(phase, this.props.character.showSecondary, false);
     }
 
     _abortPhase(phase) {
-        this.props.usePhase({phase, secondary: this.props.character.showSecondary, abort: true});
+        this.props.usePhase(phase, this.props.character.showSecondary, true);
     }
 
     _openStatusDialog() {
@@ -175,7 +175,7 @@ export default class Combat extends Component {
     }
 
     _applyStatus() {
-        this.props.applyStatus({character: this.props.character, characters: this.props.characters, status: this.props.forms.status});
+        this.props.applyStatus(this.props.forms.status);
 
         this.props.resetForm('status');
 
@@ -183,13 +183,13 @@ export default class Combat extends Component {
     }
 
     _clearAllStatuses() {
-        this.props.clearAllStatuses({character: this.props.character, characters: this.props.characters});
+        this.props.clearAllStatuses();
     }
 
     _editStatus(index) {
         const key = this.props.character.showSecondary ? 'secondary' : 'primary';
         const status = this.props.character.combatDetails[key].statuses[index];
-        let statusForm = {...this.props.forms.status};
+        const statusForm = {...this.props.forms.status};
 
         statusForm.name = status.name;
         statusForm.label = status.label || '';
@@ -219,7 +219,7 @@ export default class Combat extends Component {
     }
 
     _clearStatus(index) {
-        this.props.clearStatus({character: this.props.character, characters: this.props.characters, index});
+        this.props.clearStatus(index);
     }
 
     _closeStatusDialog() {

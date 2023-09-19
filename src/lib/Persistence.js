@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {file} from './File';
-import {combatDetails} from './CombatDetails';
 
 export const MAX_CHARACTER_SLOTS = 5;
 
@@ -245,81 +244,6 @@ class Persistence {
         } catch (error) {
             console.error('Unable to clear persisted character');
         }
-    }
-
-    async applyStatus(character, characters, status) {
-        try {
-            combatDetails.applyStatus(character, status);
-
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
-                    combatDetails.applyStatus(characters[i.toString()], status);
-                    break;
-                }
-            }
-
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-            await AsyncStorage.setItem('characters', JSON.stringify(characters));
-
-            await this.saveCharacterData(character, characters);
-        } catch (error) {
-            console.error('Unable to apply status to character');
-        }
-
-        return {
-            character: character,
-            characters: characters,
-        };
-    }
-
-    async clearAllStatuses(character, characters) {
-        try {
-            combatDetails.clearAllStatuses(character);
-
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
-                    combatDetails.clearAllStatuses(characters[i.toString()]);
-                    break;
-                }
-            }
-
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-            await AsyncStorage.setItem('characters', JSON.stringify(characters));
-
-            await this.saveCharacterData(character, characters);
-        } catch (error) {
-            console.error('Unable to clear all statuses for character');
-        }
-
-        return {
-            character: character,
-            characters: characters,
-        };
-    }
-
-    async clearStatus(character, characters, index) {
-        try {
-            combatDetails.clearStatus(character, index);
-
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
-                    combatDetails.clearStatus(characters[i.toString()], index);
-                    break;
-                }
-            }
-
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-            await AsyncStorage.setItem('characters', JSON.stringify(characters));
-
-            await this.saveCharacterData(character, characters);
-        } catch (error) {
-            console.error('Unable to clear status from character');
-        }
-
-        return {
-            character: character,
-            characters: characters,
-        };
     }
 
     async initializeApplicationSettings() {
