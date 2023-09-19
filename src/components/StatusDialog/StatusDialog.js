@@ -1,6 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {View, KeyboardAvoidingView} from 'react-native';
+import {Platform, View, KeyboardAvoidingView} from 'react-native';
 import {Button, Text, Form, Item, Label, Input} from 'native-base';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
@@ -267,7 +267,7 @@ class StatusDialog extends Component {
     render() {
         return (
             <Modal
-                style={{paddingBottom: verticalScale(200)}}
+                style={{paddingBottom: verticalScale(Platform.OS === 'ios' ? 200 : 10)}}
                 isVisible={this.props.visible}
                 onBackButtonPress={() => this.props.onClose()}
                 onBackdropPress={() => this.props.onClose()}
