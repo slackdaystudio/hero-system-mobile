@@ -34,8 +34,8 @@ const windowHeight = Dimensions.get('window').height;
 const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
     const tab = (
         <>
-            <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateFormValue} valueKey="ocv" />
-            <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateFormValue} valueKey="numberOfRolls" />
+            <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateForm} valueKey="ocv" />
+            <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateForm} valueKey="numberOfRolls" />
             <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                 <Text style={styles.grey}>Is this an autofire attack?</Text>
                 <View style={{paddingRight: scale(10)}}>
