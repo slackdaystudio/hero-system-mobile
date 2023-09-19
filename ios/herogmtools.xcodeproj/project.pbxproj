@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* herogmtoolsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* herogmtoolsTests.m */; };
-		0A476B9A3D2950A261F7EFB7 /* libPods-herogmtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 26995A7ADE394F412F2F3FEF /* libPods-herogmtools.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		83B86A29D14F8B38FE0D3294 /* libPods-herogmtools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C6265B6F37C3F45BDB027155 /* libPods-herogmtools.a */; };
 		882C16FD23DAA8710002BDF9 /* mental_psionic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16CD23DAA86E0002BDF9 /* mental_psionic.mp3 */; };
 		882C16FE23DAA8710002BDF9 /* mutant.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16CE23DAA86E0002BDF9 /* mutant.mp3 */; };
 		882C16FF23DAA8710002BDF9 /* sleep_dream.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16CF23DAA86E0002BDF9 /* sleep_dream.mp3 */; };
@@ -60,24 +60,27 @@
 		882C172A23DAA8710002BDF9 /* air_wind.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FA23DAA8700002BDF9 /* air_wind.mp3 */; };
 		882C172B23DAA8710002BDF9 /* wood_plant.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FB23DAA8700002BDF9 /* wood_plant.mp3 */; };
 		882C172C23DAA8710002BDF9 /* telekinetic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 882C16FC23DAA8700002BDF9 /* telekinetic.mp3 */; };
-		88845C182AB96071002B5BDC /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53E408F4B80544E1A8D01ABC /* AntDesign.ttf */; };
-		88845C192AB96082002B5BDC /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EC1976444FD4CBAAD8E6FE4 /* Entypo.ttf */; };
-		88845C1A2AB96082002B5BDC /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F94BA8D0C3644B399236693F /* EvilIcons.ttf */; };
-		88845C1B2AB96082002B5BDC /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EB8640E9D38C42C0AA641D92 /* Feather.ttf */; };
-		88845C1C2AB96082002B5BDC /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D18FC7E11F74419AAFC503CD /* FontAwesome.ttf */; };
-		88845C1D2AB96082002B5BDC /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 70AB8C9906DB4D929D041F34 /* FontAwesome5_Brands.ttf */; };
-		88845C1E2AB96082002B5BDC /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D99B519D2E2E4E218D2D5C85 /* FontAwesome5_Regular.ttf */; };
-		88845C1F2AB96082002B5BDC /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C98F837D67744669A9A35C3 /* FontAwesome5_Solid.ttf */; };
-		88845C202AB96082002B5BDC /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A78224D561E74987827528C2 /* Fontisto.ttf */; };
-		88845C212AB96082002B5BDC /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ABFCAD39A46946FCA263FCF7 /* Foundation.ttf */; };
-		88845C222AB96082002B5BDC /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21CEF3B97AF54A4AA27F8C20 /* Ionicons.ttf */; };
-		88845C232AB96082002B5BDC /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F239429EF2F241B6B8BCDAB9 /* MaterialCommunityIcons.ttf */; };
-		88845C242AB96082002B5BDC /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 13B30411D6A8458C83B0F476 /* MaterialIcons.ttf */; };
-		88845C252AB96082002B5BDC /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3B28CD5BCEE6450BB258EE8B /* Octicons.ttf */; };
-		88845C262AB96082002B5BDC /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 59D683E4908F44D592E2F328 /* SimpleLineIcons.ttf */; };
-		88845C272AB96082002B5BDC /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9BFE857790194ECCBA5B8430 /* Zocial.ttf */; };
-		8E5AB419450CC98E6D639D05 /* libPods-herogmtools-herogmtoolsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55212146D24B04FBD0450DBF /* libPods-herogmtools-herogmtoolsTests.a */; };
+		889352DE2ABA38E4005A0232 /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352CB2ABA37B9005A0232 /* Fontisto.ttf */; };
+		889352DF2ABA38E4005A0232 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352CC2ABA37B9005A0232 /* Octicons.ttf */; };
+		889352E02ABA38E4005A0232 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352CD2ABA37B9005A0232 /* Feather.ttf */; };
+		889352E12ABA38E4005A0232 /* Roboto_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352CE2ABA37B9005A0232 /* Roboto_medium.ttf */; };
+		889352E22ABA38E4005A0232 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352CF2ABA37B9005A0232 /* Entypo.ttf */; };
+		889352E32ABA38E4005A0232 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D02ABA37B9005A0232 /* FontAwesome5_Brands.ttf */; };
+		889352E42ABA38E4005A0232 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D12ABA37B9005A0232 /* MaterialCommunityIcons.ttf */; };
+		889352E52ABA38E4005A0232 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D22ABA37B9005A0232 /* AntDesign.ttf */; };
+		889352E62ABA38E4005A0232 /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D32ABA37B9005A0232 /* Foundation.ttf */; };
+		889352E72ABA38E4005A0232 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D42ABA37B9005A0232 /* Ionicons.ttf */; };
+		889352E82ABA38E4005A0232 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D52ABA37B9005A0232 /* FontAwesome5_Solid.ttf */; };
+		889352E92ABA38E4005A0232 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D62ABA37B9005A0232 /* FontAwesome5_Regular.ttf */; };
+		889352EA2ABA38E4005A0232 /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D72ABA37B9005A0232 /* rubicon-icon-font.ttf */; };
+		889352EB2ABA38E4005A0232 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D82ABA37B9005A0232 /* FontAwesome.ttf */; };
+		889352EC2ABA38E4005A0232 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352D92ABA37B9005A0232 /* Zocial.ttf */; };
+		889352ED2ABA38E4005A0232 /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352DA2ABA37B9005A0232 /* Roboto.ttf */; };
+		889352EE2ABA38E4005A0232 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352DB2ABA37B9005A0232 /* EvilIcons.ttf */; };
+		889352EF2ABA38E4005A0232 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352DC2ABA37B9005A0232 /* SimpleLineIcons.ttf */; };
+		889352F02ABA38E4005A0232 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 889352DD2ABA37B9005A0232 /* MaterialIcons.ttf */; };
 		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
+		EF0598CCA5A8FF0584ACAB11 /* libPods-herogmtools-herogmtoolsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 910156CFD79FA732AFF65A55 /* libPods-herogmtools-herogmtoolsTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,19 +103,13 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = herogmtools/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = herogmtools/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = herogmtools/main.m; sourceTree = "<group>"; };
-		13B30411D6A8458C83B0F476 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
-		21CEF3B97AF54A4AA27F8C20 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
-		26995A7ADE394F412F2F3FEF /* libPods-herogmtools.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E47B1E0B4A5D006451C7 /* herogmtools-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "herogmtools-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* herogmtools-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "herogmtools-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		3B28CD5BCEE6450BB258EE8B /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
-		4EC1976444FD4CBAAD8E6FE4 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
-		53E408F4B80544E1A8D01ABC /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
-		55212146D24B04FBD0450DBF /* libPods-herogmtools-herogmtoolsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools-herogmtoolsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		59D683E4908F44D592E2F328 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
-		70AB8C9906DB4D929D041F34 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
-		7F4B4715CB0A8FBC5ECD705A /* Pods-herogmtools.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.debug.xcconfig"; sourceTree = "<group>"; };
+		3A691A25335F5AF825395ED3 /* Pods-herogmtools.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.release.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.release.xcconfig"; sourceTree = "<group>"; };
+		4079A387D4C5C2DE492D00FF /* Pods-herogmtools-herogmtoolsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-herogmtoolsTests.release.xcconfig"; path = "Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests.release.xcconfig"; sourceTree = "<group>"; };
+		58D032837292DD7269E54064 /* Pods-herogmtools.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.debug.xcconfig"; sourceTree = "<group>"; };
+		60DA93CBCBE7B6110161ACAE /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-herogmtoolsTests.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		882C16CD23DAA86E0002BDF9 /* mental_psionic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = mental_psionic.mp3; path = ../../android/app/src/main/res/raw/mental_psionic.mp3; sourceTree = "<group>"; };
 		882C16CE23DAA86E0002BDF9 /* mutant.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = mutant.mp3; path = ../../android/app/src/main/res/raw/mutant.mp3; sourceTree = "<group>"; };
 		882C16CF23DAA86E0002BDF9 /* sleep_dream.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sleep_dream.mp3; path = ../../android/app/src/main/res/raw/sleep_dream.mp3; sourceTree = "<group>"; };
@@ -162,22 +159,31 @@
 		882C16FB23DAA8700002BDF9 /* wood_plant.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = wood_plant.mp3; path = ../../android/app/src/main/res/raw/wood_plant.mp3; sourceTree = "<group>"; };
 		882C16FC23DAA8700002BDF9 /* telekinetic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = telekinetic.mp3; path = ../../android/app/src/main/res/raw/telekinetic.mp3; sourceTree = "<group>"; };
 		8877D15423C29BF400BD2AE0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		889352CB2ABA37B9005A0232 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
+		889352CC2ABA37B9005A0232 /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
+		889352CD2ABA37B9005A0232 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
+		889352CE2ABA37B9005A0232 /* Roboto_medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_medium.ttf; sourceTree = "<group>"; };
+		889352CF2ABA37B9005A0232 /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
+		889352D02ABA37B9005A0232 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Brands.ttf; sourceTree = "<group>"; };
+		889352D12ABA37B9005A0232 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
+		889352D22ABA37B9005A0232 /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
+		889352D32ABA37B9005A0232 /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Foundation.ttf; sourceTree = "<group>"; };
+		889352D42ABA37B9005A0232 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
+		889352D52ABA37B9005A0232 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
+		889352D62ABA37B9005A0232 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Regular.ttf; sourceTree = "<group>"; };
+		889352D72ABA37B9005A0232 /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rubicon-icon-font.ttf"; sourceTree = "<group>"; };
+		889352D82ABA37B9005A0232 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.ttf; sourceTree = "<group>"; };
+		889352D92ABA37B9005A0232 /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Zocial.ttf; sourceTree = "<group>"; };
+		889352DA2ABA37B9005A0232 /* Roboto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto.ttf; sourceTree = "<group>"; };
+		889352DB2ABA37B9005A0232 /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
+		889352DC2ABA37B9005A0232 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
+		889352DD2ABA37B9005A0232 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
 		88CC5C91264F7FFD00263020 /* OpenSSL.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OpenSSL.xcframework; path = "Pods/OpenSSL-Universal/Frameworks/OpenSSL.xcframework"; sourceTree = "<group>"; };
 		88E0EDE32212595C00EAE0BE /* herogmtools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = herogmtools.entitlements; path = herogmtools/herogmtools.entitlements; sourceTree = "<group>"; };
-		8C98F837D67744669A9A35C3 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
-		9BFE857790194ECCBA5B8430 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
-		A60CE7A70FD14FDE847C7A16 /* Pods-herogmtools-herogmtoolsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-herogmtoolsTests.release.xcconfig"; path = "Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests.release.xcconfig"; sourceTree = "<group>"; };
-		A78224D561E74987827528C2 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
-		ABFCAD39A46946FCA263FCF7 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
-		BBC64C135AD48F6A8C3F58AC /* Pods-herogmtools.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools.release.xcconfig"; path = "Target Support Files/Pods-herogmtools/Pods-herogmtools.release.xcconfig"; sourceTree = "<group>"; };
-		D18FC7E11F74419AAFC503CD /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
-		D99B519D2E2E4E218D2D5C85 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
-		EB8640E9D38C42C0AA641D92 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		910156CFD79FA732AFF65A55 /* libPods-herogmtools-herogmtoolsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools-herogmtoolsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6265B6F37C3F45BDB027155 /* libPods-herogmtools.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herogmtools.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		F239429EF2F241B6B8BCDAB9 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
-		F8A0A4E9DC4EABA7A9A3E8D3 /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herogmtools-herogmtoolsTests.debug.xcconfig"; path = "Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests.debug.xcconfig"; sourceTree = "<group>"; };
-		F94BA8D0C3644B399236693F /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,7 +191,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E5AB419450CC98E6D639D05 /* libPods-herogmtools-herogmtoolsTests.a in Frameworks */,
+				EF0598CCA5A8FF0584ACAB11 /* libPods-herogmtools-herogmtoolsTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,7 +200,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
-				0A476B9A3D2950A261F7EFB7 /* libPods-herogmtools.a in Frameworks */,
+				83B86A29D14F8B38FE0D3294 /* libPods-herogmtools.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,8 +245,8 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
-				26995A7ADE394F412F2F3FEF /* libPods-herogmtools.a */,
-				55212146D24B04FBD0450DBF /* libPods-herogmtools-herogmtoolsTests.a */,
+				C6265B6F37C3F45BDB027155 /* libPods-herogmtools.a */,
+				910156CFD79FA732AFF65A55 /* libPods-herogmtools-herogmtoolsTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -248,10 +254,10 @@
 		3E25AF80E96BABBBA241FD29 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				7F4B4715CB0A8FBC5ECD705A /* Pods-herogmtools.debug.xcconfig */,
-				BBC64C135AD48F6A8C3F58AC /* Pods-herogmtools.release.xcconfig */,
-				F8A0A4E9DC4EABA7A9A3E8D3 /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */,
-				A60CE7A70FD14FDE847C7A16 /* Pods-herogmtools-herogmtoolsTests.release.xcconfig */,
+				58D032837292DD7269E54064 /* Pods-herogmtools.debug.xcconfig */,
+				3A691A25335F5AF825395ED3 /* Pods-herogmtools.release.xcconfig */,
+				60DA93CBCBE7B6110161ACAE /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */,
+				4079A387D4C5C2DE492D00FF /* Pods-herogmtools-herogmtoolsTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -266,6 +272,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				889352CA2ABA37B9005A0232 /* Fonts */,
 				13B07FAE1A68108700A75B9A /* herogmtools */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* herogmtoolsTests */,
@@ -347,6 +354,32 @@
 			path = sounds;
 			sourceTree = "<group>";
 		};
+		889352CA2ABA37B9005A0232 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				889352CB2ABA37B9005A0232 /* Fontisto.ttf */,
+				889352CC2ABA37B9005A0232 /* Octicons.ttf */,
+				889352CD2ABA37B9005A0232 /* Feather.ttf */,
+				889352CE2ABA37B9005A0232 /* Roboto_medium.ttf */,
+				889352CF2ABA37B9005A0232 /* Entypo.ttf */,
+				889352D02ABA37B9005A0232 /* FontAwesome5_Brands.ttf */,
+				889352D12ABA37B9005A0232 /* MaterialCommunityIcons.ttf */,
+				889352D22ABA37B9005A0232 /* AntDesign.ttf */,
+				889352D32ABA37B9005A0232 /* Foundation.ttf */,
+				889352D42ABA37B9005A0232 /* Ionicons.ttf */,
+				889352D52ABA37B9005A0232 /* FontAwesome5_Solid.ttf */,
+				889352D62ABA37B9005A0232 /* FontAwesome5_Regular.ttf */,
+				889352D72ABA37B9005A0232 /* rubicon-icon-font.ttf */,
+				889352D82ABA37B9005A0232 /* FontAwesome.ttf */,
+				889352D92ABA37B9005A0232 /* Zocial.ttf */,
+				889352DA2ABA37B9005A0232 /* Roboto.ttf */,
+				889352DB2ABA37B9005A0232 /* EvilIcons.ttf */,
+				889352DC2ABA37B9005A0232 /* SimpleLineIcons.ttf */,
+				889352DD2ABA37B9005A0232 /* MaterialIcons.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		88DF058D220BE7570001ED6B /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -357,22 +390,6 @@
 		BFADF3D9AFCB487385E6D847 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				53E408F4B80544E1A8D01ABC /* AntDesign.ttf */,
-				4EC1976444FD4CBAAD8E6FE4 /* Entypo.ttf */,
-				F94BA8D0C3644B399236693F /* EvilIcons.ttf */,
-				EB8640E9D38C42C0AA641D92 /* Feather.ttf */,
-				D18FC7E11F74419AAFC503CD /* FontAwesome.ttf */,
-				70AB8C9906DB4D929D041F34 /* FontAwesome5_Brands.ttf */,
-				D99B519D2E2E4E218D2D5C85 /* FontAwesome5_Regular.ttf */,
-				8C98F837D67744669A9A35C3 /* FontAwesome5_Solid.ttf */,
-				A78224D561E74987827528C2 /* Fontisto.ttf */,
-				ABFCAD39A46946FCA263FCF7 /* Foundation.ttf */,
-				21CEF3B97AF54A4AA27F8C20 /* Ionicons.ttf */,
-				F239429EF2F241B6B8BCDAB9 /* MaterialCommunityIcons.ttf */,
-				13B30411D6A8458C83B0F476 /* MaterialIcons.ttf */,
-				3B28CD5BCEE6450BB258EE8B /* Octicons.ttf */,
-				59D683E4908F44D592E2F328 /* SimpleLineIcons.ttf */,
-				9BFE857790194ECCBA5B8430 /* Zocial.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -384,12 +401,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "herogmtoolsTests" */;
 			buildPhases = (
-				6D78A386B0E1CEF2095AFE01 /* [CP] Check Pods Manifest.lock */,
+				40CFA6598B9FE0ADA84E7DF0 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				11952FBF8517CDEA8FFC1B23 /* [CP] Embed Pods Frameworks */,
-				72A940D8AAB868C424C6758D /* [CP] Copy Pods Resources */,
+				A5604F11FE196A55D900F3C6 /* [CP] Embed Pods Frameworks */,
+				576CC662F67BC0C75C82580E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -405,14 +422,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "herogmtools" */;
 			buildPhases = (
-				B89F0D1267FB461E86D82E85 /* [CP] Check Pods Manifest.lock */,
+				B30F1C6EEA5511539EB9A547 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				38C2BE45B8C8D9E999A7E992 /* [CP] Embed Pods Frameworks */,
-				CD2254BB0CC539D5516DF66F /* [CP] Copy Pods Resources */,
+				DC9CE006A46223023B229F6F /* [CP] Embed Pods Frameworks */,
+				FD9633ED9E5AC3D5B879B9AC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -477,22 +494,25 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				88845C192AB96082002B5BDC /* Entypo.ttf in Resources */,
-				88845C1A2AB96082002B5BDC /* EvilIcons.ttf in Resources */,
-				88845C1B2AB96082002B5BDC /* Feather.ttf in Resources */,
-				88845C1C2AB96082002B5BDC /* FontAwesome.ttf in Resources */,
-				88845C1D2AB96082002B5BDC /* FontAwesome5_Brands.ttf in Resources */,
-				88845C1E2AB96082002B5BDC /* FontAwesome5_Regular.ttf in Resources */,
-				88845C1F2AB96082002B5BDC /* FontAwesome5_Solid.ttf in Resources */,
-				88845C202AB96082002B5BDC /* Fontisto.ttf in Resources */,
-				88845C212AB96082002B5BDC /* Foundation.ttf in Resources */,
-				88845C222AB96082002B5BDC /* Ionicons.ttf in Resources */,
-				88845C232AB96082002B5BDC /* MaterialCommunityIcons.ttf in Resources */,
-				88845C242AB96082002B5BDC /* MaterialIcons.ttf in Resources */,
-				88845C252AB96082002B5BDC /* Octicons.ttf in Resources */,
-				88845C262AB96082002B5BDC /* SimpleLineIcons.ttf in Resources */,
-				88845C272AB96082002B5BDC /* Zocial.ttf in Resources */,
-				88845C182AB96071002B5BDC /* AntDesign.ttf in Resources */,
+				889352DE2ABA38E4005A0232 /* Fontisto.ttf in Resources */,
+				889352DF2ABA38E4005A0232 /* Octicons.ttf in Resources */,
+				889352E02ABA38E4005A0232 /* Feather.ttf in Resources */,
+				889352E12ABA38E4005A0232 /* Roboto_medium.ttf in Resources */,
+				889352E22ABA38E4005A0232 /* Entypo.ttf in Resources */,
+				889352E32ABA38E4005A0232 /* FontAwesome5_Brands.ttf in Resources */,
+				889352E42ABA38E4005A0232 /* MaterialCommunityIcons.ttf in Resources */,
+				889352E52ABA38E4005A0232 /* AntDesign.ttf in Resources */,
+				889352E62ABA38E4005A0232 /* Foundation.ttf in Resources */,
+				889352E72ABA38E4005A0232 /* Ionicons.ttf in Resources */,
+				889352E82ABA38E4005A0232 /* FontAwesome5_Solid.ttf in Resources */,
+				889352E92ABA38E4005A0232 /* FontAwesome5_Regular.ttf in Resources */,
+				889352EA2ABA38E4005A0232 /* rubicon-icon-font.ttf in Resources */,
+				889352EB2ABA38E4005A0232 /* FontAwesome.ttf in Resources */,
+				889352EC2ABA38E4005A0232 /* Zocial.ttf in Resources */,
+				889352ED2ABA38E4005A0232 /* Roboto.ttf in Resources */,
+				889352EE2ABA38E4005A0232 /* EvilIcons.ttf in Resources */,
+				889352EF2ABA38E4005A0232 /* SimpleLineIcons.ttf in Resources */,
+				889352F02ABA38E4005A0232 /* MaterialIcons.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				882C171223DAA8710002BDF9 /* illusion.mp3 in Resources */,
 				882C170323DAA8710002BDF9 /* animal.mp3 in Resources */,
@@ -562,41 +582,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e \n\nexport NODE_BINARY=$(which node) \n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		11952FBF8517CDEA8FFC1B23 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		38C2BE45B8C8D9E999A7E992 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		6D78A386B0E1CEF2095AFE01 /* [CP] Check Pods Manifest.lock */ = {
+		40CFA6598B9FE0ADA84E7DF0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -618,7 +604,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		72A940D8AAB868C424C6758D /* [CP] Copy Pods Resources */ = {
+		576CC662F67BC0C75C82580E /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -635,7 +621,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B89F0D1267FB461E86D82E85 /* [CP] Check Pods Manifest.lock */ = {
+		A5604F11FE196A55D900F3C6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-herogmtools-herogmtoolsTests/Pods-herogmtools-herogmtoolsTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B30F1C6EEA5511539EB9A547 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -657,21 +660,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CD2254BB0CC539D5516DF66F /* [CP] Copy Pods Resources */ = {
+		DC9CE006A46223023B229F6F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -691,6 +694,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		FD9633ED9E5AC3D5B879B9AC /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-herogmtools/Pods-herogmtools-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -726,7 +746,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F8A0A4E9DC4EABA7A9A3E8D3 /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */;
+			baseConfigurationReference = 60DA93CBCBE7B6110161ACAE /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -753,7 +773,7 @@
 		};
 		00E356F71AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F8A0A4E9DC4EABA7A9A3E8D3 /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */;
+			baseConfigurationReference = 60DA93CBCBE7B6110161ACAE /* Pods-herogmtools-herogmtoolsTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -780,7 +800,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7F4B4715CB0A8FBC5ECD705A /* Pods-herogmtools.debug.xcconfig */;
+			baseConfigurationReference = 58D032837292DD7269E54064 /* Pods-herogmtools.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -788,7 +808,7 @@
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 49;
+				CURRENT_PROJECT_VERSION = 50;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GM2P6R5MBL;
 				ENABLE_BITCODE = NO;
@@ -800,7 +820,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.3;
+				MARKETING_VERSION = 2.1.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -820,7 +840,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BBC64C135AD48F6A8C3F58AC /* Pods-herogmtools.release.xcconfig */;
+			baseConfigurationReference = 3A691A25335F5AF825395ED3 /* Pods-herogmtools.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -828,7 +848,7 @@
 				CODE_SIGN_ENTITLEMENTS = herogmtools/herogmtools.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 49;
+				CURRENT_PROJECT_VERSION = 50;
 				DEVELOPMENT_TEAM = GM2P6R5MBL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GM2P6R5MBL;
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -839,7 +859,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.3;
+				MARKETING_VERSION = 2.1.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -988,7 +1008,7 @@
 		};
 		880B5AFE264F5A1D001D9ACA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A60CE7A70FD14FDE847C7A16 /* Pods-herogmtools-herogmtoolsTests.release.xcconfig */;
+			baseConfigurationReference = 4079A387D4C5C2DE492D00FF /* Pods-herogmtools-herogmtoolsTests.release.xcconfig */;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
