@@ -36,7 +36,7 @@ export default class Header extends Component {
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={{flex: 1}}>
                             <Button transparent underlayColor="#000" onPress={() => this._onBackButtonPress()}>
-                                <Icon type="FontAwesome" name="chevron-left" style={{fontSize: verticalScale(18), color: 'white'}} />
+                                <Icon type="FontAwesome5" name="chevron-left" style={{fontSize: verticalScale(18), color: 'white'}} />
                             </Button>
                         </View>
                         <View style={{flex: 4}}>
@@ -49,7 +49,7 @@ export default class Header extends Component {
                         <View style={{flex: 1}}>
                             <Button transparent underlayColor="#000" onPress={() => this.props.navigation.toggleDrawer()}>
                                 <Icon
-                                    type="FontAwesome"
+                                    type="FontAwesome5"
                                     name="bars"
                                     style={{fontSize: verticalScale(24), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(30) : 0}}
                                 />

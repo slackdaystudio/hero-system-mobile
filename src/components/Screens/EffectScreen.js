@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {View} from 'react-native';
-import {Container, Content, List, ListItem, Left, Right, Button, Text, Radio} from 'native-base';
+import {Container, Content, Button, Text} from 'native-base';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {verticalScale} from 'react-native-size-matters';
+import {RadioGroup} from 'react-native-radio-buttons-group';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
@@ -37,12 +38,25 @@ export const EffectScreen = ({navigation}) => {
 
     const [value, setValue] = useState(null);
 
+    const [selectedId, setSelectedId] = useState();
+
     const [items, setItems] = useState([
         {label: 'No partial die', value: 0},
         {label: '+1 pip', value: PARTIAL_DIE_PLUS_ONE},
         {label: '+½ die', value: PARTIAL_DIE_HALF},
         {label: '-1 pip', value: PARTIAL_DIE_MINUS_ONE},
     ]);
+
+    const radioButtons = useMemo(() => {
+        return effectTypes.map((type, i) => ({
+            id: i,
+            label: type,
+            value: type,
+            color: '#fff',
+            containerStyle: {minWidth: verticalScale(290)},
+            labelStyle: {color: '#fff'},
+        }));
+    }, []);
 
     const roll = () => {
         navigation.navigate('Result', {
@@ -51,8 +65,10 @@ export const EffectScreen = ({navigation}) => {
         });
     };
 
-    const selectEffect = (effect) => {
-        dispatch(updateFormValue({formName: 'effect', key: 'effectType', value: effect}));
+    const selectEffect = (id) => {
+        setSelectedId(id);
+
+        dispatch(updateFormValue({formName: 'effect', key: 'effectType', value: radioButtons.find((rb) => rb.id === id).value}));
     };
 
     const setSliderState = (key, val) => {
@@ -61,26 +77,9 @@ export const EffectScreen = ({navigation}) => {
 
     const renderEffects = () => {
         return (
-            <List>
-                {effectTypes.map((type, index) => {
-                    return (
-                        <ListItem
-                            key={`effect-${index}`}
-                            noIndent
-                            underlayColor="#1b1d1f"
-                            style={{borderBottomWidth: 0, paddingBottom: 0}}
-                            onPress={() => selectEffect(type)}
-                        >
-                            <Left>
-                                <Text style={styles.grey}>{type}</Text>
-                            </Left>
-                            <Right>
-                                <Radio color="#14354d" selectedColor="#14354d" selected={effectForm.effectType === type} onPress={() => selectEffect(type)} />
-                            </Right>
-                        </ListItem>
-                    );
-                })}
-            </List>
+            <View flex={1} alignItems="stretch">
+                <RadioGroup flex={1} color="#fff" radioButtons={radioButtons} onPress={selectEffect} selectedId={selectedId} />
+            </View>
         );
     };
 

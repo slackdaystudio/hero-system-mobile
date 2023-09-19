@@ -249,6 +249,36 @@ class Common {
     merge(left, right) {
         return merge(left, right);
     }
+
+    getDieIconDetails(face) {
+        let color = '#ffffff';
+        let iconName = null;
+
+        switch (parseInt(face, 10)) {
+            case 2:
+                iconName = 'dice-two';
+                break;
+            case 3:
+                iconName = 'dice-three';
+                break;
+            case 4:
+                iconName = 'dice-four';
+                break;
+            case 5:
+                iconName = 'dice-five';
+                break;
+            case 6:
+                iconName = 'dice-six';
+                break;
+            default:
+                iconName = 'dice-one';
+        }
+
+        return {
+            iconName,
+            color,
+        };
+    }
 }
 
 export let common = new Common();

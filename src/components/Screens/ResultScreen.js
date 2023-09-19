@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {Platform, View} from 'react-native';
-import {Container, Content, Button, Text, Spinner} from 'native-base';
+import {Container, Content, Button, Text, Spinner, Icon} from 'native-base';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
@@ -335,9 +335,24 @@ export const ResultScreen = ({route, navigation}) => {
                                 </Text>
                             </View>
                         </View>
+                        <View flex={1} flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
+                            {r.rolls.map((roll, i) => {
+                                const dieIcon = common.getDieIconDetails(roll);
+
+                                return (
+                                    <Icon
+                                        key={`dice-${i}`}
+                                        solid
+                                        type="FontAwesome5"
+                                        name={dieIcon.iconName}
+                                        style={{fontSize: verticalScale(20), color: dieIcon.color, paddingRight: scale(3.5)}}
+                                    />
+                                );
+                            })}
+                        </View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                            {r.rolls.length} ({r.rolls.join(', ')})
+                            {r.rolls.length}
                         </Text>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Partial Die: </Text>
@@ -376,9 +391,24 @@ export const ResultScreen = ({route, navigation}) => {
                         </Text>
                     </View>
                 </View>
+                <View flex={1} flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
+                    {result.rolls.map((roll, i) => {
+                        const dieIcon = common.getDieIconDetails(roll);
+
+                        return (
+                            <Icon
+                                key={`dice-${i}`}
+                                solid
+                                type="FontAwesome5"
+                                name={dieIcon.iconName}
+                                style={{fontSize: verticalScale(20), color: dieIcon.color, paddingRight: scale(3.5)}}
+                            />
+                        );
+                    })}
+                </View>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                    {result.rolls.length} ({result.rolls.join(', ')})
+                    {result.rolls.length}
                 </Text>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Partial Die: </Text>
