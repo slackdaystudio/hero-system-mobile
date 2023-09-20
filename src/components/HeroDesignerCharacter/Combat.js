@@ -1,6 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {View, TouchableHighlight} from 'react-native';
+import {ImageBackground, View, TouchableHighlight} from 'react-native';
 import {Text, Button, Icon} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
@@ -526,59 +526,65 @@ export default class Combat extends Component {
     render() {
         return (
             <View>
-                <Heading text="Health" />
-                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
-                    {this._renderHealthItem('stun')}
-                    {this._renderHealthItem('body')}
-                    {this._renderHealthItem('endurance', 'END')}
-                    <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
-                        <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
-                            <Text uppercase={false} style={styles.buttonText}>
-                                Recovery
-                            </Text>
-                        </Button>
+                <ImageBackground
+                    source={require('../../../public/background.png')}
+                    style={{flex: 1, flexDirection: 'column'}}
+                    imageStyle={{resizeMode: 'repeat'}}
+                >
+                    <Heading text="Health" />
+                    <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                        {this._renderHealthItem('stun')}
+                        {this._renderHealthItem('body')}
+                        {this._renderHealthItem('endurance', 'END')}
+                        <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
+                            <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Recovery
+                                </Text>
+                            </Button>
+                        </View>
                     </View>
-                </View>
-                <Heading text="Status Effects" />
-                <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
-                        <Button style={styles.buttonSmall} onPress={() => this.openStatusDialog()}>
-                            <Text uppercase={false} style={styles.buttonText}>
-                                Add
-                            </Text>
-                        </Button>
-                        <View style={{paddingHorizontal: scale(5)}} />
-                        <Button style={styles.buttonSmall} onPress={() => this.clearAllStatuses()}>
-                            <Text uppercase={false} style={styles.buttonText}>
-                                Clear All
-                            </Text>
-                        </Button>
+                    <Heading text="Status Effects" />
+                    <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
+                            <Button style={styles.buttonSmall} onPress={() => this.openStatusDialog()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Add
+                                </Text>
+                            </Button>
+                            <View style={{paddingHorizontal: scale(5)}} />
+                            <Button style={styles.buttonSmall} onPress={() => this.clearAllStatuses()}>
+                                <Text uppercase={false} style={styles.buttonText}>
+                                    Clear All
+                                </Text>
+                            </Button>
+                        </View>
+                        {this._renderStatuses()}
                     </View>
-                    {this._renderStatuses()}
-                </View>
-                <Heading text="Defenses" />
-                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>
-                    {this._renderDefenses()}
-                </View>
-                <Heading text="Phases" />
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>{this._renderPhases()}</View>
-                <Heading text="Combat Values" />
-                <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
-                    {this._renderCv('ocv', true)}
-                    {this._renderCv('dcv')}
-                    {this._renderCv('omcv', true)}
-                    {this._renderCv('dmcv')}
-                </View>
-                {this._renderLevels()}
-                <StatusDialog
-                    character={this.props.character}
-                    statusForm={this.props.forms.status}
-                    updateForm={this.props.updateForm}
-                    updateFormValue={this.props.updateFormValue}
-                    visible={this.state.statusDialogVisible}
-                    onApply={this.applyStatus}
-                    onClose={this.closeStatusDialog}
-                />
+                    <Heading text="Defenses" />
+                    <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>
+                        {this._renderDefenses()}
+                    </View>
+                    <Heading text="Phases" />
+                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>{this._renderPhases()}</View>
+                    <Heading text="Combat Values" />
+                    <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                        {this._renderCv('ocv', true)}
+                        {this._renderCv('dcv')}
+                        {this._renderCv('omcv', true)}
+                        {this._renderCv('dmcv')}
+                    </View>
+                    {this._renderLevels()}
+                    <StatusDialog
+                        character={this.props.character}
+                        statusForm={this.props.forms.status}
+                        updateForm={this.props.updateForm}
+                        updateFormValue={this.props.updateFormValue}
+                        visible={this.state.statusDialogVisible}
+                        onApply={this.applyStatus}
+                        onClose={this.closeStatusDialog}
+                    />
+                </ImageBackground>
             </View>
         );
     }

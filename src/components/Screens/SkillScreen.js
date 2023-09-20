@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View, Switch} from 'react-native';
-import {Container, Content, Button, Text} from 'native-base';
+import {View, ImageBackground, Switch} from 'react-native';
+import {Container, Button, Text} from 'native-base';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -64,30 +64,32 @@ export const SkillScreen = ({navigation}) => {
 
     return (
         <Container style={styles.container}>
-            <Header navigation={navigation} />
-            <Content style={styles.content}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} />
                 <Text style={styles.heading}>Roll 3d6</Text>
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Is skill check?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={skillForm.skillCheck}
-                            onValueChange={() => _updateFormValue('skillCheck', !skillForm.skillCheck)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                <View paddingHorizontal={scale(10)}>
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Is skill check?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={skillForm.skillCheck}
+                                onValueChange={() => _updateFormValue('skillCheck', !skillForm.skillCheck)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    {renderSlider()}
+                    <View style={styles.buttonContainer}>
+                        <Button block style={styles.button} onPress={roll}>
+                            <Text uppercase={false}>Roll</Text>
+                        </Button>
                     </View>
                 </View>
-                {renderSlider()}
-                <View style={styles.buttonContainer}>
-                    <Button block style={styles.button} onPress={roll}>
-                        <Text uppercase={false}>Roll</Text>
-                    </Button>
-                </View>
-            </Content>
+            </ImageBackground>
         </Container>
     );
 };

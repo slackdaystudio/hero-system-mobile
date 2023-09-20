@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View} from 'react-native';
-import {Container, Content, Text, Form, Item, Label, Input} from 'native-base';
+import {ImageBackground, View} from 'react-native';
+import {Container, Text, Form, Item, Label, Input} from 'native-base';
 import {verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -50,8 +50,9 @@ export const CostCruncherScreen = ({navigation}) => {
 
     return (
         <Container style={styles.container}>
-            <Header navigation={navigation} />
-            <Content style={styles.content}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} />
+
                 <Text style={styles.heading}>Cruncher</Text>
                 <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>
                 <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingTop: 20}}>
@@ -90,7 +91,7 @@ export const CostCruncherScreen = ({navigation}) => {
                     max={0}
                     onValueChange={(val) => _updateFormValue('limitations', val)}
                 />
-            </Content>
+            </ImageBackground>
         </Container>
     );
 };

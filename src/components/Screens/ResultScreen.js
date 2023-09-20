@@ -2,8 +2,8 @@ import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {Platform, View} from 'react-native';
-import {Container, Content, Button, Text, Spinner, Icon} from 'native-base';
+import {Platform, ImageBackground, View} from 'react-native';
+import {Container, Button, Text, Spinner, Icon} from 'native-base';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
@@ -14,6 +14,7 @@ import {selectResultData} from '../../reducers/selectors';
 import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import styles from '../../Styles';
+import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -311,7 +312,7 @@ export const ResultScreen = ({route, navigation}) => {
 
                 return (
                     <View key={'roll-result-' + index}>
-                        <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
+                        <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
                             <View style={{flex: -1}}>
                                 <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
                                     <CountUp isCounting end={r.total} key={r.total} formatter={(val) => val.toFixed(0)} duration={1} />
@@ -335,7 +336,7 @@ export const ResultScreen = ({route, navigation}) => {
                                 </Text>
                             </View>
                         </View>
-                        <View flex={1} flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
+                        <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
                             {r.rolls.map((roll, i) => {
                                 const dieIcon = common.getDieIconDetails(roll);
 
@@ -368,7 +369,7 @@ export const ResultScreen = ({route, navigation}) => {
 
         return (
             <View>
-                <View style={{flex: 1, flexDirection: 'row', alignItems: 'baseline'}}>
+                <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
                     <View style={{flex: -1}}>
                         <Text style={[styles.grey, localStyles.rollResult]}>
                             <CountUp isCounting end={result.total} key={result.total} formatter={(val) => val.toFixed(0)} />
@@ -391,7 +392,7 @@ export const ResultScreen = ({route, navigation}) => {
                         </Text>
                     </View>
                 </View>
-                <View flex={1} flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
+                <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
                     {result.rolls.map((roll, i) => {
                         const dieIcon = common.getDieIconDetails(roll);
 
@@ -421,18 +422,20 @@ export const ResultScreen = ({route, navigation}) => {
 
     return (
         <Container style={styles.container}>
-            <Header navigation={navigation} />
-            <Content style={styles.content}>
-                <Text style={styles.heading}>Roll Result</Text>
-                <View>
-                    {renderRoll()}
-                    <View style={styles.buttonContainer}>
-                        <Button block style={styles.button} onPress={reRoll}>
-                            <Text uppercase={false}>Roll Again</Text>
-                        </Button>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} />
+                <VirtualizedList>
+                    <Text style={styles.heading}>Roll Result</Text>
+                    <View justifyContent="center" paddingHorizontal={scale(10)}>
+                        {renderRoll()}
+                        <View style={styles.buttonContainer}>
+                            <Button block style={styles.button} onPress={reRoll}>
+                                <Text uppercase={false}>Roll Again</Text>
+                            </Button>
+                        </View>
                     </View>
-                </View>
-            </Content>
+                </VirtualizedList>
+            </ImageBackground>
         </Container>
     );
 };

@@ -14,6 +14,7 @@ import Notes from '../HeroDesignerCharacter/Notes';
 import Header from '../Header/Header';
 import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
 import {common} from '../../lib/Common';
+import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 import {updateForm, updateFormValue, resetForm} from '../../reducers/forms';
 import {
     setShowSecondary,
@@ -79,7 +80,7 @@ const buildRoutes = (character) => {
         r.push({key: 'equipment', title: 'Equipment'});
     }
 
-    r.push({key: 'complications', title: 'Disadvantages'});
+    r.push({key: 'complications', title: heroDesignerCharacter.isFifth(character) ? 'Disadvantages' : 'Complications'});
     r.push({key: 'notes', title: 'Notes'});
 
     return r;

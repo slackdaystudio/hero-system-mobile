@@ -1,8 +1,8 @@
 import React, {useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View} from 'react-native';
-import {Container, Content, Button, Text} from 'native-base';
+import {View, ImageBackground} from 'react-native';
+import {Container, Button, Text} from 'native-base';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {verticalScale} from 'react-native-size-matters';
 import {RadioGroup} from 'react-native-radio-buttons-group';
@@ -36,9 +36,9 @@ export const EffectScreen = ({navigation}) => {
 
     const [open, setOpen] = useState(false);
 
-    const [value, setValue] = useState(null);
+    const [value, setValue] = useState('None');
 
-    const [selectedId, setSelectedId] = useState();
+    const [selectedId, setSelectedId] = useState(0);
 
     const [items, setItems] = useState([
         {label: 'No partial die', value: 0},
@@ -85,8 +85,8 @@ export const EffectScreen = ({navigation}) => {
 
     return (
         <Container style={styles.container}>
-            <Header navigation={navigation} />
-            <Content style={styles.content}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} />
                 <Heading text="Effect Roll" />
                 <View>
                     <Slider label="Dice:" value={effectForm.dice} step={1} min={0} max={50} onValueChange={setSliderState} valueKey="dice" />
@@ -111,7 +111,7 @@ export const EffectScreen = ({navigation}) => {
                     <Text uppercase={false}>Roll</Text>
                 </Button>
                 <View style={{paddingBottom: verticalScale(20)}} />
-            </Content>
+            </ImageBackground>
         </Container>
     );
 };

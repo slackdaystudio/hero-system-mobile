@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dimensions, Platform, View, Switch} from 'react-native';
+import {ImageBackground, Dimensions, Platform, View, Switch} from 'react-native';
 import {Button, Text} from 'native-base';
 import {TabView} from 'react-native-tab-view';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -35,155 +35,164 @@ const windowHeight = Dimensions.get('window').height;
 const DamageRoute = ({damageForm, picker, setOpen, setValue, setItems, updateForm, renderFadeRate, renderStunMultiplier, roll}) => {
     const tab = (
         <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
-            <View>
-                <Slider label="Dice:" value={parseInt(damageForm.dice, 10)} step={1} min={0} max={50} onValueChange={(value) => updateForm('dice', value)} />
-                <DropDownPicker
-                    theme="DARK"
-                    listMode="MODAL"
-                    open={picker.open}
-                    value={picker.value}
-                    items={picker.items}
-                    setOpen={setOpen}
-                    setValue={setValue}
-                    setItems={setItems}
-                    onChangeValue={(val) => updateForm('partialDie', picker.value)}
-                />
-                <View style={{paddingBottom: scale(30)}} />
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Is this a killing attack?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.killingToggled}
-                            onValueChange={() => updateForm('killingToggled', !damageForm.killingToggled)}
-                            color="#3da0ff"
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <View>
+                    <Slider
+                        label="Dice:"
+                        value={parseInt(damageForm.dice, 10)}
+                        step={1}
+                        min={0}
+                        max={50}
+                        onValueChange={(value) => updateForm('dice', value)}
+                    />
+                    <DropDownPicker
+                        theme="DARK"
+                        listMode="MODAL"
+                        open={picker.open}
+                        value={picker.value}
+                        items={picker.items}
+                        setOpen={setOpen}
+                        setValue={setValue}
+                        setItems={setItems}
+                        onChangeValue={(val) => updateForm('partialDie', picker.value)}
+                    />
+                    <View style={{paddingBottom: scale(30)}} />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Is this a killing attack?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.killingToggled}
+                                onValueChange={() => updateForm('killingToggled', !damageForm.killingToggled)}
+                                color="#3da0ff"
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                {renderStunMultiplier()}
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Is this an explosion?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.isExplosion}
-                            onValueChange={() => updateForm('isExplosion', !damageForm.isExplosion)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    {renderStunMultiplier()}
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Is this an explosion?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.isExplosion}
+                                onValueChange={() => updateForm('isExplosion', !damageForm.isExplosion)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                {renderFadeRate()}
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Use hit locations?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.useHitLocations}
-                            onValueChange={() => updateForm('useHitLocations', !damageForm.useHitLocations)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    {renderFadeRate()}
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Use hit locations?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.useHitLocations}
+                                onValueChange={() => updateForm('useHitLocations', !damageForm.useHitLocations)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Attack is a martial maneuver?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.isMartialManeuver}
-                            onValueChange={() => updateForm('isMartialManeuver', !damageForm.isMartialManeuver)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Attack is a martial maneuver?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.isMartialManeuver}
+                                onValueChange={() => updateForm('isMartialManeuver', !damageForm.isMartialManeuver)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Target is in the air?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.isTargetFlying}
-                            onValueChange={() => updateForm('isTargetFlying', !damageForm.isTargetFlying)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is in the air?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.isTargetFlying}
+                                onValueChange={() => updateForm('isTargetFlying', !damageForm.isTargetFlying)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Target is in zero gravity?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.isTargetInZeroG}
-                            onValueChange={() => updateForm('isTargetInZeroG', !damageForm.isTargetInZeroG)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is in zero gravity?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.isTargetInZeroG}
+                                onValueChange={() => updateForm('isTargetInZeroG', !damageForm.isTargetInZeroG)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Target is underwater?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.isTargetUnderwater}
-                            onValueChange={() => updateForm('isTargetUnderwater', !damageForm.isTargetUnderwater)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is underwater?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.isTargetUnderwater}
+                                onValueChange={() => updateForm('isTargetUnderwater', !damageForm.isTargetUnderwater)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Target rolled with a punch?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.rollWithPunch}
-                            onValueChange={() => updateForm('rollWithPunch', !damageForm.rollWithPunch)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target rolled with a punch?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.rollWithPunch}
+                                onValueChange={() => updateForm('rollWithPunch', !damageForm.rollWithPunch)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
-                </View>
-                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                    <Text style={styles.grey}>Target is using clinging?</Text>
-                    <View style={{paddingRight: scale(10)}}>
-                        <Switch
-                            value={damageForm.isUsingClinging}
-                            onValueChange={() => updateForm('isUsingClinging', !damageForm.isUsingClinging)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
-                        />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Target is using clinging?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={damageForm.isUsingClinging}
+                                onValueChange={() => updateForm('isUsingClinging', !damageForm.isUsingClinging)}
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
                     </View>
+                    <View style={{paddingBottom: 30}} />
+                    <Button block style={styles.button} onPress={roll}>
+                        <Text uppercase={false}>Roll</Text>
+                    </Button>
                 </View>
                 <View style={{paddingBottom: 30}} />
-                <Button block style={styles.button} onPress={roll}>
-                    <Text uppercase={false}>Roll</Text>
-                </Button>
-            </View>
-            <View style={{paddingBottom: 30}} />
+            </ImageBackground>
         </View>
     );
 
@@ -193,56 +202,58 @@ const DamageRoute = ({damageForm, picker, setOpen, setValue, setItems, updateFor
 const ManeuversRoute = ({}) => {
     const tab = (
         <View style={[styles.tabContent, {paddingBottom: scale(20), paddingHorizontal: scale(10)}]}>
-            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text>
-                </View>
-                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
-                </View>
-                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
-                </View>
-                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
-                </View>
-            </View>
-            {moves.map((move, index) => {
-                return (
-                    <View key={'move-' + index}>
-                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
-                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                <Text style={styles.grey}>{move.name}</Text>
-                            </View>
-                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                <Text style={styles.grey}>{move.phase}</Text>
-                            </View>
-                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                <Text style={styles.grey}>{move.ocv}</Text>
-                            </View>
-                            <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                <Text style={styles.grey}>{move.dcv}</Text>
-                            </View>
-                        </View>
-                        <View
-                            style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                justifyContent: 'flex-start',
-                                alignSelf: 'flex-start',
-                                paddingBottom: verticalScale(5),
-                            }}
-                        >
-                            <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                                <Text style={styles.grey} />
-                            </View>
-                            <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                                <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
-                            </View>
-                        </View>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text>
                     </View>
-                );
-            })}
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
+                    </View>
+                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
+                    </View>
+                </View>
+                {moves.map((move, index) => {
+                    return (
+                        <View key={'move-' + index}>
+                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.name}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.phase}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.ocv}</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={styles.grey}>{move.dcv}</Text>
+                                </View>
+                            </View>
+                            <View
+                                style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    justifyContent: 'flex-start',
+                                    alignSelf: 'flex-start',
+                                    paddingBottom: verticalScale(5),
+                                }}
+                            >
+                                <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                                    <Text style={styles.grey} />
+                                </View>
+                                <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                                    <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    );
+                })}
+            </ImageBackground>
         </View>
     );
 
@@ -349,6 +360,7 @@ export const DamageScreen = ({navigation}) => {
                 renderTabBar={Tab}
                 onIndexChange={setIndex}
                 initialLayout={{height: windowHeight, width: windowWidth}}
+                swipeEnabled={false}
             />
         </>
     );

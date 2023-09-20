@@ -1,6 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {View, TouchableHighlight, Switch} from 'react-native';
+import {ImageBackground, View, TouchableHighlight, Switch} from 'react-native';
 import {Text, Icon, Card, CardItem, Right, Body} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
@@ -502,11 +502,17 @@ export default class Characteristics extends Component {
     render() {
         return (
             <View>
-                {this._renderSecondaryCharacteristicToggle()}
-                {this._renderCharacteristics(this.props.character.characteristics)}
-                <View style={{paddingTop: verticalScale(20)}} />
-                <Heading text="Movement" />
-                {this._renderCharacteristics(this.props.character.movement)}
+                <ImageBackground
+                    source={require('../../../public/background.png')}
+                    style={{flex: 1, flexDirection: 'column'}}
+                    imageStyle={{resizeMode: 'repeat'}}
+                >
+                    {this._renderSecondaryCharacteristicToggle()}
+                    {this._renderCharacteristics(this.props.character.characteristics)}
+                    <View style={{paddingTop: verticalScale(20)}} />
+                    <Heading text="Movement" />
+                    {this._renderCharacteristics(this.props.character.movement)}
+                </ImageBackground>
             </View>
         );
     }

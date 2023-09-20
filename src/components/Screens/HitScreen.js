@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {useSelector, useDispatch} from 'react-redux';
-import {Dimensions, View, Switch, TouchableHighlight} from 'react-native';
+import {ImageBackground, Dimensions, View, Switch, TouchableHighlight} from 'react-native';
 import {Button, Text, Icon} from 'native-base';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {TabView} from 'react-native-tab-view';
@@ -33,29 +33,33 @@ const windowHeight = Dimensions.get('window').height;
 
 const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
     const tab = (
-        <>
-            <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateForm} valueKey="ocv" />
-            <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateForm} valueKey="numberOfRolls" />
-            <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                <Text style={styles.grey}>Is this an autofire attack?</Text>
-                <View style={{paddingRight: scale(10)}}>
-                    <Switch
-                        value={hitForm.isAutofire}
-                        onValueChange={() => updateForm('isAutofire', !hitForm.isAutofire)}
-                        color="#3da0ff"
-                        minimumTrackTintColor="#14354d"
-                        maximumTrackTintColor="#14354d"
-                        thumbColor="#14354d"
-                        trackColor={{false: '#000', true: '#3d5478'}}
-                        ios_backgroundColor="#3d5478"
-                    />
+        <View flex={0} flexGrow={1}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <View paddingHorizontal={scale(10)}>
+                    <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateForm} valueKey="ocv" />
+                    <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateForm} valueKey="numberOfRolls" />
+                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                        <Text style={styles.grey}>Is this an autofire attack?</Text>
+                        <View style={{paddingRight: scale(10)}}>
+                            <Switch
+                                value={hitForm.isAutofire}
+                                onValueChange={() => updateForm('isAutofire', !hitForm.isAutofire)}
+                                color="#3da0ff"
+                                minimumTrackTintColor="#14354d"
+                                maximumTrackTintColor="#14354d"
+                                thumbColor="#14354d"
+                                trackColor={{false: '#000', true: '#3d5478'}}
+                                ios_backgroundColor="#3d5478"
+                            />
+                        </View>
+                    </View>
+                    {renderDcvSlider()}
+                    <Button block style={styles.button} onPress={roll}>
+                        <Text uppercase={false}>Roll</Text>
+                    </Button>
                 </View>
-            </View>
-            {renderDcvSlider()}
-            <Button block style={styles.button} onPress={roll}>
-                <Text uppercase={false}>Roll</Text>
-            </Button>
-        </>
+            </ImageBackground>
+        </View>
     );
 
     return RouteBuilder('Roll To Hit', tab, false);
@@ -63,66 +67,68 @@ const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
 
 const RangeModsRoute = () => {
     const tab = (
-        <>
-            <View>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: 5}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text>
+        <View flex={0} flexGrow={1}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <View paddingHorizontal={scale(10)} alignItems="flex-start" alignSelf="center">
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View flex={0.5}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Range (M)</Text>
+                        </View>
+                        <View>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text>
+                        </View>
                     </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>RMOD</Text>
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View flex={0.5}>
+                            <Text style={styles.grey}>0-8</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>0</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View flex={0.5}>
+                            <Text style={styles.grey}>9-16</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>-2</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View flex={0.5}>
+                            <Text style={styles.grey}>17-32</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>-4</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View flex={0.5}>
+                            <Text style={styles.grey}>33-64</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>-6</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View flex={0.5}>
+                            <Text style={styles.grey}>65-128</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>-8</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View flex={0.5}>
+                            <Text style={styles.grey}>129-250</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>-10</Text>
+                        </View>
                     </View>
                 </View>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>0-8</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>0</Text>
-                    </View>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>9-16</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>-2</Text>
-                    </View>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>17-32</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>-4</Text>
-                    </View>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>33-64</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>-6</Text>
-                    </View>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>65-128</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>-8</Text>
-                    </View>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>129-250</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={styles.grey}>-10</Text>
-                    </View>
-                </View>
-            </View>
-        </>
+            </ImageBackground>
+        </View>
     );
 
     return RouteBuilder('Range Mods', tab, false);
@@ -130,58 +136,60 @@ const RangeModsRoute = () => {
 
 const HitLocationsRoute = ({setLocation, renderLocationDetails}) => {
     const tab = (
-        <>
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+        <View flex={0} flexGrow={1}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <View paddingHorizontal={scale(10)} alignItems="center">
+                    <View flexDirection="row" alignItems="space-evenly" justifyContent="space-between" paddingBottom={verticalScale(10)}>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Roll</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
+                        </View>
+                        <View style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Damage</Text>
+                        </View>
                     </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Roll</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Damage</Text>
-                    </View>
+                    {hitLocations.map((hitLocation, index) => {
+                        let stars = [];
+
+                        for (let i = 0; i < hitLocation.stunX; i++) {
+                            stars.push(<Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: verticalScale(14)}]} />);
+                        }
+
+                        return (
+                            <TouchableHighlight
+                                key={'hit-location-' + index}
+                                style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}
+                                underlayColor="#3da0ff"
+                                onPress={() => setLocation(index)}
+                            >
+                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>{hitLocation.location}</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'center'}}>
+                                        <Text style={styles.grey}>{hitLocation.roll}</Text>
+                                    </View>
+                                    <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                        <Text style={styles.grey}>{hitLocation.penalty}</Text>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
+                                        {stars.map((star) => {
+                                            return star;
+                                        })}
+                                    </View>
+                                </View>
+                            </TouchableHighlight>
+                        );
+                    })}
                 </View>
-                {hitLocations.map((hitLocation, index) => {
-                    let stars = [];
-
-                    for (let i = 0; i < hitLocation.stunX; i++) {
-                        stars.push(<Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: verticalScale(14)}]} />);
-                    }
-
-                    return (
-                        <TouchableHighlight
-                            key={'hit-location-' + index}
-                            style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}
-                            underlayColor="#3da0ff"
-                            onPress={() => setLocation(index)}
-                        >
-                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{hitLocation.location}</Text>
-                                </View>
-                                <View style={{flex: 1, alignSelf: 'center'}}>
-                                    <Text style={styles.grey}>{hitLocation.roll}</Text>
-                                </View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{hitLocation.penalty}</Text>
-                                </View>
-                                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
-                                    {stars.map((star) => {
-                                        return star;
-                                    })}
-                                </View>
-                            </View>
-                        </TouchableHighlight>
-                    );
-                })}
-            </View>
-            {renderLocationDetails()}
-        </>
+                {renderLocationDetails()}
+            </ImageBackground>
+        </View>
     );
 
     return RouteBuilder('Hit Locations', tab, false);
@@ -189,67 +197,69 @@ const HitLocationsRoute = ({setLocation, renderLocationDetails}) => {
 
 const TargetedShotsRoute = () => {
     const tab = (
-        <>
-            <View>
-                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch'}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text>
+        <View flex={0} flexGrow={1}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <View flex={0} justifyContent="center" alignItems="center" alignSelf="center">
+                    <View>
+                        <View flexDirection="row" justifyContent="center" paddingBottom={verticalScale(10)}>
+                            <View width="40%">
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Targeted Shot</Text>
+                            </View>
+                            <View width="15%">
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
+                            </View>
+                            <View width="30%">
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+                            </View>
                         </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Hit</Text>
+                        <View flexDirection="row" justifyContent="center" paddingBottom={verticalScale(10)}>
+                            <View width="40%">
+                                <Text style={styles.grey}>Head Shot</Text>
+                            </View>
+                            <View width="15%" alignSelf="center">
+                                <Text style={styles.grey}>-4</Text>
+                            </View>
+                            <View width="30%">
+                                <Text style={styles.grey}>1d6+3</Text>
+                            </View>
                         </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Location</Text>
+                        <View flexDirection="row" justifyContent="center" paddingBottom={verticalScale(10)}>
+                            <View width="40%">
+                                <Text style={styles.grey}>High Shot</Text>
+                            </View>
+                            <View width="15%" alignSelf="center">
+                                <Text style={styles.grey}>-2</Text>
+                            </View>
+                            <View width="30%">
+                                <Text style={styles.grey}>2d6+1</Text>
+                            </View>
                         </View>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>Head Shot</Text>
+                        <View flexDirection="row" justifyContent="center" paddingBottom={verticalScale(10)}>
+                            <View width="40%">
+                                <Text style={styles.grey}>Low Shot</Text>
+                            </View>
+                            <View width="15%" alignSelf="center">
+                                <Text style={styles.grey}>-2</Text>
+                            </View>
+                            <View width="30%">
+                                <Text style={styles.grey}>2d6+7 (19=foot)</Text>
+                            </View>
                         </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>-4</Text>
-                        </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>1d6+3</Text>
-                        </View>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>High Shot</Text>
-                        </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>-2</Text>
-                        </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>2d6+1</Text>
-                        </View>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>Low Shot</Text>
-                        </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>-2</Text>
-                        </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>2d6+7 (19=foot)</Text>
-                        </View>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>Leg Shot</Text>
-                        </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>-4</Text>
-                        </View>
-                        <View style={{flex: 1, alignSelf: 'stretch'}}>
-                            <Text style={styles.grey}>1d6+12</Text>
+                        <View flexDirection="row" justifyContent="center" paddingBottom={verticalScale(10)}>
+                            <View width="40%">
+                                <Text style={styles.grey}>Leg Shot</Text>
+                            </View>
+                            <View width="15%" alignSelf="center">
+                                <Text style={styles.grey}>-4</Text>
+                            </View>
+                            <View width="30%">
+                                <Text style={styles.grey}>1d6+12</Text>
+                            </View>
                         </View>
                     </View>
                 </View>
-            </View>
-        </>
+            </ImageBackground>
+        </View>
     );
 
     return RouteBuilder('Targeted Shots', tab, false);
@@ -364,6 +374,7 @@ export const HitScreen = ({navigation}) => {
                 renderTabBar={Tab}
                 onIndexChange={setIndex}
                 initialLayout={{height: windowHeight, width: windowWidth}}
+                swipeEnabled={false}
             />
         </>
     );

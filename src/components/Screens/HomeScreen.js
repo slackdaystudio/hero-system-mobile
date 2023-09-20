@@ -2,7 +2,7 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
 import {View, ImageBackground} from 'react-native';
-import {Container, Content} from 'native-base';
+import {Container} from 'native-base';
 import {verticalScale} from 'react-native-size-matters';
 import Header, {EXIT_APP} from '../Header/Header';
 import Heading from '../Heading/Heading';
@@ -34,7 +34,7 @@ export const HomeScreen = ({navigation}) => {
     const renderCharacterButtons = () => {
         if (common.isEmptyObject(character)) {
             return (
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
                     <IconButton
                         label="Characters"
                         textPos={TEXT_BOTTOM}
@@ -48,8 +48,8 @@ export const HomeScreen = ({navigation}) => {
         }
 
         return (
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
-                <View flex={1}>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
+                <View>
                     <IconButton
                         label="View"
                         textPos={TEXT_BOTTOM}
@@ -59,7 +59,7 @@ export const HomeScreen = ({navigation}) => {
                         onPress={() => onViewPress()}
                     />
                 </View>
-                <View flex={1}>
+                <View>
                     <IconButton
                         label="Characters"
                         textPos={TEXT_BOTTOM}
@@ -75,84 +75,81 @@ export const HomeScreen = ({navigation}) => {
 
     return (
         <Container style={styles.container}>
-            <Header navigation={navigation} backScreen={EXIT_APP} />
-            <Content style={styles.content}>
-                <ImageBackground source={require('../../../public/background.png')} style={{flex: 1}} imageStyle={{resizeMode: 'cover'}}>
-                    <Heading text="Library" />
-                    <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
-                        {renderCharacterButtons()}
-                        <Heading text="Dice Rollers" />
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
-                            <View flex={1}>
-                                <IconButton
-                                    label="3d6"
-                                    textPos={TEXT_BOTTOM}
-                                    icon="check-circle"
-                                    iconColor="#e8e8e8"
-                                    textStyle={{color: '#e8e8e8'}}
-                                    onPress={() => navigation.navigate('Skill')}
-                                />
-                            </View>
-                            <View flex={1}>
-                                <IconButton
-                                    label="Hit"
-                                    textPos={TEXT_BOTTOM}
-                                    icon="bullseye"
-                                    iconColor="#e8e8e8"
-                                    textStyle={{color: '#e8e8e8'}}
-                                    onPress={() => navigation.navigate('Hit')}
-                                />
-                            </View>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} backScreen={EXIT_APP} />
+                <Heading text="Library" />
+                <View flex={0} flexGrow={1} flexDirection="column" justifyContent="flex-start">
+                    {renderCharacterButtons()}
+                    <Heading text="Dice Rollers" />
+                    <View flexDirection="row" alignItems="center" justifyContent="space-evenly" style={{paddingBottom: verticalScale(15)}}>
+                        <View>
+                            <IconButton
+                                label="3d6"
+                                textPos={TEXT_BOTTOM}
+                                icon="check-circle"
+                                iconColor="#e8e8e8"
+                                textStyle={{color: '#e8e8e8'}}
+                                onPress={() => navigation.navigate('Skill')}
+                            />
                         </View>
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
-                            <View flex={1}>
-                                <IconButton
-                                    label="Damage"
-                                    textPos={TEXT_BOTTOM}
-                                    icon="medkit"
-                                    iconColor="#e8e8e8"
-                                    textStyle={{color: '#e8e8e8'}}
-                                    onPress={() => navigation.navigate('Damage')}
-                                />
-                            </View>
-                            <View flex={1}>
-                                <IconButton
-                                    label="Effect"
-                                    textPos={TEXT_BOTTOM}
-                                    icon="shield-virus"
-                                    iconColor="#e8e8e8"
-                                    textStyle={{color: '#e8e8e8'}}
-                                    onPress={() => navigation.navigate('Effect')}
-                                />
-                            </View>
-                        </View>
-                        <Heading text="Game Aids" />
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
-                            <View flex={1}>
-                                <IconButton
-                                    label="H.E.R.O."
-                                    textPos={TEXT_BOTTOM}
-                                    icon="mask"
-                                    iconColor="#e8e8e8"
-                                    textStyle={{color: '#e8e8e8'}}
-                                    onPress={() => navigation.navigate('RandomCharacter')}
-                                />
-                            </View>
-                            <View flex={1}>
-                                <IconButton
-                                    label="Cruncher"
-                                    textPos={TEXT_BOTTOM}
-                                    icon="square-root-alt"
-                                    iconColor="#e8e8e8"
-                                    textStyle={{color: '#e8e8e8'}}
-                                    onPress={() => navigation.navigate('CostCruncher')}
-                                />
-                            </View>
+                        <View>
+                            <IconButton
+                                label="Hit"
+                                textPos={TEXT_BOTTOM}
+                                icon="bullseye"
+                                iconColor="#e8e8e8"
+                                textStyle={{color: '#e8e8e8'}}
+                                onPress={() => navigation.navigate('Hit')}
+                            />
                         </View>
                     </View>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                </ImageBackground>
-            </Content>
+                    <View flexDirection="row" alignItems="center" justifyContent="space-evenly" style={{paddingBottom: verticalScale(15)}}>
+                        <View>
+                            <IconButton
+                                label="Damage"
+                                textPos={TEXT_BOTTOM}
+                                icon="medkit"
+                                iconColor="#e8e8e8"
+                                textStyle={{color: '#e8e8e8'}}
+                                onPress={() => navigation.navigate('Damage')}
+                            />
+                        </View>
+                        <View>
+                            <IconButton
+                                label="Effect"
+                                textPos={TEXT_BOTTOM}
+                                icon="shield-virus"
+                                iconColor="#e8e8e8"
+                                textStyle={{color: '#e8e8e8'}}
+                                onPress={() => navigation.navigate('Effect')}
+                            />
+                        </View>
+                    </View>
+                    <Heading text="Game Aids" />
+                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
+                        <View>
+                            <IconButton
+                                label="H.E.R.O."
+                                textPos={TEXT_BOTTOM}
+                                icon="mask"
+                                iconColor="#e8e8e8"
+                                textStyle={{color: '#e8e8e8'}}
+                                onPress={() => navigation.navigate('RandomCharacter')}
+                            />
+                        </View>
+                        <View>
+                            <IconButton
+                                label="Cruncher"
+                                textPos={TEXT_BOTTOM}
+                                icon="square-root-alt"
+                                iconColor="#e8e8e8"
+                                textStyle={{color: '#e8e8e8'}}
+                                onPress={() => navigation.navigate('CostCruncher')}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </ImageBackground>
         </Container>
     );
 };

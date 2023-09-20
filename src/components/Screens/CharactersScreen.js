@@ -1,9 +1,9 @@
-import React, {Fragment, useCallback, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {View} from 'react-native';
-import {Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon} from 'native-base';
+import {ImageBackground, View} from 'react-native';
+import {Container, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon} from 'native-base';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
@@ -109,7 +109,11 @@ export const CharactersScreen = ({navigation, route}) => {
                 libCharacter
                     .import(startLoad, endLoad)
                     .then((char) => {
-                        postImport(char);
+                        if (common.isEmptyObject(char)) {
+                            common.toast('Error: could not import character.');
+                        } else {
+                            postImport(char);
+                        }
                     })
                     .catch((error) => {
                         console.error(error.message);
@@ -119,7 +123,11 @@ export const CharactersScreen = ({navigation, route}) => {
             libCharacter
                 .import(startLoad, endLoad)
                 .then((char) => {
-                    postImport(char);
+                    if (common.isEmptyObject(char)) {
+                        common.toast('Error: could not import character.');
+                    } else {
+                        postImport(char);
+                    }
                 })
                 .catch((error) => {
                     console.error(error.message);
@@ -229,8 +237,8 @@ export const CharactersScreen = ({navigation, route}) => {
         }
 
         return (
-            <Fragment>
-                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: scale(300), alignSelf: 'center'}}>
+            <View flexBasis="auto">
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: scale(300), alignSelf: 'center'}}>
                     <View style={{flex: 1}}>
                         <Text style={styles.grey}>Load character into: </Text>
                     </View>
@@ -281,25 +289,25 @@ export const CharactersScreen = ({navigation, route}) => {
                         </Text>
                     </Button>
                 </View>
-            </Fragment>
+            </View>
         );
     };
 
     return (
         <Container style={styles.container}>
             <Header navigation={navigation} />
-            <Content style={styles.content}>
-                <Heading text="Characters" />
+            <Heading text="Characters" />
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 {renderCharacters()}
-                <View style={{paddingBottom: verticalScale(20)}} />
-                <ConfirmationDialog
-                    visible={dialogProps.deleteDialogVisible}
-                    title={dialogProps.dialogTitle}
-                    info={dialogProps.dialogMessage}
-                    onOk={dialogProps.dialogOnOkFn}
-                    onClose={onDeleteDialogClose}
-                />
-            </Content>
+            </ImageBackground>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <ConfirmationDialog
+                visible={dialogProps.deleteDialogVisible}
+                title={dialogProps.dialogTitle}
+                info={dialogProps.dialogMessage}
+                onOk={dialogProps.dialogOnOkFn}
+                onClose={onDeleteDialogClose}
+            />
         </Container>
     );
 };

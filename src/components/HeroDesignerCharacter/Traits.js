@@ -1,6 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {View, TouchableHighlight} from 'react-native';
+import {ImageBackground, View, TouchableHighlight} from 'react-native';
 import {Text, Icon, Card, CardItem, Body} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {dieRoller} from '../../lib/DieRoller';
@@ -445,8 +445,12 @@ export default class Traits extends Component {
     }
 
     _renderTraits(items) {
+        if (items.length === 0) {
+            return null;
+        }
+
         return (
-            <Fragment>
+            <View flexDirection="column" justifyContent="flex-start">
                 {items.map((item, index) => {
                     let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
@@ -473,16 +477,16 @@ export default class Traits extends Component {
                         </Card>
                     );
                 })}
-            </Fragment>
+            </View>
         );
     }
 
     render() {
         return (
-            <View>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 {this._renderTraits(this.props.character[this.props.listKey])}
-                <View style={{paddingTop: verticalScale(20)}} />
-            </View>
+                <View flex={0} flexBasis={1} style={{paddingTop: verticalScale(20)}} />
+            </ImageBackground>
         );
     }
 }

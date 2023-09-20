@@ -2,8 +2,10 @@ import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Container, Content, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
+import {ImageBackground} from 'react-native';
+import {Container, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
 import Header from '../Header/Header';
+import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {chart} from '../../lib/Chart';
 import {common} from '../../lib/Common';
 import {statistics as libStatistics} from '../../lib/Statistics';
@@ -74,125 +76,131 @@ export const StatisticsScreen = ({navigation}) => {
         return (
             <Container style={styles.container}>
                 <Header hasTabs={false} navigation={navigation} />
-                <Content style={styles.content}>
+                <ImageBackground
+                    source={require('../../../public/background.png')}
+                    style={{flex: 1, flexDirection: 'column'}}
+                    imageStyle={{resizeMode: 'repeat'}}
+                >
                     <Spinner color="#D0D1D3" />
-                </Content>
+                </ImageBackground>
             </Container>
         );
     }
 
     return (
         <Container style={styles.container}>
-            <Header navigation={navigation} />
-            <Content style={styles.content}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} />
                 <Text style={styles.heading}>Statistics</Text>
-                {renderDieDistributionChart()}
-                <List>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.diceRolled}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Face Value:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.sum}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Largest Amount of Dice Rolled:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.largestDieRoll}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Largest Roll:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.largestSum}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Skill Checks:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.skillChecks}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Rolls To Hit:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.hitRolls}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.normalDamage.rolls + statistics.totals.killingDamage.rolls}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Effect Rolls:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.effectRolls}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Stun:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.normalDamage.stun + statistics.totals.killingDamage.stun}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Body:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.normalDamage.body + statistics.totals.killingDamage.body}</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Total Knockback:</Text>
-                        </Left>
-                        <Right>
-                            <Text style={styles.grey}>{statistics.totals.knockback}m</Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Most Frequent Hit Location:</Text>
-                        </Left>
-                        <Right>{renderHitLocationStat()}</Right>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
-                            <Text style={styles.boldGrey}>Average Roll:</Text>
-                        </Left>
-                        <Right>{renderAverageRoll()}</Right>
-                    </ListItem>
-                    <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>
-                        *Does not include hit location or knockback rolls
-                    </Text>
-                </List>
-            </Content>
+                <VirtualizedList>
+                    {renderDieDistributionChart()}
+                    <List>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.diceRolled}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Face Value:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.sum}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Largest Amount of Dice Rolled:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.largestDieRoll}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Largest Roll:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.largestSum}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Skill Checks:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.skillChecks}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Rolls To Hit:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.hitRolls}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.normalDamage.rolls + statistics.totals.killingDamage.rolls}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Effect Rolls:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.effectRolls}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Stun:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.normalDamage.stun + statistics.totals.killingDamage.stun}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Body:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.normalDamage.body + statistics.totals.killingDamage.body}</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Total Knockback:</Text>
+                            </Left>
+                            <Right>
+                                <Text style={styles.grey}>{statistics.totals.knockback}m</Text>
+                            </Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Most Frequent Hit Location:</Text>
+                            </Left>
+                            <Right>{renderHitLocationStat()}</Right>
+                        </ListItem>
+                        <ListItem>
+                            <Left>
+                                <Text style={styles.boldGrey}>Average Roll:</Text>
+                            </Left>
+                            <Right>{renderAverageRoll()}</Right>
+                        </ListItem>
+                        <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>
+                            *Does not include hit location or knockback rolls
+                        </Text>
+                    </List>
+                </VirtualizedList>
+            </ImageBackground>
         </Container>
     );
 };

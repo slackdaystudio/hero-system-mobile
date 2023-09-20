@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
+import {ImageBackground, ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
 import {Spinner} from 'native-base';
 import {verticalScale, scale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
+import {common} from '../../lib/Common';
 
 export const RouteBuilder = (headingText, tab, showSpinner = false) => {
     if (showSpinner) {
@@ -15,8 +16,20 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
         );
     }
 
+    if (common.isEmptyObject(tab)) {
+        return (
+            <View flex={0} flexGrow={1}>
+                <ImageBackground
+                    source={require('../../../public/background.png')}
+                    style={{flex: 1, flexDirection: 'column'}}
+                    imageStyle={{resizeMode: 'repeat'}}
+                />
+            </View>
+        );
+    }
+
     return (
-        <ScrollView contentContainerStyle={{flexGrow: 1, backgroundColor: '#1b1d1f'}}>
+        <ScrollView contentContainerStyle={{flexBasis: 'auto', flexGrow: 1, backgroundColor: '#1b1d1f'}}>
             <View flex={1}>{tab}</View>
         </ScrollView>
     );
@@ -59,7 +72,7 @@ export const Tab = ({navigationState}) => {
     });
 
     return (
-        <View alignSelf="stretch" alignItems="center" backgroundColor="#1b1d1f">
+        <View alignItems="center" backgroundColor="#1b1d1f">
             <FlatList
                 backgroundColor={'#1b1d1f'}
                 horizontal
