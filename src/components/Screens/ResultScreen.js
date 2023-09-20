@@ -80,14 +80,14 @@ export const ResultScreen = ({route, navigation}) => {
         }
 
         if (result.isAutofire) {
-            if (result.hits > 0) {
-                return <Text style={styles.grey}>You can hit your target up to {result.hits}x</Text>;
+            if (hitResult.hits > 0) {
+                return <Text style={styles.grey}>You can hit your target up to {hitResult.hits}x</Text>;
             } else {
                 return <Text style={styles.grey}>You have missed your target with all of your shots</Text>;
             }
         }
 
-        return <Text style={styles.grey}>You can hit a DCV/DMCV of {result.hitCv} or less</Text>;
+        return <Text style={styles.grey}>You can hit a DCV/DMCV of {hitResult.hitCv} or less</Text>;
     };
 
     const renderHitLocation = () => {
