@@ -10,6 +10,7 @@ import {character as libCharacter} from './Character';
 import {combatDetails} from './CombatDetails';
 import {Buffer} from 'buffer';
 import iconv from 'iconv-lite';
+import sanitize from 'sanitize-filename';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -68,6 +69,8 @@ class File {
                 }
 
                 character = heroDesignerCharacter.getCharacter(parsedXml);
+
+                await this._saveCharacter(character, result.name);
             } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
                 character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_CHARACTER);
             } else {
@@ -173,17 +176,29 @@ class File {
             canonicalFromName = `${path}/${character.name}`;
             canonicalToName = `${path}/tmp`;
 
-            await unzip(canonicalFromName, canonicalToName);
+            try {
+                await unzip(canonicalFromName, canonicalToName);
 
-            char = await RNFS.readFile(`${canonicalToName}/${character.name.slice(0, -5)}.${EXT_JSON}`);
+                char = await RNFS.readFile(`${canonicalToName}/${character.name.slice(0, -5)}.${EXT_JSON}`);
 
-            char = JSON.parse(char);
+                char = JSON.parse(char);
 
-            if (libCharacter.isHeroDesignerCharacter(char)) {
-                filtered.push({
-                    name: char.characterInfo.characterName,
-                    fileName: character.name,
-                });
+                if (libCharacter.isHeroDesignerCharacter(char)) {
+                    filtered.push({
+                        name: char.characterInfo.characterName,
+                        fileName: character.name,
+                    });
+                }
+            } catch (error) {
+                common.toast(`Error: could not process file "${character.name}".  Possibly corrupt.`, 'Ok', 15000);
+
+                canonicalToName = `${path}/corrupt`;
+
+                if (!(await RNFS.exists(canonicalToName))) {
+                    RNFS.mkdir(canonicalToName);
+                }
+
+                await RNFS.moveFile(canonicalFromName, `${canonicalToName}/${character.name}`);
             }
         }
 
@@ -258,9 +273,9 @@ class File {
     }
 
     async _importCharacter(name, filepath) {
-        let importPath = await this._getPath(DEFAULT_CHARACTER_DIR);
-        let importFilename = `file://${Platform.OS === 'ios' ? importPath : decodeURIComponent(importPath)}/${name}`;
-        let exists = await RNFS.exists(importFilename);
+        const importPath = await this._getPath(DEFAULT_CHARACTER_DIR);
+        const importFilename = `file://${Platform.OS === 'ios' ? importPath : decodeURIComponent(importPath)}/${name}`;
+        const exists = await RNFS.exists(importFilename);
 
         // https://github.com/itinance/react-native-fs/issues/869
         if (exists) {
@@ -401,7 +416,7 @@ class File {
             filename = filename.slice(0, -4);
         }
 
-        return `${path}/${filename.replace(/[/\\?%*:|"<>\s]/g, '_')}.${extension}`;
+        return `${path}/${sanitize(filename, {replacement: '_'})}.${extension}`;
     }
 }
 
