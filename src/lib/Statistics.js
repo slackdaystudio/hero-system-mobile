@@ -1,4 +1,4 @@
-import {NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK, PARTIAL_DIE_HALF} from './DieRoller';
+import {NORMAL_DAMAGE, KILLING_DAMAGE, TO_HIT, EFFECT, SKILL_CHECK, PARTIAL_DIE_HALF, PARTIAL_DIE_PLUS_ONE} from './DieRoller';
 import {persistence} from './Persistence';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -15,9 +15,11 @@ import {persistence} from './Persistence';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const AVERAGE_DIE_ROLL = 3.5;
+const AVERAGE_D6_ROLL = 3.5;
 
-const AVERAGE_HALF_DIE_ROLL = 2.0;
+const AVERAGE_D3_ROLL = 2.0;
+
+const AVERAGE_D6_MINUS_1_ROLL = 3.0;
 
 class Statistics {
     async add(resultRoll) {
@@ -79,14 +81,14 @@ class Statistics {
         let sum = roll.rolls.reduce((a, b) => a + b, 0);
         let average = 0.0;
 
-        if (roll.partialDie === PARTIAL_DIE_HALF) {
+        if (roll.partialDie > PARTIAL_DIE_PLUS_ONE) {
             // The last entry on the rolls array is the half die
-            roll.rolls.pop();
+            const partialDie = roll.rolls.slice(-1);
 
-            average += AVERAGE_HALF_DIE_ROLL;
+            average += partialDie === PARTIAL_DIE_HALF ? AVERAGE_D3_ROLL : AVERAGE_D6_MINUS_1_ROLL;
         }
 
-        average += roll.rolls.length * AVERAGE_DIE_ROLL;
+        average += roll.rolls.length * AVERAGE_D6_ROLL;
 
         return Math.round((sum / average - 1) * 100 * 10) / 10;
     }

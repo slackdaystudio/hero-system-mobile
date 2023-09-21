@@ -7,7 +7,7 @@ import {Container, Button, Text, Spinner, Icon} from 'native-base';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
-import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
+import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT, PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {statistics} from '../../lib/Statistics';
 import {addStatistics} from '../../reducers/statistics';
 import {selectResultData} from '../../reducers/selectors';
@@ -308,7 +308,7 @@ export const ResultScreen = ({route, navigation}) => {
 
         if (result.hasOwnProperty('results')) {
             return result.results.map((r, index) => {
-                let percentage = statistics.getPercentage(r);
+                const percentage = statistics.getPercentage(r);
 
                 return (
                     <View key={'roll-result-' + index}>
@@ -338,7 +338,7 @@ export const ResultScreen = ({route, navigation}) => {
                         </View>
                         <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
                             {r.rolls.map((roll, i) => {
-                                const dieIcon = common.getDieIconDetails(roll);
+                                const dieIcon = common.getDieIconDetails(roll, r.partialDieType, r.rolls.length - 1 === i);
 
                                 return (
                                     <Icon
@@ -353,19 +353,21 @@ export const ResultScreen = ({route, navigation}) => {
                         </View>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                            {r.rolls.length}
+                            {r.partialDieType > PARTIAL_DIE_PLUS_ONE ? `${r.rolls.length - 1}+$1` : r.rolls.length}
                         </Text>
-                        <Text style={styles.grey}>
-                            <Text style={styles.boldGrey}>Partial Die: </Text>
-                            {dieRoller.getPartialDieName(r.partialDieType)}
-                        </Text>
+                        {r.partialDieType > 0 ? (
+                            <Text style={styles.grey}>
+                                <Text style={styles.boldGrey}>Partial Die: </Text>
+                                {dieRoller.getPartialDieName(r.partialDieType)}
+                            </Text>
+                        ) : null}
                         {renderAdditionalRollInfo(r)}
                     </View>
                 );
             });
         }
 
-        let percentage = statistics.getPercentage(result);
+        const percentage = statistics.getPercentage(result);
 
         return (
             <View>
@@ -394,7 +396,7 @@ export const ResultScreen = ({route, navigation}) => {
                 </View>
                 <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
                     {result.rolls.map((roll, i) => {
-                        const dieIcon = common.getDieIconDetails(roll);
+                        const dieIcon = common.getDieIconDetails(roll, result.partialDieType, result.rolls.length - 1 === i);
 
                         return (
                             <Icon
@@ -409,12 +411,14 @@ export const ResultScreen = ({route, navigation}) => {
                 </View>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                    {result.rolls.length}
+                    {result.partialDieType > PARTIAL_DIE_PLUS_ONE ? `${result.rolls.length - 1}+1` : result.rolls.length}
                 </Text>
-                <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Partial Die: </Text>
-                    {dieRoller.getPartialDieName(result.partialDieType)}
-                </Text>
+                {result.partialDieType > 0 ? (
+                    <Text style={styles.grey}>
+                        <Text style={styles.boldGrey}>Partial Die: </Text>
+                        {dieRoller.getPartialDieName(result.partialDieType)}
+                    </Text>
+                ) : null}
                 {renderAdditionalRollInfo(result)}
             </View>
         );

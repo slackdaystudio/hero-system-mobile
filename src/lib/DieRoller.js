@@ -173,7 +173,7 @@ class DieRoller {
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
             name = '+1 pip';
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            name = '-1 pip';
+            name = '1d6-1';
         } else if (partialDieType === PARTIAL_DIE_HALF) {
             name = '½d6';
         }
@@ -200,9 +200,16 @@ class DieRoller {
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
             resultRoll.total += 1;
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            resultRoll.total -= 1;
+            let partialDie = Math.floor(Math.random() * 6) + 1;
+
+            if (partialDie < 1) {
+                partialDie = 1;
+            }
+
+            resultRoll.total += partialDie;
+            resultRoll.rolls.push(partialDie);
         } else if (partialDieType === PARTIAL_DIE_HALF) {
-            let halfDie = Math.floor(Math.random() * 3) + 1;
+            const halfDie = Math.floor(Math.random() * 3) + 1;
 
             resultRoll.total += halfDie;
             resultRoll.rolls.push(halfDie);
@@ -216,7 +223,7 @@ class DieRoller {
 
         if (resultRoll.rollType === KILLING_DAMAGE) {
             if (resultRoll.damageForm.useHitLocations) {
-                stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier));
+                stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier, 10));
             } else {
                 if (resultRoll.stunModifier === undefined) {
                     resultRoll.stunModifier = 1;
@@ -233,7 +240,7 @@ class DieRoller {
                     }
                 }
 
-                stun = resultRoll.total * (resultRoll.stunModifier + parseInt(resultRoll.stunMultiplier));
+                stun = resultRoll.total * (resultRoll.stunModifier + parseInt(resultRoll.stunMultiplier, 10));
             }
         } else {
             stun = resultRoll.total;

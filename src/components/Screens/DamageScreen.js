@@ -187,7 +187,7 @@ const DamageRoute = ({damageForm, picker, setOpen, setValue, setItems, updateFor
                         </View>
                     </View>
                     <View style={{paddingBottom: 30}} />
-                    <Button block style={styles.button} onPress={roll}>
+                    <Button block disabled={damageForm.dice === 0 && picker.value <= PARTIAL_DIE_PLUS_ONE} style={styles.button} onPress={roll}>
                         <Text uppercase={false}>Roll</Text>
                     </Button>
                 </View>
@@ -272,8 +272,8 @@ export const DamageScreen = ({navigation}) => {
     const [items, setItems] = useState([
         {label: 'No partial die', value: 0},
         {label: '+1 pip', value: PARTIAL_DIE_PLUS_ONE},
-        {label: '+½ die', value: PARTIAL_DIE_HALF},
-        {label: '-1 pip', value: PARTIAL_DIE_MINUS_ONE},
+        {label: '½D6', value: PARTIAL_DIE_HALF},
+        {label: '1d6-1', value: PARTIAL_DIE_MINUS_ONE},
     ]);
 
     const [index, setIndex] = useState(0);

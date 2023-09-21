@@ -250,8 +250,8 @@ class Common {
         return merge(left, right);
     }
 
-    getDieIconDetails(face) {
-        let color = '#ffffff';
+    getDieIconDetails(face, partialDieType, isLast) {
+        let color = partialDieType > PARTIAL_DIE_PLUS_ONE && isLast ? '#f2de00' : '#ffffff';
         let iconName = null;
 
         switch (parseInt(face, 10)) {
