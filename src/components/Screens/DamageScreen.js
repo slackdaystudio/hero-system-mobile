@@ -9,6 +9,7 @@ import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {RouteBuilder, Tab} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
+import {Card} from '../Card/Card';
 import {dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
 import {updateFormValue} from '../../reducers/forms';
 import moves from '../../../public/moves.json';
@@ -201,29 +202,24 @@ const DamageRoute = ({damageForm, picker, setOpen, setValue, setItems, updateFor
 
 const ManeuversRoute = ({}) => {
     const tab = (
-        <View style={[styles.tabContent, {paddingBottom: scale(20), paddingHorizontal: scale(10)}]}>
+        <View style={[styles.tabContent, {paddingBottom: scale(20)}]}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Move</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
-                    </View>
-                    <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
-                    </View>
-                </View>
                 {moves.map((move, index) => {
-                    return (
-                        <View key={'move-' + index}>
-                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
+                    const heading = <Text style={[styles.grey, {fontSize: verticalScale(18)}]}>{move.name}</Text>;
+                    const body = (
+                        <>
+                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{move.name}</Text>
+                                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
                                 </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
+                                </View>
+                                <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
+                                </View>
+                            </View>
+                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
                                 <View style={{flex: 1, alignSelf: 'stretch'}}>
                                     <Text style={styles.grey}>{move.phase}</Text>
                                 </View>
@@ -234,23 +230,61 @@ const ManeuversRoute = ({}) => {
                                     <Text style={styles.grey}>{move.dcv}</Text>
                                 </View>
                             </View>
-                            <View
-                                style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    justifyContent: 'flex-start',
-                                    alignSelf: 'flex-start',
-                                    paddingBottom: verticalScale(5),
-                                }}
-                            >
-                                <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                                    <Text style={styles.grey} />
-                                </View>
-                                <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                                    <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
-                                </View>
+                        </>
+                    );
+
+                    const footer = (
+                        <View
+                            style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                justifyContent: 'flex-start',
+                                alignSelf: 'flex-start',
+                                paddingBottom: verticalScale(5),
+                            }}
+                        >
+                            <View>
+                                <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
                             </View>
                         </View>
+                    );
+
+                    return (
+                        <View key={'move-' + index}>
+                            <Card heading={heading} body={body} footer={footer} />
+                        </View>
+                        // <View key={'move-' + index}>
+                        //     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
+                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        //             <Text style={styles.grey}>{move.name}</Text>
+                        //         </View>
+                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        //             <Text style={styles.grey}>{move.phase}</Text>
+                        //         </View>
+                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        //             <Text style={styles.grey}>{move.ocv}</Text>
+                        //         </View>
+                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
+                        //             <Text style={styles.grey}>{move.dcv}</Text>
+                        //         </View>
+                        //     </View>
+                        //     <View
+                        //         style={{
+                        //             flex: 1,
+                        //             flexDirection: 'row',
+                        //             justifyContent: 'flex-start',
+                        //             alignSelf: 'flex-start',
+                        //             paddingBottom: verticalScale(5),
+                        //         }}
+                        //     >
+                        //         <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                        //             <Text style={styles.grey} />
+                        //         </View>
+                        //         <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
+                        //             <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
+                        //         </View>
+                        //     </View>
+                        // </View>
                     );
                 })}
             </ImageBackground>
