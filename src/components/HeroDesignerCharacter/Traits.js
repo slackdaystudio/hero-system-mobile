@@ -489,7 +489,11 @@ export default class Traits extends Component {
                 {items.map((item) => {
                     let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
-                    if (decoratedTrait.trait.xmlid.toUpperCase() === GENERIC_OBJECT && decoratedTrait.trait.powers.length === 0) {
+                    if (
+                        decoratedTrait.trait.xmlid.toUpperCase() === GENERIC_OBJECT &&
+                        decoratedTrait.trait.hasOwnProperty(this.props.listKey) &&
+                        decoratedTrait.trait[this.props.listKey].length === 0
+                    ) {
                         return null;
                     }
 
