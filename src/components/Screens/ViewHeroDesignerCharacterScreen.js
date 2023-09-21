@@ -234,7 +234,16 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
             return null;
         }
 
-        return <Traits navigation={navigation} headingText={title} character={character} listKey={listKey} subListKey={subListKey} updateForm={updateForm} />;
+        return (
+            <Traits
+                navigation={navigation}
+                headingText={title}
+                character={character}
+                listKey={listKey}
+                subListKey={subListKey}
+                updateForm={(type, json) => dispatch(updateForm(type, json))}
+            />
+        );
     };
 
     const renderScene = ({route}) => {

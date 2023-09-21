@@ -1,16 +1,18 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {ImageBackground, View, TouchableHighlight, Switch} from 'react-native';
-import {Text, Icon, Card, CardItem, Right, Body} from 'native-base';
+import {Text, CardItem, Body} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
+import CircleButton from '../CircleButton/CircleButton';
 import {dieRoller} from '../../lib/DieRoller';
 import {common} from '../../lib/Common';
 import {heroDesignerCharacter, TYPE_MOVEMENT} from '../../lib/HeroDesignerCharacter';
 import styles from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
 import speedTable from '../../../public/speed.json';
+import {AccordionCard} from '../Card/AccordionCard';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -221,8 +223,8 @@ export default class Characteristics extends Component {
             }
 
             return (
-                <Fragment>
-                    <CardItem style={styles.cardItem}>
+                <View paddingVertical={verticalScale(3)}>
+                    <CardItem style={{backgroundColor: '#1b1d1f'}}>
                         <Body>
                             {this._renderNonCombatMovement(characteristic)}
                             {this._renderStrength(characteristic)}
@@ -230,7 +232,7 @@ export default class Characteristics extends Component {
                             <Text style={styles.grey}>{definition}</Text>
                         </Body>
                     </CardItem>
-                    <CardItem style={styles.cardItem} footer>
+                    <CardItem style={{backgroundColor: '#1b1d1f'}} footer>
                         <Body style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                             <Text style={styles.grey}>
                                 <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
@@ -243,7 +245,7 @@ export default class Characteristics extends Component {
                             </Text>
                         </Body>
                     </CardItem>
-                </Fragment>
+                </View>
             );
         }
 
@@ -427,46 +429,51 @@ export default class Characteristics extends Component {
 
     _renderCharacteristics(characteristics) {
         return (
-            <Fragment>
+            <View paddingTop={verticalScale(20)}>
                 {characteristics.map((characteristic, index) => {
                     let name = characteristic.name.toLowerCase().startsWith('custom') ? characteristic.shortName : characteristic.name;
 
                     return (
-                        <Card style={styles.card} key={'characteristic-' + index}>
-                            <CardItem style={styles.cardItem}>
-                                <Body>
-                                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-                                        {this._renderStat(characteristic)}
-                                        <Text style={[styles.cardTitle, {paddingLeft: scale(10)}]}>{name}</Text>
-                                    </View>
-                                </Body>
-                                <Right style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
-                                    <TouchableHighlight
-                                        underlayColor="#121212"
-                                        onPress={() =>
-                                            this.props.navigation.navigate('Result', {
-                                                from: 'ViewHeroDesignerCharacter',
-                                                result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character)),
-                                            })
-                                        }
-                                    >
-                                        <Text style={[styles.cardTitle, {paddingBottom: 2}]}>
-                                            {heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}
-                                        </Text>
-                                    </TouchableHighlight>
-                                    <Icon
-                                        type="FontAwesome"
-                                        name={this.state.characteristicsButtonsShow[characteristic.shortName]}
-                                        style={{paddingLeft: scale(10), fontSize: verticalScale(25), color: '#14354d'}}
+                        <AccordionCard
+                            key={`characteristic-${index}`}
+                            title={
+                                <View flex={1} flexDirection="row" alignItems="center" paddingBottom={verticalScale(5)}>
+                                    {this._renderStat(characteristic)}
+                                    <Text style={[styles.grey, {fontSize: verticalScale(16), paddingLeft: scale(10)}]}>{name}</Text>
+                                </View>
+                            }
+                            secondaryTitle={
+                                <TouchableHighlight
+                                    underlayColor="#121212"
+                                    onPress={() =>
+                                        this.props.navigation.navigate('Result', {
+                                            from: 'ViewHeroDesignerCharacter',
+                                            result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character)),
+                                        })
+                                    }
+                                >
+                                    <Text style={[styles.grey, {fontSize: verticalScale(16), paddingLeft: scale(10)}]}>
+                                        {heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}
+                                    </Text>
+                                </TouchableHighlight>
+                            }
+                            content={this._renderDefinition(characteristic)}
+                            footerButtons={
+                                <View flex={1} flexDirection="row" alignItems="center" justifyContent="space-around">
+                                    <CircleButton
+                                        name="eye"
+                                        size={36}
+                                        fontSize={14}
+                                        color="#e8e8e8"
                                         onPress={() => this._toggleDefinitionShow(characteristic.shortName)}
                                     />
-                                </Right>
-                            </CardItem>
-                            {this._renderDefinition(characteristic)}
-                        </Card>
+                                </View>
+                            }
+                            showContent={this.state.characteristicsShow[characteristic.shortName]}
+                        />
                     );
                 })}
-            </Fragment>
+            </View>
         );
     }
 

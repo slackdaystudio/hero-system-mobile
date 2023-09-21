@@ -1,14 +1,19 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {ImageBackground, View, TouchableHighlight} from 'react-native';
-import {Text, Icon, Card, CardItem, Body} from 'native-base';
+import {Text, CardItem, Body} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
+import {AccordionCard} from '../Card/AccordionCard';
+import {Card} from '../Card/Card';
+import CircleButton from '../CircleButton/CircleButton';
 import {dieRoller} from '../../lib/DieRoller';
 import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
 import {SKILL_CHECK, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
 import {common} from '../../lib/Common';
 import CompoundPower from '../../decorators/CompoundPower';
 import styles from '../../Styles';
+import {Accordion} from '../Animated';
+import {GENERIC_OBJECT} from '../../lib/HeroDesignerCharacter';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -26,28 +31,23 @@ import styles from '../../Styles';
 
 function initItemShow(items, subListKey) {
     let itemShow = {};
-    let itemButtonShow = {};
 
-    items.map((item, index) => {
+    items.map((item) => {
         itemShow[item.id] = false;
-        itemButtonShow[item.id] = 'plus-circle';
 
         if (item.hasOwnProperty(subListKey)) {
             if (Array.isArray(item[subListKey])) {
                 for (let s of item[subListKey]) {
                     itemShow[s.id] = false;
-                    itemButtonShow[s.id] = 'plus-circle';
                 }
             } else {
                 itemShow[item[subListKey].id] = false;
-                itemButtonShow[item[subListKey].id] = 'plus-circle';
             }
         }
     });
 
     return {
         itemShow: itemShow,
-        itemButtonShow: itemButtonShow,
     };
 }
 
@@ -68,7 +68,6 @@ export default class Traits extends Component {
 
         this.state = {
             itemShow: displayOptions.itemShow,
-            itemButtonShow: displayOptions.itemButtonShow,
             character: props.character,
             listKey: props.listKey,
         };
@@ -80,7 +79,6 @@ export default class Traits extends Component {
             let newState = {...prevState};
 
             newState.itemShow = displayOptions.itemShow;
-            newState.itemButtonShow = displayOptions.itemButtonShow;
             newState.character = nextProps.character;
             newState.listKey = nextProps.listKey;
 
@@ -93,7 +91,6 @@ export default class Traits extends Component {
     _toggleDefinitionShow(name) {
         let newState = {...this.state};
         newState.itemShow[name] = !newState.itemShow[name];
-        newState.itemButtonShow[name] = newState.itemButtonShow[name] === 'plus-circle' ? 'minus-circle' : 'plus-circle';
 
         this.setState(newState);
     }
@@ -104,22 +101,28 @@ export default class Traits extends Component {
         } else if (roll.type === NORMAL_DAMAGE) {
             let dice = common.toDice(roll.roll);
 
-            this.props.updateForm('damage', {
-                dice: dice.full,
-                partialDie: dice.partial,
-                sfx: decorated.characterTrait.trait.sfx,
+            this.props.updateForm({
+                type: 'damage',
+                json: {
+                    dice: dice.full,
+                    partialDie: dice.partial,
+                    sfx: decorated.characterTrait.trait.sfx,
+                },
             });
 
             this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
         } else if (roll.type === KILLING_DAMAGE) {
             let dice = common.toDice(roll.roll);
 
-            this.props.updateForm('damage', {
-                dice: dice.full,
-                partialDie: dice.partial,
-                killingToggled: true,
-                damageType: KILLING_DAMAGE,
-                sfx: decorated.characterTrait.trait.sfx,
+            this.props.updateForm({
+                type: 'damage',
+                json: {
+                    dice: dice.full,
+                    partialDie: dice.partial,
+                    killingToggled: true,
+                    damageType: KILLING_DAMAGE,
+                    sfx: decorated.characterTrait.trait.sfx,
+                },
             });
 
             this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
@@ -141,13 +144,13 @@ export default class Traits extends Component {
             return (
                 <View style={{flex: 1}}>
                     <Text style={styles.boldGrey}>{label}</Text>
-                    {modifiers.map((modifier) => {
+                    {modifiers.map((modifier, index) => {
                         return (
-                            <View key={`mod-${modifier.id}`} style={{flex: 1, flexDirection: 'row'}}>
+                            <View key={`mod-${modifier.xmlid}-${index}`} style={{flex: 1, flexDirection: 'row'}}>
                                 <View>
                                     <Text style={styles.grey}> &bull; </Text>
                                 </View>
-                                <View>
+                                <View flex={1} flexDirection="row" flexWrap="wrap">
                                     <Text style={styles.grey}>{modifier.label}</Text>
                                 </View>
                             </View>
@@ -169,7 +172,7 @@ export default class Traits extends Component {
                         let separator = attribute.value !== '' ? ': ' : '';
 
                         return (
-                            <Text key={`attr-${attribute.id}`}>
+                            <Text key={`attr-${item.id}-${index}`}>
                                 <Text style={labelStyle}>
                                     {attribute.label}
                                     {separator}
@@ -189,13 +192,11 @@ export default class Traits extends Component {
     _renderAdvantagesAndLimitations(item) {
         if (item.advantages().length > 0 || item.limitations().length > 0) {
             return (
-                <CardItem style={styles.cardItem}>
-                    <Body>
-                        {this._renderModifiers('Advantages', item.advantages())}
-                        <View style={{paddingBottom: verticalScale(10)}} />
-                        {this._renderModifiers('Limitations', item.limitations())}
-                    </Body>
-                </CardItem>
+                <View>
+                    {this._renderModifiers('Advantages', item.advantages())}
+                    <View style={{paddingBottom: verticalScale(10)}} />
+                    {this._renderModifiers('Limitations', item.limitations())}
+                </View>
             );
         }
 
@@ -221,56 +222,72 @@ export default class Traits extends Component {
     _renderDefinition(item) {
         if (item.definition() !== '' || item.attributes().length > 0) {
             return (
-                <CardItem style={styles.cardItem}>
-                    <Body>
-                        {this._renderAttributes(item)}
-                        <Text style={styles.grey}>{item.definition()}</Text>
-                    </Body>
-                </CardItem>
+                <View>
+                    {this._renderAttributes(item)}
+                    <Text style={styles.grey}>{item.definition()}</Text>
+                </View>
             );
         }
 
         return null;
     }
 
-    _renderItemDetails(item) {
+    _renderItemDetails(item, showBottomBar = false) {
         if (this.state.itemShow[item.trait.id]) {
             if (item.trait.xmlid === 'COMPOUNDPOWER') {
                 return this._renderCompoundPowerDetails(item);
             }
 
             return (
-                <Fragment>
-                    {this._renderDefinition(item)}
-                    {this._renderAdvantagesAndLimitations(item)}
-                    {this._renderNotes(item)}
-                    <CardItem style={styles.cardItem} footer>
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                            <Text style={styles.grey}>
-                                <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
-                            </Text>
-                            <View style={{width: scale(30), alignItems: 'center'}}>
-                                <Text style={styles.grey}>—</Text>
+                <>
+                    <View borderTopColor="#e8e8e8" borderTopWidth={0.5}>
+                        {this._renderDefinition(item)}
+                        {this._renderAdvantagesAndLimitations(item)}
+                        {this._renderNotes(item)}
+                        <View
+                            flex={1}
+                            flexDirection="row"
+                            paddingTop={verticalScale(5)}
+                            marginTop={verticalScale(10)}
+                            borderTopWidth={0.5}
+                            borderTopColor="#e8e8e8"
+                        >
+                            <View
+                                style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    borderBottomWidth: showBottomBar ? 0.5 : 0,
+                                    borderBottomColor: '#e8e8e8',
+                                    paddingBottom: verticalScale(8),
+                                }}
+                            >
+                                <Text style={styles.grey}>
+                                    <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
+                                </Text>
+                                <View style={{width: scale(30), alignItems: 'center'}}>
+                                    <Text style={styles.grey}>—</Text>
+                                </View>
+                                <Text style={styles.grey}>
+                                    <Text style={styles.boldGrey}>Active:</Text> {item.activeCost()}
+                                </Text>
+                                <View style={{width: scale(30), alignItems: 'center'}}>
+                                    <Text style={styles.grey}>—</Text>
+                                </View>
+                                <Text style={styles.grey}>
+                                    <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
+                                </Text>
                             </View>
-                            <Text style={styles.grey}>
-                                <Text style={styles.boldGrey}>Active:</Text> {item.activeCost()}
-                            </Text>
-                            <View style={{width: scale(30), alignItems: 'center'}}>
-                                <Text style={styles.grey}>—</Text>
-                            </View>
-                            <Text style={styles.grey}>
-                                <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
-                            </Text>
                         </View>
-                    </CardItem>
-                </Fragment>
+                    </View>
+                </>
             );
         }
 
         return null;
     }
 
-    _renderCompoundPowerDetails(item) {
+    _renderCompoundPowerDetails(item, showBottomBar = false) {
         let powers = [];
 
         // The "powers" field is only available if the last decorator was the CompoundPowerDecorator
@@ -290,7 +307,16 @@ export default class Traits extends Component {
                 {this._renderAdvantagesAndLimitations(item)}
                 {this._renderNotes(item)}
                 <CardItem style={styles.cardItem} footer>
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                    <View
+                        style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            borderBottomWidth: showBottomBar ? 0.5 : 0,
+                            borderBottomColor: '#e8e8e8',
+                            paddingBottom: verticalScale(8),
+                        }}
+                    >
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Base:</Text> {item.cost()}
                         </Text>
@@ -310,7 +336,7 @@ export default class Traits extends Component {
                 </CardItem>
                 {powers.map((power) => {
                     return (
-                        <View key={`cp-${power.id}`}>
+                        <View key={`cp-${power.trait.id}`}>
                             <View style={{flex: 1, alignSelf: 'center'}}>
                                 <Text style={styles.boldGrey}>{power.label()}</Text>
                             </View>
@@ -319,7 +345,16 @@ export default class Traits extends Component {
                             {this._renderAdvantagesAndLimitations(power)}
                             {this._renderNotes(power)}
                             <CardItem style={styles.cardItem} footer>
-                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                                <View
+                                    style={{
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        justifyContent: 'center',
+                                        borderBottomWidth: showBottomBar ? 0.5 : 0,
+                                        borderBottomColor: '#e8e8e8',
+                                        paddingBottom: verticalScale(8),
+                                    }}
+                                >
                                     <Text style={styles.grey}>
                                         <Text style={styles.boldGrey}>Base:</Text> {power.cost()}
                                     </Text>
@@ -372,72 +407,72 @@ export default class Traits extends Component {
 
     _renderTraitList(decoratedTrait) {
         return (
-            <Card style={[styles.card, {paddingBottom: 0}]} key={'item-' + decoratedTrait.trait.position}>
-                <CardItem
-                    style={[
-                        styles.cardItem,
-                        {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'},
-                    ]}
-                    header
-                >
-                    <View style={{flex: 3, alignSelf: 'center'}}>
-                        <Text style={[styles.boldGrey, {fontSize: verticalScale(16)}]}>{decoratedTrait.label()}</Text>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                        <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
-                        <View style={{flex: 1}}>
-                            <Icon
-                                type="FontAwesome"
-                                name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                                style={{paddingLeft: scale(3), fontSize: verticalScale(22), color: '#14354d'}}
-                                onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
-                            />
+            <View key={`trait-list-${decoratedTrait.characterTrait.trait.id}`} paddingBottom={verticalScale(10)}>
+                <Card
+                    heading={
+                        <View flex={1} flexDirection="row">
+                            <Text style={[styles.boldGrey, {paddingVertical: verticalScale(5), fontSize: verticalScale(16)}]}>{decoratedTrait.label()}</Text>
+                            <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
                         </View>
-                    </View>
-                </CardItem>
-                {this._renderItemDetails(decoratedTrait)}
-                <View style={{backgroundColor: '#0e0e0f', paddingTop: verticalScale(20)}} />
-                {decoratedTrait.trait[this.props.subListKey].map((item) => {
-                    let decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
+                    }
+                    body={
+                        <View paddingTop={verticalScale(5)}>
+                            {decoratedTrait.trait[this.props.subListKey].map((item) => {
+                                const decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
-                    return (
-                        <Fragment key={`trait-${item.id}`}>
-                            <CardItem
-                                style={[
-                                    styles.cardItem,
-                                    {flex: 1, flexDirection: 'row', alignItems: 'center', paddingTop: verticalScale(5), paddingBottom: verticalScale(5)},
-                                ]}
-                                header
-                            >
-                                {this._renderTrait(decoratedSubTrait, true)}
-                            </CardItem>
-                            {this._renderItemDetails(decoratedSubTrait)}
-                        </Fragment>
-                    );
-                })}
-                <View style={{backgroundColor: '#0e0e0f', paddingBottom: verticalScale(20)}} />
-            </Card>
+                                return (
+                                    <Fragment key={`trait-${item.id}`}>
+                                        <View
+                                            style={[
+                                                styles.cardItem,
+                                                {
+                                                    flex: 1,
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                },
+                                            ]}
+                                        >
+                                            {this._renderTrait(decoratedSubTrait, true)}
+                                        </View>
+                                        <Accordion animationProps={{collapsed: !this.state.itemShow[decoratedSubTrait.trait.id], duration: 500}}>
+                                            {this._renderItemDetails(decoratedSubTrait, true)}
+                                        </Accordion>
+                                    </Fragment>
+                                );
+                            })}
+                        </View>
+                    }
+                    footer={
+                        <>
+                            <Accordion animationProps={{collapsed: !this.state.itemShow[decoratedTrait.trait.id], duration: 500}}>
+                                {this._renderItemDetails(decoratedTrait)}
+                            </Accordion>
+                            <View flex={1} flexDirection="row" justifyContent="center">
+                                <CircleButton
+                                    name="eye"
+                                    size={25}
+                                    fontSize={12}
+                                    color="#e8e8e8"
+                                    onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
+                                />
+                            </View>
+                        </>
+                    }
+                />
+            </View>
         );
     }
 
     _renderTrait(decoratedTrait, isListItem = false) {
         return (
             <Fragment>
-                <View style={{flex: 3, alignSelf: 'center'}}>
-                    <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 14 : 16)}]}>
-                        {isListItem ? ' ‣ ' : ''}
-                        {decoratedTrait.label()}
-                    </Text>
+                <View style={{flex: 2, alignItems: 'flex-start'}}>
+                    <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 16 : 18)}]}>{decoratedTrait.label()}</Text>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                     <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
-                    <View style={{flex: 1}}>
-                        <Icon
-                            type="FontAwesome"
-                            name={this.state.itemButtonShow[decoratedTrait.trait.id]}
-                            style={{paddingLeft: scale(3), fontSize: verticalScale(isListItem ? 18 : 22), color: '#14354d'}}
-                            onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
-                        />
+                    <View style={{flex: 1.75, alignItems: 'flex-end'}}>
+                        <CircleButton name="eye" size={25} fontSize={12} color="#e8e8e8" onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
                     </View>
                 </View>
             </Fragment>
@@ -450,9 +485,13 @@ export default class Traits extends Component {
         }
 
         return (
-            <View flexDirection="column" justifyContent="flex-start">
-                {items.map((item, index) => {
+            <View flexDirection="column" justifyContent="flex-start" paddingTop={verticalScale(20)}>
+                {items.map((item) => {
                     let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
+
+                    if (decoratedTrait.trait.xmlid.toUpperCase() === GENERIC_OBJECT && decoratedTrait.trait.powers.length === 0) {
+                        return null;
+                    }
 
                     if (
                         decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
@@ -463,18 +502,34 @@ export default class Traits extends Component {
                     }
 
                     return (
-                        <Card key={`trait-${index}`} style={styles.card}>
-                            <CardItem
-                                style={[
-                                    styles.cardItem,
-                                    {flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(243, 237, 233, 0.6)'},
-                                ]}
-                                header
-                            >
-                                {this._renderTrait(decoratedTrait)}
-                            </CardItem>
-                            {this._renderItemDetails(decoratedTrait)}
-                        </Card>
+                        <View key={`trait-${item.id}`} paddingBottom={verticalScale(10)}>
+                            <AccordionCard
+                                title={
+                                    <Text style={[styles.boldGrey, {paddingVertical: verticalScale(5), fontSize: verticalScale(16)}]}>
+                                        {''}
+                                        {decoratedTrait.label()}
+                                    </Text>
+                                }
+                                secondaryTitle={
+                                    <>
+                                        <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
+                                    </>
+                                }
+                                content={this._renderItemDetails(decoratedTrait)}
+                                footerButtons={
+                                    <View flex={1} flexDirection="row" justifyContent="space-around">
+                                        <CircleButton
+                                            name="eye"
+                                            size={25}
+                                            fontSize={12}
+                                            color="#e8e8e8"
+                                            onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
+                                        />
+                                    </View>
+                                }
+                                showContent={this.state.itemShow[decoratedTrait.trait.id]}
+                            />
+                        </View>
                     );
                 })}
             </View>

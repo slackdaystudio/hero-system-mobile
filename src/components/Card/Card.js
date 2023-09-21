@@ -46,8 +46,6 @@ export const Card = ({heading, body, footer, showHorizontalLine}) => {
             </View>
             <View paddingHorizontal={scale(1)}>{body}</View>
             <View
-                justifyContent="space-around"
-                alignItems="center"
                 paddingHorizontal={scale(10)}
                 paddingTop={showHorizontalLine ? verticalScale(10) : 0}
                 borderTopWidth={showHorizontalLine ? 0.25 : 0}

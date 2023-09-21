@@ -22,6 +22,10 @@ export default class CharacterTrait {
         this.listKey = listKey;
     }
 
+    getTrait() {
+        return this.item;
+    }
+
     cost() {
         return this.trait.basecost || 0;
     }

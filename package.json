@@ -25,6 +25,7 @@
     "deprecated-react-native-prop-types": "^4.2.1",
     "iconv-lite": "^0.6.2",
     "is-base64": "^1.1.0",
+    "moti": "^0.26.0",
     "native-base": "2.15.2",
     "patch-package": "^8.0.0",
     "react": "18.2.0",

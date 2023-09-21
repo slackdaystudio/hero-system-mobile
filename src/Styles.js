@@ -113,13 +113,12 @@ export default ScaledSheet.create({
         backgroundColor: '#1b1d1f',
     },
     cardItem: {
-        backgroundColor: '#0e0e0f',
+        backgroundColor: '#1b1d1f',
     },
     cardTitle: {
         fontSize: '16@vs',
         fontWeight: 'bold',
         color: '#e8e8e8',
-        backgroundColor: '#121212',
     },
     modal: {
         flex: -1,
