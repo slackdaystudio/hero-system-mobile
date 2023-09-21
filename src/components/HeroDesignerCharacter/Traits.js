@@ -141,9 +141,9 @@ export default class Traits extends Component {
             return (
                 <View style={{flex: 1}}>
                     <Text style={styles.boldGrey}>{label}</Text>
-                    {modifiers.map((modifier, index) => {
+                    {modifiers.map((modifier) => {
                         return (
-                            <View key={`mod-${index}`} style={{flex: 1, flexDirection: 'row'}}>
+                            <View key={`mod-${modifier.id}`} style={{flex: 1, flexDirection: 'row'}}>
                                 <View>
                                     <Text style={styles.grey}> &bull; </Text>
                                 </View>
@@ -169,7 +169,7 @@ export default class Traits extends Component {
                         let separator = attribute.value !== '' ? ': ' : '';
 
                         return (
-                            <Text key={`attr-${index}`}>
+                            <Text key={`attr-${attribute.id}`}>
                                 <Text style={labelStyle}>
                                     {attribute.label}
                                     {separator}
@@ -308,9 +308,9 @@ export default class Traits extends Component {
                         </Text>
                     </View>
                 </CardItem>
-                {powers.map((power, index) => {
+                {powers.map((power) => {
                     return (
-                        <View key={`cp-${index}`}>
+                        <View key={`cp-${power.id}`}>
                             <View style={{flex: 1, alignSelf: 'center'}}>
                                 <Text style={styles.boldGrey}>{power.label()}</Text>
                             </View>
@@ -397,11 +397,11 @@ export default class Traits extends Component {
                 </CardItem>
                 {this._renderItemDetails(decoratedTrait)}
                 <View style={{backgroundColor: '#0e0e0f', paddingTop: verticalScale(20)}} />
-                {decoratedTrait.trait[this.props.subListKey].map((item, index) => {
+                {decoratedTrait.trait[this.props.subListKey].map((item) => {
                     let decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
                     return (
-                        <Fragment>
+                        <Fragment key={`trait-${item.id}`}>
                             <CardItem
                                 style={[
                                     styles.cardItem,
