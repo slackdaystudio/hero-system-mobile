@@ -202,7 +202,7 @@ class DieRoller {
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
             let partialDie = Math.floor(Math.random() * 6) + 1;
 
-            if (partialDie < 1) {
+            if (--partialDie < 1) {
                 partialDie = 1;
             }
 
