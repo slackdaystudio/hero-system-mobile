@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Icon} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
-import {Animated} from '../Animated';
 import {PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {common} from '../../lib/Common';
+import {MotiView, useAnimationState} from 'moti';
+import {useSelector} from 'react-redux';
 
 const getDieIconDetails = (face, partialDieType, isLast) => {
     let color = partialDieType > PARTIAL_DIE_PLUS_ONE && isLast ? '#f2de00' : '#ffffff';
@@ -37,24 +38,34 @@ const getDieIconDetails = (face, partialDieType, isLast) => {
 };
 
 export const Die = ({roll, partialDieType, isLast}) => {
+    const showAnimations = useSelector((state) => state.settings.showAnimations);
     const dieIcon = getDieIconDetails(roll, partialDieType, isLast);
+    const dieState = useAnimationState({
+        from: {translateY: verticalScale(-200)},
+        to: {
+            translateY: 0,
+        },
+    });
 
-    return (
-        <Animated
-            key={Math.random}
-            animationProps={{
-                from: {opacity: 0, translateY: -150},
-                animate: {
-                    opacity: 1,
-                    translateY: 0,
-                },
-                duration: 3000,
-                delay: common.getRandomNumber(0, 250),
-            }}
-        >
-            <Icon solid type="FontAwesome5" name={dieIcon.iconName} style={{fontSize: verticalScale(20), color: dieIcon.color, paddingRight: scale(3.5)}} />
-        </Animated>
-    );
+    const getDie = () => {
+        return <Icon solid type="FontAwesome5" name={dieIcon.iconName} style={{fontSize: verticalScale(20), color: dieIcon.color, paddingRight: scale(3.5)}} />;
+    };
+
+    if (showAnimations) {
+        return (
+            <MotiView
+                transition={{
+                    duration: 3000,
+                    delay: common.getRandomNumber(0, 250),
+                }}
+                state={dieState}
+            >
+                {getDie()}
+            </MotiView>
+        );
+    } else {
+        return getDie();
+    }
 };
 
 Die.propTypes = {
