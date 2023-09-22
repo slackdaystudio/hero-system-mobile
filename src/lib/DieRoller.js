@@ -1,4 +1,5 @@
 import {common} from './Common';
+import {statistics} from './Statistics';
 
 export const SKILL_CHECK = 1;
 
@@ -42,6 +43,8 @@ class DieRoller {
             result.threshold = rollThreshold.slice(0, -1);
         }
 
+        statistics.add(result).catch((error) => console.error(error));
+
         return result;
     }
 
@@ -66,6 +69,8 @@ class DieRoller {
 
             results.push(result);
         }
+
+        statistics.add(result).catch((error) => console.error(error));
 
         return {results: results};
     }
@@ -110,6 +115,8 @@ class DieRoller {
             this._buildExplosionTable(resultRoll, newResultRoll);
         }
 
+        statistics.add(resultRoll).catch((error) => console.error(error));
+
         return resultRoll;
     }
 
@@ -117,6 +124,8 @@ class DieRoller {
         const resultRoll = this._roll(effectForm.dice, EFFECT, effectForm.partialDie);
 
         resultRoll.effectForm = effectForm;
+
+        statistics.add(resultRoll).catch((error) => console.error(error));
 
         return resultRoll;
     }

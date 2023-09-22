@@ -1,6 +1,6 @@
 import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {Platform, ImageBackground, View} from 'react-native';
 import {Container, Button, Text, Spinner} from 'native-base';
@@ -9,7 +9,6 @@ import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT, PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {statistics} from '../../lib/Statistics';
-import {addStatistics} from '../../reducers/statistics';
 import {selectResultData} from '../../reducers/selectors';
 import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
@@ -32,8 +31,6 @@ import {Die} from '../Animated/Die';
 // limitations under the License.
 
 export const ResultScreen = ({route, navigation}) => {
-    const dispatch = useDispatch();
-
     const {playSounds, onlyDiceSounds, useFifthEdition} = useSelector((state) => selectResultData(state));
 
     const [result, setResult] = useState(route.params.result);
@@ -44,9 +41,8 @@ export const ResultScreen = ({route, navigation}) => {
                 setResult(route.params.result);
 
                 playSoundClip();
-                updateStatistics();
             }
-        }, [playSoundClip, route.params, updateStatistics]),
+        }, [playSoundClip, route.params]),
     );
 
     const playSoundClip = useCallback(() => {
@@ -57,20 +53,9 @@ export const ResultScreen = ({route, navigation}) => {
         }
     }, [onlyDiceSounds, playSounds, result]);
 
-    const updateStatistics = useCallback(() => {
-        if (!common.isEmptyObject(result) && result.hasOwnProperty('results')) {
-            for (let i = 0; i < result.results.length; i++) {
-                dispatch(addStatistics({statistics: result.results[i]}));
-            }
-        } else {
-            dispatch(addStatistics({statistics: result}));
-        }
-    }, [dispatch, result]);
-
     const reRoll = () => {
         setResult(dieRoller.rollAgain(result));
         playSoundClip();
-        updateStatistics();
     };
 
     const renderToHitInfo = (hitResult) => {

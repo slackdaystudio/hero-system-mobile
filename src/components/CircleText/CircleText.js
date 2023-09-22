@@ -24,6 +24,8 @@ export default class CircleText extends Component {
         size: PropTypes.number.isRequired,
         fontSize: PropTypes.number.isRequired,
         color: PropTypes.string.isRequired,
+        fontColor: PropTypes.string,
+        backgroundColor: PropTypes.string,
     };
 
     render() {
@@ -36,7 +38,7 @@ export default class CircleText extends Component {
                 style={{
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: '#000',
+                    backgroundColor: this.props.backgroundColor,
                     borderColor: this.props.color,
                     width: size,
                     height: size,
@@ -54,7 +56,7 @@ export default class CircleText extends Component {
                         lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
                         paddingTop: verticalScale(3),
                         fontWeight: 'bold',
-                        color: '#F3EDE9',
+                        color: this.props.fontColor,
                     }}
                 >
                     {this.props.title}
@@ -63,3 +65,8 @@ export default class CircleText extends Component {
         );
     }
 }
+
+CircleText.defaultProps = {
+    fontColor: '#F3EDE9',
+    backgroundColor: '#000',
+};

@@ -2,14 +2,15 @@ import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ImageBackground} from 'react-native';
+import {View, ImageBackground} from 'react-native';
 import {Container, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
 import Header from '../Header/Header';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
-import {chart} from '../../lib/Chart';
+import {Chart} from '../../lib/Chart';
 import {common} from '../../lib/Common';
 import {statistics as libStatistics} from '../../lib/Statistics';
 import styles from '../../Styles';
+import {verticalScale} from 'react-native-size-matters';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -24,6 +25,8 @@ import styles from '../../Styles';
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+const MINIMUM_ROLLS_FOR_CHART = 30;
 
 export const StatisticsScreen = ({navigation}) => {
     const [statistics, setStatistics] = useState(null);
@@ -65,11 +68,11 @@ export const StatisticsScreen = ({navigation}) => {
     };
 
     const renderDieDistributionChart = () => {
-        if (statistics.sum === 0) {
-            return null;
+        if (statistics.sum === 0 || statistics.totals.diceRolled < MINIMUM_ROLLS_FOR_CHART) {
+            return <Text style={[styles.grey, {textAlign: 'center'}]}>A chart appears here once you have rolled at least 30 dice.</Text>;
         }
 
-        return chart.renderDieDistributionChart(statistics.distributions);
+        return <Chart distributions={statistics.distributions} />;
     };
 
     if (common.isEmptyObject(statistics)) {
@@ -92,9 +95,10 @@ export const StatisticsScreen = ({navigation}) => {
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 <Header navigation={navigation} />
                 <Text style={styles.heading}>Statistics</Text>
+                <View paddingBottom={verticalScale(10)} />
                 <VirtualizedList>
                     {renderDieDistributionChart()}
-                    <List>
+                    <List paddingTop={verticalScale(20)}>
                         <ListItem>
                             <Left>
                                 <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
