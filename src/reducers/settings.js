@@ -20,6 +20,7 @@ const settingsSlice = createSlice({
         useFifthEdition: false,
         playSounds: true,
         onlyDiceSounds: false,
+        showAnimations: true,
     },
     reducers: {
         initializeApplicationSettings: (state, action) => {
@@ -43,6 +44,7 @@ const settingsSlice = createSlice({
                 state.useFifthEdition = settings.useFifthEdition;
                 state.playSounds = settings.playSounds;
                 state.onlyDiceSounds = settings.onlyDiceSounds;
+                state.showAnimations = settings.showAnimations;
             });
     },
 });

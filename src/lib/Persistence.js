@@ -409,6 +409,7 @@ class Persistence {
             useFifthEdition: false,
             playSounds: true,
             onlyDiceSounds: false,
+            showAnimations: true,
         };
 
         settings = settings === null || settings === undefined ? {} : settings;

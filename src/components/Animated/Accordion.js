@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {useSelector} from 'react-redux';
 import Collapsible from 'react-native-collapsible';
 import {Animated} from './Animated';
 
@@ -18,13 +19,19 @@ import {Animated} from './Animated';
 // limitations under the License.
 
 export const Accordion = ({animationProps, children}) => {
-    return (
-        <Collapsible {...animationProps}>
-            <Animated animationProps={{from: {opacity: 0, translateY: -10}, to: {opacity: 1, translateY: 0}, animate: {opacity: 1, translateY: 0}}}>
-                {children}
-            </Animated>
-        </Collapsible>
-    );
+    const showAnimations = useSelector((state) => state.settings.showAnimations);
+
+    if (showAnimations) {
+        return (
+            <Collapsible {...animationProps}>
+                <Animated animationProps={{from: {opacity: 0, translateY: -10}, to: {opacity: 1, translateY: 0}, animate: {opacity: 1, translateY: 0}}}>
+                    {children}
+                </Animated>
+            </Collapsible>
+        );
+    }
+
+    return <>{children}</>;
 };
 
 Accordion.propTypes = {
