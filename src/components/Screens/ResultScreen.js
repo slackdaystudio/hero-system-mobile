@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {Platform, ImageBackground, View} from 'react-native';
-import {Container, Button, Text, Spinner, Icon} from 'native-base';
+import {Container, Button, Text, Spinner} from 'native-base';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
@@ -15,6 +15,7 @@ import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import styles from '../../Styles';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
+import {Die} from '../Animated/Die';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -338,17 +339,7 @@ export const ResultScreen = ({route, navigation}) => {
                         </View>
                         <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
                             {r.rolls.map((roll, i) => {
-                                const dieIcon = common.getDieIconDetails(roll, r.partialDieType, r.rolls.length - 1 === i);
-
-                                return (
-                                    <Icon
-                                        key={`dice-${i}`}
-                                        solid
-                                        type="FontAwesome5"
-                                        name={dieIcon.iconName}
-                                        style={{fontSize: verticalScale(20), color: dieIcon.color, paddingRight: scale(3.5)}}
-                                    />
-                                );
+                                return <Die key={Math.random()} roll={roll} />;
                             })}
                         </View>
                         <Text style={styles.grey}>
@@ -396,17 +387,7 @@ export const ResultScreen = ({route, navigation}) => {
                 </View>
                 <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
                     {result.rolls.map((roll, i) => {
-                        const dieIcon = common.getDieIconDetails(roll, result.partialDieType, result.rolls.length - 1 === i);
-
-                        return (
-                            <Icon
-                                key={`dice-${i}`}
-                                solid
-                                type="FontAwesome5"
-                                name={dieIcon.iconName}
-                                style={{fontSize: verticalScale(20), color: dieIcon.color, paddingRight: scale(3.5)}}
-                            />
-                        );
+                        return <Die key={Math.random()} roll={roll} />;
                     })}
                 </View>
                 <Text style={styles.grey}>

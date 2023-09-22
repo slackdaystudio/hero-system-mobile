@@ -1,3 +1,5 @@
+import {common} from './Common';
+
 export const SKILL_CHECK = 1;
 
 export const TO_HIT = 2;
@@ -191,7 +193,7 @@ class DieRoller {
         let roll = 0;
 
         for (let i = 0; i < dice; i++) {
-            roll = Math.floor(Math.random() * 6) + 1;
+            roll = common.getRandomNumber(1, 6);
 
             resultRoll.total += roll;
             resultRoll.rolls.push(roll);
@@ -200,7 +202,7 @@ class DieRoller {
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
             resultRoll.total += 1;
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            let partialDie = Math.floor(Math.random() * 6) + 1;
+            let partialDie = common.getRandomNumber(1, 6);
 
             if (--partialDie < 1) {
                 partialDie = 1;
@@ -209,7 +211,7 @@ class DieRoller {
             resultRoll.total += partialDie;
             resultRoll.rolls.push(partialDie);
         } else if (partialDieType === PARTIAL_DIE_HALF) {
-            const halfDie = Math.floor(Math.random() * 3) + 1;
+            const halfDie = common.getRandomNumber(1, 3);
 
             resultRoll.total += halfDie;
             resultRoll.rolls.push(halfDie);
@@ -229,14 +231,13 @@ class DieRoller {
                     resultRoll.stunModifier = 1;
 
                     if (resultRoll.damageForm.useFifthEdition) {
-                        resultRoll.stunModifier = Math.floor(Math.random() * 6) + 1;
-                        resultRoll.stunModifier--;
+                        resultRoll.stunModifier = common.getRandomNumber(1, 6);
 
-                        if (resultRoll.stunModifier === 0) {
+                        if (--resultRoll.stunModifier === 0) {
                             resultRoll.stunModifier = 1;
                         }
                     } else {
-                        resultRoll.stunModifier = Math.floor(Math.random() * 3) + 1;
+                        resultRoll.stunModifier = common.getRandomNumber(1, 3);
                     }
                 }
 
@@ -326,7 +327,7 @@ class DieRoller {
                 nStun: 2,
                 bodyX: 2,
             };
-        } else if (hitLocationRoll == 6) {
+        } else if (hitLocationRoll === 6) {
             return {
                 location: 'Hands',
                 stunX: 1,
@@ -340,7 +341,7 @@ class DieRoller {
                 nStun: 0.5,
                 bodyX: 0.5,
             };
-        } else if (hitLocationRoll == 9) {
+        } else if (hitLocationRoll === 9) {
             return {
                 location: 'Shoulders',
                 stunX: 3,
@@ -354,21 +355,21 @@ class DieRoller {
                 nStun: 1,
                 bodyX: 1,
             };
-        } else if (hitLocationRoll == 12) {
+        } else if (hitLocationRoll === 12) {
             return {
                 location: 'Stomach',
                 stunX: 4,
                 nStun: 1.5,
                 bodyX: 1,
             };
-        } else if (hitLocationRoll == 13) {
+        } else if (hitLocationRoll === 13) {
             return {
                 location: 'Vitals',
                 stunX: 4,
                 nStun: 1.5,
                 bodyX: 2,
             };
-        } else if (hitLocationRoll == 14) {
+        } else if (hitLocationRoll === 14) {
             return {
                 location: 'Thighs',
                 stunX: 2,

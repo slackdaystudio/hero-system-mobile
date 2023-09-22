@@ -250,34 +250,8 @@ class Common {
         return merge(left, right);
     }
 
-    getDieIconDetails(face, partialDieType, isLast) {
-        let color = partialDieType > PARTIAL_DIE_PLUS_ONE && isLast ? '#f2de00' : '#ffffff';
-        let iconName = null;
-
-        switch (parseInt(face, 10)) {
-            case 2:
-                iconName = 'dice-two';
-                break;
-            case 3:
-                iconName = 'dice-three';
-                break;
-            case 4:
-                iconName = 'dice-four';
-                break;
-            case 5:
-                iconName = 'dice-five';
-                break;
-            case 6:
-                iconName = 'dice-six';
-                break;
-            default:
-                iconName = 'dice-one';
-        }
-
-        return {
-            iconName,
-            color,
-        };
+    getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
     }
 }
 
