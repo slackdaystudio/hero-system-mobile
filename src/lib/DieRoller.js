@@ -14,6 +14,8 @@ export const HIT_LOCATIONS = 6;
 
 export const KNOCKBACK = 7;
 
+export const PARTIAL_DIE_NONE = 0;
+
 export const PARTIAL_DIE_PLUS_ONE = 1;
 
 export const PARTIAL_DIE_HALF = 2;
@@ -111,18 +113,15 @@ class DieRoller {
         return resultRoll;
     }
 
-    effectRoll(dice, partialDie, type, sfx) {
-        let resultRoll = this._roll(dice, EFFECT, partialDie);
+    rollEffect(effectForm) {
+        const resultRoll = this._roll(effectForm.dice, EFFECT, effectForm.partialDie);
 
-        resultRoll.dice = dice;
-        resultRoll.type = type;
-        resultRoll.sfx = sfx;
+        resultRoll.effectForm = effectForm;
 
         return resultRoll;
     }
 
     rollAgain(lastResult) {
-        let result = null;
         let numberOfRolls;
 
         if (lastResult.hasOwnProperty('results')) {
@@ -130,17 +129,16 @@ class DieRoller {
             lastResult = lastResult.results[0];
         }
 
-        if (lastResult.rollType === SKILL_CHECK) {
-            result = this.rollCheck(lastResult.threshold + '-');
-        } else if (lastResult.rollType === TO_HIT) {
-            result = this.rollToHit(lastResult.cv, numberOfRolls, lastResult.isAutofire, lastResult.targetDcv);
-        } else if (lastResult.rollType === NORMAL_DAMAGE || lastResult.rollType === KILLING_DAMAGE) {
-            result = this.rollDamage(lastResult.damageForm);
-        } else if (lastResult.rollType === EFFECT) {
-            result = this.effectRoll(lastResult.dice, lastResult.partialDie, lastResult.type, lastResult.sfx);
+        switch (lastResult.rollType) {
+            case SKILL_CHECK:
+                return this.rollCheck(lastResult.threshold + '-');
+            case TO_HIT:
+                return this.rollToHit(lastResult.cv, numberOfRolls, lastResult.isAutofire, lastResult.targetDcv);
+            case EFFECT:
+                return this.rollEffect(lastResult.effectForm);
+            default:
+                return this.rollDamage(lastResult.damageForm);
         }
-
-        return result;
     }
 
     countNormalDamageBody(resultRoll) {
@@ -188,7 +186,7 @@ class DieRoller {
             rollType: rollType,
             total: 0,
             rolls: [],
-            partialDieType: partialDieType || null,
+            partialDieType: partialDieType || PARTIAL_DIE_NONE,
         };
         let roll = 0;
 

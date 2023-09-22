@@ -36,11 +36,12 @@ const getDieIconDetails = (face, partialDieType, isLast) => {
     };
 };
 
-export const Die = ({roll}) => {
-    const dieIcon = getDieIconDetails(roll);
+export const Die = ({roll, partialDieType, isLast}) => {
+    const dieIcon = getDieIconDetails(roll, partialDieType, isLast);
 
     return (
         <Animated
+            key={Math.random}
             animationProps={{
                 from: {opacity: 0, translateY: -150},
                 animate: {
@@ -58,4 +59,6 @@ export const Die = ({roll}) => {
 
 Die.propTypes = {
     roll: PropTypes.number.isRequired,
+    partialDieType: PropTypes.number.isRequired,
+    isLast: PropTypes.bool.isRequired,
 };

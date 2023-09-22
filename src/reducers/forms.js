@@ -1,5 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {NORMAL_DAMAGE} from '../lib/DieRoller';
+import {NORMAL_DAMAGE, PARTIAL_DIE_NONE} from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -35,7 +35,7 @@ const initializeHitForm = () => {
 const initializeDamageForm = () => {
     return {
         dice: 12,
-        partialDie: '0',
+        partialDie: PARTIAL_DIE_NONE,
         killingToggled: false,
         damageType: NORMAL_DAMAGE,
         stunMultiplier: 0,
@@ -55,7 +55,7 @@ const initializeDamageForm = () => {
 const initializeEffectForm = () => {
     return {
         dice: 1,
-        partialDie: '0',
+        partialDie: PARTIAL_DIE_NONE,
         effectType: 'None',
         sfx: null,
     };

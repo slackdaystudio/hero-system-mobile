@@ -9,7 +9,7 @@ import {RadioGroup} from 'react-native-radio-buttons-group';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
-import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
+import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
 import styles from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
 
@@ -36,15 +36,15 @@ export const EffectScreen = ({navigation}) => {
 
     const [open, setOpen] = useState(false);
 
-    const [value, setValue] = useState('None');
+    const [value, setValue] = useState(PARTIAL_DIE_NONE);
 
     const [selectedId, setSelectedId] = useState(0);
 
     const [items, setItems] = useState([
-        {label: 'No partial die', value: 0},
+        {label: 'No partial die', value: PARTIAL_DIE_NONE},
         {label: '+1 pip', value: PARTIAL_DIE_PLUS_ONE},
-        {label: '+½ die', value: PARTIAL_DIE_HALF},
-        {label: '-1 pip', value: PARTIAL_DIE_MINUS_ONE},
+        {label: '½d6', value: PARTIAL_DIE_HALF},
+        {label: '1d6-1', value: PARTIAL_DIE_MINUS_ONE},
     ]);
 
     const radioButtons = useMemo(() => {
@@ -61,7 +61,7 @@ export const EffectScreen = ({navigation}) => {
     const roll = () => {
         navigation.navigate('Result', {
             from: 'Effect',
-            result: dieRoller.effectRoll(effectForm.dice, effectForm.partialDie, effectForm.effectType, effectForm.sfx),
+            result: dieRoller.rollEffect(effectForm),
         });
     };
 

@@ -215,7 +215,7 @@ export const ResultScreen = ({route, navigation}) => {
     };
 
     const renderEffectInfo = (rollResult) => {
-        switch (rollResult.type.toUpperCase()) {
+        switch (rollResult.effectForm.effectType.toUpperCase()) {
             case 'NONE':
                 return null;
             case 'AID':
@@ -257,7 +257,7 @@ export const ResultScreen = ({route, navigation}) => {
         } else if (rollResult.rollType === SKILL_CHECK && rollResult.threshold !== -1) {
             return renderSkillCheckInfo(rollResult);
         } else if (rollResult.rollType === EFFECT) {
-            return renderEffectInfo(rollResult);
+            return renderEffectInfo(result);
         }
 
         return null;
@@ -302,70 +302,15 @@ export const ResultScreen = ({route, navigation}) => {
         return percentage < 0.0 ? 'green' : 'red';
     };
 
-    const renderRoll = () => {
-        if (common.isEmptyObject(result)) {
-            return <Spinner color="#D0D1D3" />;
-        }
-
-        if (result.hasOwnProperty('results')) {
-            return result.results.map((r, index) => {
-                const percentage = statistics.getPercentage(r);
-
-                return (
-                    <View key={'roll-result-' + index}>
-                        <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
-                            <View style={{flex: -1}}>
-                                <Text style={[styles.grey, localStyles.rollResult, {alignSelf: 'flex-end'}]}>
-                                    <CountUp isCounting end={r.total} key={r.total} formatter={(val) => val.toFixed(0)} duration={1} />
-                                </Text>
-                            </View>
-                            <View style={{flex: 1}}>
-                                <Text
-                                    style={{
-                                        color: getRollPercentageColor(percentage),
-                                        fontSize: verticalScale(30),
-                                        paddingBottom: Platform.OS === 'ios' ? 0 : verticalScale(13),
-                                    }}
-                                >
-                                    <CountUp
-                                        isCounting
-                                        end={percentage}
-                                        key={percentage}
-                                        formatter={(val) => (val < 0.0 ? `${val.toFixed(1)}%` : `+${val.toFixed(1)}%`)}
-                                        duration={1}
-                                    />
-                                </Text>
-                            </View>
-                        </View>
-                        <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
-                            {r.rolls.map((roll, i) => {
-                                return <Die key={Math.random()} roll={roll} />;
-                            })}
-                        </View>
-                        <Text style={styles.grey}>
-                            <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                            {r.partialDieType > PARTIAL_DIE_PLUS_ONE ? `${r.rolls.length - 1}+$1` : r.rolls.length}
-                        </Text>
-                        {r.partialDieType > 0 ? (
-                            <Text style={styles.grey}>
-                                <Text style={styles.boldGrey}>Partial Die: </Text>
-                                {dieRoller.getPartialDieName(r.partialDieType)}
-                            </Text>
-                        ) : null}
-                        {renderAdditionalRollInfo(r)}
-                    </View>
-                );
-            });
-        }
-
-        const percentage = statistics.getPercentage(result);
+    const renderDie = (rollResult) => {
+        const percentage = statistics.getPercentage(rollResult);
 
         return (
             <View>
                 <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
                     <View style={{flex: -1}}>
                         <Text style={[styles.grey, localStyles.rollResult]}>
-                            <CountUp isCounting end={result.total} key={result.total} formatter={(val) => val.toFixed(0)} />
+                            <CountUp isCounting end={rollResult.total} key={rollResult.total} formatter={(val) => val.toFixed(0)} />
                         </Text>
                     </View>
                     <View style={{flex: 1}}>
@@ -386,23 +331,35 @@ export const ResultScreen = ({route, navigation}) => {
                     </View>
                 </View>
                 <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
-                    {result.rolls.map((roll, i) => {
-                        return <Die key={Math.random()} roll={roll} />;
+                    {rollResult.rolls.map((roll, i) => {
+                        return <Die key={Math.random()} roll={roll} partialDieType={rollResult.partialDieType} isLast={i === rollResult.rolls.length - 1} />;
                     })}
                 </View>
                 <Text style={styles.grey}>
                     <Text style={styles.boldGrey}>Dice Rolled: </Text>
-                    {result.partialDieType > PARTIAL_DIE_PLUS_ONE ? `${result.rolls.length - 1}+1` : result.rolls.length}
+                    {rollResult.partialDieType > PARTIAL_DIE_PLUS_ONE ? `${rollResult.rolls.length - 1}+1` : rollResult.rolls.length}
                 </Text>
-                {result.partialDieType > 0 ? (
+                {rollResult.partialDieType > 0 ? (
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>Partial Die: </Text>
-                        {dieRoller.getPartialDieName(result.partialDieType)}
+                        {dieRoller.getPartialDieName(rollResult.partialDieType)}
                     </Text>
                 ) : null}
-                {renderAdditionalRollInfo(result)}
+                {renderAdditionalRollInfo(rollResult)}
             </View>
         );
+    };
+
+    const renderRoll = () => {
+        if (common.isEmptyObject(result)) {
+            return <Spinner color="#D0D1D3" />;
+        }
+
+        if (result.hasOwnProperty('results')) {
+            return result.results.map((r) => renderDie(r));
+        }
+
+        return renderDie(result);
     };
 
     return (

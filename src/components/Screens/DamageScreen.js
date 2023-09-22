@@ -10,7 +10,7 @@ import {RouteBuilder, Tab} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import {Card} from '../Card/Card';
-import {dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
+import {dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
 import {updateFormValue} from '../../reducers/forms';
 import moves from '../../../public/moves.json';
 import styles from '../../Styles';
@@ -253,38 +253,6 @@ const ManeuversRoute = ({}) => {
                         <View key={'move-' + index}>
                             <Card heading={heading} body={body} footer={footer} />
                         </View>
-                        // <View key={'move-' + index}>
-                        //     <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingTop: verticalScale(5)}}>
-                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        //             <Text style={styles.grey}>{move.name}</Text>
-                        //         </View>
-                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        //             <Text style={styles.grey}>{move.phase}</Text>
-                        //         </View>
-                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        //             <Text style={styles.grey}>{move.ocv}</Text>
-                        //         </View>
-                        //         <View style={{flex: 1, alignSelf: 'stretch'}}>
-                        //             <Text style={styles.grey}>{move.dcv}</Text>
-                        //         </View>
-                        //     </View>
-                        //     <View
-                        //         style={{
-                        //             flex: 1,
-                        //             flexDirection: 'row',
-                        //             justifyContent: 'flex-start',
-                        //             alignSelf: 'flex-start',
-                        //             paddingBottom: verticalScale(5),
-                        //         }}
-                        //     >
-                        //         <View style={{flex: 1, alignSelf: 'stretch', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                        //             <Text style={styles.grey} />
-                        //         </View>
-                        //         <View style={{flex: 3, justifyContent: 'flex-start', borderBottomWidth: 1, borderColor: '#D0D1D3'}}>
-                        //             <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
-                        //         </View>
-                        //     </View>
-                        // </View>
                     );
                 })}
             </ImageBackground>
@@ -301,10 +269,10 @@ export const DamageScreen = ({navigation}) => {
 
     const [open, setOpen] = useState(false);
 
-    const [value, setValue] = useState(null);
+    const [value, setValue] = useState(PARTIAL_DIE_NONE);
 
     const [items, setItems] = useState([
-        {label: 'No partial die', value: 0},
+        {label: 'No partial die', value: PARTIAL_DIE_NONE},
         {label: '+1 pip', value: PARTIAL_DIE_PLUS_ONE},
         {label: '½D6', value: PARTIAL_DIE_HALF},
         {label: '1d6-1', value: PARTIAL_DIE_MINUS_ONE},
