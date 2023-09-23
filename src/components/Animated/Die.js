@@ -66,9 +66,9 @@ export const Die = memo(function Die({roll, partialDieType, isLast}) {
                 {getDie()}
             </Animated>
         );
-    } else {
-        return getDie();
     }
+
+    return getDie();
 });
 
 Die.propTypes = {

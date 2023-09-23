@@ -292,7 +292,7 @@ export const ResultScreen = ({route, navigation}) => {
         const percentage = statistics.getPercentage(rollResult);
 
         return (
-            <View>
+            <View key={`roll-result-${Math.random()}`}>
                 <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
                     <View style={{flex: -1}}>
                         <Text style={[styles.grey, localStyles.rollResult]}>
@@ -318,7 +318,14 @@ export const ResultScreen = ({route, navigation}) => {
                 </View>
                 <View flexDirection="row" flexWrap="wrap" paddingBottom={verticalScale(5)}>
                     {rollResult.rolls.map((roll, i) => {
-                        return <Die key={Math.random()} roll={roll} partialDieType={rollResult.partialDieType} isLast={i === rollResult.rolls.length - 1} />;
+                        return (
+                            <Die
+                                key={`die-${Math.random()}`}
+                                roll={roll}
+                                partialDieType={rollResult.partialDieType}
+                                isLast={i === rollResult.rolls.length - 1}
+                            />
+                        );
                     })}
                 </View>
                 <Text style={styles.grey}>
