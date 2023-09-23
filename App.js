@@ -108,8 +108,6 @@ const drawerIcon = (name) => {
 export const App = () => {
     soundPlayer.initialize(DEFAULT_SOUND, false);
 
-    setTimeout(() => SplashScreen.hide(), 200);
-
     const appState = useRef(AppState.currentState);
 
     useEffect(() => {
@@ -165,7 +163,7 @@ export const App = () => {
             <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
                 <Root>
                     <GestureHandlerRootView style={{flex: 1}}>
-                        <NavigationContainer theme={MyTheme}>
+                        <NavigationContainer theme={MyTheme} onReady={() => SplashScreen.hide()}>
                             <Drawer.Navigator
                                 screenOptions={{
                                     headerShown: false,
