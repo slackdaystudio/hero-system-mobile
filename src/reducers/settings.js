@@ -21,6 +21,7 @@ const settingsSlice = createSlice({
         playSounds: true,
         onlyDiceSounds: false,
         showAnimations: true,
+        increaseEntropy: true,
     },
     reducers: {
         initializeApplicationSettings: (state, action) => {
@@ -29,6 +30,8 @@ const settingsSlice = createSlice({
             state.useFifthEdition = settings.useFifthEdition;
             state.playSounds = settings.playSounds;
             state.onlyDiceSounds = settings.onlyDiceSounds;
+            state.showAnimations = settings.showAnimations;
+            state.increaseEntropy = settings.increaseEntropy;
         },
     },
     extraReducers: (builder) => {
@@ -45,6 +48,7 @@ const settingsSlice = createSlice({
                 state.playSounds = settings.playSounds;
                 state.onlyDiceSounds = settings.onlyDiceSounds;
                 state.showAnimations = settings.showAnimations;
+                state.increaseEntropy = settings.increaseEntropy;
             });
     },
 });

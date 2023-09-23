@@ -410,6 +410,7 @@ class Persistence {
             playSounds: true,
             onlyDiceSounds: false,
             showAnimations: true,
+            increaseEntropy: true,
         };
 
         settings = settings === null || settings === undefined ? {} : settings;

@@ -249,10 +249,6 @@ class Common {
     merge(left, right) {
         return merge(left, right);
     }
-
-    getRandomNumber(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
 }
 
 export let common = new Common();

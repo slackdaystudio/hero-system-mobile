@@ -1,5 +1,5 @@
-import {common} from './Common';
 import {statistics} from './Statistics';
+import {getRandomNumber} from '../../App';
 
 export const SKILL_CHECK = 1;
 
@@ -22,6 +22,12 @@ export const PARTIAL_DIE_PLUS_ONE = 1;
 export const PARTIAL_DIE_HALF = 2;
 
 export const PARTIAL_DIE_MINUS_ONE = 3;
+
+export const ROLL_MIN = 1;
+
+export const D6_MAX = 6;
+
+export const D3_MAX = 3;
 
 class DieRoller {
     constructor() {
@@ -156,7 +162,7 @@ class DieRoller {
         for (let roll of resultRoll.rolls) {
             if (roll >= 2 && roll <= 5) {
                 body += 1;
-            } else if (roll === 6) {
+            } else if (roll === ROLL_MIN) {
                 body += 2;
             }
         }
@@ -168,7 +174,7 @@ class DieRoller {
         let luckPoints = 0;
 
         for (let roll of resultRoll.rolls) {
-            if (roll === 6) {
+            if (roll === D6_MAX) {
                 luckPoints++;
             }
         }
@@ -191,34 +197,29 @@ class DieRoller {
     }
 
     _roll(dice, rollType, partialDieType) {
-        let resultRoll = {
+        const resultRoll = {
             rollType: rollType,
             total: 0,
             rolls: [],
             partialDieType: partialDieType || PARTIAL_DIE_NONE,
         };
-        let roll = 0;
 
-        for (let i = 0; i < dice; i++) {
-            roll = common.getRandomNumber(1, 6);
-
-            resultRoll.total += roll;
-            resultRoll.rolls.push(roll);
-        }
+        resultRoll.rolls = getRandomNumber(ROLL_MIN, D6_MAX, dice);
+        resultRoll.total = resultRoll.rolls.reduce((total, current) => total + current, 0);
 
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
             resultRoll.total += 1;
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            let partialDie = common.getRandomNumber(1, 6);
+            let partialDie = getRandomNumber(ROLL_MIN, D6_MAX);
 
-            if (--partialDie < 1) {
-                partialDie = 1;
+            if (--partialDie < ROLL_MIN) {
+                partialDie = ROLL_MIN;
             }
 
             resultRoll.total += partialDie;
             resultRoll.rolls.push(partialDie);
         } else if (partialDieType === PARTIAL_DIE_HALF) {
-            const halfDie = common.getRandomNumber(1, 3);
+            const halfDie = getRandomNumber(ROLL_MIN, D3_MAX);
 
             resultRoll.total += halfDie;
             resultRoll.rolls.push(halfDie);
@@ -238,13 +239,13 @@ class DieRoller {
                     resultRoll.stunModifier = 1;
 
                     if (resultRoll.damageForm.useFifthEdition) {
-                        resultRoll.stunModifier = common.getRandomNumber(1, 6);
+                        resultRoll.stunModifier = getRandomNumber(ROLL_MIN, D6_MAX);
 
                         if (--resultRoll.stunModifier === 0) {
                             resultRoll.stunModifier = 1;
                         }
                     } else {
-                        resultRoll.stunModifier = common.getRandomNumber(1, 3);
+                        resultRoll.stunModifier = getRandomNumber(ROLL_MIN, D3_MAX);
                     }
                 }
 

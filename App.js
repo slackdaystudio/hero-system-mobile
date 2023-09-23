@@ -8,6 +8,7 @@ import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {Icon, Root} from 'native-base';
+import prand from 'pure-rand';
 import {soundPlayer, DEFAULT_SOUND} from './src/lib/SoundPlayer';
 import rootReducer from './src/reducers';
 import {HomeScreen} from './src/components/Screens/HomeScreen';
@@ -100,6 +101,29 @@ export const store = configureStore({
             serializableCheck: false,
         }),
 });
+
+let rng = prand.xoroshiro128plus(42);
+
+export const getRandomNumber = (min, max, rolls = 1, increaseEntropyOveride = undefined) => {
+    const results = [];
+    const increaseEntropy = increaseEntropyOveride === undefined ? store.getState().settings.increaseEntropy : increaseEntropyOveride === true;
+
+    if (increaseEntropy) {
+        for (let i = 0; i < rolls; i++) {
+            const [roll, nextRng] = prand.uniformIntDistribution(min, max, rng);
+
+            results.push(roll);
+
+            rng = nextRng;
+        }
+    } else {
+        for (let i = 0; i < rolls; i++) {
+            results.push(Math.floor(Math.random() * (max - min + 1)) + min);
+        }
+    }
+
+    return results.length === 1 ? results[0] : results;
+};
 
 const drawerIcon = (name) => {
     return <Icon solid type="FontAwesome5" name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: scale(-20)}} />;

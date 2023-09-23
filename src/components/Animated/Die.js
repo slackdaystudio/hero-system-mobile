@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Icon} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
-import {common} from '../../lib/Common';
+import {getRandomNumber} from '../../../App';
 import {MotiView, useAnimationState} from 'moti';
 import {useSelector} from 'react-redux';
 
@@ -56,7 +56,7 @@ export const Die = ({roll, partialDieType, isLast}) => {
             <MotiView
                 transition={{
                     duration: 3000,
-                    delay: common.getRandomNumber(0, 250),
+                    delay: getRandomNumber(0, 250, 1, false),
                 }}
                 state={dieState}
             >

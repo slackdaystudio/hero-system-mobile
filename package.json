@@ -28,6 +28,7 @@
     "moti": "^0.26.0",
     "native-base": "2.15.2",
     "patch-package": "^8.0.0",
+    "pure-rand": "^6.0.3",
     "react": "18.2.0",
     "react-native": "0.72.4",
     "react-native-calculator": "^0.5.2",

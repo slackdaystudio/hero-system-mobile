@@ -114,7 +114,7 @@ export const SettingsScreen = ({navigation}) => {
                             </Right>
                         </ListItem>
                     </List>
-                    <Heading text="Animations" />
+                    <Heading text="Performance" />
                     <List>
                         <ListItem noIndent style={{borderBottomWidth: 0}}>
                             <Left>
@@ -124,6 +124,22 @@ export const SettingsScreen = ({navigation}) => {
                                 <Switch
                                     value={settings.showAnimations}
                                     onValueChange={() => dispatch(toggleSetting({key: 'showAnimations', value: !settings.showAnimations}))}
+                                    minimumTrackTintColor="#14354d"
+                                    maximumTrackTintColor="#14354d"
+                                    thumbColor="#14354d"
+                                    trackColor={{false: '#000', true: '#3d5478'}}
+                                    ios_backgroundColor="#3d5478"
+                                />
+                            </Right>
+                        </ListItem>
+                        <ListItem noIndent style={{borderBottomWidth: 0}}>
+                            <Left>
+                                <Text style={styles.boldGrey}>Increase roll entropy?</Text>
+                            </Left>
+                            <Right>
+                                <Switch
+                                    value={settings.increaseEntropy}
+                                    onValueChange={() => dispatch(toggleSetting({key: 'increaseEntropy', value: !settings.increaseEntropy}))}
                                     minimumTrackTintColor="#14354d"
                                     maximumTrackTintColor="#14354d"
                                     thumbColor="#14354d"
