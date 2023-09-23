@@ -1,4 +1,4 @@
 {
-    "current": "2.1.7",
-    "onFirstLoad": null
+    "current": "2.1.8",
+    "onFirstLoad": "flush"
 }
