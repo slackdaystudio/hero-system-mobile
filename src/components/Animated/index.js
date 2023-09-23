@@ -15,3 +15,7 @@
 export {Animated, useSlideInUp, useSlideInDown, useSlideInLeft, useSlideInRight, useScaleInUp} from './Animated';
 
 export {Accordion} from './Accordion';
+
+export {Die} from './Die';
+
+export {DisappearingButton} from './DisappearingButton';

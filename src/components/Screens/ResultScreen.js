@@ -3,18 +3,18 @@ import PropTypes from 'prop-types';
 import {useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {Platform, ImageBackground, View} from 'react-native';
-import {Container, Button, Text, Spinner} from 'native-base';
+import {Container, Text, Spinner} from 'native-base';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
+import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
+import {Die, DisappearingButton} from '../Animated';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT, PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {statistics} from '../../lib/Statistics';
 import {selectResultData} from '../../reducers/selectors';
 import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import styles from '../../Styles';
-import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
-import {Die} from '../Animated/Die';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -55,6 +55,7 @@ export const ResultScreen = ({route, navigation}) => {
 
     const reRoll = () => {
         setResult(dieRoller.rollAgain(result));
+
         playSoundClip();
     };
 
@@ -287,7 +288,7 @@ export const ResultScreen = ({route, navigation}) => {
         return percentage < 0.0 ? 'green' : 'red';
     };
 
-    const renderDie = (rollResult) => {
+    const renderDice = (rollResult) => {
         const percentage = statistics.getPercentage(rollResult);
 
         return (
@@ -341,10 +342,10 @@ export const ResultScreen = ({route, navigation}) => {
         }
 
         if (result.hasOwnProperty('results')) {
-            return result.results.map((r) => renderDie(r));
+            return result.results.map((r) => renderDice(r));
         }
 
-        return renderDie(result);
+        return renderDice(result);
     };
 
     return (
@@ -355,11 +356,7 @@ export const ResultScreen = ({route, navigation}) => {
                     <Text style={styles.heading}>Roll Result</Text>
                     <View justifyContent="center" paddingHorizontal={scale(10)}>
                         {renderRoll()}
-                        <View style={styles.buttonContainer}>
-                            <Button block style={styles.button} onPress={reRoll}>
-                                <Text uppercase={false}>Roll Again</Text>
-                            </Button>
-                        </View>
+                        <DisappearingButton label="Roll Again" onPress={reRoll} />
                     </View>
                 </VirtualizedList>
             </ImageBackground>

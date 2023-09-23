@@ -103,7 +103,7 @@ export const useScaleInUp = () => {
 };
 
 export const Animated = ({animationProps, children}) => {
-    const showAnimations = useSelector((state) => state.settings.animations);
+    const showAnimations = useSelector((state) => state.settings.showAnimations);
 
     if (showAnimations) {
         return <MotiView {...animationProps}>{children}</MotiView>;
