@@ -1,9 +1,50 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {common} from './Common';
 import {file} from './File';
-import {combatDetails} from './CombatDetails';
 
 export const MAX_CHARACTER_SLOTS = 5;
+
+export const DEFAULT_STATS = {
+    sum: 0,
+    largestDieRoll: 0,
+    largestSum: 0,
+    totals: {
+        diceRolled: 0,
+        hitRolls: 0,
+        skillChecks: 0,
+        effectRolls: 0,
+        normalDamage: {
+            rolls: 0,
+            stun: 0,
+            body: 0,
+        },
+        killingDamage: {
+            rolls: 0,
+            stun: 0,
+            body: 0,
+        },
+        knockback: 0,
+        hitLocations: {
+            head: 0,
+            hands: 0,
+            arms: 0,
+            shoulders: 0,
+            chest: 0,
+            stomach: 0,
+            vitals: 0,
+            thighs: 0,
+            legs: 0,
+            feet: 0,
+        },
+    },
+    distributions: {
+        one: 0,
+        two: 0,
+        three: 0,
+        four: 0,
+        five: 0,
+        six: 0,
+    },
+};
 
 class Persistence {
     async initializeApplication() {
@@ -26,7 +67,7 @@ class Persistence {
         try {
             version = await AsyncStorage.getItem('version');
         } catch (error) {
-            common.toast('Unable to retrieve version');
+            console.error('Unable to retrieve version');
         }
 
         return version;
@@ -36,7 +77,7 @@ class Persistence {
         try {
             await AsyncStorage.setItem('version', version);
         } catch (error) {
-            common.toast('Unable to persist version');
+            console.error('Unable to persist version');
         }
 
         return version;
@@ -49,7 +90,7 @@ class Persistence {
 
         await AsyncStorage.multiRemove(allCacheKeys);
 
-        common.toast('All caches have been cleared');
+        console.error('All caches have been cleared');
     }
 
     async saveCharacter(character, slot) {
@@ -74,7 +115,7 @@ class Persistence {
 
             await AsyncStorage.setItem('characters', JSON.stringify(characters));
         } catch (error) {
-            common.toast('Unable to persist statistics');
+            console.error('Unable to persist character');
         }
 
         return {
@@ -94,7 +135,7 @@ class Persistence {
             await AsyncStorage.setItem('character', JSON.stringify(character));
             await AsyncStorage.setItem('characters', JSON.stringify(characters));
         } catch (error) {
-            common.toast('Unable to persist character data');
+            console.error('Unable to persist character data');
         }
     }
 
@@ -125,34 +166,33 @@ class Persistence {
                 characterData.characters = JSON.parse(characters);
             }
         } catch (error) {
-            common.toast('Unable to retrieve persisted character');
+            console.error('Unable to retrieve persisted character');
         }
 
         return characterData;
     }
 
     async updateLoadedCharacters(newCharacter, character, characters) {
+        let data;
+
         try {
             if (newCharacter.filename === character.filename) {
                 character = {...newCharacter};
             }
 
-            for (let [slot, char] of Object.entries(characters)) {
+            for (const [slot, char] of Object.entries(characters)) {
                 if (char.filename === newCharacter.filename) {
                     characters[slot] = {...newCharacter};
                     break;
                 }
             }
 
-            this.saveCharacter(character, characters);
+            data = await this.saveCharacter(character, characters);
         } catch (error) {
-            common.toast('Unable to update loaded characters');
+            console.error('Unable to update loaded characters');
         }
 
-        return {
-            character: character,
-            characters: characters,
-        };
+        return data;
     }
 
     async clearCharacter(filename, character, characters, saveCharacters = true) {
@@ -164,7 +204,7 @@ class Persistence {
             let toBeRemoved = null;
 
             for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === filename) {
+                if (characters[i.toString()] !== undefined && characters[i.toString()].filename === filename) {
                     toBeRemoved = i.toString();
                     break;
                 }
@@ -188,7 +228,7 @@ class Persistence {
                 await AsyncStorage.setItem('characters', JSON.stringify(characters));
             }
         } catch (error) {
-            common.toast('Unable to clear persisted character');
+            console.error('Unable to clear persisted character');
         }
 
         return {
@@ -202,83 +242,8 @@ class Persistence {
             await AsyncStorage.removeItem('character');
             await AsyncStorage.removeItem('characters');
         } catch (error) {
-            common.toast('Unable to clear persisted character');
+            console.error('Unable to clear persisted character');
         }
-    }
-
-    async applyStatus(character, characters, status) {
-        try {
-            combatDetails.applyStatus(character, status);
-
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
-                    combatDetails.applyStatus(characters[i.toString()], status);
-                    break;
-                }
-            }
-
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-            await AsyncStorage.setItem('characters', JSON.stringify(characters));
-
-            await this.saveCharacterData(character, characters);
-        } catch (error) {
-            common.toast('Unable to apply status to character');
-        }
-
-        return {
-            character: character,
-            characters: characters,
-        };
-    }
-
-    async clearAllStatuses(character, characters) {
-        try {
-            combatDetails.clearAllStatuses(character);
-
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
-                    combatDetails.clearAllStatuses(characters[i.toString()]);
-                    break;
-                }
-            }
-
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-            await AsyncStorage.setItem('characters', JSON.stringify(characters));
-
-            await this.saveCharacterData(character, characters);
-        } catch (error) {
-            common.toast('Unable to clear all statuses for character');
-        }
-
-        return {
-            character: character,
-            characters: characters,
-        };
-    }
-
-    async clearStatus(character, characters, index) {
-        try {
-            combatDetails.clearStatus(character, index);
-
-            for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-                if (characters[i.toString()] !== null && characters[i.toString()].filename === character.filename) {
-                    combatDetails.clearStatus(characters[i.toString()], index);
-                    break;
-                }
-            }
-
-            await AsyncStorage.setItem('character', JSON.stringify(character));
-            await AsyncStorage.setItem('characters', JSON.stringify(characters));
-
-            await this.saveCharacterData(character, characters);
-        } catch (error) {
-            common.toast('Unable to clear status from character');
-        }
-
-        return {
-            character: character,
-            characters: characters,
-        };
     }
 
     async initializeApplicationSettings() {
@@ -294,7 +259,7 @@ class Persistence {
                 return settings;
             }
         } catch (error) {
-            common.toast('Unable to retrieve application settings or initialize a fresh set');
+            console.error('Unable to retrieve application settings or initialize a fresh set');
         }
 
         return settings;
@@ -308,7 +273,7 @@ class Persistence {
 
             await AsyncStorage.setItem('appSettings', JSON.stringify(settings));
         } catch (error) {
-            common.toast('Unable to clear application settings');
+            console.error('Unable to clear application settings');
         }
 
         return settings;
@@ -323,35 +288,33 @@ class Persistence {
 
             await AsyncStorage.setItem('appSettings', JSON.stringify(appSettings));
         } catch (error) {
-            common.toast(`Unable to toggle ${key}`);
+            console.error(`Unable to toggle ${key}`);
         }
 
         return value;
     }
 
     async initializeStatistics() {
-        let statistics = null;
-
         try {
-            statistics = await AsyncStorage.getItem('statistics');
+            let statistics = await AsyncStorage.getItem('statistics');
 
             if (statistics === null) {
                 statistics = await this._initializeStatistics();
+
+                return await this.setStatistics(statistics);
             } else {
-                statistics = JSON.parse(statistics);
+                return JSON.parse(statistics);
             }
         } catch (error) {
-            common.toast('Unable to retrieve persisted statistics or initialize a fresh set');
+            console.error('Unable to retrieve persisted statistics or initialize a fresh set');
         }
-
-        return statistics;
     }
 
     async setStatistics(statistics) {
         try {
             await AsyncStorage.setItem('statistics', JSON.stringify(statistics));
         } catch (error) {
-            common.toast('Unable to persist statistics');
+            console.error('Unable to persist statistics');
         }
 
         return statistics;
@@ -364,7 +327,7 @@ class Persistence {
             await AsyncStorage.removeItem('statistics');
             reinitializedStatistics = await this._initializeStatistics();
         } catch (error) {
-            common.toast('Unable to clear persisted statistics');
+            console.error('Unable to clear persisted statistics');
         }
 
         return reinitializedStatistics;
@@ -376,7 +339,7 @@ class Persistence {
         try {
             randomHero = await AsyncStorage.getItem('hero');
         } catch (error) {
-            common.toast('Unable to retrieve persisted H.E.R.O.');
+            console.error('Unable to retrieve persisted H.E.R.O.');
         }
 
         return randomHero === null ? null : JSON.parse(randomHero);
@@ -386,7 +349,7 @@ class Persistence {
         try {
             await AsyncStorage.setItem('hero', JSON.stringify(character));
         } catch (error) {
-            common.toast('Unable to persist H.E.R.O.');
+            console.error('Unable to persist H.E.R.O.');
         }
 
         return character;
@@ -406,7 +369,7 @@ class Persistence {
                 await AsyncStorage.setItem('hero', JSON.stringify(randomHero));
             }
         } catch (error) {
-            common.toast('Unable to retrieve persisted H.E.R.O.');
+            console.error('Unable to retrieve persisted H.E.R.O.');
         }
 
         return randomHero;
@@ -416,61 +379,18 @@ class Persistence {
         try {
             await AsyncStorage.removeItem('hero');
         } catch (error) {
-            common.toast('Unable to clear persisted H.E.R.O.');
+            console.error('Unable to clear persisted H.E.R.O.');
         }
     }
 
     async _initializeStatistics() {
-        let statistics = {
-            sum: 0,
-            largestDieRoll: 0,
-            largestSum: 0,
-            totals: {
-                diceRolled: 0,
-                hitRolls: 0,
-                skillChecks: 0,
-                effectRolls: 0,
-                normalDamage: {
-                    rolls: 0,
-                    stun: 0,
-                    body: 0,
-                },
-                killingDamage: {
-                    rolls: 0,
-                    stun: 0,
-                    body: 0,
-                },
-                knockback: 0,
-                hitLocations: {
-                    head: 0,
-                    hands: 0,
-                    arms: 0,
-                    shoulders: 0,
-                    chest: 0,
-                    stomach: 0,
-                    vitals: 0,
-                    thighs: 0,
-                    legs: 0,
-                    feet: 0,
-                },
-            },
-            distributions: {
-                one: 0,
-                two: 0,
-                three: 0,
-                four: 0,
-                five: 0,
-                six: 0,
-            },
-        };
-
         try {
-            await AsyncStorage.setItem('statistics', JSON.stringify(statistics));
+            await AsyncStorage.setItem('statistics', JSON.stringify(DEFAULT_STATS));
         } catch (error) {
-            common.toast('Unable to initialize statistics');
+            console.error('Unable to initialize statistics');
         }
 
-        return statistics;
+        return DEFAULT_STATS;
     }
 
     _initializeCharacters() {
@@ -489,6 +409,7 @@ class Persistence {
             useFifthEdition: false,
             playSounds: true,
             onlyDiceSounds: false,
+            showAnimations: true,
         };
 
         settings = settings === null || settings === undefined ? {} : settings;

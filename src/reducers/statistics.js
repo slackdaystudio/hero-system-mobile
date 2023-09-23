@@ -1,4 +1,5 @@
-import {persistence} from '../lib/Persistence';
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import {DEFAULT_STATS, persistence} from '../lib/Persistence';
 import {statistics as libStatistics} from '../lib/Statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -15,64 +16,35 @@ import {statistics as libStatistics} from '../lib/Statistics';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//////////////////////////////
-// ACTION TYPES             //
-//////////////////////////////
+export const addStatistics = createAsyncThunk('statistics/addStatistics', async ({statistics}) => {
+    return await libStatistics.add(statistics);
+});
 
-export const INITIALIZE_STATISTICS = 'INITIALIZE_STATISTICS';
+export const clearStatistics = createAsyncThunk('statistics/clearStatistics', async () => {
+    return await persistence.clearStatistics();
+});
 
-export const ADD_STATISTICS = 'ADD_STATISTICS';
+const statisticsSlice = createSlice({
+    name: 'statistics',
+    initialState: DEFAULT_STATS,
+    reducers: {
+        initializeStatistics: (state, action) => {
+            const {statistics} = action.payload;
 
-//////////////////////////////
-// ACTIONS                  //
-//////////////////////////////
-
-export function initializeStatistics() {
-    return async (dispatch) => {
-        persistence.initializeStatistics().then((stats) => {
-            dispatch({
-                type: INITIALIZE_STATISTICS,
-                payload: stats,
+            state = statistics;
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(addStatistics.fulfilled, (state, action) => {
+                state = action.payload;
+            })
+            .addCase(clearStatistics.fulfilled, (_state, _action) => {
+                console.log('Cleared and reset statistics.');
             });
-        });
-    };
-}
+    },
+});
 
-export function addStatistics(statistics) {
-    return async (dispatch) => {
-        libStatistics.add(statistics).then((stats) => {
-            dispatch({
-                type: ADD_STATISTICS,
-                payload: stats,
-            });
-        });
-    };
-}
+export const {initializeStatistics} = statisticsSlice.actions;
 
-export function clearStatistics() {
-    return async (dispatch) => {
-        persistence.clearStatistics().then((stats) => {
-            dispatch({
-                type: INITIALIZE_STATISTICS,
-                payload: stats,
-            });
-        });
-    };
-}
-
-let statisticsState = {};
-
-export default function statistics(state = statisticsState, action) {
-    let newState = null;
-
-    switch (action.type) {
-        case INITIALIZE_STATISTICS:
-        case ADD_STATISTICS:
-            newState = {...state};
-            newState = action.payload;
-
-            return newState;
-        default:
-            return state;
-    }
-}
+export default statisticsSlice.reducer;

@@ -1,19 +1,21 @@
-import React, {Component, Fragment} from 'react';
+import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {View} from 'react-native';
-import {Container, Content, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon, Picker, Item} from 'native-base';
+import {useDispatch, useSelector} from 'react-redux';
+import {useFocusEffect} from '@react-navigation/native';
+import {ImageBackground, View} from 'react-native';
+import {Container, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon} from 'native-base';
+import DropDownPicker from 'react-native-dropdown-picker';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import {file} from '../../lib/File';
-import {character} from '../../lib/Character';
 import {common} from '../../lib/Common';
 import {combatDetails} from '../../lib/CombatDetails';
-import styles from '../../Styles';
 import {setCharacter, clearCharacter, updateLoadedCharacters} from '../../reducers/character';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
+import {character as libCharacter} from '../../lib/Character';
+import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,257 +31,251 @@ import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class CharactersScreen extends Component {
-    static propTypes = {
-        route: PropTypes.object.isRequired,
-        navigation: PropTypes.object.isRequired,
-        character: PropTypes.object,
-        characters: PropTypes.object,
-        setCharacter: PropTypes.func.isRequired,
-        clearCharacter: PropTypes.func.isRequired,
-        updateLoadedCharacters: PropTypes.func.isRequired,
+export const CharactersScreen = ({navigation, route}) => {
+    const dispatch = useDispatch();
+
+    const getSlots = () => {
+        const slots = [];
+
+        for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+            slots[i] = {
+                label: `Slot ${i + 1}`,
+                value: i,
+            };
+        }
+
+        return slots;
     };
 
-    constructor(props) {
-        super(props);
+    const refreshCharacters = useCallback((onComplete) => {
+        setCharactersLoading(true);
 
-        this.state = {
-            characters: null,
-            characterLoading: false,
+        file.listCharacters()
+            .then((chars) => {
+                setLoadedCharacters(chars);
+
+                if (typeof onComplete === 'function') {
+                    onComplete();
+                }
+            })
+            .catch((error) => {
+                console.error(error.message);
+            })
+            .finally(() => {
+                setCharactersLoading(false);
+            });
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            refreshCharacters();
+
+            if (route.params !== undefined && route.params.hasOwnProperty('slot')) {
+                setValue(route.params.slot);
+            }
+        }, [route, refreshCharacters]),
+    );
+
+    const {character, characters} = useSelector((state) => state.character);
+
+    const [loadedCharacters, setLoadedCharacters] = useState(null);
+
+    const [open, setOpen] = useState(false);
+
+    const [value, setValue] = useState(0);
+
+    const [items, setItems] = useState(getSlots());
+
+    const [charactersLoading, setCharactersLoading] = useState(true);
+
+    const [dialogProps, setDialogProps] = useState({
+        dialogTitle: '',
+        dialogMessage: '',
+        dialogOnOkFn: null,
+        deleteDialogVisible: false,
+    });
+
+    const startLoad = () => {
+        setCharactersLoading(true);
+    };
+
+    const endLoad = () => {
+        setCharactersLoading(false);
+    };
+
+    const importCharacter = () => {
+        if (character !== null && character.hasOwnProperty('filename')) {
+            file.saveCharacter(character, character.filename.slice(0, -5)).then(() => {
+                libCharacter
+                    .import(startLoad, endLoad)
+                    .then((char) => {
+                        if (common.isEmptyObject(char)) {
+                            common.toast('Error: could not import character.');
+                        } else {
+                            postImport(char);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error.message);
+                    });
+            });
+        } else {
+            libCharacter
+                .import(startLoad, endLoad)
+                .then((char) => {
+                    if (common.isEmptyObject(char)) {
+                        common.toast('Error: could not import character.');
+                    } else {
+                        postImport(char);
+                    }
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                });
+        }
+    };
+
+    const postImport = (newCharacter) => {
+        refreshCharacters(() => {
+            if (Object.keys(characters).length >= 1) {
+                for (let char of Object.values(loadedCharacters)) {
+                    if (char !== null && char.filename === newCharacter.filename) {
+                        dispatch(updateLoadedCharacters({newCharacter, character, characters}));
+                        break;
+                    }
+                }
+            }
+        });
+    };
+
+    const onViewCharacterPress = (characterFilename) => {
+        if (!common.isEmptyObject(character) && character.filename === characterFilename) {
+            goToCharacterScreen();
+        } else {
+            if (!common.isEmptyObject(character) && character.hasOwnProperty('filename')) {
+                file.saveCharacter(character, character.filename.slice(0, -5))
+                    .then(() => {
+                        loadCharacter(characterFilename);
+                    })
+                    .catch((error) => {
+                        console.error(error.message);
+                    });
+            } else {
+                loadCharacter(characterFilename);
+            }
+        }
+    };
+
+    const loadCharacter = (characterFilename) => {
+        file.loadCharacter(characterFilename, startLoad, endLoad)
+            .then((char) => {
+                // Legacy: done on character load now, do not touch
+                if (!char.hasOwnProperty('filename')) {
+                    char.filename = characterFilename;
+                    char.showSecondary = true;
+                    char.combatDetails = combatDetails.init(char);
+                }
+
+                dispatch(setCharacter({character: char, slot: value.toString()}));
+
+                goToCharacterScreen();
+            })
+            .catch((error) => console.error(error));
+    };
+
+    const goToCharacterScreen = () => {
+        navigation.navigate('ViewHeroDesignerCharacter', {from: 'Characters'});
+    };
+
+    const openDeleteDialog = (name, filename) => {
+        const newState = {...dialogProps};
+
+        newState.dialogTitle = `Delete ${name}?`;
+        newState.dialogMessage =
+            'Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded';
+        newState.dialogOnOkFn = () => onDeleteDialogOk(filename);
+        newState.deleteDialogVisible = true;
+
+        setDialogProps(newState);
+    };
+
+    const onDeleteDialogClose = (callback) => {
+        setDialogProps({
             dialogTitle: '',
             dialogMessage: '',
             dialogOnOkFn: null,
             deleteDialogVisible: false,
-            toBeDeleted: null,
-            slot: 0,
-        };
-
-        this.slots = [];
-
-        for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-            this.slots.push(i);
-        }
-
-        this.startLoad = this._startLoad.bind(this);
-        this.endLoad = this._endLoad.bind(this);
-        this.onViewCharacterPress = this._onViewCharacterPress.bind(this);
-        this.openDeleteDialog = this._openDeleteDialog.bind(this);
-        this.onDeleteDialogOk = this._onDeleteDialogOk.bind(this);
-        this.onDeleteDialogClose = this._onDeleteDialogClose.bind(this);
-        this.updateSlot = this._updateSlot.bind(this);
-    }
-
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            this._refreshCharacters();
-
-            if (this.props.route.params !== undefined && this.props.route.params.hasOwnProperty('slot')) {
-                this.setState({slot: this.props.route.params.slot});
-            }
         });
-    }
 
-    componentWillUnmount() {
-        this._unsubscribe();
-    }
-
-    _updateSlot(slot) {
-        this.setState({slot: slot});
-    }
-
-    _refreshCharacters() {
-        file.listCharacters()
-            .then((characters) => {
-                this.setState({characters: characters});
-            })
-            .catch((error) => {
-                console.log(error.message);
-            });
-    }
-
-    _startLoad() {
-        this.setState({characterLoading: true});
-    }
-
-    _endLoad() {
-        this.setState({characterLoading: false});
-    }
-
-    _importCharacter() {
-        if (this.props.character !== null && this.props.character.hasOwnProperty('filename')) {
-            file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5)).then(() => {
-                character
-                    .import(this.startLoad, this.endLoad)
-                    .then((char) => {
-                        this._postImport(char);
-                    })
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
-            });
-        } else {
-            character
-                .import(this.startLoad, this.endLoad)
-                .then((char) => {
-                    this._postImport(char);
-                })
-                .catch((error) => {
-                    console.log(error.message);
-                });
+        if (typeof callback === 'function') {
+            callback();
         }
-    }
+    };
 
-    _postImport(importedCharacter) {
-        this._refreshCharacters();
-
-        if (Object.keys(this.props.characters).length >= 1) {
-            for (let char of Object.values(this.props.characters)) {
-                if (char !== null && char.filename === importedCharacter.filename) {
-                    this.props.updateLoadedCharacters(importedCharacter, this.props.character, this.props.characters);
-                    break;
+    const onDeleteDialogOk = (filename) => {
+        file.deleteCharacter(filename)
+            .then(() => {
+                if (!common.isEmptyObject(character)) {
+                    dispatch(
+                        clearCharacter({
+                            toBeDeleted: filename,
+                            character: character,
+                            characters: loadedCharacters,
+                            saveCharacter: false,
+                        }),
+                    );
                 }
-            }
-        }
-    }
+            })
+            .finally(() => {
+                onDeleteDialogClose(refreshCharacters());
+            });
+    };
 
-    _onViewCharacterPress(characterFilename) {
-        if (!common.isEmptyObject(this.props.character) && this.props.character.filename === characterFilename) {
-            this._goToCharacterScreen();
-        } else {
-            if (!common.isEmptyObject(this.props.character) && this.props.character.hasOwnProperty('filename')) {
-                file.saveCharacter(this.props.character, this.props.character.filename.slice(0, -5))
-                    .then(() => {
-                        this._loadCharacter(characterFilename);
-                    })
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
-            } else {
-                this._loadCharacter(characterFilename);
-            }
-        }
-    }
-
-    _loadCharacter(characterFilename) {
-        file.loadCharacter(characterFilename, this.startLoad, this.endLoad).then((char) => {
-            // Legacy: done on character load now, do not touch
-            if (!char.hasOwnProperty('filename')) {
-                char.filename = characterFilename;
-                char.showSecondary = true;
-                char.combatDetails = combatDetails.init(char);
-            }
-
-            this.props.setCharacter(char, this.state.slot.toString());
-
-            this._goToCharacterScreen();
-        });
-    }
-
-    _goToCharacterScreen() {
-        this.props.navigation.navigate('ViewHeroDesignerCharacter', {from: 'Characters'});
-    }
-
-    _openDeleteDialog(filename) {
-        let newState = {...this.state};
-
-        newState.dialogTitle = `Delete ${filename.slice(0, -5)}?`;
-        newState.dialogMessage =
-            'Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded';
-        newState.dialogOnOkFn = this.onDeleteDialogOk;
-        newState.deleteDialogVisible = true;
-        newState.toBeDeleted = filename;
-
-        this.setState(newState);
-    }
-
-    _onDeleteDialogClose() {
-        let newState = {...this.state};
-
-        newState.dialogTitle = '';
-        newState.dialogMessage = '';
-        newState.dialogOnOkFn = null;
-        newState.deleteDialogVisible = false;
-        newState.toBeDeleted = null;
-
-        this.setState(newState);
-    }
-
-    _onDeleteDialogOk() {
-        file.deleteCharacter(this.state.toBeDeleted).then(() => {
-            if (!common.isEmptyObject(this.props.character)) {
-                this.props.clearCharacter(this.state.toBeDeleted, this.props.character, this.props.characters, false);
-            }
-
-            this._refreshCharacters();
-            this._onDeleteDialogClose();
-        });
-    }
-
-    _renderImportCharacterButton() {
-        if (this.state.characterLoading) {
+    const renderCharacters = () => {
+        if (common.isEmptyObject(loadedCharacters) || charactersLoading) {
             return <Spinner color="#D0D1D3" />;
         }
 
         return (
-            <Button style={styles.button} onPress={() => this.onLoadPress()}>
-                <Text uppercase={false} style={styles.buttonText}>
-                    View
-                </Text>
-            </Button>
-        );
-    }
-
-    _renderCharacters() {
-        if (this.state.characters === null || this.state.characterLoading) {
-            return <Spinner color="#D0D1D3" />;
-        }
-
-        let name = null;
-
-        return (
-            <Fragment>
-                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: scale(300), alignSelf: 'center'}}>
+            <View flexBasis="auto">
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: scale(300), alignSelf: 'center'}}>
                     <View style={{flex: 1}}>
                         <Text style={styles.grey}>Load character into: </Text>
                     </View>
                     <View style={{flex: 1}}>
-                        <Picker
-                            style={{width: undefined, color: '#FFFFFF'}}
-                            textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
-                            iosHeader="Select one"
-                            mode="dropdown"
-                            selectedValue={this.state.slot}
-                            onValueChange={(value) => this.updateSlot(value)}
-                        >
-                            {this.slots.map((slot, index) => {
-                                return <Item key={'slot-' + slot} label={`Slot ${slot + 1}`} value={slot} />;
-                            })}
-                        </Picker>
+                        <DropDownPicker
+                            theme="DARK"
+                            listMode="MODAL"
+                            open={open}
+                            value={value}
+                            items={items}
+                            setOpen={setOpen}
+                            setValue={setValue}
+                            setItems={setItems}
+                        />
                     </View>
                 </View>
                 <List>
-                    {this.state.characters.map((characterName, index) => {
-                        name = characterName.slice(0, -5);
-
+                    {loadedCharacters.map((char) => {
                         return (
-                            <ListItem icon key={name}>
+                            <ListItem icon key={char.fileName}>
                                 <Left>
                                     <Icon
                                         type="FontAwesome"
                                         name="trash"
                                         style={{fontSize: verticalScale(25), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
-                                        onPress={() => this.openDeleteDialog(characterName)}
+                                        onPress={() => openDeleteDialog(char.name, char.fileName)}
                                     />
                                 </Left>
                                 <Body>
-                                    <Text style={styles.grey}>{name}</Text>
+                                    <Text style={styles.grey}>{char.name}</Text>
                                 </Body>
                                 <Right>
                                     <Icon
                                         type="FontAwesome"
                                         name="chevron-right"
                                         style={{fontSize: verticalScale(20), color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
-                                        onPress={() => this.onViewCharacterPress(characterName)}
+                                        onPress={() => onViewCharacterPress(char.fileName)}
                                     />
                                 </Right>
                             </ListItem>
@@ -287,48 +283,36 @@ class CharactersScreen extends Component {
                     })}
                 </List>
                 <View style={[styles.buttonContainer, {paddingTop: verticalScale(20)}]}>
-                    <Button style={styles.button} onPress={() => this._importCharacter()}>
+                    <Button style={styles.button} onPress={() => importCharacter()}>
                         <Text uppercase={false} style={styles.buttonText}>
                             Import
                         </Text>
                     </Button>
                 </View>
-            </Fragment>
+            </View>
         );
-    }
-
-    render() {
-        return (
-            <Container style={styles.container}>
-                <Header navigation={this.props.navigation} />
-                <Content style={styles.content}>
-                    <Heading text="Characters" />
-                    {this._renderCharacters()}
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <ConfirmationDialog
-                        visible={this.state.deleteDialogVisible}
-                        title={this.state.dialogTitle}
-                        info={this.state.dialogMessage}
-                        onOk={this.state.dialogOnOkFn}
-                        onClose={this.onDeleteDialogClose}
-                    />
-                </Content>
-            </Container>
-        );
-    }
-}
-
-const mapStateToProps = (state) => {
-    return {
-        character: state.character.character,
-        characters: state.character.characters,
     };
+
+    return (
+        <Container style={styles.container}>
+            <Header navigation={navigation} />
+            <Heading text="Characters" />
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                {renderCharacters()}
+            </ImageBackground>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <ConfirmationDialog
+                visible={dialogProps.deleteDialogVisible}
+                title={dialogProps.dialogTitle}
+                info={dialogProps.dialogMessage}
+                onOk={dialogProps.dialogOnOkFn}
+                onClose={onDeleteDialogClose}
+            />
+        </Container>
+    );
 };
 
-const mapDispatchToProps = {
-    setCharacter,
-    clearCharacter,
-    updateLoadedCharacters,
+CharactersScreen.propTypes = {
+    route: PropTypes.object.isRequired,
+    navigation: PropTypes.object.isRequired,
 };
-
-export default connect(mapStateToProps, mapDispatchToProps)(CharactersScreen);

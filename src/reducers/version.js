@@ -1,3 +1,5 @@
+import {createSlice} from '@reduxjs/toolkit';
+
 // Copyright 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,36 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//////////////////////////////
-// ACTION TYPES             //
-//////////////////////////////
+const versionSlice = createSlice({
+    name: 'version',
+    initialState: {},
+    reducers: {
+        initializeVersion: (state, action) => {
+            state.version = action.payload.version;
+        },
+    },
+});
 
-export const INITIALIZE_VERSION = 'INITIALIZE_VERSION';
+export const {initializeVersion} = versionSlice.actions;
 
-//////////////////////////////
-// ACTIONS                  //
-//////////////////////////////
-
-export function updateForm(version) {
-    return {
-        type: INITIALIZE_VERSION,
-        payload: version,
-    };
-}
-
-let versionState = {};
-
-export default function version(state = versionState, action) {
-    let newState = null;
-
-    switch (action.type) {
-        case INITIALIZE_VERSION:
-            newState = {...state};
-
-            newState.version = action.payload;
-
-            return newState;
-        default:
-            return state;
-    }
-}
+export default versionSlice.reducer;

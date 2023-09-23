@@ -1,9 +1,8 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {View} from 'react-native';
+import {ImageBackground, View} from 'react-native';
 import {Textarea} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
-import Heading from '../Heading/Heading';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -28,20 +27,25 @@ export default class Notes extends Component {
 
     render() {
         return (
-            <Fragment>
-                <Heading text="Notes" />
-                <View style={{paddingHorizontal: scale(5), paddingBottom: verticalScale(20)}}>
-                    <Textarea
-                        rowSpan={15}
-                        maxLength={10000}
-                        bordered
-                        placeholder="Campaign notes, miscellaneous equipment, etc"
-                        style={[styles.grey, {backgroundColor: '#121212', borderColor: '#303030', fontSize: verticalScale(14)}]}
-                        value={this.props.notes}
-                        onChangeText={(value) => this.props.updateNotes(value)}
-                    />
-                </View>
-            </Fragment>
+            <>
+                <ImageBackground
+                    source={require('../../../public/background.png')}
+                    style={{flex: 1, flexDirection: 'column'}}
+                    imageStyle={{resizeMode: 'repeat'}}
+                >
+                    <View style={{paddingHorizontal: scale(5), paddingBottom: verticalScale(20)}}>
+                        <Textarea
+                            rowSpan={15}
+                            maxLength={10000}
+                            bordered
+                            placeholder="Campaign notes, miscellaneous equipment, etc"
+                            style={[styles.grey, {backgroundColor: '#121212', borderColor: '#303030', fontSize: verticalScale(14)}]}
+                            defaultValue={this.props.notes}
+                            onEndEditing={(event) => this.props.updateNotes(event.nativeEvent.text)}
+                        />
+                    </View>
+                </ImageBackground>
+            </>
         );
     }
 }

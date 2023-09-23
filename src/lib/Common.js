@@ -2,6 +2,7 @@ import {Dimensions, Platform} from 'react-native';
 import {Toast} from 'native-base';
 import camelCase from 'camelcase';
 import snakeCase from 'snake-case';
+import merge from 'deepmerge';
 import {PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from './DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -243,6 +244,14 @@ class Common {
         }
 
         return dice;
+    }
+
+    merge(left, right) {
+        return merge(left, right);
+    }
+
+    getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 }
 

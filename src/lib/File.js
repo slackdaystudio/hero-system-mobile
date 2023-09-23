@@ -1,9 +1,8 @@
-import {Platform, Alert} from 'react-native';
+import {Platform} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
 import {zip, unzip} from 'react-native-zip-archive';
-import getPath from '@flyerhq/react-native-android-uri-path';
 import {isBase64} from 'is-base64';
 import {common} from './Common';
 import {heroDesignerCharacter} from './HeroDesignerCharacter';
@@ -11,6 +10,7 @@ import {character as libCharacter} from './Character';
 import {combatDetails} from './CombatDetails';
 import {Buffer} from 'buffer';
 import iconv from 'iconv-lite';
+import sanitize from 'sanitize-filename';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -47,27 +47,41 @@ class File {
         let character = null;
 
         try {
-            const result = await DocumentPicker.pick({
+            const result = await DocumentPicker.pickSingle({
                 type: [DocumentPicker.types.allFiles, 'public.item'],
+                copyTo: 'cachesDirectory',
             });
 
             if (result === null) {
                 return;
             }
 
-            if (result[0].name.toLowerCase().endsWith(`.${EXT_HD}`)) {
-                character = await this._read(result[0].name, result[0].uri, startLoad, endLoad, EXT_HD);
-            } else if (result[0].name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
-                character = await this._read(result[0].name, result[0].uri, startLoad, endLoad, EXT_CHARACTER);
+            result.fileCopyUri = Platform.OS === 'ios' ? decodeURIComponent(result.fileCopyUri) : result.fileCopyUri;
+
+            if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
+                const rawXml = await this._getRawXm(result.fileCopyUri);
+                const parsedXml = await this._loadHdcCharacter(rawXml);
+
+                if (parsedXml.hasOwnProperty('image')) {
+                    parsedXml.portrait = this._getDataUri(parsedXml);
+
+                    delete parsedXml.image;
+                }
+
+                character = heroDesignerCharacter.getCharacter(parsedXml);
+
+                await this._saveCharacter(character, result.name);
+            } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_CHARACTER);
             } else {
-                common.toast('Unsupported file type: ' + result[0].type);
+                common.toast('Unsupported file type: ' + result.type);
 
                 return;
             }
 
-            if (!result[0].name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
-                await this._initCharacterState(character, result[0].name);
-                await this._saveCharacter(character, result[0].name);
+            if (!result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
+                await this._initCharacterState(character, result.name);
+                await this._saveCharacter(character, result.name);
             }
 
             return character;
@@ -75,7 +89,7 @@ class File {
             const isCancel = DocumentPicker.isCancel(error);
 
             if (!isCancel) {
-                common.toast(error.message);
+                console.error(error.message);
             }
         }
     }
@@ -83,22 +97,21 @@ class File {
     async listCharacters() {
         let path = null;
         let characters = null;
+        let charData = null;
 
         try {
             path = await this._getPath(DEFAULT_CHARACTER_DIR);
             characters = await RNFS.readDir(path);
 
             // Users may have old XML exported characters in thier dir, filter them out but leave them in place
-            characters = await this._filterCharacters(characters);
+            charData = await this._filterCharacters(characters);
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
 
-        return characters
-            .sort((a, b) => a.name > b.name)
-            .map((c) => {
-                return c.name;
-            });
+        charData.sort((a, b) => a.name > b.name);
+
+        return charData;
     }
 
     async loadCharacter(characterName, startLoad, endLoad) {
@@ -119,7 +132,7 @@ class File {
 
             return JSON.parse(character);
         } catch (error) {
-            common.toast(error.message);
+            console.error(error.message);
         } finally {
             endLoad(character);
         }
@@ -132,7 +145,7 @@ class File {
 
             return true;
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
 
         return false;
@@ -144,7 +157,7 @@ class File {
 
             await RNFS.unlink(`${path}/${filename}`);
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
     }
 
@@ -156,15 +169,36 @@ class File {
         let canonicalFromName = null;
 
         for (const character of characters) {
+            if (!character.name.endsWith('hsmc')) {
+                continue;
+            }
+
             canonicalFromName = `${path}/${character.name}`;
             canonicalToName = `${path}/tmp`;
 
-            await unzip(canonicalFromName, canonicalToName);
+            try {
+                await unzip(canonicalFromName, canonicalToName);
 
-            char = await RNFS.readFile(`${canonicalToName}/${character.name.slice(0, -5)}.${EXT_JSON}`);
+                char = await RNFS.readFile(`${canonicalToName}/${character.name.slice(0, -5)}.${EXT_JSON}`);
 
-            if (libCharacter.isHeroDesignerCharacter(JSON.parse(char))) {
-                filtered.push(character);
+                char = JSON.parse(char);
+
+                if (libCharacter.isHeroDesignerCharacter(char)) {
+                    filtered.push({
+                        name: char.characterInfo.characterName,
+                        fileName: character.name,
+                    });
+                }
+            } catch (error) {
+                common.toast(`Error: could not process file "${character.name}".  Possibly corrupt.`, 'Ok', 15000);
+
+                canonicalToName = `${path}/corrupt`;
+
+                if (!(await RNFS.exists(canonicalToName))) {
+                    RNFS.mkdir(canonicalToName);
+                }
+
+                await RNFS.moveFile(canonicalFromName, `${canonicalToName}/${character.name}`);
             }
         }
 
@@ -181,19 +215,11 @@ class File {
         try {
             startLoad();
 
-            const absoluteFilePath = Platform.OS === 'ios' ? decodeURIComponent(getPath(uri)) : getPath(uri);
-
-            if (type === EXT_HD) {
-                let rawXml = await this._getRawXm(absoluteFilePath);
-
-                character = await this._loadHdcCharacter(rawXml);
-
-                this._savePortrait(character);
-            } else if (type === EXT_CHARACTER) {
-                character = this._importCharacter(name, absoluteFilePath);
+            if (type === EXT_CHARACTER) {
+                character = this._importCharacter(name, uri);
             }
         } catch (error) {
-            Alert.alert('Read Error: ' + error.message);
+            console.error('Read Error: ' + error.message);
         } finally {
             endLoad();
         }
@@ -208,7 +234,7 @@ class File {
     }
 
     async _loadHdcCharacter(rawXml) {
-        let parser = xml2js.Parser({
+        let parser = new xml2js.Parser({
             explicitArray: false,
             mergeAttrs: true,
             emptyTag: null,
@@ -234,39 +260,22 @@ class File {
                 },
             ],
         });
-        let character = null;
 
-        try {
-            character = await new Promise((resolve, reject) =>
-                parser.parseString(rawXml, (error, result) => {
-                    if (error) {
-                        reject(error);
-                    }
-
-                    resolve(result);
-                }),
-            );
-
-            if (character.hasOwnProperty('image')) {
-                this._savePortrait(character);
-
-                delete character.image;
-            }
-
-            character = heroDesignerCharacter.getCharacter(character);
-
-            common.toast('Character successfully loaded');
-        } catch (error) {
-            common.toast(error.message);
-        }
-
-        return character;
+        return new Promise((resolve, reject) => {
+            parser.parseString(rawXml, (error, character) => {
+                if (error) {
+                    return reject(error);
+                } else {
+                    return resolve(character);
+                }
+            });
+        });
     }
 
     async _importCharacter(name, filepath) {
-        let importPath = await this._getPath(DEFAULT_CHARACTER_DIR);
-        let importFilename = `file://${importPath}/${name}`;
-        let exists = await RNFS.exists(importFilename);
+        const importPath = await this._getPath(DEFAULT_CHARACTER_DIR);
+        const importFilename = `file://${Platform.OS === 'ios' ? importPath : decodeURIComponent(importPath)}/${name}`;
+        const exists = await RNFS.exists(importFilename);
 
         // https://github.com/itinance/react-native-fs/issues/869
         if (exists) {
@@ -324,12 +333,16 @@ class File {
 
         let zipPath = await this._getFileName(filename, DEFAULT_CHARACTER_DIR, EXT_CHARACTER);
 
+        character.filename = zipPath.split('/').slice(-1)[0];
+
         await RNFS.writeFile(characterPath, JSON.stringify(character));
         await zip([characterPath], zipPath);
         await RNFS.unlink(characterPath);
+
+        return characterPath;
     }
 
-    _savePortrait(character) {
+    _getDataUri(character) {
         if (!character.hasOwnProperty('image')) {
             return;
         }
@@ -337,9 +350,7 @@ class File {
         let extensionParts = character.image.fileName.split('.');
         let extension = extensionParts[extensionParts.length - 1];
 
-        character.portrait = `data:image/${extension};base64,${character.image._}`;
-
-        delete character.image;
+        return `data:image/${extension};base64,${{...character.image}._.replace(/\n/g, '')}`;
     }
 
     async _initCharacterState(character, filename) {
@@ -393,7 +404,7 @@ class File {
                 await RNFS.mkdir(location);
             }
         } catch (error) {
-            Alert.alert(error.message);
+            console.error(error.message);
         }
     }
 
@@ -405,7 +416,7 @@ class File {
             filename = filename.slice(0, -4);
         }
 
-        return `${path}/${filename.replace(/[/\\?%*:|"<>]/g, '_')}.${extension}`;
+        return `${path}/${sanitize(filename, {replacement: '_'})}.${extension}`;
     }
 }
 

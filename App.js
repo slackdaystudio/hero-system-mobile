@@ -1,32 +1,32 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable unused-imports/no-unused-imports */
-import React, {Component, Fragment} from 'react';
-import {Image, Pressable, SafeAreaView, View} from 'react-native';
+import React, {useRef, useEffect} from 'react';
+import {AppState, Image, SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@react-navigation/drawer';
-import {createStore, configureStore, applyMiddleware, compose} from 'redux';
+import {configureStore} from '@reduxjs/toolkit';
 import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
-import applyAppStateListener from 'redux-enhancer-react-native-appstate';
-import thunk from 'redux-thunk';
-import {Root} from 'native-base';
-import {asyncDispatchMiddleware} from './src/middleware/AsyncDispatchMiddleware';
+import {Icon, Root} from 'native-base';
 import {soundPlayer, DEFAULT_SOUND} from './src/lib/SoundPlayer';
-import reducer from './src/reducers/index';
-import HomeScreen from './src/components/Screens/HomeScreen';
-import CharactersScreen from './src/components/Screens/CharactersScreen';
-import ViewHeroDesignerCharacterScreen from './src/components/Screens/ViewHeroDesignerCharacterScreen';
-import RandomCharacterScreen from './src/components/Screens/RandomCharacterScreen';
-import ResultScreen from './src/components/Screens/ResultScreen';
-import SkillScreen from './src/components/Screens/SkillScreen';
-import HitScreen from './src/components/Screens/HitScreen';
-import DamageScreen from './src/components/Screens/DamageScreen';
-import EffectScreen from './src/components/Screens/EffectScreen';
-import CostCruncherScreen from './src/components/Screens/CostCruncherScreen';
-import StatisticsScreen from './src/components/Screens/StatisticsScreen';
-import SettingsScreen from './src/components/Screens/SettingsScreen';
-import {TEXT_COLOR} from './src/Styles';
+import rootReducer from './src/reducers';
+import {HomeScreen} from './src/components/Screens/HomeScreen';
+import {CharactersScreen} from './src/components/Screens/CharactersScreen';
+import {ViewHeroDesignerCharacterScreen} from './src/components/Screens/ViewHeroDesignerCharacterScreen';
+import {RandomCharacterScreen} from './src/components/Screens/RandomCharacterScreen';
+import {ResultScreen} from './src/components/Screens/ResultScreen';
+import {SkillScreen} from './src/components/Screens/SkillScreen';
+import {HitScreen} from './src/components/Screens/HitScreen';
+import {DamageScreen} from './src/components/Screens/DamageScreen';
+import {EffectScreen} from './src/components/Screens/EffectScreen';
+import {CostCruncherScreen} from './src/components/Screens/CostCruncherScreen';
+import {StatisticsScreen} from './src/components/Screens/StatisticsScreen';
+import {SettingsScreen} from './src/components/Screens/SettingsScreen';
+import {persistence} from './src/lib/Persistence';
+import {common} from './src/lib/Common';
+import {initialize} from './src/reducers/appState';
+import {saveCachedCharacter} from './src/reducers/character';
+import currentVersion from './public/version.json';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -42,21 +42,24 @@ import {TEXT_COLOR} from './src/Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export let sounds = {};
+export const sounds = {};
+
+const MyTheme = {
+    dark: true,
+    colors: {
+        primary: '#1b1d1f',
+        background: '#1b1d1f',
+        card: '#1b1d1f',
+    },
+};
 
 const Drawer = createDrawerNavigator();
 
 const HIDDEN_SCREENS = ['Result'];
 
-const CustomDrawerContent = (props) => {
-    if (props.spacer) {
-        return (
-            <Pressable onPress={() => null}>
-                <DrawerContentScrollView {...props} />
-            </Pressable>
-        );
-    }
+const hsmIcon = () => <Image style={{height: scale(50), width: scale(115)}} source={require('./public/hero_mobile_logo.png')} />;
 
+const CustomDrawerContent = (props) => {
     const {state, ...rest} = props;
     const newState = {...state};
     const {index, routes} = props.navigation.getState();
@@ -64,7 +67,7 @@ const CustomDrawerContent = (props) => {
 
     // Filter out routes that are hidden either all the time or contextually
     newState.routes = newState.routes.filter((item, i) => {
-        if (store.getState().character.workingCharacter === null && (item.name === 'ViewHeroDesignerCharacterScreen' || item.name === 'CharactersScreen')) {
+        if (common.isEmptyObject(store.getState().character.character) && item.name === 'ViewHeroDesignerCharacter') {
             return false;
         }
 
@@ -86,30 +89,81 @@ const CustomDrawerContent = (props) => {
     );
 };
 
-const Spacer = ({}) => {
-    return <View backgroundColor="red" />;
-};
-
 export function setSound(name, soundClip) {
     sounds[name] = soundClip;
 }
 
-export const store = createStore(reducer, compose(applyAppStateListener(), applyMiddleware(thunk), applyMiddleware(asyncDispatchMiddleware)));
+export const store = configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
+});
 
-export default class App extends Component {
-    componentDidMount() {
-        soundPlayer.initialize(DEFAULT_SOUND, false);
+const drawerIcon = (name) => {
+    return <Icon solid type="FontAwesome5" name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: scale(-20)}} />;
+};
 
-        // Adding a 100ms delay here gets rid of a white screen
-        setTimeout(() => SplashScreen.hide(), 100);
-    }
+export const App = () => {
+    soundPlayer.initialize(DEFAULT_SOUND, false);
 
-    render() {
-        return (
-            <Provider store={store}>
+    const appState = useRef(AppState.currentState);
+
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', (nextAppState) => {
+            switch (nextAppState) {
+                case 'active':
+                    persistence.getVersion().then((version) => {
+                        if (version === null) {
+                            persistence.setVersion(currentVersion.current).then(() => {
+                                persistence.clearCaches().then(() => {
+                                    store.dispatch(initialize());
+                                });
+                            });
+                        } else if (version !== currentVersion.current) {
+                            persistence.setVersion(currentVersion.current).then(() => {
+                                if (currentVersion.onFirstLoad === 'flush') {
+                                    persistence.clearCaches().then(() => {
+                                        store.dispatch(initialize());
+                                    });
+                                } else {
+                                    store.dispatch(initialize());
+                                }
+                            });
+                        } else {
+                            store.dispatch(initialize());
+                        }
+                    });
+
+                    break;
+                case 'background':
+                case 'inactive':
+                    if (!common.isEmptyObject(store.getState().character.character)) {
+                        store.dispatch(
+                            saveCachedCharacter({character: store.getState().character.character, characters: store.getState().character.characters}),
+                        );
+                    }
+
+                    break;
+                default:
+                // Do nothing
+            }
+
+            appState.current = nextAppState;
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
+    return (
+        <Provider store={store}>
+            <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
                 <Root>
-                    <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
-                        <NavigationContainer>
+                    <GestureHandlerRootView style={{flex: 1}}>
+                        <NavigationContainer theme={MyTheme} onReady={() => SplashScreen.hide()}>
                             <Drawer.Navigator
                                 screenOptions={{
                                     headerShown: false,
@@ -117,45 +171,80 @@ export default class App extends Component {
                                     drawerContentOptions: drawerContentOptions,
                                     drawerStyle: localStyles.drawer,
                                     drawerLabelStyle: {color: '#F3EDE9'},
+                                    contentStyle: {
+                                        backgroundColor: '#000000',
+                                    },
                                 }}
-                                initialRoute="Home"
-                                drawerContent={(props) => <CustomDrawerContent spacer={props.spacer === true} {...props} />}
+                                initialRouteName="Home"
+                                backBehavior="history"
+                                drawerContent={CustomDrawerContent}
                             >
+                                <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={HomeScreen} />
                                 <Drawer.Screen
-                                    options={{
-                                        drawerLabel: () => (
-                                            <Image style={{height: scale(50), width: scale(115)}} source={require('./public/hero_mobile_logo.png')} />
-                                        ),
-                                    }}
-                                    name="Home"
-                                    component={HomeScreen}
-                                />
-                                <Drawer.Screen
-                                    options={{spacer: true, drawerLabel: 'View Character'}}
+                                    options={{drawerLabel: 'View Character', drawerIcon: () => drawerIcon('user')}}
                                     name="ViewHeroDesignerCharacter"
                                     component={ViewHeroDesignerCharacterScreen}
                                 />
-                                <Drawer.Screen name="Characters" component={CharactersScreen} />
-                                {/* <Drawer.Screen options={{drawerLabel: ''}} name="RollSpacer" getComponent={() => HomeScreen} /> */}
-                                <Drawer.Screen options={{drawerLabel: '3D6'}} name="Skill" component={SkillScreen} />
-                                <Drawer.Screen name="Hit" component={HitScreen} />
-                                <Drawer.Screen name="Damage" component={DamageScreen} />
-                                <Drawer.Screen name="Effect" component={EffectScreen} />
-
-                                <Drawer.Screen name="Result" component={ResultScreen} />
-
-                                <Drawer.Screen options={{drawerLabel: 'H.E.R.O.'}} name="RandomCharacter" component={RandomCharacterScreen} />
-                                <Drawer.Screen options={{drawerLabel: 'Cruncher'}} name="CostCruncher" component={CostCruncherScreen} />
-                                <Drawer.Screen name="Statistics" component={StatisticsScreen} />
-                                <Drawer.Screen name="Settings" component={SettingsScreen} />
+                                <Drawer.Screen
+                                    name="Characters"
+                                    options={{
+                                        drawerIcon: () => drawerIcon('users'),
+                                    }}
+                                    component={CharactersScreen}
+                                />
+                                <Drawer.Screen
+                                    options={{drawerLabel: '3D6', drawerIcon: () => drawerIcon('check-circle')}}
+                                    name="Skill"
+                                    children={(props) => <SkillScreen {...props} />}
+                                />
+                                <Drawer.Screen
+                                    name="Hit"
+                                    component={HitScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('bullseye'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    name="Damage"
+                                    component={DamageScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('medkit'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    name="Effect"
+                                    component={EffectScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('shield-virus'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    name="Result"
+                                    component={ResultScreen}
+                                    options={{
+                                        drawerIcon: () => drawerIcon('dice'),
+                                    }}
+                                />
+                                <Drawer.Screen
+                                    options={{drawerLabel: 'H.E.R.O.', drawerIcon: () => drawerIcon('mask')}}
+                                    name="RandomCharacter"
+                                    component={RandomCharacterScreen}
+                                />
+                                <Drawer.Screen
+                                    options={{drawerLabel: 'Cruncher', drawerIcon: () => drawerIcon('square-root-alt')}}
+                                    name="CostCruncher"
+                                    component={CostCruncherScreen}
+                                />
+                                <Drawer.Screen name="Statistics" component={StatisticsScreen} options={{drawerIcon: () => drawerIcon('chart-pie')}} />
+                                <Drawer.Screen name="Settings" component={SettingsScreen} options={{drawerIcon: () => drawerIcon('cogs')}} />
                             </Drawer.Navigator>
                         </NavigationContainer>
-                    </SafeAreaView>
+                    </GestureHandlerRootView>
                 </Root>
-            </Provider>
-        );
-    }
-}
+            </SafeAreaView>
+        </Provider>
+    );
+};
 
 const localStyles = ScaledSheet.create({
     drawer: {

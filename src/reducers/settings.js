@@ -1,77 +1,54 @@
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {persistence} from '../lib/Persistence';
 
-export const INITIALIZE_SETTINGS = 'INITIALIZE_SETTINGS';
+export const toggleSetting = createAsyncThunk('settings/toggleSetting', async ({key, value}) => {
+    const settingValue = await persistence.toggleSetting(key, value);
 
-export const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
-
-export const TOGGLE_SETTING = 'TOGGLE_SETTING';
-
-//////////////////////////////
-// ACTIONS                  //
-//////////////////////////////
-
-export function initializeApplicationSettings() {
-    return async (dispatch) => {
-        persistence.initializeApplicationSettings().then((settings) => {
-            dispatch({
-                type: INITIALIZE_SETTINGS,
-                payload: settings,
-            });
-        });
+    return {
+        key,
+        value: settingValue,
     };
-}
+});
 
-export function clearApplicationSettings() {
-    return async (dispatch) => {
-        persistence.clearApplicationSettings().then((settings) => {
-            dispatch({
-                type: CLEAR_SETTINGS,
-                payload: settings,
+export const clearApplicationSettings = createAsyncThunk('settings/clearApplicationSettings', async () => {
+    return await persistence.clearApplicationSettings();
+});
+
+const settingsSlice = createSlice({
+    name: 'settings',
+    initialState: {
+        useFifthEdition: false,
+        playSounds: true,
+        onlyDiceSounds: false,
+        showAnimations: true,
+    },
+    reducers: {
+        initializeApplicationSettings: (state, action) => {
+            const {settings} = action.payload;
+
+            state.useFifthEdition = settings.useFifthEdition;
+            state.playSounds = settings.playSounds;
+            state.onlyDiceSounds = settings.onlyDiceSounds;
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(toggleSetting.fulfilled, (state, action) => {
+                const {key, value} = action.payload;
+
+                state[key] = value;
+            })
+            .addCase(clearApplicationSettings.fulfilled, (state, action) => {
+                const settings = {...action.payload};
+
+                state.useFifthEdition = settings.useFifthEdition;
+                state.playSounds = settings.playSounds;
+                state.onlyDiceSounds = settings.onlyDiceSounds;
+                state.showAnimations = settings.showAnimations;
             });
-        });
-    };
-}
+    },
+});
 
-export function toggleSetting(key, value) {
-    return async (dispatch) => {
-        persistence.toggleSetting(key, value).then((settingValue) => {
-            dispatch({
-                type: TOGGLE_SETTING,
-                payload: {
-                    key: key,
-                    value: settingValue,
-                },
-            });
-        });
-    };
-}
+export const {initializeApplicationSettings} = settingsSlice.actions;
 
-let settingsState = {};
-
-export default function settings(state = settingsState, action) {
-    let newState = null;
-
-    switch (action.type) {
-        case INITIALIZE_SETTINGS:
-        case CLEAR_SETTINGS:
-            newState = {
-                ...state,
-            };
-
-            newState.useFifthEdition = action.payload.useFifthEdition;
-            newState.playSounds = action.payload.playSounds;
-            newState.onlyDiceSounds = action.payload.onlyDiceSounds;
-
-            return newState;
-        case TOGGLE_SETTING:
-            newState = {
-                ...state,
-            };
-
-            newState[action.payload.key] = action.payload.value;
-
-            return newState;
-        default:
-            return state;
-    }
-}
+export default settingsSlice.reducer;

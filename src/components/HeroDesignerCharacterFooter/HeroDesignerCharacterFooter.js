@@ -4,6 +4,7 @@ import {Button, Icon, Footer, FooterTab} from 'native-base';
 import {verticalScale} from 'react-native-size-matters';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
+import {common} from '../../lib/Common';
 
 export default class HeroDesignerCharacterFooter extends Component {
     static propTypes = {
@@ -43,11 +44,11 @@ export default class HeroDesignerCharacterFooter extends Component {
             return false;
         }
 
-        return this.props.character.filename === this.props.characters[slot].filename;
+        return this.props.character.filename === this.props.characters[slot]?.filename;
     }
 
     _isSlotFilled(slot) {
-        return this.props.characters[slot] !== null;
+        return !common.isEmptyObject(this.props.characters[slot.toString()]);
     }
 
     _getFooterButtonStyle(slot) {
@@ -84,12 +85,17 @@ export default class HeroDesignerCharacterFooter extends Component {
 
     _emptySlot(slot) {
         if (this._isSlotFilled(slot) && !this._isCharacterSelected(slot)) {
-            this.setState({deleteDialogVisible: true, selectedSlot: slot});
+            const newState = {...this.state};
+
+            newState.selectedSlot = slot.toString();
+            newState.deleteDialogVisible = true;
+
+            this.setState(newState);
         }
     }
 
     _onDeleteDialogOk() {
-        this.props.clearCharacter(this.props.characters[this.state.selectedSlot].filename, this.props.character, this.props.characters);
+        this.props.clearCharacter(this.props.characters[this.state.selectedSlot.toString()].filename, this.props.character, this.props.characters, false);
 
         this._onDeleteDialogClose();
     }
@@ -102,15 +108,15 @@ export default class HeroDesignerCharacterFooter extends Component {
         return (
             <Footer>
                 <FooterTab style={{justifyContent: 'center', backgroundColor: '#000'}}>
-                    {this.slots.map((slot, index) => {
+                    {this.slots.map((slot) => {
                         return (
                             <Button
                                 key={'character-' + slot}
-                                style={this._getFooterButtonStyle(slot.toString())}
-                                onPress={() => this._activateSlot(slot.toString())}
-                                onLongPress={() => this._emptySlot(slot.toString())}
+                                style={this._getFooterButtonStyle(slot)}
+                                onPress={() => this._activateSlot(slot)}
+                                onLongPress={() => this._emptySlot(slot)}
                             >
-                                <Icon type="FontAwesome" name={this._getIcon(slot.toString())} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
+                                <Icon type="FontAwesome" name={this._getIcon(slot)} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
                             </Button>
                         );
                     })}

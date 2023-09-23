@@ -1,7 +1,9 @@
 import React from 'react';
-import {View} from 'react-native';
-import {PieChart} from 'react-native-svg-charts';
-import {Circle, G, Line, Text} from 'react-native-svg';
+import {Text, View} from 'react-native';
+import {Icon} from 'native-base';
+import {scale, verticalScale} from 'react-native-size-matters';
+import {PieChart} from 'react-native-gifted-charts';
+import styles from '../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -17,81 +19,54 @@ import {Circle, G, Line, Text} from 'react-native-svg';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class Chart {
-    renderDieDistributionChart(distributions) {
-        let pieData = [
-            {
-                value: distributions.one,
-                svg: {fill: '#ed7e78'},
-                key: 'pie-1',
-                label: '1',
-            },
-            {
-                value: distributions.two,
-                svg: {fill: '#8b8ee5'},
-                key: 'pie-2',
-                label: '2',
-            },
-            {
-                value: distributions.three,
-                svg: {fill: '#35a06e'},
-                key: 'pie-3',
-                label: '3',
-            },
-            {
-                value: distributions.four,
-                svg: {fill: '#668df9'},
-                key: 'pie-4',
-                label: '4',
-            },
-            {
-                value: distributions.five,
-                svg: {fill: '#e5b404'},
-                key: 'pie-5',
-                label: '5',
-            },
-            {
-                value: distributions.six,
-                svg: {fill: '#f57e20'},
-                key: 'pie-6',
-                label: '6',
-            },
-        ];
+export const Chart = ({distributions}) => {
+    const colors = ['#0ffc03', '#ff00e6', '#fc8403', '#0390fc', '#fcf803', '#ff4d00'];
 
-        const Labels = ({slices}) => {
-            return slices.map((slice, index) => {
-                const {labelCentroid, pieCentroid, data} = slice;
-                return (
-                    <G key={index}>
-                        <Line x1={labelCentroid[0]} y1={labelCentroid[1]} x2={pieCentroid[0]} y2={pieCentroid[1]} stroke={data.svg.fill} />
-                        <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
-                        <Text stroke="#383834" fontSize="12" x={labelCentroid[0] / 2} y={labelCentroid[1] / 2 + 5} textAnchor="middle">
-                            {data.value}
-                        </Text>
-                        <Text stroke="#383834" fontSize="12" x={labelCentroid[0]} y={labelCentroid[1] + 5} textAnchor="middle">
-                            {data.label}
-                        </Text>
-                    </G>
-                );
-            });
+    const data = Object.keys(distributions).map((key, i) => {
+        return {
+            value: distributions[key],
+            color: colors[i],
+            text: distributions[key].toString(),
+            faceName: key,
         };
+    });
 
-        return (
-            <View>
-                <PieChart
-                    style={{height: 200}}
-                    data={pieData}
-                    spacing={0}
-                    innerRadius={20}
-                    outerRadius={55}
-                    labelRadius={80}
-                    sort={(a, b) => a.label.localeCompare(b.label)}
+    return (
+        <>
+            <Text
+                style={[
+                    styles.boldGrey,
+                    {fontSize: verticalScale(20), lineHeight: verticalScale(20 * 1.35), textAlign: 'center', paddingBottom: verticalScale(10)},
+                ]}
+            >
+                Dice Face Distributions
+            </Text>
+            <View alignItems="center" justifyContent="center">
+                <View paddingLeft={scale(30)} marginBottom={verticalScale(-160)}>
+                    <PieChart semiCircle showText data={data} textColor="#000" fontWeight="bold" radius={scale(150)} labelsPosition="outward" />
+                </View>
+                <Text
+                    style={[
+                        styles.boldGrey,
+                        {fontSize: verticalScale(20), lineHeight: verticalScale(20 * 1.35), textAlign: 'center', paddingBottom: verticalScale(5)},
+                    ]}
                 >
-                    <Labels />
-                </PieChart>
+                    Legend
+                </Text>
+                <View width={scale(150)} flexDirection="row" justifyContent={'space-around'}>
+                    {data.map((d, i) => {
+                        return (
+                            <Icon
+                                key={`face-${i}`}
+                                solid
+                                type="FontAwesome5"
+                                name={`dice-${d.faceName}`}
+                                style={{fontSize: verticalScale(20), color: d.color}}
+                            />
+                        );
+                    })}
+                </View>
             </View>
-        );
-    }
-}
-
-export let chart = new Chart();
+        </>
+    );
+};

@@ -1,7 +1,8 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {View} from 'react-native';
-import {Button, Text, Form, Input, Picker, Item, Label} from 'native-base';
+import {Platform, View, KeyboardAvoidingView} from 'react-native';
+import {Button, Text, Form, Item, Label, Input} from 'native-base';
+import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
 import {scale, verticalScale} from 'react-native-size-matters';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
@@ -24,32 +25,55 @@ class StatusDialog extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            selectedItems: [],
-        };
-
         this.items = this._getItems();
 
+        this.state = {
+            open: props.visible,
+            value: props.statusForm.name,
+            items: STATUSES.map((status) => ({label: status, value: status})),
+            selectedItems: this._getItemIds(props.statusForm.targetTrait, this.items),
+        };
+
         this.updateFormValue = this._updateFormValue.bind(this);
+        this.setValue = this._setValue.bind(this);
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.visible !== prevProps.visible && this.props.visible) {
-            if (this.props.statusForm.targetTrait !== null) {
-                let itemIds = [];
+            this.setState((state) => ({
+                ...state,
+                value: this.props.statusForm.name,
+                selectedItems: this._getItemIds(this.props.statusForm.targetTrait, this.items),
+            }));
+        }
+    }
 
-                for (const category of this.items) {
-                    for (const item of category.children) {
-                        if (this.props.statusForm.targetTrait.includes(item.name)) {
-                            itemIds.push(item.id);
-                        }
+    _getItemIds(targetTrait, items) {
+        const itemIds = [];
+
+        if (targetTrait !== null) {
+            for (const category of items) {
+                for (const item of category.children) {
+                    if (targetTrait.includes(item.name)) {
+                        itemIds.push(item.id);
                     }
                 }
-
-                // eslint-disable-next-line react/no-did-update-set-state
-                this.setState({selectedItems: itemIds});
             }
         }
+
+        return itemIds;
+    }
+
+    _setValue(callback) {
+        this.setState((state) => {
+            const newState = {...state};
+
+            newState.value = callback(state.value);
+
+            this.updateFormValue('name', newState.value);
+
+            return newState;
+        });
     }
 
     _updateFormValue(key, value) {
@@ -149,13 +173,13 @@ class StatusDialog extends Component {
                         style={styles.grey}
                         keyboardType="numeric"
                         maxLength={3}
-                        value={this.props.statusForm.activePoints.toString()}
-                        onChangeText={(value) => this.updateFormValue('activePoints', value)}
+                        defaultValue={this.props.statusForm.activePoints.toString()}
+                        onEndEditing={(event) => this.updateFormValue('activePoints', event.nativeEvent.text)}
                     />
                 </Item>
                 <SectionedMultiSelect
                     styles={{
-                        selectToggleText: [styles.grey, {marginLeft: scale(-7)}],
+                        selectToggleText: [styles.grey, {marginLeft: scale(-7), width: 50}],
                         container: {backgroundColor: '#1b1d1f', borderWidth: 1, borderColor: '#303030'},
                         searchBar: {backgroundColor: '#000000'},
                         searchTextInput: {color: '#ffffff'},
@@ -197,8 +221,8 @@ class StatusDialog extends Component {
                         style={styles.grey}
                         keyboardType="numeric"
                         maxLength={3}
-                        value={this.props.statusForm.body.toString()}
-                        onChangeText={(value) => this.updateFormValue('body', value)}
+                        defaultValue={this.props.statusForm.body.toString()}
+                        onEndEditing={(event) => this.updateFormValue('body', event.nativeEvent.text)}
                     />
                 </Item>
                 <Item inlineLabel style={{marginLeft: 0}}>
@@ -207,8 +231,8 @@ class StatusDialog extends Component {
                         style={styles.grey}
                         keyboardType="numeric"
                         maxLength={3}
-                        value={this.props.statusForm.pd.toString()}
-                        onChangeText={(value) => this.updateFormValue('pd', value)}
+                        defaultValue={this.props.statusForm.pd.toString()}
+                        onEndEditing={(event) => this.updateFormValue('pd', event.nativeEvent.text)}
                     />
                 </Item>
                 <Item inlineLabel style={{marginLeft: 0}}>
@@ -217,8 +241,8 @@ class StatusDialog extends Component {
                         style={styles.grey}
                         keyboardType="numeric"
                         maxLength={3}
-                        value={this.props.statusForm.ed.toString()}
-                        onChangeText={(value) => this.updateFormValue('ed', value)}
+                        defaultValue={this.props.statusForm.ed.toString()}
+                        onEndEditing={(event) => this.updateFormValue('ed', event.nativeEvent.text)}
                     />
                 </Item>
             </View>
@@ -233,8 +257,8 @@ class StatusDialog extends Component {
                     style={styles.grey}
                     keyboardType="numeric"
                     maxLength={3}
-                    value={this.props.statusForm.segments.toString()}
-                    onChangeText={(value) => this.updateFormValue('segments', value)}
+                    defaultValue={this.props.statusForm.segments.toString()}
+                    onEndEditing={(event) => this.updateFormValue('segments', event.nativeEvent.text)}
                 />
             </Item>
         );
@@ -242,53 +266,57 @@ class StatusDialog extends Component {
 
     render() {
         return (
-            <Modal isVisible={this.props.visible} onBackButtonPress={() => this.props.onClose()} onBackdropPress={() => this.props.onClose()}>
-                <View style={styles.modal}>
-                    <Text style={styles.modalHeader}>Apply Status</Text>
-                    <View style={styles.modalContent}>
-                        <Form>
-                            <Item inlineLabel style={{marginLeft: 0}}>
-                                <Label style={styles.grey}>Name:</Label>
-                                <Input
-                                    style={styles.grey}
-                                    maxLength={32}
-                                    value={this.props.statusForm.label}
-                                    onChangeText={(value) => this.updateFormValue('label', value)}
-                                />
-                            </Item>
-                            <Item inlineLabel style={{marginLeft: 0}}>
-                                <Label style={styles.grey}>Status:</Label>
-                                <Picker
-                                    inlinelabel
-                                    label="Status"
-                                    style={{width: undefined, color: '#FFFFFF'}}
-                                    textStyle={{fontSize: verticalScale(12), color: '#FFFFFF'}}
-                                    iosHeader="Select one"
-                                    mode="dropdown"
-                                    selectedValue={this.props.statusForm.name}
-                                    onValueChange={(value) => this.updateFormValue('name', value)}
-                                >
-                                    {STATUSES.map((status, index) => {
-                                        return <Item key={`status-${index}`} label={status} value={status} />;
-                                    })}
-                                </Picker>
-                            </Item>
-                            {this._renderSecondaryControls()}
-                        </Form>
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
-                            <Button style={styles.button} onPress={() => this._onApply()}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Apply
-                                </Text>
-                            </Button>
-                            <Button style={styles.button} onPress={() => this.props.onClose()}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Cancel
-                                </Text>
-                            </Button>
+            <Modal
+                style={{paddingBottom: verticalScale(Platform.OS === 'ios' ? 200 : 10)}}
+                isVisible={this.props.visible}
+                onBackButtonPress={() => this.props.onClose()}
+                onBackdropPress={() => this.props.onClose()}
+            >
+                <KeyboardAvoidingView behavior="padding">
+                    <View style={styles.modal}>
+                        <Text style={styles.modalHeader}>Apply Status</Text>
+                        <View style={styles.modalContent}>
+                            <Form>
+                                <Item inlineLabel style={{marginLeft: 0}}>
+                                    <Label style={styles.grey}>Name:</Label>
+                                    <Input
+                                        editable
+                                        style={styles.grey}
+                                        maxLength={32}
+                                        defaultValue={this.props.statusForm.label}
+                                        onEndEditing={(event) => this.updateFormValue('label', event.nativeEvent.text)}
+                                    />
+                                </Item>
+                                <Item inlineLabel style={{marginLeft: 0}}>
+                                    <Label style={styles.grey}>Status:</Label>
+                                    <DropDownPicker
+                                        containerStyle={{maxWidth: '75%'}}
+                                        theme="DARK"
+                                        listMode="MODAL"
+                                        open={this.state.open}
+                                        value={this.state.value}
+                                        items={this.state.items}
+                                        setOpen={(open) => this.setState({open})}
+                                        setValue={this.setValue}
+                                    />
+                                </Item>
+                                {this._renderSecondaryControls()}
+                            </Form>
+                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
+                                <Button style={styles.button} onPress={() => this._onApply()}>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Apply
+                                    </Text>
+                                </Button>
+                                <Button style={styles.button} onPress={() => this.props.onClose()}>
+                                    <Text uppercase={false} style={styles.buttonText}>
+                                        Cancel
+                                    </Text>
+                                </Button>
+                            </View>
                         </View>
                     </View>
-                </View>
+                </KeyboardAvoidingView>
             </Modal>
         );
     }

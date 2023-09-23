@@ -1,10 +1,9 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {View, Switch} from 'react-native';
-import {Container, Content, Button, Text} from 'native-base';
+import {useDispatch, useSelector} from 'react-redux';
+import {View, ImageBackground, Switch} from 'react-native';
+import {Container, Button, Text} from 'native-base';
 import {ScaledSheet, scale} from 'react-native-size-matters';
-import RNShake from 'react-native-shake';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
@@ -25,79 +24,56 @@ import {updateFormValue} from '../../reducers/forms';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class SkillScreen extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        skillForm: PropTypes.object.isRequired,
-        skillCheck: PropTypes.bool,
-        updateFormValue: PropTypes.func.isRequired,
+export const SkillScreen = ({navigation}) => {
+    const dispatch = useDispatch();
+
+    const skillForm = useSelector((state) => state.forms.skill);
+
+    const roll = () => {
+        const threshold = skillForm.skillCheck ? skillForm.value + '-' : null;
+
+        navigation.navigate('Result', {from: 'Skill', result: dieRoller.rollCheck(threshold)});
     };
 
-    constructor(props) {
-        super(props);
-
-        this.updateFormValue = this._updateFormValue.bind(this);
-        this.roll = this._roll.bind(this);
-    }
-
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addEventListener('ShakeEvent', () => {
-                this.roll();
-            });
-        });
-    }
-
-    componentWillUnmount() {
-        this._unsubscribe();
-        RNShake.removeEventListener('ShakeEvent');
-    }
-
-    _roll() {
-        let threshold = this.props.skillForm.skillCheck ? this.props.skillForm.value + '-' : null;
-
-        this.props.navigation.navigate('Result', {from: 'Skill', result: dieRoller.rollCheck(threshold)});
-    }
-
-    _updateFormValue(key, value) {
+    const _updateFormValue = (key, value) => {
         if (key === 'value') {
             value = parseInt(value, 10);
         }
 
-        this.props.updateFormValue('skill', key, value);
-    }
+        dispatch(updateFormValue({formName: 'skill', key, value}));
+    };
 
-    _renderSlider() {
-        if (this.props.skillForm.skillCheck) {
+    const renderSlider = () => {
+        if (skillForm.skillCheck) {
             return (
                 <Slider
                     style={styles.switchStyle}
                     label="Skill Level:"
-                    value={this.props.skillForm.value}
+                    value={skillForm.value}
                     step={1}
                     min={-30}
                     max={30}
-                    onValueChange={this.updateFormValue}
+                    onValueChange={updateFormValue}
                     valueKey="value"
                 />
             );
         }
 
         return null;
-    }
+    };
 
-    render() {
-        return (
-            <Container style={styles.container}>
-                <Header navigation={this.props.navigation} />
-                <Content style={styles.content}>
-                    <Text style={styles.heading}>Roll 3d6</Text>
+    return (
+        <Container style={styles.container}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} />
+                <Text style={styles.heading}>Roll 3d6</Text>
+                <View paddingHorizontal={scale(10)}>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                         <Text style={styles.grey}>Is skill check?</Text>
                         <View style={{paddingRight: scale(10)}}>
                             <Switch
-                                value={this.props.skillForm.skillCheck}
-                                onValueChange={() => this.updateFormValue('skillCheck', !this.props.skillForm.skillCheck)}
+                                value={skillForm.skillCheck}
+                                onValueChange={() => _updateFormValue('skillCheck', !skillForm.skillCheck)}
                                 minimumTrackTintColor="#14354d"
                                 maximumTrackTintColor="#14354d"
                                 thumbColor="#14354d"
@@ -106,17 +82,21 @@ class SkillScreen extends Component {
                             />
                         </View>
                     </View>
-                    {this._renderSlider()}
+                    {renderSlider()}
                     <View style={styles.buttonContainer}>
-                        <Button block style={styles.button} onPress={this.roll}>
+                        <Button block style={styles.button} onPress={roll}>
                             <Text uppercase={false}>Roll</Text>
                         </Button>
                     </View>
-                </Content>
-            </Container>
-        );
-    }
-}
+                </View>
+            </ImageBackground>
+        </Container>
+    );
+};
+
+SkillScreen.propTypes = {
+    navigation: PropTypes.object.isRequired,
+};
 
 const localStyles = ScaledSheet.create({
     titleContainer: {
@@ -129,15 +109,3 @@ const localStyles = ScaledSheet.create({
         paddingBottom: '20@vs',
     },
 });
-
-const mapStateToProps = (state) => {
-    return {
-        skillForm: state.forms.skill,
-    };
-};
-
-const mapDispatchToProps = {
-    updateFormValue,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SkillScreen);

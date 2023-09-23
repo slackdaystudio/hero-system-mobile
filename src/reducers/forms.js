@@ -1,4 +1,5 @@
-import {NORMAL_DAMAGE} from '../lib/DieRoller';
+import {createSlice} from '@reduxjs/toolkit';
+import {NORMAL_DAMAGE, PARTIAL_DIE_NONE} from '../lib/DieRoller';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -14,80 +15,14 @@ import {NORMAL_DAMAGE} from '../lib/DieRoller';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//////////////////////////////
-// ACTION TYPES             //
-//////////////////////////////
-
-export const UPDATE_FORM_VALUE = 'UPDATE_FORM_VALUE';
-
-export const UPDATE_FORM = 'UPDATE_FORM';
-
-export const RESET_FORM = 'RESET_FORM';
-
-//////////////////////////////
-// ACTIONS                  //
-//////////////////////////////
-
-export function updateFormValue(formName, key, value) {
-    return {
-        type: UPDATE_FORM_VALUE,
-        payload: {
-            formName: formName,
-            key: key,
-            value: value,
-        },
-    };
-}
-
-export function updateForm(type, json) {
-    return {
-        type: UPDATE_FORM,
-        payload: {
-            type: type,
-            json: json,
-        },
-    };
-}
-
-export function resetForm(formKey) {
-    return {
-        type: RESET_FORM,
-        payload: formKey,
-    };
-}
-
-function _copyState(state) {
-    return {
-        ...state,
-        skill: {
-            ...state.skill,
-        },
-        hit: {
-            ...state.hit,
-        },
-        damage: {
-            ...state.damage,
-        },
-        effect: {
-            ...state.effect,
-        },
-        costCruncher: {
-            ...state.costCruncher,
-        },
-        status: {
-            ...state.status,
-        },
-    };
-}
-
-function _initializeSkillForm() {
+const initializeSkillForm = () => {
     return {
         skillCheck: false,
         value: 8,
     };
-}
+};
 
-function _initializeHitForm() {
+const initializeHitForm = () => {
     return {
         ocv: 0,
         numberOfRolls: 1,
@@ -95,12 +30,12 @@ function _initializeHitForm() {
         targetDcv: 0,
         selectedLocation: -1,
     };
-}
+};
 
-function _initializeDamageForm() {
+const initializeDamageForm = () => {
     return {
         dice: 12,
-        partialDie: '0',
+        partialDie: PARTIAL_DIE_NONE,
         killingToggled: false,
         damageType: NORMAL_DAMAGE,
         stunMultiplier: 0,
@@ -115,26 +50,26 @@ function _initializeDamageForm() {
         fadeRate: 1,
         sfx: null,
     };
-}
+};
 
-function _initializeEffectForm() {
+const initializeEffectForm = () => {
     return {
         dice: 1,
-        partialDie: '0',
+        partialDie: PARTIAL_DIE_NONE,
         effectType: 'None',
         sfx: null,
     };
-}
+};
 
-function _initializeCostCruncherForm() {
+const initializeCostCruncherForm = () => {
     return {
         cost: 5,
         advantages: 0,
         limitations: 0,
     };
-}
+};
 
-function _initializeStatusForm() {
+const initializeStatusForm = () => {
     return {
         name: 'Aid',
         label: '',
@@ -148,95 +83,92 @@ function _initializeStatusForm() {
         ed: 0,
         index: -1,
     };
-}
-
-let formsState = {
-    skill: _initializeSkillForm(),
-    hit: _initializeHitForm(),
-    damage: _initializeDamageForm(),
-    effect: _initializeEffectForm(),
-    costCruncher: _initializeCostCruncherForm(),
-    status: _initializeStatusForm(),
 };
 
-export default function forms(state = formsState, action) {
-    let newState = null;
+const formsState = {
+    skill: initializeSkillForm(),
+    hit: initializeHitForm(),
+    damage: initializeDamageForm(),
+    effect: initializeEffectForm(),
+    costCruncher: initializeCostCruncherForm(),
+    status: initializeStatusForm(),
+};
 
-    switch (action.type) {
-        case UPDATE_FORM_VALUE:
-            newState = _copyState(state);
-            newState[action.payload.formName][action.payload.key] = action.payload.value;
+const formsSlice = createSlice({
+    name: 'forms',
+    initialState: formsState,
+    reducers: {
+        updateFormValue: (state, action) => {
+            const {formName, key, value} = action.payload;
 
-            return newState;
-        case UPDATE_FORM:
+            state[formName][key] = value;
+        },
+        updateForm: (state, action) => {
+            const {type, json} = action.payload;
             let form = null;
 
-            switch (action.payload.type) {
+            switch (type) {
                 case 'damage':
-                    form = _initializeDamageForm();
+                    form = initializeDamageForm();
                     break;
                 case 'effect':
-                    form = _initializeEffectForm();
+                    form = initializeEffectForm();
                     break;
                 case 'hit':
-                    form = _initializeHitForm();
+                    form = initializeHitForm();
                     break;
                 case 'status':
-                    form = _initializeStatusForm();
+                    form = initializeStatusForm();
                     break;
                 default:
                 // Do nothing
             }
 
             if (form !== null) {
-                newState = _copyState(state);
-                newState[action.payload.type] = form;
+                state[type] = form;
 
-                for (let [key, value] of Object.entries(action.payload.json)) {
-                    if (newState[action.payload.type].hasOwnProperty(key)) {
-                        newState[action.payload.type][key] = value;
+                for (const [key, value] of Object.entries(json)) {
+                    if (state[type].hasOwnProperty(key)) {
+                        state[type][key] = value;
                     }
                 }
-
-                return newState;
             }
+        },
+        resetForm: (state, action) => {
+            const {formName} = action.payload;
 
-            return state;
-        case RESET_FORM:
             let reinitializedForm = null;
 
-            switch (action.payload) {
+            switch (formName) {
                 case 'skill':
-                    reinitializedForm = _initializeSkillForm();
+                    reinitializedForm = initializeSkillForm();
                     break;
                 case 'hit':
-                    reinitializedForm = _initializeHitForm();
+                    reinitializedForm = initializeHitForm();
                     break;
                 case 'damage':
-                    reinitializedForm = _initializeDamageForm();
+                    reinitializedForm = initializeDamageForm();
                     break;
                 case 'effect':
-                    reinitializedForm = _initializeEffectForm();
+                    reinitializedForm = initializeEffectForm();
                     break;
                 case 'costCruncher':
-                    reinitializedForm = _initializeCostCruncherForm();
+                    reinitializedForm = initializeCostCruncherForm();
                     break;
                 case 'status':
-                    reinitializedForm = _initializeStatusForm();
+                    reinitializedForm = initializeStatusForm();
                     break;
                 default:
                 // Do nothing
             }
 
             if (reinitializedForm !== null) {
-                newState = _copyState(state);
-                newState[action.payload] = reinitializedForm;
-
-                return newState;
+                state[formName] = {...reinitializedForm};
             }
+        },
+    },
+});
 
-            return state;
-        default:
-            return state;
-    }
-}
+export const {updateFormValue, updateForm, resetForm} = formsSlice.actions;
+
+export default formsSlice.reducer;

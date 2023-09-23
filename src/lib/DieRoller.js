@@ -1,3 +1,6 @@
+import {common} from './Common';
+import {statistics} from './Statistics';
+
 export const SKILL_CHECK = 1;
 
 export const TO_HIT = 2;
@@ -11,6 +14,8 @@ export const EFFECT = 5;
 export const HIT_LOCATIONS = 6;
 
 export const KNOCKBACK = 7;
+
+export const PARTIAL_DIE_NONE = 0;
 
 export const PARTIAL_DIE_PLUS_ONE = 1;
 
@@ -38,6 +43,8 @@ class DieRoller {
             result.threshold = rollThreshold.slice(0, -1);
         }
 
+        statistics.add(result).catch((error) => console.error(error));
+
         return result;
     }
 
@@ -62,6 +69,8 @@ class DieRoller {
 
             results.push(result);
         }
+
+        statistics.add(result).catch((error) => console.error(error));
 
         return {results: results};
     }
@@ -106,21 +115,22 @@ class DieRoller {
             this._buildExplosionTable(resultRoll, newResultRoll);
         }
 
+        statistics.add(resultRoll).catch((error) => console.error(error));
+
         return resultRoll;
     }
 
-    effectRoll(dice, partialDie, type, sfx) {
-        let resultRoll = this._roll(dice, EFFECT, partialDie);
+    rollEffect(effectForm) {
+        const resultRoll = this._roll(effectForm.dice, EFFECT, effectForm.partialDie);
 
-        resultRoll.dice = dice;
-        resultRoll.type = type;
-        resultRoll.sfx = sfx;
+        resultRoll.effectForm = effectForm;
+
+        statistics.add(resultRoll).catch((error) => console.error(error));
 
         return resultRoll;
     }
 
     rollAgain(lastResult) {
-        let result = null;
         let numberOfRolls;
 
         if (lastResult.hasOwnProperty('results')) {
@@ -128,17 +138,16 @@ class DieRoller {
             lastResult = lastResult.results[0];
         }
 
-        if (lastResult.rollType === SKILL_CHECK) {
-            result = this.rollCheck(lastResult.threshold + '-');
-        } else if (lastResult.rollType === TO_HIT) {
-            result = this.rollToHit(lastResult.cv, numberOfRolls, lastResult.isAutofire, lastResult.targetDcv);
-        } else if (lastResult.rollType === NORMAL_DAMAGE || lastResult.rollType === KILLING_DAMAGE) {
-            result = this.rollDamage(lastResult.damageForm);
-        } else if (lastResult.rollType === EFFECT) {
-            result = this.effectRoll(lastResult.dice, lastResult.partialDie, lastResult.type, lastResult.sfx);
+        switch (lastResult.rollType) {
+            case SKILL_CHECK:
+                return this.rollCheck(lastResult.threshold + '-');
+            case TO_HIT:
+                return this.rollToHit(lastResult.cv, numberOfRolls, lastResult.isAutofire, lastResult.targetDcv);
+            case EFFECT:
+                return this.rollEffect(lastResult.effectForm);
+            default:
+                return this.rollDamage(lastResult.damageForm);
         }
-
-        return result;
     }
 
     countNormalDamageBody(resultRoll) {
@@ -173,7 +182,7 @@ class DieRoller {
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
             name = '+1 pip';
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            name = '-1 pip';
+            name = '1d6-1';
         } else if (partialDieType === PARTIAL_DIE_HALF) {
             name = '½d6';
         }
@@ -186,12 +195,12 @@ class DieRoller {
             rollType: rollType,
             total: 0,
             rolls: [],
-            partialDieType: partialDieType || null,
+            partialDieType: partialDieType || PARTIAL_DIE_NONE,
         };
         let roll = 0;
 
         for (let i = 0; i < dice; i++) {
-            roll = Math.floor(Math.random() * 6) + 1;
+            roll = common.getRandomNumber(1, 6);
 
             resultRoll.total += roll;
             resultRoll.rolls.push(roll);
@@ -200,9 +209,16 @@ class DieRoller {
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
             resultRoll.total += 1;
         } else if (partialDieType === PARTIAL_DIE_MINUS_ONE) {
-            resultRoll.total -= 1;
+            let partialDie = common.getRandomNumber(1, 6);
+
+            if (--partialDie < 1) {
+                partialDie = 1;
+            }
+
+            resultRoll.total += partialDie;
+            resultRoll.rolls.push(partialDie);
         } else if (partialDieType === PARTIAL_DIE_HALF) {
-            let halfDie = Math.floor(Math.random() * 3) + 1;
+            const halfDie = common.getRandomNumber(1, 3);
 
             resultRoll.total += halfDie;
             resultRoll.rolls.push(halfDie);
@@ -216,24 +232,23 @@ class DieRoller {
 
         if (resultRoll.rollType === KILLING_DAMAGE) {
             if (resultRoll.damageForm.useHitLocations) {
-                stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier));
+                stun = resultRoll.total * (resultRoll.hitLocationDetails.stunX + parseInt(resultRoll.stunMultiplier, 10));
             } else {
                 if (resultRoll.stunModifier === undefined) {
                     resultRoll.stunModifier = 1;
 
                     if (resultRoll.damageForm.useFifthEdition) {
-                        resultRoll.stunModifier = Math.floor(Math.random() * 6) + 1;
-                        resultRoll.stunModifier--;
+                        resultRoll.stunModifier = common.getRandomNumber(1, 6);
 
-                        if (resultRoll.stunModifier === 0) {
+                        if (--resultRoll.stunModifier === 0) {
                             resultRoll.stunModifier = 1;
                         }
                     } else {
-                        resultRoll.stunModifier = Math.floor(Math.random() * 3) + 1;
+                        resultRoll.stunModifier = common.getRandomNumber(1, 3);
                     }
                 }
 
-                stun = resultRoll.total * (resultRoll.stunModifier + parseInt(resultRoll.stunMultiplier));
+                stun = resultRoll.total * (resultRoll.stunModifier + parseInt(resultRoll.stunMultiplier, 10));
             }
         } else {
             stun = resultRoll.total;
@@ -319,7 +334,7 @@ class DieRoller {
                 nStun: 2,
                 bodyX: 2,
             };
-        } else if (hitLocationRoll == 6) {
+        } else if (hitLocationRoll === 6) {
             return {
                 location: 'Hands',
                 stunX: 1,
@@ -333,7 +348,7 @@ class DieRoller {
                 nStun: 0.5,
                 bodyX: 0.5,
             };
-        } else if (hitLocationRoll == 9) {
+        } else if (hitLocationRoll === 9) {
             return {
                 location: 'Shoulders',
                 stunX: 3,
@@ -347,21 +362,21 @@ class DieRoller {
                 nStun: 1,
                 bodyX: 1,
             };
-        } else if (hitLocationRoll == 12) {
+        } else if (hitLocationRoll === 12) {
             return {
                 location: 'Stomach',
                 stunX: 4,
                 nStun: 1.5,
                 bodyX: 1,
             };
-        } else if (hitLocationRoll == 13) {
+        } else if (hitLocationRoll === 13) {
             return {
                 location: 'Vitals',
                 stunX: 4,
                 nStun: 1.5,
                 bodyX: 2,
             };
-        } else if (hitLocationRoll == 14) {
+        } else if (hitLocationRoll === 14) {
             return {
                 location: 'Thighs',
                 stunX: 2,

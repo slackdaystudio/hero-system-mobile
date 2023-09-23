@@ -21,7 +21,7 @@ import version from './version';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default combineReducers({
+const rootReducer = combineReducers({
     appState,
     character,
     forms,
@@ -30,3 +30,5 @@ export default combineReducers({
     randomHero,
     version,
 });
+
+export default rootReducer;

@@ -1,14 +1,15 @@
-import React, {Component} from 'react';
+import React, {useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {View} from 'react-native';
-import {Container, Content, List, ListItem, Left, Right, Button, Text, Radio, Picker, Item} from 'native-base';
-import RNShake from 'react-native-shake';
+import {useDispatch, useSelector} from 'react-redux';
+import {View, ImageBackground} from 'react-native';
+import {Container, Button, Text} from 'native-base';
+import DropDownPicker from 'react-native-dropdown-picker';
 import {verticalScale} from 'react-native-size-matters';
+import {RadioGroup} from 'react-native-radio-buttons-group';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
-import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from '../../lib/DieRoller';
+import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
 import styles from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
 
@@ -28,132 +29,93 @@ import {updateFormValue} from '../../reducers/forms';
 
 const effectTypes = ['None', 'Aid', 'Dispel', 'Drain', 'Entangle', 'Flash', 'Healing', 'Luck', 'Unluck'];
 
-class EffectScreen extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        effectForm: PropTypes.object.isRequired,
-        updateFormValue: PropTypes.func.isRequired,
-    };
+export const EffectScreen = ({navigation}) => {
+    const dispatch = useDispatch();
 
-    constructor(props) {
-        super(props);
+    const effectForm = useSelector((state) => state.forms.effect);
 
-        this.setSliderState = this._setSliderState.bind(this);
-        this.updatePartialDie = this._updatePartialDie.bind(this);
-        this.selectEffect = this._selectEffect.bind(this);
-        this.roll = this._roll.bind(this);
-    }
+    const [open, setOpen] = useState(false);
 
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            RNShake.addEventListener('ShakeEvent', () => {
-                this.roll();
-            });
-        });
-    }
+    const [value, setValue] = useState(PARTIAL_DIE_NONE);
 
-    componentWillUnmount() {
-        this._unsubscribe();
-        RNShake.removeEventListener('ShakeEvent');
-    }
+    const [selectedId, setSelectedId] = useState(0);
 
-    _roll() {
-        this.props.navigation.navigate('Result', {
+    const [items, setItems] = useState([
+        {label: 'No partial die', value: PARTIAL_DIE_NONE},
+        {label: '+1 pip', value: PARTIAL_DIE_PLUS_ONE},
+        {label: '½d6', value: PARTIAL_DIE_HALF},
+        {label: '1d6-1', value: PARTIAL_DIE_MINUS_ONE},
+    ]);
+
+    const radioButtons = useMemo(() => {
+        return effectTypes.map((type, i) => ({
+            id: i,
+            label: type,
+            value: type,
+            color: '#fff',
+            containerStyle: {minWidth: verticalScale(290)},
+            labelStyle: {color: '#fff'},
+        }));
+    }, []);
+
+    const roll = () => {
+        navigation.navigate('Result', {
             from: 'Effect',
-            result: dieRoller.effectRoll(
-                this.props.effectForm.dice,
-                this.props.effectForm.partialDie,
-                this.props.effectForm.effectType,
-                this.props.effectForm.sfx,
-            ),
+            result: dieRoller.rollEffect(effectForm),
         });
-    }
-
-    _selectEffect(effect) {
-        this.props.updateFormValue('effect', 'effectType', effect);
-    }
-
-    _setSliderState(key, value) {
-        this.props.updateFormValue('effect', key, parseInt(value, 10));
-    }
-
-    _updatePartialDie(value) {
-        this.props.updateFormValue('effect', 'partialDie', parseInt(value, 10));
-    }
-
-    _renderEffects() {
-        return (
-            <List>
-                {effectTypes.map((type, index) => {
-                    return (
-                        <ListItem
-                            key={`effect-${index}`}
-                            noIndent
-                            underlayColor="#1b1d1f"
-                            style={{borderBottomWidth: 0, paddingBottom: 0}}
-                            onPress={() => this.selectEffect(type)}
-                        >
-                            <Left>
-                                <Text style={styles.grey}>{type}</Text>
-                            </Left>
-                            <Right>
-                                <Radio
-                                    color="#14354d"
-                                    selectedColor="#14354d"
-                                    selected={this.props.effectForm.effectType === type}
-                                    onPress={() => this.selectEffect(type)}
-                                />
-                            </Right>
-                        </ListItem>
-                    );
-                })}
-            </List>
-        );
-    }
-
-    render() {
-        return (
-            <Container style={styles.container}>
-                <Header navigation={this.props.navigation} />
-                <Content style={styles.content}>
-                    <Heading text="Effect Roll" />
-                    <Slider label="Dice:" value={this.props.effectForm.dice} step={1} min={0} max={50} onValueChange={this.setSliderState} valueKey="dice" />
-                    <Picker
-                        inlinelabel
-                        label="Partial Die"
-                        style={{width: undefined, color: '#FFFFFF'}}
-                        textStyle={{fontSize: verticalScale(16), color: '#FFFFFF'}}
-                        iosHeader="Select one"
-                        mode="dropdown"
-                        selectedValue={this.props.effectForm.partialDie}
-                        onValueChange={(value) => this.updatePartialDie(value)}
-                    >
-                        <Item label="No partial die" value={0} />
-                        <Item label="+1 pip" value={PARTIAL_DIE_PLUS_ONE} />
-                        <Item label="+½ die" value={PARTIAL_DIE_HALF} />
-                        <Item label="-1 pip" value={PARTIAL_DIE_MINUS_ONE} />
-                    </Picker>
-                    <Heading text="Effect" />
-                    {this._renderEffects()}
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Button block style={styles.button} onPress={this.roll}>
-                        <Text uppercase={false}>Roll</Text>
-                    </Button>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                </Content>
-            </Container>
-        );
-    }
-}
-
-const mapStateToProps = (state) => {
-    return {
-        effectForm: state.forms.effect,
     };
+
+    const selectEffect = (id) => {
+        setSelectedId(id);
+
+        dispatch(updateFormValue({formName: 'effect', key: 'effectType', value: radioButtons.find((rb) => rb.id === id).value}));
+    };
+
+    const setSliderState = (key, val) => {
+        dispatch(updateFormValue({formName: 'effect', key, value: parseInt(val, 10)}));
+    };
+
+    const renderEffects = () => {
+        return (
+            <View flex={1} alignItems="stretch">
+                <RadioGroup flex={1} color="#fff" radioButtons={radioButtons} onPress={selectEffect} selectedId={selectedId} />
+            </View>
+        );
+    };
+
+    return (
+        <Container style={styles.container}>
+            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+                <Header navigation={navigation} />
+                <Heading text="Effect Roll" />
+                <View>
+                    <Slider label="Dice:" value={effectForm.dice} step={1} min={0} max={50} onValueChange={setSliderState} valueKey="dice" />
+                </View>
+                <View>
+                    <DropDownPicker
+                        theme="DARK"
+                        listMode="MODAL"
+                        open={open}
+                        value={value}
+                        items={items}
+                        setOpen={setOpen}
+                        setValue={setValue}
+                        setItems={setItems}
+                        onChangeValue={(val) => dispatch(updateFormValue({formName: 'effect', key: 'partialDie', value: val}))}
+                    />
+                </View>
+                <Heading text="Effect" />
+                {renderEffects()}
+                <View style={{paddingBottom: verticalScale(20)}} />
+                <Button block style={styles.button} onPress={roll}>
+                    <Text uppercase={false}>Roll</Text>
+                </Button>
+                <View style={{paddingBottom: verticalScale(20)}} />
+            </ImageBackground>
+        </Container>
+    );
 };
 
-const mapDispatchToProps = {
-    updateFormValue,
+EffectScreen.propTypes = {
+    navigation: PropTypes.object.isRequired,
 };
-
-export default connect(mapStateToProps, mapDispatchToProps)(EffectScreen);
