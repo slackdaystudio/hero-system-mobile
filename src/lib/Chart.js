@@ -33,12 +33,26 @@ export const Chart = ({distributions}) => {
 
     return (
         <>
-            <Text style={[styles.boldGrey, {fontSize: verticalScale(20), textAlign: 'center', paddingBottom: verticalScale(10)}]}>Dice Face Distributions</Text>
+            <Text
+                style={[
+                    styles.boldGrey,
+                    {fontSize: verticalScale(20), lineHeight: verticalScale(20 * 1.35), textAlign: 'center', paddingBottom: verticalScale(10)},
+                ]}
+            >
+                Dice Face Distributions
+            </Text>
             <View alignItems="center" justifyContent="center">
-                <View paddingLeft={scale(30)} marginBottom={verticalScale(-170)}>
+                <View paddingLeft={scale(30)} marginBottom={verticalScale(-160)}>
                     <PieChart semiCircle showText data={data} textColor="#000" fontWeight="bold" radius={scale(150)} labelsPosition="outward" />
                 </View>
-                <Text style={[styles.boldGrey, {fontSize: verticalScale(20), textAlign: 'center', paddingBottom: verticalScale(5)}]}>Legend</Text>
+                <Text
+                    style={[
+                        styles.boldGrey,
+                        {fontSize: verticalScale(20), lineHeight: verticalScale(20 * 1.35), textAlign: 'center', paddingBottom: verticalScale(5)},
+                    ]}
+                >
+                    Legend
+                </Text>
                 <View width={scale(150)} flexDirection="row" justifyContent={'space-around'}>
                     {data.map((d, i) => {
                         return (
