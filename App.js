@@ -126,7 +126,9 @@ export const getRandomNumber = (min, max, rolls = 1, increaseEntropyOveride = un
 };
 
 const drawerIcon = (name) => {
-    return <Icon solid type="FontAwesome5" name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: scale(-20)}} />;
+    return (
+        <Icon solid type="FontAwesome5" name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: common.isIPad() ? 0 : scale(-20)}} />
+    );
 };
 
 export const App = () => {
