@@ -102,7 +102,8 @@ export const store = configureStore({
         }),
 });
 
-let rng = prand.xoroshiro128plus(42);
+// eslint-disable-next-line no-bitwise
+let rng = prand.xoroshiro128plus(Date.now() ^ (Math.random() * 0x100000000));
 
 export const getRandomNumber = (min, max, rolls = 1, increaseEntropyOveride = undefined) => {
     const results = [];
