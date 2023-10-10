@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
-import {Spinner} from 'native-base';
+import {ActivityIndicator, ImageBackground, ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
 import {verticalScale, scale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import {common} from '../../lib/Common';
@@ -11,7 +10,7 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
         return (
             <>
                 <Heading text={headingText} />
-                <Spinner color={'#F3EDE9'} />
+                <ActivityIndicator color={'#F3EDE9'} />
             </>
         );
     }

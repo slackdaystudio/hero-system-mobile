@@ -1,7 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, View, TouchableHighlight} from 'react-native';
-import {Text, CardItem, Body} from 'native-base';
+import {ImageBackground, View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {AccordionCard} from '../Card/AccordionCard';
 import {Card} from '../Card/Card';
@@ -209,13 +208,11 @@ export default class Traits extends Component {
         }
 
         return (
-            <CardItem style={styles.cardItem}>
-                <Body>
-                    <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Notes:</Text> {decorated.characterTrait.trait.notes}
-                    </Text>
-                </Body>
-            </CardItem>
+            <View style={styles.cardItem}>
+                <Text style={styles.grey}>
+                    <Text style={styles.boldGrey}>Notes:</Text> {decorated.characterTrait.trait.notes}
+                </Text>
+            </View>
         );
     }
 
@@ -306,7 +303,7 @@ export default class Traits extends Component {
                 {this._renderDefinition(item)}
                 {this._renderAdvantagesAndLimitations(item)}
                 {this._renderNotes(item)}
-                <CardItem style={styles.cardItem} footer>
+                <View style={styles.cardItem}>
                     <View
                         style={{
                             flex: 1,
@@ -333,7 +330,7 @@ export default class Traits extends Component {
                             <Text style={styles.boldGrey}>Real:</Text> {item.realCost()}
                         </Text>
                     </View>
-                </CardItem>
+                </View>
                 {powers.map((power) => {
                     return (
                         <View key={`cp-${power.trait.id}`}>
@@ -344,7 +341,7 @@ export default class Traits extends Component {
                             {this._renderDefinition(power)}
                             {this._renderAdvantagesAndLimitations(power)}
                             {this._renderNotes(power)}
-                            <CardItem style={styles.cardItem} footer>
+                            <View style={styles.cardItem}>
                                 <View
                                     style={{
                                         flex: 1,
@@ -371,7 +368,7 @@ export default class Traits extends Component {
                                         <Text style={styles.boldGrey}>Real:</Text> {power.realCost()}
                                     </Text>
                                 </View>
-                            </CardItem>
+                            </View>
                         </View>
                     );
                 })}
@@ -382,11 +379,11 @@ export default class Traits extends Component {
     _renderCompoundPowerRoll(power) {
         if (power.roll() !== null && power.roll() !== undefined) {
             return (
-                <CardItem style={styles.cardItem}>
+                <View style={styles.cardItem}>
                     <TouchableHighlight underlayColor="#121212" onPress={() => this._roll(power.roll(), power)}>
                         <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
                     </TouchableHighlight>
-                </CardItem>
+                </View>
             );
         }
 

@@ -7,8 +7,9 @@ import {configureStore} from '@reduxjs/toolkit';
 import {Provider} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
-import {Icon, Root} from 'native-base';
 import prand from 'pure-rand';
+import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import {Icon} from './src/components/Icon/Icon';
 import {soundPlayer, DEFAULT_SOUND} from './src/lib/SoundPlayer';
 import rootReducer from './src/reducers';
 import {HomeScreen} from './src/components/Screens/HomeScreen';
@@ -52,6 +53,41 @@ const MyTheme = {
         background: '#1b1d1f',
         card: '#1b1d1f',
     },
+};
+
+const toastConfig = {
+    success: (props) => (
+        <BaseToast
+            {...props}
+            style={{
+                borderColor: '#35e01b',
+                backgroundColor: '#121212',
+                color: '#e8e8e8',
+                height: undefined,
+                minHeight: verticalScale(50),
+                paddingVertical: verticalScale(5),
+            }}
+            text1Style={{color: '#e8e8e8', fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
+            text2Style={{fontSize: verticalScale(11), lineHeight: verticalScale(11 * 1.35)}}
+            text2NumberOfLines={10}
+        />
+    ),
+    error: (props) => (
+        <ErrorToast
+            {...props}
+            style={{
+                borderColor: '#e01b35',
+                backgroundColor: '#121212',
+                color: '#e8e8e8',
+                height: undefined,
+                minHeight: verticalScale(50),
+                paddingVertical: verticalScale(5),
+            }}
+            text1Style={{color: '#e8e8e8', fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
+            text2Style={{fontSize: verticalScale(11), lineHeight: verticalScale(11 * 1.35)}}
+            text2NumberOfLines={10}
+        />
+    ),
 };
 
 const Drawer = createDrawerNavigator();
@@ -127,9 +163,7 @@ export const getRandomNumber = (min, max, rolls = 1, increaseEntropyOveride = un
 };
 
 const drawerIcon = (name) => {
-    return (
-        <Icon solid type="FontAwesome5" name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: common.isIPad() ? 0 : scale(-20)}} />
-    );
+    return <Icon solid name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: common.isIPad() ? 0 : scale(-20)}} />;
 };
 
 export const App = () => {
@@ -188,86 +222,85 @@ export const App = () => {
     return (
         <Provider store={store}>
             <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
-                <Root>
-                    <GestureHandlerRootView style={{flex: 1}}>
-                        <NavigationContainer theme={MyTheme} onReady={() => SplashScreen.hide()}>
-                            <Drawer.Navigator
-                                screenOptions={{
-                                    headerShown: false,
-                                    drawerPosition: 'right',
-                                    drawerContentOptions: drawerContentOptions,
-                                    drawerStyle: localStyles.drawer,
-                                    drawerLabelStyle: {color: '#F3EDE9'},
-                                    contentStyle: {
-                                        backgroundColor: '#000000',
-                                    },
+                <GestureHandlerRootView style={{flex: 1}}>
+                    <NavigationContainer theme={MyTheme} onReady={() => SplashScreen.hide()}>
+                        <Drawer.Navigator
+                            screenOptions={{
+                                headerShown: false,
+                                drawerPosition: 'right',
+                                drawerContentOptions: drawerContentOptions,
+                                drawerStyle: localStyles.drawer,
+                                drawerLabelStyle: {color: '#F3EDE9'},
+                                contentStyle: {
+                                    backgroundColor: '#000000',
+                                },
+                            }}
+                            initialRouteName="Home"
+                            backBehavior="history"
+                            drawerContent={CustomDrawerContent}
+                        >
+                            <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={HomeScreen} />
+                            <Drawer.Screen
+                                options={{drawerLabel: 'View Character', drawerIcon: () => drawerIcon('user')}}
+                                name="ViewHeroDesignerCharacter"
+                                component={ViewHeroDesignerCharacterScreen}
+                            />
+                            <Drawer.Screen
+                                name="Characters"
+                                options={{
+                                    drawerIcon: () => drawerIcon('users'),
                                 }}
-                                initialRouteName="Home"
-                                backBehavior="history"
-                                drawerContent={CustomDrawerContent}
-                            >
-                                <Drawer.Screen options={{drawerLabel: hsmIcon}} name="Home" component={HomeScreen} />
-                                <Drawer.Screen
-                                    options={{drawerLabel: 'View Character', drawerIcon: () => drawerIcon('user')}}
-                                    name="ViewHeroDesignerCharacter"
-                                    component={ViewHeroDesignerCharacterScreen}
-                                />
-                                <Drawer.Screen
-                                    name="Characters"
-                                    options={{
-                                        drawerIcon: () => drawerIcon('users'),
-                                    }}
-                                    component={CharactersScreen}
-                                />
-                                <Drawer.Screen
-                                    options={{drawerLabel: '3D6', drawerIcon: () => drawerIcon('check-circle')}}
-                                    name="Skill"
-                                    children={(props) => <SkillScreen {...props} />}
-                                />
-                                <Drawer.Screen
-                                    name="Hit"
-                                    component={HitScreen}
-                                    options={{
-                                        drawerIcon: () => drawerIcon('bullseye'),
-                                    }}
-                                />
-                                <Drawer.Screen
-                                    name="Damage"
-                                    component={DamageScreen}
-                                    options={{
-                                        drawerIcon: () => drawerIcon('medkit'),
-                                    }}
-                                />
-                                <Drawer.Screen
-                                    name="Effect"
-                                    component={EffectScreen}
-                                    options={{
-                                        drawerIcon: () => drawerIcon('shield-virus'),
-                                    }}
-                                />
-                                <Drawer.Screen
-                                    name="Result"
-                                    component={ResultScreen}
-                                    options={{
-                                        drawerIcon: () => drawerIcon('dice'),
-                                    }}
-                                />
-                                <Drawer.Screen
-                                    options={{drawerLabel: 'H.E.R.O.', drawerIcon: () => drawerIcon('mask')}}
-                                    name="RandomCharacter"
-                                    component={RandomCharacterScreen}
-                                />
-                                <Drawer.Screen
-                                    options={{drawerLabel: 'Cruncher', drawerIcon: () => drawerIcon('square-root-alt')}}
-                                    name="CostCruncher"
-                                    component={CostCruncherScreen}
-                                />
-                                <Drawer.Screen name="Statistics" component={StatisticsScreen} options={{drawerIcon: () => drawerIcon('chart-pie')}} />
-                                <Drawer.Screen name="Settings" component={SettingsScreen} options={{drawerIcon: () => drawerIcon('cogs')}} />
-                            </Drawer.Navigator>
-                        </NavigationContainer>
-                    </GestureHandlerRootView>
-                </Root>
+                                component={CharactersScreen}
+                            />
+                            <Drawer.Screen
+                                options={{drawerLabel: '3D6', drawerIcon: () => drawerIcon('check-circle')}}
+                                name="Skill"
+                                children={(props) => <SkillScreen {...props} />}
+                            />
+                            <Drawer.Screen
+                                name="Hit"
+                                component={HitScreen}
+                                options={{
+                                    drawerIcon: () => drawerIcon('bullseye'),
+                                }}
+                            />
+                            <Drawer.Screen
+                                name="Damage"
+                                component={DamageScreen}
+                                options={{
+                                    drawerIcon: () => drawerIcon('kit-medical'),
+                                }}
+                            />
+                            <Drawer.Screen
+                                name="Effect"
+                                component={EffectScreen}
+                                options={{
+                                    drawerIcon: () => drawerIcon('shield-virus'),
+                                }}
+                            />
+                            <Drawer.Screen
+                                name="Result"
+                                component={ResultScreen}
+                                options={{
+                                    drawerIcon: () => drawerIcon('dice'),
+                                }}
+                            />
+                            <Drawer.Screen
+                                options={{drawerLabel: 'H.E.R.O.', drawerIcon: () => drawerIcon('mask')}}
+                                name="RandomCharacter"
+                                component={RandomCharacterScreen}
+                            />
+                            <Drawer.Screen
+                                options={{drawerLabel: 'Cruncher', drawerIcon: () => drawerIcon('square-root-variable')}}
+                                name="CostCruncher"
+                                component={CostCruncherScreen}
+                            />
+                            <Drawer.Screen name="Statistics" component={StatisticsScreen} options={{drawerIcon: () => drawerIcon('chart-pie')}} />
+                            <Drawer.Screen name="Settings" component={SettingsScreen} options={{drawerIcon: () => drawerIcon('gears')}} />
+                        </Drawer.Navigator>
+                    </NavigationContainer>
+                    <Toast config={toastConfig} />
+                </GestureHandlerRootView>
             </SafeAreaView>
         </Provider>
     );
@@ -278,7 +311,7 @@ const localStyles = ScaledSheet.create({
         backgroundColor: '#1b1d1f',
         borderWidth: 0.5,
         borderLeftColor: '#303030',
-        width: '220@vs',
+        width: '180@s',
         color: '#F3EDE9',
     },
     label: {

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {View, ScrollView} from 'react-native';
-import {Button, Text} from 'native-base';
+import {View, Text, ScrollView} from 'react-native';
 import Modal from 'react-native-modal';
 import {verticalScale} from 'react-native-size-matters';
+import {Button} from '../Button/Button';
 import styles from '../../Styles';
 
 export default class ConfirmationDialog extends Component {
@@ -39,11 +39,7 @@ export default class ConfirmationDialog extends Component {
         if (typeof this.props.onOk === 'function') {
             return (
                 <View style={styles.buttonContainer}>
-                    <Button style={styles.button} onPress={() => this.props.onOk()}>
-                        <Text uppercase={false} style={styles.buttonText}>
-                            OK
-                        </Text>
-                    </Button>
+                    <Button label={this.props.title} style={styles.button} onPress={() => this.props.onOk()} />
                 </View>
             );
         }
@@ -69,11 +65,7 @@ export default class ConfirmationDialog extends Component {
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                             {this._renderOkButton()}
                             <View style={styles.buttonContainer}>
-                                <Button style={styles.button} onPress={() => this.props.onClose()}>
-                                    <Text uppercase={false} style={styles.buttonText}>
-                                        {this.props.onOk === null ? 'OK' : 'Cancel'}
-                                    </Text>
-                                </Button>
+                                <Button label={this.props.onOk === null ? 'OK' : 'Cancel'} style={styles.button} onPress={() => this.props.onClose()} />
                             </View>
                         </View>
                     </View>

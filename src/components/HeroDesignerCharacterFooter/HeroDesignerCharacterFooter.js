@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon, Footer, FooterTab} from 'native-base';
+import {View} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
+import {Icon} from '../Icon/Icon';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 import {common} from '../../lib/Common';
@@ -106,21 +107,21 @@ export default class HeroDesignerCharacterFooter extends Component {
 
     render() {
         return (
-            <Footer>
-                <FooterTab style={{justifyContent: 'center', backgroundColor: '#000'}}>
+            <View>
+                <View flexDirection="row" justifyContent="space-evenly" style={{backgroundColor: '#000', paddingVertical: verticalScale(5)}}>
                     {this.slots.map((slot) => {
                         return (
-                            <Button
+                            <Icon
                                 key={'character-' + slot}
-                                style={this._getFooterButtonStyle(slot)}
+                                solid
+                                name={this._getIcon(slot)}
+                                style={{fontSize: verticalScale(23), color: '#e8e8e8'}}
                                 onPress={() => this._activateSlot(slot)}
                                 onLongPress={() => this._emptySlot(slot)}
-                            >
-                                <Icon type="FontAwesome" name={this._getIcon(slot)} style={{fontSize: verticalScale(23), color: '#e8e8e8'}} />
-                            </Button>
+                            />
                         );
                     })}
-                </FooterTab>
+                </View>
                 <ConfirmationDialog
                     visible={this.state.deleteDialogVisible}
                     title="Remove Character?"
@@ -131,7 +132,7 @@ export default class HeroDesignerCharacterFooter extends Component {
                     onOk={this.onDeleteDialogOk}
                     onClose={this.onDeleteDialogClose}
                 />
-            </Footer>
+            </View>
         );
     }
 }

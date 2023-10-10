@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View, ImageBackground, Switch} from 'react-native';
-import {Container, Button, Text} from 'native-base';
+import {View, ImageBackground, Text, Switch} from 'react-native';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
+import {Button} from '../Button/Button';
 import Header from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
 import styles from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
+import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -63,7 +64,7 @@ export const SkillScreen = ({navigation}) => {
     };
 
     return (
-        <Container style={styles.container}>
+        <VirtualizedList flex={1}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 <Header navigation={navigation} />
                 <Text style={styles.heading}>Roll 3d6</Text>
@@ -84,13 +85,11 @@ export const SkillScreen = ({navigation}) => {
                     </View>
                     {renderSlider()}
                     <View style={styles.buttonContainer}>
-                        <Button block style={styles.button} onPress={roll}>
-                            <Text uppercase={false}>Roll</Text>
-                        </Button>
+                        <Button label="Roll" style={styles.button} onPress={roll} />
                     </View>
                 </View>
             </ImageBackground>
-        </Container>
+        </VirtualizedList>
     );
 };
 

@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Platform, Pressable, View} from 'react-native';
-import {Icon, Text} from 'native-base';
+import {Platform, Pressable, Text, View} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
+import {Icon} from '../Icon/Icon';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -58,7 +58,7 @@ export default class CircleButton extends Component {
                             color: '#F3EDE9',
                         }}
                     >
-                        <Icon solid type="FontAwesome5" name={this.props.name} style={{fontSize: fontSize, color: this.props.color}} />
+                        <Icon solid name={this.props.name} style={{fontSize: fontSize, color: this.props.color}} />
                     </Text>
                 </View>
             </Pressable>

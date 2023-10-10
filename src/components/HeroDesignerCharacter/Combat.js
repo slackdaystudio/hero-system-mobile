@@ -1,9 +1,10 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, View, TouchableHighlight} from 'react-native';
-import {Text, Button, Icon} from 'native-base';
+import {ImageBackground, View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
+import {Button} from '../Button/Button';
+import {Icon} from '../Icon/Icon';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
 import CalculatorInput from '../CalculatorInput/CalculatorInput';
@@ -242,12 +243,13 @@ export default class Combat extends Component {
                         />
                     </View>
                 </View>
-                <View style={{flex: 1, alignSelf: 'center'}}>
-                    <Button style={styles.buttonSmall} onPress={() => this.resetCombatState(stateKey)}>
-                        <Text uppercase={false} style={styles.buttonText}>
-                            Reset
-                        </Text>
-                    </Button>
+                <View flex={1} style={{alignSelf: 'center'}}>
+                    <Button
+                        label="Reset"
+                        style={styles.buttonTiny}
+                        onPress={() => this.resetCombatState(stateKey)}
+                        labelStyle={{fontSize: verticalScale(12)}}
+                    />
                 </View>
             </View>
         );
@@ -377,12 +379,8 @@ export default class Combat extends Component {
     _renderCvRollButton(stateKey, renderRollButton) {
         if (renderRollButton) {
             return (
-                <View style={{flex: 1, alignSelf: 'center'}}>
-                    <Button style={styles.buttonSmall} onPress={() => this.rollToHit(stateKey)}>
-                        <Text uppercase={false} style={styles.buttonText}>
-                            Roll
-                        </Text>
-                    </Button>
+                <View style={{flex: 1, justifyContent: 'flex-start', alignSelf: 'center'}}>
+                    <Icon name="dice" color="#14354d" onPress={() => this.rollToHit(stateKey)} />
                 </View>
             );
         }
@@ -396,7 +394,7 @@ export default class Combat extends Component {
         }
 
         return (
-            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', justifyContent: 'center'}}>
+            <View style={{flexDirection: 'row', alignSelf: 'stretch', justifyContent: 'center'}}>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <Text style={styles.boldGrey}>{stateKey.toUpperCase()}:</Text>
                 </View>
@@ -537,27 +535,30 @@ export default class Combat extends Component {
                         {this._renderHealthItem('body')}
                         {this._renderHealthItem('endurance', 'END')}
                         <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
-                            <Button style={styles.buttonSmall} onPress={() => this.takeRecovery()}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Recovery
-                                </Text>
-                            </Button>
+                            <Button
+                                label="Recovery"
+                                style={styles.buttonTiny}
+                                onPress={() => this.takeRecovery()}
+                                labelStyle={{fontSize: verticalScale(12), color: '#e8e8e8'}}
+                            />
                         </View>
                     </View>
                     <Heading text="Status Effects" />
                     <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
                         <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
-                            <Button style={styles.buttonSmall} onPress={() => this.openStatusDialog()}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Add
-                                </Text>
-                            </Button>
+                            <Button
+                                label="Add"
+                                style={styles.buttonTiny}
+                                onPress={() => this.openStatusDialog()}
+                                labelStyle={{fontSize: verticalScale(12), color: '#e8e8e8'}}
+                            />
                             <View style={{paddingHorizontal: scale(5)}} />
-                            <Button style={styles.buttonSmall} onPress={() => this.clearAllStatuses()}>
-                                <Text uppercase={false} style={styles.buttonText}>
-                                    Clear All
-                                </Text>
-                            </Button>
+                            <Button
+                                label="Clear All"
+                                style={styles.buttonTiny}
+                                onPress={() => this.clearAllStatuses()}
+                                labelStyle={{fontSize: verticalScale(12), color: '#e8e8e8'}}
+                            />
                         </View>
                         {this._renderStatuses()}
                     </View>

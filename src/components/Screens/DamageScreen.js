@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {ImageBackground, Dimensions, Platform, View, Switch} from 'react-native';
-import {Button, Text} from 'native-base';
+import {ImageBackground, Dimensions, Text, Platform, View, Switch} from 'react-native';
 import {TabView} from 'react-native-tab-view';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {RouteBuilder, Tab} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
+import {Button} from '../Button/Button';
 import Header from '../Header/Header';
 import {Card} from '../Card/Card';
 import {dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
@@ -188,9 +188,9 @@ const DamageRoute = ({damageForm, picker, setOpen, setValue, setItems, updateFor
                         </View>
                     </View>
                     <View style={{paddingBottom: 30}} />
-                    <Button block disabled={damageForm.dice === 0 && picker.value <= PARTIAL_DIE_PLUS_ONE} style={styles.button} onPress={roll}>
-                        <Text uppercase={false}>Roll</Text>
-                    </Button>
+                    <View style={styles.buttonContainer}>
+                        <Button solid label="Roll" disabled={damageForm.dice === 0 && picker.value <= PARTIAL_DIE_PLUS_ONE} onPress={roll} />
+                    </View>
                 </View>
                 <View style={{paddingBottom: 30}} />
             </ImageBackground>

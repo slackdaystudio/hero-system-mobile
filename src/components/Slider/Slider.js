@@ -1,8 +1,7 @@
 import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
-import {View} from 'react-native';
-import {Text, Item, Input} from 'native-base';
+import {View, Text, TextInput} from 'react-native';
 import {default as RNSlider} from '@react-native-community/slider';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
@@ -83,15 +82,13 @@ export const Slider = ({label, value, step, min, max, disabled, valueKey, onValu
             <View style={localStyles.titleContainer}>
                 <Text style={styles.grey}>{label}</Text>
                 <View style={{width: _isFraction() ? scale(50) : scale(40)}}>
-                    <Item>
-                        <Input
-                            style={styles.grey}
-                            keyboardType="numeric"
-                            maxLength={_isFraction() ? 5 : 3}
-                            defaultValue={textValue.toString()}
-                            onEndEditing={(event) => _onTextValueChange(event.nativeEvent.text, true)}
-                        />
-                    </Item>
+                    <TextInput
+                        style={styles.textInput}
+                        keyboardType="numeric"
+                        maxLength={_isFraction() ? 5 : 3}
+                        defaultValue={textValue.toString()}
+                        onEndEditing={(event) => _onTextValueChange(event.nativeEvent.text, true)}
+                    />
                 </View>
             </View>
             <View>

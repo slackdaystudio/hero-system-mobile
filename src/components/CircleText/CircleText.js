@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Platform, View} from 'react-native';
-import {Text} from 'native-base';
+import {Platform, Text, View} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
 
 // Copyright 2018-Present Philip J. Guinchard

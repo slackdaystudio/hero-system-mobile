@@ -2,18 +2,18 @@ import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useSelector, useDispatch} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {Dimensions, ImageBackground, StyleSheet, View} from 'react-native';
-import {Container, Content, Button, Text, List, ListItem, Left, Right, Body, Spinner, Form, Item, Input} from 'native-base';
-import {verticalScale} from 'react-native-size-matters';
+import {ActivityIndicator, Dimensions, ImageBackground, StyleSheet, Text, TextInput, View} from 'react-native';
+import {scale, verticalScale} from 'react-native-size-matters';
 import {TabView} from 'react-native-tab-view';
 import {randomCharacter} from '../../lib/RandomCharacter';
 import {common as libCommon} from '../../lib/Common';
 import Header from '../Header/Header';
+import {Button} from '../Button/Button';
 import styles from '../../Styles';
 import {setRandomHero, setRandomHeroName} from '../../reducers/randomHero';
 import {RouteBuilder, Tab} from '../Tab/Tab';
 
-// Copyright 2018-Present Philip J. Guinchard
+// CopyView 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,98 +35,90 @@ const GeneralRoute = ({character, dispatch, reRoll}) => {
     const tab = (
         <View flex={0} flexGrow={1}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <List>
-                    <ListItem>
-                        <Left>
+                <View paddingHorizontal={scale(10)}>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View justifyContent="center">
                             <Text style={styles.boldGrey}>Name:</Text>
-                        </Left>
-                        <Body>
-                            <Form>
-                                <Item>
-                                    <Input
-                                        style={{borderColor: '#D0D1D3', color: '#D0D1D3'}}
-                                        onEndEditing={(event) => dispatch(setRandomHeroName({name: event.nativeEvent.text}))}
-                                        defaultValue={character.name}
-                                    />
-                                </Item>
-                            </Form>
-                        </Body>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
+                        </View>
+                        <TextInput
+                            style={[styles.textInput, {width: scale(200)}]}
+                            onEndEditing={(event) => dispatch(setRandomHeroName({name: event.nativeEvent.text}))}
+                            defaultValue={character.name}
+                        />
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Archetype:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.archtype.name}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Gender:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.gender}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Special FX:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.specialFx}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Profession:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.skills.profession}</Text>
-                        </Body>
-                    </ListItem>
-                </List>
+                        </View>
+                    </View>
+                </View>
                 <View style={{paddingBottom: verticalScale(20)}} />
                 <Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
-                <List>
-                    <ListItem>
-                        <Left>
+                <View paddingHorizontal={scale(10)}>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Characteristics:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.archtype.characteristicsCost}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Powers:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.powers.powersCost}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Skills:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.skills.cost}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem>
-                        <Left>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
                             <Text style={styles.boldGrey}>Disadvantages:</Text>
-                        </Left>
-                        <Body>
+                        </View>
+                        <View>
                             <Text style={styles.grey}>{character.disadvantages.disadvantagesCost}</Text>
-                        </Body>
-                    </ListItem>
-                </List>
+                        </View>
+                    </View>
+                </View>
                 <View style={{paddingBottom: verticalScale(20)}} />
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
                     <View style={styles.buttonContainer}>
-                        <Button block style={styles.button} onPress={reRoll}>
-                            <Text uppercase={false}>Roll Again</Text>
-                        </Button>
+                        <Button label="Roll Again" style={styles.button} onPress={reRoll} />
                     </View>
                 </View>
             </ImageBackground>
@@ -142,18 +134,18 @@ const CharacteristicsRoute = ({character, renderCharacteristics}) => {
 
 const PowersRoute = ({character}) => {
     const tab = (
-        <View flex={0} flexGrow={1}>
+        <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 {character.powers.powers.map((power, index) => {
                     return (
-                        <ListItem key={'power-' + index}>
-                            <Left>
+                        <View flexDirection="row" justifyContent="space-between" key={'power-' + index}>
+                            <View flexDirection="row" flexWrap="wrap">
                                 <Text style={styles.grey}>{power.power}</Text>
-                            </Left>
-                            <Right>
+                            </View>
+                            <View>
                                 <Text style={styles.grey}>{power.cost}</Text>
-                            </Right>
-                        </ListItem>
+                            </View>
+                        </View>
                     );
                 })}
             </ImageBackground>
@@ -165,15 +157,15 @@ const PowersRoute = ({character}) => {
 
 const SkillsRoute = ({character}) => {
     const tab = (
-        <View flex={0} flexGrow={1}>
+        <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 {character.skills.skills.map((skill, index) => {
                     return (
-                        <ListItem key={'skill-' + index}>
-                            <Body>
+                        <View flexDirection="row" justifyContent="space-between" key={'skill-' + index}>
+                            <View>
                                 <Text style={styles.grey}>{skill}</Text>
-                            </Body>
-                        </ListItem>
+                            </View>
+                        </View>
                     );
                 })}
             </ImageBackground>
@@ -185,18 +177,18 @@ const SkillsRoute = ({character}) => {
 
 const DisadvantagesRoute = ({character}) => {
     const tab = (
-        <View flex={0} flexGrow={1}>
+        <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 {character.disadvantages.disadvantages.map((disad, index) => {
                     return (
-                        <ListItem key={'disad-' + index}>
-                            <Left>
+                        <View flexDirection="row" justifyContent="space-between" key={'disad-' + index}>
+                            <View flexDirection="row" flexWrap="wrap">
                                 <Text style={styles.grey}>{disad.description}</Text>
-                            </Left>
-                            <Right>
+                            </View>
+                            <View>
                                 <Text style={styles.grey}>{disad.cost}</Text>
-                            </Right>
-                        </ListItem>
+                            </View>
+                        </View>
                     );
                 })}
             </ImageBackground>
@@ -255,14 +247,14 @@ export const RandomCharacterScreen = ({navigation}) => {
 
         for (let prop in character.archtype.characteristics) {
             elements.push(
-                <ListItem key={prop}>
-                    <Left>
+                <View flexDirection="row" alignSelf="center" alignItems="flex-end" justifyContent="flex-start" key={prop} paddingLeft={scale(10)}>
+                    <View flex={1} paddingRight={scale(20)} alignSelf="flex-end">
                         <Text style={styles.boldGrey}>{character.archtype.characteristics[prop]}</Text>
-                    </Left>
-                    <Body>
+                    </View>
+                    <View flex={5}>
                         <Text style={styles.grey}>{prop.toUpperCase()}</Text>
-                    </Body>
-                </ListItem>,
+                    </View>
+                </View>,
             );
         }
 
@@ -283,12 +275,10 @@ export const RandomCharacterScreen = ({navigation}) => {
 
     if (character === null) {
         return (
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <Header hasTabs={true} navigation={navigation} />
-                <Content style={styles.content}>
-                    <Spinner color="#D0D1D3" />
-                </Content>
-            </Container>
+                <ActivityIndicator color="#D0D1D3" />
+            </View>
         );
     }
 

@@ -2,11 +2,11 @@ import React, {useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {View, ImageBackground} from 'react-native';
-import {Container, Button, Text} from 'native-base';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {verticalScale} from 'react-native-size-matters';
 import {RadioGroup} from 'react-native-radio-buttons-group';
 import Slider from '../Slider/Slider';
+import {Button} from '../Button/Button';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
 import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
@@ -84,35 +84,33 @@ export const EffectScreen = ({navigation}) => {
     };
 
     return (
-        <Container style={styles.container}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <Header navigation={navigation} />
-                <Heading text="Effect Roll" />
-                <View>
-                    <Slider label="Dice:" value={effectForm.dice} step={1} min={0} max={50} onValueChange={setSliderState} valueKey="dice" />
-                </View>
-                <View>
-                    <DropDownPicker
-                        theme="DARK"
-                        listMode="MODAL"
-                        open={open}
-                        value={value}
-                        items={items}
-                        setOpen={setOpen}
-                        setValue={setValue}
-                        setItems={setItems}
-                        onChangeValue={(val) => dispatch(updateFormValue({formName: 'effect', key: 'partialDie', value: val}))}
-                    />
-                </View>
-                <Heading text="Effect" />
-                {renderEffects()}
-                <View style={{paddingBottom: verticalScale(20)}} />
-                <Button block style={styles.button} onPress={roll}>
-                    <Text uppercase={false}>Roll</Text>
-                </Button>
-                <View style={{paddingBottom: verticalScale(20)}} />
-            </ImageBackground>
-        </Container>
+        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+            <Header navigation={navigation} />
+            <Heading text="Effect Roll" />
+            <View>
+                <Slider label="Dice:" value={effectForm.dice} step={1} min={0} max={50} onValueChange={setSliderState} valueKey="dice" />
+            </View>
+            <View>
+                <DropDownPicker
+                    theme="DARK"
+                    listMode="MODAL"
+                    open={open}
+                    value={value}
+                    items={items}
+                    setOpen={setOpen}
+                    setValue={setValue}
+                    setItems={setItems}
+                    onChangeValue={(val) => dispatch(updateFormValue({formName: 'effect', key: 'partialDie', value: val}))}
+                />
+            </View>
+            <Heading text="Effect" />
+            {renderEffects()}
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <View style={styles.buttonContainer}>
+                <Button solid label="Roll" style={styles.button} onPress={roll} />
+            </View>
+            <View style={{paddingBottom: verticalScale(20)}} />
+        </ImageBackground>
     );
 };
 

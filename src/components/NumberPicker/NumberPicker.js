@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {View} from 'react-native';
-import {Text, Icon} from 'native-base';
+import {View, Text} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {Icon} from '../Icon/Icon';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -32,11 +32,11 @@ export default class NumberPicker extends Component {
 
     render() {
         return (
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <View style={localStyles.row}>
                     <Icon
-                        type="FontAwesome"
-                        name="minus-square"
+                        solid
+                        name="square-minus"
                         style={[styles.grey, {fontSize: verticalScale(22), color: '#14354d', alignItems: 'flex-start'}]}
                         onPress={() => this.props.decrement(this.props.stateKey, this.props.step)}
                     />
@@ -46,8 +46,8 @@ export default class NumberPicker extends Component {
                 </View>
                 <View style={localStyles.row}>
                     <Icon
-                        type="FontAwesome"
-                        name="plus-square"
+                        solid
+                        name="square-plus"
                         style={[styles.grey, {fontSize: verticalScale(22), color: '#14354d', alignItems: 'flex-end'}]}
                         onPress={() => this.props.increment(this.props.stateKey, this.props.step)}
                     />
@@ -69,12 +69,5 @@ const localStyles = ScaledSheet.create({
         alignItems: 'center',
         width: '30@s',
         height: '25@vs',
-    },
-    modalContent: {
-        flex: 1,
-        flexDirection: 'row',
-        padding: 0,
-        justifyContent: 'space-around',
-        alignItems: 'stretch',
     },
 });

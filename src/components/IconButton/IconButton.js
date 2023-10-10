@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Text, View} from 'react-native';
 import {TouchableHighlight} from 'react-native-gesture-handler';
-import {Icon} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
+import {Icon} from '../Icon/Icon';
 import {PRIMARY_COLOR} from '../../Styles';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
@@ -54,7 +54,6 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
                             solid
                             size={verticalScale(64)}
                             style={{fontSize: verticalScale(32), textAlign: 'center', color: iconColor, paddingBottom: verticalScale(5)}}
-                            type="FontAwesome5"
                             name={icon}
                         />
                         <Text style={[textStyle, {textAlign: 'center'}]}>{label}</Text>

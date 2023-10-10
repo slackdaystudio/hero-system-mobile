@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {useSelector, useDispatch} from 'react-redux';
-import {ImageBackground, Dimensions, View, Switch, TouchableHighlight} from 'react-native';
-import {Button, Text, Icon} from 'native-base';
+import {ImageBackground, Dimensions, Text, View, Switch, TouchableHighlight} from 'react-native';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {TabView} from 'react-native-tab-view';
 import {Tab, RouteBuilder} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
+import {Button} from '../Button/Button';
+import {Icon} from '../Icon/Icon';
 import Header from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
 import hitLocations from '../../../public/hitLocations.json';
@@ -54,9 +55,9 @@ const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
                         </View>
                     </View>
                     {renderDcvSlider()}
-                    <Button block style={styles.button} onPress={roll}>
-                        <Text uppercase={false}>Roll</Text>
-                    </Button>
+                    <View style={styles.buttonContainer}>
+                        <Button label="Roll" style={styles.button} onPress={roll} />
+                    </View>
                 </View>
             </ImageBackground>
         </View>
@@ -157,7 +158,7 @@ const HitLocationsRoute = ({setLocation, renderLocationDetails}) => {
                         let stars = [];
 
                         for (let i = 0; i < hitLocation.stunX; i++) {
-                            stars.push(<Icon key={'star-' + index + '-' + i} name="md-star" style={[styles.grey, {fontSize: verticalScale(14)}]} />);
+                            stars.push(<Icon solid key={'star-' + index + '-' + i} name="star" style={[styles.grey, {fontSize: verticalScale(14)}]} />);
                         }
 
                         return (

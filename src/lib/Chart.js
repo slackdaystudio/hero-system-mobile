@@ -1,8 +1,8 @@
 import React from 'react';
 import {Text, View} from 'react-native';
-import {Icon} from 'native-base';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {PieChart} from 'react-native-gifted-charts';
+import {Icon} from '../components/Icon/Icon';
 import styles from '../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -55,15 +55,7 @@ export const Chart = ({distributions}) => {
                 </Text>
                 <View width={scale(150)} flexDirection="row" justifyContent={'space-around'}>
                     {data.map((d, i) => {
-                        return (
-                            <Icon
-                                key={`face-${i}`}
-                                solid
-                                type="FontAwesome5"
-                                name={`dice-${d.faceName}`}
-                                style={{fontSize: verticalScale(20), color: d.color}}
-                            />
-                        );
+                        return <Icon key={`face-${i}`} solid name={`dice-${d.faceName}`} style={{fontSize: verticalScale(20), color: d.color}} />;
                     })}
                 </View>
             </View>

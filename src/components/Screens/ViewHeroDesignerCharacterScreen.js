@@ -2,8 +2,7 @@ import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {Dimensions, Image, useWindowDimensions} from 'react-native';
-import {View, Text, Spinner} from 'native-base';
+import {ActivityIndicator, Dimensions, Image, Text, View, useWindowDimensions} from 'react-native';
 import {TabView} from 'react-native-tab-view';
 import {Tab, RouteBuilder} from '../Tab/Tab';
 import General from '../HeroDesignerCharacter/General';
@@ -301,7 +300,7 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
         return (
             <>
                 <Header hasTabs={false} navigation={navigation} />
-                <Spinner color="#F3EDE9" />
+                <ActivityIndicator color="#F3EDE9" />
             </>
         );
     }

@@ -1,9 +1,9 @@
 import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
-import {Text, View} from 'react-native';
-import {Button} from 'native-base';
+import {View} from 'react-native';
 import {useAnimationState} from 'moti';
 import {useFocusEffect} from '@react-navigation/native';
+import {Button} from '../Button/Button';
 import {Animated} from '.';
 import styles from '../../Styles';
 
@@ -62,11 +62,7 @@ export const DisappearingButton = ({label, onPress, delay, animationProps}) => {
         <Animated animationProps={{state: animationState}}>
             {
                 <View style={styles.buttonContainer}>
-                    <Button block disabled={isDisabled} style={[styles.button, {opacity: opacity}]} onPress={restart}>
-                        <Text style={[styles.grey, {opacity: opacity}]} uppercase={false}>
-                            {label}
-                        </Text>
-                    </Button>
+                    <Button label={label} disabled={isDisabled} style={[styles.button, {opacity: opacity}]} onPress={restart} />
                 </View>
             }
         </Animated>

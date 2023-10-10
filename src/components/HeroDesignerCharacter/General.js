@@ -1,7 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, View, Image} from 'react-native';
-import {Text} from 'native-base';
+import {ImageBackground, View, Text, Image} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import {common} from '../../lib/Common';

@@ -1,7 +1,6 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, View} from 'react-native';
-import {Textarea} from 'native-base';
+import {ImageBackground, TextInput, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
 
@@ -33,15 +32,20 @@ export default class Notes extends Component {
                     style={{flex: 1, flexDirection: 'column'}}
                     imageStyle={{resizeMode: 'repeat'}}
                 >
-                    <View style={{paddingHorizontal: scale(5), paddingBottom: verticalScale(20)}}>
-                        <Textarea
-                            rowSpan={15}
-                            maxLength={10000}
-                            bordered
+                    <View style={{alignItems: 'center', paddingHorizontal: scale(5), paddingVertical: verticalScale(20)}}>
+                        <TextInput
+                            multiline={true}
                             placeholder="Campaign notes, miscellaneous equipment, etc"
-                            style={[styles.grey, {backgroundColor: '#121212', borderColor: '#303030', fontSize: verticalScale(14)}]}
-                            defaultValue={this.props.notes}
-                            onEndEditing={(event) => this.props.updateNotes(event.nativeEvent.text)}
+                            placeholderTextColor="rgba(232, 232, 232, 0.3)"
+                            style={styles.textAreaInput}
+                            height={verticalScale(250)}
+                            width="95%"
+                            defaultValue={this.props.notes.toString()}
+                            onEndEditing={(event) => {
+                                event.preventDefault();
+
+                                this.props.updateNotes(event.nativeEvent.text);
+                            }}
                         />
                     </View>
                 </ImageBackground>
