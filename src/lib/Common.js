@@ -1,5 +1,5 @@
 import {Dimensions, Platform} from 'react-native';
-import {Toast} from 'native-base';
+import Toast from 'react-native-toast-message';
 import camelCase from 'camelcase';
 import snakeCase from 'snake-case';
 import merge from 'deepmerge';
@@ -200,12 +200,14 @@ class Common {
         return word.toLowerCase().charAt(0).toUpperCase() + word.slice(1);
     }
 
-    toast(message, buttonText = 'OK', duration = 3000) {
+    toast(message, type = 'error', title = 'HERO System Mobile', duration = 3000) {
         Toast.show({
-            text: message,
+            type: type.toLowerCase(),
+            text1: `${title}: ${this.capitalize(type)}`,
+            text2: message + (type.toLowerCase() === 'error' ? '\n\nSwipe up to dismiss' : ''),
             position: 'bottom',
-            buttonText: buttonText,
-            duration: duration,
+            autoHide: type.toLowerCase() === 'success',
+            visibilityTime: duration,
         });
     }
 

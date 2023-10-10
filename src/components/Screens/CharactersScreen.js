@@ -2,13 +2,15 @@ import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {ImageBackground, View} from 'react-native';
-import {Container, Button, Spinner, Text, List, ListItem, Left, Right, Body, Icon} from 'native-base';
+import {ActivityIndicator, ImageBackground, Text, View} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import Heading from '../Heading/Heading';
+import {Icon} from '../Icon/Icon';
+import {Button} from '../Button/Button';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {file} from '../../lib/File';
 import {common} from '../../lib/Common';
 import {combatDetails} from '../../lib/CombatDetails';
@@ -233,11 +235,14 @@ export const CharactersScreen = ({navigation, route}) => {
 
     const renderCharacters = () => {
         if (common.isEmptyObject(loadedCharacters) || charactersLoading) {
-            return <Spinner color="#D0D1D3" />;
+            return <ActivityIndicator color="#D0D1D3" />;
         }
 
         return (
-            <View flexBasis="auto">
+            <VirtualizedList flex={1}>
+                <View style={styles.buttonContainer}>
+                    <Button label="Import" style={styles.button} onPress={() => importCharacter()} />
+                </View>
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: scale(300), alignSelf: 'center'}}>
                     <View style={{flex: 1}}>
                         <Text style={styles.grey}>Load character into: </Text>
@@ -255,46 +260,37 @@ export const CharactersScreen = ({navigation, route}) => {
                         />
                     </View>
                 </View>
-                <List>
+                <View paddingTop={verticalScale(20)}>
                     {loadedCharacters.map((char) => {
                         return (
-                            <ListItem icon key={char.fileName}>
-                                <Left>
+                            <View key={char.fileName} flexDirection="row" justifyContent="space-evenly" paddingBottom={scale(20)}>
+                                <View flex={1}>
                                     <Icon
-                                        type="FontAwesome"
                                         name="trash"
-                                        style={{fontSize: verticalScale(25), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
+                                        style={{fontSize: verticalScale(16), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => openDeleteDialog(char.name, char.fileName)}
                                     />
-                                </Left>
-                                <Body>
+                                </View>
+                                <View flex={4}>
                                     <Text style={styles.grey}>{char.name}</Text>
-                                </Body>
-                                <Right>
+                                </View>
+                                <View flex={1}>
                                     <Icon
-                                        type="FontAwesome"
                                         name="chevron-right"
                                         style={{fontSize: verticalScale(20), color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => onViewCharacterPress(char.fileName)}
                                     />
-                                </Right>
-                            </ListItem>
+                                </View>
+                            </View>
                         );
                     })}
-                </List>
-                <View style={[styles.buttonContainer, {paddingTop: verticalScale(20)}]}>
-                    <Button style={styles.button} onPress={() => importCharacter()}>
-                        <Text uppercase={false} style={styles.buttonText}>
-                            Import
-                        </Text>
-                    </Button>
                 </View>
-            </View>
+            </VirtualizedList>
         );
     };
 
     return (
-        <Container style={styles.container}>
+        <>
             <Header navigation={navigation} />
             <Heading text="Characters" />
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -308,7 +304,7 @@ export const CharactersScreen = ({navigation, route}) => {
                 onOk={dialogProps.dialogOnOkFn}
                 onClose={onDeleteDialogClose}
             />
-        </Container>
+        </>
     );
 };
 

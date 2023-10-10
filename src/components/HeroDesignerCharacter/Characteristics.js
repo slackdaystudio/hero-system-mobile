@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, View, TouchableHighlight, Switch} from 'react-native';
-import {Text, CardItem, Body} from 'native-base';
+import {ImageBackground, View, TouchableHighlight, Text, Switch} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Heading from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
@@ -223,28 +222,24 @@ export default class Characteristics extends Component {
             }
 
             return (
-                <View paddingVertical={verticalScale(3)}>
-                    <CardItem style={{backgroundColor: '#1b1d1f'}}>
-                        <Body>
-                            {this._renderNonCombatMovement(characteristic)}
-                            {this._renderStrength(characteristic)}
-                            {this._renderNotes(characteristic)}
-                            <Text style={styles.grey}>{definition}</Text>
-                        </Body>
-                    </CardItem>
-                    <CardItem style={{backgroundColor: '#1b1d1f'}} footer>
-                        <Body style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                            <Text style={styles.grey}>
-                                <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
-                            </Text>
-                            <View style={{width: scale(20), alignItems: 'center'}}>
-                                <Text style={styles.grey}>&bull;</Text>
-                            </View>
-                            <Text style={styles.grey}>
-                                <Text style={styles.boldGrey}>Cost:</Text> {characteristic.cost}
-                            </Text>
-                        </Body>
-                    </CardItem>
+                <View paddingVertical={verticalScale(3)} style={{backgroundColor: '#1b1d1f'}}>
+                    <View style={{backgroundColor: '#1b1d1f'}}>
+                        {this._renderNonCombatMovement(characteristic)}
+                        {this._renderStrength(characteristic)}
+                        {this._renderNotes(characteristic)}
+                        <Text style={styles.grey}>{definition}</Text>
+                    </View>
+                    <View flexDirection="row" justifyContent="center" style={{backgroundColor: '#1b1d1f', marginTop: verticalScale(10)}}>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
+                        </Text>
+                        <View style={{width: scale(20), alignItems: 'center'}}>
+                            <Text style={styles.grey}>&bull;</Text>
+                        </View>
+                        <Text style={styles.grey}>
+                            <Text style={styles.boldGrey}>Cost:</Text> {characteristic.cost}
+                        </Text>
+                    </View>
                 </View>
             );
         }

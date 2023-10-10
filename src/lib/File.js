@@ -190,7 +190,7 @@ class File {
                     });
                 }
             } catch (error) {
-                common.toast(`Error: could not process file "${character.name}".  Possibly corrupt.`, 'Ok', 15000);
+                common.toast(`Error: could not process file "${character.name}".  Possibly corrupt.`, 'error', 'HERO System Mobile', 15000);
 
                 canonicalToName = `${path}/corrupt`;
 

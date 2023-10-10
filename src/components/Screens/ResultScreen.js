@@ -2,8 +2,7 @@ import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {Platform, ImageBackground, View} from 'react-native';
-import {Container, Text, Spinner} from 'native-base';
+import {ActivityIndicator, Platform, ImageBackground, Text, View} from 'react-native';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
@@ -345,7 +344,7 @@ export const ResultScreen = ({route, navigation}) => {
 
     const renderRoll = () => {
         if (common.isEmptyObject(result)) {
-            return <Spinner color="#D0D1D3" />;
+            return <ActivityIndicator color="#D0D1D3" />;
         }
 
         if (result.hasOwnProperty('results')) {
@@ -356,18 +355,16 @@ export const ResultScreen = ({route, navigation}) => {
     };
 
     return (
-        <Container style={styles.container}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <Header navigation={navigation} />
-                <VirtualizedList>
-                    <Text style={styles.heading}>Roll Result</Text>
-                    <View justifyContent="center" paddingHorizontal={scale(10)}>
-                        {renderRoll()}
-                        <DisappearingButton label="Roll Again" onPress={reRoll} />
-                    </View>
-                </VirtualizedList>
-            </ImageBackground>
-        </Container>
+        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+            <Header navigation={navigation} />
+            <VirtualizedList>
+                <Text style={styles.heading}>Roll Result</Text>
+                <View justifyContent="center" paddingHorizontal={scale(10)}>
+                    {renderRoll()}
+                    <DisappearingButton label="Roll Again" onPress={reRoll} />
+                </View>
+            </VirtualizedList>
+        </ImageBackground>
     );
 };
 

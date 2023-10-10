@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {View} from 'react-native';
-import {Icon, Text} from 'native-base';
+import {View, Text} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {CircleButton} from '../CircleButton';
+import {Icon} from '../Icon/Icon';
 import {styles, TEXT_COLOR} from '../../Styles';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
@@ -25,7 +24,7 @@ export const FooterButton = ({label, iconName, onPress, onLongPress, circular}) 
     return (
         <View alignItems="center" justifyItems="center">
             <CircleButton
-                name={<Icon solid size="sm" minWidth={scale(18)} textAlign="center" color={TEXT_COLOR} as={FontAwesome5} name={iconName} />}
+                name={<Icon solid minWidth={scale(18)} textAlign="center" color={TEXT_COLOR} name={iconName} />}
                 onPress={onPress}
                 onLongPress={onLongPress}
             />

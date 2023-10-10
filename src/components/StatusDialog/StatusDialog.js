@@ -1,13 +1,14 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {Platform, View, KeyboardAvoidingView} from 'react-native';
-import {Button, Text, Form, Item, Label, Input} from 'native-base';
+import {Platform, View, Text, TextInput, KeyboardAvoidingView} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
 import {scale, verticalScale} from 'react-native-size-matters';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Button} from '../Button/Button';
 import styles from '../../Styles';
+import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 
 export const STATUSES = ['Aid', 'Drain', 'Entangle', 'Flash'];
 
@@ -166,17 +167,17 @@ class StatusDialog extends Component {
 
     _renderAdjustmentControls() {
         return (
-            <Fragment>
-                <Item inlineLabel style={{marginLeft: 0}}>
-                    <Label style={styles.grey}>Active Points:</Label>
-                    <Input
-                        style={styles.grey}
+            <>
+                <View flexDirection="row" justifyContent="space-between">
+                    <Text style={[styles.grey, {alignSelf: 'center'}]}>Active Points:</Text>
+                    <TextInput
+                        style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
                         defaultValue={this.props.statusForm.activePoints.toString()}
                         onEndEditing={(event) => this.updateFormValue('activePoints', event.nativeEvent.text)}
                     />
-                </Item>
+                </View>
                 <SectionedMultiSelect
                     styles={{
                         selectToggleText: [styles.grey, {marginLeft: scale(-7), width: 50}],
@@ -198,7 +199,7 @@ class StatusDialog extends Component {
                     }}
                     items={this.items}
                     IconRenderer={Icon}
-                    searchIconComponent={() => <Icon name="search" color="white" size={18} style={{paddingLeft: scale(5)}} />}
+                    searchIconComponent={<Icon name="search" color="white" size={18} style={{paddingLeft: scale(5)}} />}
                     uniqueKey="id"
                     subKey="children"
                     selectText="Select affected..."
@@ -208,59 +209,59 @@ class StatusDialog extends Component {
                     onSelectedItemsChange={(selected) => this._onSelectedItemsChange(selected)}
                     selectedItems={this.state.selectedItems}
                 />
-            </Fragment>
+            </>
         );
     }
 
     _renderEntangleControls() {
         return (
             <View>
-                <Item inlineLabel style={{marginLeft: 0}}>
-                    <Label style={styles.grey}>BODY:</Label>
-                    <Input
-                        style={styles.grey}
+                <View flexDirection="row" justifyContent="space-between">
+                    <Text style={[styles.grey, {alignSelf: 'center'}]}>BODY:</Text>
+                    <TextInput
+                        style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
                         defaultValue={this.props.statusForm.body.toString()}
                         onEndEditing={(event) => this.updateFormValue('body', event.nativeEvent.text)}
                     />
-                </Item>
-                <Item inlineLabel style={{marginLeft: 0}}>
-                    <Label style={styles.grey}>PD: </Label>
-                    <Input
-                        style={styles.grey}
+                </View>
+                <View flexDirection="row" justifyContent="space-between">
+                    <Text style={[styles.grey, {alignSelf: 'center'}]}>PD: </Text>
+                    <TextInput
+                        style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
                         defaultValue={this.props.statusForm.pd.toString()}
                         onEndEditing={(event) => this.updateFormValue('pd', event.nativeEvent.text)}
                     />
-                </Item>
-                <Item inlineLabel style={{marginLeft: 0}}>
-                    <Label style={styles.grey}>ED: </Label>
-                    <Input
-                        style={styles.grey}
+                </View>
+                <View flexDirection="row" justifyContent="space-between">
+                    <Text style={[styles.grey, {alignSelf: 'center'}]}>ED: </Text>
+                    <TextInput
+                        style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
                         defaultValue={this.props.statusForm.ed.toString()}
                         onEndEditing={(event) => this.updateFormValue('ed', event.nativeEvent.text)}
                     />
-                </Item>
+                </View>
             </View>
         );
     }
 
     _renderFlashControls() {
         return (
-            <Item inlineLabel style={{marginLeft: 0}}>
-                <Label style={styles.grey}>Segments:</Label>
-                <Input
-                    style={styles.grey}
+            <View flexDirection="row" justifyContent="space-between">
+                <Text style={[styles.grey, {alignSelf: 'center'}]}>Segments:</Text>
+                <TextInput
+                    style={styles.textInput}
                     keyboardType="numeric"
                     maxLength={3}
                     defaultValue={this.props.statusForm.segments.toString()}
                     onEndEditing={(event) => this.updateFormValue('segments', event.nativeEvent.text)}
                 />
-            </Item>
+            </View>
         );
     }
 
@@ -275,20 +276,20 @@ class StatusDialog extends Component {
                 <KeyboardAvoidingView behavior="padding">
                     <View style={styles.modal}>
                         <Text style={styles.modalHeader}>Apply Status</Text>
-                        <View style={styles.modalContent}>
-                            <Form>
-                                <Item inlineLabel style={{marginLeft: 0}}>
-                                    <Label style={styles.grey}>Name:</Label>
-                                    <Input
+                        <VirtualizedList flex={0}>
+                            <View style={[styles.modalContent]}>
+                                <View flexDirection="row" justifyContent="space-between">
+                                    <Text style={[styles.grey, {alignSelf: 'center'}]}>Name:</Text>
+                                    <TextInput
                                         editable
-                                        style={styles.grey}
+                                        style={[styles.textInput, {width: scale(200)}]}
                                         maxLength={32}
                                         defaultValue={this.props.statusForm.label}
                                         onEndEditing={(event) => this.updateFormValue('label', event.nativeEvent.text)}
                                     />
-                                </Item>
-                                <Item inlineLabel style={{marginLeft: 0}}>
-                                    <Label style={styles.grey}>Status:</Label>
+                                </View>
+                                <View flexDirection="row" justifyContent="space-between">
+                                    <Text style={[styles.grey, {alignSelf: 'center'}]}>Status:</Text>
                                     <DropDownPicker
                                         containerStyle={{maxWidth: '75%'}}
                                         theme="DARK"
@@ -299,22 +300,14 @@ class StatusDialog extends Component {
                                         setOpen={(open) => this.setState({open})}
                                         setValue={this.setValue}
                                     />
-                                </Item>
+                                </View>
                                 {this._renderSecondaryControls()}
-                            </Form>
-                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
-                                <Button style={styles.button} onPress={() => this._onApply()}>
-                                    <Text uppercase={false} style={styles.buttonText}>
-                                        Apply
-                                    </Text>
-                                </Button>
-                                <Button style={styles.button} onPress={() => this.props.onClose()}>
-                                    <Text uppercase={false} style={styles.buttonText}>
-                                        Cancel
-                                    </Text>
-                                </Button>
+                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
+                                    <Button label="Apply" onPress={() => this._onApply()} />
+                                    <Button label="Cancel" style={styles.button} onPress={() => this.props.onClose()} />
+                                </View>
                             </View>
-                        </View>
+                        </VirtualizedList>
                     </View>
                 </KeyboardAvoidingView>
             </Modal>

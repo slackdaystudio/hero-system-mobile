@@ -2,17 +2,16 @@ import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {View, ImageBackground} from 'react-native';
-import {Container, Text, List, ListItem, Left, Right, Spinner} from 'native-base';
+import {ActivityIndicator, Text, View, ImageBackground} from 'react-native';
 import Header from '../Header/Header';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {Chart} from '../../lib/Chart';
 import {common} from '../../lib/Common';
 import {statistics as libStatistics} from '../../lib/Statistics';
 import styles from '../../Styles';
-import {verticalScale} from 'react-native-size-matters';
+import {scale, verticalScale} from 'react-native-size-matters';
 
-// Copyright 2018-Present Philip J. Guinchard
+// CopyView 2018-Present Philip J. Guinchard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -77,135 +76,133 @@ export const StatisticsScreen = ({navigation}) => {
 
     if (common.isEmptyObject(statistics)) {
         return (
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <Header hasTabs={false} navigation={navigation} />
                 <ImageBackground
                     source={require('../../../public/background.png')}
                     style={{flex: 1, flexDirection: 'column'}}
                     imageStyle={{resizeMode: 'repeat'}}
                 >
-                    <Spinner color="#D0D1D3" />
+                    <ActivityIndicator color="#D0D1D3" />
                 </ImageBackground>
-            </Container>
+            </View>
         );
     }
 
     return (
-        <Container style={styles.container}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <Header navigation={navigation} />
-                <Text style={styles.heading}>Statistics</Text>
-                <View paddingBottom={verticalScale(10)} />
-                <VirtualizedList>
-                    {renderDieDistributionChart()}
-                    <List paddingTop={verticalScale(20)}>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.diceRolled}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Face Value:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.sum}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Largest Amount of Dice Rolled:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.largestDieRoll}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Largest Roll:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.largestSum}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Skill Checks:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.skillChecks}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Rolls To Hit:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.hitRolls}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.normalDamage.rolls + statistics.totals.killingDamage.rolls}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Effect Rolls:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.effectRolls}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Stun:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.normalDamage.stun + statistics.totals.killingDamage.stun}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Body:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.normalDamage.body + statistics.totals.killingDamage.body}</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Total Knockback:</Text>
-                            </Left>
-                            <Right>
-                                <Text style={styles.grey}>{statistics.totals.knockback}m</Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Most Frequent Hit Location:</Text>
-                            </Left>
-                            <Right>{renderHitLocationStat()}</Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text style={styles.boldGrey}>Average Roll:</Text>
-                            </Left>
-                            <Right>{renderAverageRoll()}</Right>
-                        </ListItem>
-                        <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingLeft: 30}]}>
-                            *Does not include hit location or knockback rolls
-                        </Text>
-                    </List>
-                </VirtualizedList>
-            </ImageBackground>
-        </Container>
+        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+            <Header navigation={navigation} />
+            <Text style={styles.heading}>Statistics</Text>
+            <View paddingBottom={verticalScale(10)} />
+            <VirtualizedList flex={1}>
+                {renderDieDistributionChart()}
+                <View paddingHorizontal={scale(10)} paddingTop={verticalScale(20)}>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.diceRolled}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Face Value:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.sum}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Largest Amount of Dice Rolled:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.largestDieRoll}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Largest Roll:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.largestSum}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Skill Checks:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.skillChecks}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Rolls To Hit:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.hitRolls}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Damage Rolls:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.normalDamage.rolls + statistics.totals.killingDamage.rolls}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Effect Rolls:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.effectRolls}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Stun:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.normalDamage.stun + statistics.totals.killingDamage.stun}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Body:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.normalDamage.body + statistics.totals.killingDamage.body}</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Total Knockback:</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.grey}>{statistics.totals.knockback}m</Text>
+                        </View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Most Frequent Hit Location:</Text>
+                        </View>
+                        <View>{renderHitLocationStat()}</View>
+                    </View>
+                    <View flexDirection="row" justifyContent="space-between">
+                        <View>
+                            <Text style={styles.boldGrey}>Average Roll:</Text>
+                        </View>
+                        <View>{renderAverageRoll()}</View>
+                    </View>
+                    <Text style={[styles.grey, {fontStyle: 'italic', paddingBottom: 30, paddingTop: 30}]}>
+                        *Does not include hit location or knockback rolls
+                    </Text>
+                </View>
+            </VirtualizedList>
+        </ImageBackground>
     );
 };
 
