@@ -2,6 +2,7 @@ import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {ImageBackground, View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
+// import Feather from 'react-native-vector-icons/Feather';
 import Heading from '../Heading/Heading';
 import {Button} from '../Button/Button';
 import {Icon} from '../Icon/Icon';
@@ -28,6 +29,8 @@ import styles from '../../Styles';
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+// Feather.loadFont().catch((error) => console.error(error));
 
 export default class Combat extends Component {
     static propTypes = {
@@ -229,7 +232,7 @@ export default class Combat extends Component {
 
     _renderHealthItem(stateKey, label = null) {
         return (
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: scale(50)}}>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <Text style={styles.boldGrey}>{label === null ? stateKey.toUpperCase() : label}:</Text>
                 </View>
@@ -243,7 +246,7 @@ export default class Combat extends Component {
                         />
                     </View>
                 </View>
-                <View flex={1} style={{alignSelf: 'center'}}>
+                <View>
                     <Button
                         label="Reset"
                         style={styles.buttonTiny}
@@ -379,13 +382,13 @@ export default class Combat extends Component {
     _renderCvRollButton(stateKey, renderRollButton) {
         if (renderRollButton) {
             return (
-                <View style={{flex: 1, justifyContent: 'flex-start', alignSelf: 'center'}}>
-                    <Icon name="dice" color="#14354d" onPress={() => this.rollToHit(stateKey)} />
+                <View style={{flex: 0.75, justifyContent: 'flex-start', alignSelf: 'center'}}>
+                    <Button label="roll" style={styles.buttonTiny} onPress={() => this.rollToHit(stateKey)} />
                 </View>
             );
         }
 
-        return <View style={{flex: 1}} />;
+        return <View style={{flex: 0.75}} />;
     }
 
     _renderCv(stateKey, renderRollButton = false) {
@@ -530,7 +533,7 @@ export default class Combat extends Component {
                     imageStyle={{resizeMode: 'repeat'}}
                 >
                     <Heading text="Health" />
-                    <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                         {this._renderHealthItem('stun')}
                         {this._renderHealthItem('body')}
                         {this._renderHealthItem('endurance', 'END')}

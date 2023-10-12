@@ -18,34 +18,27 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export const Button = ({label, onPress, disabled, small, labelStyle, ...rest}) => {
-    let style = small ? styles.buttonSmall : styles.buttonBig;
+    let style = small ? {...styles.buttonSmall} : {...styles.buttonBig};
+    let textStyle = {...styles.buttonText};
 
     if (rest.style !== undefined) {
-        let incomingStyle = rest.style;
+        if (rest.hasOwnProperty('style')) {
+            style = Object.assign(style, rest.style);
 
-        if (!Array.isArray(incomingStyle)) {
-            incomingStyle = [incomingStyle];
+            delete rest.style;
         }
-
-        style = [...[style], ...incomingStyle];
     }
 
     if (labelStyle !== undefined) {
-        let incomingLabelStyle = labelStyle;
-
-        if (!Array.isArray(incomingLabelStyle)) {
-            incomingLabelStyle = [incomingLabelStyle];
-        }
-
-        labelStyle = [...[styles.buttonText], ...incomingLabelStyle];
+        textStyle = Object.assign(textStyle, labelStyle);
     } else {
         labelStyle = styles.buttonText;
     }
 
     return (
-        <Pressable flexDirection="row" onPress={disabled ? null : onPress} style={({pressed}) => [{}, {opacity: pressed ? 0.1 : 1}]} {...rest}>
+        <Pressable flexDirection="row" onPress={disabled ? null : onPress} style={({pressed}) => ({...style, opacity: pressed ? 0.1 : 1})} {...rest}>
             <View style={style}>
-                <Text style={labelStyle}>{label}</Text>
+                <Text style={textStyle}>{label}</Text>
             </View>
         </Pressable>
     );

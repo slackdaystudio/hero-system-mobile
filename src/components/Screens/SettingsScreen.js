@@ -180,25 +180,25 @@ export const SettingsScreen = ({navigation}) => {
                         <View alignSelf="center">
                             <Text style={styles.boldGrey}>Form data</Text>
                         </View>
-                        <Button small label="Clear" onPress={() => clearFormData()} />
+                        <Button label="Clear" style={styles.buttonTiny} onPress={() => clearFormData()} />
                     </View>
                     <View flexDirection="row" justifyContent="space-between" style={{paddingBottom: verticalScale(10)}}>
                         <View alignSelf="center">
                             <Text style={styles.boldGrey}>Loaded characters</Text>
                         </View>
-                        <Button small label="Clear" onPress={() => _clearCharacterData()} />
+                        <Button label="Clear" style={styles.buttonTiny} onPress={() => _clearCharacterData()} />
                     </View>
                     <View flexDirection="row" justifyContent="space-between" style={{paddingBottom: verticalScale(10)}}>
                         <View alignSelf="center">
                             <Text style={styles.boldGrey}>H.E.R.O.</Text>
                         </View>
-                        <Button small label="Clear" onPress={() => clearHeroData()} />
+                        <Button label="Clear" style={styles.buttonTiny} onPress={() => clearHeroData()} />
                     </View>
                     <View flexDirection="row" justifyContent="space-between" style={{paddingBottom: verticalScale(10)}}>
                         <View alignSelf="center">
                             <Text style={styles.boldGrey}>Statistics</Text>
                         </View>
-                        <Button small label="Clear" onPress={() => clearStatisticsData()} />
+                        <Button label="Clear" style={styles.buttonTiny} onPress={() => clearStatisticsData()} />
                     </View>
                 </View>
                 <View style={[styles.buttonContainer, {paddingTop: verticalScale(20), paddingBottom: verticalScale(20)}]}>

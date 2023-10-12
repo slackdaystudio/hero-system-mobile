@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {CalculatorInput as BaseCalculatorInput} from 'react-native-calculator';
 import {verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
@@ -36,7 +36,7 @@ export default class CalculatorInput extends Component {
                         displayTextAlign="left"
                     />
                 </View>
-                <View style={{flex: 1}} flexDirection="row" alignItems="flex-start" marginTop={verticalScale(-5)}>
+                <View style={{flex: 1}} flexDirection="row" alignItems="flex-start" marginTop={verticalScale(Platform.OS === 'ios' ? -8 : -5)}>
                     <Icon
                         name="calculator"
                         size={verticalScale(18)}

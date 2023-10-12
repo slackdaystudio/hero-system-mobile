@@ -303,8 +303,8 @@ class StatusDialog extends Component {
                                 </View>
                                 {this._renderSecondaryControls()}
                                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
-                                    <Button label="Apply" onPress={() => this._onApply()} />
-                                    <Button label="Cancel" style={styles.button} onPress={() => this.props.onClose()} />
+                                    <Button small label="Apply" onPress={() => this._onApply()} />
+                                    <Button small label="Cancel" style={styles.button} onPress={() => this.props.onClose()} />
                                 </View>
                             </View>
                         </VirtualizedList>

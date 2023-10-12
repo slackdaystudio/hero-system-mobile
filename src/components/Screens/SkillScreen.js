@@ -9,7 +9,6 @@ import Header from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
 import styles from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
-import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -64,32 +63,30 @@ export const SkillScreen = ({navigation}) => {
     };
 
     return (
-        <VirtualizedList flex={1}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <Header navigation={navigation} />
-                <Text style={styles.heading}>Roll 3d6</Text>
-                <View paddingHorizontal={scale(10)}>
-                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                        <Text style={styles.grey}>Is skill check?</Text>
-                        <View style={{paddingRight: scale(10)}}>
-                            <Switch
-                                value={skillForm.skillCheck}
-                                onValueChange={() => _updateFormValue('skillCheck', !skillForm.skillCheck)}
-                                minimumTrackTintColor="#14354d"
-                                maximumTrackTintColor="#14354d"
-                                thumbColor="#14354d"
-                                trackColor={{false: '#000', true: '#3d5478'}}
-                                ios_backgroundColor="#3d5478"
-                            />
-                        </View>
-                    </View>
-                    {renderSlider()}
-                    <View style={styles.buttonContainer}>
-                        <Button label="Roll" style={styles.button} onPress={roll} />
+        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+            <Header navigation={navigation} />
+            <Text style={styles.heading}>Roll 3d6</Text>
+            <View paddingHorizontal={scale(10)}>
+                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                    <Text style={styles.grey}>Is skill check?</Text>
+                    <View style={{paddingRight: scale(10)}}>
+                        <Switch
+                            value={skillForm.skillCheck}
+                            onValueChange={() => _updateFormValue('skillCheck', !skillForm.skillCheck)}
+                            minimumTrackTintColor="#14354d"
+                            maximumTrackTintColor="#14354d"
+                            thumbColor="#14354d"
+                            trackColor={{false: '#000', true: '#3d5478'}}
+                            ios_backgroundColor="#3d5478"
+                        />
                     </View>
                 </View>
-            </ImageBackground>
-        </VirtualizedList>
+                {renderSlider()}
+                <View style={styles.buttonContainer}>
+                    <Button label="Roll" style={styles.button} onPress={roll} />
+                </View>
+            </View>
+        </ImageBackground>
     );
 };
 

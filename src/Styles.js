@@ -79,18 +79,14 @@ export default ScaledSheet.create({
         borderRadius: '5@vs',
     },
     buttonTiny: {
-        backgroundColor: '#14354d',
-        maxWidth: '100%',
-        maxHeight: '28@vs',
-        justifyContent: 'center',
-        alignSelf: 'center',
+        minWidth: '80@s',
+        height: '28@vs',
     },
     buttonText: {
         fontWeight: 'bold',
         fontSize: '14@vs',
         color: '#e8e8e8',
         textTransform: 'uppercase',
-        paddingHorizontal: '20@s',
     },
     grey: {
         fontSize: '14@vs',
