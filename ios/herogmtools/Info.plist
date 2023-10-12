@@ -41,30 +41,17 @@
 	</dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Fontisto.ttf</string>
-		<string>Octicons.ttf</string>
-		<string>Feather.ttf</string>
-		<string>Roboto_medium.ttf</string>
-		<string>Entypo.ttf</string>
-		<string>FontAwesome5_Brands.ttf</string>
-		<string>MaterialCommunityIcons.ttf</string>
-		<string>AntDesign.ttf</string>
-		<string>Foundation.ttf</string>
-		<string>Ionicons.ttf</string>
-		<string>FontAwesome5_Solid.ttf</string>
-		<string>FontAwesome5_Regular.ttf</string>
-		<string>rubicon-icon-font.ttf</string>
+		<string>FontAwesome6_Regular.ttf</string>
 		<string>FontAwesome.ttf</string>
-		<string>Zocial.ttf</string>
-		<string>Roboto.ttf</string>
-		<string>EvilIcons.ttf</string>
-		<string>SimpleLineIcons.ttf</string>
+		<string>FontAwesome6_Solid.ttf</string>
+		<string>FontAwesome6_Brands.ttf</string>
+		<string>Feather.ttf</string>
 		<string>MaterialIcons.ttf</string>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
-	<string>HSM Launch Screen.storyboard</string>
+	<string>LaunchScreen.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
