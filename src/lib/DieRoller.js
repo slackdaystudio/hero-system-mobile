@@ -162,7 +162,7 @@ class DieRoller {
         for (let roll of resultRoll.rolls) {
             if (roll >= 2 && roll <= 5) {
                 body += 1;
-            } else if (roll === ROLL_MIN) {
+            } else if (roll === D6_MAX) {
                 body += 2;
             }
         }
