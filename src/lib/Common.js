@@ -1,7 +1,6 @@
 import {Dimensions, Platform} from 'react-native';
 import Toast from 'react-native-toast-message';
-import camelCase from 'camelcase';
-import snakeCase from 'snake-case';
+import * as changeCase from 'change-case';
 import merge from 'deepmerge';
 import {PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE} from './DieRoller';
 
@@ -189,11 +188,11 @@ class Common {
     }
 
     toCamelCase(text) {
-        return camelCase(text);
+        return changeCase.camelCase(text);
     }
 
     toSnakeCase(text) {
-        return snakeCase(text);
+        return changeCase.snakeCase(text);
     }
 
     capitalize(word) {

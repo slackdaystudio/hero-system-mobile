@@ -71,7 +71,7 @@ export default class HandToHandAttack extends CharacterTrait {
 
         dice += heroDesignerCharacter.getCharacteristicTotal('STR', character) / 5;
 
-        if (parseFloat((dice % 1).toFixed(1)) != 0.0) {
+        if (parseFloat((dice % 1).toFixed(1)) !== 0.0) {
             partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.6 ? true : false;
             dice = Math.trunc(dice);
         }

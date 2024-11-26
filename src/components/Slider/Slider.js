@@ -20,7 +20,7 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const Slider = ({label, value, step, min, max, disabled, valueKey, onValueChange, toggleTabsLocked}) => {
+export const Slider = ({label, value, step, min, max, disabled = false, valueKey, onValueChange, toggleTabsLocked = () => {}}) => {
     const [textValue, setTextValue] = useState(value);
 
     useFocusEffect(
@@ -125,11 +125,6 @@ Slider.propTypes = {
     valueKey: PropTypes.string,
     onValueChange: PropTypes.func.isRequired,
     toggleTabsLocked: PropTypes.func,
-};
-
-Slider.defaultProps = {
-    toggleTabsLocked: () => {},
-    disabled: false,
 };
 
 const localStyles = ScaledSheet.create({

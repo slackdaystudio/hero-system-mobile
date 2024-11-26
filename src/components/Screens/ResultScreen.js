@@ -10,7 +10,6 @@ import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {Die, DisappearingButton} from '../Animated';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT, PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {statistics} from '../../lib/Statistics';
-import {selectResultData} from '../../reducers/selectors';
 import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import styles from '../../Styles';
@@ -30,7 +29,11 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export const ResultScreen = ({route, navigation}) => {
-    const {playSounds, onlyDiceSounds, useFifthEdition} = useSelector((state) => selectResultData(state));
+    const playSounds = useSelector((state) => state.settings.playSounds);
+
+    const onlyDiceSounds = useSelector((state) => state.settings.onlyDiceSounds);
+
+    const useFifthEdition = useSelector((state) => state.settings.useFifthEdition);
 
     const [result, setResult] = useState(route.params.result);
 

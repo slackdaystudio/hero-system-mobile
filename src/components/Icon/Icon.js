@@ -19,7 +19,7 @@ import {TEXT_COLOR} from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const Icon = ({name, size, color, onPress, onLongPress, ...rest}) => {
+export const Icon = ({name, size = verticalScale(14), color = TEXT_COLOR, onPress, onLongPress, ...rest}) => {
     if (typeof onPress === 'function') {
         return (
             <Pressable active onPress={() => onPress()} onLongPress={() => onLongPress()} style={({pressed}) => [{}, {opacity: pressed ? 0.1 : 1}]}>
@@ -38,9 +38,4 @@ Icon.propTypes = {
     size: PropTypes.number,
     color: PropTypes.string,
     onPress: PropTypes.func,
-};
-
-Icon.defaultProps = {
-    size: verticalScale(14),
-    color: TEXT_COLOR,
 };

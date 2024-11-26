@@ -114,9 +114,4 @@ export const Animated = ({animationProps, children}) => {
 
 Animated.propTypes = {
     animatableProps: PropTypes.object,
-    showAnimations: PropTypes.bool,
-};
-
-Animated.defaultProps = {
-    showAnimations: false,
 };

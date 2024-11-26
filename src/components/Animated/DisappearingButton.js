@@ -11,7 +11,16 @@ const DISABLED_OPACITY = 0.5;
 
 const ENABLED_OPACITY = 1.0;
 
-export const DisappearingButton = ({label, onPress, delay, animationProps}) => {
+const DEFAULT_ANIMATION_PROPS = {
+    from: {
+        opacity: 0,
+    },
+    to: {
+        opacity: 1,
+    },
+};
+
+export const DisappearingButton = ({label, onPress, delay = 2000, animationProps = DEFAULT_ANIMATION_PROPS}) => {
     const [isDisabled, setIsDisabled] = useState(true);
 
     const animationState = useAnimationState(animationProps);
@@ -70,19 +79,7 @@ export const DisappearingButton = ({label, onPress, delay, animationProps}) => {
 };
 
 DisappearingButton.propTypes = {
-    animationProps: PropTypes.object.isRequired,
+    animationProps: PropTypes.object,
     onPress: PropTypes.func.isRequired,
     delay: PropTypes.number,
-};
-
-DisappearingButton.defaultProps = {
-    animationProps: {
-        from: {
-            opacity: 0,
-        },
-        to: {
-            opacity: 1,
-        },
-    },
-    delay: 2000,
 };

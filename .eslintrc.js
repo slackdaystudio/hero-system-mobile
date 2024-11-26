@@ -1,7 +1,7 @@
 module.exports = {
     root: true,
     extends: '@react-native',
-    plugins: [],
+    plugins: ['prettier'],
     rules: {
         indent: ['error', 4, {SwitchCase: 1}],
         'react-native/no-inline-styles': 0,

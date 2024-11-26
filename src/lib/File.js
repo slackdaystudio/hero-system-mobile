@@ -350,7 +350,7 @@ class File {
         let extensionParts = character.image.fileName.split('.');
         let extension = extensionParts[extensionParts.length - 1];
 
-        return `data:image/${extension};base64,${{...character.image}._.replace(/\n/g, '')}`;
+        return `data:image/${extension};base64,${{...character.image}._.replace(/\r\n|\n|\r/g, '')}`;
     }
 
     async _initCharacterState(character, filename) {

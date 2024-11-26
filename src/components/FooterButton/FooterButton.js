@@ -20,7 +20,7 @@ import {styles, TEXT_COLOR} from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const FooterButton = ({label, iconName, onPress, onLongPress, circular}) => {
+export const FooterButton = ({label, iconName, onPress, onLongPress}) => {
     return (
         <View alignItems="center" justifyItems="center">
             <CircleButton
@@ -38,9 +38,4 @@ FooterButton.propTypes = {
     iconName: PropTypes.string.isRequired,
     onPress: PropTypes.func.isRequired,
     onLongPress: PropTypes.func,
-    circular: PropTypes.bool,
-};
-
-FooterButton.defaultProps = {
-    circular: false,
 };

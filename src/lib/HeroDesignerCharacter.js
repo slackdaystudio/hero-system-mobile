@@ -562,7 +562,7 @@ class HeroDesignerCharacter {
     }
 
     _isResistent(power) {
-        if (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR') {
+        if (power?.xmlid && (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR')) {
             return true;
         }
 
@@ -706,7 +706,7 @@ class HeroDesignerCharacter {
 
     _getCharacteristicNcm(templateCharacteristic) {
         if (Array.isArray(templateCharacteristic.adder)) {
-            let adder = templateCharacteristic.adder.filter((adder) => adder.xmlid === 'IMPROVEDNONCOMBAT')[0];
+            let adder = templateCharacteristic.adder.filter((a) => a.xmlid === 'IMPROVEDNONCOMBAT')[0];
 
             return adder.lvlval * adder.lvlmultiplier;
         }
@@ -1125,7 +1125,7 @@ class HeroDesignerCharacter {
     }
 
     _getUnusualDefensePoints(defenses, unusualDefense, character) {
-        let points = unusualDefense.levels;
+        let points = unusualDefense.levels || 0;
 
         if (unusualDefense.xmlid === 'MENTALDEFENSE' && heroDesignerCharacter.isFifth(character)) {
             points += common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', character) / 5);

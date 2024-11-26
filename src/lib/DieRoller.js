@@ -35,7 +35,7 @@ class DieRoller {
     }
 
     rollCheck(threshold = null) {
-        let regex = /^([0-9]+\-|[0-9]+\-\s\/\s[0-9]+\-)$/;
+        let regex = /^([0-9]+-|[0-9]+-\s\/\s[0-9]+-)$/;
         let result = this._roll(3, SKILL_CHECK);
         result.threshold = -1;
 

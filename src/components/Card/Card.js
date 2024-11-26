@@ -17,7 +17,7 @@ import {verticalScale, scale} from 'react-native-size-matters';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const Card = ({heading, body, footer, showHorizontalLine}) => {
+export const Card = ({heading, body, footer, showHorizontalLine = true}) => {
     return (
         <View
             flex={1}
@@ -62,8 +62,4 @@ Card.propTypes = {
     body: PropTypes.object,
     footer: PropTypes.object,
     showHorizontalLine: PropTypes.bool,
-};
-
-Card.defaultProps = {
-    showHorizontalLine: true,
 };

@@ -2,19 +2,18 @@ import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {ImageBackground, View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
-// import Feather from 'react-native-vector-icons/Feather';
 import Heading from '../Heading/Heading';
 import {Button} from '../Button/Button';
 import {Icon} from '../Icon/Icon';
 import CircleText from '../CircleText/CircleText';
 import NumberPicker from '../NumberPicker/NumberPicker';
-import CalculatorInput from '../CalculatorInput/CalculatorInput';
 import StatusDialog from '../StatusDialog/StatusDialog';
 import {common} from '../../lib/Common';
 import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 import {dieRoller} from '../../lib/DieRoller';
 import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
 import styles from '../../Styles';
+import {TextInput} from 'react-native-gesture-handler';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -97,7 +96,7 @@ export default class Combat extends Component {
     }
 
     _updateCombatState(key, value) {
-        if (/^(\-)?[0-9]*$/.test(value) === false) {
+        if (/^(-)?[0-9]*$/.test(value) === false) {
             return;
         }
 
@@ -232,21 +231,22 @@ export default class Combat extends Component {
 
     _renderHealthItem(stateKey, label = null) {
         return (
-            <View style={{flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: scale(50)}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: scale(25)}}>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <Text style={styles.boldGrey}>{label === null ? stateKey.toUpperCase() : label}:</Text>
                 </View>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <View style={{alignSelf: 'center', width: scale(75)}}>
-                        <CalculatorInput
-                            itemKey={stateKey}
-                            value={this.state.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, this.props.character)}
-                            onAccept={this.updateCombatState}
-                            alignment="flex-end"
+                        <TextInput
+                            style={styles.textInput}
+                            keyboardType="numeric"
+                            maxLength={3}
+                            defaultValue={this.state.combatDetails[stateKey].toString()}
+                            onEndEditing={(event) => this.updateCombatState(stateKey, event.nativeEvent.text)}
                         />
                     </View>
                 </View>
-                <View>
+                <View marginLeft={scale(25)}>
                     <Button
                         label="Reset"
                         style={styles.buttonTiny}

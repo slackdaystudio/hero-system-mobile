@@ -1,6 +1,6 @@
 import React, {useRef, useEffect} from 'react';
 import {AppState, Image, SafeAreaView} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createDrawerNavigator, DrawerContentScrollView, DrawerItemList} from '@react-navigation/drawer';
 import {configureStore} from '@reduxjs/toolkit';
@@ -47,6 +47,7 @@ import currentVersion from './public/version.json';
 export const sounds = {};
 
 const MyTheme = {
+    ...DefaultTheme,
     dark: true,
     colors: {
         primary: '#1b1d1f',
@@ -163,7 +164,7 @@ export const getRandomNumber = (min, max, rolls = 1, increaseEntropyOveride = un
 };
 
 const drawerIcon = (name) => {
-    return <Icon solid name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: common.isIPad() ? 0 : scale(-20)}} />;
+    return <Icon solid name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: 0}} />;
 };
 
 export const App = () => {

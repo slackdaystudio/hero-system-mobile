@@ -20,7 +20,7 @@ import {styles} from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AccordionCard = ({title, secondaryTitle, content, footerButtons, showContent}) => {
+export const AccordionCard = ({title, secondaryTitle, content, footerButtons, showContent = false}) => {
     return (
         <Card
             heading={
@@ -53,8 +53,4 @@ AccordionCard.propTypes = {
     content: PropTypes.object,
     footerButtons: PropTypes.object,
     showContent: PropTypes.bool,
-};
-
-AccordionCard.defaultProps = {
-    showContent: false,
 };

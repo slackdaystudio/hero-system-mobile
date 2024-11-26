@@ -26,7 +26,6 @@ import {
     clearAllStatuses,
     clearStatus,
 } from '../../reducers/character';
-import {selectCharacterData} from '../../reducers/selectors';
 import styles from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -186,7 +185,11 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
 
     const {width} = useWindowDimensions();
 
-    const {character, characters, forms} = useSelector((state) => selectCharacterData(state));
+    const character = useSelector((state) => state.character.character);
+
+    const characters = useSelector((state) => state.character.characters);
+
+    const forms = useSelector((state) => state.forms);
 
     const [index, setIndex] = useState(0);
 

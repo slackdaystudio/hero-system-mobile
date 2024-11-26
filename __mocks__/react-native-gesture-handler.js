@@ -1,6 +1,4 @@
-/* eslint-disable no-undef */
 jest.mock('react-native-gesture-handler', () => {
-    // eslint-disable-next-line global-require
     const View = require('react-native/Libraries/Components/View/View');
     return {
         Swipeable: View,
