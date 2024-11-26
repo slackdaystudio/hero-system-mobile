@@ -88,7 +88,7 @@ export const EffectScreen = ({navigation}) => {
             <Header navigation={navigation} />
             <Heading text="Effect Roll" />
             <View>
-                <Slider label="Dice:" value={effectForm.dice} step={1} min={0} max={50} onValueChange={setSliderState} valueKey="dice" />
+                <Slider label="Dice:" value={effectForm.dice} step={1} min={1} max={50} onValueChange={setSliderState} valueKey="dice" />
             </View>
             <View>
                 <DropDownPicker
