@@ -204,7 +204,7 @@ class DieRoller {
             partialDieType: partialDieType || PARTIAL_DIE_NONE,
         };
 
-        resultRoll.rolls = getRandomNumber(ROLL_MIN, D6_MAX, dice);
+        resultRoll.rolls = [getRandomNumber(ROLL_MIN, D6_MAX, dice)].flat();
         resultRoll.total = resultRoll.rolls.reduce((total, current) => total + current, 0);
 
         if (partialDieType === PARTIAL_DIE_PLUS_ONE) {
