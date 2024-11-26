@@ -103,8 +103,8 @@ android {
         applicationId "com.herogmtools"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 57
-        versionName "2.1.11"
+        versionCode 58
+        versionName "2.1.12"
     }
 
     splits {
