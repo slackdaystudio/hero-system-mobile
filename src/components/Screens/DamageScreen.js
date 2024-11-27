@@ -42,7 +42,7 @@ const DamageRoute = ({damageForm, picker, setOpen, setValue, setItems, updateFor
                         label="Dice:"
                         value={parseInt(damageForm.dice, 10)}
                         step={1}
-                        min={damageForm.killingToggled ? 0 : 1}
+                        min={0}
                         max={50}
                         onValueChange={(value) => updateForm('dice', value)}
                     />
