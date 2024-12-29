@@ -32,6 +32,8 @@ export const SkillScreen = ({navigation}) => {
     const roll = () => {
         const threshold = skillForm.skillCheck ? skillForm.value + '-' : null;
 
+        console.log('threshold', threshold);
+
         navigation.navigate('Result', {from: 'Skill', result: dieRoller.rollCheck(threshold)});
     };
 
@@ -53,7 +55,7 @@ export const SkillScreen = ({navigation}) => {
                     step={1}
                     min={-30}
                     max={30}
-                    onValueChange={updateFormValue}
+                    onValueChange={_updateFormValue}
                     valueKey="value"
                 />
             );
