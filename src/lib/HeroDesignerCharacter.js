@@ -356,14 +356,19 @@ class HeroDesignerCharacter {
     _getTotalCharacteristicPoints(characteristic, value, showSecondary) {
         if (Array.isArray(characteristic)) {
             for (let char of characteristic) {
-                value += this._getTotalCharacteristicPoints(char, value, showSecondary);
+                if (
+                    (characteristic.affectsPrimary && characteristic.affectsTotal) ||
+                    (!characteristic.affectsPrimary && characteristic.affectsTotal && showSecondary)
+                ) {
+                    value += this._getTotalCharacteristicPoints(char, value, showSecondary);
+                }
             }
         } else {
             if (
                 (characteristic.affectsPrimary && characteristic.affectsTotal) ||
                 (!characteristic.affectsPrimary && characteristic.affectsTotal && showSecondary)
             ) {
-                value += characteristic.levels;
+                value += parseInt(characteristic.levels, 10);
             }
         }
 
