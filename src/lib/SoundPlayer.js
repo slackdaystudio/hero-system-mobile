@@ -24,24 +24,27 @@ const DEFAULT_SFX_NAME = 'Default';
 
 const DEFAULT_SOUND = 'dice';
 
-const VOLUME = {
-    electricity: 0.1,
-};
+const VOLUME = {electricity: 0.1};
 
 class SoundPlayer {
     play(name) {
-        name = this._getClipName(name);
+        try {
+            name = this._getClipName(name);
 
-        if (!sounds.hasOwnProperty(name)) {
-            this.initialize(name);
-        } else {
-            let clip = sounds[DEFAULT_SOUND];
+            if (!sounds.hasOwnProperty(name)) {
+                this.initialize(name);
+            } else {
+                let clip = sounds[DEFAULT_SOUND];
 
-            if (sounds[name].initialized) {
-                clip = sounds[name];
+                if (sounds[name].initialized) {
+                    clip = sounds[name];
+                }
+
+                this._playClip(clip);
             }
-
-            this._playClip(clip);
+        } catch (error) {
+            // Ignore errors
+            console.log('Error playing sound:', error);
         }
     }
 
@@ -66,11 +69,7 @@ class SoundPlayer {
             return null;
         }
 
-        let clip = {
-            initialized: false,
-            sound: null,
-            volume: 1.0,
-        };
+        let clip = {initialized: false, sound: null, volume: 1.0};
 
         let sound = new Sound(`${name}.mp3`, Sound.MAIN_BUNDLE, (error) => {
             if (error) {

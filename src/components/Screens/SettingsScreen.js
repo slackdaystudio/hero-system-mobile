@@ -13,7 +13,6 @@ import {clearAllCharacters} from '../../reducers/character';
 import {clearRandomHero} from '../../reducers/randomHero';
 import {clearApplicationSettings, toggleSetting} from '../../reducers/settings';
 import {clearStatistics} from '../../reducers/statistics';
-import {selectSettingsData} from '../../reducers/selectors';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -33,7 +32,9 @@ import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 export const SettingsScreen = ({navigation}) => {
     const dispatch = useDispatch();
 
-    const {settings, version} = useSelector((state) => selectSettingsData(state));
+    const settings = useSelector((state) => state.settings);
+
+    const version = useSelector((state) => state.version);
 
     const clearFormData = (showToast = true) => {
         dispatch(resetForm({formName: 'skill'}));
@@ -42,6 +43,11 @@ export const SettingsScreen = ({navigation}) => {
         dispatch(resetForm({formName: 'effect'}));
         dispatch(resetForm({formName: 'costCruncher'}));
         dispatch(resetForm({formName: 'status'}));
+        dispatch(resetForm({formName: 'playSounds'}));
+        dispatch(resetForm({formName: 'onlyDiceSounds'}));
+        dispatch(resetForm({formName: 'showAnimations'}));
+        dispatch(resetForm({formName: 'increaseEntropy'}));
+        dispatch(resetForm({formName: 'useFifthEdition'}));
 
         if (showToast) {
             common.toast('Form data has been cleared', 'success');

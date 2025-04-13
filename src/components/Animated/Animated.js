@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {useSelector} from 'react-redux';
 import {MotiView, useAnimationState} from 'moti';
 
@@ -110,8 +109,4 @@ export const Animated = ({animationProps, children}) => {
     }
 
     return <>{children}</>;
-};
-
-Animated.propTypes = {
-    animatableProps: PropTypes.object,
 };

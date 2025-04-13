@@ -19,7 +19,7 @@ const settingsSlice = createSlice({
     initialState: {
         useFifthEdition: false,
         playSounds: true,
-        onlyDiceSounds: false,
+        onlyDiceSounds: true,
         showAnimations: true,
         increaseEntropy: true,
     },

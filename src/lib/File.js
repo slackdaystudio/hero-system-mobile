@@ -1,5 +1,5 @@
 import {Platform} from 'react-native';
-import DocumentPicker from 'react-native-document-picker';
+import {errorCodes, keepLocalCopy, pick, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import xml2js from 'react-native-xml2js';
 import {zip, unzip} from 'react-native-zip-archive';
@@ -47,8 +47,8 @@ class File {
         let character = null;
 
         try {
-            const result = await DocumentPicker.pickSingle({
-                type: [DocumentPicker.types.allFiles, 'public.item'],
+            const [result] = await pick({
+                type: [types.allFiles, 'public.item'],
                 copyTo: 'cachesDirectory',
             });
 
@@ -56,10 +56,20 @@ class File {
                 return;
             }
 
-            result.fileCopyUri = Platform.OS === 'ios' ? decodeURIComponent(result.fileCopyUri) : result.fileCopyUri;
+            const [localCopy] = await keepLocalCopy({
+                files: [
+                    {
+                        uri: result.uri,
+                        fileName: result.name ?? 'fallbackName',
+                    },
+                ],
+                destination: 'cachesDirectory',
+            });
+
+            result.fileCopyUri = Platform.OS === 'ios' ? decodeURIComponent(localCopy.localUri) : localCopy.localUri;
 
             if (result.name.toLowerCase().endsWith(`.${EXT_HD}`)) {
-                const rawXml = await this._getRawXm(result.fileCopyUri);
+                const rawXml = await this._getRawXm(localCopy.localUri);
                 const parsedXml = await this._loadHdcCharacter(rawXml);
 
                 if (parsedXml.hasOwnProperty('image')) {
@@ -72,7 +82,7 @@ class File {
 
                 await this._saveCharacter(character, result.name);
             } else if (result.name.toLowerCase().endsWith(`.${EXT_CHARACTER}`)) {
-                character = await this._read(result.name, result.fileCopyUri, startLoad, endLoad, EXT_CHARACTER);
+                character = await this._read(result.name, localCopy.localUri, startLoad, endLoad, EXT_CHARACTER);
             } else {
                 common.toast('Unsupported file type: ' + result.type);
 
@@ -86,10 +96,8 @@ class File {
 
             return character;
         } catch (error) {
-            const isCancel = DocumentPicker.isCancel(error);
-
-            if (!isCancel) {
-                console.error(error.message);
+            if (error.code !== errorCodes.OPERATION_CANCELED) {
+                common.toast(error.message);
             }
         }
     }

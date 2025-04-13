@@ -45,7 +45,7 @@ export default class Header extends Component {
 
     render() {
         return (
-            <View flex={1} style={{maxHeight: verticalScale(Platform.OS === 'ios' ? 85 : 55)}}>
+            <View flex={1} style={{maxHeight: verticalScale(Platform.OS === 'ios' ? 85 : 55), marginTop: verticalScale(Platform.OS === 'ios' ? 20 : 40)}}>
                 <StatusBar backgroundColor="#1b1d1f" barStyle="light-content" />
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                     <View style={{flex: 1}}>
