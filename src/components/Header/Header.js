@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {BackHandler, Platform, View, Image, TouchableHighlight, StatusBar} from 'react-native';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
+import {Colors} from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -45,15 +46,15 @@ export default class Header extends Component {
 
     render() {
         return (
-            <View flex={1} style={{maxHeight: verticalScale(Platform.OS === 'ios' ? 85 : 55), marginTop: verticalScale(Platform.OS === 'ios' ? 20 : 40)}}>
-                <StatusBar backgroundColor="#1b1d1f" barStyle="light-content" />
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+            <View style={localStyles.header}>
+                <StatusBar barStyle="light-content" />
+                <View style={{flex: 1, paddingTop: 50, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.primary}}>
                     <View style={{flex: 1}}>
-                        <Icon name="chevron-left" style={{fontSize: verticalScale(18), color: 'white'}} onPress={() => this._onBackButtonPress()} />
+                        <Icon name="chevron-left" style={{fontSize: verticalScale(18), color: Colors.tertiary}} onPress={() => this._onBackButtonPress()} />
                     </View>
                     <View style={{flex: 4}}>
                         <View style={localStyles.logo}>
-                            <TouchableHighlight underlayColor="#000" onPress={() => this.props.navigation.navigate('Home')}>
+                            <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => this.props.navigation.navigate('Home')}>
                                 <Image style={{height: scale(60), width: scale(138)}} source={require('../../../public/hero_mobile_logo.png')} />
                             </TouchableHighlight>
                         </View>
@@ -61,7 +62,7 @@ export default class Header extends Component {
                     <View style={{flex: 1}}>
                         <Icon
                             name="bars"
-                            style={{fontSize: verticalScale(24), color: 'white', paddingBottom: Platform.OS === 'ios' ? verticalScale(30) : 0}}
+                            style={{fontSize: verticalScale(24), color: Colors.tertiary, paddingBottom: Platform.OS === 'ios' ? verticalScale(30) : 0}}
                             onPress={() => this.props.navigation.toggleDrawer()}
                         />
                     </View>
@@ -73,8 +74,10 @@ export default class Header extends Component {
 
 const localStyles = ScaledSheet.create({
     header: {
-        backgroundColor: '#000',
-        height: Platform.OS === 'ios' ? '75@vs' : '60@vs',
+        backgroundColor: Colors.primary,
+        borderBottomWidth: 0.5,
+        borderColor: Colors.characterFooter,
+        height: Platform.OS === 'ios' ? '75@vs' : '100@vs',
     },
     logo: {
         alignSelf: 'center',

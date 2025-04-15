@@ -7,7 +7,7 @@ import {scale, verticalScale} from 'react-native-size-matters';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Button} from '../Button/Button';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 
 export const STATUSES = ['Aid', 'Drain', 'Entangle', 'Flash'];
@@ -181,20 +181,20 @@ class StatusDialog extends Component {
                 <SectionedMultiSelect
                     styles={{
                         selectToggleText: [styles.grey, {marginLeft: scale(-7), width: 50}],
-                        container: {backgroundColor: '#1b1d1f', borderWidth: 1, borderColor: '#303030'},
+                        container: {backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.formControl},
                         searchBar: {backgroundColor: '#000000'},
                         searchTextInput: {color: '#ffffff'},
-                        separator: {color: '#e8e8e8'},
+                        separator: {color: Colors.background},
                     }}
                     colors={{
                         selectToggleTextColor: '#ffffff',
-                        chipColor: '#e8e8e8',
-                        primary: '#14354d',
-                        cancel: '#14354d',
-                        text: '#e8e8e8',
-                        subText: '#e8e8e8',
-                        itemBackground: '#1b1d1f',
-                        subItemBackground: '#1b1d1f',
+                        chipColor: Colors.background,
+                        primary: Colors.formControl,
+                        cancel: Colors.formControl,
+                        text: Colors.background,
+                        subText: Colors.background,
+                        itemBackground: Colors.background,
+                        subItemBackground: Colors.background,
                         searchSelectionColor: '#ffffff',
                     }}
                     items={this.items}

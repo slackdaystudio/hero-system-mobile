@@ -12,7 +12,7 @@ import Header from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
 import hitLocations from '../../../public/hitLocations.json';
 import {updateFormValue} from '../../reducers/forms';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -46,9 +46,9 @@ const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
                                 value={hitForm.isAutofire}
                                 onValueChange={() => updateForm('isAutofire', !hitForm.isAutofire)}
                                 color="#3da0ff"
-                                minimumTrackTintColor="#14354d"
-                                maximumTrackTintColor="#14354d"
-                                thumbColor="#14354d"
+                                minimumTrackTintColor={Colors.formControl}
+                                maximumTrackTintColor={Colors.primary}
+                                thumbColor={Colors.formControl}
                                 trackColor={{false: '#000', true: '#3d5478'}}
                                 ios_backgroundColor="#3d5478"
                             />

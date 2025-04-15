@@ -6,7 +6,7 @@ import {ActivityIndicator, ImageBackground, Text, View} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
-import Heading from '../Heading/Heading';
+import {Heading} from '../Heading/Heading';
 import {Icon} from '../Icon/Icon';
 import {Button} from '../Button/Button';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
@@ -17,7 +17,7 @@ import {combatDetails} from '../../lib/CombatDetails';
 import {setCharacter, clearCharacter, updateLoadedCharacters} from '../../reducers/character';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 import {character as libCharacter} from '../../lib/Character';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -267,7 +267,7 @@ export const CharactersScreen = ({navigation, route}) => {
                                 <View flex={1}>
                                     <Icon
                                         name="trash"
-                                        style={{fontSize: verticalScale(16), color: '#14354d', alignSelf: 'center', paddingTop: 0}}
+                                        style={{fontSize: verticalScale(16), color: Colors.formControl, alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => openDeleteDialog(char.name, char.fileName)}
                                     />
                                 </View>
@@ -277,7 +277,7 @@ export const CharactersScreen = ({navigation, route}) => {
                                 <View flex={1}>
                                     <Icon
                                         name="chevron-right"
-                                        style={{fontSize: verticalScale(20), color: '#e8e8e8', alignSelf: 'center', paddingTop: 0}}
+                                        style={{fontSize: verticalScale(20), color: Colors.formControl, alignSelf: 'center', paddingTop: 0}}
                                         onPress={() => onViewCharacterPress(char.fileName)}
                                     />
                                 </View>

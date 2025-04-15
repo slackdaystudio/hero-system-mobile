@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {View, Text} from 'react-native';
-import {verticalScale} from 'react-native-size-matters';
+import {View, Text, TouchableOpacity} from 'react-native';
+import {scale, verticalScale} from 'react-native-size-matters';
 import {Card} from './Card';
 import {Accordion} from '../Animated';
-import {styles} from '../../Styles';
+import styles, {Colors} from '../../Styles';
+import {Icon} from '../Icon/Icon';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -20,15 +20,55 @@ import {styles} from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AccordionCard = ({title, secondaryTitle, content, footerButtons, showContent = false}) => {
+export const AccordionCard = ({
+    title,
+    secondaryTitle,
+    content,
+    footerButtons,
+    showContent,
+    outsideBorderWidth = 0.25,
+    headingBackgroundColor = false,
+    onTitlePress,
+}) => {
+    const show = showContent === true;
+
+    const _renderBulletedLabel = (label, dieCode = undefined) => {
+        return (
+            <TouchableOpacity onPress={onTitlePress} underlayColor={Colors.secondaryForm}>
+                <View flex={1} flexDirection="row" justifyContent="flex-start" alignItems="center" marginLeft={scale(0)}>
+                    <Icon
+                        size={verticalScale(14)}
+                        name={showContent ? 'angle-down' : 'angle-right'}
+                        style={{color: Colors.text}}
+                        marginRight={scale(5)}
+                        marginTop={3}
+                    />
+                    <Text style={styles.grey}>{label}</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
     return (
         <Card
+            borderWidth={outsideBorderWidth}
+            showHorizontalLine={false}
+            headingBackgroundColor={headingBackgroundColor}
+            paddingTop={headingBackgroundColor ? verticalScale(5) : verticalScale(0)}
             heading={
-                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-between'}}>
-                    <View>{title}</View>
-                    <View>
+                <View
+                    style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingLeft: scale(10),
+                        paddingRight: scale(10),
+                    }}
+                >
+                    <View style={{marginRight: verticalScale(10), width: 0, flexGrow: 1, flex: 1}}>{_renderBulletedLabel(title)}</View>
+                    <View marginLeft={verticalScale(10)} flexDirection="row">
                         {typeof secondaryTitle === 'string' ? (
-                            <Text style={[styles.text, {lineHeight: verticalScale(50), fontSize: verticalScale(16)}]}>{secondaryTitle}</Text>
+                            <Text style={[styles.text, {lineHeight: verticalScale(15), fontSize: verticalScale(16)}]}>{secondaryTitle}</Text>
                         ) : (
                             <>{secondaryTitle}</>
                         )}
@@ -36,21 +76,20 @@ export const AccordionCard = ({title, secondaryTitle, content, footerButtons, sh
                 </View>
             }
             body={
-                <Accordion animationProps={{collapsed: !showContent, duration: 500}}>
-                    <View flex={1} marginBottom={showContent ? verticalScale(10) : 0}>
+                <Accordion animationProps={{collapsed: !show, duration: 500}}>
+                    <View
+                        flex={1}
+                        marginTop={verticalScale(headingBackgroundColor ? 5 : 0)}
+                        marginBottom={show ? verticalScale(10) : 0}
+                        paddingHorizontal={scale(10)}
+                    >
                         {content}
+                    </View>
+                    <View flex={1} flexDirection="row" alignSelf="center">
+                        {footerButtons === undefined ? null : footerButtons}
                     </View>
                 </Accordion>
             }
-            footer={footerButtons === undefined ? null : footerButtons}
         />
     );
-};
-
-AccordionCard.propTypes = {
-    title: PropTypes.object.isRequired,
-    secondaryTitle: PropTypes.object.isRequired,
-    content: PropTypes.object,
-    footerButtons: PropTypes.object,
-    showContent: PropTypes.bool,
 };

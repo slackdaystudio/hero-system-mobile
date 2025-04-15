@@ -8,7 +8,7 @@ import {RadioGroup} from 'react-native-radio-buttons-group';
 import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
 import Header from '../Header/Header';
-import Heading from '../Heading/Heading';
+import {Heading} from '../Heading/Heading';
 import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
 import styles from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';

@@ -4,7 +4,7 @@ import {View, Text} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {CircleButton} from '../CircleButton';
 import {Icon} from '../Icon/Icon';
-import {styles, TEXT_COLOR} from '../../Styles';
+import {styles} from '../../Styles';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -23,11 +23,7 @@ import {styles, TEXT_COLOR} from '../../Styles';
 export const FooterButton = ({label, iconName, onPress, onLongPress}) => {
     return (
         <View alignItems="center" justifyItems="center">
-            <CircleButton
-                name={<Icon solid minWidth={scale(18)} textAlign="center" color={TEXT_COLOR} name={iconName} />}
-                onPress={onPress}
-                onLongPress={onLongPress}
-            />
+            <CircleButton name={<Icon solid minWidth={scale(18)} textAlign="center" name={iconName} />} onPress={onPress} onLongPress={onLongPress} />
             {label ? <Text style={[styles.text, {fontSize: verticalScale(10)}]}>{label}</Text> : null}
         </View>
     );

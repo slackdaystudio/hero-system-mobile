@@ -4,10 +4,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {View, ImageBackground, Text, Switch} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
-import Heading from '../Heading/Heading';
+import {Heading} from '../Heading/Heading';
 import {Button} from '../Button/Button';
 import {common} from '../../lib/Common';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import {resetForm} from '../../reducers/forms';
 import {clearAllCharacters} from '../../reducers/character';
 import {clearRandomHero} from '../../reducers/randomHero';
@@ -109,9 +109,9 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.useFifthEdition}
                             onValueChange={() => dispatch(toggleSetting({key: 'useFifthEdition', value: !settings.useFifthEdition}))}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.primary}
+                            thumbColor={Colors.formControl}
                             trackColor={{false: '#000', true: '#3d5478'}}
                             ios_backgroundColor="#3d5478"
                         />
@@ -126,9 +126,9 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.showAnimations}
                             onValueChange={() => dispatch(toggleSetting({key: 'showAnimations', value: !settings.showAnimations}))}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.formControl}
+                            thumbColor={Colors.formControl}
                             trackColor={{false: '#000', true: '#3d5478'}}
                             ios_backgroundColor="#3d5478"
                         />
@@ -140,9 +140,9 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.increaseEntropy}
                             onValueChange={() => dispatch(toggleSetting({key: 'increaseEntropy', value: !settings.increaseEntropy}))}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.formControl}
+                            thumbColor={Colors.formControl}
                             trackColor={{false: '#000', true: '#3d5478'}}
                             ios_backgroundColor="#3d5478"
                         />
@@ -157,9 +157,9 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.playSounds}
                             onValueChange={() => dispatch(toggleSetting({key: 'playSounds', value: !settings.playSounds}))}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.formControl}
+                            thumbColor={Colors.formControl}
                             trackColor={{false: '#000', true: '#3d5478'}}
                             ios_backgroundColor="#3d5478"
                         />
@@ -171,9 +171,9 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.onlyDiceSounds}
                             onValueChange={() => dispatch(toggleSetting({key: 'onlyDiceSounds', value: !settings.onlyDiceSounds}))}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.formControl}
+                            thumbColor={Colors.formControl}
                             trackColor={{false: '#000', true: '#3d5478'}}
                             ios_backgroundColor="#3d5478"
                             disabled={!settings.playSounds}

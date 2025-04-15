@@ -101,6 +101,24 @@ export const useScaleInUp = () => {
     });
 };
 
+export const useFlip = () => {
+    return useAnimationState({
+        from: {
+            rotateY: '540deg',
+            scale: 0.3,
+            opacity: 0,
+        },
+        to: {
+            rotateY: '0deg',
+            opacity: 1,
+            scale: 1,
+        },
+        animate: {
+            rotateY: '180deg',
+        },
+    });
+};
+
 export const Animated = ({animationProps, children}) => {
     const showAnimations = useSelector((state) => state.settings.showAnimations);
 

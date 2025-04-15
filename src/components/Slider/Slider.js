@@ -4,7 +4,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {View, Text, TextInput} from 'react-native';
 import {default as RNSlider} from '@react-native-community/slider';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -79,8 +79,8 @@ export const Slider = ({label, value, step, min, max, disabled = false, valueKey
 
     return (
         <View style={{paddingHorizontal: scale(20)}}>
-            <View style={localStyles.titleContainer}>
-                <Text style={styles.grey}>{label}</Text>
+            <View style={[localStyles.titleContainer, {paddingRight: scale(5)}]}>
+                <Text style={[styles.grey, {marginLeft: -15}]}>{label}</Text>
                 <View style={{width: _isFraction() ? scale(50) : scale(40)}}>
                     <TextInput
                         style={styles.textInput}
@@ -88,12 +88,14 @@ export const Slider = ({label, value, step, min, max, disabled = false, valueKey
                         maxLength={_isFraction() ? 5 : 3}
                         defaultValue={textValue.toString()}
                         onEndEditing={(event) => _onTextValueChange(event.nativeEvent.text, true)}
+                        borderWidth={0.75}
+                        borderColor={Colors.formControl}
                     />
                 </View>
             </View>
             <View>
                 <RNSlider
-                    style={{height: verticalScale(35)}}
+                    style={{height: verticalScale(35), paddingLeft: scale(25), maxWidth: '70%', transform: [{scaleX: 1.8}, {scaleY: 1.8}]}}
                     value={parseNum(textValue)}
                     step={step}
                     minimumValue={min}
@@ -106,9 +108,9 @@ export const Slider = ({label, value, step, min, max, disabled = false, valueKey
                         _onTextValueChange(val.toString(), true);
                     }}
                     disabled={disabled}
-                    minimumTrackTintColor="#ffffff"
-                    maximumTrackTintColor="#858889"
-                    thumbTintColor="#ffffff"
+                    minimumTrackTintColor={Colors.formAccent}
+                    maximumTrackTintColor={Colors.secondaryForm}
+                    thumbTintColor={Colors.formControl}
                 />
             </View>
         </View>

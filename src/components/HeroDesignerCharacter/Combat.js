@@ -2,7 +2,7 @@ import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {ImageBackground, View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
-import Heading from '../Heading/Heading';
+import {Heading} from '../Heading/Heading';
 import {Button} from '../Button/Button';
 import {Icon} from '../Icon/Icon';
 import CircleText from '../CircleText/CircleText';
@@ -12,7 +12,7 @@ import {common} from '../../lib/Common';
 import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 import {dieRoller} from '../../lib/DieRoller';
 import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import {TextInput} from 'react-native-gesture-handler';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -344,7 +344,7 @@ export default class Combat extends Component {
     }
 
     _renderPhase(phase) {
-        let color = '#303030';
+        let color = Colors.formControl;
 
         if (this.state.combatDetails.phases[phase].used) {
             color = '#FFC300';
@@ -355,7 +355,7 @@ export default class Combat extends Component {
         return (
             <View key={`phase-${phase}`} style={{paddingHorizontal: scale(5)}}>
                 <TouchableHighlight
-                    underlayColor="#1b1d1f"
+                    underlayColor={Colors.background}
                     onPress={() => this.usePhase(phase, this.props.character.showSecondary)}
                     onLongPress={() => this.abortPhase(phase)}
                 >
@@ -501,13 +501,13 @@ export default class Combat extends Component {
                                 <Icon
                                     type="FontAwesome"
                                     name="edit"
-                                    style={{fontSize: verticalScale(20), color: '#14354d', marginRight: scale(10), paddingTop: verticalScale(3)}}
+                                    style={{fontSize: verticalScale(20), color: Colors.formControl, marginRight: scale(10), paddingTop: verticalScale(3)}}
                                     onPress={() => this.editStatus(index)}
                                 />
                                 <Icon
                                     type="FontAwesome"
                                     name="trash"
-                                    style={{fontSize: verticalScale(20), color: '#14354d'}}
+                                    style={{fontSize: verticalScale(20), color: Colors.formControl}}
                                     onPress={() => this.clearStatus(index)}
                                 />
                             </View>
@@ -542,7 +542,7 @@ export default class Combat extends Component {
                                 label="Recovery"
                                 style={styles.buttonTiny}
                                 onPress={() => this.takeRecovery()}
-                                labelStyle={{fontSize: verticalScale(12), color: '#e8e8e8'}}
+                                labelStyle={{fontSize: verticalScale(12), color: Colors.background}}
                             />
                         </View>
                     </View>
@@ -553,14 +553,14 @@ export default class Combat extends Component {
                                 label="Add"
                                 style={styles.buttonTiny}
                                 onPress={() => this.openStatusDialog()}
-                                labelStyle={{fontSize: verticalScale(12), color: '#e8e8e8'}}
+                                labelStyle={{fontSize: verticalScale(12), color: Colors.background}}
                             />
                             <View style={{paddingHorizontal: scale(5)}} />
                             <Button
                                 label="Clear All"
                                 style={styles.buttonTiny}
                                 onPress={() => this.clearAllStatuses()}
-                                labelStyle={{fontSize: verticalScale(12), color: '#e8e8e8'}}
+                                labelStyle={{fontSize: verticalScale(12), color: Colors.background}}
                             />
                         </View>
                         {this._renderStatuses()}

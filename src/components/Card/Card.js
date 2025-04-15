@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {View} from 'react-native';
 import {verticalScale, scale} from 'react-native-size-matters';
+import {Colors} from '../../Styles';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -17,49 +17,38 @@ import {verticalScale, scale} from 'react-native-size-matters';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const Card = ({heading, body, footer, showHorizontalLine = true}) => {
+export const ROUNDED = 0;
+
+export const SQUARE = 1;
+
+export const Card = ({heading, body, footer, cardShape = ROUNDED}) => {
     return (
         <View
             flex={1}
-            backgroundColor="#1b1d1f"
-            borderColor="#F3EDE9"
-            borderWidth={0.25}
-            borderRadius={4}
-            paddingBottom={2}
-            marginBottom={verticalScale(5)}
-            paddingHorizontal={scale(5)}
+            backgroundColor={Colors.primary}
+            borderColor={Colors.formAccent}
+            borderWidth={0.5}
+            borderRadius={verticalScale(10)}
+            paddingTop={verticalScale(5)}
+            minHeight={verticalScale(53)}
             alignSelf="center"
-            width="95%"
+            width="100%"
         >
-            <View
-                flex={1}
-                flexDirection="row"
-                justifyContent="space-between"
-                paddingHorizontal={scale(1)}
-                paddingTop={scale(5)}
-                paddingBottom={0}
-                marginBottom={0}
-                borderBottomWidth={showHorizontalLine ? 0.25 : 0}
-                borderBottomColor="#F3EDE9"
-            >
-                {heading === undefined ? null : heading}
-            </View>
-            <View paddingHorizontal={scale(1)}>{body}</View>
-            <View
-                paddingHorizontal={scale(10)}
-                paddingTop={showHorizontalLine ? verticalScale(10) : 0}
-                borderTopWidth={showHorizontalLine ? 0.25 : 0}
-                borderTopColor="#F3EDE9"
-            >
+            {heading === undefined ? null : heading}
+            {body === undefined ? null : (
+                <View
+                    marginTop={verticalScale(10)}
+                    paddingHorizontal={scale(1)}
+                    borderBottomLeftRadius={verticalScale(cardShape === ROUNDED ? 10 : 0)}
+                    borderBottomRightRadius={verticalScale(cardShape === ROUNDED ? 10 : 0)}
+                    backgroundColor={Colors.background}
+                >
+                    {body}
+                </View>
+            )}
+            <View flexDirection="row" justifyContent="space-around" alignItems="center">
                 {footer === undefined ? null : footer}
             </View>
         </View>
     );
-};
-
-Card.propTypes = {
-    heading: PropTypes.object.isRequired,
-    body: PropTypes.object,
-    footer: PropTypes.object,
-    showHorizontalLine: PropTypes.bool,
 };

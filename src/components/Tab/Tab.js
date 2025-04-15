@@ -2,15 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {ActivityIndicator, ImageBackground, ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
 import {verticalScale, scale} from 'react-native-size-matters';
-import Heading from '../Heading/Heading';
+import {Heading} from '../Heading/Heading';
 import {common} from '../../lib/Common';
+import {Colors} from '../../Styles';
 
 export const RouteBuilder = (headingText, tab, showSpinner = false) => {
     if (showSpinner) {
         return (
             <>
                 <Heading text={headingText} />
-                <ActivityIndicator color={'#F3EDE9'} />
+                <ActivityIndicator color={Colors.text} />
             </>
         );
     }
@@ -28,7 +29,7 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
     }
 
     return (
-        <ScrollView contentContainerStyle={{flexBasis: 'auto', flexGrow: 1, backgroundColor: '#1b1d1f'}}>
+        <ScrollView contentContainerStyle={{flexBasis: 'auto', flexGrow: 1, backgroundColor: Colors.background}}>
             <View flex={1}>{tab}</View>
         </ScrollView>
     );
@@ -36,7 +37,7 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
 
 export const Tab = ({navigationState}) => {
     const _renderItem = (item, _i) => {
-        const color = navigationState.index === item.index ? '#F3EDE9' : 'rgba(193, 235, 255, 0.4)';
+        const color = navigationState.index === item.index ? Colors.text : 'rgba(193, 235, 255, 0.4)';
         const borderBottomWidth = navigationState.index === item.index ? 5 : 1;
 
         return (
@@ -44,13 +45,15 @@ export const Tab = ({navigationState}) => {
                 key={item.item.id}
                 borderBottomWidth={borderBottomWidth}
                 borderColor={color}
-                alignItems="center"
+                alignSelf="center"
                 cursor="pointer"
-                paddingHorizontal={scale(10)}
+                paddingHorizontal={scale(30)}
             >
                 <Pressable onPress={() => navigationState.setIndex(item.index)} style={{minHeight: verticalScale(40), paddingTop: verticalScale(10)}}>
-                    <Animated.Text style={{color, fontSize: verticalScale(12), lineHeight: verticalScale(15 * 1.35)}}>
-                        {item.item.title.toUpperCase()}
+                    <Animated.Text
+                        style={{color, fontVariant: 'small-caps', fontFamily: 'Roboto', fontSize: verticalScale(12), lineHeight: verticalScale(15 * 1.35)}}
+                    >
+                        {item.item.title}
                     </Animated.Text>
                 </Pressable>
             </View>
@@ -71,9 +74,8 @@ export const Tab = ({navigationState}) => {
     });
 
     return (
-        <View alignItems="center" backgroundColor="#1b1d1f">
+        <View alignItems="center" backgroundColor={Colors.background}>
             <FlatList
-                backgroundColor={'#1b1d1f'}
                 horizontal
                 pagingEnabled={false}
                 showsHorizontalScrollIndicator={true}
@@ -81,11 +83,10 @@ export const Tab = ({navigationState}) => {
                 data={data}
                 renderItem={(item, i) => _renderItem(item, i)}
                 keyExtractor={(item) => item.id}
-                style={{fontSize: verticalScale(30), backgroundColor: '#1b1d1f'}}
+                style={{backgroundColor: Colors.background, maxHeight: verticalScale(45)}}
                 contentContainerStyle={{
                     alignSelf: 'center',
                     justifyContent: 'space-around',
-                    backgroundColor: '#1b1d1f',
                 }}
             />
         </View>

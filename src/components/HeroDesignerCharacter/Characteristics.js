@@ -2,13 +2,12 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {ImageBackground, View, TouchableHighlight, Text, Switch} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
-import Heading from '../Heading/Heading';
+import {Heading} from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
-import CircleButton from '../CircleButton/CircleButton';
 import {dieRoller} from '../../lib/DieRoller';
 import {common} from '../../lib/Common';
 import {heroDesignerCharacter, TYPE_MOVEMENT} from '../../lib/HeroDesignerCharacter';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
 import speedTable from '../../../public/speed.json';
 import {AccordionCard} from '../Card/AccordionCard';
@@ -222,14 +221,14 @@ export default class Characteristics extends Component {
             }
 
             return (
-                <View paddingVertical={verticalScale(3)} style={{backgroundColor: '#1b1d1f'}}>
-                    <View style={{backgroundColor: '#1b1d1f'}}>
+                <View paddingVertical={verticalScale(3)} style={{backgroundColor: Colors.background}}>
+                    <View style={{backgroundColor: Colors.background}}>
                         {this._renderNonCombatMovement(characteristic)}
                         {this._renderStrength(characteristic)}
                         {this._renderNotes(characteristic)}
                         <Text style={styles.grey}>{definition}</Text>
                     </View>
-                    <View flexDirection="row" justifyContent="center" style={{backgroundColor: '#1b1d1f', marginTop: verticalScale(10)}}>
+                    <View flexDirection="row" justifyContent="center" style={{backgroundColor: Colors.background, marginTop: verticalScale(10)}}>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Base:</Text> {characteristic.base}
                         </Text>
@@ -409,7 +408,7 @@ export default class Characteristics extends Component {
                 unit = '"';
             }
 
-            return <CircleText title={this._getMovementTotal(characteristic, true) + unit} fontSize={18} size={55} color="#303030" />;
+            return <CircleText title={this._getMovementTotal(characteristic, true) + unit} fontSize={18} size={55} color={Colors.formControl} />;
         }
 
         return (
@@ -417,7 +416,7 @@ export default class Characteristics extends Component {
                 title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()}
                 fontSize={18}
                 size={45}
-                color="#303030"
+                color={Colors.formControl}
             />
         );
     }
@@ -437,9 +436,10 @@ export default class Characteristics extends Component {
                                     <Text style={[styles.grey, {fontSize: verticalScale(16), paddingLeft: scale(10)}]}>{name}</Text>
                                 </View>
                             }
+                            onTitlePress={() => this._toggleDefinitionShow(characteristic.shortName)}
                             secondaryTitle={
                                 <TouchableHighlight
-                                    underlayColor="#121212"
+                                    underlayColor={Colors.secondaryForm}
                                     onPress={() =>
                                         this.props.navigation.navigate('Result', {
                                             from: 'ViewHeroDesignerCharacter',
@@ -453,17 +453,6 @@ export default class Characteristics extends Component {
                                 </TouchableHighlight>
                             }
                             content={this._renderDefinition(characteristic)}
-                            footerButtons={
-                                <View flex={1} flexDirection="row" alignItems="center" justifyContent="space-around">
-                                    <CircleButton
-                                        name="eye"
-                                        size={36}
-                                        fontSize={14}
-                                        color="#e8e8e8"
-                                        onPress={() => this._toggleDefinitionShow(characteristic.shortName)}
-                                    />
-                                </View>
-                            }
                             showContent={this.state.characteristicsShow[characteristic.shortName]}
                         />
                     );
@@ -487,9 +476,9 @@ export default class Characteristics extends Component {
                         <Switch
                             value={this.props.character.showSecondary}
                             onValueChange={() => this._toggleSecondaryCharacteristics()}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.primary}
+                            thumbColor={Colors.formControl}
                             trackColor={{false: '#000', true: '#3d5478'}}
                             ios_backgroundColor="#3d5478"
                         />

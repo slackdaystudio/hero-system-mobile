@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {View, Text} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -37,7 +37,7 @@ export default class NumberPicker extends Component {
                     <Icon
                         solid
                         name="square-minus"
-                        style={[styles.grey, {fontSize: verticalScale(22), color: '#14354d', alignItems: 'flex-start'}]}
+                        style={[styles.grey, {fontSize: verticalScale(22), color: Colors.formControl, alignItems: 'flex-start'}]}
                         onPress={() => this.props.decrement(this.props.stateKey, this.props.step)}
                     />
                 </View>
@@ -48,7 +48,7 @@ export default class NumberPicker extends Component {
                     <Icon
                         solid
                         name="square-plus"
-                        style={[styles.grey, {fontSize: verticalScale(22), color: '#14354d', alignItems: 'flex-end'}]}
+                        style={[styles.grey, {fontSize: verticalScale(22), color: Colors.formControl, alignItems: 'flex-end'}]}
                         onPress={() => this.props.increment(this.props.stateKey, this.props.step)}
                     />
                 </View>

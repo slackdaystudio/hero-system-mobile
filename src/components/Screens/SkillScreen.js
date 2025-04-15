@@ -7,7 +7,7 @@ import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
 import Header from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -73,9 +73,9 @@ export const SkillScreen = ({navigation}) => {
                         <Switch
                             value={skillForm.skillCheck}
                             onValueChange={() => _updateFormValue('skillCheck', !skillForm.skillCheck)}
-                            minimumTrackTintColor="#14354d"
-                            maximumTrackTintColor="#14354d"
-                            thumbColor="#14354d"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.primary}
+                            thumbColor={Colors.formControl}
                             trackColor={{false: '#000', true: '#3d5478'}}
                             ios_backgroundColor="#3d5478"
                         />

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import {Platform, Text, View} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
+import {Colors} from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -18,15 +18,6 @@ import {verticalScale} from 'react-native-size-matters';
 // limitations under the License.
 
 export default class CircleText extends Component {
-    static propTypes = {
-        title: PropTypes.string.isRequired,
-        size: PropTypes.number.isRequired,
-        fontSize: PropTypes.number.isRequired,
-        color: PropTypes.string.isRequired,
-        fontColor: PropTypes.string,
-        backgroundColor: PropTypes.string,
-    };
-
     render() {
         const size = verticalScale(this.props.size);
         const fontSize = verticalScale(this.props.fontSize);
@@ -37,8 +28,8 @@ export default class CircleText extends Component {
                 style={{
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: this.props.backgroundColor,
-                    borderColor: this.props.color,
+                    backgroundColor: Colors.background,
+                    borderColor: Colors.formAccent,
                     width: size,
                     height: size,
                     borderRadius: size / 2,
@@ -55,7 +46,7 @@ export default class CircleText extends Component {
                         lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
                         paddingTop: verticalScale(3),
                         fontWeight: 'bold',
-                        color: this.props.fontColor,
+                        color: Colors.text,
                     }}
                 >
                     {this.props.title}
@@ -64,8 +55,3 @@ export default class CircleText extends Component {
         );
     }
 }
-
-CircleText.defaultProps = {
-    fontColor: '#F3EDE9',
-    backgroundColor: '#000',
-};

@@ -6,6 +6,7 @@ import {Icon} from '../Icon/Icon';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 import {common} from '../../lib/Common';
+import {Colors} from '../../Styles';
 
 export default class HeroDesignerCharacterFooter extends Component {
     static propTypes = {
@@ -55,14 +56,14 @@ export default class HeroDesignerCharacterFooter extends Component {
     _getFooterButtonStyle(slot) {
         if (this._isSlotFilled(slot) && this._isCharacterSelected(slot)) {
             return {
-                backgroundColor: '#121212',
+                backgroundColor: Colors.tertiary,
                 borderWidth: 1,
-                borderColor: '#303030',
+                borderColor: Colors.formControl,
             };
         }
 
         return {
-            backgroundColor: '#000',
+            backgroundColor: Colors.tertiary,
         };
     }
 
@@ -107,21 +108,29 @@ export default class HeroDesignerCharacterFooter extends Component {
 
     render() {
         return (
-            <View>
-                <View flexDirection="row" justifyContent="space-evenly" style={{backgroundColor: '#000', paddingVertical: verticalScale(5)}}>
-                    {this.slots.map((slot) => {
-                        return (
-                            <Icon
-                                key={'character-' + slot}
-                                solid
-                                name={this._getIcon(slot)}
-                                style={{fontSize: verticalScale(23), color: '#e8e8e8'}}
-                                onPress={() => this._activateSlot(slot)}
-                                onLongPress={() => this._emptySlot(slot)}
-                            />
-                        );
-                    })}
-                </View>
+            <View
+                flexDirection="row"
+                justifyContent="space-evenly"
+                style={{
+                    backgroundColor: Colors.primary,
+                    paddingVertical: verticalScale(5),
+                    borderTopWidth: 0.5,
+                    borderColor: Colors.characterFooter,
+                    paddingBottom: verticalScale(13),
+                }}
+            >
+                {this.slots.map((slot) => {
+                    return (
+                        <Icon
+                            key={'character-' + slot}
+                            solid
+                            name={this._getIcon(slot)}
+                            style={{fontSize: verticalScale(23), color: Colors.tertiary}}
+                            onPress={() => this._activateSlot(slot)}
+                            onLongPress={() => this._emptySlot(slot)}
+                        />
+                    );
+                })}
                 <ConfirmationDialog
                     visible={this.state.deleteDialogVisible}
                     title="Remove Character?"

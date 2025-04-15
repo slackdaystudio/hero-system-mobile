@@ -7,9 +7,10 @@ import {Icon} from '../Icon/Icon';
 import {Animated} from './Animated';
 import {PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {getRandomNumber} from '../../../App';
+import {Colors} from '../../Styles';
 
 const getDieIconDetails = (face, partialDieType, isLast) => {
-    let color = partialDieType > PARTIAL_DIE_PLUS_ONE && isLast ? '#f2de00' : '#ffffff';
+    let color = partialDieType > PARTIAL_DIE_PLUS_ONE && isLast ? Colors.yellow : Colors.text;
     let iconName = null;
 
     switch (parseInt(face, 10)) {

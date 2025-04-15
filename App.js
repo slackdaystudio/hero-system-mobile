@@ -29,6 +29,7 @@ import {common} from './src/lib/Common';
 import {initialize} from './src/reducers/appState';
 import {saveCachedCharacter} from './src/reducers/character';
 import currentVersion from './public/version.json';
+import {Colors} from './src/Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -50,9 +51,9 @@ const MyTheme = {
     ...DefaultTheme,
     dark: true,
     colors: {
-        primary: '#1b1d1f',
-        background: '#1b1d1f',
-        card: '#1b1d1f',
+        primary: Colors.background,
+        background: Colors.background,
+        card: Colors.background,
     },
 };
 
@@ -62,13 +63,13 @@ const toastConfig = {
             {...props}
             style={{
                 borderColor: '#35e01b',
-                backgroundColor: '#121212',
-                color: '#e8e8e8',
+                backgroundColor: Colors.background,
+                color: Colors.background,
                 height: undefined,
                 minHeight: verticalScale(50),
                 paddingVertical: verticalScale(5),
             }}
-            text1Style={{color: '#e8e8e8', fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
+            text1Style={{color: Colors.background, fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
             text2Style={{fontSize: verticalScale(11), lineHeight: verticalScale(11 * 1.35)}}
             text2NumberOfLines={10}
         />
@@ -78,13 +79,13 @@ const toastConfig = {
             {...props}
             style={{
                 borderColor: '#e01b35',
-                backgroundColor: '#121212',
-                color: '#e8e8e8',
+                backgroundColor: Colors.background,
+                color: Colors.background,
                 height: undefined,
                 minHeight: verticalScale(50),
                 paddingVertical: verticalScale(5),
             }}
-            text1Style={{color: '#e8e8e8', fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
+            text1Style={{color: Colors.background, fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
             text2Style={{fontSize: verticalScale(11), lineHeight: verticalScale(11 * 1.35)}}
             text2NumberOfLines={10}
         />
@@ -164,7 +165,7 @@ export const getRandomNumber = (min, max, rolls = 1, increaseEntropyOveride = un
 };
 
 const drawerIcon = (name) => {
-    return <Icon solid name={name} style={{fontSize: verticalScale(14), color: '#e8e8e8', marginRight: 0}} />;
+    return <Icon solid name={name} style={{fontSize: verticalScale(14), color: Colors.tertiary, marginRight: 0}} />;
 };
 
 export const App = () => {
@@ -231,7 +232,7 @@ export const App = () => {
                                 drawerPosition: 'right',
                                 drawerContentOptions: drawerContentOptions,
                                 drawerStyle: localStyles.drawer,
-                                drawerLabelStyle: {color: '#F3EDE9'},
+                                drawerLabelStyle: {color: Colors.text},
                                 contentStyle: {
                                     backgroundColor: '#000000',
                                 },
@@ -309,20 +310,20 @@ export const App = () => {
 
 const localStyles = ScaledSheet.create({
     drawer: {
-        backgroundColor: '#1b1d1f',
+        backgroundColor: Colors.primary,
         borderWidth: 0.5,
-        borderLeftColor: '#303030',
+        borderLeftColor: Colors.secondaryForm,
         width: '180@s',
-        color: '#F3EDE9',
+        color: Colors.text,
     },
     label: {
-        color: '#F3EDE9',
+        color: Colors.text,
         fontSize: '14@vs',
     },
 });
 
 const drawerContentOptions = {
-    activeTintColor: '#172535',
+    activeTintColor: Colors.secondaryForm,
     activeBackgroundColor: '#FFECCE',
     labelStyle: localStyles.label,
 };

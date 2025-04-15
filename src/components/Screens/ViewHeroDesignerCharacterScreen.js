@@ -26,7 +26,7 @@ import {
     clearAllStatuses,
     clearStatus,
 } from '../../reducers/character';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -175,7 +175,7 @@ const NotesRoute = ({character}) => {
 };
 
 const LazyPlaceholder = ({route}) => (
-    <View style={{flex: 1, backgroundColor: '#1b1d1f'}}>
+    <View style={{flex: 1, backgroundColor: Colors.background}}>
         <Text style={[styles.grey, {textAlign: 'center'}]}>Loading {route.title}...</Text>
     </View>
 );
@@ -303,7 +303,7 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
         return (
             <>
                 <Header hasTabs={false} navigation={navigation} />
-                <ActivityIndicator color="#F3EDE9" />
+                <ActivityIndicator color={Colors.text} />
             </>
         );
     }

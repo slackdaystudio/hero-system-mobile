@@ -10,7 +10,7 @@ import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator'
 import {SKILL_CHECK, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
 import {common} from '../../lib/Common';
 import CompoundPower from '../../decorators/CompoundPower';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import {Accordion} from '../Animated';
 import {GENERIC_OBJECT} from '../../lib/HeroDesignerCharacter';
 
@@ -237,7 +237,7 @@ export default class Traits extends Component {
 
             return (
                 <>
-                    <View borderTopColor="#e8e8e8" borderTopWidth={0.5}>
+                    <View borderTopColor={Colors.background} borderTopWidth={0.5}>
                         {this._renderDefinition(item)}
                         {this._renderAdvantagesAndLimitations(item)}
                         {this._renderNotes(item)}
@@ -247,7 +247,7 @@ export default class Traits extends Component {
                             paddingTop={verticalScale(5)}
                             marginTop={verticalScale(10)}
                             borderTopWidth={0.5}
-                            borderTopColor="#e8e8e8"
+                            borderTopColor={Colors.background}
                         >
                             <View
                                 style={{
@@ -255,7 +255,7 @@ export default class Traits extends Component {
                                     flexDirection: 'row',
                                     justifyContent: 'center',
                                     borderBottomWidth: showBottomBar ? 0.5 : 0,
-                                    borderBottomColor: '#e8e8e8',
+                                    borderBottomColor: Colors.background,
                                     paddingBottom: verticalScale(8),
                                 }}
                             >
@@ -310,7 +310,7 @@ export default class Traits extends Component {
                             flexDirection: 'row',
                             justifyContent: 'center',
                             borderBottomWidth: showBottomBar ? 0.5 : 0,
-                            borderBottomColor: '#e8e8e8',
+                            borderBottomColor: Colors.background,
                             paddingBottom: verticalScale(8),
                         }}
                     >
@@ -348,7 +348,7 @@ export default class Traits extends Component {
                                         flexDirection: 'row',
                                         justifyContent: 'center',
                                         borderBottomWidth: showBottomBar ? 0.5 : 0,
-                                        borderBottomColor: '#e8e8e8',
+                                        borderBottomColor: Colors.background,
                                         paddingBottom: verticalScale(8),
                                     }}
                                 >
@@ -445,13 +445,7 @@ export default class Traits extends Component {
                                 {this._renderItemDetails(decoratedTrait)}
                             </Accordion>
                             <View flex={1} flexDirection="row" justifyContent="center">
-                                <CircleButton
-                                    name="eye"
-                                    size={25}
-                                    fontSize={12}
-                                    color="#e8e8e8"
-                                    onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
-                                />
+                                <CircleButton name="eye" size={25} fontSize={12} onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
                             </View>
                         </>
                     }
@@ -469,7 +463,7 @@ export default class Traits extends Component {
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                     <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
                     <View style={{flex: 1.75, alignItems: 'flex-end'}}>
-                        <CircleButton name="eye" size={25} fontSize={12} color="#e8e8e8" onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
+                        <CircleButton name="eye" size={25} fontSize={12} onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
                     </View>
                 </View>
             </Fragment>
@@ -506,11 +500,12 @@ export default class Traits extends Component {
                         <View key={`trait-${item.id}`} paddingBottom={verticalScale(10)}>
                             <AccordionCard
                                 title={
-                                    <Text style={[styles.boldGrey, {paddingVertical: verticalScale(5), fontSize: verticalScale(16)}]}>
+                                    <Text style={[styles.boldGrey, {paddingVertical: verticalScale(0), fontSize: verticalScale(16)}]}>
                                         {''}
                                         {decoratedTrait.label()}
                                     </Text>
                                 }
+                                onTitlePress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                                 secondaryTitle={
                                     <>
                                         <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
@@ -519,13 +514,7 @@ export default class Traits extends Component {
                                 content={this._renderItemDetails(decoratedTrait)}
                                 footerButtons={
                                     <View flex={1} flexDirection="row" justifyContent="space-around">
-                                        <CircleButton
-                                            name="eye"
-                                            size={25}
-                                            fontSize={12}
-                                            color="#e8e8e8"
-                                            onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
-                                        />
+                                        <CircleButton name="eye" size={25} fontSize={12} onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
                                     </View>
                                 }
                                 showContent={this.state.itemShow[decoratedTrait.trait.id]}

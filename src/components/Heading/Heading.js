@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import {View, Text} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
 import styles from '../../Styles';
+import {Animated, useSlideInLeft} from '../Animated';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -18,16 +18,22 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default class Heading extends Component {
-    static propTypes = {
-        text: PropTypes.string.isRequired,
-    };
+export const Heading = ({text, animated = false}) => {
+    const slideIn = useSlideInLeft();
 
-    render() {
+    if (animated) {
         return (
-            <View style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: 20}}>
-                <Text style={styles.heading}>{this.props.text}</Text>
-            </View>
+            <Animated animationProps={{duration: 3000, delay: 800, state: slideIn}} style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: 20}}>
+                <View style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: verticalScale(48)}}>
+                    <Text style={styles.heading}>{text}</Text>
+                </View>
+            </Animated>
         );
     }
-}
+
+    return (
+        <View style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: 20}}>
+            <Text style={styles.heading}>{text}</Text>
+        </View>
+    );
+};
