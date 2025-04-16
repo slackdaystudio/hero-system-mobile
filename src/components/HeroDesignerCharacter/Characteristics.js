@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, View, TouchableHighlight, Text, Switch} from 'react-native';
+import {View, TouchableHighlight, Text, Switch} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {Heading} from '../Heading/Heading';
 import CircleText from '../CircleText/CircleText';
@@ -423,41 +423,49 @@ export default class Characteristics extends Component {
 
     _renderCharacteristics(characteristics) {
         return (
-            <View paddingTop={verticalScale(20)}>
+            <>
                 {characteristics.map((characteristic, index) => {
                     let name = characteristic.name.toLowerCase().startsWith('custom') ? characteristic.shortName : characteristic.name;
 
                     return (
-                        <AccordionCard
-                            key={`characteristic-${index}`}
-                            title={
-                                <View flex={1} flexDirection="row" alignItems="center" paddingBottom={verticalScale(5)}>
-                                    {this._renderStat(characteristic)}
-                                    <Text style={[styles.grey, {fontSize: verticalScale(16), paddingLeft: scale(10)}]}>{name}</Text>
-                                </View>
-                            }
-                            onTitlePress={() => this._toggleDefinitionShow(characteristic.shortName)}
-                            secondaryTitle={
-                                <TouchableHighlight
-                                    underlayColor={Colors.secondaryForm}
-                                    onPress={() =>
-                                        this.props.navigation.navigate('Result', {
-                                            from: 'ViewHeroDesignerCharacter',
-                                            result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character)),
-                                        })
-                                    }
-                                >
-                                    <Text style={[styles.grey, {fontSize: verticalScale(16), paddingLeft: scale(10)}]}>
-                                        {heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}
-                                    </Text>
-                                </TouchableHighlight>
-                            }
-                            content={this._renderDefinition(characteristic)}
-                            showContent={this.state.characteristicsShow[characteristic.shortName]}
-                        />
+                        <View key={`characteristic-${index}`} marginBottom={verticalScale(5)}>
+                            <AccordionCard
+                                title={
+                                    <View flex={1} flexDirection="row" alignItems="center" paddingTop={verticalScale(2)}>
+                                        {this._renderStat(characteristic)}
+                                        <Text
+                                            style={[
+                                                styles.grey,
+                                                {fontSize: verticalScale(16), paddingLeft: scale(10), fontFamily: 'Roboto', fontVariant: 'small-caps'},
+                                            ]}
+                                        >
+                                            {name}
+                                        </Text>
+                                    </View>
+                                }
+                                onTitlePress={() => this._toggleDefinitionShow(characteristic.shortName)}
+                                secondaryTitle={
+                                    <TouchableHighlight
+                                        underlayColor={Colors.secondaryForm}
+                                        onPress={() =>
+                                            this.props.navigation.navigate('Result', {
+                                                from: 'ViewHeroDesignerCharacter',
+                                                result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character)),
+                                            })
+                                        }
+                                    >
+                                        <Text style={[styles.grey, {fontSize: verticalScale(16), paddingLeft: scale(10)}]}>
+                                            {heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}
+                                        </Text>
+                                    </TouchableHighlight>
+                                }
+                                content={this._renderDefinition(characteristic)}
+                                showContent={this.state.characteristicsShow[characteristic.shortName]}
+                            />
+                        </View>
                     );
                 })}
-            </View>
+            </>
         );
     }
 
@@ -476,10 +484,11 @@ export default class Characteristics extends Component {
                         <Switch
                             value={this.props.character.showSecondary}
                             onValueChange={() => this._toggleSecondaryCharacteristics()}
-                            minimumTrackTintColor={Colors.formControl}
-                            maximumTrackTintColor={Colors.primary}
+                            color="#3da0ff"
+                            minimumTrackTintColor={Colors.formAccent}
+                            maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
-                            trackColor={{false: '#000', true: '#3d5478'}}
+                            trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
                             ios_backgroundColor="#3d5478"
                         />
                     </View>
@@ -493,17 +502,11 @@ export default class Characteristics extends Component {
     render() {
         return (
             <View>
-                <ImageBackground
-                    source={require('../../../public/background.png')}
-                    style={{flex: 1, flexDirection: 'column'}}
-                    imageStyle={{resizeMode: 'repeat'}}
-                >
-                    {this._renderSecondaryCharacteristicToggle()}
-                    {this._renderCharacteristics(this.props.character.characteristics)}
-                    <View style={{paddingTop: verticalScale(20)}} />
-                    <Heading text="Movement" />
-                    {this._renderCharacteristics(this.props.character.movement)}
-                </ImageBackground>
+                {this._renderSecondaryCharacteristicToggle()}
+                {this._renderCharacteristics(this.props.character.characteristics)}
+                <View style={{paddingTop: verticalScale(20)}} />
+                <Heading text="Movement" />
+                {this._renderCharacteristics(this.props.character.movement)}
             </View>
         );
     }

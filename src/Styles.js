@@ -40,6 +40,7 @@ export const Colors = {
     primary: AllColors.base03,
     secondary: AllColors.base00,
     tertiary: AllColors.base1,
+    lightBackground: AllColors.base02,
     text: AllColors.base2,
     formControl: AllColors.base01,
     secondaryForm: AllColors.green,
