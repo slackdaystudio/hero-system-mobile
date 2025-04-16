@@ -489,7 +489,7 @@ export default class Characteristics extends Component {
                             maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
                             trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                            ios_backgroundColor="#3d5478"
+                            ios_backgroundColor={Colors.switchGutter}
                         />
                     </View>
                 </View>

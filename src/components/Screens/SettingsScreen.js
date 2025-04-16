@@ -114,7 +114,7 @@ export const SettingsScreen = ({navigation}) => {
                             maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
                             trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                            ios_backgroundColor="#3d5478"
+                            ios_backgroundColor={Colors.switchGutter}
                         />
                     </View>
                 </View>
@@ -132,7 +132,7 @@ export const SettingsScreen = ({navigation}) => {
                             maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
                             trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                            ios_backgroundColor="#3d5478"
+                            ios_backgroundColor={Colors.switchGutter}
                         />
                     </View>
                     <View flexDirection="row" justifyContent="space-between" style={{paddingBottom: verticalScale(10)}}>
@@ -147,7 +147,7 @@ export const SettingsScreen = ({navigation}) => {
                             maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
                             trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                            ios_backgroundColor="#3d5478"
+                            ios_backgroundColor={Colors.switchGutter}
                         />
                     </View>
                 </View>
@@ -165,7 +165,7 @@ export const SettingsScreen = ({navigation}) => {
                             maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
                             trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                            ios_backgroundColor="#3d5478"
+                            ios_backgroundColor={Colors.switchGutter}
                         />
                     </View>
                     <View flexDirection="row" justifyContent="space-between" style={{paddingBottom: verticalScale(10)}}>
@@ -180,7 +180,7 @@ export const SettingsScreen = ({navigation}) => {
                             maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
                             trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                            ios_backgroundColor="#3d5478"
+                            ios_backgroundColor={Colors.switchGutter}
                             disabled={!settings.playSounds}
                         />
                     </View>

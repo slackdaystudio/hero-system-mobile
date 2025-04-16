@@ -48,7 +48,16 @@ export default class Header extends Component {
         return (
             <View style={localStyles.header}>
                 <StatusBar barStyle="light-content" />
-                <View style={{flex: 1, paddingTop: 50, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.primary}}>
+                <View
+                    style={{
+                        flex: 1,
+                        paddingTop: Platform.OS === 'ios' ? 0 : 50,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: Colors.primary,
+                    }}
+                >
                     <View style={{flex: 1}}>
                         <Icon name="chevron-left" style={{fontSize: verticalScale(18), color: Colors.tertiary}} onPress={() => this._onBackButtonPress()} />
                     </View>
@@ -62,7 +71,7 @@ export default class Header extends Component {
                     <View style={{flex: 1}}>
                         <Icon
                             name="bars"
-                            style={{fontSize: verticalScale(24), color: Colors.tertiary, paddingBottom: Platform.OS === 'ios' ? verticalScale(30) : 0}}
+                            style={{fontSize: verticalScale(24), color: Colors.tertiary, paddingBottom: Platform.OS === 'ios' ? verticalScale(0) : 0}}
                             onPress={() => this.props.navigation.toggleDrawer()}
                         />
                     </View>
@@ -77,7 +86,7 @@ const localStyles = ScaledSheet.create({
         backgroundColor: Colors.primary,
         borderBottomWidth: 0.5,
         borderColor: Colors.characterFooter,
-        height: Platform.OS === 'ios' ? '75@vs' : '100@vs',
+        height: Platform.OS === 'ios' ? '90@vs' : '100@vs',
     },
     logo: {
         alignSelf: 'center',

@@ -37,8 +37,10 @@ const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
         <View flex={0} flexGrow={1}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
                 <View paddingHorizontal={scale(10)}>
-                    <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateForm} valueKey="ocv" />
-                    <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateForm} valueKey="numberOfRolls" />
+                    <View paddingHorizontal={scale(10)}>
+                        <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateForm} valueKey="ocv" />
+                        <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateForm} valueKey="numberOfRolls" />
+                    </View>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                         <Text style={styles.grey}>Is this an autofire attack?</Text>
                         <View style={{paddingRight: scale(10)}}>
@@ -49,12 +51,11 @@ const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
                                 minimumTrackTintColor={Colors.formControl}
                                 maximumTrackTintColor={Colors.primary}
                                 thumbColor={Colors.formControl}
-                                trackColor={{false: '#000', true: '#3d5478'}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
-                    {renderDcvSlider()}
+                    <View paddingHorizontal={scale(10)}>{renderDcvSlider()}</View>
                     <View style={styles.buttonContainer}>
                         <Button label="Roll" style={styles.button} onPress={roll} />
                     </View>

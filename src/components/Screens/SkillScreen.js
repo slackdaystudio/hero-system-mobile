@@ -76,12 +76,11 @@ export const SkillScreen = ({navigation}) => {
                             minimumTrackTintColor={Colors.formControl}
                             maximumTrackTintColor={Colors.primary}
                             thumbColor={Colors.formControl}
-                            trackColor={{false: '#000', true: '#3d5478'}}
-                            ios_backgroundColor="#3d5478"
+                            ios_backgroundColor={Colors.switchGutter}
                         />
                     </View>
                 </View>
-                {renderSlider()}
+                <View paddingHorizontal={scale(10)}>{renderSlider()}</View>
                 <View style={styles.buttonContainer}>
                     <Button label="Roll" style={styles.button} onPress={roll} />
                 </View>

@@ -73,22 +73,24 @@ export const CostCruncherScreen = ({navigation}) => {
                         onEndEditing={(event) => _updateFormValue('cost', event.nativeEvent.text)}
                     />
                 </View>
-                <Slider
-                    label="Advantages:"
-                    value={costCruncherForm.advantages}
-                    step={0.25}
-                    min={0}
-                    max={5}
-                    onValueChange={(val) => _updateFormValue('advantages', val)}
-                />
-                <Slider
-                    label="Limitations:"
-                    value={costCruncherForm.limitations}
-                    step={0.25}
-                    min={-5}
-                    max={0}
-                    onValueChange={(val) => _updateFormValue('limitations', val)}
-                />
+                <View paddingHorizontal={scale(10)}>
+                    <Slider
+                        label="Advantages:"
+                        value={costCruncherForm.advantages}
+                        step={0.25}
+                        min={0}
+                        max={5}
+                        onValueChange={(val) => _updateFormValue('advantages', val)}
+                    />
+                    <Slider
+                        label="Limitations:"
+                        value={costCruncherForm.limitations}
+                        step={0.25}
+                        min={-5}
+                        max={0}
+                        onValueChange={(val) => _updateFormValue('limitations', val)}
+                    />
+                </View>
             </View>
         </>
     );

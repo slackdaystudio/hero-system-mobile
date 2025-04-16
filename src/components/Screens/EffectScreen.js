@@ -88,7 +88,9 @@ export const EffectScreen = ({navigation}) => {
             <Header navigation={navigation} />
             <Heading text="Effect Roll" />
             <View paddingHorizontal={scale(10)} paddingBottom={verticalScale(20)}>
-                <Slider label="Dice:" value={effectForm.dice} step={1} min={1} max={50} onValueChange={setSliderState} valueKey="dice" />
+                <View paddingHorizontal={scale(10)}>
+                    <Slider label="Dice:" value={effectForm.dice} step={1} min={1} max={50} onValueChange={setSliderState} valueKey="dice" />
+                </View>
                 <View>
                     <DropDownPicker
                         theme="DARK"

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {ImageBackground, Dimensions, Text, Platform, View, Switch as RNSwitch} from 'react-native';
+import {Dimensions, Text, Platform, View, Switch as RNSwitch} from 'react-native';
 import {TabView} from 'react-native-tab-view';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
@@ -35,60 +35,58 @@ const windowHeight = Dimensions.get('window').height;
 
 const ManeuversRoute = ({}) => {
     const tab = (
-        <View style={[styles.tabContent, {paddingBottom: scale(20)}]}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                {moves.map((move, index) => {
-                    const heading = <Text style={[styles.grey, {fontSize: verticalScale(18)}]}>{move.name}</Text>;
-                    const body = (
-                        <>
-                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
-                                </View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
-                                </View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
-                                </View>
+        <View style={[styles.tabContent, {marginHorizontal: scale(10)}]}>
+            {moves.map((move, index) => {
+                const heading = <Text style={[styles.grey, {paddingLeft: scale(10), fontSize: verticalScale(18)}]}>{move.name}</Text>;
+                const body = (
+                    <View borderRightWidth={1} borderColor={Colors.formAccent} style={{padding: scale(10)}}>
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', padding: verticalScale(5)}}>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
                             </View>
-                            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', paddingVertical: verticalScale(5)}}>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{move.phase}</Text>
-                                </View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{move.ocv}</Text>
-                                </View>
-                                <View style={{flex: 1, alignSelf: 'stretch'}}>
-                                    <Text style={styles.grey}>{move.dcv}</Text>
-                                </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>OCV</Text>
                             </View>
-                        </>
-                    );
-
-                    const footer = (
-                        <View
-                            style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                justifyContent: 'flex-start',
-                                alignSelf: 'flex-start',
-                                paddingBottom: verticalScale(5),
-                            }}
-                        >
-                            <View>
-                                <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>DCV</Text>
                             </View>
                         </View>
-                    );
-
-                    return (
-                        <View key={'move-' + index}>
-                            <Card heading={heading} body={body} footer={footer} />
+                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', padding: verticalScale(5)}}>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>{move.phase}</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>{move.ocv}</Text>
+                            </View>
+                            <View style={{flex: 1, alignSelf: 'stretch'}}>
+                                <Text style={styles.grey}>{move.dcv}</Text>
+                            </View>
                         </View>
-                    );
-                })}
-            </ImageBackground>
+                    </View>
+                );
+
+                const footer = (
+                    <View
+                        style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                            alignSelf: 'flex-start',
+                            paddingBottom: verticalScale(5),
+                        }}
+                    >
+                        <View paddingLeft={scale(10)} paddingRight={scale(10)} style={{flex: 1, alignSelf: 'stretch'}}>
+                            <Text style={[styles.grey, {fontStyle: 'italic'}]}>{move.effect}</Text>
+                        </View>
+                    </View>
+                );
+
+                return (
+                    <View key={'move-' + index} paddingBottom={scale(5)}>
+                        <Card heading={heading} body={body} footer={footer} />
+                    </View>
+                );
+            })}
         </View>
     );
 
@@ -122,7 +120,16 @@ export const DamageScreen = ({navigation}) => {
         const tab = (
             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                 <View>
-                    <Slider label="Dice:" value={parseInt(damageForm.dice, 10)} step={1} min={0} max={50} onValueChange={(val) => updateForm('dice', val)} />
+                    <View paddingHorizontal={scale(10)}>
+                        <Slider
+                            label="Dice:"
+                            value={parseInt(damageForm.dice, 10)}
+                            step={1}
+                            min={0}
+                            max={50}
+                            onValueChange={(val) => updateForm('dice', val)}
+                        />
+                    </View>
                     <DropDownPicker
                         theme="DARK"
                         listMode="MODAL"
@@ -151,11 +158,11 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
-                    {renderStunMultiplier()}
+                    <View paddingHorizontal={scale(10)}>{renderStunMultiplier()}</View>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                         <Text style={styles.grey}>Is this an explosion?</Text>
                         <View style={{paddingRight: scale(10)}}>
@@ -166,11 +173,11 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
-                    {renderFadeRate()}
+                    <View paddingHorizontal={scale(10)}>{renderFadeRate()}</View>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                         <Text style={styles.grey}>Use hit locations?</Text>
                         <View style={{paddingRight: scale(10)}}>
@@ -181,7 +188,7 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
@@ -195,7 +202,7 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
@@ -209,7 +216,7 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
@@ -223,7 +230,7 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
@@ -237,7 +244,7 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
@@ -251,7 +258,7 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
@@ -265,7 +272,7 @@ export const DamageScreen = ({navigation}) => {
                                 maximumTrackTintColor={Colors.secondaryForm}
                                 thumbColor={Colors.formControl}
                                 trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
-                                ios_backgroundColor="#3d5478"
+                                ios_backgroundColor={Colors.switchGutter}
                             />
                         </View>
                     </View>
