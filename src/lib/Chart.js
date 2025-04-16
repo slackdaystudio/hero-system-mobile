@@ -32,7 +32,7 @@ export const Chart = ({distributions}) => {
     });
 
     return (
-        <>
+        <View flex={1}>
             <Text
                 style={[
                     styles.boldGrey,
@@ -41,10 +41,7 @@ export const Chart = ({distributions}) => {
             >
                 Dice Face Distributions
             </Text>
-            <View alignItems="center" justifyContent="center">
-                <View paddingLeft={scale(30)} marginBottom={verticalScale(-160)}>
-                    <PieChart semiCircle showText data={data} textColor="#000" fontWeight="bold" radius={scale(150)} labelsPosition="outward" />
-                </View>
+            <View flex={1} alignItems="center" justifyContent="center">
                 <Text
                     style={[
                         styles.boldGrey,
@@ -53,12 +50,15 @@ export const Chart = ({distributions}) => {
                 >
                     Legend
                 </Text>
-                <View width={scale(150)} flexDirection="row" justifyContent={'space-around'}>
+                <View width={scale(150)} flexDirection="row" justifyContent={'space-around'} paddingBottom={verticalScale(10)}>
                     {data.map((d, i) => {
                         return <Icon key={`face-${i}`} solid name={`dice-${d.faceName}`} style={{fontSize: verticalScale(20), color: d.color}} />;
                     })}
                 </View>
+                <View>
+                    <PieChart semiCircle showText data={data} textColor="#000" fontWeight="bold" radius={scale(150)} labelsPosition="outward" />
+                </View>
             </View>
-        </>
+        </View>
     );
 };

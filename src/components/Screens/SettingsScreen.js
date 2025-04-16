@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View, ImageBackground, Text, Switch} from 'react-native';
+import {View, Text, Switch} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
 import {Heading} from '../Heading/Heading';
@@ -90,7 +90,7 @@ export const SettingsScreen = ({navigation}) => {
     };
 
     return (
-        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+        <>
             <Header navigation={navigation} />
             <VirtualizedList>
                 <Heading text="App Version" />
@@ -109,10 +109,11 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.useFifthEdition}
                             onValueChange={() => dispatch(toggleSetting({key: 'useFifthEdition', value: !settings.useFifthEdition}))}
-                            minimumTrackTintColor={Colors.formControl}
-                            maximumTrackTintColor={Colors.primary}
+                            color="#3da0ff"
+                            minimumTrackTintColor={Colors.formAccent}
+                            maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
-                            trackColor={{false: '#000', true: '#3d5478'}}
+                            trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
                             ios_backgroundColor="#3d5478"
                         />
                     </View>
@@ -126,10 +127,11 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.showAnimations}
                             onValueChange={() => dispatch(toggleSetting({key: 'showAnimations', value: !settings.showAnimations}))}
-                            minimumTrackTintColor={Colors.formControl}
-                            maximumTrackTintColor={Colors.formControl}
+                            color="#3da0ff"
+                            minimumTrackTintColor={Colors.formAccent}
+                            maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
-                            trackColor={{false: '#000', true: '#3d5478'}}
+                            trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
                             ios_backgroundColor="#3d5478"
                         />
                     </View>
@@ -140,10 +142,11 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.increaseEntropy}
                             onValueChange={() => dispatch(toggleSetting({key: 'increaseEntropy', value: !settings.increaseEntropy}))}
-                            minimumTrackTintColor={Colors.formControl}
-                            maximumTrackTintColor={Colors.formControl}
+                            color="#3da0ff"
+                            minimumTrackTintColor={Colors.formAccent}
+                            maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
-                            trackColor={{false: '#000', true: '#3d5478'}}
+                            trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
                             ios_backgroundColor="#3d5478"
                         />
                     </View>
@@ -157,10 +160,11 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.playSounds}
                             onValueChange={() => dispatch(toggleSetting({key: 'playSounds', value: !settings.playSounds}))}
-                            minimumTrackTintColor={Colors.formControl}
-                            maximumTrackTintColor={Colors.formControl}
+                            color="#3da0ff"
+                            minimumTrackTintColor={Colors.formAccent}
+                            maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
-                            trackColor={{false: '#000', true: '#3d5478'}}
+                            trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
                             ios_backgroundColor="#3d5478"
                         />
                     </View>
@@ -171,17 +175,18 @@ export const SettingsScreen = ({navigation}) => {
                         <Switch
                             value={settings.onlyDiceSounds}
                             onValueChange={() => dispatch(toggleSetting({key: 'onlyDiceSounds', value: !settings.onlyDiceSounds}))}
-                            minimumTrackTintColor={Colors.formControl}
-                            maximumTrackTintColor={Colors.formControl}
+                            color="#3da0ff"
+                            minimumTrackTintColor={Colors.formAccent}
+                            maximumTrackTintColor={Colors.secondaryForm}
                             thumbColor={Colors.formControl}
-                            trackColor={{false: '#000', true: '#3d5478'}}
+                            trackColor={{false: Colors.switchGutter, true: Colors.formAccent}}
                             ios_backgroundColor="#3d5478"
                             disabled={!settings.playSounds}
                         />
                     </View>
                 </View>
                 <Heading text="Cache" />
-                <View>
+                <View paddingHorizontal={scale(10)}>
                     <View flexDirection="row" justifyContent="space-between" style={{paddingBottom: verticalScale(10)}}>
                         <View alignSelf="center">
                             <Text style={styles.boldGrey}>Form data</Text>
@@ -211,7 +216,7 @@ export const SettingsScreen = ({navigation}) => {
                     <Button label="Clear All" onPress={() => clearAll()} />
                 </View>
             </VirtualizedList>
-        </ImageBackground>
+        </>
     );
 };
 

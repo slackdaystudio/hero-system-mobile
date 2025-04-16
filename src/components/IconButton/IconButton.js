@@ -24,7 +24,7 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
                 <TouchableHighlight
                     onPress={onPress}
                     onLongPress={onLongPress}
-                    underlayColor={Colors.formControl}
+                    underlayColor={Colors.secondaryForm}
                     style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
                 >
                     <View flex={1} flexDirection="row" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">
@@ -44,7 +44,7 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
                 <TouchableHighlight
                     onPress={onPress}
                     onLongPress={onLongPress}
-                    underlayColor={Colors.formControl}
+                    underlayColor={Colors.secondaryForm}
                     style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
                 >
                     <View flex={1} flexDirection="row" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">
@@ -63,7 +63,7 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
                 <TouchableHighlight
                     onPress={onPress}
                     onLongPress={onLongPress}
-                    underlayColor={Colors.formControl}
+                    underlayColor={Colors.secondaryForm}
                     style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
                 >
                     <View flex={1} flexDirection="column" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">
@@ -88,7 +88,7 @@ export const IconButton = ({label, textPos, icon, iconColor, onPress, onLongPres
                     <TouchableHighlight
                         onPress={onPress}
                         onLongPress={onLongPress}
-                        underlayColor={Colors.formControl}
+                        underlayColor={Colors.secondaryForm}
                         style={{width: scale(90), height: verticalScale(60), borderRadius: 10}}
                     >
                         <View flex={1} flexDirection="column" alignContent="center" alignItems="center" justifyContent="center" textAlign="center">

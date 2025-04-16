@@ -62,7 +62,7 @@ const toastConfig = {
         <BaseToast
             {...props}
             style={{
-                borderColor: '#35e01b',
+                borderColor: Colors.secondaryForm,
                 backgroundColor: Colors.background,
                 color: Colors.background,
                 height: undefined,
@@ -78,14 +78,14 @@ const toastConfig = {
         <ErrorToast
             {...props}
             style={{
-                borderColor: '#e01b35',
+                borderColor: Colors.red,
                 backgroundColor: Colors.background,
                 color: Colors.background,
                 height: undefined,
                 minHeight: verticalScale(50),
                 paddingVertical: verticalScale(5),
             }}
-            text1Style={{color: Colors.background, fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
+            text1Style={{color: Colors.text, fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
             text2Style={{fontSize: verticalScale(11), lineHeight: verticalScale(11 * 1.35)}}
             text2NumberOfLines={10}
         />
@@ -230,6 +230,7 @@ export const App = () => {
                             screenOptions={{
                                 headerShown: false,
                                 drawerPosition: 'right',
+                                swipeEdgeWidth: 0,
                                 drawerContentOptions: drawerContentOptions,
                                 drawerStyle: localStyles.drawer,
                                 drawerLabelStyle: {color: Colors.text},

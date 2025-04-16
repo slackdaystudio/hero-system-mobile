@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Pressable, Text, View} from 'react-native';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -28,6 +28,9 @@ export const Button = ({label, onPress, disabled, small, labelStyle, ...rest}) =
             delete rest.style;
         }
     }
+
+    style.borderWidth = 0.75;
+    style.borderColor = Colors.text;
 
     if (labelStyle !== undefined) {
         textStyle = Object.assign(textStyle, labelStyle);

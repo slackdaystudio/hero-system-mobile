@@ -2,13 +2,13 @@ import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ActivityIndicator, Text, View, ImageBackground} from 'react-native';
+import {ActivityIndicator, Text, View} from 'react-native';
 import Header from '../Header/Header';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {Chart} from '../../lib/Chart';
 import {common} from '../../lib/Common';
 import {statistics as libStatistics} from '../../lib/Statistics';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import {scale, verticalScale} from 'react-native-size-matters';
 
 // CopyView 2018-Present Philip J. Guinchard
@@ -71,32 +71,30 @@ export const StatisticsScreen = ({navigation}) => {
             return <Text style={[styles.grey, {textAlign: 'center'}]}>A chart appears here once you have rolled at least 30 dice.</Text>;
         }
 
-        return <Chart distributions={statistics.distributions} />;
+        return (
+            <View>
+                <Chart distributions={statistics.distributions} />
+            </View>
+        );
     };
 
     if (common.isEmptyObject(statistics)) {
         return (
             <View style={styles.container}>
                 <Header hasTabs={false} navigation={navigation} />
-                <ImageBackground
-                    source={require('../../../public/background.png')}
-                    style={{flex: 1, flexDirection: 'column'}}
-                    imageStyle={{resizeMode: 'repeat'}}
-                >
-                    <ActivityIndicator color="#D0D1D3" />
-                </ImageBackground>
+                <ActivityIndicator color={Colors.formControl} />
             </View>
         );
     }
 
     return (
-        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+        <>
             <Header navigation={navigation} />
             <Text style={styles.heading}>Statistics</Text>
             <View paddingBottom={verticalScale(10)} />
-            <VirtualizedList flex={1}>
+            <VirtualizedList>
                 {renderDieDistributionChart()}
-                <View paddingHorizontal={scale(10)} paddingTop={verticalScale(20)}>
+                <View paddingHorizontal={scale(10)} paddingTop={verticalScale(10)}>
                     <View flexDirection="row" justifyContent="space-between">
                         <View>
                             <Text style={styles.boldGrey}>Total Dice Rolled:*</Text>
@@ -202,7 +200,7 @@ export const StatisticsScreen = ({navigation}) => {
                     </Text>
                 </View>
             </VirtualizedList>
-        </ImageBackground>
+        </>
     );
 };
 

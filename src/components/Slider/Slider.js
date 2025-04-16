@@ -109,7 +109,7 @@ export const Slider = ({label, value, step, min, max, disabled = false, valueKey
                     }}
                     disabled={disabled}
                     minimumTrackTintColor={Colors.formAccent}
-                    maximumTrackTintColor={Colors.secondaryForm}
+                    maximumTrackTintColor={Colors.secondary}
                     thumbTintColor={Colors.formControl}
                 />
             </View>

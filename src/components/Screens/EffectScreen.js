@@ -1,16 +1,16 @@
 import React, {useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View, ImageBackground} from 'react-native';
+import {View} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {verticalScale} from 'react-native-size-matters';
+import {scale, verticalScale} from 'react-native-size-matters';
 import {RadioGroup} from 'react-native-radio-buttons-group';
 import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
 import Header from '../Header/Header';
 import {Heading} from '../Heading/Heading';
 import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
-import styles from '../../Styles';
+import styles, {Colors} from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
 
 // Copyright 2018-Present Philip J. Guinchard
@@ -52,9 +52,9 @@ export const EffectScreen = ({navigation}) => {
             id: i,
             label: type,
             value: type,
-            color: '#fff',
+            color: Colors.formControl,
             containerStyle: {minWidth: verticalScale(290)},
-            labelStyle: {color: '#fff'},
+            labelStyle: {color: Colors.formAccent, fontSize: verticalScale(12), fontWeight: 'bold', paddingLeft: scale(5), paddingRight: scale(5)},
         }));
     }, []);
 
@@ -78,30 +78,35 @@ export const EffectScreen = ({navigation}) => {
     const renderEffects = () => {
         return (
             <View flex={1} alignItems="stretch">
-                <RadioGroup flex={1} color="#fff" radioButtons={radioButtons} onPress={selectEffect} selectedId={selectedId} />
+                <RadioGroup flex={1} color={Colors.formControl} radioButtons={radioButtons} onPress={selectEffect} selectedId={selectedId} />
             </View>
         );
     };
 
     return (
-        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+        <>
             <Header navigation={navigation} />
             <Heading text="Effect Roll" />
-            <View>
+            <View paddingHorizontal={scale(10)} paddingBottom={verticalScale(20)}>
                 <Slider label="Dice:" value={effectForm.dice} step={1} min={1} max={50} onValueChange={setSliderState} valueKey="dice" />
-            </View>
-            <View>
-                <DropDownPicker
-                    theme="DARK"
-                    listMode="MODAL"
-                    open={open}
-                    value={value}
-                    items={items}
-                    setOpen={setOpen}
-                    setValue={setValue}
-                    setItems={setItems}
-                    onChangeValue={(val) => dispatch(updateFormValue({formName: 'effect', key: 'partialDie', value: val}))}
-                />
+                <View>
+                    <DropDownPicker
+                        theme="DARK"
+                        listMode="MODAL"
+                        open={open}
+                        value={value}
+                        items={items}
+                        setOpen={setOpen}
+                        setValue={setValue}
+                        setItems={setItems}
+                        onChangeValue={(val) => dispatch(updateFormValue({formName: 'effect', key: 'partialDie', value: val}))}
+                        style={{backgroundColor: Colors.formControl}}
+                        labelStyle={{fontSize: verticalScale(12), color: Colors.text, paddingLeft: scale(5)}}
+                        listItemContainerStyle={{backgroundColor: Colors.background}}
+                        selectedItemContainerStyle={{backgroundColor: Colors.formAccent}}
+                        modalContentContainerStyle={{backgroundColor: Colors.primary}}
+                    />
+                </View>
             </View>
             <Heading text="Effect" />
             {renderEffects()}
@@ -110,7 +115,7 @@ export const EffectScreen = ({navigation}) => {
                 <Button solid label="Roll" style={styles.button} onPress={roll} />
             </View>
             <View style={{paddingBottom: verticalScale(20)}} />
-        </ImageBackground>
+        </>
     );
 };
 

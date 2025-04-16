@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {ImageBackground, Text, TextInput, View} from 'react-native';
+import {Text, TextInput, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -48,48 +48,49 @@ export const CostCruncherScreen = ({navigation}) => {
     };
 
     return (
-        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+        <>
             <Header navigation={navigation} />
-
             <Text style={styles.heading}>Cruncher</Text>
-            <Text style={styles.grey}>Use this tool to calculate power costs on the fly.</Text>
-            <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingTop: 20}}>
-                <Text style={styles.boldGrey}>Active Cost</Text>
-                <Text style={styles.boldGrey}>Real Cost</Text>
-            </View>
-            <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                {renderActiveCost()}
-                {renderRealCost()}
-            </View>
-            <View flexDirection="row" justifyContent="space-between" paddingHorizontal={scale(10)}>
-                <View alignSelf="center">
-                    <Text style={styles.boldGrey}>Base Cost:</Text>
+            <View paddingHorizontal={scale(10)} paddingTop={verticalScale(10)}>
+                <Text style={[styles.grey, {textAlign: 'center'}]}>Use this tool to calculate power costs on the fly.</Text>
+                <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingTop: 20}}>
+                    <Text style={styles.boldGrey}>Active Cost</Text>
+                    <Text style={styles.boldGrey}>Real Cost</Text>
                 </View>
-                <TextInput
-                    style={styles.textInput}
-                    keyboardType="numeric"
-                    maxLength={3}
-                    defaultValue={costCruncherForm.cost.toString()}
-                    onEndEditing={(event) => _updateFormValue('cost', event.nativeEvent.text)}
+                <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+                    {renderActiveCost()}
+                    {renderRealCost()}
+                </View>
+                <View flexDirection="row" justifyContent="space-between" paddingHorizontal={scale(10)}>
+                    <View alignSelf="center">
+                        <Text style={styles.boldGrey}>Base Cost:</Text>
+                    </View>
+                    <TextInput
+                        style={styles.textInput}
+                        keyboardType="numeric"
+                        maxLength={3}
+                        defaultValue={costCruncherForm.cost.toString()}
+                        onEndEditing={(event) => _updateFormValue('cost', event.nativeEvent.text)}
+                    />
+                </View>
+                <Slider
+                    label="Advantages:"
+                    value={costCruncherForm.advantages}
+                    step={0.25}
+                    min={0}
+                    max={5}
+                    onValueChange={(val) => _updateFormValue('advantages', val)}
+                />
+                <Slider
+                    label="Limitations:"
+                    value={costCruncherForm.limitations}
+                    step={0.25}
+                    min={-5}
+                    max={0}
+                    onValueChange={(val) => _updateFormValue('limitations', val)}
                 />
             </View>
-            <Slider
-                label="Advantages:"
-                value={costCruncherForm.advantages}
-                step={0.25}
-                min={0}
-                max={5}
-                onValueChange={(val) => _updateFormValue('advantages', val)}
-            />
-            <Slider
-                label="Limitations:"
-                value={costCruncherForm.limitations}
-                step={0.25}
-                min={-5}
-                max={0}
-                onValueChange={(val) => _updateFormValue('limitations', val)}
-            />
-        </ImageBackground>
+        </>
     );
 };
 

@@ -2,7 +2,7 @@ import React, {useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {ActivityIndicator, Platform, ImageBackground, Text, View} from 'react-native';
+import {ActivityIndicator, Platform, Text, View} from 'react-native';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import Header from '../Header/Header';
@@ -358,7 +358,7 @@ export const ResultScreen = ({route, navigation}) => {
     };
 
     return (
-        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+        <>
             <Header navigation={navigation} />
             <VirtualizedList>
                 <Text style={styles.heading}>Roll Result</Text>
@@ -367,7 +367,7 @@ export const ResultScreen = ({route, navigation}) => {
                     <DisappearingButton label="Roll Again" onPress={reRoll} />
                 </View>
             </VirtualizedList>
-        </ImageBackground>
+        </>
     );
 };
 

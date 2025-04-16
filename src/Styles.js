@@ -17,7 +17,6 @@ import {ScaledSheet} from 'react-native-size-matters';
 const AllColors = {
     base03: '#002b36',
     base02: '#073642',
-    highlight: '#05232b',
     base01: '#586e75',
     base00: '#657b83',
     base0: '#839496',
@@ -32,21 +31,23 @@ const AllColors = {
     blue: '#268bd2',
     cyan: '#2aa198',
     green: '#859900',
+    background: '#05232b',
+    switchGutter: '#283134',
 };
 
 export const Colors = {
-    background: AllColors.highlight,
-    // backgroundAlpha: ,
-    primary: AllColors.base02,
+    background: AllColors.background,
+    primary: AllColors.base03,
     secondary: AllColors.base00,
     tertiary: AllColors.base1,
     text: AllColors.base2,
-    formControl: AllColors.green,
-    // formControl: 'rgba()'
-    secondaryForm: AllColors.cyan,
-    formAccent: AllColors.base01,
+    formControl: AllColors.base01,
+    secondaryForm: AllColors.green,
+    formAccent: AllColors.base1,
     characterFooter: AllColors.cyan,
     yellow: AllColors.yellow,
+    red: AllColors.red,
+    switchGutter: AllColors.switchGutter,
 };
 
 export default ScaledSheet.create({
@@ -101,7 +102,7 @@ export default ScaledSheet.create({
         backgroundColor: Colors.formControl,
         borderWidth: 0.5,
         borderColor: Colors.formControl,
-        borderRadius: '5@vs',
+        borderRadius: '10@vs',
     },
     buttonSmall: {
         alignItems: 'center',
@@ -134,7 +135,7 @@ export default ScaledSheet.create({
     },
     textInput: {
         borderWidth: 0.5,
-        borderColor: Colors.text,
+        borderColor: Colors.formControl,
         backgroundColor: Colors.primary,
         color: Colors.text,
         fontSize: '14@vs',
