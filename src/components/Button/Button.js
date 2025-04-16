@@ -30,7 +30,7 @@ export const Button = ({label, onPress, disabled, small, labelStyle, ...rest}) =
     }
 
     style.borderWidth = 0.75;
-    style.borderColor = Colors.text;
+    style.borderColor = Colors.switchGutter;
 
     if (labelStyle !== undefined) {
         textStyle = Object.assign(textStyle, labelStyle);

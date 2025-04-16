@@ -47,7 +47,7 @@ export const Tab = ({navigationState}) => {
                 borderColor={color}
                 alignSelf="center"
                 cursor="pointer"
-                paddingHorizontal={scale(30)}
+                paddingHorizontal={scale(10)}
             >
                 <Pressable onPress={() => navigationState.setIndex(item.index)} style={{minHeight: verticalScale(40), paddingTop: verticalScale(10)}}>
                     <Animated.Text

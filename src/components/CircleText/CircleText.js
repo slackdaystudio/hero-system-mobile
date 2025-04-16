@@ -29,7 +29,7 @@ export default class CircleText extends Component {
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: Colors.background,
-                    borderColor: Colors.formAccent,
+                    borderColor: this.props.color ? this.props.color : Colors.formAccent,
                     width: size,
                     height: size,
                     borderRadius: size / 2,

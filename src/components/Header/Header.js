@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {BackHandler, Platform, View, Image, TouchableHighlight, StatusBar} from 'react-native';
+import {BackHandler, Platform, View, Image, StatusBar, TouchableOpacity} from 'react-native';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
 import {Colors} from '../../Styles';
@@ -54,9 +54,9 @@ export default class Header extends Component {
                     </View>
                     <View style={{flex: 4}}>
                         <View style={localStyles.logo}>
-                            <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => this.props.navigation.navigate('Home')}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}>
                                 <Image style={{height: scale(60), width: scale(138)}} source={require('../../../public/hero_mobile_logo.png')} />
-                            </TouchableHighlight>
+                            </TouchableOpacity>
                         </View>
                     </View>
                     <View style={{flex: 1}}>

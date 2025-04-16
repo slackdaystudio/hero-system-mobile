@@ -182,20 +182,20 @@ class StatusDialog extends Component {
                     styles={{
                         selectToggleText: [styles.grey, {marginLeft: scale(-7), width: 50}],
                         container: {backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.formControl},
-                        searchBar: {backgroundColor: '#000000'},
-                        searchTextInput: {color: '#ffffff'},
+                        searchBar: {backgroundColor: Colors.switchGutter},
+                        searchTextInput: {color: Colors.text},
                         separator: {color: Colors.background},
                     }}
                     colors={{
-                        selectToggleTextColor: '#ffffff',
-                        chipColor: Colors.background,
+                        selectToggleTextColor: Colors.text,
+                        chipColor: Colors.tertiary,
                         primary: Colors.formControl,
-                        cancel: Colors.formControl,
-                        text: Colors.background,
-                        subText: Colors.background,
+                        cancel: Colors.red,
+                        text: Colors.text,
+                        subText: Colors.text,
                         itemBackground: Colors.background,
-                        subItemBackground: Colors.background,
-                        searchSelectionColor: '#ffffff',
+                        subItemBackground: Colors.primary,
+                        searchSelectionColor: Colors.text,
                     }}
                     items={this.items}
                     IconRenderer={Icon}

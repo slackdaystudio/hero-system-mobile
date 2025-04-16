@@ -1,8 +1,8 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {ImageBackground, View, Text, TouchableHighlight} from 'react-native';
+import {View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
-import {AccordionCard} from '../Card/AccordionCard';
+import {AccordionCard, BulletedLabel} from '../Card/AccordionCard';
 import {Card} from '../Card/Card';
 import CircleButton from '../CircleButton/CircleButton';
 import {dieRoller} from '../../lib/DieRoller';
@@ -380,7 +380,7 @@ export default class Traits extends Component {
         if (power.roll() !== null && power.roll() !== undefined) {
             return (
                 <View style={styles.cardItem}>
-                    <TouchableHighlight underlayColor="#121212" onPress={() => this._roll(power.roll(), power)}>
+                    <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => this._roll(power.roll(), power)}>
                         <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
                     </TouchableHighlight>
                 </View>
@@ -393,8 +393,8 @@ export default class Traits extends Component {
     _renderRoll(item) {
         if (item.roll() !== null && item.roll() !== undefined) {
             return (
-                <TouchableHighlight underlayColor="#121212" onPress={() => this._roll(item.roll(), item)}>
-                    <Text style={[styles.cardTitle, {paddingTop: 0}]}>{item.roll().roll}</Text>
+                <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => this._roll(item.roll(), item)}>
+                    <Text style={[styles.grey, {paddingTop: 0}]}>{item.roll().roll}</Text>
                 </TouchableHighlight>
             );
         }
@@ -404,16 +404,29 @@ export default class Traits extends Component {
 
     _renderTraitList(decoratedTrait) {
         return (
-            <View key={`trait-list-${decoratedTrait.characterTrait.trait.id}`} paddingBottom={verticalScale(10)}>
+            <View key={`trait-list-${decoratedTrait.characterTrait.trait.id}`} paddingBottom={verticalScale(10)} paddingHorizontal={scale(10)}>
                 <Card
                     heading={
                         <View flex={1} flexDirection="row">
-                            <Text style={[styles.boldGrey, {paddingVertical: verticalScale(5), fontSize: verticalScale(16)}]}>{decoratedTrait.label()}</Text>
+                            <Text
+                                style={[
+                                    styles.grey,
+                                    {
+                                        paddingVertical: verticalScale(5),
+                                        fontSize: verticalScale(16),
+                                        fontFamily: 'Roboto',
+                                        fontVariant: 'small-caps',
+                                        paddingLeft: scale(10),
+                                    },
+                                ]}
+                            >
+                                {decoratedTrait.label()}
+                            </Text>
                             <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
                         </View>
                     }
                     body={
-                        <View paddingTop={verticalScale(5)}>
+                        <>
                             {decoratedTrait.trait[this.props.subListKey].map((item) => {
                                 const decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
 
@@ -432,22 +445,22 @@ export default class Traits extends Component {
                                             {this._renderTrait(decoratedSubTrait, true)}
                                         </View>
                                         <Accordion animationProps={{collapsed: !this.state.itemShow[decoratedSubTrait.trait.id], duration: 500}}>
-                                            {this._renderItemDetails(decoratedSubTrait, true)}
+                                            <View paddingLeft={scale(28)}>{this._renderItemDetails(decoratedSubTrait, true)}</View>
                                         </Accordion>
                                     </Fragment>
                                 );
                             })}
-                        </View>
+                        </>
                     }
                     footer={
-                        <>
+                        <View flex={1} justifyContent="center">
                             <Accordion animationProps={{collapsed: !this.state.itemShow[decoratedTrait.trait.id], duration: 500}}>
                                 {this._renderItemDetails(decoratedTrait)}
                             </Accordion>
                             <View flex={1} flexDirection="row" justifyContent="center">
                                 <CircleButton name="eye" size={25} fontSize={12} onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
                             </View>
-                        </>
+                        </View>
                     }
                 />
             </View>
@@ -456,17 +469,18 @@ export default class Traits extends Component {
 
     _renderTrait(decoratedTrait, isListItem = false) {
         return (
-            <Fragment>
-                <View style={{flex: 2, alignItems: 'flex-start'}}>
-                    <Text style={[styles.boldGrey, {fontSize: verticalScale(isListItem ? 16 : 18)}]}>{decoratedTrait.label()}</Text>
+            <View paddingVertical={isListItem ? verticalScale(5) : 0} style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                <View style={{flex: 2, alignItems: 'flex-start', paddingLeft: isListItem ? scale(10) : 0}}>
+                    <BulletedLabel
+                        label={decoratedTrait.label()}
+                        onTitlePress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
+                        showContent={this.state.itemShow[decoratedTrait.trait.id]}
+                    />
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                    <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
-                    <View style={{flex: 1.75, alignItems: 'flex-end'}}>
-                        <CircleButton name="eye" size={25} fontSize={12} onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
-                    </View>
+                    <View style={{flex: 2, alignItems: 'flex-end', paddingRight: isListItem ? scale(10) : 0}}>{this._renderRoll(decoratedTrait)}</View>
                 </View>
-            </Fragment>
+            </View>
         );
     }
 
@@ -497,14 +511,9 @@ export default class Traits extends Component {
                     }
 
                     return (
-                        <View key={`trait-${item.id}`} paddingBottom={verticalScale(10)}>
+                        <View key={`trait-${item.id}`} paddingBottom={verticalScale(10)} paddingHorizontal={scale(10)}>
                             <AccordionCard
-                                title={
-                                    <Text style={[styles.boldGrey, {paddingVertical: verticalScale(0), fontSize: verticalScale(16)}]}>
-                                        {''}
-                                        {decoratedTrait.label()}
-                                    </Text>
-                                }
+                                title={<Text style={{fontFamily: 'Roboto', fontVariant: 'small-caps'}}>{decoratedTrait.label()}</Text>}
                                 onTitlePress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
                                 secondaryTitle={
                                     <>
@@ -512,11 +521,6 @@ export default class Traits extends Component {
                                     </>
                                 }
                                 content={this._renderItemDetails(decoratedTrait)}
-                                footerButtons={
-                                    <View flex={1} flexDirection="row" justifyContent="space-around">
-                                        <CircleButton name="eye" size={25} fontSize={12} onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
-                                    </View>
-                                }
                                 showContent={this.state.itemShow[decoratedTrait.trait.id]}
                             />
                         </View>
@@ -528,10 +532,10 @@ export default class Traits extends Component {
 
     render() {
         return (
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+            <>
                 {this._renderTraits(this.props.character[this.props.listKey])}
                 <View flex={0} flexBasis={1} style={{paddingTop: verticalScale(20)}} />
-            </ImageBackground>
+            </>
         );
     }
 }

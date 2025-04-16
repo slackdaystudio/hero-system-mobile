@@ -30,7 +30,7 @@ export default class CircleButton extends Component {
                     style={{
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: Colors.background,
+                        backgroundColor: this.props.color ? this.props.color : Colors.background,
                         borderColor: Colors.tertiary,
                         width: size,
                         height: size,

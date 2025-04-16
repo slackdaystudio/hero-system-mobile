@@ -20,6 +20,23 @@ import {Icon} from '../Icon/Icon';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const BulletedLabel = ({label, onTitlePress, showContent}) => {
+    return (
+        <TouchableOpacity onPress={onTitlePress}>
+            <View flex={1} flexDirection="row" justifyContent="flex-start" alignItems="center">
+                <Icon
+                    size={verticalScale(14)}
+                    name={showContent ? 'angle-down' : 'angle-right'}
+                    style={{color: Colors.text}}
+                    marginRight={scale(5)}
+                    marginTop={3}
+                />
+                <Text style={styles.grey}>{label}</Text>
+            </View>
+        </TouchableOpacity>
+    );
+};
+
 export const AccordionCard = ({
     title,
     secondaryTitle,
@@ -31,23 +48,6 @@ export const AccordionCard = ({
     onTitlePress,
 }) => {
     const show = showContent === true;
-
-    const _renderBulletedLabel = (label, dieCode = undefined) => {
-        return (
-            <TouchableOpacity onPress={onTitlePress} underlayColor={Colors.secondaryForm}>
-                <View flex={1} flexDirection="row" justifyContent="flex-start" alignItems="center" marginLeft={scale(0)}>
-                    <Icon
-                        size={verticalScale(14)}
-                        name={showContent ? 'angle-down' : 'angle-right'}
-                        style={{color: Colors.text}}
-                        marginRight={scale(5)}
-                        marginTop={3}
-                    />
-                    <Text style={styles.grey}>{label}</Text>
-                </View>
-            </TouchableOpacity>
-        );
-    };
 
     return (
         <Card
@@ -65,12 +65,14 @@ export const AccordionCard = ({
                         paddingRight: scale(10),
                     }}
                 >
-                    <View style={{marginRight: verticalScale(10), width: 0, flexGrow: 1, flex: 1}}>{_renderBulletedLabel(title)}</View>
+                    <View style={{marginRight: verticalScale(10), width: 300}}>
+                        <BulletedLabel label={title} onTitlePress={onTitlePress} showContent={showContent} />
+                    </View>
                     <View marginLeft={verticalScale(10)} flexDirection="row">
                         {typeof secondaryTitle === 'string' ? (
                             <Text style={[styles.text, {lineHeight: verticalScale(15), fontSize: verticalScale(16)}]}>{secondaryTitle}</Text>
                         ) : (
-                            <>{secondaryTitle}</>
+                            <View paddingLeft={30}>{secondaryTitle}</View>
                         )}
                     </View>
                 </View>

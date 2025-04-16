@@ -538,29 +538,19 @@ export default class Combat extends Component {
                         {this._renderHealthItem('body')}
                         {this._renderHealthItem('endurance', 'END')}
                         <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
-                            <Button
-                                label="Recovery"
-                                style={styles.buttonTiny}
-                                onPress={() => this.takeRecovery()}
-                                labelStyle={{fontSize: verticalScale(12), color: Colors.background}}
-                            />
+                            <Button label="Recovery" style={styles.buttonTiny} onPress={() => this.takeRecovery()} labelStyle={{fontSize: verticalScale(12)}} />
                         </View>
                     </View>
                     <Heading text="Status Effects" />
                     <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
                         <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
-                            <Button
-                                label="Add"
-                                style={styles.buttonTiny}
-                                onPress={() => this.openStatusDialog()}
-                                labelStyle={{fontSize: verticalScale(12), color: Colors.background}}
-                            />
+                            <Button label="Add" style={styles.buttonTiny} onPress={() => this.openStatusDialog()} labelStyle={{fontSize: verticalScale(12)}} />
                             <View style={{paddingHorizontal: scale(5)}} />
                             <Button
                                 label="Clear All"
                                 style={styles.buttonTiny}
                                 onPress={() => this.clearAllStatuses()}
-                                labelStyle={{fontSize: verticalScale(12), color: Colors.background}}
+                                labelStyle={{fontSize: verticalScale(12)}}
                             />
                         </View>
                         {this._renderStatuses()}
