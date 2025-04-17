@@ -39,7 +39,7 @@ const ManeuversRoute = ({}) => {
             {moves.map((move, index) => {
                 const heading = <Text style={[styles.grey, {paddingLeft: scale(10), fontSize: verticalScale(18)}]}>{move.name}</Text>;
                 const body = (
-                    <View borderRightWidth={1} borderColor={Colors.formAccent} style={{padding: scale(10)}}>
+                    <View style={{padding: scale(10)}}>
                         <View style={{flex: 1, flexDirection: 'row', alignSelf: 'stretch', padding: verticalScale(5)}}>
                             <View style={{flex: 1, alignSelf: 'stretch'}}>
                                 <Text style={[styles.boldGrey, {textDecorationLine: 'underline'}]}>Phase</Text>
@@ -120,7 +120,7 @@ export const DamageScreen = ({navigation}) => {
         const tab = (
             <View style={[styles.tabContent, {paddingHorizontal: scale(10)}]}>
                 <View>
-                    <View paddingHorizontal={scale(10)}>
+                    <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>
                         <Slider
                             label="Dice:"
                             value={parseInt(damageForm.dice, 10)}
@@ -162,7 +162,7 @@ export const DamageScreen = ({navigation}) => {
                             />
                         </View>
                     </View>
-                    <View paddingHorizontal={scale(10)}>{renderStunMultiplier()}</View>
+                    <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>{renderStunMultiplier()}</View>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                         <Text style={styles.grey}>Is this an explosion?</Text>
                         <View style={{paddingRight: scale(10)}}>
@@ -177,7 +177,7 @@ export const DamageScreen = ({navigation}) => {
                             />
                         </View>
                     </View>
-                    <View paddingHorizontal={scale(10)}>{renderFadeRate()}</View>
+                    <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>{renderFadeRate()}</View>
                     <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                         <Text style={styles.grey}>Use hit locations?</Text>
                         <View style={{paddingRight: scale(10)}}>

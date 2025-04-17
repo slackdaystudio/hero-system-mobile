@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {RadioGroup} from 'react-native-radio-buttons-group';
@@ -88,7 +88,7 @@ export const EffectScreen = ({navigation}) => {
             <Header navigation={navigation} />
             <Heading text="Effect Roll" />
             <View paddingHorizontal={scale(10)} paddingBottom={verticalScale(20)}>
-                <View paddingHorizontal={scale(10)}>
+                <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>
                     <Slider label="Dice:" value={effectForm.dice} step={1} min={1} max={50} onValueChange={setSliderState} valueKey="dice" />
                 </View>
                 <View>

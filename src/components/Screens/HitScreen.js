@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {useSelector, useDispatch} from 'react-redux';
-import {ImageBackground, Dimensions, Text, View, Switch, TouchableHighlight} from 'react-native';
+import {ImageBackground, Dimensions, Text, View, Switch, TouchableHighlight, Platform} from 'react-native';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {TabView} from 'react-native-tab-view';
 import {Tab, RouteBuilder} from '../Tab/Tab';
@@ -35,32 +35,30 @@ const windowHeight = Dimensions.get('window').height;
 const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
     const tab = (
         <View flex={0} flexGrow={1}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <View paddingHorizontal={scale(10)}>
-                    <View paddingHorizontal={scale(10)}>
-                        <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateForm} valueKey="ocv" />
-                        <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateForm} valueKey="numberOfRolls" />
-                    </View>
-                    <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
-                        <Text style={styles.grey}>Is this an autofire attack?</Text>
-                        <View style={{paddingRight: scale(10)}}>
-                            <Switch
-                                value={hitForm.isAutofire}
-                                onValueChange={() => updateForm('isAutofire', !hitForm.isAutofire)}
-                                color="#3da0ff"
-                                minimumTrackTintColor={Colors.formControl}
-                                maximumTrackTintColor={Colors.primary}
-                                thumbColor={Colors.formControl}
-                                ios_backgroundColor={Colors.switchGutter}
-                            />
-                        </View>
-                    </View>
-                    <View paddingHorizontal={scale(10)}>{renderDcvSlider()}</View>
-                    <View style={styles.buttonContainer}>
-                        <Button label="Roll" style={styles.button} onPress={roll} />
+            <View paddingHorizontal={scale(10)}>
+                <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>
+                    <Slider label="Total OCV/OMCV:" value={hitForm.ocv} step={1} min={-30} max={30} onValueChange={updateForm} valueKey="ocv" />
+                    <Slider label="Rolls:" value={hitForm.numberOfRolls} step={1} min={1} max={20} onValueChange={updateForm} valueKey="numberOfRolls" />
+                </View>
+                <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
+                    <Text style={styles.grey}>Is this an autofire attack?</Text>
+                    <View style={{paddingRight: scale(10)}}>
+                        <Switch
+                            value={hitForm.isAutofire}
+                            onValueChange={() => updateForm('isAutofire', !hitForm.isAutofire)}
+                            color="#3da0ff"
+                            minimumTrackTintColor={Colors.formControl}
+                            maximumTrackTintColor={Colors.primary}
+                            thumbColor={Colors.formControl}
+                            ios_backgroundColor={Colors.switchGutter}
+                        />
                     </View>
                 </View>
-            </ImageBackground>
+                <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>{renderDcvSlider()}</View>
+                <View style={styles.buttonContainer}>
+                    <Button label="Roll" style={styles.button} onPress={roll} />
+                </View>
+            </View>
         </View>
     );
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {Text, TextInput, View} from 'react-native';
+import {Platform, Text, TextInput, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import Header from '../Header/Header';
@@ -73,7 +73,7 @@ export const CostCruncherScreen = ({navigation}) => {
                         onEndEditing={(event) => _updateFormValue('cost', event.nativeEvent.text)}
                     />
                 </View>
-                <View paddingHorizontal={scale(10)}>
+                <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>
                     <Slider
                         label="Advantages:"
                         value={costCruncherForm.advantages}

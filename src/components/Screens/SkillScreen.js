@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View, ImageBackground, Text, Switch} from 'react-native';
+import {View, ImageBackground, Text, Switch, Platform} from 'react-native';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
@@ -80,7 +80,7 @@ export const SkillScreen = ({navigation}) => {
                         />
                     </View>
                 </View>
-                <View paddingHorizontal={scale(10)}>{renderSlider()}</View>
+                <View paddingHorizontal={scale(Platform.OS === 'ios' ? 10 : 0)}>{renderSlider()}</View>
                 <View style={styles.buttonContainer}>
                     <Button label="Roll" style={styles.button} onPress={roll} />
                 </View>
