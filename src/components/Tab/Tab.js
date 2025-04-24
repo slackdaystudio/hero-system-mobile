@@ -4,9 +4,10 @@ import {ActivityIndicator, ImageBackground, ScrollView, View, Animated, Pressabl
 import {verticalScale, scale} from 'react-native-size-matters';
 import {Heading} from '../Heading/Heading';
 import {common} from '../../lib/Common';
-import {Colors} from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
-export const RouteBuilder = (headingText, tab, showSpinner = false) => {
+export const RouteBuilder = (headingText, tab, Colors, showSpinner = false) => {
     if (showSpinner) {
         return (
             <>
@@ -36,8 +37,12 @@ export const RouteBuilder = (headingText, tab, showSpinner = false) => {
 };
 
 export const Tab = ({navigationState}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors} = useColorTheme(scheme);
+
     const _renderItem = (item, _i) => {
-        const color = navigationState.index === item.index ? Colors.text : 'rgba(193, 235, 255, 0.4)';
+        const color = navigationState.index === item.index ? Colors.text : Colors.lighText;
         const borderBottomWidth = navigationState.index === item.index ? 5 : 1;
 
         return (

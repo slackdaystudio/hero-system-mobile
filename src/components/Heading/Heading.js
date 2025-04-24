@@ -1,8 +1,9 @@
 import React from 'react';
 import {View, Text} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
-import styles from '../../Styles';
 import {Animated, useSlideInLeft} from '../Animated';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -19,6 +20,10 @@ import {Animated, useSlideInLeft} from '../Animated';
 // limitations under the License.
 
 export const Heading = ({text, animated = false}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {styles} = useColorTheme(scheme);
+
     const slideIn = useSlideInLeft();
 
     if (animated) {
@@ -32,7 +37,7 @@ export const Heading = ({text, animated = false}) => {
     }
 
     return (
-        <View style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: 20}}>
+        <View style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: verticalScale(48)}}>
             <Text style={styles.heading}>{text}</Text>
         </View>
     );

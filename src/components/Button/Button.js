@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {Pressable, Text, View} from 'react-native';
-import styles, {Colors} from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -18,7 +18,12 @@ import styles, {Colors} from '../../Styles';
 // limitations under the License.
 
 export const Button = ({label, onPress, disabled, small, labelStyle, ...rest}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
     let style = small ? {...styles.buttonSmall} : {...styles.buttonBig};
+
     let textStyle = {...styles.buttonText};
 
     if (rest.style !== undefined) {
@@ -45,16 +50,4 @@ export const Button = ({label, onPress, disabled, small, labelStyle, ...rest}) =
             </View>
         </Pressable>
     );
-};
-
-Button.propTypes = {
-    label: PropTypes.string.isRequired,
-    onPress: PropTypes.func.isRequired,
-    small: PropTypes.bool,
-    labelStyle: PropTypes.object,
-};
-
-Button.defaulProps = {
-    small: false,
-    labelStyle: styles.buttonText,
 };

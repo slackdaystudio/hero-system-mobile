@@ -1,9 +1,10 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import {BackHandler, Platform, View, Image, StatusBar, TouchableOpacity} from 'react-native';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
-import {Colors} from '../../Styles';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {DARK, LIGHT, useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -21,74 +22,79 @@ import {Colors} from '../../Styles';
 
 export const EXIT_APP = '0';
 
-export default class Header extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        hasTabs: PropTypes.bool,
-        backScreen: PropTypes.string,
-    };
+export const Header = ({backScreen}) => {
+    const navigation = useNavigation();
 
-    _onBackButtonPress() {
-        if (this.props.backScreen === EXIT_APP) {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors} = useColorTheme(scheme);
+
+    const localStyles = createLocalStyles(Colors);
+
+    const _onBackButtonPress = () => {
+        if (backScreen === EXIT_APP) {
             BackHandler.exitApp();
 
             return true;
         }
 
-        if (this.props.backScreen === null || this.props.backScreen === undefined) {
-            this.props.navigation.goBack();
+        if (backScreen === null || backScreen === undefined) {
+            navigation.goBack();
 
             return true;
         }
 
-        this.props.navigation.navigate(this.props.backScreen);
-    }
+        navigation.navigate(backScreen);
+    };
 
-    render() {
-        return (
-            <View style={localStyles.header}>
-                <StatusBar barStyle="light-content" />
-                <View
-                    style={{
-                        flex: 1,
-                        paddingTop: Platform.OS === 'ios' ? 0 : 50,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: Colors.primary,
-                    }}
-                >
-                    <View style={{flex: 1}}>
-                        <Icon name="chevron-left" style={{fontSize: verticalScale(18), color: Colors.tertiary}} onPress={() => this._onBackButtonPress()} />
-                    </View>
-                    <View style={{flex: 4}}>
-                        <View style={localStyles.logo}>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')}>
-                                <Image style={{height: scale(60), width: scale(138)}} source={require('../../../public/hero_mobile_logo.png')} />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    <View style={{flex: 1}}>
-                        <Icon
-                            name="bars"
-                            style={{fontSize: verticalScale(24), color: Colors.tertiary, paddingBottom: Platform.OS === 'ios' ? verticalScale(0) : 0}}
-                            onPress={() => this.props.navigation.toggleDrawer()}
-                        />
+    return (
+        <View style={localStyles.header}>
+            <StatusBar barStyle={`${scheme === LIGHT ? DARK : LIGHT}-content`} />
+            <View
+                style={{
+                    flex: 1,
+                    paddingTop: Platform.OS === 'ios' ? 0 : 50,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: Colors.primary,
+                }}
+            >
+                <View style={{flex: 1}}>
+                    <Icon name="chevron-left" style={{fontSize: verticalScale(18), color: Colors.tertiary}} onPress={_onBackButtonPress} />
+                </View>
+                <View style={{flex: 4}}>
+                    <View style={localStyles.logo}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                            <Image
+                                style={{tintColor: Colors.text, height: scale(60), width: scale(138)}}
+                                source={require('../../../public/hero_mobile_logo.png')}
+                            />
+                        </TouchableOpacity>
                     </View>
                 </View>
+                <View style={{flex: 1}}>
+                    <Icon
+                        name="bars"
+                        style={{fontSize: verticalScale(24), color: Colors.tertiary, paddingBottom: Platform.OS === 'ios' ? verticalScale(0) : 0}}
+                        onPress={() => navigation.toggleDrawer()}
+                    />
+                </View>
             </View>
-        );
-    }
-}
+        </View>
+    );
+};
 
-const localStyles = ScaledSheet.create({
-    header: {
-        backgroundColor: Colors.primary,
-        borderBottomWidth: 0.5,
-        borderColor: Colors.characterFooter,
-        height: Platform.OS === 'ios' ? '90@vs' : '100@vs',
-    },
-    logo: {
-        alignSelf: 'center',
-    },
-});
+const createLocalStyles = (Colors) => {
+    return ScaledSheet.create({
+        header: {
+            backgroundColor: Colors.primary,
+            borderBottomWidth: 0.5,
+            borderColor: Colors.characterFooter,
+            height: Platform.OS === 'ios' ? '90@vs' : '100@vs',
+        },
+        logo: {
+            alignSelf: 'center',
+        },
+    });
+};

@@ -1,19 +1,20 @@
-import React, {Component, Fragment} from 'react';
-import PropTypes from 'prop-types';
-import {ImageBackground, View, Text, TouchableHighlight} from 'react-native';
+import React, {Fragment, useState} from 'react';
+import {View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {Heading} from '../Heading/Heading';
 import {Button} from '../Button/Button';
 import {Icon} from '../Icon/Icon';
-import CircleText from '../CircleText/CircleText';
-import NumberPicker from '../NumberPicker/NumberPicker';
-import StatusDialog from '../StatusDialog/StatusDialog';
+import {CircleText} from '../CircleText/CircleText';
+import {NumberPicker} from '../NumberPicker/NumberPicker';
+import {StatusDialog} from '../StatusDialog/StatusDialog';
 import {common} from '../../lib/Common';
 import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 import {dieRoller} from '../../lib/DieRoller';
 import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
-import styles, {Colors} from '../../Styles';
 import {TextInput} from 'react-native-gesture-handler';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,101 +30,109 @@ import {TextInput} from 'react-native-gesture-handler';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Feather.loadFont().catch((error) => console.error(error));
-
-export default class Combat extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        character: PropTypes.object.isRequired,
-        characters: PropTypes.object.isRequired,
-        setSparseCombatDetails: PropTypes.func.isRequired,
-        usePhase: PropTypes.func.isRequired,
-        forms: PropTypes.object.isRequired,
-        updateForm: PropTypes.func.isRequired,
-        updateFormValue: PropTypes.func.isRequired,
-        resetForm: PropTypes.func.isRequired,
-        applyStatus: PropTypes.func.isRequired,
-        clearAllStatuses: PropTypes.func.isRequired,
-        clearStatus: PropTypes.func.isRequired,
-    };
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            combatDetails: this._getCombatDetails(props.character),
-            statusDialogVisible: false,
-        };
-
-        this.updateCombatState = this._updateCombatState.bind(this);
-        this.resetCombatState = this._resetCombatState.bind(this);
-        this.takeRecovery = this._takeRecovery.bind(this);
-        this.incrementCv = this._incrementCv.bind(this);
-        this.decrementCv = this._decrementCv.bind(this);
-        this.rollToHit = this._rollToHit.bind(this);
-        this.usePhase = this._usePhase.bind(this);
-        this.abortPhase = this._abortPhase.bind(this);
-        this.applyStatus = this._applyStatus.bind(this);
-        this.openStatusDialog = this._openStatusDialog.bind(this);
-        this.closeStatusDialog = this._closeStatusDialog.bind(this);
-        this.clearAllStatuses = this._clearAllStatuses.bind(this);
-        this.editStatus = this._editStatus.bind(this);
-        this.clearStatus = this._clearStatus.bind(this);
-    }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (prevState.character !== nextProps.character) {
-            let newState = {...prevState};
-
-            if (nextProps.character.showSecondary) {
-                newState.combatDetails = nextProps.character.combatDetails.secondary;
-            } else {
-                newState.combatDetails = nextProps.character.combatDetails.primary;
-            }
-
-            return newState;
-        }
-
+const getCombatDetails = (character) => {
+    if (character === null) {
         return null;
     }
 
-    _getCombatDetails(character) {
-        if (character === null) {
-            return null;
-        }
+    return character.showSecondary ? character.combatDetails.secondary : character.combatDetails.primary;
+};
 
-        return character.showSecondary ? character.combatDetails.secondary : character.combatDetails.primary;
-    }
+export const Combat = ({
+    character,
+    forms,
+    setSparseCombatDetails,
+    checkPhase,
+    updateForm,
+    updateFormValue,
+    resetForm,
+    applyStatus,
+    clearAllStatuses,
+    clearStatus,
+}) => {
+    const navigation = useNavigation();
 
-    _updateCombatState(key, value) {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
+    const [combatDetails, setCombatDetails] = useState(getCombatDetails(character));
+
+    const [statusDialogVisible, setStatusDialogVisible] = useState(false);
+
+    // constructor(props) {
+    //     super(props);
+
+    //     state = {
+    //         combatDetails: _getCombatDetails(props.character),
+    //         statusDialogVisible: false,
+    //     };
+
+    //     updateCombatState = _updateCombatState.bind(this);
+    //     resetCombatState = _resetCombatState.bind(this);
+    //     takeRecovery = _takeRecovery.bind(this);
+    //     incrementCv = _incrementCv.bind(this);
+    //     decrementCv = _decrementCv.bind(this);
+    //     rollToHit = _rollToHit.bind(this);
+    //     usePhase = _usePhase.bind(this);
+    //     abortPhase = _abortPhase.bind(this);
+    //     applyStatus = _applyStatus.bind(this);
+    //     openStatusDialog = _openStatusDialog.bind(this);
+    //     closeStatusDialog = _closeStatusDialog.bind(this);
+    //     clearAllStatuses = _clearAllStatuses.bind(this);
+    //     editStatus = _editStatus.bind(this);
+    //     clearStatus = _clearStatus.bind(this);
+    // }
+
+    // static getDerivedStateFromProps(nextProps, prevState) {
+    //     if (prevState.character !== nextProps.character) {
+    //         let newState = {...prevState};
+
+    //         if (nextProps.character.showSecondary) {
+    //             newState.combatDetails = nextProps.character.combatDetails.secondary;
+    //         } else {
+    //             newState.combatDetails = nextProps.character.combatDetails.primary;
+    //         }
+
+    //         return newState;
+    //     }
+
+    //     return null;
+    // }
+
+    const updateCombatState = (key, value) => {
         if (/^(-)?[0-9]*$/.test(value) === false) {
             return;
         }
 
-        let combatDetails = {};
+        let newCombatDetails = {...combatDetails};
 
-        combatDetails[key] = value;
+        newCombatDetails[key] = value;
 
-        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
-    }
+        setCombatDetails(newCombatDetails);
 
-    _resetCombatState(key) {
-        let combatDetails = {};
+        setSparseCombatDetails(combatDetails, character.showSecondary);
+    };
 
-        combatDetails[key] = heroDesignerCharacter.getCharacteristicTotal(key === 'endurance' ? 'end' : key, this.props.character);
+    const resetCombatState = (key) => {
+        let newCombatDetails = {...combatDetails};
 
-        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
-    }
+        newCombatDetails[key] = heroDesignerCharacter.getCharacteristicTotal(key === 'endurance' ? 'end' : key, character);
 
-    _takeRecovery() {
-        let recovery = heroDesignerCharacter.getCharacteristicTotal('rec', this.props.character);
-        let stunMax = heroDesignerCharacter.getCharacteristicTotal('stun', this.props.character);
-        let endMax = heroDesignerCharacter.getCharacteristicTotal('end', this.props.character);
-        let stun = this.state.combatDetails.stun;
+        setCombatDetails(newCombatDetails);
+
+        setSparseCombatDetails(combatDetails, character.showSecondary);
+    };
+
+    const takeRecovery = () => {
+        let recovery = heroDesignerCharacter.getCharacteristicTotal('rec', character);
+        let stunMax = heroDesignerCharacter.getCharacteristicTotal('stun', character);
+        let endMax = heroDesignerCharacter.getCharacteristicTotal('end', character);
+        let stun = combatDetails.stun;
         let combatStun = parseInt(stun, 10);
-        let endurance = this.state.combatDetails.endurance;
+        let endurance = combatDetails.endurance;
         let combatEnd = parseInt(endurance, 10);
-        let combatDetails = {};
+        let newCombatDetails = {...combatDetails};
 
         if (stun < stunMax) {
             stun = combatStun + recovery > stunMax ? stunMax : combatStun + recovery;
@@ -133,66 +142,67 @@ export default class Combat extends Component {
             endurance = combatEnd + recovery > endMax ? endMax : combatEnd + recovery;
         }
 
-        combatDetails.stun = stun;
-        combatDetails.endurance = endurance;
+        newCombatDetails.stun = stun;
+        newCombatDetails.endurance = endurance;
 
-        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
-    }
+        setCombatDetails(newCombatDetails);
 
-    _incrementCv(key, step) {
-        let combatDetails = {};
-        combatDetails[key] = this.state.combatDetails[key] + step;
+        setSparseCombatDetails(combatDetails, character.showSecondary);
+    };
 
-        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
-    }
+    const incrementCv = (key, step) => {
+        let newCombatDetails = {...combatDetails};
 
-    _decrementCv(key, step) {
-        let combatDetails = {};
-        combatDetails[key] = this.state.combatDetails[key] - step;
+        newCombatDetails[key] = combatDetails[key] + step;
 
-        this.props.setSparseCombatDetails(combatDetails, this.props.character.showSecondary);
-    }
+        setCombatDetails(newCombatDetails);
 
-    _rollToHit(stateKey) {
-        let hitForm = {...this.props.forms.hit};
-        hitForm.ocv = this.state.combatDetails[stateKey];
+        setSparseCombatDetails(combatDetails, character.showSecondary);
+    };
 
-        this.props.updateForm('hit', hitForm);
+    const decrementCv = (key, step) => {
+        let newCombatDetails = {...combatDetails};
 
-        this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollToHit(hitForm.ocv, 1, false, 0)});
-    }
+        newCombatDetails[key] = combatDetails[key] - step;
 
-    _usePhase(phase) {
-        this.props.usePhase(phase, this.props.character.showSecondary, false);
-    }
+        setCombatDetails(newCombatDetails);
 
-    _abortPhase(phase) {
-        this.props.usePhase(phase, this.props.character.showSecondary, true);
-    }
+        setSparseCombatDetails(combatDetails, character.showSecondary);
+    };
 
-    _openStatusDialog() {
-        let newState = {...this.state};
-        newState.statusDialogVisible = true;
+    const rollToHit = (stateKey) => {
+        let hitForm = {...forms.hit};
+        hitForm.ocv = combatDetails[stateKey];
 
-        this.setState(newState);
-    }
+        updateForm('hit', hitForm);
 
-    _applyStatus() {
-        this.props.applyStatus(this.props.forms.status);
+        navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollToHit(hitForm.ocv, 1, false, 0)});
+    };
 
-        this.props.resetForm('status');
+    const _usePhase = (phase) => {
+        checkPhase(phase, character.showSecondary, false);
+    };
 
-        this._closeStatusDialog();
-    }
+    const abortPhase = (phase) => {
+        checkPhase(phase, character.showSecondary, true);
+    };
 
-    _clearAllStatuses() {
-        this.props.clearAllStatuses();
-    }
+    const openStatusDialog = () => {
+        setStatusDialogVisible(true);
+    };
 
-    _editStatus(index) {
-        const key = this.props.character.showSecondary ? 'secondary' : 'primary';
-        const status = this.props.character.combatDetails[key].statuses[index];
-        const statusForm = {...this.props.forms.status};
+    const _applyStatus = () => {
+        applyStatus(forms.status);
+
+        resetForm('status');
+
+        closeStatusDialog();
+    };
+
+    const editStatus = (index) => {
+        const key = character.showSecondary ? 'secondary' : 'primary';
+        const status = character.combatDetails[key].statuses[index];
+        const statusForm = {...forms.status};
 
         statusForm.name = status.name;
         statusForm.label = status.label || '';
@@ -216,20 +226,16 @@ export default class Combat extends Component {
             // Do nothing
         }
 
-        this.props.updateForm('status', statusForm);
+        updateForm('status', statusForm);
 
-        this.openStatusDialog();
-    }
+        openStatusDialog();
+    };
 
-    _clearStatus(index) {
-        this.props.clearStatus(index);
-    }
+    const closeStatusDialog = () => {
+        setStatusDialogVisible(false);
+    };
 
-    _closeStatusDialog() {
-        this.setState({statusDialogVisible: false});
-    }
-
-    _renderHealthItem(stateKey, label = null) {
+    const renderHealthItem = (stateKey, styles, label = null) => {
         return (
             <View style={{flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: scale(25)}}>
                 <View style={{flex: 1, alignSelf: 'center'}}>
@@ -241,58 +247,53 @@ export default class Combat extends Component {
                             style={styles.textInput}
                             keyboardType="numeric"
                             maxLength={3}
-                            defaultValue={this.state.combatDetails[stateKey].toString()}
-                            onEndEditing={(event) => this.updateCombatState(stateKey, event.nativeEvent.text)}
+                            defaultValue={combatDetails[stateKey].toString()}
+                            onEndEditing={(event) => updateCombatState(stateKey, event.nativeEvent.text)}
                         />
                     </View>
                 </View>
                 <View marginLeft={scale(25)}>
-                    <Button
-                        label="Reset"
-                        style={styles.buttonTiny}
-                        onPress={() => this.resetCombatState(stateKey)}
-                        labelStyle={{fontSize: verticalScale(12)}}
-                    />
+                    <Button label="Reset" style={styles.buttonTiny} onPress={() => resetCombatState(stateKey)} labelStyle={{fontSize: verticalScale(12)}} />
                 </View>
             </View>
         );
-    }
+    };
 
-    _renderDefenses() {
+    const renderDefenses = () => {
         let rows = [
             {
                 label: 'PD',
-                value: heroDesignerCharacter.getTotalDefense(this.props.character, 'PD'),
+                value: heroDesignerCharacter.getTotalDefense(character, 'PD'),
             },
             {
                 label: 'ED',
-                value: heroDesignerCharacter.getTotalDefense(this.props.character, 'ED'),
+                value: heroDesignerCharacter.getTotalDefense(character, 'ED'),
             },
             {
                 label: 'MD',
-                value: heroDesignerCharacter.getTotalUnusualDefense(this.props.character, 'MENTALDEFENSE'),
+                value: heroDesignerCharacter.getTotalUnusualDefense(character, 'MENTALDEFENSE'),
             },
             {
                 label: 'PwD',
-                value: heroDesignerCharacter.getTotalUnusualDefense(this.props.character, 'POWERDEFENSE'),
+                value: heroDesignerCharacter.getTotalUnusualDefense(character, 'POWERDEFENSE'),
             },
         ];
 
         return (
             <Fragment>
                 <View style={{flex: 1, flexDirection: 'row'}}>
-                    {this._renderDefense(rows[0])}
-                    {this._renderDefense(rows[1])}
+                    {renderDefense(rows[0])}
+                    {renderDefense(rows[1])}
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
-                    {this._renderDefense(rows[2])}
-                    {this._renderDefense(rows[3])}
+                    {renderDefense(rows[2])}
+                    {renderDefense(rows[3])}
                 </View>
             </Fragment>
         );
-    }
+    };
 
-    _renderDefense(row) {
+    const renderDefense = (row) => {
         return (
             <Fragment>
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-end'}}>
@@ -305,10 +306,10 @@ export default class Combat extends Component {
                 </View>
             </Fragment>
         );
-    }
+    };
 
-    _renderPhases() {
-        let phases = Object.keys(this.state.combatDetails.phases);
+    const renderPhases = () => {
+        let phases = Object.keys(combatDetails.phases);
 
         if (phases.length > 6) {
             let firstRow = phases.slice(0, 6);
@@ -318,15 +319,15 @@ export default class Combat extends Component {
                 <View style={{flex: 1, alignItems: 'center'}}>
                     <View style={{flex: 1, flexDirection: 'row', paddingBottom: verticalScale(10)}}>
                         {firstRow.map((phase, index) => {
-                            return this._renderPhase(phase.toString());
+                            return renderPhase(phase.toString());
                         })}
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', paddingBottom: verticalScale(10)}}>
                         {secondRow.map((phase, index) => {
-                            return this._renderPhase(phase.toString());
+                            return renderPhase(phase.toString());
                         })}
                     </View>
-                    {this._renderPhaseInfo()}
+                    {renderPhaseInfo()}
                 </View>
             );
         }
@@ -335,20 +336,20 @@ export default class Combat extends Component {
             <View style={{flex: 1, alignItems: 'center'}}>
                 <View style={{flex: 1, flexDirection: 'row', paddingBottom: verticalScale(10)}}>
                     {phases.map((phase, index) => {
-                        return this._renderPhase(phase.toString());
+                        return renderPhase(phase.toString());
                     })}
                 </View>
-                {this._renderPhaseInfo()}
+                {renderPhaseInfo()}
             </View>
         );
-    }
+    };
 
-    _renderPhase(phase) {
+    const renderPhase = (phase) => {
         let color = Colors.formControl;
 
-        if (this.state.combatDetails.phases[phase].used) {
+        if (combatDetails.phases[phase].used) {
             color = '#FFC300';
-        } else if (this.state.combatDetails.phases[phase].aborted) {
+        } else if (combatDetails.phases[phase].aborted) {
             color = '#D11F1F';
         }
 
@@ -356,43 +357,43 @@ export default class Combat extends Component {
             <View key={`phase-${phase}`} style={{paddingHorizontal: scale(5)}}>
                 <TouchableHighlight
                     underlayColor={Colors.background}
-                    onPress={() => this.usePhase(phase, this.props.character.showSecondary)}
-                    onLongPress={() => this.abortPhase(phase)}
+                    onPress={() => _usePhase(phase, character.showSecondary)}
+                    onLongPress={() => abortPhase(phase)}
                 >
                     <CircleText title={phase} fontSize={18} size={40} color={color} />
                 </TouchableHighlight>
             </View>
         );
-    }
+    };
 
-    _renderPhaseInfo() {
+    const renderPhaseInfo = () => {
         return (
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                 <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Dexterity:</Text> {heroDesignerCharacter.getCharacteristicTotal('DEX', this.props.character)}
+                    <Text style={styles.boldGrey}>Dexterity:</Text> {heroDesignerCharacter.getCharacteristicTotal('DEX', character)}
                 </Text>
                 <View style={{width: scale(40)}} />
                 <Text style={styles.grey}>
-                    <Text style={styles.boldGrey}>Speed:</Text> {heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character)}
+                    <Text style={styles.boldGrey}>Speed:</Text> {heroDesignerCharacter.getCharacteristicTotal('SPD', character)}
                 </Text>
             </View>
         );
-    }
+    };
 
-    _renderCvRollButton(stateKey, renderRollButton) {
+    const renderCvRollButton = (stateKey, renderRollButton) => {
         if (renderRollButton) {
             return (
                 <View style={{flex: 0.75, justifyContent: 'flex-start', alignSelf: 'center'}}>
-                    <Button label="roll" style={styles.buttonTiny} onPress={() => this.rollToHit(stateKey)} />
+                    <Button label="roll" style={styles.buttonTiny} onPress={() => rollToHit(stateKey)} />
                 </View>
             );
         }
 
         return <View style={{flex: 0.75}} />;
-    }
+    };
 
-    _renderCv(stateKey, renderRollButton = false) {
-        if (!this.state.combatDetails.hasOwnProperty(stateKey)) {
+    const renderCv = (stateKey, renderRollButton = false) => {
+        if (!combatDetails.hasOwnProperty(stateKey)) {
             return null;
         }
 
@@ -403,20 +404,20 @@ export default class Combat extends Component {
                 </View>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <NumberPicker
-                        value={this.state.combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, this.props.character)}
-                        increment={this.incrementCv}
-                        decrement={this.decrementCv}
+                        value={combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, character)}
+                        increment={incrementCv}
+                        decrement={decrementCv}
                         stateKey={stateKey}
                     />
                 </View>
-                {this._renderCvRollButton(stateKey, renderRollButton)}
+                {renderCvRollButton(stateKey, renderRollButton)}
             </View>
         );
-    }
+    };
 
-    _renderLevels() {
-        if (this.props.character.skills.length > 0) {
-            let skillMap = common.toMap(common.flatten(this.props.character.skills, 'skills'));
+    const renderLevels = () => {
+        if (character.skills.length > 0) {
+            let skillMap = common.toMap(common.flatten(character.skills, 'skills'));
 
             if (skillMap.has('COMBAT_LEVELS') || skillMap.has('SKILL_LEVELS')) {
                 return (
@@ -424,10 +425,10 @@ export default class Combat extends Component {
                         {Array.from(skillMap.values()).map((skill, index) => {
                             if (Array.isArray(skill)) {
                                 return skill.map((s, i) => {
-                                    return this._renderCombatSkillLevel(s);
+                                    return renderCombatSkillLevel(s);
                                 });
                             } else {
-                                return this._renderCombatSkillLevel(skill);
+                                return renderCombatSkillLevel(skill);
                             }
                         })}
                     </View>
@@ -436,9 +437,9 @@ export default class Combat extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderCombatSkillLevel(skill) {
+    const renderCombatSkillLevel = (skill) => {
         if (skill.xmlid.toUpperCase() !== 'COMBAT_LEVELS' && skill.xmlid.toUpperCase() !== 'SKILL_LEVELS') {
             return null;
         }
@@ -449,7 +450,7 @@ export default class Combat extends Component {
             }
         }
 
-        let decorated = characterTraitDecorator.decorate(skill, 'skills', () => this.props.character);
+        let decorated = characterTraitDecorator.decorate(skill, 'skills', () => character);
 
         return (
             <View style={{flex: 1, flexDirection: 'row'}} key={'skill-' + decorated.trait.id}>
@@ -458,18 +459,15 @@ export default class Combat extends Component {
                 </View>
             </View>
         );
-    }
+    };
 
-    _renderStatuses() {
-        const combatDetailsKey = this.props.character.showSecondary ? 'secondary' : 'primary';
+    const renderStatuses = () => {
+        const combatDetailsKey = character.showSecondary ? 'secondary' : 'primary';
 
-        if (
-            this.props.character.combatDetails[combatDetailsKey].hasOwnProperty('statuses') &&
-            this.props.character.combatDetails[combatDetailsKey].statuses.length > 0
-        ) {
+        if (character.combatDetails[combatDetailsKey].hasOwnProperty('statuses') && character.combatDetails[combatDetailsKey].statuses.length > 0) {
             return (
                 <Fragment>
-                    {this.props.character.combatDetails[combatDetailsKey].statuses.map((status, index) => {
+                    {character.combatDetails[combatDetailsKey].statuses.map((status, index) => {
                         let statusText = status.label === '' ? `${status.name} - ` : `${status.label} (${status.name})`;
 
                         switch (status.name) {
@@ -502,13 +500,13 @@ export default class Combat extends Component {
                                     type="FontAwesome"
                                     name="edit"
                                     style={{fontSize: verticalScale(20), color: Colors.formControl, marginRight: scale(10), paddingTop: verticalScale(3)}}
-                                    onPress={() => this.editStatus(index)}
+                                    onPress={() => editStatus(index)}
                                 />
                                 <Icon
                                     type="FontAwesome"
                                     name="trash"
                                     style={{fontSize: verticalScale(20), color: Colors.formControl}}
-                                    onPress={() => this.clearStatus(index)}
+                                    onPress={() => clearStatus(index)}
                                 />
                             </View>
                         );
@@ -522,64 +520,49 @@ export default class Combat extends Component {
                 <Text style={styles.grey}>You have no active status effects</Text>
             </View>
         );
-    }
+    };
 
-    render() {
-        return (
-            <View>
-                <ImageBackground
-                    source={require('../../../public/background.png')}
-                    style={{flex: 1, flexDirection: 'column'}}
-                    imageStyle={{resizeMode: 'repeat'}}
-                >
-                    <Heading text="Health" />
-                    <View style={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
-                        {this._renderHealthItem('stun')}
-                        {this._renderHealthItem('body')}
-                        {this._renderHealthItem('endurance', 'END')}
-                        <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
-                            <Button label="Recovery" style={styles.buttonTiny} onPress={() => this.takeRecovery()} labelStyle={{fontSize: verticalScale(12)}} />
-                        </View>
-                    </View>
-                    <Heading text="Status Effects" />
-                    <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
-                        <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
-                            <Button label="Add" style={styles.buttonTiny} onPress={() => this.openStatusDialog()} labelStyle={{fontSize: verticalScale(12)}} />
-                            <View style={{paddingHorizontal: scale(5)}} />
-                            <Button
-                                label="Clear All"
-                                style={styles.buttonTiny}
-                                onPress={() => this.clearAllStatuses()}
-                                labelStyle={{fontSize: verticalScale(12)}}
-                            />
-                        </View>
-                        {this._renderStatuses()}
-                    </View>
-                    <Heading text="Defenses" />
-                    <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>
-                        {this._renderDefenses()}
-                    </View>
-                    <Heading text="Phases" />
-                    <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>{this._renderPhases()}</View>
-                    <Heading text="Combat Values" />
-                    <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
-                        {this._renderCv('ocv', true)}
-                        {this._renderCv('dcv')}
-                        {this._renderCv('omcv', true)}
-                        {this._renderCv('dmcv')}
-                    </View>
-                    {this._renderLevels()}
-                    <StatusDialog
-                        character={this.props.character}
-                        statusForm={this.props.forms.status}
-                        updateForm={this.props.updateForm}
-                        updateFormValue={this.props.updateFormValue}
-                        visible={this.state.statusDialogVisible}
-                        onApply={this.applyStatus}
-                        onClose={this.closeStatusDialog}
-                    />
-                </ImageBackground>
+    return (
+        <View>
+            <Heading text="Health" />
+            <View style={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                {renderHealthItem('stun', styles)}
+                {renderHealthItem('body', styles)}
+                {renderHealthItem('endurance', styles, 'END')}
+                <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
+                    <Button label="Recovery" style={styles.buttonTiny} onPress={() => takeRecovery()} labelStyle={{fontSize: verticalScale(12)}} />
+                </View>
             </View>
-        );
-    }
-}
+            <Heading text="Status Effects" />
+            <View style={{flex: 1, paddingHorizontal: scale(10), alignItems: 'center', paddingBottom: verticalScale(10)}}>
+                <View style={{flex: 1, flexDirection: 'row', alignSelf: 'flex-end', paddingBottom: verticalScale(10)}}>
+                    <Button label="Add" style={styles.buttonTiny} onPress={() => openStatusDialog()} labelStyle={{fontSize: verticalScale(12)}} />
+                    <View style={{paddingHorizontal: scale(5)}} />
+                    <Button label="Clear All" style={styles.buttonTiny} onPress={() => clearAllStatuses()} labelStyle={{fontSize: verticalScale(12)}} />
+                </View>
+                {renderStatuses()}
+            </View>
+            <Heading text="Defenses" />
+            <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', paddingBottom: verticalScale(10)}}>{renderDefenses()}</View>
+            <Heading text="Phases" />
+            <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingBottom: verticalScale(10)}}>{renderPhases()}</View>
+            <Heading text="Combat Values" />
+            <View style={{flex: 1, width: scale(300), alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
+                {renderCv('ocv', true)}
+                {renderCv('dcv')}
+                {renderCv('omcv', true)}
+                {renderCv('dmcv')}
+            </View>
+            {renderLevels()}
+            <StatusDialog
+                character={character}
+                statusForm={forms.status}
+                updateForm={updateForm}
+                updateFormValue={updateFormValue}
+                visible={statusDialogVisible}
+                onApply={_applyStatus}
+                onClose={closeStatusDialog}
+            />
+        </View>
+    );
+};

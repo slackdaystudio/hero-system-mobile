@@ -1,10 +1,10 @@
 import React, {useState, useCallback} from 'react';
-import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
 import {View, Text, TextInput} from 'react-native';
 import {default as RNSlider} from '@react-native-community/slider';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
-import styles, {Colors} from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -21,6 +21,10 @@ import styles, {Colors} from '../../Styles';
 // limitations under the License.
 
 export const Slider = ({label, value, step, min, max, disabled = false, valueKey, onValueChange, toggleTabsLocked = () => {}}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
     const [textValue, setTextValue] = useState(value);
 
     useFocusEffect(
@@ -115,18 +119,6 @@ export const Slider = ({label, value, step, min, max, disabled = false, valueKey
             </View>
         </View>
     );
-};
-
-Slider.propTypes = {
-    label: PropTypes.string.isRequired,
-    value: PropTypes.number.isRequired,
-    step: PropTypes.number.isRequired,
-    min: PropTypes.number.isRequired,
-    max: PropTypes.number.isRequired,
-    disabled: PropTypes.bool,
-    valueKey: PropTypes.string,
-    onValueChange: PropTypes.func.isRequired,
-    toggleTabsLocked: PropTypes.func,
 };
 
 const localStyles = ScaledSheet.create({

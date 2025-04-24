@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {persistence} from '../lib/Persistence';
+import {SYSTEM} from '../hooks/useColorTheme';
 
 export const toggleSetting = createAsyncThunk('settings/toggleSetting', async ({key, value}) => {
     const settingValue = await persistence.toggleSetting(key, value);
@@ -22,6 +23,7 @@ const settingsSlice = createSlice({
         onlyDiceSounds: true,
         showAnimations: true,
         increaseEntropy: true,
+        colorScheme: SYSTEM,
     },
     reducers: {
         initializeApplicationSettings: (state, action) => {
@@ -32,6 +34,7 @@ const settingsSlice = createSlice({
             state.onlyDiceSounds = settings.onlyDiceSounds;
             state.showAnimations = settings.showAnimations;
             state.increaseEntropy = settings.increaseEntropy;
+            state.colorScheme = settings.colorScheme;
         },
     },
     extraReducers: (builder) => {
@@ -49,6 +52,7 @@ const settingsSlice = createSlice({
                 state.onlyDiceSounds = settings.onlyDiceSounds;
                 state.showAnimations = settings.showAnimations;
                 state.increaseEntropy = settings.increaseEntropy;
+                state.colorScheme = settings.colorScheme;
             });
     },
 });

@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ActivityIndicator, Text, View} from 'react-native';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {Chart} from '../../lib/Chart';
 import {common} from '../../lib/Common';
 import {statistics as libStatistics} from '../../lib/Statistics';
-import styles, {Colors} from '../../Styles';
 import {scale, verticalScale} from 'react-native-size-matters';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // CopyView 2018-Present Philip J. Guinchard
 //
@@ -28,6 +29,10 @@ import {scale, verticalScale} from 'react-native-size-matters';
 const MINIMUM_ROLLS_FOR_CHART = 30;
 
 export const StatisticsScreen = ({navigation}) => {
+    const userColorScheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(userColorScheme);
+
     const [statistics, setStatistics] = useState(null);
 
     useFocusEffect(

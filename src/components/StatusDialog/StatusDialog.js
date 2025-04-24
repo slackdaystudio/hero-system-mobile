@@ -1,5 +1,4 @@
-import React, {Component, Fragment} from 'react';
-import PropTypes from 'prop-types';
+import React, {useRef, useState} from 'react';
 import {Platform, View, Text, TextInput, KeyboardAvoidingView} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
@@ -7,165 +6,174 @@ import {scale, verticalScale} from 'react-native-size-matters';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Button} from '../Button/Button';
-import styles, {Colors} from '../../Styles';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 export const STATUSES = ['Aid', 'Drain', 'Entangle', 'Flash'];
 
-class StatusDialog extends Component {
-    static propTypes = {
-        character: PropTypes.object.isRequired,
-        statusForm: PropTypes.object.isRequired,
-        updateForm: PropTypes.func.isRequired,
-        updateFormValue: PropTypes.func.isRequired,
-        visible: PropTypes.bool.isRequired,
-        onApply: PropTypes.func.isRequired,
-        onClose: PropTypes.func.isRequired,
-    };
+const getItems = (character) => {
+    let items = [
+        {
+            id: 0,
+            name: 'Characteristics',
+            children: [],
+        },
+        {
+            id: 1,
+            name: 'Powers',
+            children: [],
+        },
+    ];
 
-    constructor(props) {
-        super(props);
+    items[0].children = character.characteristics
+        .map((c) => {
+            return {
+                id: c.shortName,
+                name: c.name,
+            };
+        })
+        .slice();
 
-        this.items = this._getItems();
+    items[1].children = character.powers
+        .map((p) => {
+            return {
+                id: p.id,
+                name: p.name,
+            };
+        })
+        .slice();
 
-        this.state = {
-            open: props.visible,
-            value: props.statusForm.name,
-            items: STATUSES.map((status) => ({label: status, value: status})),
-            selectedItems: this._getItemIds(props.statusForm.targetTrait, this.items),
-        };
+    return items;
+};
 
-        this.updateFormValue = this._updateFormValue.bind(this);
-        this.setValue = this._setValue.bind(this);
-    }
+const getItemIds = (targetTrait, items) => {
+    const itemIds = [];
 
-    componentDidUpdate(prevProps) {
-        if (this.props.visible !== prevProps.visible && this.props.visible) {
-            this.setState((state) => ({
-                ...state,
-                value: this.props.statusForm.name,
-                selectedItems: this._getItemIds(this.props.statusForm.targetTrait, this.items),
-            }));
-        }
-    }
-
-    _getItemIds(targetTrait, items) {
-        const itemIds = [];
-
-        if (targetTrait !== null) {
-            for (const category of items) {
-                for (const item of category.children) {
-                    if (targetTrait.includes(item.name)) {
-                        itemIds.push(item.id);
-                    }
+    if (targetTrait !== null) {
+        for (const category of items) {
+            for (const item of category.children) {
+                if (targetTrait.includes(item.name)) {
+                    itemIds.push(item.id);
                 }
             }
         }
-
-        return itemIds;
     }
 
-    _setValue(callback) {
-        this.setState((state) => {
-            const newState = {...state};
+    return itemIds;
+};
 
-            newState.value = callback(state.value);
+export const StatusDialog = ({character, statusForm, updateForm, updateFormValue, visible, onApply, onClose}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
 
-            this.updateFormValue('name', newState.value);
+    const {Colors, styles} = useColorTheme(scheme);
 
-            return newState;
-        });
-    }
+    const statuses = useRef(getItems(character));
 
-    _updateFormValue(key, value) {
+    const [open, setOpen] = useState(false);
+
+    const [value, setValue] = useState(statusForm.name);
+
+    // eslint-disable-next-line no-unused-vars
+    const [items, _setItems] = useState(STATUSES.map((status) => ({label: status, value: status})));
+
+    const [selectedItems, setSelectedItems] = useState(getItemIds(statusForm.targetTrait, items));
+
+    // constructor(props) {
+    //     super(props);
+
+    //     this.items = this._getItems();
+
+    //     this.state = {
+    //         open: props.visible,
+    //         value: props.statusForm.name,
+    //         items: STATUSES.map((status) => ({label: status, value: status})),
+    //         selectedItems: this._getItemIds(props.statusForm.targetTrait, this.items),
+    //     };
+
+    //     this.updateFormValue = this._updateFormValue.bind(this);
+    //     this.setValue = this._setValue.bind(this);
+    // }
+
+    // componentDidUpdate(prevProps) {
+    //     if (visible !== prevProps.visible && visible) {
+    //         this.setState((state) => ({
+    //             ...state,
+    //             value: statusForm.name,
+    //             selectedItems: this._getItemIds(statusForm.targetTrait, this.items),
+    //         }));
+    //     }
+    // }
+
+    const setNewValue = (callback) => {
+        setValue(callback(value));
+
+        updateFormValue('name', value);
+
+        // this.setState((state) => {
+        //     const newState = {...state};
+
+        //     newState.value = callback(state.value);
+
+        //     this.updateFormValue('name', newState.value);
+
+        //     return newState;
+        // });
+    };
+
+    const _updateFormValue = (key, val) => {
         if (key === 'activePoints') {
-            if (/^(-)?[0-9]*$/.test(value) === false) {
+            if (/^(-)?[0-9]*$/.test(val) === false) {
                 return;
             }
         } else if (key !== 'name' && key !== 'label') {
-            if (/^[0-9]*$/.test(value) === false) {
+            if (/^[0-9]*$/.test(val) === false) {
                 return;
             }
         }
 
-        this.props.updateFormValue('status', key, value);
-    }
+        updateFormValue('status', key, val);
+    };
 
-    _getItems() {
-        let items = [
-            {
-                id: 0,
-                name: 'Characteristics',
-                children: [],
-            },
-            {
-                id: 1,
-                name: 'Powers',
-                children: [],
-            },
-        ];
+    const onSelectedItemsChange = (newItems) => {
+        setSelectedItems(newItems);
 
-        items[0].children = this.props.character.characteristics
-            .map((c) => {
-                return {
-                    id: c.shortName,
-                    name: c.name,
-                };
-            })
-            .slice();
+        let itemLabels = [];
 
-        items[1].children = this.props.character.powers
-            .map((p) => {
-                return {
-                    id: p.id,
-                    name: p.name,
-                };
-            })
-            .slice();
-
-        return items;
-    }
-
-    _onSelectedItemsChange(selectedItems) {
-        this.setState({selectedItems: selectedItems}, () => {
-            let statusForm = {...this.props.statusForm};
-            let itemLabels = [];
-
-            for (const category of this.items) {
-                for (const item of category.children) {
-                    if (this.state.selectedItems.includes(item.id)) {
-                        itemLabels.push(item.name);
-                    }
+        for (const category of items) {
+            for (const item of category.children) {
+                if (selectedItems.includes(item.id)) {
+                    itemLabels.push(item.name);
                 }
             }
+        }
 
-            statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
+        statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
 
-            this.props.updateForm('status', statusForm);
-        });
-    }
+        updateForm('status', statusForm);
+    };
 
-    _onApply() {
-        this.setState({selectedItems: []}, () => {
-            this.props.onApply();
-        });
-    }
+    const _onApply = () => {
+        setSelectedItems([]);
 
-    _renderSecondaryControls() {
-        switch (this.props.statusForm.name) {
+        onApply();
+    };
+
+    const renderSecondaryControls = () => {
+        switch (statusForm.name) {
             case 'Aid':
             case 'Drain':
-                return this._renderAdjustmentControls();
+                return renderAdjustmentControls();
             case 'Entangle':
-                return this._renderEntangleControls();
+                return renderEntangleControls();
             case 'Flash':
-                return this._renderFlashControls();
+                return renderFlashControls();
             default:
                 return null;
         }
-    }
+    };
 
-    _renderAdjustmentControls() {
+    const renderAdjustmentControls = () => {
         return (
             <>
                 <View flexDirection="row" justifyContent="space-between">
@@ -174,8 +182,8 @@ class StatusDialog extends Component {
                         style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
-                        defaultValue={this.props.statusForm.activePoints.toString()}
-                        onEndEditing={(event) => this.updateFormValue('activePoints', event.nativeEvent.text)}
+                        defaultValue={statusForm.activePoints.toString()}
+                        onEndEditing={(event) => _updateFormValue('activePoints', event.nativeEvent.text)}
                     />
                 </View>
                 <SectionedMultiSelect
@@ -197,7 +205,7 @@ class StatusDialog extends Component {
                         subItemBackground: Colors.primary,
                         searchSelectionColor: Colors.text,
                     }}
-                    items={this.items}
+                    items={items}
                     IconRenderer={Icon}
                     searchIconComponent={<Icon name="search" color="white" size={18} style={{paddingLeft: scale(5)}} />}
                     uniqueKey="id"
@@ -206,14 +214,14 @@ class StatusDialog extends Component {
                     showDropDowns={true}
                     showCancelButton={true}
                     readOnlyHeadings={true}
-                    onSelectedItemsChange={(selected) => this._onSelectedItemsChange(selected)}
-                    selectedItems={this.state.selectedItems}
+                    onSelectedItemsChange={(selected) => onSelectedItemsChange(selected)}
+                    selectedItems={selectedItems}
                 />
             </>
         );
-    }
+    };
 
-    _renderEntangleControls() {
+    const renderEntangleControls = () => {
         return (
             <View>
                 <View flexDirection="row" justifyContent="space-between">
@@ -222,8 +230,8 @@ class StatusDialog extends Component {
                         style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
-                        defaultValue={this.props.statusForm.body.toString()}
-                        onEndEditing={(event) => this.updateFormValue('body', event.nativeEvent.text)}
+                        defaultValue={statusForm.body.toString()}
+                        onEndEditing={(event) => _updateFormValue('body', event.nativeEvent.text)}
                     />
                 </View>
                 <View flexDirection="row" justifyContent="space-between">
@@ -232,8 +240,8 @@ class StatusDialog extends Component {
                         style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
-                        defaultValue={this.props.statusForm.pd.toString()}
-                        onEndEditing={(event) => this.updateFormValue('pd', event.nativeEvent.text)}
+                        defaultValue={statusForm.pd.toString()}
+                        onEndEditing={(event) => _updateFormValue('pd', event.nativeEvent.text)}
                     />
                 </View>
                 <View flexDirection="row" justifyContent="space-between">
@@ -242,15 +250,15 @@ class StatusDialog extends Component {
                         style={styles.textInput}
                         keyboardType="numeric"
                         maxLength={3}
-                        defaultValue={this.props.statusForm.ed.toString()}
-                        onEndEditing={(event) => this.updateFormValue('ed', event.nativeEvent.text)}
+                        defaultValue={statusForm.ed.toString()}
+                        onEndEditing={(event) => _updateFormValue('ed', event.nativeEvent.text)}
                     />
                 </View>
             </View>
         );
-    }
+    };
 
-    _renderFlashControls() {
+    const renderFlashControls = () => {
         return (
             <View flexDirection="row" justifyContent="space-between">
                 <Text style={[styles.grey, {alignSelf: 'center'}]}>Segments:</Text>
@@ -258,61 +266,62 @@ class StatusDialog extends Component {
                     style={styles.textInput}
                     keyboardType="numeric"
                     maxLength={3}
-                    defaultValue={this.props.statusForm.segments.toString()}
-                    onEndEditing={(event) => this.updateFormValue('segments', event.nativeEvent.text)}
+                    defaultValue={statusForm.segments.toString()}
+                    onEndEditing={(event) => _updateFormValue('segments', event.nativeEvent.text)}
                 />
             </View>
         );
-    }
+    };
 
-    render() {
-        return (
-            <Modal
-                style={{paddingBottom: verticalScale(Platform.OS === 'ios' ? 200 : 10)}}
-                isVisible={this.props.visible}
-                onBackButtonPress={() => this.props.onClose()}
-                onBackdropPress={() => this.props.onClose()}
-            >
-                <KeyboardAvoidingView behavior="padding">
-                    <View style={styles.modal}>
-                        <Text style={styles.modalHeader}>Apply Status</Text>
-                        <VirtualizedList flex={0}>
-                            <View style={[styles.modalContent]}>
-                                <View flexDirection="row" justifyContent="space-between">
-                                    <Text style={[styles.grey, {alignSelf: 'center'}]}>Name:</Text>
-                                    <TextInput
-                                        editable
-                                        style={[styles.textInput, {width: scale(200)}]}
-                                        maxLength={32}
-                                        defaultValue={this.props.statusForm.label}
-                                        onEndEditing={(event) => this.updateFormValue('label', event.nativeEvent.text)}
-                                    />
-                                </View>
-                                <View flexDirection="row" justifyContent="space-between">
-                                    <Text style={[styles.grey, {alignSelf: 'center'}]}>Status:</Text>
-                                    <DropDownPicker
-                                        containerStyle={{maxWidth: '75%'}}
-                                        theme="DARK"
-                                        listMode="MODAL"
-                                        open={this.state.open}
-                                        value={this.state.value}
-                                        items={this.state.items}
-                                        setOpen={(open) => this.setState({open})}
-                                        setValue={this.setValue}
-                                    />
-                                </View>
-                                {this._renderSecondaryControls()}
-                                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
-                                    <Button small label="Apply" onPress={() => this._onApply()} />
-                                    <Button small label="Cancel" style={styles.button} onPress={() => this.props.onClose()} />
-                                </View>
+    return (
+        <Modal
+            style={{paddingBottom: verticalScale(Platform.OS === 'ios' ? 200 : 10)}}
+            isVisible={visible}
+            onBackButtonPress={() => onClose()}
+            onBackdropPress={() => onClose()}
+        >
+            <KeyboardAvoidingView behavior="padding">
+                <View style={styles.modal}>
+                    <Text style={styles.modalHeader}>Apply Status</Text>
+                    <VirtualizedList flex={0}>
+                        <View style={[styles.modalContent]}>
+                            <View flexDirection="row" justifyContent="space-between">
+                                <Text style={[styles.grey, {alignSelf: 'center'}]}>Name:</Text>
+                                <TextInput
+                                    editable
+                                    style={[styles.textInput, {width: scale(200)}]}
+                                    maxLength={32}
+                                    defaultValue={statusForm.label}
+                                    onEndEditing={(event) => _updateFormValue('label', event.nativeEvent.text)}
+                                />
                             </View>
-                        </VirtualizedList>
-                    </View>
-                </KeyboardAvoidingView>
-            </Modal>
-        );
-    }
-}
-
-export default StatusDialog;
+                            <View flexDirection="row" justifyContent="space-between">
+                                <Text style={[styles.grey, {alignSelf: 'center'}]}>Status:</Text>
+                                <DropDownPicker
+                                    containerStyle={{maxWidth: '75%'}}
+                                    theme="DARK"
+                                    listMode="MODAL"
+                                    open={open}
+                                    value={value}
+                                    items={statuses.current}
+                                    setOpen={(val) => setOpen(val === true)}
+                                    setValue={setNewValue}
+                                    style={{backgroundColor: Colors.formControl}}
+                                    labelStyle={[styles.buttonText, {fontSize: verticalScale(12), paddingLeft: scale(5)}]}
+                                    listItemContainerStyle={{backgroundColor: Colors.background}}
+                                    selectedItemContainerStyle={{backgroundColor: Colors.formAccent}}
+                                    modalContentContainerStyle={{backgroundColor: Colors.primary}}
+                                />
+                            </View>
+                            {renderSecondaryControls()}
+                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingTop: verticalScale(30)}}>
+                                <Button small label="Apply" onPress={() => _onApply()} />
+                                <Button small label="Cancel" style={styles.button} onPress={() => onClose()} />
+                            </View>
+                        </View>
+                    </VirtualizedList>
+                </View>
+            </KeyboardAvoidingView>
+        </Modal>
+    );
+};

@@ -1,19 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, {useMemo, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {View, Text, Switch} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {Heading} from '../Heading/Heading';
 import {Button} from '../Button/Button';
 import {common} from '../../lib/Common';
-import styles, {Colors} from '../../Styles';
 import {resetForm} from '../../reducers/forms';
 import {clearAllCharacters} from '../../reducers/character';
 import {clearRandomHero} from '../../reducers/randomHero';
 import {clearApplicationSettings, toggleSetting} from '../../reducers/settings';
 import {clearStatistics} from '../../reducers/statistics';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
+import {ALL_THEMES, useColorTheme} from '../../hooks/useColorTheme';
+import RadioButtonsGroup from 'react-native-radio-buttons-group';
+import {useNavigation} from '@react-navigation/native';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,12 +30,31 @@ import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const SettingsScreen = ({navigation}) => {
+export const SettingsScreen = () => {
     const dispatch = useDispatch();
+
+    const navigation = useNavigation();
+
+    const userColorScheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(userColorScheme);
 
     const settings = useSelector((state) => state.settings);
 
     const version = useSelector((state) => state.version);
+
+    const [selectedTheme, setSelectedTheme] = useState(settings.colorScheme);
+
+    const themeRadioButtons = useMemo(() => {
+        return ALL_THEMES.map((theme, i) => ({
+            id: theme,
+            label: common.capitalize(theme),
+            value: theme,
+            color: Colors.formControl,
+            containerStyle: {minWidth: verticalScale(290)},
+            labelStyle: {color: Colors.formAccent, fontSize: verticalScale(12), fontWeight: 'bold', paddingLeft: scale(5), paddingRight: scale(5)},
+        }));
+    }, [Colors.formAccent, Colors.formControl]);
 
     const clearFormData = (showToast = true) => {
         dispatch(resetForm({formName: 'skill'}));
@@ -48,6 +68,7 @@ export const SettingsScreen = ({navigation}) => {
         dispatch(resetForm({formName: 'showAnimations'}));
         dispatch(resetForm({formName: 'increaseEntropy'}));
         dispatch(resetForm({formName: 'useFifthEdition'}));
+        dispatch(resetForm({formName: 'colorScheme'}));
 
         if (showToast) {
             common.toast('Form data has been cleared', 'success');
@@ -185,6 +206,20 @@ export const SettingsScreen = ({navigation}) => {
                         />
                     </View>
                 </View>
+                <Heading text="Color Theme" />
+                <View style={{paddingHorizontal: scale(10), paddingBottom: verticalScale(20)}}>
+                    <RadioButtonsGroup
+                        flex={1}
+                        color={Colors.formControl}
+                        radioButtons={themeRadioButtons}
+                        onPress={(val) => {
+                            setSelectedTheme(val);
+
+                            dispatch(toggleSetting({key: 'colorScheme', value: val}));
+                        }}
+                        selectedId={selectedTheme}
+                    />
+                </View>
                 <Heading text="Cache" />
                 <View paddingHorizontal={scale(10)}>
                     <View flexDirection="row" justifyContent="space-between" style={{paddingBottom: verticalScale(10)}}>
@@ -218,8 +253,4 @@ export const SettingsScreen = ({navigation}) => {
             </VirtualizedList>
         </>
     );
-};
-
-SettingsScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
 };

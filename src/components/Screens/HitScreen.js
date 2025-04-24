@@ -8,11 +8,11 @@ import {Tab, RouteBuilder} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
 import {Icon} from '../Icon/Icon';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
 import hitLocations from '../../../public/hitLocations.json';
 import {updateFormValue} from '../../reducers/forms';
-import styles, {Colors} from '../../Styles';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -32,7 +32,7 @@ const windowWidth = Dimensions.get('window').width;
 
 const windowHeight = Dimensions.get('window').height;
 
-const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
+const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider, styles, Colors}) => {
     const tab = (
         <View flex={0} flexGrow={1}>
             <View paddingHorizontal={scale(10)}>
@@ -65,7 +65,7 @@ const RollRoute = ({hitForm, updateForm, roll, renderDcvSlider}) => {
     return RouteBuilder('Roll To Hit', tab, false);
 };
 
-const RangeModsRoute = () => {
+const RangeModsRoute = (styles) => {
     const tab = (
         <View flex={0} flexGrow={1}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -134,7 +134,7 @@ const RangeModsRoute = () => {
     return RouteBuilder('Range Mods', tab, false);
 };
 
-const HitLocationsRoute = ({setLocation, renderLocationDetails}) => {
+const HitLocationsRoute = ({setLocation, renderLocationDetails, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -195,7 +195,7 @@ const HitLocationsRoute = ({setLocation, renderLocationDetails}) => {
     return RouteBuilder('Hit Locations', tab, false);
 };
 
-const TargetedShotsRoute = () => {
+const TargetedShotsRoute = (styles) => {
     const tab = (
         <View flex={0} flexGrow={1}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -266,6 +266,10 @@ const TargetedShotsRoute = () => {
 };
 
 export const HitScreen = ({navigation}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
     const dispatch = useDispatch();
 
     const hitForm = useSelector((state) => state.forms.hit);
@@ -353,13 +357,15 @@ export const HitScreen = ({navigation}) => {
     const renderScene = () => {
         switch (index) {
             case 0:
-                return <RollRoute hitForm={hitForm} updateForm={_updateFormValue} roll={roll} renderDcvSlider={renderDcvSlider} />;
+                return (
+                    <RollRoute hitForm={hitForm} updateForm={_updateFormValue} roll={roll} renderDcvSlider={renderDcvSlider} styles={styles} Colors={Colors} />
+                );
             case 1:
-                return <RangeModsRoute />;
+                return <RangeModsRoute styles={styles} />;
             case 2:
-                return <HitLocationsRoute setLocation={_setLocation} renderLocationDetails={renderLocationDetails} />;
+                return <HitLocationsRoute setLocation={_setLocation} renderLocationDetails={renderLocationDetails} styles={styles} />;
             case 3:
-                return <TargetedShotsRoute />;
+                return <TargetedShotsRoute styles={styles} />;
             default:
                 return null;
         }

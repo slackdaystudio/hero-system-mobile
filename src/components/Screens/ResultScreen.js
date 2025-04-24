@@ -1,18 +1,17 @@
 import React, {useState, useCallback} from 'react';
-import PropTypes from 'prop-types';
 import {useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {ActivityIndicator, Platform, Text, View} from 'react-native';
 import {CountUp} from 'use-count-up';
 import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {Die, DisappearingButton} from '../Animated';
 import {dieRoller, SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT, PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {statistics} from '../../lib/Statistics';
 import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
-import styles from '../../Styles';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,6 +28,10 @@ import styles from '../../Styles';
 // limitations under the License.
 
 export const ResultScreen = ({route, navigation}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {styles} = useColorTheme(scheme);
+
     const playSounds = useSelector((state) => state.settings.playSounds);
 
     const onlyDiceSounds = useSelector((state) => state.settings.onlyDiceSounds);
@@ -369,11 +372,6 @@ export const ResultScreen = ({route, navigation}) => {
             </VirtualizedList>
         </>
     );
-};
-
-ResultScreen.propTypes = {
-    route: PropTypes.object.isRequired,
-    navigation: PropTypes.object.isRequired,
 };
 
 const localStyles = ScaledSheet.create({

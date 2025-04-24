@@ -1,6 +1,8 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 import {MotiView, useAnimationState} from 'moti';
+import {getRandomNumber} from '../../../App';
+import {ReduceMotion} from 'react-native-reanimated';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -87,34 +89,38 @@ export const useSlideInUp = () => {
 export const useScaleInUp = () => {
     return useAnimationState({
         from: {
-            opacity: 0,
-            scale: 0.5,
+            scale: 0.1,
         },
         to: {
-            opacity: 1,
             scale: 1,
         },
         animate: {
-            opacity: 1,
             scale: 1,
         },
     });
 };
 
 export const useFlip = () => {
+    const rotations = getRandomNumber(5, 20);
+
     return useAnimationState({
         from: {
-            rotateY: '540deg',
-            scale: 0.3,
-            opacity: 0,
-        },
-        to: {
-            rotateY: '0deg',
-            opacity: 1,
-            scale: 1,
+            rotateX: `${180 * rotations}deg`,
         },
         animate: {
-            rotateY: '180deg',
+            rotateX: '0deg',
+        },
+        transition: {
+            rotateX: {
+                type: 'timing',
+                duration: rotations * 50,
+                dampingRatio: 0.5,
+                stiffness: 100,
+                overshootClamping: false,
+                restDisplacementThreshold: 0.01,
+                restSpeedThreshold: 2,
+                reduceMotion: ReduceMotion.System,
+            },
         },
     });
 };

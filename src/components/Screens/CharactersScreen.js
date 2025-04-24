@@ -2,14 +2,14 @@ import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {ActivityIndicator, ImageBackground, Text, View} from 'react-native';
+import {ActivityIndicator, Text, View} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {scale, verticalScale} from 'react-native-size-matters';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {Heading} from '../Heading/Heading';
 import {Icon} from '../Icon/Icon';
 import {Button} from '../Button/Button';
-import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+import {ConfirmationDialog} from '../ConfirmationDialog/ConfirmationDialog';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {file} from '../../lib/File';
 import {common} from '../../lib/Common';
@@ -17,7 +17,7 @@ import {combatDetails} from '../../lib/CombatDetails';
 import {setCharacter, clearCharacter, updateLoadedCharacters} from '../../reducers/character';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 import {character as libCharacter} from '../../lib/Character';
-import styles, {Colors} from '../../Styles';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -34,6 +34,10 @@ import styles, {Colors} from '../../Styles';
 // limitations under the License.
 
 export const CharactersScreen = ({navigation, route}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
     const dispatch = useDispatch();
 
     const getSlots = () => {
@@ -235,7 +239,7 @@ export const CharactersScreen = ({navigation, route}) => {
 
     const renderCharacters = () => {
         if (common.isEmptyObject(loadedCharacters) || charactersLoading) {
-            return <ActivityIndicator color="#D0D1D3" />;
+            return <ActivityIndicator color={Colors.text} />;
         }
 
         return (
@@ -257,6 +261,11 @@ export const CharactersScreen = ({navigation, route}) => {
                             setOpen={setOpen}
                             setValue={setValue}
                             setItems={setItems}
+                            style={{backgroundColor: Colors.formControl}}
+                            labelStyle={[styles.buttonText, {fontSize: verticalScale(12), paddingLeft: scale(5)}]}
+                            listItemContainerStyle={{backgroundColor: Colors.background}}
+                            selectedItemContainerStyle={{backgroundColor: Colors.formAccent}}
+                            modalContentContainerStyle={{backgroundColor: Colors.primary}}
                         />
                     </View>
                 </View>
@@ -293,9 +302,7 @@ export const CharactersScreen = ({navigation, route}) => {
         <>
             <Header navigation={navigation} />
             <Heading text="Characters" />
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                {renderCharacters()}
-            </ImageBackground>
+            <View style={{flex: 1, flexDirection: 'column'}}>{renderCharacters()}</View>
             <View style={{paddingBottom: verticalScale(20)}} />
             <ConfirmationDialog
                 visible={dialogProps.deleteDialogVisible}

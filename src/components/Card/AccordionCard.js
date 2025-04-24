@@ -3,8 +3,9 @@ import {View, Text, TouchableOpacity} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {Card} from './Card';
 import {Accordion} from '../Animated';
-import styles, {Colors} from '../../Styles';
 import {Icon} from '../Icon/Icon';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -20,7 +21,7 @@ import {Icon} from '../Icon/Icon';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const BulletedLabel = ({label, onTitlePress, showContent}) => {
+export const BulletedLabel = ({label, onTitlePress, showContent, styles, Colors}) => {
     return (
         <TouchableOpacity onPress={onTitlePress}>
             <View flex={1} flexDirection="row" justifyContent="flex-start" alignItems="center">
@@ -47,6 +48,10 @@ export const AccordionCard = ({
     headingBackgroundColor = false,
     onTitlePress,
 }) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
     const show = showContent === true;
 
     return (
@@ -66,7 +71,7 @@ export const AccordionCard = ({
                     }}
                 >
                     <View style={{marginRight: verticalScale(10), width: 300}}>
-                        <BulletedLabel label={title} onTitlePress={onTitlePress} showContent={showContent} />
+                        <BulletedLabel label={title} onTitlePress={onTitlePress} showContent={showContent} styles={styles} Colors={Colors} />
                     </View>
                     <View marginLeft={verticalScale(10)} flexDirection="row">
                         {typeof secondaryTitle === 'string' ? (

@@ -5,13 +5,13 @@ import {useFocusEffect} from '@react-navigation/native';
 import {ActivityIndicator, Dimensions, Image, Text, View, useWindowDimensions} from 'react-native';
 import {TabView} from 'react-native-tab-view';
 import {Tab, RouteBuilder} from '../Tab/Tab';
-import General from '../HeroDesignerCharacter/General';
-import Combat from '../HeroDesignerCharacter/Combat';
-import Characteristics from '../HeroDesignerCharacter/Characteristics';
-import Traits from '../HeroDesignerCharacter/Traits';
-import Notes from '../HeroDesignerCharacter/Notes';
-import Header from '../Header/Header';
-import HeroDesignerCharacterFooter from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
+import {General} from '../HeroDesignerCharacter/General';
+import {Combat} from '../HeroDesignerCharacter/Combat';
+import {Characteristics} from '../HeroDesignerCharacter/Characteristics';
+import {Traits} from '../HeroDesignerCharacter/Traits';
+import {Notes} from '../HeroDesignerCharacter/Notes';
+import {Header} from '../Header/Header';
+import {HeroDesignerCharacterFooter} from '../HeroDesignerCharacterFooter/HeroDesignerCharacterFooter';
 import {common} from '../../lib/Common';
 import {heroDesignerCharacter} from '../../lib/HeroDesignerCharacter';
 import {updateForm, updateFormValue, resetForm} from '../../reducers/forms';
@@ -26,7 +26,7 @@ import {
     clearAllStatuses,
     clearStatus,
 } from '../../reducers/character';
-import styles, {Colors} from '../../Styles';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -95,7 +95,6 @@ const GeneralRoute = ({character, width, height}) => {
 const CombatRoute = ({
     navigation,
     character,
-    characters,
     forms,
     // eslint-disable-next-line no-shadow
     setSparseCombatDetails,
@@ -105,7 +104,7 @@ const CombatRoute = ({
     updateFormValue,
     // eslint-disable-next-line no-shadow
     resetForm,
-    usePhase,
+    checkPhase,
     // eslint-disable-next-line no-shadow
     applyStatus,
     // eslint-disable-next-line no-shadow
@@ -118,14 +117,13 @@ const CombatRoute = ({
         <Combat
             navigation={navigation}
             character={character}
-            characters={characters}
             combatDetails={character.combatDetails}
             setSparseCombatDetails={setSparseCombatDetails}
             forms={forms}
             updateForm={updateForm}
             updateFormValue={updateFormValue}
             resetForm={resetForm}
-            usePhase={usePhase}
+            checkPhase={checkPhase}
             applyStatus={applyStatus}
             clearAllStatuses={clearAllStatuses}
             clearStatus={clearStatus}
@@ -174,13 +172,17 @@ const NotesRoute = ({character}) => {
     return RouteBuilder('Notes', <Notes notes={character.notes || ''} updateNotes={updateNotes} />, common.isEmptyObject(character));
 };
 
-const LazyPlaceholder = ({route}) => (
+const LazyPlaceholder = ({route, styles, Colors}) => (
     <View style={{flex: 1, backgroundColor: Colors.background}}>
         <Text style={[styles.grey, {textAlign: 'center'}]}>Loading {route.title}...</Text>
     </View>
 );
 
 export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
     const dispatch = useDispatch();
 
     const {width} = useWindowDimensions();
@@ -257,10 +259,9 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
                     <CombatRoute
                         navigation={navigation}
                         character={character}
-                        characters={characters}
                         forms={forms}
                         setSparseCombatDetails={(sparseCombatDetails, secondary) => dispatch(setSparseCombatDetails({sparseCombatDetails, secondary}))}
-                        usePhase={(phase, secondary, abort) => dispatch(hsmUsePhase({phase, secondary, abort}))}
+                        checkPhase={(phase, secondary, abort) => dispatch(hsmUsePhase({phase, secondary, abort}))}
                         updateForm={(type, json) => dispatch(updateForm({type, json}))}
                         updateFormValue={(formName, key, value) => dispatch(updateFormValue({formName, key, value}))}
                         resetForm={(formName) => dispatch(resetForm({formName}))}
@@ -313,7 +314,7 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
             <Header hasTabs={false} navigation={navigation} />
             <TabView
                 lazy
-                renderLazyPlaceholder={({route}) => <LazyPlaceholder route={route} />}
+                renderLazyPlaceholder={({route}) => <LazyPlaceholder route={route} styles={styles} Colors={Colors} />}
                 swipeEnabled={false}
                 navigationState={{index, setIndex, routes: routes()}}
                 renderScene={renderScene}
@@ -322,7 +323,6 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
                 initialLayout={{width: windowWidth, height: windowHeight}}
             />
             <HeroDesignerCharacterFooter
-                navigation={navigation}
                 character={character}
                 characters={characters}
                 selectCharacter={(c) => dispatch(selectCharacter({character: c}))}

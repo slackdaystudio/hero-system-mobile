@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {file} from './File';
+import {SYSTEM} from '../hooks/useColorTheme';
 
 export const MAX_CHARACTER_SLOTS = 5;
 
@@ -411,6 +412,7 @@ class Persistence {
             onlyDiceSounds: false,
             showAnimations: true,
             increaseEntropy: true,
+            colorScheme: SYSTEM,
         };
 
         settings = settings === null || settings === undefined ? {} : settings;

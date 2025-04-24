@@ -1,5 +1,4 @@
 import React, {useMemo, useState} from 'react';
-import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {Platform, View} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -7,11 +6,11 @@ import {scale, verticalScale} from 'react-native-size-matters';
 import {RadioGroup} from 'react-native-radio-buttons-group';
 import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {Heading} from '../Heading/Heading';
 import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
-import styles, {Colors} from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -30,6 +29,8 @@ import {updateFormValue} from '../../reducers/forms';
 const effectTypes = ['None', 'Aid', 'Dispel', 'Drain', 'Entangle', 'Flash', 'Healing', 'Luck', 'Unluck'];
 
 export const EffectScreen = ({navigation}) => {
+    const {Colors, styles} = useColorTheme();
+
     const dispatch = useDispatch();
 
     const effectForm = useSelector((state) => state.forms.effect);
@@ -56,7 +57,7 @@ export const EffectScreen = ({navigation}) => {
             containerStyle: {minWidth: verticalScale(290)},
             labelStyle: {color: Colors.formAccent, fontSize: verticalScale(12), fontWeight: 'bold', paddingLeft: scale(5), paddingRight: scale(5)},
         }));
-    }, []);
+    }, [Colors.formAccent, Colors.formControl]);
 
     const roll = () => {
         navigation.navigate('Result', {
@@ -103,7 +104,7 @@ export const EffectScreen = ({navigation}) => {
                         setItems={setItems}
                         onChangeValue={(val) => dispatch(updateFormValue({formName: 'effect', key: 'partialDie', value: val}))}
                         style={{backgroundColor: Colors.formControl}}
-                        labelStyle={{fontSize: verticalScale(12), color: Colors.text, paddingLeft: scale(5)}}
+                        labelStyle={[styles.buttonText, {fontSize: verticalScale(12), paddingLeft: scale(5)}]}
                         listItemContainerStyle={{backgroundColor: Colors.background}}
                         selectedItemContainerStyle={{backgroundColor: Colors.formAccent}}
                         modalContentContainerStyle={{backgroundColor: Colors.primary}}
@@ -119,8 +120,4 @@ export const EffectScreen = ({navigation}) => {
             <View style={{paddingBottom: verticalScale(20)}} />
         </>
     );
-};
-
-EffectScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
 };

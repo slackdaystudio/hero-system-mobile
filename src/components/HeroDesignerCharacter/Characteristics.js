@@ -1,16 +1,17 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {View, TouchableHighlight, Text, Switch} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {Heading} from '../Heading/Heading';
-import CircleText from '../CircleText/CircleText';
+import {CircleText} from '../CircleText/CircleText';
 import {dieRoller} from '../../lib/DieRoller';
 import {common} from '../../lib/Common';
 import {heroDesignerCharacter, TYPE_MOVEMENT} from '../../lib/HeroDesignerCharacter';
-import styles, {Colors} from '../../Styles';
 import strengthTable from '../../../public/strengthTable.json';
 import speedTable from '../../../public/speed.json';
 import {AccordionCard} from '../Card/AccordionCard';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -26,76 +27,94 @@ import {AccordionCard} from '../Card/AccordionCard';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function initCharacteristicsShow(characteristics, movement) {
-    let characteristicsShow = {};
-    let characteristicsButtonsShow = {};
+const initCharacteristicsShow = (characteristics, movement) => {
+    let show = {};
+    let buttonsShow = {};
 
     characteristics.map((characteristic, index) => {
-        characteristicsShow[characteristic.shortName] = false;
-        characteristicsButtonsShow[characteristic.shortName] = 'plus-circle';
+        show[characteristic.shortName] = false;
+        buttonsShow[characteristic.shortName] = 'plus-circle';
     });
 
     movement.map((move, index) => {
-        characteristicsShow[move.shortName] = false;
-        characteristicsButtonsShow[move.shortName] = 'plus-circle';
+        show[move.shortName] = false;
+        buttonsShow[move.shortName] = 'plus-circle';
     });
 
     return {
-        characteristicsShow: characteristicsShow,
-        characteristicsButtonsShow: characteristicsButtonsShow,
+        show: show,
+        buttonsShow: buttonsShow,
     };
-}
+};
 
-export default class Characteristics extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        character: PropTypes.object.isRequired,
-        setShowSecondary: PropTypes.func.isRequired,
-        updateForm: PropTypes.func.isRequired,
+export const Characteristics = ({character, setShowSecondary, updateForm}) => {
+    const navigation = useNavigation();
+
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
+    const {show, buttonsShow} = initCharacteristicsShow(character.characteristics, character.movement);
+
+    const [characteristicsShow, setCharacteristicsShow] = useState(show);
+
+    const [characteristicsButtonsShow, setCharacteristicsButtonsShow] = useState(buttonsShow);
+
+    const powersMap = common.toMap(common.flatten(character.powers, 'powers'));
+
+    // constructor(props) {
+    //     super(props);
+
+    //     const displayOptions = initCharacteristicsShow(props.character.characteristics, props.character.movement);
+
+    //     this.state = {
+    //         characteristicsShow: displayOptions.characteristicsShow,
+    //         characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
+    //         character: props.character,
+    //         powersMap: common.toMap(common.flatten(props.character.powers, 'powers')),
+    //     };
+    // }
+
+    // static getDerivedStateFromProps(nextProps, prevState) {
+    //     if (prevState.character !== nextProps.character) {
+    //         const displayOptions = initCharacteristicsShow(nextProps.character.characteristics, nextProps.character.movement);
+    //         let newState = {...prevState};
+
+    //         newState.characteristicsShow = displayOptions.characteristicsShow;
+    //         newState.characteristicsButtonsShow = displayOptions.characteristicsButtonsShow;
+    //         newState.character = nextProps.character;
+    //         newState.powersMap = common.toMap(common.flatten(nextProps.character.powers, 'powers'));
+
+    //         return newState;
+    //     }
+
+    //     return null;
+    // }
+
+    const toggleDefinitionShow = (name) => {
+        const newShow = {...characteristicsShow};
+
+        newShow[name] = !characteristicsShow[name];
+
+        setCharacteristicsShow(newShow);
+
+        const newButtonsShow = {...characteristicsButtonsShow};
+
+        newButtonsShow[name] = characteristicsButtonsShow[name] === 'plus-circle' ? 'minus-circle' : 'plus-circle';
+
+        setCharacteristicsButtonsShow(newButtonsShow);
+        // let newState = {...this.state};
+        // newState.characteristicsShow[name] = !newState.characteristicsShow[name];
+        // newState.characteristicsButtonsShow[name] = newState.characteristicsButtonsShow[name] === 'plus-circle' ? 'minus-circle' : 'plus-circle';
+
+        // this.setState(newState);
     };
 
-    constructor(props) {
-        super(props);
-
-        const displayOptions = initCharacteristicsShow(props.character.characteristics, props.character.movement);
-
-        this.state = {
-            characteristicsShow: displayOptions.characteristicsShow,
-            characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
-            character: props.character,
-            powersMap: common.toMap(common.flatten(props.character.powers, 'powers')),
-        };
-    }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (prevState.character !== nextProps.character) {
-            const displayOptions = initCharacteristicsShow(nextProps.character.characteristics, nextProps.character.movement);
-            let newState = {...prevState};
-
-            newState.characteristicsShow = displayOptions.characteristicsShow;
-            newState.characteristicsButtonsShow = displayOptions.characteristicsButtonsShow;
-            newState.character = nextProps.character;
-            newState.powersMap = common.toMap(common.flatten(nextProps.character.powers, 'powers'));
-
-            return newState;
-        }
-
-        return null;
-    }
-
-    _toggleDefinitionShow(name) {
-        let newState = {...this.state};
-        newState.characteristicsShow[name] = !newState.characteristicsShow[name];
-        newState.characteristicsButtonsShow[name] = newState.characteristicsButtonsShow[name] === 'plus-circle' ? 'minus-circle' : 'plus-circle';
-
-        this.setState(newState);
-    }
-
-    _getMovementTotal(characteristic, formatFraction = false) {
+    const getMovementTotal = (characteristic, formatFraction = false) => {
         let meters = characteristic.value;
 
-        if (characteristic.shortName.toUpperCase() === 'LEAPING' && heroDesignerCharacter.isFifth(this.props.character)) {
-            let total = heroDesignerCharacter.getAdditionalCharacteristicPoints('STR', this.props.character) / 5;
+        if (characteristic.shortName.toUpperCase() === 'LEAPING' && heroDesignerCharacter.isFifth(character)) {
+            let total = heroDesignerCharacter.getAdditionalCharacteristicPoints('STR', character) / 5;
             let fractionalPart = parseFloat((total % 1).toFixed(1));
 
             if (fractionalPart >= 0.6) {
@@ -107,8 +126,8 @@ export default class Characteristics extends Component {
             meters = characteristic.base + total;
         }
 
-        if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
-            meters = this._getTotalMeters(this.state.powersMap.get(characteristic.shortName.toUpperCase()), meters);
+        if (powersMap.has(characteristic.shortName.toUpperCase())) {
+            meters = getTotalMeters(powersMap.get(characteristic.shortName.toUpperCase()), meters);
         }
 
         if (formatFraction) {
@@ -122,25 +141,25 @@ export default class Characteristics extends Component {
         }
 
         return meters;
-    }
+    };
 
-    _getTotalMeters(movementMode, meters) {
+    const getTotalMeters = (movementMode, meters) => {
         if (Array.isArray(movementMode)) {
             for (let move of movementMode) {
-                meters += this._getTotalMeters(move, meters);
+                meters += getTotalMeters(move, meters);
             }
         } else {
             if (movementMode.affectsPrimary && movementMode.affectsTotal) {
                 meters += movementMode.levels;
-            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.character.showSecondary) {
+            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && character.showSecondary) {
                 meters += movementMode.levels;
             }
         }
 
         return meters;
-    }
+    };
 
-    _getStrengthDamage(strength) {
+    const getStrengthDamage = (strength) => {
         let damage = strength / 5;
         let fractionalPart = parseFloat((damage % 1).toFixed(1));
 
@@ -153,20 +172,20 @@ export default class Characteristics extends Component {
         }
 
         return `${damage}d6`;
-    }
+    };
 
-    _rollStrengthDamage(strengthDamage) {
+    const rollStrengthDamage = (strengthDamage) => {
         let dice = common.toDice(strengthDamage);
 
-        this.props.updateForm('damage', {
+        updateForm('damage', {
             dice: dice.full,
             partialDie: dice.partial,
         });
 
-        this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
-    }
+        navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
+    };
 
-    _renderNotes(characteristic) {
+    const renderNotes = (characteristic) => {
         let whitelistedCharacteristics = ['DEX', 'INT', 'EGO', 'SPD'];
 
         if (whitelistedCharacteristics.includes(characteristic.shortName.toUpperCase())) {
@@ -178,21 +197,21 @@ export default class Characteristics extends Component {
             if (characteristic.shortName.toUpperCase() === 'INT') {
                 // TODO: total all sources or PER modifiers
                 note.label = 'PER';
-                note.text = heroDesignerCharacter.getRollTotal(characteristic, this.props.character);
+                note.text = heroDesignerCharacter.getRollTotal(characteristic, character);
             } else if (characteristic.shortName.toUpperCase() === 'SPD') {
                 note.label = 'Phases';
-                note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character).toString()].phases.join(', ');
+                note.text = speedTable[heroDesignerCharacter.getCharacteristicTotal('SPD', character).toString()].phases.join(', ');
             }
 
-            if (heroDesignerCharacter.isFifth(this.props.character)) {
+            if (heroDesignerCharacter.isFifth(character)) {
                 if (characteristic.shortName.toUpperCase() === 'DEX') {
-                    let cv = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('DEX', this.props.character) / 3);
+                    let cv = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('DEX', character) / 3);
 
                     note.label = 'OCV/DCV';
                     note.text = `${cv}/${cv}`;
                 } else if (characteristic.shortName.toUpperCase() === 'EGO') {
                     note.label = 'ECV';
-                    note.text = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', this.props.character) / 3);
+                    note.text = common.roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', character) / 3);
                 }
             }
 
@@ -210,10 +229,10 @@ export default class Characteristics extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderDefinition(characteristic) {
-        if (this.state.characteristicsShow[characteristic.shortName]) {
+    const renderDefinition = (characteristic) => {
+        if (characteristicsShow[characteristic.shortName]) {
             let definition = characteristic.definition;
 
             if (characteristic.type === TYPE_MOVEMENT) {
@@ -223,9 +242,9 @@ export default class Characteristics extends Component {
             return (
                 <View paddingVertical={verticalScale(3)} style={{backgroundColor: Colors.background}}>
                     <View style={{backgroundColor: Colors.background}}>
-                        {this._renderNonCombatMovement(characteristic)}
-                        {this._renderStrength(characteristic)}
-                        {this._renderNotes(characteristic)}
+                        {renderNonCombatMovement(characteristic)}
+                        {renderStrength(characteristic)}
+                        {renderNotes(characteristic)}
                         <Text style={styles.grey}>{definition}</Text>
                     </View>
                     <View flexDirection="row" justifyContent="center" style={{backgroundColor: Colors.background, marginTop: verticalScale(10)}}>
@@ -244,23 +263,23 @@ export default class Characteristics extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderNonCombatMovement(characteristic) {
+    const renderNonCombatMovement = (characteristic) => {
         if (characteristic.type === TYPE_MOVEMENT) {
-            let speed = heroDesignerCharacter.getCharacteristicTotal('SPD', this.props.character);
-            let movement = this._getMovementTotal(characteristic);
+            let speed = heroDesignerCharacter.getCharacteristicTotal('SPD', character);
+            let movement = getMovementTotal(characteristic);
             let meters = movement;
             let unit = 'm';
             let ncm = 2;
 
-            if (heroDesignerCharacter.isFifth(this.props.character)) {
+            if (heroDesignerCharacter.isFifth(character)) {
                 unit = '"';
                 meters *= 2;
             }
 
-            if (this.state.powersMap.has(characteristic.shortName.toUpperCase())) {
-                ncm = this._getTotalNcm(this.state.powersMap.get(characteristic.shortName.toUpperCase()), ncm);
+            if (powersMap.has(characteristic.shortName.toUpperCase())) {
+                ncm = getTotalNcm(powersMap.get(characteristic.shortName.toUpperCase()), ncm);
             }
 
             let combatKph = (meters * speed * 5 * 60) / 1000;
@@ -283,17 +302,17 @@ export default class Characteristics extends Component {
         }
 
         return null;
-    }
+    };
 
-    _getTotalNcm(movementMode, ncm) {
+    const getTotalNcm = (movementMode, ncm) => {
         if (Array.isArray(movementMode)) {
             for (let move of movementMode) {
-                ncm += this._getTotalNcm(move, ncm);
+                ncm += getTotalNcm(move, ncm);
             }
         } else {
             if (
                 (movementMode.affectsPrimary && movementMode.affectsTotal) ||
-                (!movementMode.affectsPrimary && movementMode.affectsTotal && this.props.character.showSecondary)
+                (!movementMode.affectsPrimary && movementMode.affectsTotal && character.showSecondary)
             ) {
                 let adderMap = common.toMap(movementMode.adder);
 
@@ -304,13 +323,13 @@ export default class Characteristics extends Component {
         }
 
         return ncm;
-    }
+    };
 
-    _renderStrength(characteristic) {
+    const renderStrength = (characteristic) => {
         if (characteristic.shortName === 'STR') {
             let step = null;
             let lift = '0.0 kg';
-            let totalStrength = heroDesignerCharacter.getCharacteristicTotal('STR', this.props.character);
+            let totalStrength = heroDesignerCharacter.getCharacteristicTotal('STR', character);
 
             for (let key of Object.keys(strengthTable)) {
                 if (totalStrength === parseInt(key, 10)) {
@@ -363,18 +382,18 @@ export default class Characteristics extends Component {
                 }
             }
 
-            let strengthDamage = this._getStrengthDamage(totalStrength);
+            let strengthDamage = getStrengthDamage(totalStrength);
 
             return (
                 <View style={{flex: 1, paddingBottom: verticalScale(10)}}>
-                    <TouchableHighlight underlayColor="#121212" onPress={() => this._rollStrengthDamage(strengthDamage)}>
+                    <TouchableHighlight underlayColor="#121212" onPress={() => rollStrengthDamage(strengthDamage)}>
                         <Text style={styles.grey}>
                             <Text style={styles.boldGrey}>Damage:</Text> {strengthDamage}
                         </Text>
                     </TouchableHighlight>
 
                     <Text style={styles.grey}>
-                        <Text style={styles.boldGrey}>Lift:</Text> {this._renderLift(lift)}
+                        <Text style={styles.boldGrey}>Lift:</Text> {renderLift(lift)}
                     </Text>
                     <Text style={styles.grey}>
                         <Text style={styles.boldGrey}>Example:</Text> {step.example}
@@ -384,9 +403,9 @@ export default class Characteristics extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderLift(lift) {
+    const renderLift = (lift) => {
         if (lift >= 1000000000000) {
             return `${Math.round((lift / 1000000000000) * 10) / 10} Gigatonnes`;
         } else if (lift >= 1000000000) {
@@ -398,30 +417,30 @@ export default class Characteristics extends Component {
         } else {
             return `${Math.round(lift * 10) / 10} kg`;
         }
-    }
+    };
 
-    _renderStat(characteristic) {
+    const renderStat = (characteristic) => {
         if (characteristic.type === TYPE_MOVEMENT) {
             let unit = 'm';
 
-            if (heroDesignerCharacter.isFifth(this.props.character)) {
+            if (heroDesignerCharacter.isFifth(character)) {
                 unit = '"';
             }
 
-            return <CircleText title={this._getMovementTotal(characteristic, true) + unit} fontSize={18} size={55} color={Colors.formControl} />;
+            return <CircleText title={getMovementTotal(characteristic, true) + unit} fontSize={18} size={55} color={Colors.formControl} />;
         }
 
         return (
             <CircleText
-                title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, this.props.character).toString()}
+                title={heroDesignerCharacter.getCharacteristicTotal(characteristic.shortName, character).toString()}
                 fontSize={18}
                 size={45}
                 color={Colors.formControl}
             />
         );
-    }
+    };
 
-    _renderCharacteristics(characteristics) {
+    const renderCharacteristics = (characteristics) => {
         return (
             <>
                 {characteristics.map((characteristic, index) => {
@@ -432,7 +451,7 @@ export default class Characteristics extends Component {
                             <AccordionCard
                                 title={
                                     <View flex={1} flexDirection="row" alignItems="center" paddingTop={verticalScale(2)}>
-                                        {this._renderStat(characteristic)}
+                                        {renderStat(characteristic)}
                                         <Text
                                             style={[
                                                 styles.grey,
@@ -443,38 +462,38 @@ export default class Characteristics extends Component {
                                         </Text>
                                     </View>
                                 }
-                                onTitlePress={() => this._toggleDefinitionShow(characteristic.shortName)}
+                                onTitlePress={() => toggleDefinitionShow(characteristic.shortName)}
                                 secondaryTitle={
                                     <TouchableHighlight
                                         underlayColor={Colors.secondaryForm}
                                         onPress={() =>
-                                            this.props.navigation.navigate('Result', {
+                                            navigation.navigate('Result', {
                                                 from: 'ViewHeroDesignerCharacter',
-                                                result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, this.props.character)),
+                                                result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, character)),
                                             })
                                         }
                                     >
                                         <Text style={[styles.grey, {fontSize: verticalScale(16), paddingLeft: scale(10)}]}>
-                                            {heroDesignerCharacter.getRollTotal(characteristic, this.props.character)}
+                                            {heroDesignerCharacter.getRollTotal(characteristic, character)}
                                         </Text>
                                     </TouchableHighlight>
                                 }
-                                content={this._renderDefinition(characteristic)}
-                                showContent={this.state.characteristicsShow[characteristic.shortName]}
+                                content={renderDefinition(characteristic)}
+                                showContent={characteristicsShow[characteristic.shortName]}
                             />
                         </View>
                     );
                 })}
             </>
         );
-    }
+    };
 
-    _toggleSecondaryCharacteristics() {
-        this.props.setShowSecondary(!this.props.character.showSecondary);
-    }
+    const toggleSecondaryCharacteristics = () => {
+        setShowSecondary(!character.showSecondary);
+    };
 
-    _renderSecondaryCharacteristicToggle() {
-        if (heroDesignerCharacter.hasSecondaryCharacteristics(common.flatten(this.props.character.powers, 'powers'))) {
+    const renderSecondaryCharacteristicToggle = () => {
+        if (heroDesignerCharacter.hasSecondaryCharacteristics(common.flatten(character.powers, 'powers'))) {
             return (
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingVertical: verticalScale(20)}}>
                     <View>
@@ -482,8 +501,8 @@ export default class Characteristics extends Component {
                     </View>
                     <View>
                         <Switch
-                            value={this.props.character.showSecondary}
-                            onValueChange={() => this._toggleSecondaryCharacteristics()}
+                            value={character.showSecondary}
+                            onValueChange={() => toggleSecondaryCharacteristics()}
                             color="#3da0ff"
                             minimumTrackTintColor={Colors.formAccent}
                             maximumTrackTintColor={Colors.secondaryForm}
@@ -497,17 +516,15 @@ export default class Characteristics extends Component {
         }
 
         return null;
-    }
+    };
 
-    render() {
-        return (
-            <View>
-                {this._renderSecondaryCharacteristicToggle()}
-                {this._renderCharacteristics(this.props.character.characteristics)}
-                <View style={{paddingTop: verticalScale(20)}} />
-                <Heading text="Movement" />
-                {this._renderCharacteristics(this.props.character.movement)}
-            </View>
-        );
-    }
-}
+    return (
+        <View>
+            {renderSecondaryCharacteristicToggle()}
+            {renderCharacteristics(character.characteristics)}
+            <View style={{paddingTop: verticalScale(20)}} />
+            <Heading text="Movement" />
+            {renderCharacteristics(character.movement)}
+        </View>
+    );
+};

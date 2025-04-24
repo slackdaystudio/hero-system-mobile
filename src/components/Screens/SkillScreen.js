@@ -1,14 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {View, ImageBackground, Text, Switch, Platform} from 'react-native';
+import {View, Text, Switch, Platform} from 'react-native';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {dieRoller} from '../../lib/DieRoller';
-import styles, {Colors} from '../../Styles';
 import {updateFormValue} from '../../reducers/forms';
+import {Heading} from '../Heading/Heading';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -26,6 +26,12 @@ import {updateFormValue} from '../../reducers/forms';
 
 export const SkillScreen = ({navigation}) => {
     const dispatch = useDispatch();
+
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
+    const localStyles = createLocalStyles();
 
     const skillForm = useSelector((state) => state.forms.skill);
 
@@ -63,9 +69,9 @@ export const SkillScreen = ({navigation}) => {
     };
 
     return (
-        <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
+        <>
             <Header navigation={navigation} />
-            <Text style={styles.heading}>Roll 3d6</Text>
+            <Heading text="Roll 3d6" />
             <View paddingHorizontal={scale(10)}>
                 <View style={[localStyles.titleContainer, localStyles.checkContainer]}>
                     <Text style={styles.grey}>Is skill check?</Text>
@@ -85,22 +91,20 @@ export const SkillScreen = ({navigation}) => {
                     <Button label="Roll" style={styles.button} onPress={roll} />
                 </View>
             </View>
-        </ImageBackground>
+        </>
     );
 };
 
-SkillScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
+const createLocalStyles = () => {
+    return ScaledSheet.create({
+        titleContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingTop: '10@vs',
+        },
+        checkContainer: {
+            paddingBottom: '20@vs',
+        },
+    });
 };
-
-const localStyles = ScaledSheet.create({
-    titleContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: '10@vs',
-    },
-    checkContainer: {
-        paddingBottom: '20@vs',
-    },
-});

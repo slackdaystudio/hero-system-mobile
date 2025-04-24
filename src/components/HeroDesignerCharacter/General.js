@@ -1,10 +1,10 @@
-import React, {Component, Fragment} from 'react';
-import PropTypes from 'prop-types';
-import {ImageBackground, View, Text, Image} from 'react-native';
+import React from 'react';
+import {View, Text, Image} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
 import {Heading} from '../Heading/Heading';
 import {common} from '../../lib/Common';
-import styles from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -20,89 +20,78 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default class General extends Component {
-    static propTypes = {
-        characterInfo: PropTypes.object.isRequired,
-        portrait: PropTypes.string,
-        portraitWidth: PropTypes.number,
-        portraitHeight: PropTypes.number,
-    };
+export const General = ({portrait, portraitWidth, portraitHeight, characterInfo}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
 
-    _renderPortrait() {
-        if (this.props.portrait === null || this.props.portrait === undefined) {
+    const {styles} = useColorTheme(scheme);
+
+    const _renderPortrait = () => {
+        if (portrait === null || portrait === undefined) {
             return null;
         }
 
         return (
-            <Fragment>
+            <>
                 <Heading text="Portrait" />
-                <Image style={{width: this.props.portraitWidth, height: this.props.portraitHeight, alignSelf: 'center'}} source={{uri: this.props.portrait}} />
-            </Fragment>
+                <Image style={{width: portraitWidth, height: portraitHeight, alignSelf: 'center'}} source={{uri: portrait}} />
+            </>
         );
-    }
+    };
 
-    render() {
-        return (
-            <View>
-                <ImageBackground
-                    source={require('../../../public/background.png')}
-                    style={{flex: 1, flexDirection: 'column'}}
-                    imageStyle={{resizeMode: 'repeat'}}
-                >
-                    <Heading text="Information" />
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Text style={[styles.boldGrey, {flex: 1}]}>Name:</Text>
-                        <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.characterName}</Text>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Text style={[styles.boldGrey, {flex: 1}]}>Aliases:</Text>
-                        <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.alternateIdentities}</Text>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Text style={[styles.boldGrey, {flex: 1}]}>Player:</Text>
-                        <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.playerName}</Text>
-                    </View>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    {this._renderPortrait()}
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Traits" />
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Text style={[styles.boldGrey, {flex: 1}]}>Height:</Text>
-                        <Text style={[styles.grey, {flex: 3}]}>{common.toCm(this.props.characterInfo.height)} cm</Text>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Text style={[styles.boldGrey, {flex: 1}]}>Weight:</Text>
-                        <Text style={[styles.grey, {flex: 3}]}>{common.toKg(this.props.characterInfo.weight)} kg</Text>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Text style={[styles.boldGrey, {flex: 1}]}>Eye Color:</Text>
-                        <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.eyeColor}</Text>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Text style={[styles.boldGrey, {flex: 1}]}>Hair Color:</Text>
-                        <Text style={[styles.grey, {flex: 3}]}>{this.props.characterInfo.hairColor}</Text>
-                    </View>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Background" />
-                    <Text style={styles.grey}>{this.props.characterInfo.background}</Text>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="personality" />
-                    <Text style={styles.grey}>{this.props.characterInfo.personality}</Text>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Quote" />
-                    <Text style={styles.grey}>{this.props.characterInfo.quote}</Text>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Tactics" />
-                    <Text style={styles.grey}>{this.props.characterInfo.tactics}</Text>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Campaign Use" />
-                    <Text style={styles.grey}>{this.props.characterInfo.campaignUse}</Text>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                    <Heading text="Appearance" />
-                    <Text style={styles.grey}>{this.props.characterInfo.appearance}</Text>
-                    <View style={{paddingBottom: verticalScale(20)}} />
-                </ImageBackground>
+    return (
+        <View>
+            <Heading text="Information" />
+            <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={[styles.boldGrey, {flex: 1}]}>Name:</Text>
+                <Text style={[styles.grey, {flex: 3}]}>{characterInfo.characterName}</Text>
             </View>
-        );
-    }
-}
+            <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={[styles.boldGrey, {flex: 1}]}>Aliases:</Text>
+                <Text style={[styles.grey, {flex: 3}]}>{characterInfo.alternateIdentities}</Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={[styles.boldGrey, {flex: 1}]}>Player:</Text>
+                <Text style={[styles.grey, {flex: 3}]}>{characterInfo.playerName}</Text>
+            </View>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            {_renderPortrait()}
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Heading text="Traits" />
+            <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={[styles.boldGrey, {flex: 1}]}>Height:</Text>
+                <Text style={[styles.grey, {flex: 3}]}>{common.toCm(characterInfo.height)} cm</Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={[styles.boldGrey, {flex: 1}]}>Weight:</Text>
+                <Text style={[styles.grey, {flex: 3}]}>{common.toKg(characterInfo.weight)} kg</Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={[styles.boldGrey, {flex: 1}]}>Eye Color:</Text>
+                <Text style={[styles.grey, {flex: 3}]}>{characterInfo.eyeColor}</Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={[styles.boldGrey, {flex: 1}]}>Hair Color:</Text>
+                <Text style={[styles.grey, {flex: 3}]}>{characterInfo.hairColor}</Text>
+            </View>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Heading text="Background" />
+            <Text style={styles.grey}>{characterInfo.background}</Text>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Heading text="personality" />
+            <Text style={styles.grey}>{characterInfo.personality}</Text>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Heading text="Quote" />
+            <Text style={styles.grey}>{characterInfo.quote}</Text>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Heading text="Tactics" />
+            <Text style={styles.grey}>{characterInfo.tactics}</Text>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Heading text="Campaign Use" />
+            <Text style={styles.grey}>{characterInfo.campaignUse}</Text>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Heading text="Appearance" />
+            <Text style={styles.grey}>{characterInfo.appearance}</Text>
+            <View style={{paddingBottom: verticalScale(20)}} />
+        </View>
+    );
+};

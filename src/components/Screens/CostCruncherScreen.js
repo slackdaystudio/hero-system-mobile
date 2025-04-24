@@ -4,9 +4,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Platform, Text, TextInput, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import Slider from '../Slider/Slider';
-import Header from '../Header/Header';
-import styles from '../../Styles';
+import {Header} from '../Header/Header';
 import {updateFormValue} from '../../reducers/forms';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -23,6 +23,10 @@ import {updateFormValue} from '../../reducers/forms';
 // limitations under the License.
 
 export const CostCruncherScreen = ({navigation}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {styles} = useColorTheme(scheme);
+
     const dispatch = useDispatch();
 
     const costCruncherForm = useSelector((state) => state.forms.costCruncher);

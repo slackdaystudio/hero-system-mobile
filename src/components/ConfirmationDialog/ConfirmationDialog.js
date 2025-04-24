@@ -1,76 +1,59 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React, {useRef, useState} from 'react';
 import {View, Text, ScrollView} from 'react-native';
 import Modal from 'react-native-modal';
 import {verticalScale} from 'react-native-size-matters';
 import {Button} from '../Button/Button';
-import styles from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
-export default class ConfirmationDialog extends Component {
-    static propTypes = {
-        visible: PropTypes.bool.isRequired,
-        title: PropTypes.string.isRequired,
-        info: PropTypes.string.isRequired,
-        onOk: PropTypes.func,
-        onClose: PropTypes.func.isRequired,
+export const ConfirmationDialog = ({visible, title, info, onOk, onClose}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {styles} = useColorTheme(scheme);
+
+    // eslint-disable-next-line no-unused-vars
+    const [_scrollOffset, setScrollOffset] = useState(0);
+
+    const scrollViewRef = useRef();
+
+    const _handleOnScroll = (event) => {
+        setScrollOffset(event.nativeEvent.contentOffset.y);
     };
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            scrollOffset: 0,
-        };
-    }
-
-    _handleOnScroll = (event) => {
-        this.setState({
-            scrollOffset: event.nativeEvent.contentOffset.y,
-        });
-    };
-
-    _handleScrollTo = (p) => {
-        if (this.scrollViewRef) {
-            this.scrollViewRef.scrollTo(p);
+    const _handleScrollTo = (p) => {
+        if (scrollViewRef) {
+            scrollViewRef.scrollTo(p);
         }
     };
 
-    _renderOkButton() {
-        if (typeof this.props.onOk === 'function') {
+    const _renderOkButton = () => {
+        if (typeof onOk === 'function') {
             return (
                 <View style={styles.buttonContainer}>
-                    <Button label={this.props.title} style={styles.button} onPress={() => this.props.onOk()} />
+                    <Button label={title} style={styles.button} onPress={() => onOk()} />
                 </View>
             );
         }
 
         return null;
-    }
+    };
 
-    render() {
-        return (
-            <Modal
-                isVisible={this.props.visible}
-                onBackButtonPress={() => this.props.onClose()}
-                onBackdropPress={() => this.props.onClose()}
-                scrollTo={this._handleScrollTo}
-                scrollOffsetMax={300 - 200}
-            >
-                <View style={styles.modal}>
-                    <Text style={styles.modalHeader}>{this.props.title}</Text>
-                    <View style={[styles.modalContent, {minHeight: verticalScale(170)}]}>
-                        <ScrollView ref={(ref) => (this.scrollViewRef = ref)} onScroll={this._handleOnScroll} scrollEventThrottle={16}>
-                            <Text style={styles.grey}>{this.props.info}</Text>
-                        </ScrollView>
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
-                            {this._renderOkButton()}
-                            <View style={styles.buttonContainer}>
-                                <Button label={this.props.onOk === null ? 'OK' : 'Cancel'} style={styles.button} onPress={() => this.props.onClose()} />
-                            </View>
+    return (
+        <Modal isVisible={visible} onBackButtonPress={() => onClose()} onBackdropPress={() => onClose()} scrollTo={_handleScrollTo} scrollOffsetMax={300 - 200}>
+            <View style={styles.modal}>
+                <Text style={styles.modalHeader}>{title}</Text>
+                <View style={[styles.modalContent, {minHeight: verticalScale(170)}]}>
+                    <ScrollView ref={scrollViewRef.current} onScroll={_handleOnScroll} scrollEventThrottle={16}>
+                        <Text style={styles.grey}>{info}</Text>
+                    </ScrollView>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
+                        {_renderOkButton()}
+                        <View style={styles.buttonContainer}>
+                            <Button label={onOk === null ? 'OK' : 'Cancel'} style={styles.button} onPress={() => onClose()} />
                         </View>
                     </View>
                 </View>
-            </Modal>
-        );
-    }
-}
+            </View>
+        </Modal>
+    );
+};

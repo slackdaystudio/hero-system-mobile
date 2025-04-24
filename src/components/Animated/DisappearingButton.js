@@ -5,7 +5,8 @@ import {useAnimationState} from 'moti';
 import {useFocusEffect} from '@react-navigation/native';
 import {Button} from '../Button/Button';
 import {Animated} from '.';
-import styles from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 const DISABLED_OPACITY = 0.5;
 
@@ -26,6 +27,10 @@ export const DisappearingButton = ({label, onPress, delay = 2000, animationProps
     const animationState = useAnimationState(animationProps);
 
     const [opacity, setOpacity] = useState(DISABLED_OPACITY);
+
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {styles} = useColorTheme(scheme);
 
     useFocusEffect(
         useCallback(() => {

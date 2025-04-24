@@ -1,8 +1,9 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {Platform, Pressable, Text, View} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
-import {Colors} from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -18,42 +19,46 @@ import {Colors} from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default class CircleButton extends Component {
-    render() {
-        const size = verticalScale(this.props.size);
-        const fontSize = verticalScale(this.props.fontSize);
-        const borderWidth = 1;
+export const CircleButton = ({name, size, fontSize, color, onPress}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
 
-        return (
-            <Pressable onPress={this.props.onPress}>
-                <View
+    const {Colors} = useColorTheme(scheme);
+
+    size = verticalScale(size);
+
+    fontSize = verticalScale(fontSize);
+
+    const borderWidth = 1;
+
+    return (
+        <Pressable onPress={onPress}>
+            <View
+                style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: color ? color : Colors.background,
+                    borderColor: Colors.tertiary,
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
+                    borderWidth: borderWidth,
+                    marginVertical: verticalScale(8),
+                }}
+            >
+                <Text
                     style={{
-                        alignItems: 'center',
+                        textAlign: 'center',
+                        alignSelf: 'center',
                         justifyContent: 'center',
-                        backgroundColor: this.props.color ? this.props.color : Colors.background,
-                        borderColor: Colors.tertiary,
-                        width: size,
-                        height: size,
-                        borderRadius: size / 2,
-                        borderWidth: borderWidth,
-                        marginVertical: verticalScale(8),
+                        fontSize: fontSize - 2 * borderWidth,
+                        lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
+                        fontWeight: 'bold',
+                        color: Colors.text,
                     }}
                 >
-                    <Text
-                        style={{
-                            textAlign: 'center',
-                            alignSelf: 'center',
-                            justifyContent: 'center',
-                            fontSize: fontSize - 2 * borderWidth,
-                            lineHeight: fontSize - (Platform.OS === 'ios' ? 2 * borderWidth : borderWidth),
-                            fontWeight: 'bold',
-                            color: Colors.text,
-                        }}
-                    >
-                        <Icon solid name={this.props.name} style={{fontSize: fontSize, color: Colors.tertiary}} />
-                    </Text>
-                </View>
-            </Pressable>
-        );
-    }
-}
+                    <Icon solid name={name} style={{fontSize: fontSize, color: Colors.tertiary}} />
+                </Text>
+            </View>
+        </Pressable>
+    );
+};

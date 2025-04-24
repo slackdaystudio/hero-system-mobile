@@ -1,5 +1,4 @@
 import React, {useCallback, useState} from 'react';
-import PropTypes from 'prop-types';
 import {useSelector, useDispatch} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {ActivityIndicator, Dimensions, ImageBackground, StyleSheet, Text, TextInput, View} from 'react-native';
@@ -7,11 +6,11 @@ import {scale, verticalScale} from 'react-native-size-matters';
 import {TabView} from 'react-native-tab-view';
 import {randomCharacter} from '../../lib/RandomCharacter';
 import {common as libCommon} from '../../lib/Common';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {Button} from '../Button/Button';
-import styles from '../../Styles';
 import {setRandomHero, setRandomHeroName} from '../../reducers/randomHero';
 import {RouteBuilder, Tab} from '../Tab/Tab';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // CopyView 2018-Present Philip J. Guinchard
 //
@@ -31,7 +30,7 @@ const windowWidth = Dimensions.get('window').width;
 
 const windowHeight = Dimensions.get('window').height;
 
-const GeneralRoute = ({character, dispatch, reRoll}) => {
+const GeneralRoute = ({character, dispatch, reRoll, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -132,7 +131,7 @@ const CharacteristicsRoute = ({character, renderCharacteristics}) => {
     return RouteBuilder('Characteristics', renderCharacteristics(), libCommon.isEmptyObject(character));
 };
 
-const PowersRoute = ({character}) => {
+const PowersRoute = ({character, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -155,7 +154,7 @@ const PowersRoute = ({character}) => {
     return RouteBuilder('Powers', tab, libCommon.isEmptyObject(character));
 };
 
-const SkillsRoute = ({character}) => {
+const SkillsRoute = ({character, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -175,7 +174,7 @@ const SkillsRoute = ({character}) => {
     return RouteBuilder('Skills', tab, libCommon.isEmptyObject(character));
 };
 
-const DisadvantagesRoute = ({character}) => {
+const DisadvantagesRoute = ({character, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
@@ -199,6 +198,10 @@ const DisadvantagesRoute = ({character}) => {
 };
 
 export const RandomCharacterScreen = ({navigation}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {styles} = useColorTheme(scheme);
+
     const dispatch = useDispatch();
 
     const character = useSelector((state) => state.randomHero.hero);
@@ -224,15 +227,15 @@ export const RandomCharacterScreen = ({navigation}) => {
     const renderScene = () => {
         switch (index) {
             case 0:
-                return <GeneralRoute character={character} dispatch={dispatch} reRoll={reRoll} />;
+                return <GeneralRoute character={character} dispatch={dispatch} reRoll={reRoll} styles={styles} />;
             case 1:
                 return <CharacteristicsRoute character={character} renderCharacteristics={renderCharacteristics} />;
             case 2:
-                return <PowersRoute character={character} />;
+                return <PowersRoute character={character} styles={styles} />;
             case 3:
-                return <SkillsRoute character={character} />;
+                return <SkillsRoute character={character} styles={styles} />;
             case 4:
-                return <DisadvantagesRoute character={character} />;
+                return <DisadvantagesRoute character={character} styles={styles} />;
             default:
                 return null;
         }
@@ -295,10 +298,6 @@ export const RandomCharacterScreen = ({navigation}) => {
             />
         </>
     );
-};
-
-RandomCharacterScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
 };
 
 const localStyles = StyleSheet.create({

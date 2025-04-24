@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dimensions, Text, Platform, View, Switch as RNSwitch} from 'react-native';
 import {TabView} from 'react-native-tab-view';
@@ -8,12 +7,13 @@ import {ScaledSheet, scale, verticalScale} from 'react-native-size-matters';
 import {RouteBuilder, Tab} from '../Tab/Tab';
 import Slider from '../Slider/Slider';
 import {Button} from '../Button/Button';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 import {Card} from '../Card/Card';
 import {dieRoller, KILLING_DAMAGE, NORMAL_DAMAGE, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
 import {updateFormValue} from '../../reducers/forms';
 import moves from '../../../public/moves.json';
-import styles, {Colors} from '../../Styles';
+import {useNavigation} from '@react-navigation/native';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -33,7 +33,7 @@ const windowWidth = Dimensions.get('window').width;
 
 const windowHeight = Dimensions.get('window').height;
 
-const ManeuversRoute = ({}) => {
+const ManeuversRoute = ({styles}) => {
     const tab = (
         <View style={[styles.tabContent, {marginHorizontal: scale(10)}]}>
             {moves.map((move, index) => {
@@ -93,8 +93,14 @@ const ManeuversRoute = ({}) => {
     return RouteBuilder('Maneuvers', tab, false);
 };
 
-export const DamageScreen = ({navigation}) => {
+export const DamageScreen = () => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
     const dispatch = useDispatch();
+
+    const navigation = useNavigation();
 
     const damageForm = useSelector((state) => state.forms.damage);
 
@@ -141,7 +147,7 @@ export const DamageScreen = ({navigation}) => {
                         setItems={setItems}
                         onChangeValue={(val) => updateForm('partialDie', picker.value)}
                         style={{backgroundColor: Colors.formControl}}
-                        labelStyle={{fontSize: verticalScale(12), color: Colors.text, paddingLeft: scale(5)}}
+                        labelStyle={[styles.buttonText, {fontSize: verticalScale(12), paddingLeft: scale(5)}]}
                         listItemContainerStyle={{backgroundColor: Colors.background}}
                         selectedItemContainerStyle={{backgroundColor: Colors.formAccent}}
                         modalContentContainerStyle={{backgroundColor: Colors.primary}}
@@ -305,7 +311,7 @@ export const DamageScreen = ({navigation}) => {
                     />
                 );
             case 1:
-                return <ManeuversRoute />;
+                return <ManeuversRoute styles={styles} />;
             default:
                 return null;
         }
@@ -366,10 +372,6 @@ export const DamageScreen = ({navigation}) => {
             />
         </>
     );
-};
-
-DamageScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
 };
 
 const localStyles = ScaledSheet.create({

@@ -1,16 +1,15 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
 import {View} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
-import Header, {EXIT_APP} from '../Header/Header';
+import {Header, EXIT_APP} from '../Header/Header';
 import {Heading} from '../Heading/Heading';
 import {IconButton, TEXT_BOTTOM} from '../IconButton/IconButton';
 import {common} from '../../lib/Common';
-import {Colors} from '../../Styles';
 import {Animated} from '../Animated';
-import {useFlip} from '../Animated/Animated';
-import {getRandomNumber} from '../../../App';
+import {ReduceMotion} from 'react-native-reanimated';
+import {useNavigation} from '@react-navigation/native';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -26,102 +25,83 @@ import {getRandomNumber} from '../../../App';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const HomeScreen = ({navigation}) => {
-    const flip = useFlip();
+export const HomeScreen = () => {
+    const navigation = useNavigation();
 
     const character = useSelector((state) => state.character.character);
 
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors} = useColorTheme(scheme);
+
     const onViewPress = () => {
+        if (common.isEmptyObject(character)) {
+            return;
+        }
+
         navigation.navigate('ViewHeroDesignerCharacter', {from: 'Home'});
     };
 
     return (
         <>
             <Header navigation={navigation} backScreen={EXIT_APP} />
-            <Heading text="Library" animated />
-            <View flex={0} flexGrow={1} flexDirection="column" justifyContent="flex-start">
-                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
+            <Animated
+                animationProps={{
+                    from: {
+                        scale: 0.1,
+                    },
+                    animate: {
+                        scale: 1,
+                    },
+                    transition: {
+                        scale: {
+                            type: 'spring',
+                            duration: 1200,
+                            dampingRatio: 0.3,
+                            stiffness: 1,
+                            overshootClamping: false,
+                            restDisplacementThreshold: 0.2,
+                            restSpeedThreshold: 0.01,
+                            reduceMotion: ReduceMotion.System,
+                        },
+                    },
+                }}
+                style={{flex: 1, maxHeight: verticalScale(48), paddingBottom: verticalScale(48)}}
+            >
+                <Heading text="Library" />
+                <View flex={0} flexGrow={1} flexDirection="column" justifyContent="flex-start">
+                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
                         <IconButton
                             label="View"
-                            textPos={TEXT_BOTTOM}
                             icon="user"
                             iconColor={Colors.tertiary}
                             onPress={() => onViewPress()}
                             opacity={common.isEmptyObject(character) ? 0.3 : 1}
                         />
-                    </Animated>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
-                        <IconButton
-                            label="Characters"
-                            textPos={TEXT_BOTTOM}
-                            icon="users"
-                            iconColor={Colors.tertiary}
-                            onPress={() => navigation.navigate('Characters')}
-                        />
-                    </Animated>
-                </View>
-                <Heading text="Dice Rollers" animated />
-                <View flexDirection="row" alignItems="center" justifyContent="space-evenly" style={{paddingBottom: verticalScale(15)}}>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
-                        <IconButton
-                            label="3d6"
-                            textPos={TEXT_BOTTOM}
-                            icon="check-circle"
-                            iconColor={Colors.tertiary}
-                            onPress={() => navigation.navigate('Skill')}
-                        />
-                    </Animated>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
+                        <IconButton label="Characters" icon="users" iconColor={Colors.tertiary} onPress={() => navigation.navigate('Characters')} />
+                    </View>
+
+                    <Heading text="Dice Rollers" />
+                    <View flexDirection="row" alignItems="center" justifyContent="space-evenly" style={{paddingBottom: verticalScale(15)}}>
+                        <IconButton label="3d6" icon="check-circle" iconColor={Colors.tertiary} onPress={() => navigation.navigate('Skill')} />
                         <IconButton label="Hit" textPos={TEXT_BOTTOM} icon="bullseye" iconColor={Colors.tertiary} onPress={() => navigation.navigate('Hit')} />
-                    </Animated>
-                </View>
-                <View flexDirection="row" alignItems="center" justifyContent="space-evenly" style={{paddingBottom: verticalScale(15)}}>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
-                        <IconButton
-                            label="Damage"
-                            textPos={TEXT_BOTTOM}
-                            icon="kit-medical"
-                            iconColor={Colors.tertiary}
-                            onPress={() => navigation.navigate('Damage')}
-                        />
-                    </Animated>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
-                        <IconButton
-                            label="Effect"
-                            textPos={TEXT_BOTTOM}
-                            icon="shield-virus"
-                            iconColor={Colors.tertiary}
-                            onPress={() => navigation.navigate('Effect')}
-                        />
-                    </Animated>
-                </View>
-                <Heading text="Game Aids" animated />
-                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
-                        <IconButton
-                            label="H.E.R.O."
-                            textPos={TEXT_BOTTOM}
-                            icon="mask"
-                            iconColor={Colors.tertiary}
-                            onPress={() => navigation.navigate('RandomCharacter')}
-                        />
-                    </Animated>
-                    <Animated animationProps={{duration: 3000, delay: getRandomNumber(800, 2200), state: flip}}>
+                    </View>
+                    <View flexDirection="row" alignItems="center" justifyContent="space-evenly" style={{paddingBottom: verticalScale(15)}}>
+                        <IconButton label="Damage" icon="kit-medical" iconColor={Colors.tertiary} onPress={() => navigation.navigate('Damage')} />
+                        <IconButton label="Effect" icon="shield-virus" iconColor={Colors.tertiary} onPress={() => navigation.navigate('Effect')} />
+                    </View>
+                    <Heading text="Game Tools" />
+                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingBottom: verticalScale(15)}}>
+                        <IconButton label="H.E.R.O." icon="mask" iconColor={Colors.tertiary} onPress={() => navigation.navigate('RandomCharacter')} />
                         <IconButton
                             label="Cruncher"
-                            textPos={TEXT_BOTTOM}
                             icon="square-root-variable"
                             iconColor={Colors.tertiary}
                             onPress={() => navigation.navigate('CostCruncher')}
                         />
-                    </Animated>
+                    </View>
                 </View>
-            </View>
+            </Animated>
         </>
     );
-};
-
-HomeScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
 };

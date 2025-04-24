@@ -1,4 +1,5 @@
 import {ScaledSheet} from 'react-native-size-matters';
+import {LIGHT} from './hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -35,203 +36,229 @@ const AllColors = {
     switchGutter: '#283134',
 };
 
-export const Colors = {
-    background: AllColors.background,
-    primary: AllColors.base03,
-    secondary: AllColors.base00,
-    tertiary: AllColors.base1,
-    lightBackground: AllColors.base02,
-    text: AllColors.base2,
-    formControl: AllColors.base01,
-    secondaryForm: AllColors.green,
-    formAccent: AllColors.base1,
-    characterFooter: AllColors.cyan,
-    yellow: AllColors.yellow,
-    red: AllColors.red,
-    switchGutter: AllColors.switchGutter,
+export const getColorTheme = (theme) => {
+    if (theme === 'dark') {
+        return {
+            background: AllColors.background,
+            primary: AllColors.base03,
+            secondary: AllColors.base00,
+            tertiary: AllColors.base3,
+            lightBackground: AllColors.base02,
+            lighText: AllColors.base1,
+            text: AllColors.base2,
+            formControl: AllColors.base01,
+            secondaryForm: AllColors.blue,
+            formAccent: AllColors.base1,
+            characterFooter: AllColors.cyan,
+            yellow: AllColors.yellow,
+            red: AllColors.red,
+            switchGutter: AllColors.switchGutter,
+        };
+    }
+
+    return {
+        background: AllColors.base3,
+        primary: AllColors.base2,
+        secondary: AllColors.base0,
+        tertiary: AllColors.base01,
+        lightBackground: AllColors.base00,
+        lighText: AllColors.base1,
+        text: AllColors.base00,
+        formControl: '#ac9d57',
+        secondaryForm: AllColors.orange,
+        formAccent: AllColors.yellow,
+        characterFooter: AllColors.base00,
+        yellow: AllColors.yellow,
+        red: AllColors.red,
+        switchGutter: AllColors.switchGutter,
+    };
 };
 
-export default ScaledSheet.create({
-    container: {
-        backgroundColor: Colors.background,
-    },
-    content: {
-        paddingTop: 0,
-        paddingHorizontal: 0,
-        backgroundColor: Colors.background,
-    },
-    heading: {
-        fontSize: '16@vs',
-        fontFamily: 'Roboto',
-        fontWeight: 'bold',
-        fontVariant: 'small-caps',
-        color: Colors.text,
-        paddingVertical: '5@s',
-        textAlign: 'center',
-        backgroundColor: Colors.primary,
-        width: '100%',
-        height: '32@vs',
-        borderColor: Colors.text,
-        borderBottomWidth: 0.5,
-        borderTopWidth: 0.5,
-        letterSpacing: 6,
-    },
-    subHeading: {
-        alignSelf: 'center',
-        fontWeight: 'bold',
-        textDecorationLine: 'underline',
-        color: Colors.text,
-    },
-    hdSubHeading: {
-        fontSize: '18@vs',
-        fontWeight: 'bold',
-        paddingTop: '10@vs',
-        color: Colors.text,
-        borderBottomColor: Colors.text,
-        borderBottomWidth: '2@vs',
-        width: '100%',
-    },
-    buttonContainer: {
-        paddingVertical: '5@s',
-        alignItems: 'center',
-    },
-    buttonBig: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        minWidth: '130@vs',
-        height: '43@vs',
-        backgroundColor: Colors.formControl,
-        borderWidth: 0.5,
-        borderColor: Colors.formControl,
-        borderRadius: '10@vs',
-    },
-    buttonSmall: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        minWidth: '100@s',
-        height: '43@vs',
-        backgroundColor: Colors.formControl,
-        borderWidth: 0.5,
-        borderColor: Colors.formControl,
-        borderRadius: '5@vs',
-    },
-    buttonTiny: {
-        minWidth: '80@s',
-        height: '28@vs',
-    },
-    buttonText: {
-        fontWeight: 'bold',
-        fontSize: '14@vs',
-        color: Colors.text,
-        fontVariant: 'small-caps',
-    },
-    grey: {
-        fontSize: '14@vs',
-        color: Colors.text,
-    },
-    boldGrey: {
-        fontSize: '14@vs',
-        color: Colors.text,
-        fontWeight: 'bold',
-    },
-    textInput: {
-        borderWidth: 0.5,
-        borderColor: Colors.formControl,
-        backgroundColor: Colors.primary,
-        color: Colors.text,
-        fontSize: '14@vs',
-        height: '30@vs',
-        lineHeight: '15@vs',
-        minWidth: '55@vs',
-        textAlign: 'center',
-        borderRadius: '10@vs',
-    },
-    textAreaInput: {
-        color: Colors.text,
-        borderWidth: 0.5,
-        borderColor: Colors.formControl,
-        backgroundColor: 'rgba(18, 18, 18, 0.3)',
-        fontSize: '14@vs',
-        textAlignVertical: 'top',
-    },
-    tabHeading: {
-        backgroundColor: '#000',
-    },
-    activeTabStyle: {
-        backgroundColor: '#000',
-        color: '#000',
-        fontSize: 999,
-    },
-    activeTextStyle: {
-        backgroundColor: '#000',
-        color: '#000',
-    },
-    tabStyle: {
-        fontSize: '14@vs',
-        color: Colors.background,
-    },
-    scrollableTab: {
-        backgroundColor: '#000',
-    },
-    tabBarUnderline: {
-        backgroundColor: Colors.text,
-    },
-    tabContent: {
-        // backgroundColor: Colors.background,
-    },
-    card: {
-        backgroundColor: Colors.primary,
-    },
-    cardItem: {
-        backgroundColor: Colors.primary,
-    },
-    cardTitle: {
-        fontSize: '16@vs',
-        fontWeight: 'bold',
-        color: Colors.primary,
-    },
-    modal: {
-        flex: -1,
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: Colors.formControl,
-        flexDirection: 'column',
-    },
-    modalHeader: {
-        fontSize: '20@vs',
-        paddingLeft: '22@s',
-        fontFamily: 'Roboto',
-        fontWeight: 'bold',
-        color: Colors.text,
-        paddingVertical: '5@vs',
-        backgroundColor: '#121212',
-        width: '100%',
-        borderColor: Colors.formControl,
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-    },
-    modalContent: {
-        flex: -1,
-        backgroundColor: Colors.background,
-        paddingHorizontal: '22@s',
-        paddingTop: '10@vs',
-        paddingBottom: '40@vs',
-        justifyContent: 'center',
-        alignItems: 'stretch',
-    },
-    autocompletesContainer: {
-        paddingTop: 0,
-        width: '100%',
-    },
-    autocompleteInputContainer: {
-        display: 'flex',
-        flexShrink: 0,
-        flexGrow: 0,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        borderWidth: 0,
-        marginLeft: '-13@s',
-    },
-});
+export const createStyles = (scheme) => {
+    const Colors = getColorTheme(scheme);
+
+    return ScaledSheet.create({
+        container: {
+            backgroundColor: Colors.background,
+        },
+        content: {
+            paddingTop: 0,
+            paddingHorizontal: 0,
+            backgroundColor: Colors.background,
+        },
+        heading: {
+            fontSize: '16@vs',
+            fontFamily: 'Roboto',
+            fontWeight: 'bold',
+            fontVariant: 'small-caps',
+            color: Colors.text,
+            paddingVertical: '5@s',
+            textAlign: 'center',
+            backgroundColor: Colors.primary,
+            width: '100%',
+            height: '32@vs',
+            borderColor: Colors.text,
+            borderBottomWidth: 0.5,
+            borderTopWidth: 0.5,
+            letterSpacing: 6,
+        },
+        subHeading: {
+            alignSelf: 'center',
+            fontWeight: 'bold',
+            textDecorationLine: 'underline',
+            color: Colors.text,
+        },
+        hdSubHeading: {
+            fontSize: '18@vs',
+            fontWeight: 'bold',
+            paddingTop: '10@vs',
+            color: Colors.text,
+            borderBottomColor: Colors.text,
+            borderBottomWidth: '2@vs',
+            width: '100%',
+        },
+        buttonContainer: {
+            paddingVertical: '5@s',
+            alignItems: 'center',
+        },
+        buttonBig: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '130@vs',
+            height: '43@vs',
+            backgroundColor: Colors.formControl,
+            borderWidth: 0.5,
+            borderColor: Colors.formControl,
+            borderRadius: '10@vs',
+        },
+        buttonSmall: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '100@s',
+            height: '43@vs',
+            backgroundColor: Colors.formControl,
+            borderWidth: 0.5,
+            borderColor: Colors.formControl,
+            borderRadius: '5@vs',
+        },
+        buttonTiny: {
+            minWidth: '80@s',
+            height: '28@vs',
+        },
+        buttonText: {
+            fontWeight: 'bold',
+            fontSize: '14@vs',
+            color: scheme === LIGHT ? AllColors.base3 : Colors.text,
+            fontVariant: 'small-caps',
+        },
+        grey: {
+            fontSize: '14@vs',
+            color: Colors.text,
+        },
+        boldGrey: {
+            fontSize: '14@vs',
+            color: Colors.text,
+            fontWeight: 'bold',
+        },
+        textInput: {
+            borderWidth: 0.5,
+            borderColor: Colors.formControl,
+            backgroundColor: Colors.primary,
+            color: Colors.text,
+            fontSize: '14@vs',
+            height: '30@vs',
+            lineHeight: '15@vs',
+            minWidth: '55@vs',
+            textAlign: 'center',
+            borderRadius: '10@vs',
+        },
+        textAreaInput: {
+            color: Colors.text,
+            borderWidth: 0.5,
+            borderColor: Colors.formControl,
+            backgroundColor: 'rgba(18, 18, 18, 0.3)',
+            fontSize: '14@vs',
+            textAlignVertical: 'top',
+        },
+        tabHeading: {
+            backgroundColor: '#000',
+        },
+        activeTabStyle: {
+            backgroundColor: '#000',
+            color: '#000',
+            fontSize: 999,
+        },
+        activeTextStyle: {
+            backgroundColor: '#000',
+            color: '#000',
+        },
+        tabStyle: {
+            fontSize: '14@vs',
+            color: Colors.background,
+        },
+        scrollableTab: {
+            backgroundColor: '#000',
+        },
+        tabBarUnderline: {
+            backgroundColor: Colors.text,
+        },
+        tabContent: {
+            // backgroundColor: Colors.background,
+        },
+        card: {
+            backgroundColor: Colors.primary,
+        },
+        cardItem: {
+            backgroundColor: Colors.primary,
+        },
+        cardTitle: {
+            fontSize: '16@vs',
+            fontWeight: 'bold',
+            color: Colors.primary,
+        },
+        modal: {
+            flex: -1,
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: Colors.formControl,
+            flexDirection: 'column',
+        },
+        modalHeader: {
+            fontSize: '20@vs',
+            paddingLeft: '22@s',
+            fontFamily: 'Roboto',
+            fontWeight: 'bold',
+            color: Colors.text,
+            paddingVertical: '5@vs',
+            backgroundColor: '#121212',
+            width: '100%',
+            borderColor: Colors.formControl,
+            borderBottomWidth: 1,
+            borderTopWidth: 1,
+        },
+        modalContent: {
+            flex: -1,
+            backgroundColor: Colors.background,
+            paddingHorizontal: '22@s',
+            paddingTop: '10@vs',
+            paddingBottom: '40@vs',
+            justifyContent: 'center',
+            alignItems: 'stretch',
+        },
+        autocompletesContainer: {
+            paddingTop: 0,
+            width: '100%',
+        },
+        autocompleteInputContainer: {
+            display: 'flex',
+            flexShrink: 0,
+            flexGrow: 0,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            borderWidth: 0,
+            marginLeft: '-13@s',
+        },
+    });
+};

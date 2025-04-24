@@ -1,147 +1,136 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
-import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+import {ConfirmationDialog} from '../ConfirmationDialog/ConfirmationDialog';
 import {MAX_CHARACTER_SLOTS} from '../../lib/Persistence';
 import {common} from '../../lib/Common';
-import {Colors} from '../../Styles';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
-export default class HeroDesignerCharacterFooter extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        character: PropTypes.object,
-        characters: PropTypes.object.isRequired,
-        selectCharacter: PropTypes.func.isRequired,
-        clearCharacter: PropTypes.func.isRequired,
-    };
+export const HeroDesignerCharacterFooter = ({character, characters, selectCharacter, clearCharacter}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
 
-    constructor(props) {
-        super(props);
+    const {Colors} = useColorTheme(scheme);
 
-        this.state = {
-            deleteDialogVisible: false,
-            selectedSlot: null,
-        };
+    const navigation = useNavigation();
 
-        this.slots = [];
+    const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
 
-        for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
-            this.slots.push(i);
-        }
+    const [selectedSlot, setSelectedSlot] = useState(null);
 
-        this.onDeleteDialogOk = this._onDeleteDialogOk.bind(this);
-        this.onDeleteDialogClose = this._onDeleteDialogClose.bind(this);
+    const slots = [];
+
+    for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+        slots.push(i);
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.character !== null && prevProps.character !== null && prevProps.character.filename !== this.props.character.filename) {
-            this.props.navigation.navigate('ViewHeroDesignerCharacter');
-        }
-    }
+    // constructor(props) {
+    //     super(props);
 
-    _isCharacterSelected(slot) {
-        if (this.props.character === null || this.props.character === undefined) {
+    //     this.state = {
+    //         deleteDialogVisible: false,
+    //         selectedSlot: null,
+    //     };
+
+    //     this.slots = [];
+
+    //     for (let i = 0; i < MAX_CHARACTER_SLOTS; i++) {
+    //         this.slots.push(i);
+    //     }
+
+    //     this.onDeleteDialogOk = this._onDeleteDialogOk.bind(this);
+    //     this.onDeleteDialogClose = this._onDeleteDialogClose.bind(this);
+    // }
+
+    // componentDidUpdate(prevProps) {
+    //     if (character !== null && prevProps.character !== null && prevProps.character.filename !== character.filename) {
+    //         this.props.navigation.navigate('ViewHeroDesignerCharacter');
+    //     }
+    // }
+
+    const _isCharacterSelected = (slot) => {
+        if (character === null || character === undefined) {
             return false;
         }
 
-        return this.props.character.filename === this.props.characters[slot]?.filename;
-    }
+        return character.filename === characters[slot]?.filename;
+    };
 
-    _isSlotFilled(slot) {
-        return !common.isEmptyObject(this.props.characters[slot.toString()]);
-    }
+    const _isSlotFilled = (slot) => {
+        return !common.isEmptyObject(characters[slot.toString()]);
+    };
 
-    _getFooterButtonStyle(slot) {
-        if (this._isSlotFilled(slot) && this._isCharacterSelected(slot)) {
-            return {
-                backgroundColor: Colors.tertiary,
-                borderWidth: 1,
-                borderColor: Colors.formControl,
-            };
-        }
-
-        return {
-            backgroundColor: Colors.tertiary,
-        };
-    }
-
-    _getIcon(slot) {
-        if (this._isSlotFilled(slot)) {
+    const _getIcon = (slot) => {
+        if (_isSlotFilled(slot)) {
             return 'user';
         }
 
         return 'user-plus';
-    }
+    };
 
-    _activateSlot(slot) {
-        if (this._isSlotFilled(slot)) {
-            if (this.props.character.filename !== this.props.characters[slot].filename) {
-                this.props.selectCharacter(this.props.characters[slot]);
+    const _activateSlot = (slot) => {
+        if (_isSlotFilled(slot)) {
+            if (character.filename !== characters[slot].filename) {
+                selectCharacter(characters[slot]);
             }
         } else {
-            this.props.navigation.navigate('Characters', {from: 'ViewHeroDesignerCharacter', slot: parseInt(slot, 10)});
+            navigation.navigate('Characters', {from: 'ViewHeroDesignerCharacter', slot: parseInt(slot, 10)});
         }
-    }
+    };
 
-    _emptySlot(slot) {
-        if (this._isSlotFilled(slot) && !this._isCharacterSelected(slot)) {
-            const newState = {...this.state};
+    const _emptySlot = (slot) => {
+        if (_isSlotFilled(slot) && !_isCharacterSelected(slot)) {
+            setSelectedSlot(slot.toString());
 
-            newState.selectedSlot = slot.toString();
-            newState.deleteDialogVisible = true;
-
-            this.setState(newState);
+            setDeleteDialogVisible(true);
         }
-    }
+    };
 
-    _onDeleteDialogOk() {
-        this.props.clearCharacter(this.props.characters[this.state.selectedSlot.toString()].filename, this.props.character, this.props.characters, false);
+    const _onDeleteDialogOk = () => {
+        clearCharacter(characters[selectedSlot.toString()].filename, character, characters, false);
 
-        this._onDeleteDialogClose();
-    }
+        _onDeleteDialogClose();
+    };
 
-    _onDeleteDialogClose() {
-        this.setState({deleteDialogVisible: false, selectedSlot: null});
-    }
+    const _onDeleteDialogClose = () => {
+        setSelectedSlot(null);
 
-    render() {
-        return (
-            <View
-                flexDirection="row"
-                justifyContent="space-evenly"
-                style={{
-                    backgroundColor: Colors.primary,
-                    paddingVertical: verticalScale(5),
-                    borderTopWidth: 0.5,
-                    borderColor: Colors.characterFooter,
-                    paddingBottom: verticalScale(13),
-                }}
-            >
-                {this.slots.map((slot) => {
-                    return (
-                        <Icon
-                            key={'character-' + slot}
-                            solid
-                            name={this._getIcon(slot)}
-                            style={{fontSize: verticalScale(23), color: Colors.tertiary}}
-                            onPress={() => this._activateSlot(slot)}
-                            onLongPress={() => this._emptySlot(slot)}
-                        />
-                    );
-                })}
-                <ConfirmationDialog
-                    visible={this.state.deleteDialogVisible}
-                    title="Remove Character?"
-                    info={
-                        // eslint-disable-next-line max-len
-                        'Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.'
-                    }
-                    onOk={this.onDeleteDialogOk}
-                    onClose={this.onDeleteDialogClose}
-                />
-            </View>
-        );
-    }
-}
+        setDeleteDialogVisible(false);
+    };
+
+    return (
+        <View
+            flexDirection="row"
+            justifyContent="space-evenly"
+            style={{
+                backgroundColor: Colors.primary,
+                paddingVertical: verticalScale(5),
+                borderTopWidth: 0.5,
+                borderColor: Colors.characterFooter,
+                paddingBottom: verticalScale(13),
+            }}
+        >
+            {slots.map((slot) => {
+                return (
+                    <Icon
+                        key={'character-' + slot}
+                        solid
+                        name={_getIcon(slot)}
+                        style={{fontSize: verticalScale(23), color: Colors.tertiary}}
+                        onPress={() => _activateSlot(slot)}
+                        onLongPress={() => _emptySlot(slot)}
+                    />
+                );
+            })}
+            <ConfirmationDialog
+                visible={deleteDialogVisible}
+                title="Remove Character?"
+                info={'Are you certain you want to remove this character from this slot?\n\nThis will not delete this character from your imported characters.'}
+                onOk={_onDeleteDialogOk}
+                onClose={_onDeleteDialogClose}
+            />
+        </View>
+    );
+};

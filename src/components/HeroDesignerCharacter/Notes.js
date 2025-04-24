@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {ImageBackground, TextInput, View} from 'react-native';
+import React from 'react';
+import {TextInput, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
-import styles from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -18,38 +18,29 @@ import styles from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default class Notes extends Component {
-    static propTypes = {
-        notes: PropTypes.string,
-        updateNotes: PropTypes.func.isRequired,
-    };
+export const Notes = ({notes, updateNotes}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
 
-    render() {
-        return (
-            <>
-                <ImageBackground
-                    source={require('../../../public/background.png')}
-                    style={{flex: 1, flexDirection: 'column'}}
-                    imageStyle={{resizeMode: 'repeat'}}
-                >
-                    <View style={{alignItems: 'center', paddingHorizontal: scale(5), paddingVertical: verticalScale(20)}}>
-                        <TextInput
-                            multiline={true}
-                            placeholder="Campaign notes, miscellaneous equipment, etc"
-                            placeholderTextColor="rgba(232, 232, 232, 0.3)"
-                            style={styles.textAreaInput}
-                            height={verticalScale(250)}
-                            width="95%"
-                            defaultValue={this.props.notes.toString()}
-                            onEndEditing={(event) => {
-                                event.preventDefault();
+    const {styles} = useColorTheme(scheme);
 
-                                this.props.updateNotes(event.nativeEvent.text);
-                            }}
-                        />
-                    </View>
-                </ImageBackground>
-            </>
-        );
-    }
-}
+    return (
+        <>
+            <View style={{alignItems: 'center', paddingHorizontal: scale(5), paddingVertical: verticalScale(20)}}>
+                <TextInput
+                    multiline={true}
+                    placeholder="Campaign notes, miscellaneous equipment, etc"
+                    placeholderTextColor="rgba(232, 232, 232, 0.3)"
+                    style={styles.textAreaInput}
+                    height={verticalScale(250)}
+                    width="95%"
+                    defaultValue={notes.toString()}
+                    onEndEditing={(event) => {
+                        event.preventDefault();
+
+                        updateNotes(event.nativeEvent.text);
+                    }}
+                />
+            </View>
+        </>
+    );
+};

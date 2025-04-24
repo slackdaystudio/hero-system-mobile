@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {View, Text} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {CircleButton} from '../CircleButton';
 import {Icon} from '../Icon/Icon';
-import {styles} from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -21,17 +21,14 @@ import {styles} from '../../Styles';
 // limitations under the License.
 
 export const FooterButton = ({label, iconName, onPress, onLongPress}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {styles} = useColorTheme(scheme);
+
     return (
         <View alignItems="center" justifyItems="center">
             <CircleButton name={<Icon solid minWidth={scale(18)} textAlign="center" name={iconName} />} onPress={onPress} onLongPress={onLongPress} />
             {label ? <Text style={[styles.text, {fontSize: verticalScale(10)}]}>{label}</Text> : null}
         </View>
     );
-};
-
-FooterButton.propTypes = {
-    label: PropTypes.string,
-    iconName: PropTypes.string.isRequired,
-    onPress: PropTypes.func.isRequired,
-    onLongPress: PropTypes.func,
 };

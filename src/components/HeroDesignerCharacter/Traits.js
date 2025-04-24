@@ -1,18 +1,19 @@
-import React, {Component, Fragment} from 'react';
-import PropTypes from 'prop-types';
+import React, {Fragment, useState} from 'react';
 import {View, Text, TouchableHighlight} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {AccordionCard, BulletedLabel} from '../Card/AccordionCard';
 import {Card} from '../Card/Card';
-import CircleButton from '../CircleButton/CircleButton';
+import {CircleButton} from '../CircleButton/CircleButton';
 import {dieRoller} from '../../lib/DieRoller';
 import {characterTraitDecorator} from '../../decorators/CharacterTraitDecorator';
 import {SKILL_CHECK, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT} from '../../lib/DieRoller';
 import {common} from '../../lib/Common';
 import CompoundPower from '../../decorators/CompoundPower';
-import styles, {Colors} from '../../Styles';
 import {Accordion} from '../Animated';
 import {GENERIC_OBJECT} from '../../lib/HeroDesignerCharacter';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -28,7 +29,7 @@ import {GENERIC_OBJECT} from '../../lib/HeroDesignerCharacter';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function initItemShow(items, subListKey) {
+const initItemShow = (items, subListKey) => {
     let itemShow = {};
 
     items.map((item) => {
@@ -45,62 +46,33 @@ function initItemShow(items, subListKey) {
         }
     });
 
-    return {
-        itemShow: itemShow,
+    return itemShow;
+};
+
+export const Traits = ({headingText, character, listKey, subListKey, updateForm}) => {
+    const navigation = useNavigation();
+
+    const [itemShow, setItemShow] = useState(initItemShow(character[listKey], subListKey));
+
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors, styles} = useColorTheme(scheme);
+
+    const toggleDefinitionShow = (name) => {
+        const newItemShow = {...itemShow};
+
+        newItemShow[name] = !newItemShow[name];
+
+        setItemShow(newItemShow);
     };
-}
 
-export default class Traits extends Component {
-    static propTypes = {
-        navigation: PropTypes.object.isRequired,
-        headingText: PropTypes.string.isRequired,
-        character: PropTypes.object.isRequired,
-        listKey: PropTypes.string.isRequired,
-        subListKey: PropTypes.string.isRequired,
-        updateForm: PropTypes.func.isRequired,
-    };
+    const roll = (rollConfig, decorated) => {
+        if (rollConfig.type === SKILL_CHECK) {
+            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(rollConfig.roll)});
+        } else if (rollConfig.type === NORMAL_DAMAGE) {
+            let dice = common.toDice(rollConfig.roll);
 
-    constructor(props) {
-        super(props);
-
-        const displayOptions = initItemShow(props.character[props.listKey], props.subListKey);
-
-        this.state = {
-            itemShow: displayOptions.itemShow,
-            character: props.character,
-            listKey: props.listKey,
-        };
-    }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (prevState.character !== nextProps.character || prevState.listKey !== nextProps.listKey) {
-            const displayOptions = initItemShow(nextProps.character[nextProps.listKey], nextProps.subListKey);
-            let newState = {...prevState};
-
-            newState.itemShow = displayOptions.itemShow;
-            newState.character = nextProps.character;
-            newState.listKey = nextProps.listKey;
-
-            return newState;
-        }
-
-        return null;
-    }
-
-    _toggleDefinitionShow(name) {
-        let newState = {...this.state};
-        newState.itemShow[name] = !newState.itemShow[name];
-
-        this.setState(newState);
-    }
-
-    _roll(roll, decorated) {
-        if (roll.type === SKILL_CHECK) {
-            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(roll.roll)});
-        } else if (roll.type === NORMAL_DAMAGE) {
-            let dice = common.toDice(roll.roll);
-
-            this.props.updateForm({
+            updateForm({
                 type: 'damage',
                 json: {
                     dice: dice.full,
@@ -109,11 +81,11 @@ export default class Traits extends Component {
                 },
             });
 
-            this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
-        } else if (roll.type === KILLING_DAMAGE) {
-            let dice = common.toDice(roll.roll);
+            navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
+        } else if (rollConfig.type === KILLING_DAMAGE) {
+            let dice = common.toDice(rollConfig.roll);
 
-            this.props.updateForm({
+            updateForm({
                 type: 'damage',
                 json: {
                     dice: dice.full,
@@ -124,9 +96,9 @@ export default class Traits extends Component {
                 },
             });
 
-            this.props.navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
-        } else if (roll.type === EFFECT) {
-            let dice = common.toDice(roll.roll);
+            navigation.navigate('Damage', {from: 'ViewHeroDesignerCharacter'});
+        } else if (rollConfig.type === EFFECT) {
+            let dice = common.toDice(rollConfig.roll);
             let type = 'None';
             let sfx = decorated.characterTrait.trait.sfx;
 
@@ -134,11 +106,11 @@ export default class Traits extends Component {
                 type = decorated.characterTrait.trait.xmlid.toUpperCase();
             }
 
-            this.props.navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.effectRoll(dice.full, dice.partial, type, sfx)});
+            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.effectRoll(dice.full, dice.partial, type, sfx)});
         }
-    }
+    };
 
-    _renderModifiers(label, modifiers) {
+    const renderModifiers = (label, modifiers) => {
         if (modifiers.length > 0) {
             return (
                 <View style={{flex: 1}}>
@@ -160,9 +132,9 @@ export default class Traits extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderAttributes(item) {
+    const renderAttributes = (item) => {
         if (item.attributes().length > 0) {
             return (
                 <Fragment>
@@ -186,23 +158,23 @@ export default class Traits extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderAdvantagesAndLimitations(item) {
+    const renderAdvantagesAndLimitations = (item) => {
         if (item.advantages().length > 0 || item.limitations().length > 0) {
             return (
                 <View>
-                    {this._renderModifiers('Advantages', item.advantages())}
+                    {renderModifiers('Advantages', item.advantages())}
                     <View style={{paddingBottom: verticalScale(10)}} />
-                    {this._renderModifiers('Limitations', item.limitations())}
+                    {renderModifiers('Limitations', item.limitations())}
                 </View>
             );
         }
 
         return null;
-    }
+    };
 
-    _renderNotes(decorated) {
+    const renderNotes = (decorated) => {
         if (decorated.characterTrait.trait.notes === null) {
             return null;
         }
@@ -214,33 +186,33 @@ export default class Traits extends Component {
                 </Text>
             </View>
         );
-    }
+    };
 
-    _renderDefinition(item) {
+    const renderDefinition = (item) => {
         if (item.definition() !== '' || item.attributes().length > 0) {
             return (
                 <View>
-                    {this._renderAttributes(item)}
+                    {renderAttributes(item)}
                     <Text style={styles.grey}>{item.definition()}</Text>
                 </View>
             );
         }
 
         return null;
-    }
+    };
 
-    _renderItemDetails(item, showBottomBar = false) {
-        if (this.state.itemShow[item.trait.id]) {
+    const renderItemDetails = (item, showBottomBar = false) => {
+        if (itemShow[item.trait.id]) {
             if (item.trait.xmlid === 'COMPOUNDPOWER') {
-                return this._renderCompoundPowerDetails(item);
+                return renderCompoundPowerDetails(item);
             }
 
             return (
                 <>
                     <View borderTopColor={Colors.background} borderTopWidth={0.5}>
-                        {this._renderDefinition(item)}
-                        {this._renderAdvantagesAndLimitations(item)}
-                        {this._renderNotes(item)}
+                        {renderDefinition(item)}
+                        {renderAdvantagesAndLimitations(item)}
+                        {renderNotes(item)}
                         <View
                             flex={1}
                             flexDirection="row"
@@ -282,9 +254,9 @@ export default class Traits extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderCompoundPowerDetails(item, showBottomBar = false) {
+    const renderCompoundPowerDetails = (item, showBottomBar = false) => {
         let powers = [];
 
         // The "powers" field is only available if the last decorator was the CompoundPowerDecorator
@@ -294,15 +266,15 @@ export default class Traits extends Component {
             powers = item.powers;
         } else {
             for (let power of item.characterTrait.powers) {
-                powers.push(characterTraitDecorator.decorate(power.trait, this.props.subListKey, () => this.props.character));
+                powers.push(characterTraitDecorator.decorate(power.trait, subListKey, () => character));
             }
         }
 
         return (
             <Fragment>
-                {this._renderDefinition(item)}
-                {this._renderAdvantagesAndLimitations(item)}
-                {this._renderNotes(item)}
+                {renderDefinition(item)}
+                {renderAdvantagesAndLimitations(item)}
+                {renderNotes(item)}
                 <View style={styles.cardItem}>
                     <View
                         style={{
@@ -337,10 +309,10 @@ export default class Traits extends Component {
                             <View style={{flex: 1, alignSelf: 'center'}}>
                                 <Text style={styles.boldGrey}>{power.label()}</Text>
                             </View>
-                            {this._renderCompoundPowerRoll(power)}
-                            {this._renderDefinition(power)}
-                            {this._renderAdvantagesAndLimitations(power)}
-                            {this._renderNotes(power)}
+                            {renderCompoundPowerRoll(power)}
+                            {renderDefinition(power)}
+                            {renderAdvantagesAndLimitations(power)}
+                            {renderNotes(power)}
                             <View style={styles.cardItem}>
                                 <View
                                     style={{
@@ -374,13 +346,13 @@ export default class Traits extends Component {
                 })}
             </Fragment>
         );
-    }
+    };
 
-    _renderCompoundPowerRoll(power) {
+    const renderCompoundPowerRoll = (power) => {
         if (power.roll() !== null && power.roll() !== undefined) {
             return (
                 <View style={styles.cardItem}>
-                    <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => this._roll(power.roll(), power)}>
+                    <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => roll(power.roll(), power)}>
                         <Text style={[styles.cardTitle, {paddingTop: 0}]}>Effect: {power.roll().roll}</Text>
                     </TouchableHighlight>
                 </View>
@@ -388,21 +360,21 @@ export default class Traits extends Component {
         }
 
         return null;
-    }
+    };
 
-    _renderRoll(item) {
+    const renderRoll = (item) => {
         if (item.roll() !== null && item.roll() !== undefined) {
             return (
-                <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => this._roll(item.roll(), item)}>
+                <TouchableHighlight underlayColor={Colors.secondaryForm} onPress={() => roll(item.roll(), item)}>
                     <Text style={[styles.grey, {paddingTop: 0}]}>{item.roll().roll}</Text>
                 </TouchableHighlight>
             );
         }
 
         return null;
-    }
+    };
 
-    _renderTraitList(decoratedTrait) {
+    const renderTraitList = (decoratedTrait) => {
         return (
             <View key={`trait-list-${decoratedTrait.characterTrait.trait.id}`} paddingBottom={verticalScale(10)} paddingHorizontal={scale(10)}>
                 <Card
@@ -422,13 +394,13 @@ export default class Traits extends Component {
                             >
                                 {decoratedTrait.label()}
                             </Text>
-                            <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
+                            <View style={{flex: 2, alignItems: 'flex-end'}}>{renderRoll(decoratedTrait)}</View>
                         </View>
                     }
                     body={
                         <>
-                            {decoratedTrait.trait[this.props.subListKey].map((item) => {
-                                const decoratedSubTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
+                            {decoratedTrait.trait[subListKey].map((item) => {
+                                const decoratedSubTrait = characterTraitDecorator.decorate(item, listKey, () => character);
 
                                 return (
                                     <Fragment key={`trait-${item.id}`}>
@@ -442,10 +414,10 @@ export default class Traits extends Component {
                                                 },
                                             ]}
                                         >
-                                            {this._renderTrait(decoratedSubTrait, true)}
+                                            {renderTrait(decoratedSubTrait, true)}
                                         </View>
-                                        <Accordion animationProps={{collapsed: !this.state.itemShow[decoratedSubTrait.trait.id], duration: 500}}>
-                                            <View paddingLeft={scale(28)}>{this._renderItemDetails(decoratedSubTrait, true)}</View>
+                                        <Accordion animationProps={{collapsed: !itemShow[decoratedSubTrait.trait.id], duration: 500}}>
+                                            <View paddingLeft={scale(28)}>{renderItemDetails(decoratedSubTrait, true)}</View>
                                         </Accordion>
                                     </Fragment>
                                 );
@@ -454,37 +426,39 @@ export default class Traits extends Component {
                     }
                     footer={
                         <View flex={1} justifyContent="center">
-                            <Accordion animationProps={{collapsed: !this.state.itemShow[decoratedTrait.trait.id], duration: 500}}>
-                                {this._renderItemDetails(decoratedTrait)}
+                            <Accordion animationProps={{collapsed: !itemShow[decoratedTrait.trait.id], duration: 500}}>
+                                {renderItemDetails(decoratedTrait)}
                             </Accordion>
                             <View flex={1} flexDirection="row" justifyContent="center">
-                                <CircleButton name="eye" size={25} fontSize={12} onPress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)} />
+                                <CircleButton name="eye" size={25} fontSize={12} onPress={() => toggleDefinitionShow(decoratedTrait.trait.id)} />
                             </View>
                         </View>
                     }
                 />
             </View>
         );
-    }
+    };
 
-    _renderTrait(decoratedTrait, isListItem = false) {
+    const renderTrait = (decoratedTrait, isListItem = false) => {
         return (
             <View paddingVertical={isListItem ? verticalScale(5) : 0} style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                 <View style={{flex: 2, alignItems: 'flex-start', paddingLeft: isListItem ? scale(10) : 0}}>
                     <BulletedLabel
                         label={decoratedTrait.label()}
-                        onTitlePress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
-                        showContent={this.state.itemShow[decoratedTrait.trait.id]}
+                        onTitlePress={() => toggleDefinitionShow(decoratedTrait.trait.id)}
+                        showContent={itemShow[decoratedTrait.trait.id]}
+                        styles={styles}
+                        Colors={Colors}
                     />
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                    <View style={{flex: 2, alignItems: 'flex-end', paddingRight: isListItem ? scale(10) : 0}}>{this._renderRoll(decoratedTrait)}</View>
+                    <View style={{flex: 2, alignItems: 'flex-end', paddingRight: isListItem ? scale(10) : 0}}>{renderRoll(decoratedTrait)}</View>
                 </View>
             </View>
         );
-    }
+    };
 
-    _renderTraits(items) {
+    const renderTraits = (items) => {
         if (items.length === 0) {
             return null;
         }
@@ -492,50 +466,48 @@ export default class Traits extends Component {
         return (
             <View flexDirection="column" justifyContent="flex-start" paddingTop={verticalScale(20)}>
                 {items.map((item) => {
-                    let decoratedTrait = characterTraitDecorator.decorate(item, this.props.listKey, () => this.props.character);
+                    let decoratedTrait = characterTraitDecorator.decorate(item, listKey, () => character);
 
                     if (
                         decoratedTrait.trait.xmlid.toUpperCase() === GENERIC_OBJECT &&
-                        decoratedTrait.trait.hasOwnProperty(this.props.listKey) &&
-                        decoratedTrait.trait[this.props.listKey].length === 0
+                        decoratedTrait.trait.hasOwnProperty(listKey) &&
+                        decoratedTrait.trait[listKey].length === 0
                     ) {
                         return null;
                     }
 
                     if (
                         decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
-                        decoratedTrait.trait.hasOwnProperty(this.props.subListKey) &&
-                        decoratedTrait.trait[this.props.subListKey].length > 0
+                        decoratedTrait.trait.hasOwnProperty(subListKey) &&
+                        decoratedTrait.trait[subListKey].length > 0
                     ) {
-                        return this._renderTraitList(decoratedTrait);
+                        return renderTraitList(decoratedTrait);
                     }
 
                     return (
                         <View key={`trait-${item.id}`} paddingBottom={verticalScale(10)} paddingHorizontal={scale(10)}>
                             <AccordionCard
                                 title={<Text style={{fontFamily: 'Roboto', fontVariant: 'small-caps'}}>{decoratedTrait.label()}</Text>}
-                                onTitlePress={() => this._toggleDefinitionShow(decoratedTrait.trait.id)}
+                                onTitlePress={() => toggleDefinitionShow(decoratedTrait.trait.id)}
                                 secondaryTitle={
                                     <>
-                                        <View style={{flex: 2, alignItems: 'flex-end'}}>{this._renderRoll(decoratedTrait)}</View>
+                                        <View style={{flex: 2, alignItems: 'flex-end'}}>{renderRoll(decoratedTrait)}</View>
                                     </>
                                 }
-                                content={this._renderItemDetails(decoratedTrait)}
-                                showContent={this.state.itemShow[decoratedTrait.trait.id]}
+                                content={renderItemDetails(decoratedTrait)}
+                                showContent={itemShow[decoratedTrait.trait.id]}
                             />
                         </View>
                     );
                 })}
             </View>
         );
-    }
+    };
 
-    render() {
-        return (
-            <>
-                {this._renderTraits(this.props.character[this.props.listKey])}
-                <View flex={0} flexBasis={1} style={{paddingTop: verticalScale(20)}} />
-            </>
-        );
-    }
-}
+    return (
+        <>
+            {renderTraits(character[listKey])}
+            <View flex={0} flexBasis={1} style={{paddingTop: verticalScale(20)}} />
+        </>
+    );
+};

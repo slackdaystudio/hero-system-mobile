@@ -1,5 +1,4 @@
 import React, {memo} from 'react';
-import PropTypes from 'prop-types';
 import {useSelector} from 'react-redux';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {useAnimationState} from 'moti';
@@ -7,9 +6,9 @@ import {Icon} from '../Icon/Icon';
 import {Animated} from './Animated';
 import {PARTIAL_DIE_PLUS_ONE} from '../../lib/DieRoller';
 import {getRandomNumber} from '../../../App';
-import {Colors} from '../../Styles';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
-const getDieIconDetails = (face, partialDieType, isLast) => {
+const getDieIconDetails = (face, partialDieType, isLast, Colors) => {
     let color = partialDieType > PARTIAL_DIE_PLUS_ONE && isLast ? Colors.yellow : Colors.text;
     let iconName = null;
 
@@ -40,9 +39,13 @@ const getDieIconDetails = (face, partialDieType, isLast) => {
 };
 
 export const Die = memo(function Die({roll, partialDieType, isLast}) {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors} = useColorTheme(scheme);
+
     const showAnimations = useSelector((state) => state.settings.showAnimations);
 
-    const dieIcon = getDieIconDetails(roll, partialDieType, isLast);
+    const dieIcon = getDieIconDetails(roll, partialDieType, isLast, Colors);
 
     const dieState = useAnimationState({
         from: {translateY: verticalScale(-200)},
@@ -71,9 +74,3 @@ export const Die = memo(function Die({roll, partialDieType, isLast}) {
 
     return getDie();
 });
-
-Die.propTypes = {
-    roll: PropTypes.number.isRequired,
-    partialDieType: PropTypes.number.isRequired,
-    isLast: PropTypes.bool.isRequired,
-};

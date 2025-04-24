@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import {View, Text} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {Icon} from '../Icon/Icon';
-import styles, {Colors} from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -19,48 +19,34 @@ import styles, {Colors} from '../../Styles';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default class NumberPicker extends Component {
-    static propTypes = {
-        value: PropTypes.number.isRequired,
-        step: PropTypes.number,
-        increment: PropTypes.func.isRequired,
-        decrement: PropTypes.func.isRequired,
-        stateKey: PropTypes.string.isRequired,
-        min: PropTypes.number,
-        max: PropTypes.number,
-    };
+export const NumberPicker = ({value, step, increment, decrement, stateKey, min, max}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
 
-    render() {
-        return (
-            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                <View style={localStyles.row}>
-                    <Icon
-                        solid
-                        name="square-minus"
-                        style={[styles.grey, {fontSize: verticalScale(22), color: Colors.formControl, alignItems: 'flex-start'}]}
-                        onPress={() => this.props.decrement(this.props.stateKey, this.props.step)}
-                    />
-                </View>
-                <View style={localStyles.row}>
-                    <Text style={styles.grey}>{this.props.value}</Text>
-                </View>
-                <View style={localStyles.row}>
-                    <Icon
-                        solid
-                        name="square-plus"
-                        style={[styles.grey, {fontSize: verticalScale(22), color: Colors.formControl, alignItems: 'flex-end'}]}
-                        onPress={() => this.props.increment(this.props.stateKey, this.props.step)}
-                    />
-                </View>
+    const {Colors, styles} = useColorTheme(scheme);
+
+    return (
+        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+            <View style={localStyles.row}>
+                <Icon
+                    solid
+                    name="square-minus"
+                    style={[styles.grey, {fontSize: verticalScale(22), color: Colors.formControl, alignItems: 'flex-start'}]}
+                    onPress={() => decrement(stateKey, step)}
+                />
             </View>
-        );
-    }
-}
-
-NumberPicker.defaultProps = {
-    step: 1,
-    min: -99,
-    max: 99,
+            <View style={localStyles.row}>
+                <Text style={styles.grey}>{value}</Text>
+            </View>
+            <View style={localStyles.row}>
+                <Icon
+                    solid
+                    name="square-plus"
+                    style={[styles.grey, {fontSize: verticalScale(22), color: Colors.formControl, alignItems: 'flex-end'}]}
+                    onPress={() => increment(stateKey, step)}
+                />
+            </View>
+        </View>
+    );
 };
 
 const localStyles = ScaledSheet.create({

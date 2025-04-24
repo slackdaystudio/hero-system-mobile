@@ -1,7 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
 import {verticalScale, scale} from 'react-native-size-matters';
-import {Colors} from '../../Styles';
+import {useSelector} from 'react-redux';
+import {useColorTheme} from '../../hooks/useColorTheme';
 
 // Copyright (C) Slack Day Studio - All Rights Reserved
 //
@@ -22,6 +23,10 @@ export const ROUNDED = 0;
 export const SQUARE = 1;
 
 export const Card = ({heading, body, footer, cardShape = ROUNDED}) => {
+    const scheme = useSelector((state) => state.settings.colorScheme);
+
+    const {Colors} = useColorTheme(scheme);
+
     return (
         <View
             flex={1}
