@@ -47,8 +47,10 @@ const initCharacteristicsShow = (characteristics, movement) => {
     };
 };
 
-export const Characteristics = ({character, setShowSecondary, updateForm}) => {
+export const Characteristics = ({setShowSecondary, updateForm}) => {
     const navigation = useNavigation();
+
+    const character = useSelector((state) => state.character.character);
 
     const scheme = useSelector((state) => state.settings.colorScheme);
 
@@ -62,35 +64,6 @@ export const Characteristics = ({character, setShowSecondary, updateForm}) => {
 
     const powersMap = common.toMap(common.flatten(character.powers, 'powers'));
 
-    // constructor(props) {
-    //     super(props);
-
-    //     const displayOptions = initCharacteristicsShow(props.character.characteristics, props.character.movement);
-
-    //     this.state = {
-    //         characteristicsShow: displayOptions.characteristicsShow,
-    //         characteristicsButtonsShow: displayOptions.characteristicsButtonsShow,
-    //         character: props.character,
-    //         powersMap: common.toMap(common.flatten(props.character.powers, 'powers')),
-    //     };
-    // }
-
-    // static getDerivedStateFromProps(nextProps, prevState) {
-    //     if (prevState.character !== nextProps.character) {
-    //         const displayOptions = initCharacteristicsShow(nextProps.character.characteristics, nextProps.character.movement);
-    //         let newState = {...prevState};
-
-    //         newState.characteristicsShow = displayOptions.characteristicsShow;
-    //         newState.characteristicsButtonsShow = displayOptions.characteristicsButtonsShow;
-    //         newState.character = nextProps.character;
-    //         newState.powersMap = common.toMap(common.flatten(nextProps.character.powers, 'powers'));
-
-    //         return newState;
-    //     }
-
-    //     return null;
-    // }
-
     const toggleDefinitionShow = (name) => {
         const newShow = {...characteristicsShow};
 
@@ -103,11 +76,6 @@ export const Characteristics = ({character, setShowSecondary, updateForm}) => {
         newButtonsShow[name] = characteristicsButtonsShow[name] === 'plus-circle' ? 'minus-circle' : 'plus-circle';
 
         setCharacteristicsButtonsShow(newButtonsShow);
-        // let newState = {...this.state};
-        // newState.characteristicsShow[name] = !newState.characteristicsShow[name];
-        // newState.characteristicsButtonsShow[name] = newState.characteristicsButtonsShow[name] === 'plus-circle' ? 'minus-circle' : 'plus-circle';
-
-        // this.setState(newState);
     };
 
     const getMovementTotal = (characteristic, formatFraction = false) => {

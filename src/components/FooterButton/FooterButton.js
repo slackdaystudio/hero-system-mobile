@@ -1,8 +1,7 @@
 import React from 'react';
 import {View, Text} from 'react-native';
-import {scale, verticalScale} from 'react-native-size-matters';
-import {CircleButton} from '../CircleButton';
-import {Icon} from '../Icon/Icon';
+import {verticalScale} from 'react-native-size-matters';
+import {CircleButton} from '../CircleButton/CircleButton';
 import {useSelector} from 'react-redux';
 import {useColorTheme} from '../../hooks/useColorTheme';
 
@@ -27,8 +26,8 @@ export const FooterButton = ({label, iconName, onPress, onLongPress}) => {
 
     return (
         <View alignItems="center" justifyItems="center">
-            <CircleButton name={<Icon solid minWidth={scale(18)} textAlign="center" name={iconName} />} onPress={onPress} onLongPress={onLongPress} />
-            {label ? <Text style={[styles.text, {fontSize: verticalScale(10)}]}>{label}</Text> : null}
+            <CircleButton name={iconName} size={verticalScale(30)} fontSize={verticalScale(12)} onPress={onPress} onLongPress={onLongPress} />
+            {label ? <Text style={styles.grey}>{label}</Text> : null}
         </View>
     );
 };

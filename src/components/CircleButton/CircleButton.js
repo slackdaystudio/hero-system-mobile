@@ -24,10 +24,6 @@ export const CircleButton = ({name, size, fontSize, color, onPress}) => {
 
     const {Colors} = useColorTheme(scheme);
 
-    size = verticalScale(size);
-
-    fontSize = verticalScale(fontSize);
-
     const borderWidth = 1;
 
     return (
@@ -56,7 +52,7 @@ export const CircleButton = ({name, size, fontSize, color, onPress}) => {
                         color: Colors.text,
                     }}
                 >
-                    <Icon solid name={name} style={{fontSize: fontSize, color: Colors.tertiary}} />
+                    <Icon solid name={name} style={{fontSize, color: Colors.tertiary}} />
                 </Text>
             </View>
         </Pressable>

@@ -193,8 +193,10 @@ class File {
 
                 if (libCharacter.isHeroDesignerCharacter(char)) {
                     filtered.push({
-                        name: char.characterInfo.characterName,
+                        name: char.characterInfo.characterName ?? char.characterInfo.alternateIdentities ?? character.name ?? 'Unknown',
+                        background: char.characterInfo.background,
                         fileName: character.name,
+                        portrait: char.portrait,
                     });
                 }
             } catch (error) {
@@ -212,6 +214,10 @@ class File {
 
         if (canonicalToName) {
             await RNFS.unlink(canonicalToName);
+        }
+
+        if (filtered.length > 1) {
+            filtered.sort((a, b) => a.name.localeCompare(b.name));
         }
 
         return filtered;

@@ -282,7 +282,7 @@ class HeroDesignerCharacter {
     _getCharacteristicTotal(characteristic, powersMap, showSecondary, character) {
         let value = characteristic.value;
 
-        if (powersMap.has(characteristic.shortName.toUpperCase())) {
+        if (!common.isEmptyObject(powersMap) && powersMap.has(characteristic.shortName.toUpperCase())) {
             value = this._getTotalCharacteristicPoints(powersMap.get(characteristic.shortName.toUpperCase()), value, showSecondary);
         }
 
@@ -360,7 +360,7 @@ class HeroDesignerCharacter {
                     (characteristic.affectsPrimary && characteristic.affectsTotal) ||
                     (!characteristic.affectsPrimary && characteristic.affectsTotal && showSecondary)
                 ) {
-                    value += this._getTotalCharacteristicPoints(char, value, showSecondary);
+                    value += this._getTotalCharacteristicPoints(char, showSecondary);
                 }
             }
         } else {
@@ -378,7 +378,12 @@ class HeroDesignerCharacter {
     _getTotalDensityIncreaseCharacteristcs(characteristic, densityIncrease, value, showSecondary) {
         if (Array.isArray(densityIncrease)) {
             for (let di of densityIncrease) {
-                value += this._getTotalDensityIncreaseCharacteristcs(characteristic, di, value, showSecondary);
+                if (
+                    (densityIncrease.affectsPrimary && densityIncrease.affectsTotal) ||
+                    (!densityIncrease.affectsPrimary && densityIncrease.affectsTotal && showSecondary)
+                ) {
+                    value += this._getTotalDensityIncreaseCharacteristcs(characteristic, di, value, showSecondary);
+                }
             }
         } else {
             if (
@@ -405,7 +410,12 @@ class HeroDesignerCharacter {
     _getTotalArmorDefenseIncrease(type, resistantDefence, value, showSecondary) {
         if (Array.isArray(resistantDefence)) {
             for (let rd of resistantDefence) {
-                value += this._getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
+                if (
+                    (resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                    (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)
+                ) {
+                    value += this._getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
+                }
             }
         } else {
             if (
@@ -431,7 +441,12 @@ class HeroDesignerCharacter {
     _getTotalResistantDefensesIncrease(type, resistantDefence, value, showSecondary) {
         if (Array.isArray(resistantDefence)) {
             for (let rd of resistantDefence) {
-                value = this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
+                if (
+                    (resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                    (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)
+                ) {
+                    value = this._getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
+                }
             }
         } else {
             if (
@@ -549,7 +564,9 @@ class HeroDesignerCharacter {
     _getResistantDefense(resistant, power, character, showSecondary) {
         if (Array.isArray(power)) {
             for (let p of power) {
-                resistant = this._getResistantDefense(resistant, p, character, showSecondary);
+                if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                    resistant = this._getResistantDefense(resistant, p, character, showSecondary);
+                }
             }
         } else {
             if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
@@ -764,10 +781,13 @@ class HeroDesignerCharacter {
             value.template = templateTrait;
 
             if (value.hasOwnProperty('parentid')) {
-                character[traitKey]
-                    .filter((t) => t.id === value.parentid)
-                    .shift()
-                    [characterSubTrait].push(value);
+                const t = character[traitKey].filter((trt) => trt.id === value.parentid).shift();
+
+                if (t === undefined) {
+                    character[traitKey].push(value);
+                } else {
+                    t[characterSubTrait].push(value);
+                }
             } else {
                 character[traitKey].push(value);
             }
