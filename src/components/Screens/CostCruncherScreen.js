@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {Platform, Text, TextInput, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
@@ -98,8 +97,4 @@ export const CostCruncherScreen = ({navigation}) => {
             </View>
         </>
     );
-};
-
-CostCruncherScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
 };

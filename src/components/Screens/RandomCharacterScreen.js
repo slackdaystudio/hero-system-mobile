@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
-import {ActivityIndicator, Dimensions, ImageBackground, StyleSheet, Text, TextInput, View} from 'react-native';
+import {ActivityIndicator, Dimensions, StyleSheet, Text, TextInput, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {TabView} from 'react-native-tab-view';
 import {randomCharacter} from '../../lib/RandomCharacter';
@@ -33,94 +33,92 @@ const windowHeight = Dimensions.get('window').height;
 const GeneralRoute = ({character, dispatch, reRoll, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                <View paddingHorizontal={scale(10)}>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View justifyContent="center">
-                            <Text style={styles.boldGrey}>Name:</Text>
-                        </View>
-                        <TextInput
-                            style={[styles.textInput, {width: scale(200)}]}
-                            onEndEditing={(event) => dispatch(setRandomHeroName({name: event.nativeEvent.text}))}
-                            defaultValue={character.name}
-                        />
+            <View paddingHorizontal={scale(10)}>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View justifyContent="center">
+                        <Text style={styles.boldGrey}>Name:</Text>
                     </View>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Archetype:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.archtype.name}</Text>
-                        </View>
+                    <TextInput
+                        style={[styles.textInput, {width: scale(200)}]}
+                        onEndEditing={(event) => dispatch(setRandomHeroName({name: event.nativeEvent.text}))}
+                        defaultValue={character.name}
+                    />
+                </View>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Archetype:</Text>
                     </View>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Gender:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.gender}</Text>
-                        </View>
-                    </View>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Special FX:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.specialFx}</Text>
-                        </View>
-                    </View>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Profession:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.skills.profession}</Text>
-                        </View>
+                    <View>
+                        <Text style={styles.grey}>{character.archtype.name}</Text>
                     </View>
                 </View>
-                <View style={{paddingBottom: verticalScale(20)}} />
-                <Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
-                <View paddingHorizontal={scale(10)}>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Characteristics:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.archtype.characteristicsCost}</Text>
-                        </View>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Gender:</Text>
                     </View>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Powers:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.powers.powersCost}</Text>
-                        </View>
-                    </View>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Skills:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.skills.cost}</Text>
-                        </View>
-                    </View>
-                    <View flexDirection="row" justifyContent="space-between">
-                        <View>
-                            <Text style={styles.boldGrey}>Disadvantages:</Text>
-                        </View>
-                        <View>
-                            <Text style={styles.grey}>{character.disadvantages.disadvantagesCost}</Text>
-                        </View>
+                    <View>
+                        <Text style={styles.grey}>{character.gender}</Text>
                     </View>
                 </View>
-                <View style={{paddingBottom: verticalScale(20)}} />
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
-                    <View style={styles.buttonContainer}>
-                        <Button label="Roll Again" style={styles.button} onPress={reRoll} />
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Special FX:</Text>
+                    </View>
+                    <View>
+                        <Text style={styles.grey}>{character.specialFx}</Text>
                     </View>
                 </View>
-            </ImageBackground>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Profession:</Text>
+                    </View>
+                    <View>
+                        <Text style={styles.grey}>{character.skills.profession}</Text>
+                    </View>
+                </View>
+            </View>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <Text style={[styles.boldGrey, localStyles.pointCostsHeader]}>Point Costs</Text>
+            <View paddingHorizontal={scale(10)}>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Characteristics:</Text>
+                    </View>
+                    <View>
+                        <Text style={styles.grey}>{character.archtype.characteristicsCost}</Text>
+                    </View>
+                </View>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Powers:</Text>
+                    </View>
+                    <View>
+                        <Text style={styles.grey}>{character.powers.powersCost}</Text>
+                    </View>
+                </View>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Skills:</Text>
+                    </View>
+                    <View>
+                        <Text style={styles.grey}>{character.skills.cost}</Text>
+                    </View>
+                </View>
+                <View flexDirection="row" justifyContent="space-between">
+                    <View>
+                        <Text style={styles.boldGrey}>Disadvantages:</Text>
+                    </View>
+                    <View>
+                        <Text style={styles.grey}>{character.disadvantages.disadvantagesCost}</Text>
+                    </View>
+                </View>
+            </View>
+            <View style={{paddingBottom: verticalScale(20)}} />
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 20}}>
+                <View style={styles.buttonContainer}>
+                    <Button label="Roll Again" style={styles.button} onPress={reRoll} />
+                </View>
+            </View>
         </View>
     );
 
@@ -134,20 +132,18 @@ const CharacteristicsRoute = ({character, renderCharacteristics}) => {
 const PowersRoute = ({character, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                {character.powers.powers.map((power, index) => {
-                    return (
-                        <View flexDirection="row" justifyContent="space-between" key={'power-' + index}>
-                            <View flexDirection="row" flexWrap="wrap">
-                                <Text style={styles.grey}>{power.power}</Text>
-                            </View>
-                            <View>
-                                <Text style={styles.grey}>{power.cost}</Text>
-                            </View>
+            {character.powers.powers.map((power, index) => {
+                return (
+                    <View flexDirection="row" justifyContent="space-between" key={'power-' + index}>
+                        <View flexDirection="row" flexWrap="wrap">
+                            <Text style={styles.grey}>{power.power}</Text>
                         </View>
-                    );
-                })}
-            </ImageBackground>
+                        <View>
+                            <Text style={styles.grey}>{power.cost}</Text>
+                        </View>
+                    </View>
+                );
+            })}
         </View>
     );
 
@@ -157,17 +153,15 @@ const PowersRoute = ({character, styles}) => {
 const SkillsRoute = ({character, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                {character.skills.skills.map((skill, index) => {
-                    return (
-                        <View flexDirection="row" justifyContent="space-between" key={'skill-' + index}>
-                            <View>
-                                <Text style={styles.grey}>{skill}</Text>
-                            </View>
+            {character.skills.skills.map((skill, index) => {
+                return (
+                    <View flexDirection="row" justifyContent="space-between" key={'skill-' + index}>
+                        <View>
+                            <Text style={styles.grey}>{skill}</Text>
                         </View>
-                    );
-                })}
-            </ImageBackground>
+                    </View>
+                );
+            })}
         </View>
     );
 
@@ -177,20 +171,18 @@ const SkillsRoute = ({character, styles}) => {
 const DisadvantagesRoute = ({character, styles}) => {
     const tab = (
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
-            <ImageBackground source={require('../../../public/background.png')} style={{flex: 1, flexDirection: 'column'}} imageStyle={{resizeMode: 'repeat'}}>
-                {character.disadvantages.disadvantages.map((disad, index) => {
-                    return (
-                        <View flexDirection="row" justifyContent="space-between" key={'disad-' + index}>
-                            <View flexDirection="row" flexWrap="wrap">
-                                <Text style={styles.grey}>{disad.description}</Text>
-                            </View>
-                            <View>
-                                <Text style={styles.grey}>{disad.cost}</Text>
-                            </View>
+            {character.disadvantages.disadvantages.map((disad, index) => {
+                return (
+                    <View flexDirection="row" justifyContent="space-between" key={'disad-' + index}>
+                        <View flexDirection="row" flexWrap="wrap">
+                            <Text style={styles.grey}>{disad.description}</Text>
                         </View>
-                    );
-                })}
-            </ImageBackground>
+                        <View>
+                            <Text style={styles.grey}>{disad.cost}</Text>
+                        </View>
+                    </View>
+                );
+            })}
         </View>
     );
 
@@ -263,15 +255,9 @@ export const RandomCharacterScreen = ({navigation}) => {
 
         return (
             <View flex={0} flexGrow={1}>
-                <ImageBackground
-                    source={require('../../../public/background.png')}
-                    style={{flex: 1, flexDirection: 'column'}}
-                    imageStyle={{resizeMode: 'repeat'}}
-                >
-                    {elements.map((element, _index) => {
-                        return element;
-                    })}
-                </ImageBackground>
+                {elements.map((element, _index) => {
+                    return element;
+                })}
             </View>
         );
     };

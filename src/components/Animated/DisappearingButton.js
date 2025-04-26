@@ -1,5 +1,4 @@
 import React, {useCallback, useState} from 'react';
-import PropTypes from 'prop-types';
 import {View} from 'react-native';
 import {useAnimationState} from 'moti';
 import {useFocusEffect} from '@react-navigation/native';
@@ -81,10 +80,4 @@ export const DisappearingButton = ({label, onPress, delay = 2000, animationProps
             }
         </Animated>
     );
-};
-
-DisappearingButton.propTypes = {
-    animationProps: PropTypes.object,
-    onPress: PropTypes.func.isRequired,
-    delay: PropTypes.number,
 };

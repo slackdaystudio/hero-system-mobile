@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {Pressable, View} from 'react-native';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {verticalScale} from 'react-native-size-matters';
@@ -31,11 +30,4 @@ export const Icon = ({name, size = verticalScale(14), color = TEXT_COLOR, onPres
     }
 
     return <FontAwesome6 name={name} size={size} color={color} {...rest} />;
-};
-
-Icon.propTypes = {
-    name: PropTypes.string.isRequired,
-    size: PropTypes.number,
-    color: PropTypes.string,
-    onPress: PropTypes.func,
 };

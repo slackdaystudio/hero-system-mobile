@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {ActivityIndicator, ImageBackground, ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
+import {ActivityIndicator, ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
 import {verticalScale, scale} from 'react-native-size-matters';
 import {Heading} from '../Heading/Heading';
 import {common} from '../../lib/Common';
@@ -18,15 +17,7 @@ export const RouteBuilder = (headingText, tab, Colors, showSpinner = false) => {
     }
 
     if (common.isEmptyObject(tab)) {
-        return (
-            <View flex={0} flexGrow={1}>
-                <ImageBackground
-                    source={require('../../../public/background.png')}
-                    style={{flex: 1, flexDirection: 'column'}}
-                    imageStyle={{resizeMode: 'repeat'}}
-                />
-            </View>
-        );
+        return <View flex={0} flexGrow={1} />;
     }
 
     return (
@@ -96,8 +87,4 @@ export const Tab = ({navigationState}) => {
             />
         </View>
     );
-};
-
-Tab.propTypes = {
-    navigationState: PropTypes.object.isRequired,
 };

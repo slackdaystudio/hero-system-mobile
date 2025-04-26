@@ -1,5 +1,4 @@
 import React, {useState, useCallback} from 'react';
-import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import {ActivityIndicator, Dimensions, Image, Text, View, useWindowDimensions} from 'react-native';
@@ -339,9 +338,4 @@ export const ViewHeroDesignerCharacterScreen = ({navigation}) => {
             />
         </>
     );
-};
-
-ViewHeroDesignerCharacterScreen.propTypes = {
-    route: PropTypes.object.isRequired,
-    navigation: PropTypes.object.isRequired,
 };

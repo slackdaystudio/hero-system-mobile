@@ -1,5 +1,4 @@
 import React, {useCallback, useState} from 'react';
-import PropTypes from 'prop-types';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ActivityIndicator, Text, View} from 'react-native';
@@ -207,8 +206,4 @@ export const StatisticsScreen = ({navigation}) => {
             </VirtualizedList>
         </>
     );
-};
-
-StatisticsScreen.propTypes = {
-    navigation: PropTypes.object.isRequired,
 };

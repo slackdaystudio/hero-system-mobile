@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {useSelector} from 'react-redux';
 import Collapsible from 'react-native-collapsible';
 import {Animated} from './Animated';
@@ -32,8 +31,4 @@ export const Accordion = ({animationProps, children}) => {
     }
 
     return <>{children}</>;
-};
-
-Accordion.propTypes = {
-    animationProps: PropTypes.object.isRequired,
 };
