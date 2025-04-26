@@ -49,7 +49,7 @@ export const ConfirmationDialog = ({visible, title, info, onOk, onClose}) => {
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around'}}>
                         {_renderOkButton()}
                         <View style={styles.buttonContainer}>
-                            <Button label={onOk === null ? 'OK' : 'Cancel'} style={styles.button} onPress={() => onClose()} />
+                            <Button small label={onOk === null ? 'OK' : 'Cancel'} style={styles.button} onPress={() => onClose()} />
                         </View>
                     </View>
                 </View>

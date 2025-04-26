@@ -427,10 +427,10 @@ export const Traits = ({headingText, character, listKey, subListKey, updateForm}
                     footer={
                         <View flex={1} justifyContent="center">
                             <Accordion animationProps={{collapsed: !itemShow[decoratedTrait.trait.id], duration: 500}}>
-                                {renderItemDetails(decoratedTrait)}
+                                <View paddingLeft={scale(28)}>{renderItemDetails(decoratedTrait, true)}</View>
                             </Accordion>
                             <View flex={1} flexDirection="row" justifyContent="center">
-                                <CircleButton name="eye" size={25} fontSize={12} onPress={() => toggleDefinitionShow(decoratedTrait.trait.id)} />
+                                <CircleButton name="eye" size={30} fontSize={15} onPress={() => toggleDefinitionShow(decoratedTrait.trait.id)} />
                             </View>
                         </View>
                     }
