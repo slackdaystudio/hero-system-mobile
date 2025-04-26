@@ -103,10 +103,10 @@ export const Traits = ({headingText, character, listKey, subListKey, updateForm}
             let sfx = decorated.characterTrait.trait.sfx;
 
             if (decorated.characterTrait.trait.hasOwnProperty('xmlid')) {
-                type = decorated.characterTrait.trait.xmlid.toUpperCase();
+                type = decorated.characterTrait.trait.xmlid?.toUpperCase();
             }
 
-            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.effectRoll(dice.full, dice.partial, type, sfx)});
+            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollEffect(dice.full, dice.partial, type, sfx)});
         }
     };
 

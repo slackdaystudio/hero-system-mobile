@@ -206,7 +206,7 @@ export const ResultScreen = ({route, navigation}) => {
     };
 
     const renderEffectInfo = (rollResult) => {
-        switch (rollResult.effectForm.effectType.toUpperCase()) {
+        switch (rollResult.effectForm.effectType?.toUpperCase() || 'NONE') {
             case 'NONE':
                 return null;
             case 'AID':
