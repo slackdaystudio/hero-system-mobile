@@ -276,9 +276,9 @@ export const CharactersScreen = () => {
     const openDeleteDialog = (name, filename) => {
         const newState = {...dialogProps};
 
-        newState.dialogTitle = `Delete ${name}?`;
-        newState.dialogMessage =
-            'Are you certain you want to delete this character?\n\nThis will permanently delete your current health and any notes you have recorded';
+        newState.dialogTitle = 'Delete?';
+        // eslint-disable-next-line max-len
+        newState.dialogMessage = `Are you certain you want to delete ${name}?\n\nThis will permanently delete your current health and any notes you have recorded`;
         newState.dialogOnOkFn = () => onDeleteDialogOk(filename);
         newState.deleteDialogVisible = true;
 
