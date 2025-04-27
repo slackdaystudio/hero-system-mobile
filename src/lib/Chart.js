@@ -1,9 +1,9 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text, useColorScheme, View} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {PieChart} from 'react-native-gifted-charts';
 import {Icon} from '../components/Icon/Icon';
-import styles from '../Styles';
+import {useColorTheme} from '../hooks/useColorTheme';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -20,6 +20,10 @@ import styles from '../Styles';
 // limitations under the License.
 
 export const Chart = ({distributions}) => {
+    const scheme = useColorScheme();
+
+    const {styles} = useColorTheme(scheme);
+
     const colors = ['#0ffc03', '#ff00e6', '#fc8403', '#0390fc', '#fcf803', '#ff4d00'];
 
     const data = Object.keys(distributions).map((key, i) => {
