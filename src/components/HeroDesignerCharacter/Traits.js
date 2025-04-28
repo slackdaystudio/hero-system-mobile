@@ -14,6 +14,7 @@ import {GENERIC_OBJECT} from '../../lib/HeroDesignerCharacter';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {FlatList} from 'react-native-gesture-handler';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -458,55 +459,64 @@ export const Traits = ({headingText, character, listKey, subListKey, updateForm}
         );
     };
 
-    const renderTraits = (items) => {
-        if (items.length === 0) {
+    const renderTraits = (item) => {
+        if (item === null || item === undefined) {
             return null;
         }
 
+        let entry;
+
+        let decoratedTrait = characterTraitDecorator.decorate(item, listKey, () => character);
+
+        if (
+            decoratedTrait.trait.xmlid.toUpperCase() === GENERIC_OBJECT &&
+            decoratedTrait.trait.hasOwnProperty(listKey) &&
+            decoratedTrait.trait[listKey].length > 0
+        ) {
+            entry = renderTraitList(decoratedTrait);
+        } else if (
+            decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
+            decoratedTrait.trait.hasOwnProperty(subListKey) &&
+            decoratedTrait.trait[subListKey].length > 0
+        ) {
+            entry = renderTraitList(decoratedTrait);
+        } else {
+            entry = (
+                <View key={`trait-${item.id}`} paddingBottom={verticalScale(10)} paddingHorizontal={scale(10)}>
+                    <AccordionCard
+                        title={<Text style={{fontFamily: 'Roboto', fontVariant: 'small-caps'}}>{decoratedTrait.label()}</Text>}
+                        onTitlePress={() => toggleDefinitionShow(decoratedTrait.trait.id)}
+                        secondaryTitle={
+                            <>
+                                <View style={{flex: 2, alignItems: 'flex-end'}}>{renderRoll(decoratedTrait)}</View>
+                            </>
+                        }
+                        content={renderItemDetails(decoratedTrait)}
+                        showContent={itemShow[decoratedTrait.trait.id]}
+                    />
+                </View>
+            );
+        }
+
+        return entry;
+    };
+
+    const renderFlatList = () => {
         return (
-            <View flexDirection="column" justifyContent="flex-start" paddingTop={verticalScale(20)}>
-                {items.map((item) => {
-                    let decoratedTrait = characterTraitDecorator.decorate(item, listKey, () => character);
-
-                    if (
-                        decoratedTrait.trait.xmlid.toUpperCase() === GENERIC_OBJECT &&
-                        decoratedTrait.trait.hasOwnProperty(listKey) &&
-                        decoratedTrait.trait[listKey].length === 0
-                    ) {
-                        return null;
-                    }
-
-                    if (
-                        decoratedTrait.trait.xmlid.toUpperCase() !== 'COMPOUNDPOWER' &&
-                        decoratedTrait.trait.hasOwnProperty(subListKey) &&
-                        decoratedTrait.trait[subListKey].length > 0
-                    ) {
-                        return renderTraitList(decoratedTrait);
-                    }
-
-                    return (
-                        <View key={`trait-${item.id}`} paddingBottom={verticalScale(10)} paddingHorizontal={scale(10)}>
-                            <AccordionCard
-                                title={<Text style={{fontFamily: 'Roboto', fontVariant: 'small-caps'}}>{decoratedTrait.label()}</Text>}
-                                onTitlePress={() => toggleDefinitionShow(decoratedTrait.trait.id)}
-                                secondaryTitle={
-                                    <>
-                                        <View style={{flex: 2, alignItems: 'flex-end'}}>{renderRoll(decoratedTrait)}</View>
-                                    </>
-                                }
-                                content={renderItemDetails(decoratedTrait)}
-                                showContent={itemShow[decoratedTrait.trait.id]}
-                            />
-                        </View>
-                    );
-                })}
+            <View>
+                <FlatList data={[]} renderItem={({item}) => console.log(item)} keyExtractor={(item) => item.id} />
             </View>
         );
     };
 
     return (
         <>
-            {renderTraits(character[listKey])}
+            <FlatList
+                data={character[listKey]}
+                renderItem={({item}) => renderTraits(item)}
+                keyExtractor={(item) => item.id}
+                ListFooterComponent={renderFlatList}
+            />
             <View flex={0} flexBasis={1} style={{paddingTop: verticalScale(20)}} />
         </>
     );

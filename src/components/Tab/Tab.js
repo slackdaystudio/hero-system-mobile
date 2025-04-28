@@ -1,10 +1,11 @@
 import React from 'react';
-import {ActivityIndicator, ScrollView, View, Animated, Pressable, FlatList} from 'react-native';
+import {ActivityIndicator, View, Animated, Pressable, FlatList} from 'react-native';
 import {verticalScale, scale} from 'react-native-size-matters';
 import {Heading} from '../Heading/Heading';
 import {common} from '../../lib/Common';
 import {useSelector} from 'react-redux';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 
 export const RouteBuilder = (headingText, tab, Colors, showSpinner = false) => {
     if (showSpinner) {
@@ -21,9 +22,9 @@ export const RouteBuilder = (headingText, tab, Colors, showSpinner = false) => {
     }
 
     return (
-        <ScrollView contentContainerStyle={{flexBasis: 'auto', flexGrow: 1, backgroundColor: Colors.background}}>
+        <VirtualizedList>
             <View flex={1}>{tab}</View>
-        </ScrollView>
+        </VirtualizedList>
     );
 };
 
