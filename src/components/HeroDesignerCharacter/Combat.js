@@ -56,49 +56,9 @@ export const Combat = ({
 
     const {Colors, styles} = useColorTheme(scheme);
 
-    const [combatDetails, setCombatDetails] = useState(getCombatDetails(character));
-
     const [statusDialogVisible, setStatusDialogVisible] = useState(false);
 
-    // constructor(props) {
-    //     super(props);
-
-    //     state = {
-    //         combatDetails: _getCombatDetails(props.character),
-    //         statusDialogVisible: false,
-    //     };
-
-    //     updateCombatState = _updateCombatState.bind(this);
-    //     resetCombatState = _resetCombatState.bind(this);
-    //     takeRecovery = _takeRecovery.bind(this);
-    //     incrementCv = _incrementCv.bind(this);
-    //     decrementCv = _decrementCv.bind(this);
-    //     rollToHit = _rollToHit.bind(this);
-    //     usePhase = _usePhase.bind(this);
-    //     abortPhase = _abortPhase.bind(this);
-    //     applyStatus = _applyStatus.bind(this);
-    //     openStatusDialog = _openStatusDialog.bind(this);
-    //     closeStatusDialog = _closeStatusDialog.bind(this);
-    //     clearAllStatuses = _clearAllStatuses.bind(this);
-    //     editStatus = _editStatus.bind(this);
-    //     clearStatus = _clearStatus.bind(this);
-    // }
-
-    // static getDerivedStateFromProps(nextProps, prevState) {
-    //     if (prevState.character !== nextProps.character) {
-    //         let newState = {...prevState};
-
-    //         if (nextProps.character.showSecondary) {
-    //             newState.combatDetails = nextProps.character.combatDetails.secondary;
-    //         } else {
-    //             newState.combatDetails = nextProps.character.combatDetails.primary;
-    //         }
-
-    //         return newState;
-    //     }
-
-    //     return null;
-    // }
+    const combatDetails = getCombatDetails(character);
 
     const updateCombatState = (key, value) => {
         if (/^(-)?[0-9]*$/.test(value) === false) {
@@ -109,9 +69,7 @@ export const Combat = ({
 
         newCombatDetails[key] = value;
 
-        setCombatDetails(newCombatDetails);
-
-        setSparseCombatDetails(combatDetails, character.showSecondary);
+        setSparseCombatDetails(newCombatDetails, character.showSecondary);
     };
 
     const resetCombatState = (key) => {
@@ -119,9 +77,7 @@ export const Combat = ({
 
         newCombatDetails[key] = heroDesignerCharacter.getCharacteristicTotal(key === 'endurance' ? 'end' : key, character);
 
-        setCombatDetails(newCombatDetails);
-
-        setSparseCombatDetails(combatDetails, character.showSecondary);
+        setSparseCombatDetails(newCombatDetails, character.showSecondary);
     };
 
     const takeRecovery = () => {
@@ -145,29 +101,23 @@ export const Combat = ({
         newCombatDetails.stun = stun;
         newCombatDetails.endurance = endurance;
 
-        setCombatDetails(newCombatDetails);
-
-        setSparseCombatDetails(combatDetails, character.showSecondary);
+        setSparseCombatDetails(newCombatDetails, character.showSecondary);
     };
 
-    const incrementCv = (key, step) => {
-        let newCombatDetails = {...combatDetails};
+    const incrementCv = (key, step = 1) => {
+        let newCombatDetails = {};
 
         newCombatDetails[key] = combatDetails[key] + step;
 
-        setCombatDetails(newCombatDetails);
-
-        setSparseCombatDetails(combatDetails, character.showSecondary);
+        setSparseCombatDetails(newCombatDetails, character.showSecondary);
     };
 
-    const decrementCv = (key, step) => {
+    const decrementCv = (key, step = 1) => {
         let newCombatDetails = {...combatDetails};
 
-        newCombatDetails[key] = combatDetails[key] - step;
+        newCombatDetails[key] -= step;
 
-        setCombatDetails(newCombatDetails);
-
-        setSparseCombatDetails(combatDetails, character.showSecondary);
+        setSparseCombatDetails(newCombatDetails, character.showSecondary);
     };
 
     const rollToHit = (stateKey) => {
@@ -235,7 +185,7 @@ export const Combat = ({
         setStatusDialogVisible(false);
     };
 
-    const renderHealthItem = (stateKey, styles, label = null) => {
+    const renderHealthItem = (stateKey, label = null) => {
         return (
             <View style={{flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: scale(25)}}>
                 <View style={{flex: 1, alignSelf: 'center'}}>
@@ -280,7 +230,7 @@ export const Combat = ({
         ];
 
         return (
-            <Fragment>
+            <>
                 <View style={{flex: 1, flexDirection: 'row'}}>
                     {renderDefense(rows[0])}
                     {renderDefense(rows[1])}
@@ -289,13 +239,13 @@ export const Combat = ({
                     {renderDefense(rows[2])}
                     {renderDefense(rows[3])}
                 </View>
-            </Fragment>
+            </>
         );
     };
 
     const renderDefense = (row) => {
         return (
-            <Fragment>
+            <>
                 <View style={{flex: 1, flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-end'}}>
                     <Text style={styles.boldGrey}>{row.label}: </Text>
                 </View>
@@ -304,7 +254,7 @@ export const Combat = ({
                         <Text style={styles.grey}>{row.value}</Text>
                     </View>
                 </View>
-            </Fragment>
+            </>
         );
     };
 
@@ -404,7 +354,7 @@ export const Combat = ({
                 </View>
                 <View style={{flex: 1, alignSelf: 'center'}}>
                     <NumberPicker
-                        value={combatDetails[stateKey] || heroDesignerCharacter.getCharacteristicTotal(stateKey, character)}
+                        value={combatDetails[stateKey] ?? heroDesignerCharacter.getCharacteristicTotal(stateKey, character)}
                         increment={incrementCv}
                         decrement={decrementCv}
                         stateKey={stateKey}
@@ -526,9 +476,9 @@ export const Combat = ({
         <View>
             <Heading text="Health" />
             <View style={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
-                {renderHealthItem('stun', styles)}
-                {renderHealthItem('body', styles)}
-                {renderHealthItem('endurance', styles, 'END')}
+                {renderHealthItem('stun')}
+                {renderHealthItem('body')}
+                {renderHealthItem('endurance', 'END')}
                 <View style={[styles.buttonContainer, {paddingVertical: verticalScale(10)}]}>
                     <Button label="Recovery" style={styles.buttonTiny} onPress={() => takeRecovery()} labelStyle={{fontSize: verticalScale(12)}} />
                 </View>

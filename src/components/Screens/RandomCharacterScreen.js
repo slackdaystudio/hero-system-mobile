@@ -134,7 +134,7 @@ const PowersRoute = ({character, styles}) => {
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             {character.powers.powers.map((power, index) => {
                 return (
-                    <View flexDirection="row" justifyContent="space-between" key={'power-' + index}>
+                    <View flexDirection="row" justifyContent="space-between" key={'power-' + index} marginRight={scale(10)}>
                         <View flexDirection="row" flexWrap="wrap">
                             <Text style={styles.grey}>{power.power}</Text>
                         </View>
@@ -155,7 +155,7 @@ const SkillsRoute = ({character, styles}) => {
         <View flex={0} flexGrow={1} paddingHorizontal={scale(10)}>
             {character.skills.skills.map((skill, index) => {
                 return (
-                    <View flexDirection="row" justifyContent="space-between" key={'skill-' + index}>
+                    <View flexDirection="row" justifyContent="space-between" key={'skill-' + index} marginRight={scale(10)}>
                         <View>
                             <Text style={styles.grey}>{skill}</Text>
                         </View>
@@ -174,7 +174,7 @@ const DisadvantagesRoute = ({character, styles}) => {
             {character.disadvantages.disadvantages.map((disad, index) => {
                 return (
                     <View flexDirection="row" justifyContent="space-between" key={'disad-' + index}>
-                        <View flexDirection="row" flexWrap="wrap">
+                        <View flexDirection="row" flexWrap="wrap" marginRight={scale(10)}>
                             <Text style={styles.grey}>{disad.description}</Text>
                         </View>
                         <View>

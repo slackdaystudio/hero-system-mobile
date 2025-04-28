@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {Platform, View, Text, TextInput, KeyboardAvoidingView} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
@@ -53,7 +53,7 @@ const getItemIds = (targetTrait, items) => {
     if (targetTrait !== null) {
         for (const category of items) {
             for (const item of category.children) {
-                if (targetTrait.includes(item.name)) {
+                if (targetTrait?.includes(item.name)) {
                     itemIds.push(item.id);
                 }
             }
@@ -68,57 +68,16 @@ export const StatusDialog = ({character, statusForm, updateForm, updateFormValue
 
     const {Colors, styles} = useColorTheme(scheme);
 
-    const statuses = useRef(getItems(character));
+    const statuses = STATUSES.map((status) => ({label: status, value: status}));
 
     const [open, setOpen] = useState(false);
 
-    const [value, setValue] = useState(statusForm.name);
-
-    // eslint-disable-next-line no-unused-vars
-    const [items, _setItems] = useState(STATUSES.map((status) => ({label: status, value: status})));
+    const [items, setItems] = useState(getItems(character));
 
     const [selectedItems, setSelectedItems] = useState(getItemIds(statusForm.targetTrait, items));
 
-    // constructor(props) {
-    //     super(props);
-
-    //     this.items = this._getItems();
-
-    //     this.state = {
-    //         open: props.visible,
-    //         value: props.statusForm.name,
-    //         items: STATUSES.map((status) => ({label: status, value: status})),
-    //         selectedItems: this._getItemIds(props.statusForm.targetTrait, this.items),
-    //     };
-
-    //     this.updateFormValue = this._updateFormValue.bind(this);
-    //     this.setValue = this._setValue.bind(this);
-    // }
-
-    // componentDidUpdate(prevProps) {
-    //     if (visible !== prevProps.visible && visible) {
-    //         this.setState((state) => ({
-    //             ...state,
-    //             value: statusForm.name,
-    //             selectedItems: this._getItemIds(statusForm.targetTrait, this.items),
-    //         }));
-    //     }
-    // }
-
     const setNewValue = (callback) => {
-        setValue(callback(value));
-
-        updateFormValue('name', value);
-
-        // this.setState((state) => {
-        //     const newState = {...state};
-
-        //     newState.value = callback(state.value);
-
-        //     this.updateFormValue('name', newState.value);
-
-        //     return newState;
-        // });
+        _updateFormValue('name', callback(statusForm.name));
     };
 
     const _updateFormValue = (key, val) => {
@@ -136,21 +95,29 @@ export const StatusDialog = ({character, statusForm, updateForm, updateFormValue
     };
 
     const onSelectedItemsChange = (newItems) => {
-        setSelectedItems(newItems);
+        if (newItems === undefined || newItems.length === 0) {
+            return;
+        }
+
+        setItems(getItems(character));
 
         let itemLabels = [];
 
         for (const category of items) {
             for (const item of category.children) {
-                if (selectedItems.includes(item.id)) {
+                if (newItems.includes(item.id)) {
                     itemLabels.push(item.name);
                 }
             }
         }
 
-        statusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
+        const newStatusForm = {...statusForm};
 
-        updateForm('status', statusForm);
+        newStatusForm.targetTrait = itemLabels.length === 0 ? '' : itemLabels.join(', ');
+
+        updateForm('status', newStatusForm);
+
+        setSelectedItems(getItemIds(newStatusForm.targetTrait, items));
     };
 
     const _onApply = () => {
@@ -302,10 +269,10 @@ export const StatusDialog = ({character, statusForm, updateForm, updateFormValue
                                     theme="DARK"
                                     listMode="MODAL"
                                     open={open}
-                                    value={value}
-                                    items={statuses.current}
+                                    value={statusForm.name}
+                                    items={statuses}
                                     setOpen={(val) => setOpen(val === true)}
-                                    setValue={setNewValue}
+                                    setValue={(val) => setNewValue(val)}
                                     style={{backgroundColor: Colors.formControl}}
                                     labelStyle={[styles.buttonText, {fontSize: verticalScale(12), paddingLeft: scale(5)}]}
                                     listItemContainerStyle={{backgroundColor: Colors.background}}
