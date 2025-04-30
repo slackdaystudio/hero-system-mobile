@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useMemo} from 'react';
+import React, {useRef, useEffect, useMemo, useCallback} from 'react';
 import {ActivityIndicator, Appearance, AppState, Image, SafeAreaView, useColorScheme} from 'react-native';
 import {DefaultTheme, DarkTheme, NavigationContainer} from '@react-navigation/native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -29,6 +29,7 @@ import {initialize} from './src/reducers/appState';
 import {saveCachedCharacter} from './src/reducers/character';
 import currentVersion from './public/version.json';
 import {DARK, SYSTEM, useColorTheme} from './src/hooks/useColorTheme';
+import {DatabaseProvider, useDatabase} from './src/contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -161,9 +162,21 @@ const selectColorScheme = (state) => {
     return state.settings.colorScheme;
 };
 
-export let systemColorScheme;
+const App = () => {
+    const db = useDatabase();
 
-export const App = () => {
+    const loadDataCallback = useCallback(async () => {
+        try {
+            store.dispatch(initialize(db));
+        } catch (error) {
+            console.error(error);
+        }
+    }, [db]);
+
+    useEffect(() => {
+        loadDataCallback();
+    }, [loadDataCallback]);
+
     const systemScheme = useColorScheme();
 
     let userColorScheme = store.getState().settings.colorScheme;
@@ -213,27 +226,31 @@ export const App = () => {
 
     useEffect(() => {
         const subscription = AppState.addEventListener('change', (nextAppState) => {
+            // if (db === null) {
+            //     return;
+            // }
+
             switch (nextAppState) {
                 case 'active':
                     persistence.getVersion().then((version) => {
                         if (version === null) {
                             persistence.setVersion(currentVersion.current).then(() => {
                                 persistence.clearCaches().then(() => {
-                                    store.dispatch(initialize());
+                                    store.dispatch(initialize(db));
                                 });
                             });
                         } else if (version !== currentVersion.current) {
                             persistence.setVersion(currentVersion.current).then(() => {
                                 if (currentVersion.onFirstLoad === 'flush') {
                                     persistence.clearCaches().then(() => {
-                                        store.dispatch(initialize());
+                                        store.dispatch(initialize(db));
                                     });
                                 } else {
-                                    store.dispatch(initialize());
+                                    store.dispatch(initialize(db));
                                 }
                             });
                         } else {
-                            store.dispatch(initialize());
+                            store.dispatch(initialize(db));
                         }
                     });
 
@@ -257,9 +274,9 @@ export const App = () => {
         return () => {
             subscription.remove();
         };
-    }, []);
+    }, [db]);
 
-    if (userColorScheme === undefined) {
+    if (db === null || userColorScheme === undefined) {
         return <ActivityIndicator color={Colors.text} />;
     }
 
@@ -348,6 +365,14 @@ export const App = () => {
                 </GestureHandlerRootView>
             </SafeAreaView>
         </Provider>
+    );
+};
+
+export default () => {
+    return (
+        <DatabaseProvider>
+            <App />
+        </DatabaseProvider>
     );
 };
 

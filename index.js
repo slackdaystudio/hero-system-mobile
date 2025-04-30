@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import {AppRegistry} from 'react-native';
-import {App} from './App';
+import App from './App';
 
 // Copyright 2018-Present Philip J. Guinchard
 //

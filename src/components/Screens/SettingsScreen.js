@@ -1,6 +1,6 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {View, Text, Switch} from 'react-native';
+import {View, Text, Switch, ActivityIndicator} from 'react-native';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {Header} from '../Header/Header';
 import {Heading} from '../Heading/Heading';
@@ -14,7 +14,8 @@ import {clearStatistics} from '../../reducers/statistics';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {ALL_THEMES, useColorTheme} from '../../hooks/useColorTheme';
 import RadioButtonsGroup from 'react-native-radio-buttons-group';
-import {useNavigation} from '@react-navigation/native';
+import {useDatabase} from '../../contexts/DatabaseContext';
+import {getSettings} from '../../database/Settings';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -33,17 +34,29 @@ import {useNavigation} from '@react-navigation/native';
 export const SettingsScreen = () => {
     const dispatch = useDispatch();
 
-    const navigation = useNavigation();
+    const db = useDatabase();
 
-    const userColorScheme = useSelector((state) => state.settings.colorScheme);
+    const colorScheme = useSelector((state) => state.settings.colorScheme);
 
-    const {Colors, styles} = useColorTheme(userColorScheme);
+    const {Colors, styles} = useColorTheme(colorScheme);
 
-    const settings = useSelector((state) => state.settings);
+    const [settings, setSettings] = useState(null);
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const s = await getSettings(db);
+
+            setSettings(s);
+        };
+
+        fetchSettings().catch((error) => {
+            console.error('Error fetching settings:', error);
+        });
+    });
 
     const version = useSelector((state) => state.version);
 
-    const [selectedTheme, setSelectedTheme] = useState(settings.colorScheme);
+    const [selectedTheme, setSelectedTheme] = useState(colorScheme);
 
     const themeRadioButtons = useMemo(() => {
         return ALL_THEMES.map((theme, i) => ({
@@ -110,9 +123,22 @@ export const SettingsScreen = () => {
         common.toast('Everything has been cleared', 'success');
     };
 
+    const toggle = ({key, value}) => {
+        dispatch(toggleSetting({db, key, value}));
+    };
+
+    if (common.isEmptyObject(settings)) {
+        return (
+            <>
+                <Header />
+                <ActivityIndicator size="large" color={Colors.formAccent} style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} />
+            </>
+        );
+    }
+
     return (
         <>
-            <Header navigation={navigation} />
+            <Header />
             <VirtualizedList>
                 <Heading text="App Version" />
                 <View style={{paddingHorizontal: scale(10), paddingBottom: verticalScale(20), paddingTop: verticalScale(10)}}>
@@ -129,7 +155,7 @@ export const SettingsScreen = () => {
                         </View>
                         <Switch
                             value={settings.useFifthEdition}
-                            onValueChange={() => dispatch(toggleSetting({key: 'useFifthEdition', value: !settings.useFifthEdition}))}
+                            onValueChange={() => toggle({key: 'useFifthEdition', value: !settings.useFifthEdition})}
                             color="#3da0ff"
                             minimumTrackTintColor={Colors.formAccent}
                             maximumTrackTintColor={Colors.secondaryForm}
@@ -147,7 +173,7 @@ export const SettingsScreen = () => {
                         </View>
                         <Switch
                             value={settings.showAnimations}
-                            onValueChange={() => dispatch(toggleSetting({key: 'showAnimations', value: !settings.showAnimations}))}
+                            onValueChange={() => toggle({key: 'showAnimations', value: !settings.showAnimations})}
                             color="#3da0ff"
                             minimumTrackTintColor={Colors.formAccent}
                             maximumTrackTintColor={Colors.secondaryForm}
@@ -162,7 +188,7 @@ export const SettingsScreen = () => {
                         </View>
                         <Switch
                             value={settings.increaseEntropy}
-                            onValueChange={() => dispatch(toggleSetting({key: 'increaseEntropy', value: !settings.increaseEntropy}))}
+                            onValueChange={() => toggle({key: 'increaseEntropy', value: !settings.increaseEntropy})}
                             color="#3da0ff"
                             minimumTrackTintColor={Colors.formAccent}
                             maximumTrackTintColor={Colors.secondaryForm}
@@ -180,7 +206,7 @@ export const SettingsScreen = () => {
                         </View>
                         <Switch
                             value={settings.playSounds}
-                            onValueChange={() => dispatch(toggleSetting({key: 'playSounds', value: !settings.playSounds}))}
+                            onValueChange={() => toggle({key: 'playSounds', value: !settings.playSounds})}
                             color="#3da0ff"
                             minimumTrackTintColor={Colors.formAccent}
                             maximumTrackTintColor={Colors.secondaryForm}
@@ -195,7 +221,7 @@ export const SettingsScreen = () => {
                         </View>
                         <Switch
                             value={settings.onlyDiceSounds}
-                            onValueChange={() => dispatch(toggleSetting({key: 'onlyDiceSounds', value: !settings.onlyDiceSounds}))}
+                            onValueChange={() => toggle({key: 'onlyDiceSounds', value: !settings.onlyDiceSounds})}
                             color="#3da0ff"
                             minimumTrackTintColor={Colors.formAccent}
                             maximumTrackTintColor={Colors.secondaryForm}
@@ -215,7 +241,7 @@ export const SettingsScreen = () => {
                         onPress={(val) => {
                             setSelectedTheme(val);
 
-                            dispatch(toggleSetting({key: 'colorScheme', value: val}));
+                            toggle({key: 'colorScheme', value: val});
                         }}
                         selectedId={selectedTheme}
                     />

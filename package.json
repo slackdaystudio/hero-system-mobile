@@ -48,6 +48,7 @@
     "react-native-slider": "^0.11.0",
     "react-native-sound": "^0.11.2",
     "react-native-splash-screen": "^3.3.0",
+    "react-native-sqlite-storage": "^6.0.1",
     "react-native-svg": "^15.11.2",
     "react-native-tab-view": "^4.0.3",
     "react-native-toast-message": "^2.2.1",

@@ -1,6 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {file} from './File';
 import {SYSTEM} from '../hooks/useColorTheme';
+import {dropTable} from '../database/Database';
+import {INIT_SETTINGS} from '../reducers/settings';
+import {common} from './Common';
+import {createSettingsTable, getSettings, saveSettings, setSetting} from '../database/Settings';
 
 export const MAX_CHARACTER_SLOTS = 5;
 
@@ -48,14 +52,14 @@ export const DEFAULT_STATS = {
 };
 
 class Persistence {
-    async initializeApplication() {
-        let settings = await this.initializeApplicationSettings();
+    async initializeApplication(db) {
+        let settings = await this.initializeApplicationSettings(db);
         let statistics = await this.initializeStatistics();
         let character = await this.initializeCharacter();
         let randomHero = await this.initializeRandomHero();
 
         return {
-            settings: settings,
+            settings,
             statistics: statistics,
             character: character,
             randomHero: randomHero,
@@ -84,12 +88,18 @@ class Persistence {
         return version;
     }
 
-    async clearCaches() {
+    async clearCaches(db) {
         let cacheKeys = ['appSettings', 'character', 'statistics', 'statistics'];
         let legacyCacheKeys = ['showSecondaryCharacteristics', 'combat'];
         let allCacheKeys = cacheKeys.concat(legacyCacheKeys);
 
         await AsyncStorage.multiRemove(allCacheKeys);
+
+        await dropTable(db, 'settings');
+
+        await createSettingsTable(db);
+
+        await saveSettings(db, INIT_SETTINGS);
 
         console.error('All caches have been cleared');
     }
@@ -247,23 +257,21 @@ class Persistence {
         }
     }
 
-    async initializeApplicationSettings() {
-        let settings = null;
-
-        try {
-            settings = await AsyncStorage.getItem('appSettings');
-            settings = settings === null ? {} : JSON.parse(settings);
-
-            if (this._populateMissingSetttings(settings)) {
-                await AsyncStorage.setItem('appSettings', JSON.stringify(settings));
-
-                return settings;
-            }
-        } catch (error) {
-            console.error('Unable to retrieve application settings or initialize a fresh set');
+    async initializeApplicationSettings(db) {
+        if (db === null) {
+            console.error('Database is null');
+            return;
         }
 
-        return settings;
+        await createSettingsTable(db);
+
+        let settings = await getSettings(db);
+
+        if (common.isEmptyObject(settings)) {
+            await saveSettings(db, INIT_SETTINGS);
+
+            settings = await getSettings(db);
+        }
     }
 
     async clearApplicationSettings() {
@@ -280,15 +288,11 @@ class Persistence {
         return settings;
     }
 
-    async toggleSetting(key, value) {
+    async toggleSetting(db, key, value) {
         try {
-            let appSettings = await AsyncStorage.getItem('appSettings');
-            appSettings = JSON.parse(appSettings);
-
-            appSettings[key] = value;
-
-            await AsyncStorage.setItem('appSettings', JSON.stringify(appSettings));
+            await setSetting(db, key, value);
         } catch (error) {
+            console.error(error.message);
             console.error(`Unable to toggle ${key}`);
         }
 

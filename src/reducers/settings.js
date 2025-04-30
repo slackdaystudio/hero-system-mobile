@@ -2,8 +2,17 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {persistence} from '../lib/Persistence';
 import {SYSTEM} from '../hooks/useColorTheme';
 
-export const toggleSetting = createAsyncThunk('settings/toggleSetting', async ({key, value}) => {
-    const settingValue = await persistence.toggleSetting(key, value);
+export const INIT_SETTINGS = {
+    useFifthEdition: false,
+    playSounds: false,
+    onlyDiceSounds: false,
+    showAnimations: true,
+    increaseEntropy: true,
+    colorScheme: SYSTEM,
+};
+
+export const toggleSetting = createAsyncThunk('settings/toggleSetting', async ({db, key, value}) => {
+    const settingValue = await persistence.toggleSetting(db, key, value);
 
     return {
         key,
@@ -17,14 +26,7 @@ export const clearApplicationSettings = createAsyncThunk('settings/clearApplicat
 
 const settingsSlice = createSlice({
     name: 'settings',
-    initialState: {
-        useFifthEdition: false,
-        playSounds: true,
-        onlyDiceSounds: true,
-        showAnimations: true,
-        increaseEntropy: true,
-        colorScheme: SYSTEM,
-    },
+    initialState: INIT_SETTINGS,
     reducers: {
         initializeApplicationSettings: (state, action) => {
             const {settings} = action.payload;

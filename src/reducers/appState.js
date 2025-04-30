@@ -21,9 +21,9 @@ import currentVersion from '../../public/version.json';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const initialize = () => {
+export const initialize = (db) => {
     return async (dispatch) => {
-        const appSettings = await persistence.initializeApplication();
+        const appSettings = await persistence.initializeApplication(db);
 
         dispatch(initializeApplicationSettings({settings: appSettings.settings}));
 
