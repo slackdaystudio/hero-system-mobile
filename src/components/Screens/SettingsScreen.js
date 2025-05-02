@@ -9,7 +9,7 @@ import {common} from '../../lib/Common';
 import {resetForm} from '../../reducers/forms';
 import {clearAllCharacters} from '../../reducers/character';
 import {clearRandomHero} from '../../reducers/randomHero';
-import {clearApplicationSettings, toggleSetting} from '../../reducers/settings';
+import {clearApplicationSettings, INIT_SETTINGS, toggleSetting} from '../../reducers/settings';
 import {clearStatistics} from '../../reducers/statistics';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
 import {ALL_THEMES, useColorTheme} from '../../hooks/useColorTheme';
@@ -50,7 +50,8 @@ export const SettingsScreen = () => {
         };
 
         fetchSettings().catch((error) => {
-            console.error('Error fetching settings:', error);
+            console.log('Setting settings to default', error);
+            setSettings(INIT_SETTINGS);
         });
     });
 
@@ -113,7 +114,7 @@ export const SettingsScreen = () => {
     };
 
     const clearAll = () => {
-        dispatch(clearApplicationSettings());
+        dispatch(clearApplicationSettings({db}));
 
         clearFormData(false);
         _clearCharacterData(false);

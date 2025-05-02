@@ -1,9 +1,13 @@
 import {enablePromise, openDatabase} from 'react-native-sqlite-storage';
+import {DB_NAME} from '../contexts/DatabaseContext';
 
+/**
+ * Required for all SQLite operations to work.
+ */
 enablePromise(true);
 
 export const getDBConnection = async () => {
-    return openDatabase({name: 'hsm.db', location: 'default'});
+    return openDatabase({name: DB_NAME, location: 'default'});
 };
 
 export const dropTable = async (db, table) => {

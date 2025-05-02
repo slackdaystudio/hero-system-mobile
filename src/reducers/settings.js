@@ -1,8 +1,10 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {persistence} from '../lib/Persistence';
 import {SYSTEM} from '../hooks/useColorTheme';
+import {DEFAULT_LOADOUT} from '../database/Settings';
 
 export const INIT_SETTINGS = {
+    loadout: DEFAULT_LOADOUT,
     useFifthEdition: false,
     playSounds: false,
     onlyDiceSounds: false,
@@ -20,8 +22,8 @@ export const toggleSetting = createAsyncThunk('settings/toggleSetting', async ({
     };
 });
 
-export const clearApplicationSettings = createAsyncThunk('settings/clearApplicationSettings', async () => {
-    return await persistence.clearApplicationSettings();
+export const clearApplicationSettings = createAsyncThunk('settings/clearApplicationSettings', async ({db}) => {
+    return await persistence.clearApplicationSettings(db);
 });
 
 const settingsSlice = createSlice({
@@ -31,6 +33,7 @@ const settingsSlice = createSlice({
         initializeApplicationSettings: (state, action) => {
             const {settings} = action.payload;
 
+            state.loadout = settings.loadout;
             state.useFifthEdition = settings.useFifthEdition;
             state.playSounds = settings.playSounds;
             state.onlyDiceSounds = settings.onlyDiceSounds;
@@ -49,6 +52,7 @@ const settingsSlice = createSlice({
             .addCase(clearApplicationSettings.fulfilled, (state, action) => {
                 const settings = {...action.payload};
 
+                state.loadout = settings.loadout;
                 state.useFifthEdition = settings.useFifthEdition;
                 state.playSounds = settings.playSounds;
                 state.onlyDiceSounds = settings.onlyDiceSounds;

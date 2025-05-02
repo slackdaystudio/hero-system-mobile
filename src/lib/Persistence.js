@@ -1,10 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {file} from './File';
 import {SYSTEM} from '../hooks/useColorTheme';
-import {dropTable} from '../database/Database';
 import {INIT_SETTINGS} from '../reducers/settings';
 import {common} from './Common';
-import {createSettingsTable, getSettings, saveSettings, setSetting} from '../database/Settings';
+import {createSettingsTable, getSettings, resetSettings, saveSettings, setSetting} from '../database/Settings';
 
 export const MAX_CHARACTER_SLOTS = 5;
 
@@ -95,11 +94,7 @@ class Persistence {
 
         await AsyncStorage.multiRemove(allCacheKeys);
 
-        await dropTable(db, 'settings');
-
-        await createSettingsTable(db);
-
-        await saveSettings(db, INIT_SETTINGS);
+        await resetSettings(db);
 
         console.error('All caches have been cleared');
     }
@@ -258,9 +253,9 @@ class Persistence {
     }
 
     async initializeApplicationSettings(db) {
-        if (db === null) {
-            console.error('Database is null');
-            return;
+        if (!db || db === null) {
+            console.error('Database is not initialized');
+            return null;
         }
 
         await createSettingsTable(db);
@@ -268,19 +263,23 @@ class Persistence {
         let settings = await getSettings(db);
 
         if (common.isEmptyObject(settings)) {
+            console.log('Settings are empty, initializing with default settings');
+
             await saveSettings(db, INIT_SETTINGS);
 
             settings = await getSettings(db);
         }
+
+        return settings;
     }
 
-    async clearApplicationSettings() {
+    async clearApplicationSettings(db) {
         let settings = {};
 
         try {
-            this._populateMissingSetttings(settings);
+            await resetSettings(db);
 
-            await AsyncStorage.setItem('appSettings', JSON.stringify(settings));
+            settings = await getSettings(db);
         } catch (error) {
             console.error('Unable to clear application settings');
         }
@@ -290,7 +289,7 @@ class Persistence {
 
     async toggleSetting(db, key, value) {
         try {
-            await setSetting(db, key, value);
+            await setSetting(db, key, value.valueOf());
         } catch (error) {
             console.error(error.message);
             console.error(`Unable to toggle ${key}`);

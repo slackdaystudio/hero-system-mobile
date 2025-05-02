@@ -1,7 +1,7 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {openDatabase as SQLiteOpenDatabase} from 'react-native-sqlite-storage';
 
-const DB_NAME = 'hsm.db';
+export const DB_NAME = 'hsm.db';
 
 const DatabaseContext = createContext();
 

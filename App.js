@@ -235,14 +235,14 @@ const App = () => {
                     persistence.getVersion().then((version) => {
                         if (version === null) {
                             persistence.setVersion(currentVersion.current).then(() => {
-                                persistence.clearCaches().then(() => {
+                                persistence.clearCaches(db).then(() => {
                                     store.dispatch(initialize(db));
                                 });
                             });
                         } else if (version !== currentVersion.current) {
                             persistence.setVersion(currentVersion.current).then(() => {
                                 if (currentVersion.onFirstLoad === 'flush') {
-                                    persistence.clearCaches().then(() => {
+                                    persistence.clearCaches(db).then(() => {
                                         store.dispatch(initialize(db));
                                     });
                                 } else {
