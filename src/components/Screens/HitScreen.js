@@ -12,6 +12,7 @@ import {dieRoller} from '../../lib/DieRoller';
 import hitLocations from '../../../public/hitLocations.json';
 import {updateFormValue} from '../../reducers/forms';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -259,6 +260,8 @@ const TargetedShotsRoute = (styles) => {
 };
 
 export const HitScreen = ({navigation}) => {
+    const db = useDatabase();
+
     const scheme = useSelector((state) => state.settings.colorScheme);
 
     const {Colors, styles} = useColorTheme(scheme);
@@ -281,7 +284,7 @@ export const HitScreen = ({navigation}) => {
     const roll = () => {
         navigation.navigate('Result', {
             from: 'Hit',
-            result: dieRoller.rollToHit(hitForm.ocv, hitForm.numberOfRolls, hitForm.isAutofire, hitForm.targetDcv),
+            result: dieRoller.rollToHit(db, hitForm.ocv, hitForm.numberOfRolls, hitForm.isAutofire, hitForm.targetDcv),
         });
     };
 

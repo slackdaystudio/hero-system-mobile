@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {useColorTheme} from '../../hooks/useColorTheme';
 import {FlatList} from 'react-native-gesture-handler';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -51,6 +52,8 @@ const initItemShow = (items, subListKey) => {
 };
 
 export const Traits = ({headingText, character, listKey, subListKey, updateForm}) => {
+    const db = useDatabase();
+
     const navigation = useNavigation();
 
     const [itemShow, setItemShow] = useState(initItemShow(character[listKey], subListKey));
@@ -69,7 +72,7 @@ export const Traits = ({headingText, character, listKey, subListKey, updateForm}
 
     const roll = (rollConfig, decorated) => {
         if (rollConfig.type === SKILL_CHECK) {
-            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(rollConfig.roll)});
+            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollCheck(db, rollConfig.roll)});
         } else if (rollConfig.type === NORMAL_DAMAGE) {
             let dice = common.toDice(rollConfig.roll);
 
@@ -107,7 +110,7 @@ export const Traits = ({headingText, character, listKey, subListKey, updateForm}
                 type = decorated.characterTrait.trait.xmlid?.toUpperCase();
             }
 
-            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollEffect(dice.full, dice.partial, type, sfx)});
+            navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollEffect(db, dice.full, dice.partial, type, sfx)});
         }
     };
 

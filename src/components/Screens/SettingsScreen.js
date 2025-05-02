@@ -51,6 +51,7 @@ export const SettingsScreen = () => {
 
         fetchSettings().catch((error) => {
             console.log('Setting settings to default', error);
+
             setSettings(INIT_SETTINGS);
         });
     });
@@ -106,7 +107,7 @@ export const SettingsScreen = () => {
     };
 
     const clearStatisticsData = (showToast = true) => {
-        dispatch(clearStatistics());
+        dispatch(clearStatistics({db}));
 
         if (showToast) {
             common.toast('Statistical data has been cleared', 'success');

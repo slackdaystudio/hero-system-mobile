@@ -4,56 +4,28 @@ import {SYSTEM} from '../hooks/useColorTheme';
 import {INIT_SETTINGS} from '../reducers/settings';
 import {common} from './Common';
 import {createSettingsTable, getSettings, resetSettings, saveSettings, setSetting} from '../database/Settings';
+import {createStatisticsTable, DEFAULT_STATS, getStatistics, resetStatistics, saveStatistics} from '../database/Statistics';
+
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 export const MAX_CHARACTER_SLOTS = 5;
-
-export const DEFAULT_STATS = {
-    sum: 0,
-    largestDieRoll: 0,
-    largestSum: 0,
-    totals: {
-        diceRolled: 0,
-        hitRolls: 0,
-        skillChecks: 0,
-        effectRolls: 0,
-        normalDamage: {
-            rolls: 0,
-            stun: 0,
-            body: 0,
-        },
-        killingDamage: {
-            rolls: 0,
-            stun: 0,
-            body: 0,
-        },
-        knockback: 0,
-        hitLocations: {
-            head: 0,
-            hands: 0,
-            arms: 0,
-            shoulders: 0,
-            chest: 0,
-            stomach: 0,
-            vitals: 0,
-            thighs: 0,
-            legs: 0,
-            feet: 0,
-        },
-    },
-    distributions: {
-        one: 0,
-        two: 0,
-        three: 0,
-        four: 0,
-        five: 0,
-        six: 0,
-    },
-};
 
 class Persistence {
     async initializeApplication(db) {
         let settings = await this.initializeApplicationSettings(db);
-        let statistics = await this.initializeStatistics();
+        let statistics = await this.initializeStatistics(db);
         let character = await this.initializeCharacter();
         let randomHero = await this.initializeRandomHero();
 
@@ -298,25 +270,30 @@ class Persistence {
         return value;
     }
 
-    async initializeStatistics() {
-        try {
-            let statistics = await AsyncStorage.getItem('statistics');
-
-            if (statistics === null) {
-                statistics = await this._initializeStatistics();
-
-                return await this.setStatistics(statistics);
-            } else {
-                return JSON.parse(statistics);
-            }
-        } catch (error) {
-            console.error('Unable to retrieve persisted statistics or initialize a fresh set');
+    async initializeStatistics(db) {
+        if (!db || db === null) {
+            console.error('Database is not initialized');
+            return null;
         }
+
+        await createStatisticsTable(db);
+
+        let statistics = await getStatistics(db);
+
+        if (common.isEmptyObject(statistics)) {
+            console.log('Statistics are empty, initializing with default statistics');
+
+            await saveStatistics(db, DEFAULT_STATS);
+
+            statistics = await getStatistics(db);
+        }
+
+        return statistics;
     }
 
-    async setStatistics(statistics) {
+    async setStatistics(db, statistics) {
         try {
-            await AsyncStorage.setItem('statistics', JSON.stringify(statistics));
+            await saveStatistics(db, statistics);
         } catch (error) {
             console.error('Unable to persist statistics');
         }
@@ -324,17 +301,18 @@ class Persistence {
         return statistics;
     }
 
-    async clearStatistics() {
-        let reinitializedStatistics = null;
+    async clearStatistics(db) {
+        let stats = {};
 
         try {
-            await AsyncStorage.removeItem('statistics');
-            reinitializedStatistics = await this._initializeStatistics();
+            await resetStatistics(db);
+
+            stats = await getStatistics(db);
         } catch (error) {
-            console.error('Unable to clear persisted statistics');
+            console.error('Unable to clear statistics');
         }
 
-        return reinitializedStatistics;
+        return stats;
     }
 
     async initializeRandomHero() {

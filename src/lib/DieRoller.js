@@ -1,6 +1,20 @@
 import {statistics} from './Statistics';
 import {getRandomNumber} from '../../App';
 
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 export const SKILL_CHECK = 1;
 
 export const TO_HIT = 2;
@@ -34,7 +48,7 @@ class DieRoller {
         this.validLastRollTypes = [SKILL_CHECK, TO_HIT, NORMAL_DAMAGE, KILLING_DAMAGE, EFFECT];
     }
 
-    rollCheck(threshold = null) {
+    rollCheck(db, threshold = null) {
         let regex = /^([0-9]+-|[0-9]+-\s\/\s[0-9]+-)$/;
         let result = this._roll(3, SKILL_CHECK);
         result.threshold = -1;
@@ -49,12 +63,12 @@ class DieRoller {
             result.threshold = rollThreshold.slice(0, -1);
         }
 
-        statistics.add(result).catch((error) => console.error(error));
+        statistics.add(db, result).catch((error) => console.error(error));
 
         return result;
     }
 
-    rollToHit(cv, numberOfRolls, isAutofire, targetDcv) {
+    rollToHit(db, cv, numberOfRolls, isAutofire, targetDcv) {
         let results = [];
         let result;
 
@@ -76,12 +90,12 @@ class DieRoller {
             results.push(result);
         }
 
-        statistics.add(result).catch((error) => console.error(error));
+        statistics.add(db, result).catch((error) => console.error(error));
 
         return {results: results};
     }
 
-    rollDamage(damageForm) {
+    rollDamage(db, damageForm) {
         let resultRoll = this._roll(damageForm.dice, damageForm.damageType, damageForm.partialDie);
         let hitLocationRoll = damageForm.useHitLocations ? this._roll(3, HIT_LOCATIONS).total : 10;
         resultRoll.damageForm = damageForm;
@@ -121,22 +135,22 @@ class DieRoller {
             this._buildExplosionTable(resultRoll, newResultRoll);
         }
 
-        statistics.add(resultRoll).catch((error) => console.error(error));
+        statistics.add(db, resultRoll).catch((error) => console.error(error));
 
         return resultRoll;
     }
 
-    rollEffect(effectForm) {
+    rollEffect(db, effectForm) {
         const resultRoll = this._roll(effectForm.dice, EFFECT, effectForm.partialDie);
 
         resultRoll.effectForm = effectForm;
 
-        statistics.add(resultRoll).catch((error) => console.error(error));
+        statistics.add(db, resultRoll).catch((error) => console.error(error));
 
         return resultRoll;
     }
 
-    rollAgain(lastResult) {
+    rollAgain(db, lastResult) {
         let numberOfRolls;
 
         if (lastResult.hasOwnProperty('results')) {
@@ -146,13 +160,13 @@ class DieRoller {
 
         switch (lastResult.rollType) {
             case SKILL_CHECK:
-                return this.rollCheck(lastResult.threshold + '-');
+                return this.rollCheck(db, lastResult.threshold + '-');
             case TO_HIT:
-                return this.rollToHit(lastResult.cv, numberOfRolls, lastResult.isAutofire, lastResult.targetDcv);
+                return this.rollToHit(db, lastResult.cv, numberOfRolls, lastResult.isAutofire, lastResult.targetDcv);
             case EFFECT:
-                return this.rollEffect(lastResult.effectForm);
+                return this.rollEffect(db, lastResult.effectForm);
             default:
-                return this.rollDamage(lastResult.damageForm);
+                return this.rollDamage(db, lastResult.damageForm);
         }
     }
 

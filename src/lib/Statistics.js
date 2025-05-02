@@ -22,12 +22,11 @@ const AVERAGE_D3_ROLL = 2.0;
 const AVERAGE_D6_MINUS_1_ROLL = 3.0;
 
 class Statistics {
-    async add(resultRoll) {
-        let stats = await persistence.initializeStatistics();
+    async add(db, resultRoll) {
+        let stats = await persistence.initializeStatistics(db);
         let total = resultRoll.rolls.reduce((a, b) => a + b, 0);
 
         stats.sum += total;
-        stats.totals.diceRolled += resultRoll.rolls.length;
         stats.largestDieRoll = resultRoll.rolls.length > stats.largestDieRoll ? resultRoll.rolls.length : stats.largestDieRoll;
         stats.largestSum = total > stats.largestSum ? total : stats.largestSum;
 
@@ -52,9 +51,11 @@ class Statistics {
             stats.totals.skillChecks++;
         }
 
+        stats.totals.diceRolled += resultRoll.rolls.length;
+
         this._updateDistributions(resultRoll.rolls, stats.distributions);
 
-        return persistence.setStatistics(stats);
+        return await persistence.setStatistics(db, {...stats});
     }
 
     getMostFrequentHitLocation(hitLocationStats) {

@@ -11,6 +11,7 @@ import {Heading} from '../Heading/Heading';
 import {dieRoller, PARTIAL_DIE_PLUS_ONE, PARTIAL_DIE_HALF, PARTIAL_DIE_MINUS_ONE, PARTIAL_DIE_NONE} from '../../lib/DieRoller';
 import {updateFormValue} from '../../reducers/forms';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -29,6 +30,8 @@ import {useColorTheme} from '../../hooks/useColorTheme';
 const effectTypes = ['None', 'Aid', 'Dispel', 'Drain', 'Entangle', 'Flash', 'Healing', 'Luck', 'Unluck'];
 
 export const EffectScreen = ({navigation}) => {
+    const db = useDatabase();
+
     const {Colors, styles} = useColorTheme();
 
     const dispatch = useDispatch();
@@ -62,7 +65,7 @@ export const EffectScreen = ({navigation}) => {
     const roll = () => {
         navigation.navigate('Result', {
             from: 'Effect',
-            result: dieRoller.rollEffect(effectForm),
+            result: dieRoller.rollEffect(db, effectForm),
         });
     };
 

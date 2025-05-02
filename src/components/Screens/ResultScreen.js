@@ -12,6 +12,7 @@ import {statistics} from '../../lib/Statistics';
 import {common} from '../../lib/Common';
 import {soundPlayer, DEFAULT_SOUND} from '../../lib/SoundPlayer';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -28,6 +29,8 @@ import {useColorTheme} from '../../hooks/useColorTheme';
 // limitations under the License.
 
 export const ResultScreen = ({route, navigation}) => {
+    const db = useDatabase();
+
     const scheme = useSelector((state) => state.settings.colorScheme);
 
     const {styles} = useColorTheme(scheme);
@@ -59,7 +62,7 @@ export const ResultScreen = ({route, navigation}) => {
     }, [onlyDiceSounds, playSounds, result]);
 
     const reRoll = () => {
-        setResult(dieRoller.rollAgain(result));
+        setResult(dieRoller.rollAgain(db, result));
 
         playSoundClip();
     };

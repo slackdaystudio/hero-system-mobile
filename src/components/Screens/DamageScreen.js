@@ -14,6 +14,7 @@ import {updateFormValue} from '../../reducers/forms';
 import moves from '../../../public/moves.json';
 import {useNavigation} from '@react-navigation/native';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -94,6 +95,8 @@ const ManeuversRoute = ({styles}) => {
 };
 
 export const DamageScreen = () => {
+    const db = useDatabase();
+
     const scheme = useSelector((state) => state.settings.colorScheme);
 
     const {Colors, styles} = useColorTheme(scheme);
@@ -318,7 +321,7 @@ export const DamageScreen = () => {
     };
 
     const roll = () => {
-        navigation.navigate('Result', {from: 'Damage', result: dieRoller.rollDamage(damageForm)});
+        navigation.navigate('Result', {from: 'Damage', result: dieRoller.rollDamage(db, damageForm)});
     };
 
     const _updateFormValue = (key, val) => {

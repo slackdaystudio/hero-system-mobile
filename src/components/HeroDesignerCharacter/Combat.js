@@ -15,6 +15,7 @@ import {TextInput} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -50,6 +51,8 @@ export const Combat = ({
     clearAllStatuses,
     clearStatus,
 }) => {
+    const db = useDatabase();
+
     const navigation = useNavigation();
 
     const scheme = useSelector((state) => state.settings.colorScheme);
@@ -126,7 +129,7 @@ export const Combat = ({
 
         updateForm('hit', hitForm);
 
-        navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollToHit(hitForm.ocv, 1, false, 0)});
+        navigation.navigate('Result', {from: 'ViewHeroDesignerCharacter', result: dieRoller.rollToHit(db, hitForm.ocv, 1, false, 0)});
     };
 
     const _usePhase = (phase) => {

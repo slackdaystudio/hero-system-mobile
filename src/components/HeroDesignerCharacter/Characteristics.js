@@ -12,6 +12,7 @@ import {AccordionCard} from '../Card/AccordionCard';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -48,6 +49,8 @@ const initCharacteristicsShow = (characteristics, movement) => {
 };
 
 export const Characteristics = ({setShowSecondary, updateForm}) => {
+    const db = useDatabase();
+
     const navigation = useNavigation();
 
     const character = useSelector((state) => state.character.character);
@@ -437,7 +440,7 @@ export const Characteristics = ({setShowSecondary, updateForm}) => {
                                         onPress={() =>
                                             navigation.navigate('Result', {
                                                 from: 'ViewHeroDesignerCharacter',
-                                                result: dieRoller.rollCheck(heroDesignerCharacter.getRollTotal(characteristic, character)),
+                                                result: dieRoller.rollCheck(db, heroDesignerCharacter.getRollTotal(characteristic, character)),
                                             })
                                         }
                                     >

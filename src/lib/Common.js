@@ -202,7 +202,7 @@ class Common {
     toast(message, type = 'error', title = 'HERO System Mobile', duration = 3000) {
         Toast.show({
             type: type.toLowerCase(),
-            text1: `${title}: ${this.capitalize(type)}`,
+            text1: this.capitalize(type),
             text2: message + (type.toLowerCase() === 'error' ? '\n\nSwipe up to dismiss' : ''),
             position: 'bottom',
             autoHide: type.toLowerCase() === 'success',

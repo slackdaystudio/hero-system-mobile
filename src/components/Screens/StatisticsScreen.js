@@ -1,6 +1,5 @@
 import React, {useCallback, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ActivityIndicator, Text, View} from 'react-native';
 import {Header} from '../Header/Header';
 import {VirtualizedList} from '../VirtualizedList/VirtualizedList';
@@ -10,6 +9,8 @@ import {statistics as libStatistics} from '../../lib/Statistics';
 import {scale, verticalScale} from 'react-native-size-matters';
 import {useSelector} from 'react-redux';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {getStatistics} from '../../database/Statistics';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // CopyView 2018-Present Philip J. Guinchard
 //
@@ -28,6 +29,8 @@ import {useColorTheme} from '../../hooks/useColorTheme';
 const MINIMUM_ROLLS_FOR_CHART = 30;
 
 export const StatisticsScreen = ({navigation}) => {
+    const db = useDatabase();
+
     const userColorScheme = useSelector((state) => state.settings.colorScheme);
 
     const {Colors, styles} = useColorTheme(userColorScheme);
@@ -39,18 +42,20 @@ export const StatisticsScreen = ({navigation}) => {
             _loadStats();
 
             return () => {};
-        }, []),
+        }, [_loadStats]),
     );
 
-    const _loadStats = () => {
-        AsyncStorage.getItem('statistics')
-            .then((s) => {
-                setStatistics(JSON.parse(s));
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    };
+    const _loadStats = useCallback(() => {
+        const loadStats = async () => {
+            const stats = await getStatistics(db);
+
+            setStatistics(stats);
+        };
+
+        loadStats().catch((error) => {
+            console.error('Error loading statistics:', error);
+        });
+    }, [db]);
 
     const renderHitLocationStat = () => {
         const mostFrequentHitLocation = libStatistics.getMostFrequentHitLocation(statistics.totals.hitLocations);
@@ -72,7 +77,7 @@ export const StatisticsScreen = ({navigation}) => {
 
     const renderDieDistributionChart = () => {
         if (statistics.sum === 0 || statistics.totals.diceRolled < MINIMUM_ROLLS_FOR_CHART) {
-            return <Text style={[styles.grey, {textAlign: 'center'}]}>A chart appears here once you have rolled at least 30 dice.</Text>;
+            return <Text style={[styles.grey, {textAlign: 'center'}]}>A chart appears here once you have rolled at least {MINIMUM_ROLLS_FOR_CHART} dice.</Text>;
         }
 
         return (

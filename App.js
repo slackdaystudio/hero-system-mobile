@@ -58,13 +58,13 @@ const getToastConfig = (Colors) => {
                 {...props}
                 style={{
                     borderColor: Colors.secondaryForm,
-                    backgroundColor: Colors.background,
-                    color: Colors.background,
+                    backgroundColor: Colors.primary,
+                    color: Colors.text,
                     height: undefined,
                     minHeight: verticalScale(50),
                     paddingVertical: verticalScale(5),
                 }}
-                text1Style={{color: Colors.background, fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
+                text1Style={{color: Colors.text, fontSize: verticalScale(14), lineHeight: verticalScale(14 * 1.35)}}
                 text2Style={{fontSize: verticalScale(11), lineHeight: verticalScale(11 * 1.35)}}
                 text2NumberOfLines={10}
             />
@@ -74,8 +74,8 @@ const getToastConfig = (Colors) => {
                 {...props}
                 style={{
                     borderColor: Colors.red,
-                    backgroundColor: Colors.background,
-                    color: Colors.background,
+                    backgroundColor: Colors.primary,
+                    color: Colors.text,
                     height: undefined,
                     minHeight: verticalScale(50),
                     paddingVertical: verticalScale(5),
@@ -210,11 +210,11 @@ const App = () => {
                 ...t.colors,
                 background: Colors.background,
                 text: Colors.text,
-                primary: Colors.background,
-                card: Colors.background,
+                primary: Colors.primary,
+                card: Colors.formControl,
             },
         };
-    }, [Colors.background, Colors.text, systemScheme, userColorScheme]);
+    }, [Colors.background, Colors.formControl, Colors.primary, Colors.text, systemScheme, userColorScheme]);
 
     const hsmIcon = () => <Image style={{tintColor: Colors.text, height: scale(50), width: scale(115)}} source={require('./public/hero_mobile_logo.png')} />;
 
@@ -226,10 +226,6 @@ const App = () => {
 
     useEffect(() => {
         const subscription = AppState.addEventListener('change', (nextAppState) => {
-            // if (db === null) {
-            //     return;
-            // }
-
             switch (nextAppState) {
                 case 'active':
                     persistence.getVersion().then((version) => {

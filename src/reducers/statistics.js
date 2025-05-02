@@ -1,6 +1,7 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {DEFAULT_STATS, persistence} from '../lib/Persistence';
+import {persistence} from '../lib/Persistence';
 import {statistics as libStatistics} from '../lib/Statistics';
+import {DEFAULT_STATS} from '../database/Statistics';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -16,12 +17,12 @@ import {statistics as libStatistics} from '../lib/Statistics';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const addStatistics = createAsyncThunk('statistics/addStatistics', async ({statistics}) => {
-    return await libStatistics.add(statistics);
+export const addStatistics = createAsyncThunk('statistics/addStatistics', async ({db, statistics}) => {
+    return await libStatistics.add(db, statistics);
 });
 
-export const clearStatistics = createAsyncThunk('statistics/clearStatistics', async () => {
-    return await persistence.clearStatistics();
+export const clearStatistics = createAsyncThunk('statistics/clearStatistics', async ({db}) => {
+    return await persistence.clearStatistics(db);
 });
 
 const statisticsSlice = createSlice({

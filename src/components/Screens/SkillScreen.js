@@ -9,6 +9,7 @@ import {dieRoller} from '../../lib/DieRoller';
 import {updateFormValue} from '../../reducers/forms';
 import {Heading} from '../Heading/Heading';
 import {useColorTheme} from '../../hooks/useColorTheme';
+import {useDatabase} from '../../contexts/DatabaseContext';
 
 // Copyright 2018-Present Philip J. Guinchard
 //
@@ -25,6 +26,8 @@ import {useColorTheme} from '../../hooks/useColorTheme';
 // limitations under the License.
 
 export const SkillScreen = ({navigation}) => {
+    const db = useDatabase();
+
     const dispatch = useDispatch();
 
     const scheme = useSelector((state) => state.settings.colorScheme);
@@ -38,7 +41,7 @@ export const SkillScreen = ({navigation}) => {
     const roll = () => {
         const threshold = skillForm.skillCheck ? skillForm.value + '-' : null;
 
-        navigation.navigate('Result', {from: 'Skill', result: dieRoller.rollCheck(threshold)});
+        navigation.navigate('Result', {from: 'Skill', result: dieRoller.rollCheck(db, threshold)});
     };
 
     const _updateFormValue = (key, value) => {
