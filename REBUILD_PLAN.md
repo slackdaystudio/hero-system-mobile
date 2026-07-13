@@ -130,22 +130,29 @@ Store, App Store, Amazon Appstore); recreating those buys nothing. It is not a *
 clean-room (it's our own code), so keeping the old code reachable is an asset — it powers
 the golden-master tests.
 
-Isolation approach: **orphan branch + worktree**.
+Isolation approach: **orphan branch in a sibling worktree**.
 
-- Build the fresh app on an **orphan branch** (e.g. `rebuild`) so its root is clean — none
-  of the old files, no scaffold collision when `react-native init` regenerates `android/`
-  and `ios/`.
-- Keep the current app checked out in a **git worktree** for side-by-side reference and
-  golden-master diffing:
+- The **primary directory stays on `master`** (the legacy app) — it already carries the
+  installed toolchain (`node_modules`, built `android/`/`ios/`) and the store/release config.
+- The fresh app is built on an **orphan branch** (`rebuild`) checked out in a **sibling
+  worktree** so its root is clean — none of the old files, no scaffold collision when
+  `react-native init` regenerates `android/` and `ios/`. The legacy tree stays one
+  directory over for side-by-side reference and golden-master diffing.
 
   ```sh
-  git worktree add ../hsm-legacy master     # old app, read-only reference
-  git switch --orphan rebuild                # clean root for the fresh scaffold
+  # from the primary (master) checkout:
+  git worktree add -b rebuild --orphan ../hsm-rebuild   # clean root for the fresh scaffold
+  # legacy app remains in place at the primary dir on master
   ```
+
+  Note: you cannot `git worktree add` the branch that is already checked out in the primary
+  dir, and `--orphan` on `worktree add` (git ≥ 2.42) takes the branch via `-b` with the path
+  as the sole positional arg.
 
 - Full history stays in the repo (blame on the 79 decorators remains available).
 - **Cutover:** when the rebuild reaches parity, promote `rebuild` to the default branch
-  (or merge with `-X theirs` / a squash) so the store config and history carry forward.
+  (or merge with `-X theirs` / a squash) so the store config and history carry forward,
+  then remove the worktree (`git worktree remove ../hsm-rebuild`).
 
 ## State management
 
