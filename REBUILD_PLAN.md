@@ -4,6 +4,23 @@
 > **Redux Toolkit** for state. Scope: **everything fresh** — new scaffold, new UI, new
 > infra; port only the domain logic (Tier 1/2 below).
 
+## Progress
+
+- [x] **Phase 0 — Scaffold** *(done)* — RN 0.79.2 + TS on the orphan `rebuild` branch at
+  `../hsm-rebuild`. Layered `core`/`infra`/`app` layout, path aliases, ESLint pure-core
+  guard (verified firing), Prettier matched to legacy, Jest split into node `core` +
+  `react-native` `app` projects. Commit `72e1ca2`. lint/tsc/jest all green.
+- [ ] **Phase 1 — Core port** *(next)* — start with the dice vertical slice:
+  port `DieRoller` math into `core/dice` behind an injected `Rng` port (drop the `App.js`
+  coupling + stats side-effect), stand up the golden-master harness vs. the legacy roller.
+- [ ] **Phase 2 — Ports + infra adapters**
+- [ ] **Phase 3 — State (RTK slices)**
+- [ ] **Phase 4 — UI (12 screens)**
+- [ ] **Phase 5 — Migration + parity + release**
+
+> The living copy of this plan is on the `rebuild` branch (in `../hsm-rebuild`), where
+> active work happens. This `master` copy is the historical/reference snapshot.
+
 ## Goal & guiding principle
 
 Rebuild the app on a clean, typed foundation while preserving the hard-to-recreate
