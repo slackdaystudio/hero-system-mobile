@@ -10,9 +10,17 @@
   `../hsm-rebuild`. Layered `core`/`infra`/`app` layout, path aliases, ESLint pure-core
   guard (verified firing), Prettier matched to legacy, Jest split into node `core` +
   `react-native` `app` projects. Commit `72e1ca2`. lint/tsc/jest all green.
-- [ ] **Phase 1 — Core port** *(next)* — start with the dice vertical slice:
-  port `DieRoller` math into `core/dice` behind an injected `Rng` port (drop the `App.js`
-  coupling + stats side-effect), stand up the golden-master harness vs. the legacy roller.
+- [ ] **Phase 1 — Core port** *(in progress)* — porting the domain, dice-first.
+  - [x] **dice vertical slice** *(done, commit `0eaa05b`)* — `DieRoller` math ported into
+    `core/dice` behind an injected `core/ports` `Rng` (the `App.js` `getRandomNumber` coupling
+    and the `statistics` side-effect are gone; methods return a result object). Golden-master
+    harness stands: a seeded `pure-rand` `Rng` drives both the real legacy roller (App +
+    Statistics mocked) and the new core off one seed, asserting byte-identical results across
+    22 scenarios × 30 seeds; scripted-RNG unit tests pin exact body/stun/knockback. lint
+    (incl. pure-core guard) + tsc + jest (673 tests) green.
+  - [ ] `templates/` — data mapping over `public/HERODesigner/*.json` *(next)*
+  - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk)
+  - [ ] `combat/` + `random/`
 - [ ] **Phase 2 — Ports + infra adapters**
 - [ ] **Phase 3 — State (RTK slices)**
 - [ ] **Phase 4 — UI (12 screens)**
