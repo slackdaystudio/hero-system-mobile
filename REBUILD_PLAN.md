@@ -18,8 +18,13 @@
     Statistics mocked) and the new core off one seed, asserting byte-identical results across
     22 scenarios × 30 seeds; scripted-RNG unit tests pin exact body/stun/knockback. lint
     (incl. pure-core guard) + tsc + jest (673 tests) green.
-  - [ ] `templates/` — data mapping over `public/HERODesigner/*.json` *(next)*
-  - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk)
+  - [x] **`templates/`** *(done)* — `HeroDesignerTemplate.getTemplate` + finalize/merge
+    (characteristics + 8 item categories, with `remove` directives) ported into `core/templates`;
+    the 13 rules JSON copied verbatim into `core/data/herodesigner`. Legacy `toast`-on-unknown-id
+    coupling replaced with an injected `onUnrecognized` hook. Golden master (11 built-ins + 2
+    unrecognized + 4 custom overlays) pins byte-identical output to legacy, including its quirks
+    (case-sensitive characteristic removal, copied `remove` artifact, ignored `mainapp`). 697 tests green.
+  - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk) *(next)*
   - [ ] `combat/` + `random/`
 - [ ] **Phase 2 — Ports + infra adapters** — persistence design is specced in
   [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md): SQLite (op-sqlite) as the runtime source
