@@ -21,7 +21,10 @@
   - [ ] `templates/` — data mapping over `public/HERODesigner/*.json` *(next)*
   - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk)
   - [ ] `combat/` + `random/`
-- [ ] **Phase 2 — Ports + infra adapters**
+- [ ] **Phase 2 — Ports + infra adapters** — persistence design is specced in
+  [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md): SQLite (op-sqlite) as the runtime source
+  of truth, portraits as files on disk, `.hsmc` demoted to export-only, `loadout` dropped,
+  edition derived per-character, one-time AsyncStorage→SQLite user migration.
 - [ ] **Phase 3 — State (RTK slices)**
 - [ ] **Phase 4 — UI (12 screens)**
 - [ ] **Phase 5 — Migration + parity + release**
