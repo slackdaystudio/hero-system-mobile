@@ -24,7 +24,11 @@
     coupling replaced with an injected `onUnrecognized` hook. Golden master (11 built-ins + 2
     unrecognized + 4 custom overlays) pins byte-identical output to legacy, including its quirks
     (case-sensitive characteristic removal, copied `remove` artifact, ignored `mainapp`). 697 tests green.
-  - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk) *(next)*
+  - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk) *(next)* —
+    scoped in [`docs/HERO_TRAITS_SLICE.md`](docs/HERO_TRAITS_SLICE.md): build order
+    (`core/util` + constants → `hero/` model → `traits/` decorators in tiers), the
+    coupling to untangle (import cycle, untyped trait bag), and the golden-master plan.
+    Blocked on a diverse `.hdc` fixture set (5E/6E × genres × frameworks).
   - [ ] `combat/` + `random/`
 - [ ] **Phase 2 — Ports + infra adapters** — persistence design is specced in
   [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md): SQLite (op-sqlite) as the runtime source
