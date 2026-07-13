@@ -1,0 +1,13 @@
+{
+    "extends": "@react-native/typescript-config/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "core/*": ["src/core/*"],
+            "infra/*": ["src/infra/*"],
+            "app/*": ["src/app/*"]
+        }
+    },
+    "include": ["src", "index.js"],
+    "exclude": ["node_modules", "android", "ios"]
+}
