@@ -26,7 +26,7 @@ import {plantDevLegacyData} from './devLegacyHarness';
 
 // DEV: set true to plant a fake legacy install (see devLegacyHarness) and watch
 // migrateV1 import it on launch. Leave false for normal behaviour.
-const SIMULATE_LEGACY_DATA = true;
+const SIMULATE_LEGACY_DATA = false;
 
 // A distinct runtime DB file. The legacy `hsm.db` is read only during migration
 // (its `settings`/`statistics` tables differ from ours and must not collide).
