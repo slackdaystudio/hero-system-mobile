@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react';
-import {Pressable} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -22,6 +22,7 @@ import type {RollRequest} from 'app/dice/rollRequest';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {DiceScreen} from 'app/screens/DiceScreen';
+import {SettingsScreen} from 'app/screens/SettingsScreen';
 import {StatisticsScreen} from 'app/screens/StatisticsScreen';
 import {useTheme} from 'app/theme';
 
@@ -35,6 +36,7 @@ export type RootStackParamList = {
     CharacterDetail: {id: string};
     Dice: {request?: RollRequest} | undefined;
     Statistics: undefined;
+    Settings: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -58,11 +60,18 @@ export function AppNavigator(): React.JSX.Element {
                             // headerRight is a react-navigation render prop, not a nested component definition.
                             // eslint-disable-next-line react/no-unstable-nested-components
                             headerRight: () => (
-                                <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Dice')}>
-                                    <Text variant="label" color={theme.colors.primary}>
-                                        Dice
-                                    </Text>
-                                </Pressable>
+                                <View style={styles.headerActions}>
+                                    <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Dice')}>
+                                        <Text variant="label" color={theme.colors.primary}>
+                                            Dice
+                                        </Text>
+                                    </Pressable>
+                                    <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Settings')}>
+                                        <Text variant="label" color={theme.colors.primary}>
+                                            Settings
+                                        </Text>
+                                    </Pressable>
+                                </View>
                             ),
                         })}>
                         {({navigation}) => <CharacterListScreen onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />}
@@ -95,8 +104,18 @@ export function AppNavigator(): React.JSX.Element {
                     <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>
                         {() => <StatisticsScreen />}
                     </Stack.Screen>
+                    <Stack.Screen name="Settings" options={{title: 'Settings'}}>
+                        {() => <SettingsScreen />}
+                    </Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>
         </SafeAreaProvider>
     );
 }
+
+const styles = StyleSheet.create({
+    headerActions: {
+        flexDirection: 'row',
+        columnGap: 16,
+    },
+});

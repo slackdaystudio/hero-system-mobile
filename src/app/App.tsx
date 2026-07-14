@@ -19,6 +19,7 @@ import {createDeviceRepositories} from 'app/composition/deviceRepositories';
 import {AppNavigator} from 'app/navigation/AppNavigator';
 import {DiceProvider} from 'app/providers/DiceProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
+import {SettingsProvider, useSettings} from 'app/providers/SettingsProvider';
 import {ThemeProvider} from 'app/theme';
 import type {Repositories} from 'infra/persistence/repositories';
 
@@ -52,19 +53,40 @@ function App(): React.JSX.Element {
         };
     }, []);
 
-    return (
-        <ThemeProvider>
-            {boot.status === 'ready' ? (
-                <RepositoriesProvider repositories={boot.repositories}>
-                    <DiceProvider>
-                        <AppNavigator />
-                    </DiceProvider>
-                </RepositoriesProvider>
-            ) : (
+    if (boot.status !== 'ready') {
+        // Boot states are themed with the default (system) scheme — settings
+        // aren't loaded yet.
+        return (
+            <ThemeProvider>
                 <Screen style={styles.centered}>
                     {boot.status === 'loading' ? <ActivityIndicator /> : <Text muted>{boot.message}</Text>}
                 </Screen>
-            )}
+            </ThemeProvider>
+        );
+    }
+
+    return (
+        <RepositoriesProvider repositories={boot.repositories}>
+            <SettingsProvider>
+                <ThemedApp />
+            </SettingsProvider>
+        </RepositoriesProvider>
+    );
+}
+
+/**
+ * The themed app tree. Lives under {@link SettingsProvider} so the theme can
+ * follow the persisted colour-scheme setting live — changing it in Settings
+ * re-themes everything immediately.
+ */
+function ThemedApp(): React.JSX.Element {
+    const {settings} = useSettings();
+
+    return (
+        <ThemeProvider colorScheme={settings.colorScheme}>
+            <DiceProvider>
+                <AppNavigator />
+            </DiceProvider>
         </ThemeProvider>
     );
 }
