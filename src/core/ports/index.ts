@@ -13,3 +13,4 @@
 // limitations under the License.
 
 export type {Rng} from './rng';
+export * from './persistence';
