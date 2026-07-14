@@ -88,7 +88,9 @@ export function StatusDialog({initial, onApply, onClose}: {initial: CombatStatus
 
                     <SegmentedControl segments={TYPE_SEGMENTS} value={form.name} onChange={(value) => set('name')(value)} />
 
-                    <TextField testID="status-label" label="Label (optional)" value={form.label} onChangeText={set('label')} maxLength={32} placeholder={form.name} />
+                    <View style={styles.row}>
+                        <TextField testID="status-label" label="Label (optional)" value={form.label} onChangeText={set('label')} maxLength={32} placeholder={form.name} />
+                    </View>
 
                     <SecondaryFields form={form} set={set} />
 
@@ -110,8 +112,18 @@ function SecondaryFields({form, set}: {form: FormState; set: (key: keyof FormSta
     if (form.name === 'Aid' || form.name === 'Drain') {
         return (
             <>
-                <TextField testID="status-activePoints" label="Active Points" value={form.activePoints} onChangeText={set('activePoints')} keyboardType="numbers-and-punctuation" />
-                <TextField testID="status-targetTrait" label="Affected trait(s)" value={form.targetTrait} onChangeText={set('targetTrait')} placeholder="e.g. STR, Force Field" />
+                <View style={styles.row}>
+                    <TextField
+                        testID="status-activePoints"
+                        label="Active Points"
+                        value={form.activePoints}
+                        onChangeText={set('activePoints')}
+                        keyboardType="numbers-and-punctuation"
+                    />
+                </View>
+                <View style={styles.row}>
+                    <TextField testID="status-targetTrait" label="Affected trait(s)" value={form.targetTrait} onChangeText={set('targetTrait')} placeholder="e.g. STR, Force Field" />
+                </View>
             </>
         );
     }
@@ -124,7 +136,11 @@ function SecondaryFields({form, set}: {form: FormState; set: (key: keyof FormSta
             </View>
         );
     }
-    return <NumberField testID="status-segments" label="Segments" value={form.segments} onChangeText={set('segments')} />;
+    return (
+        <View style={styles.row}>
+            <NumberField testID="status-segments" label="Segments" value={form.segments} onChangeText={set('segments')} />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
