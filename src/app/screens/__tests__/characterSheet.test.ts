@@ -14,10 +14,14 @@
 
 import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
 import type {CharacterDocument} from 'core/ports';
+import type {Obj} from 'core/traits';
 import sample from '../../composition/sampleCharacter.json';
-import {asHeroCharacter, buildCharacterSheet} from '../characterSheet';
+import {alternateIdentities, asHeroCharacter, buildCharacterSheet, buildCombatSheet, hasAlternateForm} from '../characterSheet';
 
 const processed = (): CharacterDocument => heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as CharacterDocument;
+
+const heroOf = (fixture: string): Obj =>
+    heroDesignerCharacter.getCharacter(JSON.parse(JSON.stringify(require(`../../../core/hero/__tests__/fixtures/${fixture}.json`))) as ParsedCharacter) as unknown as Obj;
 
 describe('characterSheet', () => {
     it('recognises a processed character and rejects a thin document', () => {
@@ -45,5 +49,33 @@ describe('characterSheet', () => {
         expect(allTraits.length).toBeGreaterThan(0);
         expect(allTraits.every((t) => typeof t.label === 'string' && t.label.length > 0)).toBe(true);
         expect(allTraits.every((t) => Number.isFinite(t.realCost))).toBe(true);
+    });
+
+    describe('alternate identity (showSecondary)', () => {
+        it('detects the alternate (super) form only when a trait is only-in-alternate-ID', () => {
+            expect(hasAlternateForm(heroOf('gravity-girl'))).toBe(true);
+            expect(hasAlternateForm(heroOf('champions-9-11-teen-supers-blank'))).toBe(false);
+        });
+
+        it('reads the alias / alternate identity from the character info', () => {
+            expect(alternateIdentities(heroOf('gravity-girl') as unknown as CharacterDocument)).toBe('Jane Smith');
+            expect(alternateIdentities(heroOf('defensor') as unknown as CharacterDocument)).toBeNull();
+        });
+
+        it('changes characteristic totals when the alternate-ID form is toggled on', () => {
+            const gg = heroOf('gravity-girl');
+            const inForm = buildCharacterSheet(gg, true).characteristics.map((c) => c.total);
+            const baseForm = buildCharacterSheet(gg, false).characteristics.map((c) => c.total);
+
+            expect(inForm).not.toEqual(baseForm);
+        });
+
+        it('changes the derived defenses with the form too', () => {
+            const gg = heroOf('gravity-girl');
+            const inForm = buildCombatSheet(gg, true).defenses.map((d) => d.value);
+            const baseForm = buildCombatSheet(gg, false).defenses.map((d) => d.value);
+
+            expect(inForm).not.toEqual(baseForm);
+        });
     });
 });

@@ -96,16 +96,16 @@ const parsePartialDie = (roll: string): PartialDie => {
 };
 
 /** A characteristic roll (e.g. "13-") becomes a skill check against that number. */
-export function characteristicRollRequest(roll: string | null, label: string): RollRequest | null {
-    if (roll === null) {
+export function characteristicRollRequest(roll: string | null | undefined, label: string): RollRequest | null {
+    if (roll === null || roll === undefined) {
         return null;
     }
     return {mode: 'skill', threshold: parseLeadingInt(roll, 11), label};
 }
 
 /** A decorated trait's roll becomes the matching skill / damage / effect request. */
-export function traitRollRequest(roll: RollDescriptor | null, label: string): RollRequest | null {
-    if (roll === null) {
+export function traitRollRequest(roll: RollDescriptor | null | undefined, label: string): RollRequest | null {
+    if (roll === null || roll === undefined) {
         return null;
     }
     switch (roll.type) {

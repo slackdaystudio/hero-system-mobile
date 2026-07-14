@@ -16,6 +16,24 @@ import {combatDetails} from 'core/combat';
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Obj, type RollDescriptor} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
+import {flatten} from 'core/util';
+
+/**
+ * True when the character has "only in Alternate Identity" traits — powers/
+ * characteristics that only apply in the alternate (super) form. When so, the
+ * sheet offers the {@link buildCharacterSheet} `showSecondary` toggle.
+ */
+export function hasAlternateForm(character: Obj): boolean {
+    return heroDesignerCharacter.hasSecondaryCharacteristics(flatten(toArray(character.powers), 'powers'));
+}
+
+/** The character's alias / alternate identity (super name) from the parsed info, or null. */
+export function alternateIdentities(document: CharacterDocument): string | null {
+    const info = (document as {characterInfo?: {alternateIdentities?: unknown}}).characterInfo;
+    const alias = info?.alternateIdentities;
+
+    return typeof alias === 'string' && alias.trim() !== '' ? alias : null;
+}
 
 /** Display-ready view of a parsed HeroDesigner character (see the trait engine in core). */
 export interface SheetCharacteristic {
@@ -77,8 +95,8 @@ const COMBAT_VALUE_FIELDS: Array<{key: string; label: string; attack: boolean}> 
  * `combatDetails` port, so 5E figured OCV/DCV is handled), defenses, key combat
  * characteristics, and per-mode movement distances.
  */
-export function buildCombatSheet(character: Obj): CombatSheet {
-    const c: Obj = {...character, showSecondary: character.showSecondary ?? false};
+export function buildCombatSheet(character: Obj, showSecondary = false): CombatSheet {
+    const c: Obj = {...character, showSecondary};
     const total = (shortName: string): number => heroDesignerCharacter.getCharacteristicTotal(shortName, c);
 
     // init() flips showSecondary while it works, so hand it its own copy and keep `c` primary.
@@ -150,9 +168,10 @@ export function asHeroCharacter(document: CharacterDocument): Obj | null {
 }
 
 /** Build the full sheet from a processed character: characteristics + decorated trait sections. */
-export function buildCharacterSheet(character: Obj): CharacterSheet {
-    // Several engine methods read `showSecondary`; default it without mutating input.
-    const c: Obj = {...character, showSecondary: character.showSecondary ?? false};
+export function buildCharacterSheet(character: Obj, showSecondary = false): CharacterSheet {
+    // Several engine methods read `showSecondary` (the alt-ID form); set it on a
+    // copy so the caller's toggle drives the totals without mutating input.
+    const c: Obj = {...character, showSecondary};
 
     const characteristics: SheetCharacteristic[] = toArray(c.characteristics).map((entry) => {
         const name = String(entry.name ?? entry.shortName ?? '');
@@ -188,7 +207,7 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
     for (const item of items) {
         try {
             const decorated = characterTraitDecorator.decorate(item, listKey, () => character);
-            rows.push({label: decorated.label(), roll: decorated.roll(), realCost: decorated.realCost(), definition: decorated.definition(), depth});
+            rows.push({label: decorated.label(), roll: decorated.roll() ?? null, realCost: decorated.realCost(), definition: decorated.definition(), depth});
 
             const children = toArray(item.powers);
             if (children.length > 0) {

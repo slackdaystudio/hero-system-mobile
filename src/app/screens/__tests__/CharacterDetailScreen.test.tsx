@@ -224,6 +224,25 @@ describe('CharacterDetailScreen', () => {
         expect(onRollRequest.mock.calls[0][0]).toMatchObject({mode: 'hit', label: 'OCV'});
     });
 
+    it('shows the alias and an alternate-ID toggle that recomputes the stats', async () => {
+        const gg = heroDesignerCharacter.getCharacter(
+            JSON.parse(JSON.stringify(require('../../../core/hero/__tests__/fixtures/gravity-girl.json'))) as ParsedCharacter,
+        ) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({name: 'Gravity Girl', document: gg})));
+
+        expect(collectText(tree.toJSON())).toContain('Jane Smith'); // alias in the header
+
+        const before = collectText(tree.toJSON());
+        const toggle = tree.root.findAllByProps({testID: 'toggle-alternate-id'}).find((node) => typeof node.props.onValueChange === 'function');
+        expect(toggle?.props.value).toBe(true); // alt-ID form on by default
+
+        await act(async () => {
+            toggle?.props.onValueChange(false);
+        });
+
+        expect(collectText(tree.toJSON())).not.toEqual(before); // totals recomputed for the base form
+    });
+
     it('calls onReady with the loaded character (for the header title)', async () => {
         const onReady = jest.fn();
         await renderScreen(fakeCharacters(character({name: 'Grond'})), {onReady});

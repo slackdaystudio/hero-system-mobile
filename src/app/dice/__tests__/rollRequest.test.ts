@@ -26,6 +26,7 @@ describe('rollRequest', () => {
     it('turns a characteristic roll into a skill-check request', () => {
         expect(characteristicRollRequest('13-', 'STR')).toEqual({mode: 'skill', threshold: 13, label: 'STR'});
         expect(characteristicRollRequest(null, 'STR')).toBeNull();
+        expect(characteristicRollRequest(undefined, 'STR')).toBeNull(); // a trait can decorate to an undefined roll
     });
 
     it('turns decorated trait rolls into the matching requests', () => {
@@ -34,6 +35,7 @@ describe('rollRequest', () => {
         expect(traitRollRequest({roll: '2½d6', type: RollType.KillingDamage}, 'HKA')).toEqual({mode: 'killing', dice: 2, partialDie: PartialDie.Half, label: 'HKA'});
         expect(traitRollRequest({roll: '8d6', type: RollType.Effect}, 'Aid')).toEqual({mode: 'effect', dice: 8, partialDie: PartialDie.None, label: 'Aid'});
         expect(traitRollRequest(null, 'x')).toBeNull();
+        expect(traitRollRequest(undefined, 'x')).toBeNull(); // guards against a decorated undefined roll (would crash the sheet)
     });
 
     it('performs a request and summarises the result', () => {

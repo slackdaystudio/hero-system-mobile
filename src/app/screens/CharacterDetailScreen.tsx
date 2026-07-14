@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
+import {ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Switch, View, type ViewStyle} from 'react-native';
 import type {LastRoll} from 'core/dice';
 import type {Character} from 'core/ports';
 import type {Obj} from 'core/traits';
@@ -22,7 +22,17 @@ import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitR
 import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
-import {asHeroCharacter, buildCharacterSheet, buildCombatSheet, type CharacterSheet, type CombatSheet, type SheetCharacteristic, type SheetTrait} from './characterSheet';
+import {
+    alternateIdentities,
+    asHeroCharacter,
+    buildCharacterSheet,
+    buildCombatSheet,
+    hasAlternateForm,
+    type CharacterSheet,
+    type CombatSheet,
+    type SheetCharacteristic,
+    type SheetTrait,
+} from './characterSheet';
 import {CombatTracker} from './CombatTracker';
 
 type LoadState = {status: 'loading'} | {status: 'ready'; character: Character} | {status: 'not-found'} | {status: 'error'; message: string};
@@ -70,13 +80,25 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
 
     // Decorate the whole sheet once per character (engine work), not per render.
     const character = state.status === 'ready' ? state.character : null;
-    const sheet = useMemo<{hero: Obj; character: CharacterSheet; combat: CombatSheet} | null>(() => {
+    // "Only in Alternate Identity" form. Default on — matches legacy (which loaded
+    // characters with showSecondary = true), so alt-ID stat boosts count by default.
+    const [showSecondary, setShowSecondary] = useState(true);
+
+    const sheet = useMemo<{hero: Obj; character: CharacterSheet; combat: CombatSheet; hasAlternate: boolean} | null>(() => {
         if (character === null) {
             return null;
         }
         const hero = asHeroCharacter(character.document);
-        return hero === null ? null : {hero, character: buildCharacterSheet(hero), combat: buildCombatSheet(hero)};
-    }, [character]);
+        if (hero === null) {
+            return null;
+        }
+        return {
+            hero,
+            character: buildCharacterSheet(hero, showSecondary),
+            combat: buildCombatSheet(hero, showSecondary),
+            hasAlternate: hasAlternateForm(hero),
+        };
+    }, [character, showSecondary]);
 
     const [flash, setFlash] = useState<RollFlashState | null>(null);
 
@@ -126,6 +148,7 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
     }
 
     const loaded = state.character;
+    const alias = alternateIdentities(loaded.document);
     const avatarStyle: ViewStyle = {backgroundColor: theme.colors.surfaceAlt, borderRadius: theme.radius.md};
     const content: ViewStyle = {padding: theme.spacing(4), rowGap: theme.spacing(4)};
 
@@ -144,6 +167,11 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                     </View>
                     <View style={styles.headerText}>
                         <Text variant="title">{loaded.name}</Text>
+                        {alias !== null ? (
+                            <Text variant="subtitle" color={theme.colors.primary}>
+                                {alias}
+                            </Text>
+                        ) : null}
                         <Text variant="caption" muted>
                             {loaded.player ? `${loaded.edition} · ${loaded.player}` : loaded.edition}
                         </Text>
@@ -156,7 +184,10 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                 </View>
 
                 {sheet !== null ? (
-                    <SheetTabs sheet={sheet.character} combat={sheet.combat} hero={sheet.hero} characterId={characterId} onRoll={handleRoll} />
+                    <>
+                        {sheet.hasAlternate ? <AlternateIdToggle value={showSecondary} onChange={setShowSecondary} /> : null}
+                        <SheetTabs sheet={sheet.character} combat={sheet.combat} hero={sheet.hero} characterId={characterId} onRoll={handleRoll} />
+                    </>
                 ) : (
                     <BasicBody character={loaded} />
                 )}
@@ -193,6 +224,31 @@ function SheetTabs({
             <SegmentedControl segments={SHEET_TABS} value={tab} onChange={(value) => setTab(value as SheetTab)} />
             {tab === 'character' ? <SheetBody sheet={sheet} onRoll={onRoll} /> : <CombatTracker character={hero} characterId={characterId} combat={combat} onRoll={onRoll} />}
         </View>
+    );
+}
+
+function AlternateIdToggle({value, onChange}: {value: boolean; onChange: (next: boolean) => void}): React.JSX.Element {
+    const theme = useTheme();
+
+    return (
+        <Card>
+            <View style={styles.altToggle}>
+                <View style={styles.grow}>
+                    <Text variant="label">Alternate Identity</Text>
+                    <Text variant="caption" muted>
+                        Include stats that only apply in the character&apos;s alternate (super) form.
+                    </Text>
+                </View>
+                <Switch
+                    testID="toggle-alternate-id"
+                    value={value}
+                    onValueChange={onChange}
+                    trackColor={{false: theme.colors.surfaceAlt, true: theme.colors.primary}}
+                    thumbColor={theme.colors.onPrimary}
+                    ios_backgroundColor={theme.colors.surfaceAlt}
+                />
+            </View>
+        </Card>
     );
 }
 
@@ -384,6 +440,11 @@ const styles = StyleSheet.create({
     },
     tabbed: {
         rowGap: 16,
+    },
+    altToggle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 16,
     },
     section: {
         rowGap: 6,
