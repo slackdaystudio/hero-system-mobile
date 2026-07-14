@@ -35,11 +35,14 @@ const fakeSettings = (initial: Settings = DEFAULT_SETTINGS) => {
     return {repo, current: () => stored};
 };
 
-// A probe that surfaces the currently-resolved theme background so a test can
-// assert the live re-theme.
+// A probe that surfaces the currently-resolved theme so a test can assert the
+// live re-theme (background) and font scaling (title size).
 let observedBackground = '';
+let observedTitleSize = 0;
 function ThemeProbe(): null {
-    observedBackground = useTheme().colors.background;
+    const theme = useTheme();
+    observedBackground = theme.colors.background;
+    observedTitleSize = theme.fontSize.title;
     return null;
 }
 
@@ -64,7 +67,7 @@ const renderApp = async (settingsRepo: SettingsRepository): Promise<ReactTestRen
 function LiveTheme(): React.JSX.Element {
     const {settings} = useSettings();
     return (
-        <ThemeProvider colorScheme={settings.colorScheme}>
+        <ThemeProvider colorScheme={settings.colorScheme} fontScale={settings.fontScale}>
             <ThemeProbe />
             <SettingsScreen />
         </ThemeProvider>
@@ -113,5 +116,35 @@ describe('SettingsScreen', () => {
         await act(async () => {});
 
         expect(current().showAnimations).toBe(false);
+    });
+
+    const pressButton = async (tree: ReactTestRenderer, testID: string): Promise<void> => {
+        const target = tree.root.findAllByProps({testID}).find((node) => typeof node.props.onPress === 'function');
+        await act(async () => {
+            target?.props.onPress();
+        });
+        await act(async () => {});
+    };
+
+    it('bumps the font scale up and down and persists it', async () => {
+        const {repo, current} = fakeSettings();
+        const tree = await renderApp(repo);
+
+        await pressButton(tree, 'font-increase');
+        expect(current().fontScale).toBe(1.1);
+
+        await pressButton(tree, 'font-decrease');
+        await pressButton(tree, 'font-decrease');
+        expect(current().fontScale).toBe(0.9);
+    });
+
+    it('scales the theme font sizes live from the persisted setting', async () => {
+        const {repo} = fakeSettings({...DEFAULT_SETTINGS, fontScale: 1.5});
+        await renderApp(repo);
+
+        expect(observedTitleSize).toBe(Math.round(darkTheme.fontSize.title * 1.5));
+
+        await renderApp(fakeSettings().repo); // back to default scale
+        expect(observedTitleSize).toBe(darkTheme.fontSize.title);
     });
 });

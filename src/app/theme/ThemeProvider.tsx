@@ -22,13 +22,15 @@ const ThemeContext = createContext<Theme | null>(null);
 export interface ThemeProviderProps {
     /** From settings: 'system' follows the OS; 'light'/'dark' pin it. */
     colorScheme?: ColorScheme;
+    /** From settings: multiplier applied to every font size (1 = default). */
+    fontScale?: number;
     children: React.ReactNode;
 }
 
-export function ThemeProvider({colorScheme = 'system', children}: ThemeProviderProps): React.JSX.Element {
+export function ThemeProvider({colorScheme = 'system', fontScale = 1, children}: ThemeProviderProps): React.JSX.Element {
     const systemScheme = useColorScheme();
     const resolved = colorScheme === 'system' ? systemScheme ?? 'dark' : colorScheme;
-    const theme = useMemo(() => themeFor(resolved), [resolved]);
+    const theme = useMemo(() => themeFor(resolved, fontScale), [resolved, fontScale]);
 
     return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;
 }

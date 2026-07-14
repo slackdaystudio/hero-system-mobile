@@ -83,7 +83,7 @@ function ThemedApp(): React.JSX.Element {
     const {settings} = useSettings();
 
     return (
-        <ThemeProvider colorScheme={settings.colorScheme}>
+        <ThemeProvider colorScheme={settings.colorScheme} fontScale={settings.fontScale}>
             <DiceProvider>
                 <AppNavigator />
             </DiceProvider>

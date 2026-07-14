@@ -27,12 +27,15 @@ export interface Settings {
     useFifthEdition: boolean;
     showAnimations: boolean;
     colorScheme: ColorScheme;
+    /** Multiplier applied to every font size (1 = default). */
+    fontScale: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
     useFifthEdition: false,
     showAnimations: true,
     colorScheme: 'system',
+    fontScale: 1,
 };
 
 export interface SettingsRepository {

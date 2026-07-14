@@ -87,4 +87,21 @@ export const lightTheme: Theme = {
     fontWeight,
 };
 
-export const themeFor = (scheme: ResolvedScheme): Theme => (scheme === 'dark' ? darkTheme : lightTheme);
+const scaleFontSize = (base: Theme['fontSize'], factor: number): Theme['fontSize'] => ({
+    caption: Math.round(base.caption * factor),
+    label: Math.round(base.label * factor),
+    body: Math.round(base.body * factor),
+    subtitle: Math.round(base.subtitle * factor),
+    title: Math.round(base.title * factor),
+});
+
+/**
+ * Resolve the theme for a scheme, optionally scaling every font size by
+ * `fontScale` (1 = default). Text reads `theme.fontSize[variant]`, so scaling
+ * here resizes all copy app-wide from the one setting.
+ */
+export const themeFor = (scheme: ResolvedScheme, fontScale = 1): Theme => {
+    const base = scheme === 'dark' ? darkTheme : lightTheme;
+
+    return fontScale === 1 ? base : {...base, fontSize: scaleFontSize(base.fontSize, fontScale)};
+};
