@@ -243,6 +243,21 @@ describe('CharacterDetailScreen', () => {
         expect(collectText(tree.toJSON())).not.toEqual(before); // totals recomputed for the base form
     });
 
+    it('renders martial-arts maneuvers as a two-row table (strike/evasion/damage + notes)', async () => {
+        const document = heroDesignerCharacter.getCharacter(
+            JSON.parse(JSON.stringify(require('../../../core/hero/__tests__/fixtures/aoe.json'))) as ParsedCharacter,
+        ) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({document})));
+
+        const text = collectText(tree.toJSON());
+        expect(text).toContain('OCV'); // column header
+        expect(text).toContain('Damage'); // column header
+        expect(text).toContain('Choke Hold'); // maneuver name
+        expect(text).toContain('-2'); // its OCV (strike)
+        expect(text).toContain('Grab One Limb; 3½d6 NND'); // damage/effect
+        expect(text.some((value) => value.includes('Phase ½'))).toBe(true); // notes row
+    });
+
     it('calls onReady with the loaded character (for the header title)', async () => {
         const onReady = jest.fn();
         await renderScreen(fakeCharacters(character({name: 'Grond'})), {onReady});

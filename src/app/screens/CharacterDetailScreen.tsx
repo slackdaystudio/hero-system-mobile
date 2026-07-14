@@ -260,14 +260,74 @@ function SheetBody({sheet, onRoll}: {sheet: CharacterSheet; onRoll: RollHandler}
                     <CharacteristicRow key={index} characteristic={characteristic} onRoll={onRoll} />
                 ))}
             </Section>
-            {sheet.sections.map((section) => (
-                <Section key={section.title} title={section.title}>
-                    {section.traits.map((trait, index) => (
-                        <TraitRow key={index} trait={trait} onRoll={onRoll} />
-                    ))}
-                </Section>
-            ))}
+            {sheet.sections.map((section) => {
+                const maneuvers = section.traits.some((trait) => trait.maneuver !== undefined);
+                return (
+                    <Section key={section.title} title={section.title}>
+                        {maneuvers ? <ManeuverHeader /> : null}
+                        {section.traits.map((trait, index) => (
+                            <TraitRow key={index} trait={trait} onRoll={onRoll} />
+                        ))}
+                    </Section>
+                );
+            })}
         </>
+    );
+}
+
+function ManeuverHeader(): React.JSX.Element {
+    return (
+        <View style={styles.maneuverRow}>
+            <Text variant="caption" muted style={styles.maneuverName} />
+            <Text variant="caption" muted style={styles.maneuverStat}>
+                OCV
+            </Text>
+            <Text variant="caption" muted style={styles.maneuverStat}>
+                DCV
+            </Text>
+            <Text variant="caption" muted style={styles.maneuverStat}>
+                Rng
+            </Text>
+            <Text variant="caption" muted style={styles.maneuverDamage}>
+                Damage
+            </Text>
+        </View>
+    );
+}
+
+function ManeuverRow({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}): React.JSX.Element {
+    const theme = useTheme();
+    const maneuver = trait.maneuver!;
+    const request = traitRollRequest(trait.roll, trait.label);
+    const damage = maneuver.damage ?? '—';
+
+    return (
+        <View style={styles.maneuver}>
+            <View style={styles.maneuverRow}>
+                <Text style={styles.maneuverName} numberOfLines={1}>
+                    {trait.label}
+                </Text>
+                <Text style={styles.maneuverStat}>{maneuver.ocv ?? '—'}</Text>
+                <Text style={styles.maneuverStat}>{maneuver.dcv ?? '—'}</Text>
+                <Text style={styles.maneuverStat}>{maneuver.range ?? '—'}</Text>
+                {trait.roll !== null && request !== null ? (
+                    <Pressable testID={`roll-trait-${trait.label}`} style={styles.maneuverDamage} onPress={() => onRoll(request, false)} onLongPress={() => onRoll(request, true)}>
+                        <Text variant="caption" color={theme.colors.primary} style={styles.rollText}>
+                            {damage}
+                        </Text>
+                    </Pressable>
+                ) : (
+                    <Text variant="caption" style={[styles.maneuverDamage, styles.rollText]}>
+                        {damage}
+                    </Text>
+                )}
+            </View>
+            {maneuver.notes.length > 0 ? (
+                <Text variant="caption" muted style={styles.maneuverNotes}>
+                    {maneuver.notes}
+                </Text>
+            ) : null}
+        </View>
     );
 }
 
@@ -299,6 +359,9 @@ function CharacteristicRow({characteristic, onRoll}: {characteristic: SheetChara
 
 function TraitRow({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}): React.JSX.Element {
     const theme = useTheme();
+    if (trait.maneuver !== undefined) {
+        return <ManeuverRow trait={trait} onRoll={onRoll} />;
+    }
     const indent: ViewStyle = {paddingLeft: trait.depth * 16};
     const request = traitRollRequest(trait.roll, trait.label);
 
@@ -493,6 +556,28 @@ const styles = StyleSheet.create({
     traitCost: {
         width: 44,
         textAlign: 'right',
+    },
+    maneuver: {
+        paddingVertical: 5,
+    },
+    maneuverRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 6,
+    },
+    maneuverName: {
+        flex: 1,
+    },
+    maneuverStat: {
+        width: 32,
+        textAlign: 'right',
+    },
+    maneuverDamage: {
+        flex: 1.3,
+        textAlign: 'right',
+    },
+    maneuverNotes: {
+        paddingTop: 2,
     },
     backdrop: {
         flex: 1,

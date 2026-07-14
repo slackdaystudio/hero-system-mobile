@@ -14,7 +14,7 @@
 
 import {combatDetails} from 'core/combat';
 import {heroDesignerCharacter} from 'core/hero';
-import {characterTraitDecorator, type Obj, type RollDescriptor} from 'core/traits';
+import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
 import {flatten} from 'core/util';
 
@@ -88,6 +88,15 @@ export interface SheetCharacteristic {
     cost: number;
 }
 
+/** The combat line for a martial-arts maneuver: strike (OCV), evasion (DCV), range, damage, notes. */
+export interface ManeuverDetail {
+    ocv: string | null;
+    dcv: string | null;
+    range: string | null;
+    damage: string | null;
+    notes: string;
+}
+
 export interface SheetTrait {
     label: string;
     roll: RollDescriptor | null;
@@ -95,6 +104,31 @@ export interface SheetTrait {
     definition: string;
     /** 0 for a top-level trait, 1+ for framework/compound children. */
     depth: number;
+    /** Present for martial-arts maneuvers — drives the two-row combat table. */
+    maneuver?: ManeuverDetail;
+}
+
+const MANEUVER_MAIN = new Set(['Name', 'OCV', 'DCV', 'Range', 'Effect']);
+
+const maneuverValue = (attributes: Attribute[], label: string): string | null => {
+    const found = attributes.find((attribute) => attribute.label === label);
+    return found === undefined ? null : String(found.value);
+};
+
+/** Extract the maneuver combat line from a decorated maneuver's attributes + definition. */
+function buildManeuver(attributes: Attribute[], definition: string): ManeuverDetail {
+    const extras = attributes.filter((attribute) => !MANEUVER_MAIN.has(attribute.label)).map((attribute) => (attribute.label === 'Phase' ? `Phase ${attribute.value}` : String(attribute.value)));
+    if (definition.trim() !== '') {
+        extras.push(definition.trim());
+    }
+
+    return {
+        ocv: maneuverValue(attributes, 'OCV'),
+        dcv: maneuverValue(attributes, 'DCV'),
+        range: maneuverValue(attributes, 'Range'),
+        damage: maneuverValue(attributes, 'Effect'),
+        notes: extras.join(' · '),
+    };
 }
 
 export interface SheetSection {
@@ -255,7 +289,8 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
     for (const item of items) {
         try {
             const decorated = characterTraitDecorator.decorate(item, listKey, () => character);
-            rows.push({label: decorated.label(), roll: decorated.roll() ?? null, realCost: decorated.realCost(), definition: decorated.definition(), depth});
+            const maneuver = listKey === 'martialArts' ? buildManeuver(decorated.attributes(), decorated.definition()) : undefined;
+            rows.push({label: decorated.label(), roll: decorated.roll() ?? null, realCost: decorated.realCost(), definition: decorated.definition(), depth, maneuver});
 
             const children = toArray(item.powers);
             if (children.length > 0) {

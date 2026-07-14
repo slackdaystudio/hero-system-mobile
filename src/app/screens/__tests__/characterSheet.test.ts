@@ -103,6 +103,19 @@ describe('characterSheet', () => {
             expect(snapshot(false)).not.toEqual(snapshot(true));
         });
 
+        it('builds a maneuver combat line (strike/evasion/range/damage/notes) for martial arts', () => {
+            const aoe = heroOf('aoe');
+            const section = buildCharacterSheet(aoe, true).sections.find((s) => s.title === 'Martial Arts');
+            expect(section).toBeDefined();
+
+            const choke = section!.traits.find((t) => t.label === 'Choke Hold');
+            expect(choke?.maneuver).toEqual({ocv: '-2', dcv: '+0', range: null, damage: 'Grab One Limb; 3½d6 NND', notes: 'Empty Hand · Phase ½'});
+
+            // Non-maneuver traits carry no maneuver line.
+            const powers = buildCharacterSheet(aoe, true).sections.find((s) => s.title === 'Powers');
+            expect(powers?.traits.every((t) => t.maneuver === undefined)).toBe(true);
+        });
+
         it('isOnlyInAlternateId only fires on the OIHID limitation', () => {
             expect(isOnlyInAlternateId({modifier: {xmlid: 'OIHID'}})).toBe(true);
             expect(isOnlyInAlternateId({modifier: [{xmlid: 'FOCUS'}, {xmlid: 'OIHID'}]})).toBe(true);
