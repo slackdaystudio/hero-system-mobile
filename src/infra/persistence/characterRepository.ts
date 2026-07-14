@@ -49,6 +49,18 @@ export class SqliteCharacterRepository implements CharacterRepository {
         return rows.length > 0 ? this.toCharacter(rows[0]) : null;
     }
 
+    async markAccessed(id: string): Promise<void> {
+        this.db.execute('UPDATE characters SET accessed_at = ? WHERE id = ?', [this.now(), id]);
+    }
+
+    async recent(limit = 4): Promise<CharacterSummary[]> {
+        // Recently accessed first (NULLs sort last under DESC), then recently
+        // updated — so the list is populated even before anything is opened.
+        const {rows} = this.db.execute(`SELECT ${SUMMARY_COLUMNS} FROM characters ORDER BY accessed_at DESC, updated_at DESC LIMIT ?`, [limit]);
+
+        return rows.map((row) => this.toSummary(row));
+    }
+
     async save(character: SaveCharacter): Promise<void> {
         const existing = this.db.execute('SELECT portrait_id, is_active FROM characters WHERE id = ?', [character.id]).rows[0];
         const existingPortraitId = (existing?.portrait_id as string | null) ?? null;

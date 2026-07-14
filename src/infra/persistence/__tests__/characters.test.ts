@@ -124,6 +124,44 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
         });
     });
 
+    describe('recent + markAccessed', () => {
+        // A repo with a controllable clock so save/access timestamps are distinct.
+        const clockedRepo = () => {
+            const db = createBetterSqlite3Database();
+            runMigrations(db);
+            const {store} = fakeImageStore();
+            let tick = 0;
+            const repo = new SqliteCharacterRepository(db, store, () => `2026-01-01T00:00:${String(tick).padStart(2, '0')}.000Z`);
+            return {repo, at: (t: number) => (tick = t)};
+        };
+
+        it('orders by last-accessed, then most-recently-updated, and respects the limit', async () => {
+            const {repo, at} = clockedRepo();
+            at(1);
+            await repo.save(character({id: 'a', name: 'Alpha'}));
+            at(2);
+            await repo.save(character({id: 'b', name: 'Beta'}));
+            at(3);
+            await repo.save(character({id: 'c', name: 'Gamma'}));
+
+            // Nothing accessed yet → newest-updated first.
+            expect((await repo.recent(2)).map((c) => c.name)).toEqual(['Gamma', 'Beta']);
+
+            at(9);
+            await repo.markAccessed('a'); // Alpha just opened
+            expect((await repo.recent(3)).map((c) => c.name)).toEqual(['Alpha', 'Gamma', 'Beta']);
+        });
+
+        it('drops a deleted character from the recent list automatically', async () => {
+            const {repo} = clockedRepo();
+            await repo.save(character({id: 'a', name: 'Alpha'}));
+            await repo.markAccessed('a');
+            await repo.delete('a');
+
+            expect(await repo.recent()).toEqual([]);
+        });
+    });
+
     describe('active character', () => {
         it('setActive keeps exactly one active character', async () => {
             const {repo} = setup();

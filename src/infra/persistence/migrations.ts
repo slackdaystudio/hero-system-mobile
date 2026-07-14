@@ -71,8 +71,16 @@ const migration003: Migration = {
     },
 };
 
+/** 004 — track last-access time so Home can show recently opened characters. */
+const migration004: Migration = {
+    version: 4,
+    up(db) {
+        db.execute('ALTER TABLE characters ADD COLUMN accessed_at TEXT');
+    },
+};
+
 /** All migrations, in ascending version order. */
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004];
 
 /**
  * Apply every migration newer than the recorded schema version, each in its own

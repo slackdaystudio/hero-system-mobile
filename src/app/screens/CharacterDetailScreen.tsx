@@ -69,6 +69,9 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
             }
             setState({status: 'ready', character});
             onReadyRef.current?.(character);
+            repository.markAccessed(characterId).catch(() => {
+                // Recency for the Home list — best-effort, never blocks the sheet.
+            });
         } catch (error) {
             setState({status: 'error', message: error instanceof Error ? error.message : 'Failed to load character'});
         }

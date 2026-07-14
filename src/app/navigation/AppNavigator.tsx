@@ -67,7 +67,7 @@ export function AppNavigator(): React.JSX.Element {
                         {({navigation}) => (
                             <HomeScreen
                                 onOpenCharacters={() => navigation.navigate('CharacterList')}
-                                onOpenActiveCharacter={(id) => navigation.navigate('CharacterDetail', {id})}
+                                onOpenCharacter={(id) => navigation.navigate('CharacterDetail', {id})}
                                 onOpenDice={(mode) => navigation.navigate('Dice', {mode})}
                                 onOpenStatistics={() => navigation.navigate('Statistics')}
                                 onOpenSettings={() => navigation.navigate('Settings')}

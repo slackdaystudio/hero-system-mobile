@@ -14,7 +14,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 import {Image, Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
-import type {Character} from 'core/ports';
+import type {CharacterSummary} from 'core/ports';
 import {Card, Screen, Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
@@ -22,9 +22,12 @@ import {useTheme} from 'app/theme';
 
 type DiceMode = RollRequest['mode'];
 
+/** How many recent characters the Home dashboard shows. */
+const RECENT_LIMIT = 4;
+
 export interface HomeScreenProps {
     onOpenCharacters: () => void;
-    onOpenActiveCharacter: (id: string) => void;
+    onOpenCharacter: (id: string) => void;
     onOpenDice: (mode?: DiceMode) => void;
     onOpenStatistics: () => void;
     onOpenSettings: () => void;
@@ -37,23 +40,20 @@ const DICE_TILES: Array<{label: string; mode: DiceMode}> = [
     {label: 'Effect', mode: 'effect'},
 ];
 
-const AVATAR = 56;
-
 /**
- * The landing hub: a quick view of the active character plus tiles into the
- * library, the dice rollers, and the game tools. Screen stays props-driven — the
- * navigator wires each callback — and loads the active character through the
- * repository port.
+ * The landing hub: recently opened characters plus tiles into the library, the
+ * dice rollers, and the game tools. Screen stays props-driven — the navigator
+ * wires each callback — and reads the recent list through the repository port.
  */
-export function HomeScreen({onOpenCharacters, onOpenActiveCharacter, onOpenDice, onOpenStatistics, onOpenSettings}: HomeScreenProps): React.JSX.Element {
+export function HomeScreen({onOpenCharacters, onOpenCharacter, onOpenDice, onOpenStatistics, onOpenSettings}: HomeScreenProps): React.JSX.Element {
     const {characters} = useRepositories();
-    const [active, setActive] = useState<Character | null | undefined>(undefined);
+    const [recent, setRecent] = useState<CharacterSummary[] | undefined>(undefined);
 
     const load = useCallback(async () => {
         try {
-            setActive(await characters.getActive());
+            setRecent(await characters.recent(RECENT_LIMIT));
         } catch {
-            setActive(null);
+            setRecent([]);
         }
     }, [characters]);
 
@@ -64,8 +64,8 @@ export function HomeScreen({onOpenCharacters, onOpenActiveCharacter, onOpenDice,
     return (
         <Screen>
             <ScrollView contentContainerStyle={styles.content}>
-                <Section title="Active Character">
-                    <ActiveCharacterCard active={active} onOpen={onOpenActiveCharacter} />
+                <Section title="Recent">
+                    <RecentCharacters characters={recent} onOpen={onOpenCharacter} />
                 </Section>
 
                 <Section title="Library">
@@ -93,10 +93,8 @@ export function HomeScreen({onOpenCharacters, onOpenActiveCharacter, onOpenDice,
     );
 }
 
-function ActiveCharacterCard({active, onOpen}: {active: Character | null | undefined; onOpen: (id: string) => void}): React.JSX.Element {
-    const theme = useTheme();
-
-    if (active === undefined) {
+function RecentCharacters({characters, onOpen}: {characters: CharacterSummary[] | undefined; onOpen: (id: string) => void}): React.JSX.Element {
+    if (characters === undefined) {
         return (
             <Card>
                 <Text muted>Loading…</Text>
@@ -104,40 +102,44 @@ function ActiveCharacterCard({active, onOpen}: {active: Character | null | undef
         );
     }
 
-    if (active === null) {
+    if (characters.length === 0) {
         return (
             <Card>
-                <Text>No active character</Text>
+                <Text>No characters yet</Text>
                 <Text variant="caption" muted>
-                    Open a character from the library to make it active.
+                    Import a character to get started.
                 </Text>
             </Card>
         );
     }
 
-    const avatarStyle: ViewStyle = {backgroundColor: theme.colors.surfaceAlt, borderRadius: theme.radius.md};
+    return (
+        <View style={styles.recentRow}>
+            {characters.map((character) => (
+                <RecentCard key={character.id} character={character} onOpen={onOpen} />
+            ))}
+        </View>
+    );
+}
+
+function RecentCard({character, onOpen}: {character: CharacterSummary; onOpen: (id: string) => void}): React.JSX.Element {
+    const theme = useTheme();
+    const square: ViewStyle = {backgroundColor: theme.colors.surfaceAlt, borderRadius: theme.radius.md};
 
     return (
-        <Pressable testID="active-character" accessibilityRole="button" onPress={() => onOpen(active.id)}>
-            <Card>
-                <View style={styles.activeRow}>
-                    <View style={[styles.avatar, avatarStyle]}>
-                        {active.portraitUri ? (
-                            <Image testID="active-portrait" source={{uri: active.portraitUri}} style={styles.avatarImage} />
-                        ) : (
-                            <Text variant="title" muted>
-                                {(active.name.trim()[0] ?? '?').toUpperCase()}
-                            </Text>
-                        )}
-                    </View>
-                    <View style={styles.activeText}>
-                        <Text variant="subtitle">{active.name}</Text>
-                        <Text variant="caption" muted>
-                            {active.player ? `${active.edition} · ${active.player}` : active.edition}
-                        </Text>
-                    </View>
-                </View>
-            </Card>
+        <Pressable testID={`recent-${character.id}`} accessibilityRole="button" onPress={() => onOpen(character.id)} style={styles.recentCard}>
+            <View style={[styles.recentSquare, square]}>
+                {character.portraitUri ? (
+                    <Image testID={`recent-portrait-${character.id}`} source={{uri: character.portraitUri}} style={styles.recentImage} />
+                ) : (
+                    <Text variant="title" muted>
+                        {(character.name.trim()[0] ?? '?').toUpperCase()}
+                    </Text>
+                )}
+            </View>
+            <Text variant="caption" numberOfLines={1} style={styles.recentName}>
+                {character.name}
+            </Text>
         </Pressable>
     );
 }
@@ -189,24 +191,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 16,
     },
-    activeRow: {
+    recentRow: {
         flexDirection: 'row',
-        alignItems: 'center',
-        columnGap: 16,
+        columnGap: 10,
     },
-    avatar: {
-        width: AVATAR,
-        height: AVATAR,
+    recentCard: {
+        flex: 1,
+        maxWidth: 96,
+        rowGap: 4,
+    },
+    recentSquare: {
+        aspectRatio: 1,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
     },
-    avatarImage: {
-        width: AVATAR,
-        height: AVATAR,
+    recentImage: {
+        width: '100%',
+        height: '100%',
     },
-    activeText: {
-        flex: 1,
-        rowGap: 2,
+    recentName: {
+        textAlign: 'center',
     },
 });

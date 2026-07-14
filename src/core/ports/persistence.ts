@@ -163,6 +163,10 @@ export interface CharacterRepository {
     delete(id: string): Promise<void>;
     setActive(id: string): Promise<void>;
     getActive(): Promise<Character | null>;
+    /** Record that a character was just opened (drives the Home "recent" list). */
+    markAccessed(id: string): Promise<void>;
+    /** Recently opened characters (falling back to recently updated), most-recent first. */
+    recent(limit?: number): Promise<CharacterSummary[]>;
 }
 
 /**

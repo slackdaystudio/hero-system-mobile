@@ -14,23 +14,21 @@
 
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
-import type {Character, CharacterRepository} from 'core/ports';
+import type {CharacterRepository, CharacterSummary} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
 import {HomeScreen, type HomeScreenProps} from '../HomeScreen';
 
-const activeCharacter: Character = {
+const summary = (over: Partial<CharacterSummary> = {}): CharacterSummary => ({
     id: 'c1',
     name: 'Defensor',
     player: 'Phil',
     edition: '6E',
-    isActive: true,
+    isActive: false,
     portraitUri: null,
-    filename: 'defensor.hsmc',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    document: {},
-};
+    ...over,
+});
 
 const collectText = (node: unknown): string[] => {
     if (node === null || node === undefined) {
@@ -47,14 +45,14 @@ const collectText = (node: unknown): string[] => {
 
 const callbacks = (): HomeScreenProps => ({
     onOpenCharacters: jest.fn(),
-    onOpenActiveCharacter: jest.fn(),
+    onOpenCharacter: jest.fn(),
     onOpenDice: jest.fn(),
     onOpenStatistics: jest.fn(),
     onOpenSettings: jest.fn(),
 });
 
-const render = async (active: Character | null, props: HomeScreenProps): Promise<ReactTestRenderer> => {
-    const repositories = {characters: {getActive: async () => active} as unknown as CharacterRepository} as unknown as Repositories;
+const render = async (recent: CharacterSummary[], props: HomeScreenProps): Promise<ReactTestRenderer> => {
+    const repositories = {characters: {recent: async () => recent} as unknown as CharacterRepository} as unknown as Repositories;
     let tree!: ReactTestRenderer;
     await act(async () => {
         tree = TestRenderer.create(
@@ -65,7 +63,7 @@ const render = async (active: Character | null, props: HomeScreenProps): Promise
             </ThemeProvider>,
         );
     });
-    await act(async () => {}); // flush the active-character load
+    await act(async () => {}); // flush the recent-characters load
     return tree;
 };
 
@@ -77,26 +75,26 @@ const press = async (tree: ReactTestRenderer, testID: string): Promise<void> => 
 };
 
 describe('HomeScreen', () => {
-    it('shows the active character and opens it when tapped', async () => {
+    it('shows recent characters and opens one when tapped', async () => {
         const props = callbacks();
-        const tree = await render(activeCharacter, props);
+        const tree = await render([summary({id: 'c1', name: 'Defensor'}), summary({id: 'c2', name: 'Grond'})], props);
 
         const text = collectText(tree.toJSON());
         expect(text).toContain('Defensor');
-        expect(text).toContain('6E · Phil');
+        expect(text).toContain('Grond');
 
-        await press(tree, 'active-character');
-        expect(props.onOpenActiveCharacter).toHaveBeenCalledWith('c1');
+        await press(tree, 'recent-c2');
+        expect(props.onOpenCharacter).toHaveBeenCalledWith('c2');
     });
 
-    it('shows an empty state when there is no active character', async () => {
-        const tree = await render(null, callbacks());
-        expect(collectText(tree.toJSON())).toContain('No active character');
+    it('shows an empty state when there are no characters', async () => {
+        const tree = await render([], callbacks());
+        expect(collectText(tree.toJSON())).toContain('No characters yet');
     });
 
     it('launches a dice roller in the chosen mode', async () => {
         const props = callbacks();
-        const tree = await render(null, props);
+        const tree = await render([], props);
 
         await press(tree, 'tile-Damage');
         expect(props.onOpenDice).toHaveBeenCalledWith('normal');
@@ -107,7 +105,7 @@ describe('HomeScreen', () => {
 
     it('navigates to the library and game tools', async () => {
         const props = callbacks();
-        const tree = await render(null, props);
+        const tree = await render([], props);
 
         await press(tree, 'tile-All Characters');
         await press(tree, 'tile-Statistics');

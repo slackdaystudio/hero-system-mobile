@@ -63,6 +63,8 @@ interface CharacterRepository {
     delete(id: string): Promise<void>;         // also deletes the portrait file
     setActive(id: string): Promise<void>;
     getActive(): Promise<Character | null>;
+    markAccessed(id: string): Promise<void>;       // stamps accessed_at (migration 004)
+    recent(limit?): Promise<CharacterSummary[]>;    // Home dashboard: last-opened, then last-updated
     // Slots were retired (migration 003): the library + active pointer replaced
     // the legacy slot loadout, which the removed character viewer used.
 }
@@ -110,6 +112,7 @@ characters(
   edition      TEXT NOT NULL,           -- '5E' | '6E', derived at import via isFifth()
   -- slot column existed in migration 001; retired in migration 003 (see below)
   is_active    INTEGER NOT NULL DEFAULT 0,
+  accessed_at  TEXT,                    -- last opened (migration 004); drives Home "recent"
   portrait_id  TEXT,                    -- ImageStore id, NULL if no portrait
   filename     TEXT,                    -- .hsmc export name
   data         TEXT NOT NULL,           -- full HD document JSON, portrait bytes stripped

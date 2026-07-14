@@ -84,6 +84,7 @@ const fakeCombatState = (): CombatStateRepository => {
 const fakeCharacters = (result: Character | null): CharacterRepository =>
     ({
         get: async () => result,
+        markAccessed: async () => undefined,
     } as unknown as CharacterRepository);
 
 const collectText = (node: unknown): string[] => {
@@ -285,6 +286,15 @@ describe('CharacterDetailScreen', () => {
 
         expect(onReady).toHaveBeenCalledTimes(1);
         expect(onReady.mock.calls[0][0].name).toBe('Grond');
+    });
+
+    it('marks the character accessed when the sheet opens (feeds the Home recent list)', async () => {
+        const markAccessed = jest.fn(async () => undefined);
+        const repo = {get: async () => character(), markAccessed} as unknown as CharacterRepository;
+
+        await renderScreen(repo);
+
+        expect(markAccessed).toHaveBeenCalledWith('c1');
     });
 
     it('shows a not-found state when the character is missing', async () => {
