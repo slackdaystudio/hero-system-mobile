@@ -19,6 +19,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
+import {useSettings} from 'app/providers/SettingsProvider';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {DiceScreen} from 'app/screens/DiceScreen';
@@ -43,6 +44,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator(): React.JSX.Element {
     const theme = useTheme();
+    const {settings} = useSettings();
 
     return (
         <SafeAreaProvider>
@@ -52,6 +54,8 @@ export function AppNavigator(): React.JSX.Element {
                         headerStyle: {backgroundColor: theme.colors.surface},
                         headerTintColor: theme.colors.text,
                         contentStyle: {backgroundColor: theme.colors.background},
+                        // Respect the reduce-motion preference: no push/pop transition when off.
+                        animation: settings.showAnimations ? 'default' : 'none',
                     }}>
                     <Stack.Screen
                         name="CharacterList"

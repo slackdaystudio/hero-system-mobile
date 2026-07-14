@@ -99,4 +99,19 @@ describe('SettingsScreen', () => {
 
         expect(observedBackground).toBe(lightTheme.colors.background);
     });
+
+    it('toggles screen animations and persists the choice', async () => {
+        const {repo, current} = fakeSettings();
+        const tree = await renderApp(repo);
+
+        const toggle = tree.root.findAllByProps({testID: 'toggle-animations'}).find((node) => typeof node.props.onValueChange === 'function');
+        expect(toggle?.props.value).toBe(true); // default on
+
+        await act(async () => {
+            toggle?.props.onValueChange(false);
+        });
+        await act(async () => {});
+
+        expect(current().showAnimations).toBe(false);
+    });
 });

@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, Switch, View} from 'react-native';
 import type {ColorScheme} from 'core/ports';
 import {Card, Screen, SegmentedControl, Text, type Segment} from 'app/components';
 import {useSettings} from 'app/providers/SettingsProvider';
+import {useTheme} from 'app/theme';
 
 const THEME_SEGMENTS: Segment[] = [
     {value: 'system', label: 'System'},
@@ -26,6 +27,7 @@ const THEME_SEGMENTS: Segment[] = [
 
 export function SettingsScreen(): React.JSX.Element {
     const {settings, update} = useSettings();
+    const theme = useTheme();
 
     return (
         <Screen>
@@ -45,6 +47,25 @@ export function SettingsScreen(): React.JSX.Element {
                         />
                     </View>
                 </Card>
+
+                <Card>
+                    <View style={styles.toggleRow}>
+                        <View style={styles.heading}>
+                            <Text variant="label">Screen animations</Text>
+                            <Text variant="caption" muted>
+                                Turn off to remove screen transitions.
+                            </Text>
+                        </View>
+                        <Switch
+                            testID="toggle-animations"
+                            value={settings.showAnimations}
+                            onValueChange={(value) => update('showAnimations', value)}
+                            trackColor={{false: theme.colors.surfaceAlt, true: theme.colors.primary}}
+                            thumbColor={theme.colors.onPrimary}
+                            ios_backgroundColor={theme.colors.surfaceAlt}
+                        />
+                    </View>
+                </Card>
             </View>
         </Screen>
     );
@@ -59,6 +80,12 @@ const styles = StyleSheet.create({
         rowGap: 12,
     },
     heading: {
+        flex: 1,
         rowGap: 4,
+    },
+    toggleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 16,
     },
 });
