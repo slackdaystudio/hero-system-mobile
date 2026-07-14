@@ -22,6 +22,11 @@ import {createOpSqliteDatabase} from 'infra/persistence/driver/opSqliteDatabase'
 import type {SqlDatabase} from 'infra/persistence/driver/sqlDatabase';
 import {createRepositories, type Repositories} from 'infra/persistence/repositories';
 import {asyncStorageKeyValue} from './asyncStorageKeyValue';
+import {plantDevLegacyData} from './devLegacyHarness';
+
+// DEV: set true to plant a fake legacy install (see devLegacyHarness) and watch
+// migrateV1 import it on launch. Leave false for normal behaviour.
+const SIMULATE_LEGACY_DATA = true;
 
 // A distinct runtime DB file. The legacy `hsm.db` is read only during migration
 // (its `settings`/`statistics` tables differ from ours and must not collide).
@@ -41,6 +46,10 @@ export async function createDeviceRepositories(): Promise<Repositories> {
     const imageStore = new FileImageStore(nativeFileSystem(), `${documentDirectoryPath()}/images`);
 
     const repositories = createRepositories(db, imageStore); // runs migrations
+
+    if (__DEV__ && SIMULATE_LEGACY_DATA) {
+        await plantDevLegacyData(db);
+    }
 
     // One-time import of legacy data (AsyncStorage + hsm.db + .hsmc). Guarded by
     // migrateV1's own migrated_v1 flag; a no-op on a device with no legacy data.
