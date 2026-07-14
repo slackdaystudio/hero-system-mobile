@@ -24,11 +24,17 @@
     coupling replaced with an injected `onUnrecognized` hook. Golden master (11 built-ins + 2
     unrecognized + 4 custom overlays) pins byte-identical output to legacy, including its quirks
     (case-sensitive characteristic removal, copied `remove` artifact, ignored `mainapp`). 697 tests green.
-  - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk) *(next)* —
-    scoped in [`docs/HERO_TRAITS_SLICE.md`](docs/HERO_TRAITS_SLICE.md): build order
-    (`core/util` + constants → `hero/` model → `traits/` decorators in tiers), the
-    coupling to untangle (import cycle, untyped trait bag), and the golden-master plan.
-    Blocked on a diverse `.hdc` fixture set (5E/6E × genres × frameworks).
+  - [ ] `hero/` + `traits/` — character model + the 79 decorators (the bulk) *(in progress)* —
+    scoped in [`docs/HERO_TRAITS_SLICE.md`](docs/HERO_TRAITS_SLICE.md).
+    - [x] **golden-master corpus** — 37 real `.hdc` characters, sanitized (PII stripped,
+      secret identities → John/Jane Smith, portraits → picsum placeholders), committed under
+      `fixtures/characters/`; parsed into JSON fixtures at `src/core/hero/__tests__/fixtures/`.
+    - [x] **sub-phase 1 — `core/util` + constants** — the pure half of `Common` ported to
+      `core/util` (`change-case` pinned 5.4.4), and `core/hero/constants.ts` breaking the
+      `HeroDesignerCharacter ⇄ decorators` import cycle.
+    - [ ] **sub-phase 2 — `core/hero` character model** — `getCharacter` normalize/populate
+      pipeline + characteristic/defense/roll calcs, golden-mastered vs legacy over the fixtures *(next)*
+    - [ ] **sub-phase 3 — `core/traits`** — the 79 decorators, in complexity tiers
   - [ ] `combat/` + `random/`
 - [ ] **Phase 2 — Ports + infra adapters** — persistence design is specced in
   [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md): SQLite (op-sqlite) as the runtime source
