@@ -13,9 +13,34 @@
 // limitations under the License.
 
 import {type CharacterTrait} from '../characterTrait';
+import TraitWithSkillRoll from '../traitWithSkillRoll';
+import Contact from './contact';
+import FollowerAndBase from './followerAndBase';
+import ResourcePoints from './resourcePoints';
 
-// STUB — the perk sub-factory (Contact, FollowerAndBase, ResourcePoints, …) is
-// ported in tier 2. Pass-through for now.
-export const perkDecorator = {
-    decorate: (decorated: CharacterTrait): CharacterTrait => decorated,
-};
+/** Perk sub-factory, ported from legacy `decorators/perks/PerkDecorator.js`. */
+class PerkDecorator {
+    decorate(decorated: CharacterTrait): CharacterTrait {
+        switch (decorated.trait.xmlid.toUpperCase()) {
+            case 'FOLLOWER':
+            case 'VEHICLE_BASE':
+                decorated = new FollowerAndBase(decorated);
+                break;
+            case 'CONTACT':
+                decorated = new Contact(decorated);
+                break;
+            case 'RESOURCE_POOL':
+                decorated = new ResourcePoints(decorated);
+                break;
+            case 'CUSTOMPERK':
+                decorated = new TraitWithSkillRoll(decorated);
+                break;
+            default:
+            // do nothing
+        }
+
+        return decorated;
+    }
+}
+
+export const perkDecorator = new PerkDecorator();

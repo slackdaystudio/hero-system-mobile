@@ -13,19 +13,17 @@
 // limitations under the License.
 
 /**
- * Golden master for the decorator cost engine (sub-phase 3, tier 1), scoped to
- * the trait category it fully covers: **disadvantages** (base → Complication →
- * ModifierCalculator, no sub-factory). Each character is built via the legacy
- * engine, then every disadvantage is decorated by both the legacy and the ported
- * factory and their cost/activeCost/realCost/roll compared. Later tiers extend
- * this to skills/perks/talents/powers.
+ * Golden master for the trait-decorator stack: the ported `core/traits` factory
+ * must reproduce the legacy factory's cost/activeCost/realCost/roll for every
+ * trait it decorates. Grows one trait category at a time as its decorators land
+ * (tier 1: disadvantages; tier 2: + perks, talents; tier 3: + skills, powers,
+ * martial arts).
  */
 import manifest from '../../hero/__tests__/fixtures/manifest.json';
 import {characterTraitDecorator as core} from 'core/traits';
 import {flatten} from 'core/util';
 
-// react-native/toast via moduleNameMapper; App/Statistics stubbed here (see the
-// hero golden master for the rationale).
+// react-native/toast via moduleNameMapper; App/Statistics stubbed here.
 jest.mock('../../../../../hero-system-mobile/App', () => ({getRandomNumber: () => 1}));
 jest.mock('../../../../../hero-system-mobile/src/lib/Statistics', () => ({statistics: {add: () => Promise.resolve()}}));
 
@@ -37,7 +35,15 @@ const legacyDecorator = (require('../../../../../hero-system-mobile/src/decorato
 const fixtures = manifest.map((entry) => entry.fixture).sort();
 const clone = (name: string): any => JSON.parse(JSON.stringify(require(`../../hero/__tests__/fixtures/${name}.json`)));
 
-describe('golden master: core/traits decorator (disadvantages) reproduces legacy', () => {
+// Ported trait categories. `key` is the character array; `subKey` is the child
+// key list containers store their members under (for flatten).
+const CATEGORIES: Array<{key: string; subKey: string}> = [
+    {key: 'disadvantages', subKey: 'disadvantages'},
+    {key: 'perks', subKey: 'perks'},
+    {key: 'talents', subKey: 'talents'},
+];
+
+describe('golden master: core/traits factory reproduces legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
     });
@@ -45,12 +51,11 @@ describe('golden master: core/traits decorator (disadvantages) reproduces legacy
     describe.each(fixtures)('%s', (name) => {
         const character = legacyModel.getCharacter(clone(name));
         const getCharacter = () => character;
-        const disadvantages = flatten(character.disadvantages, 'disadvantages');
 
-        it(`decorates ${disadvantages.length} disadvantage(s) identically`, () => {
-            for (const disadvantage of disadvantages) {
-                const legacy = legacyDecorator.decorate(disadvantage, 'disadvantages', getCharacter);
-                const ported = core.decorate(disadvantage, 'disadvantages', getCharacter);
+        it.each(CATEGORIES)('$key decorated identically', ({key, subKey}) => {
+            for (const trait of flatten(character[key], subKey)) {
+                const legacy = legacyDecorator.decorate(trait, key, getCharacter);
+                const ported = core.decorate(trait, key, getCharacter);
 
                 expect(ported.cost()).toBe(legacy.cost());
                 expect(ported.activeCost()).toBe(legacy.activeCost());

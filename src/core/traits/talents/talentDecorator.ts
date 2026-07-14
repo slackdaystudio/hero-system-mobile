@@ -13,9 +13,39 @@
 // limitations under the License.
 
 import {type CharacterTrait} from '../characterTrait';
+import TraitWithSkillRoll from '../traitWithSkillRoll';
+import TwelveOrLessRoll from '../twelveOrLessRoll';
+import CombatSense from './combatSense';
+import LightningReflexes from './lightningReflexes';
+import StrikingAppearance from './strikingAppearance';
 
-// STUB — the talent sub-factory (CombatSense, LightningReflexes, TwelveOrLessRoll,
-// …) is ported in tier 2. Pass-through for now.
-export const talentDecorator = {
-    decorate: (decorated: CharacterTrait): CharacterTrait => decorated,
-};
+/** Talent sub-factory, ported from legacy `decorators/talents/TalentDecorator.js`. */
+class TalentDecorator {
+    decorate(decorated: CharacterTrait): CharacterTrait {
+        switch (decorated.trait.xmlid.toUpperCase()) {
+            case 'COMBAT_SENSE':
+                decorated = new CombatSense(decorated);
+                decorated = new TwelveOrLessRoll(decorated);
+                break;
+            case 'DANGER_SENSE':
+            case 'UNIVERSAL_TRANSLATOR':
+                decorated = new TwelveOrLessRoll(decorated);
+                break;
+            case 'LIGHTNING_REFLEXES_ALL':
+                decorated = new LightningReflexes(decorated);
+                break;
+            case 'STRIKING_APPEARANCE':
+                decorated = new StrikingAppearance(decorated);
+                break;
+            case 'CUSTOMTALENT':
+                decorated = new TraitWithSkillRoll(decorated);
+                break;
+            default:
+            // do nothing
+        }
+
+        return decorated;
+    }
+}
+
+export const talentDecorator = new TalentDecorator();
