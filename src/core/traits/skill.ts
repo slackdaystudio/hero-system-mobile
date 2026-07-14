@@ -12,8 +12,82 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {hasOwn, type RollDescriptor} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
-// STUB — the base skill cost engine is ported in tier 2 (skills). Pass-through for
-// now; only reached by skill traits, which the disad golden master does not cover.
-export default class Skill extends TraitDecorator {}
+/**
+ * Base of all skills, ported from legacy `decorators/Skill.js`: cost by
+ * characteristic / familiarity / proficiency / language / custom, plus the
+ * skill-specific label.
+ */
+export default class Skill extends TraitDecorator {
+    cost(): number {
+        let cost = this.characterTrait.cost();
+        const trait = this.characterTrait.trait;
+
+        if (trait.type === 'list') {
+            return cost;
+        }
+
+        if (trait.xmlid.toUpperCase() === 'CRAMMING') {
+            cost = trait.basecost;
+        } else if (trait.xmlid.toUpperCase() === 'CUSTOMSKILL') {
+            cost = trait.basecost + trait.levels * trait.template.lvlcost;
+        } else if (trait.proficiency) {
+            cost = 2;
+        } else if (trait.familiarity || trait.everyman || trait.nativeTongue) {
+            cost = trait.familiarity ? 1 : 0;
+        } else if (trait.xmlid.toUpperCase() === 'LANGUAGES') {
+            for (const option of trait.template.option) {
+                if (option.xmlid.toUpperCase() === trait.optionid.toUpperCase()) {
+                    cost = option.basecost;
+                    break;
+                }
+            }
+        } else if (hasOwn(trait, 'characteristic')) {
+            cost = this.getCostByCharacteristic();
+        }
+
+        return cost;
+    }
+
+    activeCost(): number {
+        return this.cost();
+    }
+
+    realCost(): number {
+        return this.cost();
+    }
+
+    label(): string {
+        const name = this.trait.name === null || this.trait.name === '' ? '' : this.trait.name;
+        const label = this.trait.name === null || this.trait.name === '' ? this.trait.alias : ` (${this.trait.alias})`;
+        const input = this.trait.input === null || this.trait.input === undefined ? '' : `: ${this.trait.input}`;
+
+        return `${name}${label}${input}`;
+    }
+
+    roll(): RollDescriptor | null {
+        return this.characterTrait.trait.roll;
+    }
+
+    private getCostByCharacteristic(): number {
+        let basecost = 0;
+        let skillLevelCost = 0;
+        const trait = this.characterTrait.trait;
+
+        if (Array.isArray(trait.template.characteristicChoice.item)) {
+            for (const item of trait.template.characteristicChoice.item) {
+                if (item.characteristic.toLowerCase() === trait.characteristic.toLowerCase()) {
+                    basecost = item.basecost;
+                    skillLevelCost = item.lvlcost;
+                }
+            }
+        } else {
+            basecost = trait.template.characteristicChoice.item.basecost;
+            skillLevelCost = trait.template.characteristicChoice.item.lvlcost;
+        }
+
+        return basecost + trait.levels * skillLevelCost;
+    }
+}

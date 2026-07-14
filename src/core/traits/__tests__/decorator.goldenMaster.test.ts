@@ -41,6 +41,7 @@ const CATEGORIES: Array<{key: string; subKey: string}> = [
     {key: 'disadvantages', subKey: 'disadvantages'},
     {key: 'perks', subKey: 'perks'},
     {key: 'talents', subKey: 'talents'},
+    {key: 'skills', subKey: 'skills'},
 ];
 
 describe('golden master: core/traits factory reproduces legacy', () => {
