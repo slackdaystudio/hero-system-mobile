@@ -34,27 +34,19 @@ import {seededRng} from './support/seededRng';
 // per scenario. Named `mock*` so jest's factory-hoist allows the reference.
 let mockRng: Rng;
 
-jest.mock(
-    '../../../../../hero-system-mobile/App',
-    () => ({
-        getRandomNumber: (min: number, max: number, rolls = 1): number | number[] => {
-            const out: number[] = [];
-            for (let i = 0; i < rolls; i++) {
-                out.push(mockRng.next(min, max));
-            }
-            return out.length === 1 ? out[0] : out;
-        },
-    }),
-    {virtual: true},
-);
+jest.mock('../../../../../hero-system-mobile/App', () => ({
+    getRandomNumber: (min: number, max: number, rolls = 1): number | number[] => {
+        const out: number[] = [];
+        for (let i = 0; i < rolls; i++) {
+            out.push(mockRng.next(min, max));
+        }
+        return out.length === 1 ? out[0] : out;
+    },
+}));
 
-jest.mock(
-    '../../../../../hero-system-mobile/src/lib/Statistics',
-    () => ({
-        statistics: {add: () => Promise.resolve()},
-    }),
-    {virtual: true},
-);
+jest.mock('../../../../../hero-system-mobile/src/lib/Statistics', () => ({
+    statistics: {add: () => Promise.resolve()},
+}));
 
 const legacy = require('../../../../../hero-system-mobile/src/lib/DieRoller') as {
     dieRoller: {

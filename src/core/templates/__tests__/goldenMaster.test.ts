@@ -25,11 +25,7 @@
 import {getTemplate} from 'core/templates';
 import type {HeroDesignerTemplateData, TemplateInput} from 'core/templates';
 
-jest.mock(
-    '../../../../../hero-system-mobile/src/lib/Common',
-    () => ({common: {toast: () => {}}}),
-    {virtual: true},
-);
+jest.mock('../../../../../hero-system-mobile/src/lib/Common', () => ({common: {toast: () => {}}}));
 
 const legacy = require('../../../../../hero-system-mobile/src/lib/HeroDesignerTemplate') as {
     heroDesignerTemplate: {getTemplate(template: TemplateInput): HeroDesignerTemplateData};

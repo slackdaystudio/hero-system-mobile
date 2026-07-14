@@ -23,6 +23,15 @@ module.exports = {
             // change-case is ESM-only; let babel transpile it (everything else in
             // node_modules stays ignored).
             transformIgnorePatterns: ['/node_modules/(?!change-case/)'],
+            // The golden-master oracle loads the legacy engine, which imports
+            // react-native (Dimensions/Platform) and the toast module. Map those to
+            // pure-node stubs project-wide — deterministic across files, unlike a
+            // per-test virtual jest.mock of a bare specifier that resolves into the
+            // sibling worktree.
+            moduleNameMapper: {
+                '^react-native$': '<rootDir>/test/stubs/react-native.js',
+                '^react-native-toast-message$': '<rootDir>/test/stubs/react-native-toast-message.js',
+            },
         },
         {
             displayName: 'app',
