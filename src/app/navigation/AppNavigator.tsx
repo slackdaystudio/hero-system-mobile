@@ -13,11 +13,14 @@
 // limitations under the License.
 
 import React from 'react';
+import {Pressable} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Text} from 'app/components';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
+import {DiceScreen} from 'app/screens/DiceScreen';
 import {useTheme} from 'app/theme';
 
 /**
@@ -28,6 +31,7 @@ import {useTheme} from 'app/theme';
 export type RootStackParamList = {
     CharacterList: undefined;
     CharacterDetail: {id: string};
+    Dice: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -44,13 +48,29 @@ export function AppNavigator(): React.JSX.Element {
                         headerTintColor: theme.colors.text,
                         contentStyle: {backgroundColor: theme.colors.background},
                     }}>
-                    <Stack.Screen name="CharacterList" options={{title: 'Characters'}}>
+                    <Stack.Screen
+                        name="CharacterList"
+                        options={({navigation}) => ({
+                            title: 'Characters',
+                            // headerRight is a react-navigation render prop, not a nested component definition.
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            headerRight: () => (
+                                <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Dice')}>
+                                    <Text variant="label" color={theme.colors.primary}>
+                                        Dice
+                                    </Text>
+                                </Pressable>
+                            ),
+                        })}>
                         {({navigation}) => <CharacterListScreen onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />}
                     </Stack.Screen>
                     <Stack.Screen name="CharacterDetail" options={{title: ''}}>
                         {({route, navigation}) => (
                             <CharacterDetailScreen characterId={route.params.id} onReady={(character) => navigation.setOptions({title: character.name})} />
                         )}
+                    </Stack.Screen>
+                    <Stack.Screen name="Dice" options={{title: 'Dice Roller'}}>
+                        {() => <DiceScreen />}
                     </Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>

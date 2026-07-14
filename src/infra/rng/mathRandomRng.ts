@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {Text, type TextProps, type TextVariant} from './Text';
-export {Screen, type ScreenProps} from './Screen';
-export {Card, type CardProps} from './Card';
-export {ListRow, type ListRowProps} from './ListRow';
-export {Button, type ButtonProps} from './Button';
-export {NumberField, type NumberFieldProps} from './NumberField';
-export {SegmentedControl, type Segment, type SegmentedControlProps} from './SegmentedControl';
+import type {Rng} from 'core/ports';
+
+/**
+ * {@link Rng} over `Math.random` — Hermes backs it with a quality uniform PRNG,
+ * which is more than adequate for dice. Matches the legacy roller's default
+ * (non-"increaseEntropy") branch exactly. The dice math itself is golden-mastered
+ * in core against a seeded fake generator, so this adapter stays trivial.
+ */
+export const mathRandomRng = (): Rng => ({
+    next: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+});

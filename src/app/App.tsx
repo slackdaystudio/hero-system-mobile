@@ -17,6 +17,7 @@ import {ActivityIndicator, StyleSheet} from 'react-native';
 import {Screen, Text} from 'app/components';
 import {createDeviceRepositories} from 'app/composition/deviceRepositories';
 import {AppNavigator} from 'app/navigation/AppNavigator';
+import {DiceProvider} from 'app/providers/DiceProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
 import type {Repositories} from 'infra/persistence/repositories';
@@ -55,7 +56,9 @@ function App(): React.JSX.Element {
         <ThemeProvider>
             {boot.status === 'ready' ? (
                 <RepositoriesProvider repositories={boot.repositories}>
-                    <AppNavigator />
+                    <DiceProvider>
+                        <AppNavigator />
+                    </DiceProvider>
                 </RepositoriesProvider>
             ) : (
                 <Screen style={styles.centered}>
