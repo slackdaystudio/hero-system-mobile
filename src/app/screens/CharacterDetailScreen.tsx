@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ActivityIndicator, Image, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
 import type {Character} from 'core/ports';
 import {Card, Screen, Text} from 'app/components';
 import {useCharacterRepository} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
+import {asHeroCharacter, buildCharacterSheet, type CharacterSheet, type SheetCharacteristic, type SheetTrait} from './characterSheet';
 
 type LoadState = {status: 'loading'} | {status: 'ready'; character: Character} | {status: 'not-found'} | {status: 'error'; message: string};
 
@@ -27,19 +28,6 @@ export interface CharacterDetailScreenProps {
     onReady?: (character: Character) => void;
 }
 
-const asObjects = (value: unknown): Array<Record<string, unknown>> =>
-    Array.isArray(value) ? value.filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null) : [];
-
-const firstString = (item: Record<string, unknown>, keys: string[]): string => {
-    for (const key of keys) {
-        const value = item[key];
-        if (typeof value === 'string' && value.length > 0) {
-            return value;
-        }
-    }
-    return '—';
-};
-
 const AVATAR = 96;
 
 export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScreenProps): React.JSX.Element {
@@ -47,8 +35,6 @@ export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScr
     const theme = useTheme();
     const [state, setState] = useState<LoadState>({status: 'loading'});
 
-    // Keep the latest onReady without making `load` depend on its identity (the
-    // navigator passes a fresh closure each render).
     const onReadyRef = useRef(onReady);
     onReadyRef.current = onReady;
 
@@ -69,6 +55,16 @@ export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScr
     useEffect(() => {
         load();
     }, [load]);
+
+    // Decorate the whole sheet once per character (engine work), not per render.
+    const character = state.status === 'ready' ? state.character : null;
+    const sheet = useMemo<CharacterSheet | null>(() => {
+        if (character === null) {
+            return null;
+        }
+        const hero = asHeroCharacter(character.document);
+        return hero === null ? null : buildCharacterSheet(hero);
+    }, [character]);
 
     if (state.status === 'loading') {
         return (
@@ -94,10 +90,7 @@ export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScr
         );
     }
 
-    const {character} = state;
-    const powers = asObjects(character.document.powers);
-    const characteristics = asObjects(character.document.characteristics);
-
+    const loaded = state.character;
     const avatarStyle: ViewStyle = {backgroundColor: theme.colors.surfaceAlt, borderRadius: theme.radius.md};
     const content: ViewStyle = {padding: theme.spacing(4), rowGap: theme.spacing(4)};
 
@@ -106,20 +99,20 @@ export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScr
             <ScrollView contentContainerStyle={content}>
                 <View style={styles.header}>
                     <View style={[styles.avatar, avatarStyle]}>
-                        {character.portraitUri ? (
-                            <Image testID="portrait" source={{uri: character.portraitUri}} style={styles.avatarImage} />
+                        {loaded.portraitUri ? (
+                            <Image testID="portrait" source={{uri: loaded.portraitUri}} style={styles.avatarImage} />
                         ) : (
                             <Text variant="title" muted>
-                                {(character.name.trim()[0] ?? '?').toUpperCase()}
+                                {(loaded.name.trim()[0] ?? '?').toUpperCase()}
                             </Text>
                         )}
                     </View>
                     <View style={styles.headerText}>
-                        <Text variant="title">{character.name}</Text>
+                        <Text variant="title">{loaded.name}</Text>
                         <Text variant="caption" muted>
-                            {character.player ? `${character.edition} · ${character.player}` : character.edition}
+                            {loaded.player ? `${loaded.edition} · ${loaded.player}` : loaded.edition}
                         </Text>
-                        {character.isActive ? (
+                        {loaded.isActive ? (
                             <Text variant="caption" color={theme.colors.active}>
                                 Active
                             </Text>
@@ -127,29 +120,102 @@ export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScr
                     </View>
                 </View>
 
-                <Section title="Details">
-                    <Row label="Edition" value={character.edition} />
-                    <Row label="Slot" value={character.slot === null ? 'Unassigned' : `Slot ${character.slot + 1}`} />
-                    <Row label="File" value={character.filename ?? '—'} />
-                </Section>
-
-                {characteristics.length > 0 ? (
-                    <Section title="Characteristics">
-                        {characteristics.map((item, index) => (
-                            <Row key={index} label={firstString(item, ['name', 'xmlid'])} value={typeof item.value === 'number' ? String(item.value) : firstString(item, ['value'])} />
-                        ))}
-                    </Section>
-                ) : null}
-
-                {powers.length > 0 ? (
-                    <Section title="Powers">
-                        {powers.map((item, index) => (
-                            <Text key={index}>{firstString(item, ['name', 'alias', 'xmlid'])}</Text>
-                        ))}
-                    </Section>
-                ) : null}
+                {sheet !== null ? <SheetBody sheet={sheet} /> : <BasicBody character={loaded} />}
             </ScrollView>
         </Screen>
+    );
+}
+
+function SheetBody({sheet}: {sheet: CharacterSheet}): React.JSX.Element {
+    return (
+        <>
+            <Section title="Characteristics">
+                {sheet.characteristics.map((characteristic, index) => (
+                    <CharacteristicRow key={index} characteristic={characteristic} />
+                ))}
+            </Section>
+            {sheet.sections.map((section) => (
+                <Section key={section.title} title={section.title}>
+                    {section.traits.map((trait, index) => (
+                        <TraitRow key={index} trait={trait} />
+                    ))}
+                </Section>
+            ))}
+        </>
+    );
+}
+
+function CharacteristicRow({characteristic}: {characteristic: SheetCharacteristic}): React.JSX.Element {
+    return (
+        <View style={styles.charRow}>
+            <Text style={styles.charName}>{characteristic.name}</Text>
+            <Text style={styles.charTotal}>{String(characteristic.total)}</Text>
+            <Text variant="caption" muted style={styles.charRoll}>
+                {characteristic.roll ?? ''}
+            </Text>
+            <Text variant="caption" muted style={styles.charCost}>
+                {`${characteristic.cost}`}
+            </Text>
+        </View>
+    );
+}
+
+function TraitRow({trait}: {trait: SheetTrait}): React.JSX.Element {
+    const theme = useTheme();
+    const indent: ViewStyle = {paddingLeft: trait.depth * 16};
+
+    return (
+        <View style={[styles.trait, indent]}>
+            <View style={styles.traitHead}>
+                <Text style={styles.traitLabel}>{trait.label}</Text>
+                {trait.roll !== null ? (
+                    <Text variant="caption" color={theme.colors.primary}>
+                        {trait.roll.roll}
+                    </Text>
+                ) : null}
+                <Text variant="caption" muted style={styles.traitCost}>
+                    {`${trait.realCost}`}
+                </Text>
+            </View>
+            {trait.definition.length > 0 ? (
+                <Text variant="caption" muted>
+                    {trait.definition}
+                </Text>
+            ) : null}
+        </View>
+    );
+}
+
+const asObjects = (value: unknown): Array<Record<string, unknown>> =>
+    Array.isArray(value) ? value.filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null) : [];
+
+/** Fallback for thin/legacy documents that aren't a processed HeroDesigner character. */
+function BasicBody({character}: {character: Character}): React.JSX.Element {
+    const characteristics = asObjects(character.document.characteristics);
+    const powers = asObjects(character.document.powers);
+
+    return (
+        <>
+            <Section title="Details">
+                <Row label="Edition" value={character.edition} />
+                <Row label="Slot" value={character.slot === null ? 'Unassigned' : `Slot ${character.slot + 1}`} />
+                <Row label="File" value={character.filename ?? '—'} />
+            </Section>
+            {characteristics.length > 0 ? (
+                <Section title="Characteristics">
+                    {characteristics.map((entry, index) => (
+                        <Row key={index} label={String(entry.name ?? entry.shortName ?? entry.xmlid ?? '?')} value={entry.value === undefined ? '—' : String(entry.value)} />
+                    ))}
+                </Section>
+            ) : null}
+            {powers.length > 0 ? (
+                <Section title="Powers">
+                    {powers.map((power, index) => (
+                        <Text key={index}>{String(power.name ?? power.alias ?? power.xmlid ?? 'Power')}</Text>
+                    ))}
+                </Section>
+            ) : null}
+        </>
     );
 }
 
@@ -205,5 +271,42 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 4,
+    },
+    charRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 3,
+        columnGap: 8,
+    },
+    charName: {
+        flex: 1,
+    },
+    charTotal: {
+        width: 44,
+        textAlign: 'right',
+        fontWeight: '600',
+    },
+    charRoll: {
+        width: 44,
+        textAlign: 'right',
+    },
+    charCost: {
+        width: 40,
+        textAlign: 'right',
+    },
+    trait: {
+        paddingVertical: 5,
+    },
+    traitHead: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 10,
+    },
+    traitLabel: {
+        flex: 1,
+    },
+    traitCost: {
+        width: 44,
+        textAlign: 'right',
     },
 });

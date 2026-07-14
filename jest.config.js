@@ -44,6 +44,9 @@ module.exports = {
             displayName: 'app',
             preset: 'react-native',
             testMatch: ['<rootDir>/src/app/**/*.test.{ts,tsx}'],
+            // Keep the RN preset's transforms but also transpile the ESM-only
+            // change-case (pulled in transitively by core/hero via core/util).
+            transformIgnorePatterns: ['node_modules/(?!((jest-)?react-native|@react-native(-community)?|@react-navigation/.*|react-native-.*|@react-native-async-storage/.*|change-case)/)'],
         },
     ],
 };

@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
+import type {CharacterDocument} from 'core/ports';
 import {FileImageStore} from 'infra/files/fileImageStore';
 import {base64ToBytes} from 'infra/files/base64';
+import sampleCharacter from './sampleCharacter.json';
 import {documentDirectoryPath, nativeFileSystem} from 'infra/files/nativeFileSystem';
 import {fflateUnzip} from 'infra/migration/fflateUnzip';
 import {createLegacySource} from 'infra/migration/legacySourceImpl';
@@ -105,24 +108,22 @@ async function sweepOrphanedPortraits(repositories: Repositories, imageStore: Fi
 }
 
 async function seedDemoCharacters(repositories: Repositories): Promise<void> {
+    // A real HeroDesigner character (run through the engine) so the detail screen
+    // shows a full sheet — characteristics, rolls, decorated powers/skills.
+    const document = heroDesignerCharacter.getCharacter(sampleCharacter as unknown as ParsedCharacter) as unknown as CharacterDocument;
+    const info = (document.characterInfo ?? {}) as {characterName?: string; playerName?: string};
     await repositories.characters.save({
-        id: 'demo-defensor',
-        name: 'Defensor',
-        player: 'Phil',
-        edition: '6E',
+        id: 'sample-hero',
+        name: info.characterName ?? 'Sample Hero',
+        player: info.playerName ?? null,
+        edition: heroDesignerCharacter.isFifth(document) ? '5E' : '6E',
         slot: 0,
-        filename: 'defensor.hsmc',
-        document: {
-            characterInfo: {characterName: 'Defensor'},
-            characteristics: [
-                {name: 'STR', value: 20},
-                {name: 'DEX', value: 18},
-                {name: 'CON', value: 23},
-            ],
-            powers: [{name: 'Force Field', xmlid: 'FORCEFIELD'}, {name: 'Flight', xmlid: 'FLIGHT'}],
-        },
+        filename: 'sample.hsmc',
+        document,
         portrait: {bytes: base64ToBytes(DEMO_PORTRAIT_PNG), mime: 'image/png'},
     });
+
+    // A thin document to exercise the basic-info fallback path.
     await repositories.characters.save({
         id: 'demo-grond',
         name: 'Grond',
@@ -139,5 +140,5 @@ async function seedDemoCharacters(repositories: Repositories): Promise<void> {
             powers: [{name: 'Rampage', xmlid: 'CUSTOMPOWER'}],
         },
     });
-    await repositories.characters.setActive('demo-defensor');
+    await repositories.characters.setActive('sample-hero');
 }

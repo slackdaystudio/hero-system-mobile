@@ -14,10 +14,12 @@
 
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
+import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
 import type {Character, CharacterRepository} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
+import sample from '../../composition/sampleCharacter.json';
 import {CharacterDetailScreen, type CharacterDetailScreenProps} from '../CharacterDetailScreen';
 
 const character = (over: Partial<Character> = {}): Character => ({
@@ -75,18 +77,28 @@ const renderScreen = async (repo: CharacterRepository, props: Partial<CharacterD
 };
 
 describe('CharacterDetailScreen', () => {
-    it('renders the header, details, characteristics and powers from the parsed document', async () => {
+    it('falls back to basic info for a thin/legacy document', async () => {
         const tree = await renderScreen(fakeCharacters(character()));
 
         const text = collectText(tree.toJSON());
         expect(text).toContain('Defensor');
         expect(text).toContain('6E · Phil');
         expect(text).toContain('Active');
-        expect(text).toContain('defensor.hsmc');
+        expect(text).toContain('defensor.hsmc'); // File row (basic-body only)
         expect(text).toContain('Slot 1'); // slot 0 shown 1-indexed
         expect(text).toContain('STR');
         expect(text).toContain('20');
         expect(text).toContain('Force Field');
+    });
+
+    it('renders the full engine sheet for a processed HeroDesigner document', async () => {
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({document})));
+
+        const text = collectText(tree.toJSON());
+        expect(text).toContain('Strength'); // real characteristic name from the engine
+        expect(text.some((value) => /^\d+-$/.test(value))).toBe(true); // a roll like "13-"
+        expect(text).not.toContain('File'); // full sheet, not the basic-body fallback
     });
 
     it('calls onReady with the loaded character (for the header title)', async () => {
