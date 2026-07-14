@@ -49,7 +49,10 @@
       along the way are catalogued in [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md)
       and fixed afterward as isolated commits (each: fix + correctness test + golden-master
       re-base). Notably H3: duplicate defenses (e.g. two Force Fields) currently total zero.
-  - [ ] `combat/` — `CombatDetails` math
+  - [x] **`combat/`** *(done)* — `CombatDetails` ported (combat values + per-SPEED phase
+    chart, 5E/6E, primary/secondary; `sync` preserves phase state). Golden-mastered over
+    all 37 fixtures. **Phase 1 core domain port is complete** — the entire HERO System rules
+    engine (dice, templates, util, hero, traits, combat) is ported and golden-mastered.
   - [ ] ~~`random/` — `RandomCharacter`~~ **dropped from the port.** The current random
     character creator is being reimagined (bigger ambitions), so it is *not* ported
     as-is; it'll be designed fresh later rather than carried over. (`RandomCharacter.js`
