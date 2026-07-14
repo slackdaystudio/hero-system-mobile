@@ -6,6 +6,11 @@
  * in both projects.
  */
 module.exports = {
+    // The golden-master suites load the real legacy engine, whose `Common` pulls in
+    // the ESM-only `change-case`. Transpiling that across parallel jest workers races
+    // the transform cache and intermittently fails a sibling suite; serial execution
+    // is deterministic and these suites run in ~1s. Revisit if the suite grows large.
+    maxWorkers: 1,
     projects: [
         {
             displayName: 'core',
