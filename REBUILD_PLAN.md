@@ -49,7 +49,11 @@
       along the way are catalogued in [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md)
       and fixed afterward as isolated commits (each: fix + correctness test + golden-master
       re-base). Notably H3: duplicate defenses (e.g. two Force Fields) currently total zero.
-  - [ ] `combat/` + `random/`
+  - [ ] `combat/` — `CombatDetails` math
+  - [ ] ~~`random/` — `RandomCharacter`~~ **dropped from the port.** The current random
+    character creator is being reimagined (bigger ambitions), so it is *not* ported
+    as-is; it'll be designed fresh later rather than carried over. (`RandomCharacter.js`
+    stays available in the legacy tree for reference.)
 - [ ] **Phase 2 — Ports + infra adapters** — persistence design is specced in
   [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md): SQLite (op-sqlite) as the runtime source
   of truth, portraits as files on disk, `.hsmc` demoted to export-only, `loadout` dropped,
@@ -99,7 +103,6 @@ src/
     templates/          # <- HeroDesignerTemplate
     traits/             # <- the 79 decorators (CharacterTrait + decorators tree)
     combat/             # <- CombatDetails
-    random/             # <- RandomCharacter
     util/               # <- pure half of Common
     data/               # <- public/*.json (HERO rules), imported statically
     ports/              # interfaces: Rng, StatisticsSink, Clock, ...
@@ -142,8 +145,10 @@ src/
 - `HeroDesignerCharacter.js` (character model + parsing)
 - `HeroDesignerTemplate.js` (rules-template mapping)
 - `CombatDetails.js` (combat math)
-- `RandomCharacter.js` (pure, consumes `public/templates/*.json`)
 - All `public/*.json` rules data
+
+> **Not ported:** `RandomCharacter.js` (the random character creator) is being
+> reimagined rather than carried over — see the Progress notes. Dropped from the port.
 
 **Tier 2 — port with decoupling:**
 - `DieRoller.js` — dice math is gold; inject `Rng`, emit results instead of writing stats
@@ -231,7 +236,7 @@ Order chosen so each layer builds on tested foundations:
 1. `dice/` — most self-contained, most testable; establishes the golden-master harness
 2. `templates/` — data mapping over `public/HERODesigner/*.json`
 3. `hero/` + `traits/` — the character model and the 79 decorators (the bulk of the work)
-4. `combat/` + `random/`
+4. `combat/` — combat math (`RandomCharacter` dropped; being reimagined)
 Each with golden-master + unit tests before moving on.
 
 ### Phase 2 — Ports + infra adapters
