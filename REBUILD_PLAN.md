@@ -39,6 +39,11 @@
       byte-identical; query methods across both showSecondary settings). Legacy engine
       loaded in pure node via react-native/toast stubs + App/Statistics mocks.
     - [ ] **sub-phase 3 — `core/traits`** — the 79 decorators, in complexity tiers *(next)*
+    - [ ] **correctness pass** *(deferred, after sub-phase 3)* — the port is faithful
+      bug-for-bug so the golden masters can assert parity; the legacy quirks/bugs found
+      along the way are catalogued in [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md)
+      and fixed afterward as isolated commits (each: fix + correctness test + golden-master
+      re-base). Notably H3: duplicate defenses (e.g. two Force Fields) currently total zero.
   - [ ] `combat/` + `random/`
 - [ ] **Phase 2 — Ports + infra adapters** — persistence design is specced in
   [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md): SQLite (op-sqlite) as the runtime source
