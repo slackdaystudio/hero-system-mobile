@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {roundInPlayersFavor} from 'core/util';
+// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
+// so it is inert for the decorator golden master; attribute/label logic pending.
 import {TraitDecorator} from '../traitDecorator';
 
-/** A multipower slot: real cost is the slot's cost divided by the pool factor.
- *  Ported from legacy `powers/MultipowerItem.js`. */
-export default class MultipowerItem extends TraitDecorator {
-    realCost(): number {
-        const divisor = (this.characterTrait as unknown as {ultraSlot?: boolean}).ultraSlot ? 5 : 10;
-
-        return roundInPlayersFavor(this.characterTrait.realCost() / divisor);
-    }
-}
+export default class HandKillingAttack extends TraitDecorator {}

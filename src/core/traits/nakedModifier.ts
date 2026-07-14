@@ -12,8 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {roundInPlayersFavor} from 'core/util';
 import {TraitDecorator} from './traitDecorator';
 
-// STUB — naked-advantage cost is ported in a later tier. Pass-through for now;
-// only reached by NAKEDMODIFIER traits, outside the disad golden master.
-export default class NakedModifier extends TraitDecorator {}
+/** Naked advantage (advantage applied to a chunk of Active Points), ported from
+ *  legacy `decorators/NakedModifier.js`. */
+export default class NakedModifier extends TraitDecorator {
+    cost(): number {
+        return this.characterTrait.trait.levels || 0;
+    }
+
+    activeCost(): number {
+        return roundInPlayersFavor(this.cost() * (1 + this.advantages()!.reduce((a: number, b: {cost: number}) => a + b.cost, 0))) - this.cost();
+    }
+
+    realCost(): number {
+        return roundInPlayersFavor(this.activeCost() / (1 - this.limitations()!.reduce((a: number, b: {cost: number}) => a + b.cost, 0)));
+    }
+}

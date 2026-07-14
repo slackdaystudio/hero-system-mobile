@@ -14,6 +14,10 @@
 
 import {TraitDecorator} from '../traitDecorator';
 
-// STUB — elemental control slot cost is ported in a later tier. Pass-through for
-// now; only reached by elemental-control framework items.
-export default class ElementalControlItem extends TraitDecorator {}
+/** An elemental-control slot: real cost is active cost minus the pool base.
+ *  Ported from legacy `powers/ElementalControlItem.js`. */
+export default class ElementalControlItem extends TraitDecorator {
+    realCost(): number {
+        return Math.floor((this.activeCost() - this.characterTrait.parentTrait!.basecost) / (1 - this.limitations()!.reduce((a: number, b: {cost: number}) => a + b.cost, 0)));
+    }
+}

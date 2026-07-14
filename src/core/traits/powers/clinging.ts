@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {roundInPlayersFavor} from 'core/util';
+import {getMultiplierCost} from 'core/util';
 import {TraitDecorator} from '../traitDecorator';
 
-/** A multipower slot: real cost is the slot's cost divided by the pool factor.
- *  Ported from legacy `powers/MultipowerItem.js`. */
-export default class MultipowerItem extends TraitDecorator {
-    realCost(): number {
-        const divisor = (this.characterTrait as unknown as {ultraSlot?: boolean}).ultraSlot ? 5 : 10;
+/** Clinging, ported from legacy `powers/Clinging.js`. */
+export default class Clinging extends TraitDecorator {
+    cost(): number {
+        let cost = this.characterTrait.trait.basecost;
 
-        return roundInPlayersFavor(this.characterTrait.realCost() / divisor);
+        cost += getMultiplierCost(this.characterTrait.trait.levels, this.characterTrait.trait.template.lvlval, this.characterTrait.trait.template.lvlcost);
+
+        return cost + 1;
     }
 }

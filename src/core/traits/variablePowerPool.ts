@@ -12,8 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {roundInPlayersFavor} from 'core/util';
+import {CharacterTrait} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
-// STUB — variable power pool control-cost math is ported in a later tier.
-// Pass-through for now; only reached by VPP traits, outside the disad golden master.
-export default class VariablePowerPool extends TraitDecorator {}
+/** Variable Power Pool control cost, ported from legacy `decorators/VariablePowerPool.js`. */
+export default class VariablePowerPool extends TraitDecorator {
+    private controlCost: number;
+
+    constructor(characterTrait: CharacterTrait) {
+        super(characterTrait);
+
+        this.controlCost = this.getControlCost();
+    }
+
+    cost(): number {
+        return this.controlCost + this.characterTrait.trait.levels;
+    }
+
+    activeCost(): number {
+        return this.getControlActiveCost() + this.characterTrait.trait.levels;
+    }
+
+    realCost(): number {
+        const realCost = this.getControlActiveCost() / (1 - this.limitations()!.reduce((a: number, b: {cost: number}) => a + b.cost, 0));
+
+        return roundInPlayersFavor(realCost) + this.characterTrait.trait.levels;
+    }
+
+    private getControlCost(): number {
+        let cost = Math.round(this.characterTrait.trait.levels * 0.5);
+
+        if (this.characterTrait.trait.adder) {
+            const adder = this.characterTrait.trait.adder;
+
+            if (adder.xmlid.toUpperCase() === 'CONTROLCOST') {
+                cost = (adder.levels / adder.lvlval) * adder.lvlcost;
+            }
+        }
+
+        return cost;
+    }
+
+    private getControlActiveCost(): number {
+        return roundInPlayersFavor(this.controlCost * (1 + this.advantages()!.reduce((a: number, b: {cost: number}) => a + b.cost, 0)));
+    }
+}

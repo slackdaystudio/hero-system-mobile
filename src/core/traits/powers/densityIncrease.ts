@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {roundInPlayersFavor} from 'core/util';
 import {TraitDecorator} from '../traitDecorator';
 
-/** A multipower slot: real cost is the slot's cost divided by the pool factor.
- *  Ported from legacy `powers/MultipowerItem.js`. */
-export default class MultipowerItem extends TraitDecorator {
-    realCost(): number {
-        const divisor = (this.characterTrait as unknown as {ultraSlot?: boolean}).ultraSlot ? 5 : 10;
-
-        return roundInPlayersFavor(this.characterTrait.realCost() / divisor);
+/** Density Increase, ported from legacy `powers/DensityIncrease.js`. */
+export default class DensityIncrease extends TraitDecorator {
+    cost(): number {
+        return this.characterTrait.trait.levels * 5 - 5;
     }
 }

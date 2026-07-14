@@ -12,13 +12,67 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {CharacterTrait} from './characterTrait';
+import {CharacterTrait, type Obj} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
-// STUB — compound-power recursive re-decoration is ported in a later tier. The
-// factory constructs it with (characterTrait, factory); pass-through for now.
+interface TraitFactory {
+    decorate(item: Obj, listKey: string, getCharacter: () => Obj): CharacterTrait;
+}
+
+/** A compound power: sums the cost of its re-decorated child powers. Ported from
+ *  legacy `decorators/CompoundPower.js`. */
 export default class CompoundPower extends TraitDecorator {
-    constructor(characterTrait: CharacterTrait, _factory: unknown) {
+    private powers: CharacterTrait[];
+    private characterTraitDecorator: TraitFactory;
+
+    constructor(characterTrait: CharacterTrait, characterTraitDecorator: TraitFactory) {
         super(characterTrait);
+
+        this.characterTraitDecorator = characterTraitDecorator;
+        this.powers = this.getCompoundPowers(this.characterTrait.trait.powers);
+    }
+
+    cost(): number {
+        let cost = 0;
+
+        for (const power of this.powers) {
+            cost += power.cost();
+        }
+
+        return cost;
+    }
+
+    activeCost(): number {
+        let activeCost = 0;
+
+        for (const power of this.powers) {
+            activeCost += power.activeCost();
+        }
+
+        return activeCost;
+    }
+
+    realCost(): number {
+        let realCost = 0;
+
+        for (const power of this.powers) {
+            realCost += power.realCost();
+        }
+
+        return realCost;
+    }
+
+    private getCompoundPowers(powers: Obj | Obj[]): CharacterTrait[] {
+        let compoundPowers: CharacterTrait[] = [];
+
+        if (Array.isArray(powers)) {
+            for (const power of powers) {
+                compoundPowers = compoundPowers.concat(this.getCompoundPowers(power));
+            }
+        } else {
+            compoundPowers.push(this.characterTraitDecorator.decorate(powers, this.characterTrait.listKey, this.characterTrait.getCharacter));
+        }
+
+        return compoundPowers;
     }
 }

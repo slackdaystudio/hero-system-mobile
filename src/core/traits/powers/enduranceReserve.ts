@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {roundInPlayersFavor} from 'core/util';
 import {TraitDecorator} from '../traitDecorator';
 
-/** A multipower slot: real cost is the slot's cost divided by the pool factor.
- *  Ported from legacy `powers/MultipowerItem.js`. */
-export default class MultipowerItem extends TraitDecorator {
-    realCost(): number {
-        const divisor = (this.characterTrait as unknown as {ultraSlot?: boolean}).ultraSlot ? 5 : 10;
+/** Endurance Reserve (reserve + recovery cost), ported from legacy `powers/EnduranceReserve.js`. */
+export default class EnduranceReserve extends TraitDecorator {
+    cost(): number {
+        const trait = this.characterTrait.trait;
 
-        return roundInPlayersFavor(this.characterTrait.realCost() / divisor);
+        let cost = Math.ceil((trait.levels / trait.template.lvlval) * trait.template.lvlcost);
+        cost += Math.ceil((trait.power.levels / trait.template.endurancereserverec.lvlval) * trait.template.endurancereserverec.lvlcost);
+
+        return cost;
     }
 }
