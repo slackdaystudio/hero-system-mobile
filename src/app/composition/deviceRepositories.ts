@@ -15,8 +15,13 @@
 import {FileImageStore} from 'infra/files/fileImageStore';
 import {base64ToBytes} from 'infra/files/base64';
 import {documentDirectoryPath, nativeFileSystem} from 'infra/files/nativeFileSystem';
+import {fflateUnzip} from 'infra/migration/fflateUnzip';
+import {createLegacySource} from 'infra/migration/legacySourceImpl';
+import {migrateV1} from 'infra/migration/migrateV1';
 import {createOpSqliteDatabase} from 'infra/persistence/driver/opSqliteDatabase';
+import type {SqlDatabase} from 'infra/persistence/driver/sqlDatabase';
 import {createRepositories, type Repositories} from 'infra/persistence/repositories';
+import {asyncStorageKeyValue} from './asyncStorageKeyValue';
 
 // A distinct runtime DB file. The legacy `hsm.db` is read only during migration
 // (its `settings`/`statistics` tables differ from ours and must not collide).
@@ -37,13 +42,45 @@ export async function createDeviceRepositories(): Promise<Repositories> {
 
     const repositories = createRepositories(db, imageStore); // runs migrations
 
+    // One-time import of legacy data (AsyncStorage + hsm.db + .hsmc). Guarded by
+    // migrateV1's own migrated_v1 flag; a no-op on a device with no legacy data.
+    await runLegacyMigration(repositories);
+
     await sweepOrphanedPortraits(repositories, imageStore);
 
+    // Dev-only demo data, only when nothing else populated the store.
     if (__DEV__ && (await repositories.characters.list()).length === 0) {
         await seedDemoCharacters(repositories);
     }
 
     return repositories;
+}
+
+/** Best-effort open of the legacy `hsm.db`; null if it isn't there / can't be read. */
+function openLegacyDatabase(): SqlDatabase | null {
+    try {
+        return createOpSqliteDatabase({name: 'hsm.db'});
+    } catch {
+        return null;
+    }
+}
+
+async function runLegacyMigration(repositories: Repositories): Promise<void> {
+    const legacyDb = openLegacyDatabase();
+
+    try {
+        const source = createLegacySource({
+            keyValue: asyncStorageKeyValue(),
+            fileSystem: nativeFileSystem(),
+            unzip: fflateUnzip,
+            characterDir: `${documentDirectoryPath()}/character`,
+            legacyDb,
+        });
+
+        await migrateV1(repositories, source);
+    } finally {
+        legacyDb?.close();
+    }
 }
 
 /** Delete image files no surviving character references (portrait id === filename). */
