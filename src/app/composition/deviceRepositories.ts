@@ -14,7 +14,7 @@
 
 import {FileImageStore} from 'infra/files/fileImageStore';
 import {base64ToBytes} from 'infra/files/base64';
-import {documentDirectoryPath, rnfsFileSystem} from 'infra/files/rnfsFileSystem';
+import {documentDirectoryPath, nativeFileSystem} from 'infra/files/nativeFileSystem';
 import {createOpSqliteDatabase} from 'infra/persistence/driver/opSqliteDatabase';
 import {createRepositories, type Repositories} from 'infra/persistence/repositories';
 
@@ -33,7 +33,7 @@ const DEMO_PORTRAIT_PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQ
  */
 export async function createDeviceRepositories(): Promise<Repositories> {
     const db = createOpSqliteDatabase({name: RUNTIME_DATABASE});
-    const imageStore = new FileImageStore(rnfsFileSystem(), `${documentDirectoryPath()}/images`);
+    const imageStore = new FileImageStore(nativeFileSystem(), `${documentDirectoryPath()}/images`);
 
     const repositories = createRepositories(db, imageStore); // runs migrations
 

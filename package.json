@@ -10,11 +10,11 @@
     "test": "jest"
   },
   "dependencies": {
-    "@dr.pogodin/react-native-fs": "^2.39.2",
     "@op-engineering/op-sqlite": "^17.1.2",
     "change-case": "5.4.4",
     "react": "19.0.0",
-    "react-native": "0.79.2"
+    "react-native": "0.79.2",
+    "react-native-blob-util": "^0.24.10"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
