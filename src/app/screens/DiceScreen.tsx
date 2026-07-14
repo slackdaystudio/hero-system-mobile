@@ -32,6 +32,32 @@ const SEGMENTS: Segment[] = [
     {value: 'effect', label: 'Effect'},
 ];
 
+// The partial die is a fractional modifier on a damage/effect roll. Its enum
+// values are numeric (and match legacy), so we key the segmented control on
+// stable string slugs and map back to PartialDie on change.
+const PARTIAL_SEGMENTS: Segment[] = [
+    {value: 'none', label: 'Whole'},
+    {value: 'half', label: '+½d6'},
+    {value: 'plus', label: '+1 pip'},
+    {value: 'minus', label: '−1 pip'},
+];
+
+const PARTIAL_BY_KEY: Record<string, PartialDie> = {
+    none: PartialDie.None,
+    half: PartialDie.Half,
+    plus: PartialDie.PlusOne,
+    minus: PartialDie.MinusOne,
+};
+
+const KEY_BY_PARTIAL: Record<PartialDie, string> = {
+    [PartialDie.None]: 'none',
+    [PartialDie.Half]: 'half',
+    [PartialDie.PlusOne]: 'plus',
+    [PartialDie.MinusOne]: 'minus',
+};
+
+const isDamageOrEffect = (mode: Mode): boolean => mode === 'normal' || mode === 'killing' || mode === 'effect';
+
 const toInt = (value: string, fallback: number): number => {
     const parsed = Number.parseInt(value, 10);
     return Number.isNaN(parsed) ? fallback : parsed;
@@ -115,6 +141,19 @@ export function DiceScreen({initialRequest}: DiceScreenProps): React.JSX.Element
                 <SegmentedControl segments={SEGMENTS} value={mode} onChange={(value) => setMode(value as Mode)} />
 
                 <Inputs mode={mode} inputs={inputs} setInput={setInput} />
+
+                {isDamageOrEffect(mode) ? (
+                    <View style={styles.field}>
+                        <Text variant="caption" muted>
+                            Partial die
+                        </Text>
+                        <SegmentedControl
+                            segments={PARTIAL_SEGMENTS}
+                            value={KEY_BY_PARTIAL[partialDie]}
+                            onChange={(value) => setPartialDie(PARTIAL_BY_KEY[value])}
+                        />
+                    </View>
+                ) : null}
 
                 <View style={styles.actions}>
                     <View style={styles.grow}>
@@ -248,6 +287,9 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         columnGap: 12,
+    },
+    field: {
+        rowGap: 6,
     },
     actions: {
         flexDirection: 'row',

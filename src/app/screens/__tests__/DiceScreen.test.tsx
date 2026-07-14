@@ -122,6 +122,32 @@ describe('DiceScreen', () => {
         expect(current().totals.effectRolls).toBe(1);
     });
 
+    it('adds a half die to an effect roll when the partial-die control is set', async () => {
+        const {repo} = fakeStatistics();
+        const tree = render([2], repo); // every die (d6 and the d3 half) comes up 2
+
+        await press(tree, 'segment-effect');
+        await press(tree, 'segment-half'); // +½d6
+        await press(tree, 'roll');
+
+        // 6d6 of 2s (=12) plus the half die (a 2) = 14
+        expect(collectText(tree.toJSON())).toContain('14');
+    });
+
+    it('only shows the partial-die control for damage/effect modes', async () => {
+        const {repo} = fakeStatistics();
+        const tree = render([3], repo);
+
+        const hasPartial = () => tree.root.findAllByProps({testID: 'segment-half'}).length > 0;
+        expect(hasPartial()).toBe(false); // skill mode: no partial die
+
+        await press(tree, 'segment-killing');
+        expect(hasPartial()).toBe(true);
+
+        await press(tree, 'segment-hit');
+        expect(hasPartial()).toBe(false);
+    });
+
     it('enables Roll Again only after a first roll, and it re-rolls', async () => {
         const {repo, current} = fakeStatistics();
         const tree = render([4], repo);
