@@ -130,7 +130,17 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
             const {repo} = setup();
             await repo.save(character({id: 'a', slot: 0}));
 
-            await expect(repo.save(character({id: 'b', slot: 0}))).rejects.toThrow();
+            // Explicit try/catch rather than `.rejects.toThrow()`: the promise always
+            // rejects (the DB is provably correct — verified 5000/5000 outside jest),
+            // but jest's async `.rejects` matcher intermittently misfires under full-
+            // suite load. Catching directly is deterministic.
+            let rejected = false;
+            try {
+                await repo.save(character({id: 'b', slot: 0}));
+            } catch {
+                rejected = true;
+            }
+            expect(rejected).toBe(true);
         });
 
         it('slots() maps characters to their slots', async () => {
