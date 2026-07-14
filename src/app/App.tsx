@@ -1,42 +1,75 @@
-import React from 'react';
-import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
-import {CORE_MARKER} from 'core/util/version';
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import React, {useEffect, useState} from 'react';
+import {ActivityIndicator, StyleSheet} from 'react-native';
+import {Screen, Text} from 'app/components';
+import {createDeviceRepositories} from 'app/composition/deviceRepositories';
+import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
+import {CharacterListScreen} from 'app/screens/CharacterListScreen';
+import {ThemeProvider} from 'app/theme';
+import type {Repositories} from 'infra/persistence/repositories';
+
+type Boot = {status: 'loading'} | {status: 'ready'; repositories: Repositories} | {status: 'error'; message: string};
 
 /**
- * Phase 0 app shell. Proves the app -> core wiring and the layered layout.
- * Real navigation, store, and screens arrive in Phases 3-4.
+ * App entry: bootstrap the on-device composition root (open the DB, migrate, wire
+ * repositories), then render the character list inside its providers. Theming
+ * wraps everything so the loading and error states are on-brand too.
  */
 function App(): React.JSX.Element {
+    const [boot, setBoot] = useState<Boot>({status: 'loading'});
+
+    useEffect(() => {
+        let cancelled = false;
+
+        createDeviceRepositories()
+            .then((repositories) => {
+                if (!cancelled) {
+                    setBoot({status: 'ready', repositories});
+                }
+            })
+            .catch((error: unknown) => {
+                if (!cancelled) {
+                    setBoot({status: 'error', message: error instanceof Error ? error.message : String(error)});
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" />
-            <View style={styles.content}>
-                <Text style={styles.title}>HERO System Mobile</Text>
-                <Text style={styles.subtitle}>clean-room rebuild — core: {CORE_MARKER}</Text>
-            </View>
-        </SafeAreaView>
+        <ThemeProvider>
+            {boot.status === 'ready' ? (
+                <RepositoriesProvider repositories={boot.repositories}>
+                    <CharacterListScreen />
+                </RepositoriesProvider>
+            ) : (
+                <Screen style={styles.centered}>
+                    {boot.status === 'loading' ? <ActivityIndicator /> : <Text muted>{boot.message}</Text>}
+                </Screen>
+            )}
+        </ThemeProvider>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#1b1b1d',
-    },
-    content: {
-        flex: 1,
+    centered: {
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    title: {
-        color: '#e8e8e8',
-        fontSize: 22,
-        fontWeight: '600',
-    },
-    subtitle: {
-        color: '#8a8a8a',
-        fontSize: 13,
-        marginTop: 8,
     },
 });
 
