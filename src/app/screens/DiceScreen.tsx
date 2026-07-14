@@ -68,12 +68,14 @@ const diceCount = (value: string): number => Math.max(1, toInt(value, 1));
 export interface DiceScreenProps {
     /** Optional pre-fill from a tapped character-sheet roll (does not auto-roll). */
     initialRequest?: RollRequest;
+    /** Optional starting mode from a Home quick-launch (no pre-filled values). */
+    initialMode?: Mode;
 }
 
-export function DiceScreen({initialRequest}: DiceScreenProps): React.JSX.Element {
+export function DiceScreen({initialRequest, initialMode}: DiceScreenProps): React.JSX.Element {
     const roller = useDieRoller();
     const {statistics} = useRepositories();
-    const [mode, setMode] = useState<Mode>('skill');
+    const [mode, setMode] = useState<Mode>(initialMode ?? 'skill');
     const [inputs, setInputs] = useState<Record<string, string>>({threshold: '11', ocv: '8', dcv: '5', dice: '6'});
     const [partialDie, setPartialDie] = useState<PartialDie>(PartialDie.None);
     const [last, setLast] = useState<LastRoll | null>(null);

@@ -56,7 +56,7 @@ const collectText = (node: unknown): string[] => {
     return collectText((node as {children?: unknown}).children);
 };
 
-const render = (faces: number[], statistics: StatisticsRepository): ReactTestRenderer => {
+const render = (faces: number[], statistics: StatisticsRepository, initialMode?: 'skill' | 'hit' | 'normal' | 'killing' | 'effect'): ReactTestRenderer => {
     const repositories = {statistics} as unknown as Repositories;
     let tree!: ReactTestRenderer;
     act(() => {
@@ -64,7 +64,7 @@ const render = (faces: number[], statistics: StatisticsRepository): ReactTestRen
             <ThemeProvider colorScheme="dark">
                 <RepositoriesProvider repositories={repositories}>
                     <DiceProvider dieRoller={new DieRoller(scriptedRng(faces))}>
-                        <DiceScreen />
+                        <DiceScreen initialMode={initialMode} />
                     </DiceProvider>
                 </RepositoriesProvider>
             </ThemeProvider>,
@@ -132,6 +132,15 @@ describe('DiceScreen', () => {
 
         // 6d6 of 2s (=12) plus the half die (a 2) = 14
         expect(collectText(tree.toJSON())).toContain('14');
+    });
+
+    it('starts in the mode supplied by a Home quick-launch', async () => {
+        const {repo, current} = fakeStatistics();
+        const tree = render([2], repo, 'effect'); // 6d6 of 2s -> 12
+
+        await press(tree, 'roll'); // no mode switch needed — it opened in effect
+        expect(collectText(tree.toJSON())).toContain('12');
+        expect(current().totals.effectRolls).toBe(1);
     });
 
     it('only shows the partial-die control for damage/effect modes', async () => {

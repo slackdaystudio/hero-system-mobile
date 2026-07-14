@@ -62,8 +62,17 @@
   of truth, portraits as files on disk, `.hsmc` demoted to export-only, `loadout` dropped,
   edition derived per-character, one-time AsyncStorage→SQLite user migration.
 - [ ] **Phase 3 — State (RTK slices)**
-- [ ] **Phase 4 — UI (12 screens)**
-- [ ] **Phase 5 — Migration + parity + release**
+- [ ] **Phase 4 — UI** *(in progress)* — on the in-house design system (StyleSheet + typed
+  theme; no third-party UI kit). Built: **Home** (hub), **Characters** (list), **View
+  character** (full HeroDesigner sheet + Character/Combat tabs), the **mutable combat tracker**
+  (health/Recovery, combat values, phase chart, status effects), **Dice** (Skill/Hit/Damage/
+  Effect + partial dice, consolidating the legacy Skill/Hit/Damage/Effect/Result screens),
+  **Statistics**, and **Settings** (live theme, text-size scaling, screen-animation toggle).
+  Tappable sheet rolls wired to the roller. Remaining: **CostCruncher**. RandomCharacter is
+  dropped (being reimagined). ~1320 tests green.
+- [ ] **Phase 5 — Migration + parity + release** — user-data migration is done and
+  device-validated (`migrateV1`/`legacySource`). Remaining: full parity pass (incl. the
+  deferred Phase-1 correctness fixes in `docs/KNOWN_DEVIATIONS.md`), store releases.
 
 > The living copy of this plan is on the `rebuild` branch (in `../hsm-rebuild`), where
 > active work happens. This `master` copy is the historical/reference snapshot.

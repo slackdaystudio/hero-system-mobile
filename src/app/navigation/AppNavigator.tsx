@@ -23,6 +23,7 @@ import {useSettings} from 'app/providers/SettingsProvider';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {DiceScreen} from 'app/screens/DiceScreen';
+import {HomeScreen} from 'app/screens/HomeScreen';
 import {SettingsScreen} from 'app/screens/SettingsScreen';
 import {StatisticsScreen} from 'app/screens/StatisticsScreen';
 import {useTheme} from 'app/theme';
@@ -33,9 +34,10 @@ import {useTheme} from 'app/theme';
  * is the single seam that wires them into a themed native stack.
  */
 export type RootStackParamList = {
+    Home: undefined;
     CharacterList: undefined;
     CharacterDetail: {id: string};
-    Dice: {request?: RollRequest} | undefined;
+    Dice: {request?: RollRequest; mode?: RollRequest['mode']} | undefined;
     Statistics: undefined;
     Settings: undefined;
 };
@@ -57,6 +59,17 @@ export function AppNavigator(): React.JSX.Element {
                         // Respect the reduce-motion preference: no push/pop transition when off.
                         animation: settings.showAnimations ? 'default' : 'none',
                     }}>
+                    <Stack.Screen name="Home" options={{title: 'HERO System Mobile'}}>
+                        {({navigation}) => (
+                            <HomeScreen
+                                onOpenCharacters={() => navigation.navigate('CharacterList')}
+                                onOpenActiveCharacter={(id) => navigation.navigate('CharacterDetail', {id})}
+                                onOpenDice={(mode) => navigation.navigate('Dice', {mode})}
+                                onOpenStatistics={() => navigation.navigate('Statistics')}
+                                onOpenSettings={() => navigation.navigate('Settings')}
+                            />
+                        )}
+                    </Stack.Screen>
                     <Stack.Screen
                         name="CharacterList"
                         options={({navigation}) => ({
@@ -103,7 +116,7 @@ export function AppNavigator(): React.JSX.Element {
                                 </Pressable>
                             ),
                         })}>
-                        {({route}) => <DiceScreen initialRequest={route.params?.request} />}
+                        {({route}) => <DiceScreen initialRequest={route.params?.request} initialMode={route.params?.mode} />}
                     </Stack.Screen>
                     <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>
                         {() => <StatisticsScreen />}
