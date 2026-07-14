@@ -15,14 +15,33 @@
 import {DEFAULT_STATISTICS, type Statistics, type StatisticsRepository} from 'core/ports';
 import type {SqlDatabase} from './driver/sqlDatabase';
 
+const isPlainObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/** Recursively overlay `override` onto `base`, so absent fields keep their defaults. */
+const deepMerge = <T>(base: T, override: unknown): T => {
+    if (!isPlainObject(override)) {
+        return base;
+    }
+
+    const result = {...(base as Record<string, unknown>)};
+    for (const key of Object.keys(override)) {
+        result[key] = isPlainObject(result[key]) && isPlainObject(override[key]) ? deepMerge(result[key], override[key]) : override[key];
+    }
+
+    return result as T;
+};
+
 /** Global dice statistics as a single JSON row (`statistics.id = 1`). */
 export class SqliteStatisticsRepository implements StatisticsRepository {
     constructor(private readonly db: SqlDatabase) {}
 
     async get(): Promise<Statistics> {
         const {rows} = this.db.execute('SELECT stats FROM statistics WHERE id = 1');
+        // A fresh, complete Statistics every time: partial or legacy-shaped stored
+        // JSON (e.g. missing `totals`) is layered onto the defaults, never trusted raw.
+        const base = JSON.parse(JSON.stringify(DEFAULT_STATISTICS)) as Statistics;
 
-        return rows.length > 0 ? (JSON.parse(rows[0].stats as string) as Statistics) : {...DEFAULT_STATISTICS};
+        return rows.length > 0 ? deepMerge(base, JSON.parse(rows[0].stats as string) as unknown) : base;
     }
 
     async save(statistics: Statistics): Promise<void> {

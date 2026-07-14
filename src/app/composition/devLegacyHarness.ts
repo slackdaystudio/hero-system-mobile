@@ -14,6 +14,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {strToU8, zipSync} from 'fflate';
+import {DEFAULT_STATISTICS} from 'core/ports';
 import {documentDirectoryPath, nativeFileSystem} from 'infra/files/nativeFileSystem';
 import {createOpSqliteDatabase} from 'infra/persistence/driver/opSqliteDatabase';
 import type {SqlDatabase} from 'infra/persistence/driver/sqlDatabase';
@@ -96,7 +97,8 @@ export async function plantDevLegacyData(runtimeDb: SqlDatabase): Promise<void> 
         legacyDb.execute('CREATE TABLE IF NOT EXISTS settings (loadout TEXT PRIMARY KEY, useFifthEdition INTEGER, playSounds INTEGER, onlyDiceSounds INTEGER, showAnimations INTEGER, increaseEntropy INTEGER, colorScheme TEXT)');
         legacyDb.execute('INSERT OR REPLACE INTO settings VALUES (?, ?, ?, ?, ?, ?, ?)', ['default', 0, 1, 0, 1, 1, 'dark']);
         legacyDb.execute('CREATE TABLE IF NOT EXISTS statistics (loadout TEXT PRIMARY KEY, stats TEXT)');
-        legacyDb.execute('INSERT OR REPLACE INTO statistics VALUES (?, ?)', ['default', JSON.stringify({sum: 1234, largestDieRoll: 6, largestSum: 42})]);
+        const stats = {...DEFAULT_STATISTICS, sum: 1234, largestDieRoll: 6, largestSum: 42};
+        legacyDb.execute('INSERT OR REPLACE INTO statistics VALUES (?, ?)', ['default', JSON.stringify(stats)]);
     } finally {
         legacyDb.close();
     }

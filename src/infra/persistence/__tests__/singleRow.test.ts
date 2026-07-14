@@ -47,6 +47,20 @@ describe('SqliteStatisticsRepository (real SQLite)', () => {
 
         expect(await repo.get()).toEqual(DEFAULT_STATISTICS);
     });
+
+    it('heals a partial / legacy-shaped stored row against the defaults', async () => {
+        const database = db();
+        // A blob missing `totals`/`distributions`, as legacy or a partial migration could leave.
+        database.execute('INSERT INTO statistics (id, stats) VALUES (1, ?)', [JSON.stringify({sum: 1234, largestDieRoll: 6})]);
+
+        const stats = await new SqliteStatisticsRepository(database).get();
+
+        expect(stats.sum).toBe(1234);
+        expect(stats.largestDieRoll).toBe(6);
+        expect(stats.totals.diceRolled).toBe(0);
+        expect(stats.totals.normalDamage).toEqual({rolls: 0, stun: 0, body: 0});
+        expect(stats.distributions.one).toBe(0);
+    });
 });
 
 describe('SqliteRandomHeroRepository (real SQLite)', () => {
