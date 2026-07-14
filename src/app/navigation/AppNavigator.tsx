@@ -21,6 +21,7 @@ import {Text} from 'app/components';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {DiceScreen} from 'app/screens/DiceScreen';
+import {StatisticsScreen} from 'app/screens/StatisticsScreen';
 import {useTheme} from 'app/theme';
 
 /**
@@ -32,6 +33,7 @@ export type RootStackParamList = {
     CharacterList: undefined;
     CharacterDetail: {id: string};
     Dice: undefined;
+    Statistics: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -69,8 +71,24 @@ export function AppNavigator(): React.JSX.Element {
                             <CharacterDetailScreen characterId={route.params.id} onReady={(character) => navigation.setOptions({title: character.name})} />
                         )}
                     </Stack.Screen>
-                    <Stack.Screen name="Dice" options={{title: 'Dice Roller'}}>
+                    <Stack.Screen
+                        name="Dice"
+                        options={({navigation}) => ({
+                            title: 'Dice Roller',
+                            // headerRight is a react-navigation render prop, not a nested component definition.
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            headerRight: () => (
+                                <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Statistics')}>
+                                    <Text variant="label" color={theme.colors.primary}>
+                                        Stats
+                                    </Text>
+                                </Pressable>
+                            ),
+                        })}>
                         {() => <DiceScreen />}
+                    </Stack.Screen>
+                    <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>
+                        {() => <StatisticsScreen />}
                     </Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>
