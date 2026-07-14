@@ -90,8 +90,9 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // Cutover: legacy shipped versionCode 62 / versionName 2.3.0.
-        versionCode 63
-        versionName "2.4.0"
+        // 64/2.4.1 — hotfix: import filenames with spaces/accents.
+        versionCode 64
+        versionName "2.4.1"
     }
     signingConfigs {
         debug {
