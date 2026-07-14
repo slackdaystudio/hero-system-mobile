@@ -57,7 +57,7 @@ const fakeKeyValue = (data: Record<string, string>): LegacyKeyValueStore & {rema
 const legacyHsmDb = (): SqlDatabase => {
     const db = createBetterSqlite3Database();
     db.execute('CREATE TABLE settings (loadout TEXT PRIMARY KEY, useFifthEdition INTEGER, playSounds INTEGER, onlyDiceSounds INTEGER, showAnimations INTEGER, increaseEntropy INTEGER, colorScheme TEXT)');
-    db.execute('INSERT INTO settings VALUES (?, ?, ?, ?, ?, ?, ?)', ['default', 1, 0, 0, 1, 1, 'dark']);
+    db.execute('INSERT INTO settings VALUES (?, ?, ?, ?, ?, ?, ?)', ['default', 1, 0, 0, 0, 1, 'dark']);
     db.execute('CREATE TABLE statistics (loadout TEXT PRIMARY KEY, stats TEXT)');
     db.execute('INSERT INTO statistics VALUES (?, ?)', ['default', JSON.stringify({...DEFAULT_STATISTICS, sum: 99})]);
     return db;
@@ -104,7 +104,7 @@ describe('createLegacySource + migrateV1 (real zip + real legacy SQLite)', () =>
         // Settings from the columnar hsm.db (0/1 -> bool), statistics from its JSON.
         const settings = await repos.settings.get();
         expect(settings.useFifthEdition).toBe(true);
-        expect(settings.playSounds).toBe(false);
+        expect(settings.showAnimations).toBe(false);
         expect(settings.colorScheme).toBe('dark');
         expect((await repos.statistics.get()).sum).toBe(99);
 
@@ -141,6 +141,6 @@ describe('createLegacySource + migrateV1 (real zip + real legacy SQLite)', () =>
 
         expect(result.characters).toBe(0);
         expect(await repos.characters.list()).toEqual([]);
-        expect((await repos.settings.get()).playSounds).toBe(true); // untouched defaults
+        expect((await repos.settings.get()).showAnimations).toBe(true); // untouched defaults
     });
 });

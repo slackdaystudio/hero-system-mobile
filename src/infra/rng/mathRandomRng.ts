@@ -16,8 +16,7 @@ import type {Rng} from 'core/ports';
 
 /**
  * {@link Rng} over `Math.random` — Hermes backs it with a quality uniform PRNG,
- * which is more than adequate for dice. Matches the legacy roller's default
- * (non-"increaseEntropy") branch exactly. The dice math itself is golden-mastered
+ * which is more than adequate for dice. The dice math itself is golden-mastered
  * in core against a seeded fake generator, so this adapter stays trivial.
  */
 export const mathRandomRng = (): Rng => ({

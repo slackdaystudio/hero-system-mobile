@@ -33,7 +33,7 @@ describe('createRepositories (composition root)', () => {
         const {repos} = setup();
 
         expect(await repos.characters.list()).toEqual([]);
-        expect((await repos.settings.get()).playSounds).toBe(true);
+        expect((await repos.settings.get()).showAnimations).toBe(true);
         expect(await repos.appState.get('missing')).toBeNull();
     });
 

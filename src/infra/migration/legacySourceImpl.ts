@@ -145,16 +145,13 @@ async function readSettingsAndStatistics(deps: LegacySourceDeps): Promise<{setti
 
 function readLegacySettings(db: SqlDatabase): Partial<Settings> | null {
     try {
-        const row = db.execute('SELECT useFifthEdition, playSounds, onlyDiceSounds, showAnimations, increaseEntropy, colorScheme FROM settings WHERE loadout = ?', ['default']).rows[0];
+        const row = db.execute('SELECT useFifthEdition, showAnimations, colorScheme FROM settings WHERE loadout = ?', ['default']).rows[0];
         if (row === undefined) {
             return null;
         }
         return {
             useFifthEdition: row.useFifthEdition === 1,
-            playSounds: row.playSounds === 1,
-            onlyDiceSounds: row.onlyDiceSounds === 1,
             showAnimations: row.showAnimations === 1,
-            increaseEntropy: row.increaseEntropy === 1,
             colorScheme: (row.colorScheme as Settings['colorScheme']) ?? 'system',
         };
     } catch {

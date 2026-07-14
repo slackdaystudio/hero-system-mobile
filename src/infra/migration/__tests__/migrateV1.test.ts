@@ -45,7 +45,7 @@ const snapshot = (): LegacySnapshot => ({
             },
         },
     ],
-    settings: {playSounds: false, useFifthEdition: true},
+    settings: {showAnimations: false, useFifthEdition: true},
     statistics: {...DEFAULT_STATISTICS, sum: 42},
     randomHero: {name: 'Random Guy'},
     version: '2.3.0',
@@ -105,9 +105,9 @@ describe('migrateV1 (real SQLite + FileImageStore)', () => {
         await migrateV1(repos, source);
 
         const settings = await repos.settings.get();
-        expect(settings.playSounds).toBe(false);
+        expect(settings.showAnimations).toBe(false);
         expect(settings.useFifthEdition).toBe(true);
-        expect(settings.showAnimations).toBe(true); // untouched default
+        expect(settings.colorScheme).toBe('system'); // untouched default
         expect((await repos.statistics.get()).sum).toBe(42);
         expect((await repos.randomHero.get())?.name).toBe('Random Guy');
         expect(await repos.appState.get(VERSION_KEY)).toBe('2.3.0');

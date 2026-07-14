@@ -25,19 +25,13 @@ export type ColorScheme = 'system' | 'light' | 'dark';
 /** Global, app-wide settings (per-character edition is derived, not stored here). */
 export interface Settings {
     useFifthEdition: boolean;
-    playSounds: boolean;
-    onlyDiceSounds: boolean;
     showAnimations: boolean;
-    increaseEntropy: boolean;
     colorScheme: ColorScheme;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
     useFifthEdition: false,
-    playSounds: true,
-    onlyDiceSounds: false,
     showAnimations: true,
-    increaseEntropy: true,
     colorScheme: 'system',
 };
 

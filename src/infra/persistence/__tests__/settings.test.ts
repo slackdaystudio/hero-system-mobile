@@ -34,11 +34,11 @@ describe('SqliteSettingsRepository (real SQLite)', () => {
     it('persists a setting and leaves the rest at their defaults', async () => {
         const {repo} = setup();
 
-        await repo.set('playSounds', false);
+        await repo.set('showAnimations', false);
         await repo.set('colorScheme', 'dark');
 
         const settings = await repo.get();
-        expect(settings.playSounds).toBe(false);
+        expect(settings.showAnimations).toBe(false);
         expect(settings.colorScheme).toBe('dark');
         expect(settings.useFifthEdition).toBe(DEFAULT_SETTINGS.useFifthEdition);
     });
@@ -46,17 +46,17 @@ describe('SqliteSettingsRepository (real SQLite)', () => {
     it('upserts on repeated set rather than duplicating rows', async () => {
         const {db, repo} = setup();
 
-        await repo.set('playSounds', false);
-        await repo.set('playSounds', true);
+        await repo.set('showAnimations', false);
+        await repo.set('showAnimations', true);
 
         expect(db.execute('SELECT COUNT(*) AS n FROM settings').rows[0].n).toBe(1);
-        expect((await repo.get()).playSounds).toBe(true);
+        expect((await repo.get()).showAnimations).toBe(true);
     });
 
     it('reset clears back to defaults', async () => {
         const {repo} = setup();
 
-        await repo.set('increaseEntropy', false);
+        await repo.set('showAnimations', false);
         await repo.reset();
 
         expect(await repo.get()).toEqual(DEFAULT_SETTINGS);
