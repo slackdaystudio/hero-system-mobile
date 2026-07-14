@@ -72,15 +72,12 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
-// Release signing is driven by a gitignored keystore.properties (see RELEASE.md).
-// This is a store CUTOVER of com.herogmtools, so the release build MUST be signed
-// with the legacy app's existing upload key. Absent the file, release falls back to
-// debug signing so local `assembleRelease` still works (but Play would reject it).
-def keystorePropertiesFile = rootProject.file("keystore.properties")
-def keystoreProperties = new Properties()
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
+// Release signing reads the app's key from ~/.gradle/gradle.properties (Gradle
+// loads it automatically) under the HEROGMTOOLS_RELEASE_* prefix — see RELEASE.md.
+// This is a store CUTOVER of com.herogmtools, so these MUST be the legacy app's
+// existing upload key. Absent the props, release falls back to debug signing so
+// local `assembleRelease` still works (but Play would reject it).
+def hasReleaseSigning = project.hasProperty('HEROGMTOOLS_RELEASE_STORE_FILE')
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -104,11 +101,11 @@ android {
             keyPassword 'android'
         }
         release {
-            if (keystorePropertiesFile.exists()) {
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
+            if (hasReleaseSigning) {
+                storeFile file(HEROGMTOOLS_RELEASE_STORE_FILE)
+                storePassword HEROGMTOOLS_RELEASE_STORE_PASSWORD
+                keyAlias HEROGMTOOLS_RELEASE_KEY_ALIAS
+                keyPassword HEROGMTOOLS_RELEASE_KEY_PASSWORD
             }
         }
     }
@@ -117,7 +114,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
+            signingConfig hasReleaseSigning ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

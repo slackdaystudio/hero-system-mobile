@@ -14,18 +14,23 @@ listing. Two consequences:
   is set to **63 / 2.4.0** (`android/app/build.gradle`). Bump `versionCode` for
   every subsequent upload.
 
-## One-time signing setup
+## Signing setup
 
-1. Put the **legacy upload keystore** at `android/app/herogmtools-upload.keystore`
-   (or anywhere — the path in `keystore.properties` is resolved relative to
-   `android/app/`). Both the keystore and `keystore.properties` are gitignored.
-2. Copy the template and fill it in:
-   ```sh
-   cp keystore.properties.example keystore.properties
-   # edit keystore.properties: storeFile, storePassword, keyAlias, keyPassword
-   ```
-   With `keystore.properties` present, `release` builds sign with it; without it,
-   they fall back to debug signing (fine for a local smoke test, rejected by Play).
+Release signing reads the app's key from **`~/.gradle/gradle.properties`** (Gradle
+loads it automatically — never committed) under the **`HEROGMTOOLS_RELEASE_`**
+prefix. These must be the **legacy app's existing upload key** (cutover). Already
+configured on the build machine:
+
+```properties
+HEROGMTOOLS_RELEASE_STORE_FILE=/absolute/path/to/herogmtools-upload.keystore
+HEROGMTOOLS_RELEASE_STORE_PASSWORD=…
+HEROGMTOOLS_RELEASE_KEY_ALIAS=…
+HEROGMTOOLS_RELEASE_KEY_PASSWORD=…
+```
+
+Use an **absolute** `STORE_FILE` path (Gradle does not expand `~`). When those
+properties are present, `release` builds sign with them; absent, release falls
+back to debug signing (fine for a local smoke test, rejected by Play).
 
 ## Build the bundle
 
@@ -60,7 +65,7 @@ App Store Connect → TestFlight.
 ## Pre-push checklist
 
 - [ ] `npm run lint && npx tsc --noEmit && npm test` all green
-- [ ] `keystore.properties` points at the **legacy** upload key
+- [ ] `HEROGMTOOLS_RELEASE_*` in `~/.gradle/gradle.properties` points at the **legacy** upload key
 - [ ] `versionCode` is higher than the last uploaded build
 - [ ] AAB verifies against the expected certificate
 - [ ] Smoke-tested on a device (see the QA checklist you ran)

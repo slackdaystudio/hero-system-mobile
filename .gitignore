@@ -34,8 +34,7 @@ local.properties
 *.keystore
 !debug.keystore
 *.jks
-# Release signing secrets — never commit (see RELEASE.md / keystore.properties.example)
-keystore.properties
+# Release signing lives in ~/.gradle/gradle.properties (HEROGMTOOLS_RELEASE_*), never in-repo.
 .kotlin/
 
 # node.js
