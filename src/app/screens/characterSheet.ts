@@ -14,7 +14,7 @@
 
 import {combatDetails} from 'core/combat';
 import {heroDesignerCharacter} from 'core/hero';
-import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor} from 'core/traits';
+import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
 import {flatten} from 'core/util';
 
@@ -104,6 +104,8 @@ export interface SheetTrait {
     definition: string;
     /** 0 for a top-level trait, 1+ for framework/compound children. */
     depth: number;
+    /** The mechanical stat block — the flip-card front (definition is the back). */
+    writeup: Writeup;
     /** Present for martial-arts maneuvers — drives the two-row combat table. */
     maneuver?: ManeuverDetail;
 }
@@ -327,7 +329,7 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
             const decorated = characterTraitDecorator.decorate(item, listKey, () => character);
             const roll = decorated.roll() ?? null;
             const maneuver = listKey === 'martialArts' ? buildManeuver(decorated.attributes(), decorated.definition(), roll) : undefined;
-            rows.push({label: decorated.label(), roll, realCost: decorated.realCost(), definition: decorated.definition(), depth, maneuver});
+            rows.push({label: decorated.label(), roll, realCost: decorated.realCost(), definition: decorated.definition(), depth, writeup: decorated.toWriteup(), maneuver});
 
             const children = toArray(item.powers);
             if (children.length > 0) {
@@ -335,7 +337,14 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
             }
         } catch {
             // A single malformed trait shouldn't blank the whole sheet.
-            rows.push({label: String(item.name ?? item.alias ?? item.xmlid ?? 'Trait'), roll: null, realCost: 0, definition: '', depth});
+            rows.push({
+                label: String(item.name ?? item.alias ?? item.xmlid ?? 'Trait'),
+                roll: null,
+                realCost: 0,
+                definition: '',
+                depth,
+                writeup: {attributes: [], advantages: [], limitations: [], notes: null, cost: {base: 0, active: 0, real: 0}},
+            });
         }
     }
 

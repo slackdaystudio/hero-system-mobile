@@ -51,6 +51,17 @@ describe('characterSheet', () => {
         expect(allTraits.every((t) => Number.isFinite(t.realCost))).toBe(true);
     });
 
+    it('attaches a mechanical writeup (costs + advantages/limitations) to each trait', () => {
+        const aoe = heroOf('aoe');
+        const powers = buildCharacterSheet(aoe, true).sections.find((s) => s.title === 'Powers')!.traits;
+
+        // Every trait carries a writeup with numeric base/active/real costs.
+        expect(powers.every((t) => Number.isFinite(t.writeup.cost.base) && Number.isFinite(t.writeup.cost.active) && Number.isFinite(t.writeup.cost.real))).toBe(true);
+
+        // Some power lists an Area Of Effect advantage in its writeup.
+        expect(powers.some((t) => t.writeup.advantages.some((a) => a.includes('Area Of Effect')))).toBe(true);
+    });
+
     describe('alternate identity (showSecondary)', () => {
         it('detects the alternate (super) form only when a trait is only-in-alternate-ID', () => {
             expect(hasAlternateForm(heroOf('gravity-girl'))).toBe(true);

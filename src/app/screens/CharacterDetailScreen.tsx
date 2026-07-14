@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Switch, View, type ViewStyle} from 'react-native';
+import {ActivityIndicator, Animated, Image, Modal, Pressable, ScrollView, StyleSheet, Switch, View, type ViewStyle} from 'react-native';
 import type {LastRoll} from 'core/dice';
 import type {Character} from 'core/ports';
 import type {Obj} from 'core/traits';
@@ -260,17 +260,25 @@ function SheetBody({sheet, onRoll}: {sheet: CharacterSheet; onRoll: RollHandler}
                     <CharacteristicRow key={index} characteristic={characteristic} onRoll={onRoll} />
                 ))}
             </Section>
-            {sheet.sections.map((section) => {
-                const maneuvers = section.traits.some((trait) => trait.maneuver !== undefined);
-                return (
+            {sheet.sections.map((section) =>
+                section.traits.some((trait) => trait.maneuver !== undefined) ? (
                     <Section key={section.title} title={section.title}>
-                        {maneuvers ? <ManeuverHeader /> : null}
+                        <ManeuverHeader />
                         {section.traits.map((trait, index) => (
-                            <TraitRow key={index} trait={trait} onRoll={onRoll} />
+                            <ManeuverRow key={index} trait={trait} onRoll={onRoll} />
                         ))}
                     </Section>
-                );
-            })}
+                ) : (
+                    <View key={section.title} style={styles.section}>
+                        <Text variant="label" muted>
+                            {section.title.toUpperCase()}
+                        </Text>
+                        {section.traits.map((trait, index) => (
+                            <TraitFlipCard key={index} trait={trait} onRoll={onRoll} />
+                        ))}
+                    </View>
+                ),
+            )}
         </>
     );
 }
@@ -357,16 +365,49 @@ function CharacteristicRow({characteristic, onRoll}: {characteristic: SheetChara
     );
 }
 
-function TraitRow({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}): React.JSX.Element {
-    const theme = useTheme();
-    if (trait.maneuver !== undefined) {
-        return <ManeuverRow trait={trait} onRoll={onRoll} />;
-    }
+/**
+ * A trait as a flip card: the mechanical writeup on the front, the in-game
+ * definition on the back. Only one face is mounted at a time, so front/back can
+ * differ in height; the container flips on rotateY and content swaps at the
+ * edge-on midpoint (the back is counter-rotated so it reads correctly).
+ */
+function TraitFlipCard({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}): React.JSX.Element {
+    const rotate = useRef(new Animated.Value(0)).current;
+    const [face, setFace] = useState<'front' | 'back'>('front');
+    const flippable = trait.definition.trim() !== '';
     const indent: ViewStyle = {paddingLeft: trait.depth * 16};
-    const request = traitRollRequest(trait.roll, trait.label);
+
+    const flip = useCallback(() => {
+        const toBack = face === 'front';
+        Animated.timing(rotate, {toValue: toBack ? 1 : 0, duration: 320, useNativeDriver: true}).start();
+        // Swap content while the card is edge-on (invisible) at ~90°.
+        setTimeout(() => setFace(toBack ? 'back' : 'front'), 160);
+    }, [rotate, face]);
+
+    const rotateY = rotate.interpolate({inputRange: [0, 1], outputRange: ['0deg', '180deg']});
 
     return (
-        <View style={[styles.trait, indent]}>
+        <View style={indent}>
+            <Animated.View style={{transform: [{perspective: 1200}, {rotateY}]}}>
+                <View style={face === 'back' ? styles.flipped : undefined}>
+                    {face === 'front' ? (
+                        <WriteupFace trait={trait} onRoll={onRoll} onFlip={flippable ? flip : undefined} />
+                    ) : (
+                        <DefinitionFace trait={trait} onFlip={flip} />
+                    )}
+                </View>
+            </Animated.View>
+        </View>
+    );
+}
+
+function WriteupFace({trait, onRoll, onFlip}: {trait: SheetTrait; onRoll: RollHandler; onFlip?: () => void}): React.JSX.Element {
+    const theme = useTheme();
+    const request = traitRollRequest(trait.roll, trait.label);
+    const {cost, attributes, advantages, limitations, notes} = trait.writeup;
+
+    return (
+        <Card style={styles.traitCard}>
             <View style={styles.traitHead}>
                 <Text style={styles.traitLabel}>{trait.label}</Text>
                 {trait.roll !== null && request !== null ? (
@@ -376,15 +417,79 @@ function TraitRow({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}): Re
                         </Text>
                     </Pressable>
                 ) : null}
-                <Text variant="caption" muted style={styles.traitCost}>
-                    {`${trait.realCost}`}
-                </Text>
             </View>
-            {trait.definition.length > 0 ? (
-                <Text variant="caption" muted>
-                    {trait.definition}
+
+            {attributes.map((attribute, index) => (
+                <Text key={index} variant="caption">
+                    <Text variant="caption" muted>
+                        {String(attribute.value) === '' ? attribute.label : `${attribute.label}: `}
+                    </Text>
+                    {String(attribute.value)}
+                </Text>
+            ))}
+            <ModifierList label="Advantages" items={advantages} />
+            <ModifierList label="Limitations" items={limitations} />
+            {notes !== null ? (
+                <Text variant="caption">
+                    <Text variant="caption" muted>
+                        Notes:{' '}
+                    </Text>
+                    {notes}
                 </Text>
             ) : null}
+
+            <View style={styles.traitFooter}>
+                <Text variant="caption" muted>
+                    {`Base ${cost.base}  ·  Active ${cost.active}  ·  Real ${cost.real}`}
+                </Text>
+                {onFlip !== undefined ? (
+                    <Pressable testID={`flip-${trait.label}`} accessibilityRole="button" onPress={onFlip}>
+                        <Text variant="caption" color={theme.colors.primary}>
+                            Definition ⟲
+                        </Text>
+                    </Pressable>
+                ) : null}
+            </View>
+        </Card>
+    );
+}
+
+function DefinitionFace({trait, onFlip}: {trait: SheetTrait; onFlip: () => void}): React.JSX.Element {
+    const theme = useTheme();
+
+    return (
+        <Card style={styles.traitCard}>
+            <Text style={styles.traitLabel}>{trait.label}</Text>
+            <Text variant="caption" muted style={styles.definitionText}>
+                {trait.definition}
+            </Text>
+            <View style={styles.traitFooter}>
+                <View style={styles.grow} />
+                <Pressable testID={`flip-back-${trait.label}`} accessibilityRole="button" onPress={onFlip}>
+                    <Text variant="caption" color={theme.colors.primary}>
+                        Stats ⟲
+                    </Text>
+                </Pressable>
+            </View>
+        </Card>
+    );
+}
+
+function ModifierList({label, items}: {label: string; items: string[]}): React.JSX.Element | null {
+    if (items.length === 0) {
+        return null;
+    }
+
+    return (
+        <View style={styles.modifierList}>
+            <Text variant="caption" muted>
+                {label}
+            </Text>
+            {items.map((item, index) => (
+                <Text key={index} variant="caption">
+                    {`• ${item}`}
+                </Text>
+            ))}
         </View>
     );
 }
@@ -542,8 +647,8 @@ const styles = StyleSheet.create({
         width: 40,
         textAlign: 'right',
     },
-    trait: {
-        paddingVertical: 5,
+    traitCard: {
+        rowGap: 4,
     },
     traitHead: {
         flexDirection: 'row',
@@ -552,10 +657,23 @@ const styles = StyleSheet.create({
     },
     traitLabel: {
         flex: 1,
+        fontWeight: '600',
     },
-    traitCost: {
-        width: 44,
-        textAlign: 'right',
+    traitFooter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        columnGap: 12,
+        marginTop: 6,
+    },
+    modifierList: {
+        rowGap: 1,
+    },
+    definitionText: {
+        lineHeight: 18,
+    },
+    flipped: {
+        transform: [{rotateY: '180deg'}],
     },
     maneuver: {
         paddingVertical: 5,

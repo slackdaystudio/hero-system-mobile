@@ -259,6 +259,28 @@ describe('CharacterDetailScreen', () => {
         expect(text.some((value) => value.includes('Phase ½'))).toBe(true); // notes row
     });
 
+    it('flips a trait card between the mechanical writeup and the definition', async () => {
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({document})));
+
+        // Front (writeup) shows the cost line; the definition is not visible yet.
+        expect(collectText(tree.toJSON()).some((v) => v.includes('Real'))).toBe(true);
+
+        const flip = tree.root.findAllByProps({testID: 'flip-Resistant Protection'}).find((node) => typeof node.props.onPress === 'function');
+        expect(flip).toBeDefined();
+
+        await act(async () => {
+            flip?.props.onPress();
+        });
+        await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 220)); // wait past the edge-on content swap
+        });
+
+        // Back is now mounted: the flip-back control exists and the definition shows.
+        expect(tree.root.findAllByProps({testID: 'flip-back-Resistant Protection'}).length).toBeGreaterThan(0);
+        expect(collectText(tree.toJSON()).some((v) => v.includes('Resistant Defense'))).toBe(true);
+    });
+
     it('calls onReady with the loaded character (for the header title)', async () => {
         const onReady = jest.fn();
         await renderScreen(fakeCharacters(character({name: 'Grond'})), {onReady});

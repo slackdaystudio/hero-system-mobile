@@ -30,6 +30,15 @@ export interface RollDescriptor {
     [key: string]: unknown;
 }
 
+/** The mechanical stat block for a trait — the "front" of a sheet flip card (the `definition()` is the back). */
+export interface Writeup {
+    attributes: Attribute[];
+    advantages: string[];
+    limitations: string[];
+    notes: string | null;
+    cost: {base: number; active: number; real: number};
+}
+
 /**
  * Base of the trait-decorator stack, ported from legacy
  * `src/decorators/CharacterTrait.js`. Provides the default cost/roll/label/
@@ -133,6 +142,25 @@ export class CharacterTrait {
 
     limitations(): any[] | null {
         return null;
+    }
+
+    /**
+     * The mechanical stat block: attributes, advantages/limitations (as labels),
+     * notes, and the base/active/real costs. Calls the (decorated) accessors, so a
+     * decorator that overrides any of them is reflected here. Pairs with
+     * {@link definition} — writeup on the card front, definition on the back.
+     */
+    toWriteup(): Writeup {
+        const labels = (modifiers: any[] | null): string[] =>
+            (modifiers ?? []).map((modifier) => String((modifier as Obj).label ?? (modifier as Obj).alias ?? '')).filter((label) => label !== '');
+
+        return {
+            attributes: this.attributes(),
+            advantages: labels(this.advantages()),
+            limitations: labels(this.limitations()),
+            notes: typeof this.trait.notes === 'string' && this.trait.notes.trim() !== '' ? this.trait.notes : null,
+            cost: {base: this.cost(), active: this.activeCost(), real: this.realCost()},
+        };
     }
 
     protected addAttribute(attribute: Obj | Obj[], attributes: Attribute[]): void {

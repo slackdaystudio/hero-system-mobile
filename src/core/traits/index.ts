@@ -13,5 +13,5 @@
 // limitations under the License.
 
 export {characterTraitDecorator} from './characterTraitDecorator';
-export {CharacterTrait, type Attribute, type Obj, type RollDescriptor} from './characterTrait';
+export {CharacterTrait, type Attribute, type Obj, type RollDescriptor, type Writeup} from './characterTrait';
 export {TraitDecorator} from './traitDecorator';
