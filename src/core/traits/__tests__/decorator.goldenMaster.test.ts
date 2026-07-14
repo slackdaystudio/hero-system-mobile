@@ -32,6 +32,16 @@ const legacyDecorator = (require('../../../../../hero-system-mobile/src/decorato
     characterTraitDecorator: {decorate(item: unknown, listKey: string, getCharacter: () => unknown): any};
 }).characterTraitDecorator;
 
+// roll() can throw (a faithfully-ported legacy crash); treat "both threw the same"
+// as a match by comparing value-or-error rather than calling toEqual on a throw.
+const safeRoll = (decorated: {roll(): unknown}): unknown => {
+    try {
+        return {value: decorated.roll()};
+    } catch (error) {
+        return {threw: (error as Error).message};
+    }
+};
+
 const fixtures = manifest.map((entry) => entry.fixture).sort();
 const clone = (name: string): any => JSON.parse(JSON.stringify(require(`../../hero/__tests__/fixtures/${name}.json`)));
 
@@ -43,6 +53,7 @@ const CATEGORIES: Array<{key: string; subKey: string}> = [
     {key: 'talents', subKey: 'talents'},
     {key: 'skills', subKey: 'skills'},
     {key: 'powers', subKey: 'powers'},
+    {key: 'martialArts', subKey: 'maneuver'},
 ];
 
 // Power xmlids not yet fully reproduced, skipped so the golden master verifies the
@@ -74,7 +85,10 @@ describe('golden master: core/traits factory reproduces legacy', () => {
                 expect(ported.cost()).toBe(legacy.cost());
                 expect(ported.activeCost()).toBe(legacy.activeCost());
                 expect(ported.realCost()).toBe(legacy.realCost());
-                expect(ported.roll()).toEqual(legacy.roll());
+                // roll() faithfully reproduces a legacy crash on a maneuver whose
+                // `effect` references a template that didn't resolve (see
+                // KNOWN_DEVIATIONS H4): both throw identically, which counts as a match.
+                expect(safeRoll(ported)).toEqual(safeRoll(legacy));
             }
         });
     });

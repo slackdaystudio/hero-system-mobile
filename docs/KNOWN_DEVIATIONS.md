@@ -40,6 +40,7 @@
 | H1 | `character.template` always `undefined` | cosmetic | yes | hero |
 | H2 | Trait sort uses a boolean-returning comparator | real bug | likely (trait order) | hero |
 | H3 | Char/defense totals skip **duplicate** powers | **real bug, active** | **yes — 17 fixtures** | hero query |
+| H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | **real bug, active** | **yes — tazimmaad (JAB)** | traits |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 
 ---
@@ -140,6 +141,21 @@
   from the rules (sum the duplicates), **not** from legacy. Re-base the query golden
   master for the affected characters, and add a hand-built test (a character with two
   Force Fields) pinning the summed total. Highest-value fix here.
+
+## H4 — `Maneuver.roll()` crashes on an unresolved-template maneuver
+
+- **Where:** `core/traits/maneuver.ts` `roll()` (legacy `decorators/Maneuver.js`). The
+  guard is `hasOwnProperty('effect') && hasOwnProperty('template')`, but a maneuver can
+  carry a `template` property whose value is `undefined` (its xmlid didn't resolve to a
+  template entry). `trait.template.doesdamage` then throws.
+- **Legacy:** throws the identical `Cannot read properties of undefined (reading 'doesdamage')`.
+- **Correct:** guard the `template` value (not just the property), e.g. `trait.template &&
+  trait.template.doesdamage`, and fall back to the delegated roll.
+- **Corpus impact:** triggered by `tazimmaad`'s `JAB` maneuver (effect `"[NORMALDC] Strike"`,
+  unresolved template). The decorator golden master treats "both engines throw the same
+  error" as a match; the corrected behaviour needs a purpose-built test.
+- **Fix + verify:** add the truthy `template` guard; hand-built maneuver with an unresolved
+  template asserting the delegated roll; drop the `safeRoll` tolerance for this case.
 
 ## U1 — `capitalize` only upper-cases the first character
 
