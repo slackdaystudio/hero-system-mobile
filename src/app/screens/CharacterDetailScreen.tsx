@@ -16,12 +16,22 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
 import type {LastRoll} from 'core/dice';
 import type {Character} from 'core/ports';
-import {Button, Card, Screen, Text} from 'app/components';
+import {Button, Card, Screen, SegmentedControl, Text, type Segment} from 'app/components';
 import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
 import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
-import {asHeroCharacter, buildCharacterSheet, type CharacterSheet, type SheetCharacteristic, type SheetTrait} from './characterSheet';
+import {
+    asHeroCharacter,
+    buildCharacterSheet,
+    buildCombatSheet,
+    type CharacterSheet,
+    type CombatSheet,
+    type CombatStat,
+    type MovementRow,
+    type SheetCharacteristic,
+    type SheetTrait,
+} from './characterSheet';
 
 type LoadState = {status: 'loading'} | {status: 'ready'; character: Character} | {status: 'not-found'} | {status: 'error'; message: string};
 
@@ -68,12 +78,12 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
 
     // Decorate the whole sheet once per character (engine work), not per render.
     const character = state.status === 'ready' ? state.character : null;
-    const sheet = useMemo<CharacterSheet | null>(() => {
+    const sheet = useMemo<{character: CharacterSheet; combat: CombatSheet} | null>(() => {
         if (character === null) {
             return null;
         }
         const hero = asHeroCharacter(character.document);
-        return hero === null ? null : buildCharacterSheet(hero);
+        return hero === null ? null : {character: buildCharacterSheet(hero), combat: buildCombatSheet(hero)};
     }, [character]);
 
     const [flash, setFlash] = useState<RollFlashState | null>(null);
@@ -153,10 +163,85 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                     </View>
                 </View>
 
-                {sheet !== null ? <SheetBody sheet={sheet} onRoll={handleRoll} /> : <BasicBody character={loaded} />}
+                {sheet !== null ? <SheetTabs sheet={sheet.character} combat={sheet.combat} onRoll={handleRoll} /> : <BasicBody character={loaded} />}
             </ScrollView>
             <RollFlash flash={flash} onClose={() => setFlash(null)} onRollAgain={rollNow} />
         </Screen>
+    );
+}
+
+type SheetTab = 'character' | 'combat';
+
+const SHEET_TABS: Segment[] = [
+    {value: 'character', label: 'Character'},
+    {value: 'combat', label: 'Combat'},
+];
+
+function SheetTabs({sheet, combat, onRoll}: {sheet: CharacterSheet; combat: CombatSheet; onRoll: RollHandler}): React.JSX.Element {
+    const [tab, setTab] = useState<SheetTab>('character');
+
+    return (
+        <View style={styles.tabbed}>
+            <SegmentedControl segments={SHEET_TABS} value={tab} onChange={(value) => setTab(value as SheetTab)} />
+            {tab === 'character' ? <SheetBody sheet={sheet} onRoll={onRoll} /> : <CombatBody combat={combat} onRoll={onRoll} />}
+        </View>
+    );
+}
+
+function CombatBody({combat, onRoll}: {combat: CombatSheet; onRoll: RollHandler}): React.JSX.Element {
+    return (
+        <>
+            <Section title="Combat Values">
+                {combat.combatValues.map((stat) => (
+                    <CombatStatRow key={stat.label} stat={stat} onRoll={onRoll} />
+                ))}
+            </Section>
+            <Section title="Defenses">
+                {combat.defenses.map((stat) => (
+                    <Row key={stat.label} label={stat.label} value={stat.value} />
+                ))}
+                <Text variant="caption" muted style={styles.defenseNote}>
+                    Shown as total / resistant
+                </Text>
+            </Section>
+            <Section title="Combat Info">
+                {combat.info.map((stat) => (
+                    <Row key={stat.label} label={stat.label} value={stat.value} />
+                ))}
+            </Section>
+            {combat.movement.length > 0 ? (
+                <Section title="Movement">
+                    {combat.movement.map((row) => (
+                        <MovementRowView key={row.name} row={row} />
+                    ))}
+                </Section>
+            ) : null}
+        </>
+    );
+}
+
+function CombatStatRow({stat, onRoll}: {stat: CombatStat; onRoll: RollHandler}): React.JSX.Element {
+    const theme = useTheme();
+    if (stat.attackOcv === undefined) {
+        return <Row label={stat.label} value={stat.value} />;
+    }
+
+    const request: RollRequest = {mode: 'hit', ocv: stat.attackOcv, dcv: 3, label: stat.label};
+
+    return (
+        <Pressable testID={`roll-ocv-${stat.label}`} style={styles.row} onPress={() => onRoll(request, false)} onLongPress={() => onRoll(request, true)}>
+            <Text muted>{stat.label}</Text>
+            <Text color={theme.colors.primary}>{stat.value}</Text>
+        </Pressable>
+    );
+}
+
+function MovementRowView({row}: {row: MovementRow}): React.JSX.Element {
+    return (
+        <View style={styles.row}>
+            <Text muted>{row.name}</Text>
+            <Text>{`${row.combat}  ·  NC ${row.nonCombat}`}</Text>
+        </View>
     );
 }
 
@@ -346,8 +431,14 @@ const styles = StyleSheet.create({
         flex: 1,
         rowGap: 2,
     },
+    tabbed: {
+        rowGap: 16,
+    },
     section: {
         rowGap: 6,
+    },
+    defenseNote: {
+        paddingTop: 4,
     },
     row: {
         flexDirection: 'row',

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {combatDetails} from 'core/combat';
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Obj, type RollDescriptor} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
@@ -41,6 +42,89 @@ export interface SheetSection {
 export interface CharacterSheet {
     characteristics: SheetCharacteristic[];
     sections: SheetSection[];
+}
+
+/** A labelled combat number. `attackOcv` marks it as rollable as a to-hit at that OCV. */
+export interface CombatStat {
+    label: string;
+    value: string;
+    attackOcv?: number;
+}
+
+/** A movement mode with its combat and non-combat distances (already unit-formatted). */
+export interface MovementRow {
+    name: string;
+    combat: string;
+    nonCombat: string;
+}
+
+export interface CombatSheet {
+    combatValues: CombatStat[];
+    defenses: CombatStat[];
+    info: CombatStat[];
+    movement: MovementRow[];
+}
+
+const COMBAT_VALUE_FIELDS: Array<{key: string; label: string; attack: boolean}> = [
+    {key: 'ocv', label: 'OCV', attack: true},
+    {key: 'dcv', label: 'DCV', attack: false},
+    {key: 'omcv', label: 'OMCV', attack: true},
+    {key: 'dmcv', label: 'DMCV', attack: false},
+];
+
+/**
+ * Build the combat/movement view: combat values and phases (via the golden-mastered
+ * `combatDetails` port, so 5E figured OCV/DCV is handled), defenses, key combat
+ * characteristics, and per-mode movement distances.
+ */
+export function buildCombatSheet(character: Obj): CombatSheet {
+    const c: Obj = {...character, showSecondary: character.showSecondary ?? false};
+    const total = (shortName: string): number => heroDesignerCharacter.getCharacteristicTotal(shortName, c);
+
+    // init() flips showSecondary while it works, so hand it its own copy and keep `c` primary.
+    const details: Obj = combatDetails.init({...c}).primary;
+
+    const combatValues: CombatStat[] = COMBAT_VALUE_FIELDS.filter((field) => details[field.key] !== undefined).map((field) => ({
+        label: field.label,
+        value: String(details[field.key]),
+        attackOcv: field.attack ? Number(details[field.key]) : undefined,
+    }));
+
+    const defenses: CombatStat[] = [
+        {label: 'PD', value: heroDesignerCharacter.getTotalDefense(c, 'PD')},
+        {label: 'ED', value: heroDesignerCharacter.getTotalDefense(c, 'ED')},
+        {label: 'Mental', value: heroDesignerCharacter.getTotalUnusualDefense(c, 'MENTALDEFENSE')},
+        {label: 'Power', value: heroDesignerCharacter.getTotalUnusualDefense(c, 'POWERDEFENSE')},
+    ];
+
+    const phases = Object.keys(details.phases)
+        .map(Number)
+        .sort((a, b) => a - b)
+        .join(', ');
+
+    const info: CombatStat[] = [
+        {label: 'SPD', value: String(total('SPD'))},
+        {label: 'Phases', value: phases.length > 0 ? phases : '—'},
+        {label: 'DEX', value: String(total('DEX'))},
+        {label: 'REC', value: String(total('REC'))},
+        {label: 'END', value: String(total('END'))},
+        {label: 'STUN', value: String(total('STUN'))},
+        {label: 'BODY', value: String(total('BODY'))},
+    ];
+
+    const unit = heroDesignerCharacter.isFifth(c) ? '"' : 'm';
+    const movement: MovementRow[] = toArray(c.movement).map((mode) => {
+        const distance = heroDesignerCharacter.getMovementTotal(mode, c, true);
+        const raw = Number(heroDesignerCharacter.getMovementTotal(mode, c));
+        const ncm = heroDesignerCharacter.getTotalNcm(mode, c);
+        return {
+            name: String(mode.name ?? mode.shortName ?? ''),
+            combat: `${distance}${unit}`,
+            nonCombat: `${raw * ncm}${unit} (×${ncm})`,
+        };
+    });
+
+    return {combatValues, defenses, info, movement};
 }
 
 const TRAIT_SECTIONS: Array<{key: string; title: string}> = [

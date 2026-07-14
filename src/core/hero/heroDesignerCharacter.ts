@@ -233,6 +233,87 @@ export class HeroDesignerCharacter {
         return `${defenses.nonResistant}/${defenses.resistant}`;
     }
 
+    /**
+     * Total meters for a movement mode: its own value, plus 5E leaping's STR
+     * bonus, plus any movement-boosting powers of the same short name.
+     * `formatFraction` renders a trailing ½ as the legacy sheet does.
+     */
+    getMovementTotal(characteristic: Obj, character: Obj, formatFraction = false): number | string {
+        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const shortName = String(characteristic.shortName).toUpperCase();
+        let meters: number = characteristic.value;
+
+        if (shortName === 'LEAPING' && this.isFifth(character)) {
+            let total = this.getAdditionalCharacteristicPoints('STR', character) / 5;
+            const fractionalPart = parseFloat((total % 1).toFixed(1));
+
+            if (fractionalPart >= 0.6) {
+                total = Math.trunc(total) + 0.5;
+            } else {
+                total = Math.trunc(total);
+            }
+
+            meters = characteristic.base + total;
+        }
+
+        if (powersMap.has(shortName)) {
+            meters = this.getTotalMeters(powersMap.get(shortName), meters, character);
+        }
+
+        if (formatFraction) {
+            const fractionalMeters = parseFloat((meters % 1).toFixed(1));
+
+            return fractionalMeters >= 0.5 ? `${Math.trunc(meters)}½` : Math.trunc(meters);
+        }
+
+        return meters;
+    }
+
+    /** Non-combat movement multiplier (default x2), raised by IMPROVEDNONCOMBAT adders. */
+    getTotalNcm(characteristic: Obj, character: Obj): number {
+        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const shortName = String(characteristic.shortName).toUpperCase();
+        let ncm = 2;
+
+        if (powersMap.has(shortName)) {
+            ncm = this.getTotalNcmInner(powersMap.get(shortName), ncm, character);
+        }
+
+        return ncm;
+    }
+
+    private getTotalMeters(movementMode: Obj | Obj[], meters: number, character: Obj): number {
+        if (Array.isArray(movementMode)) {
+            for (const move of movementMode) {
+                meters += this.getTotalMeters(move, meters, character);
+            }
+        } else {
+            if (movementMode.affectsPrimary && movementMode.affectsTotal) {
+                meters += movementMode.levels;
+            } else if (!movementMode.affectsPrimary && movementMode.affectsTotal && character.showSecondary) {
+                meters += movementMode.levels;
+            }
+        }
+
+        return meters;
+    }
+
+    private getTotalNcmInner(movementMode: Obj | Obj[], ncm: number, character: Obj): number {
+        if (Array.isArray(movementMode)) {
+            for (const move of movementMode) {
+                ncm += this.getTotalNcmInner(move, ncm, character);
+            }
+        } else if ((movementMode.affectsPrimary && movementMode.affectsTotal) || (!movementMode.affectsPrimary && movementMode.affectsTotal && character.showSecondary)) {
+            const adderMap = toMap(movementMode.adder);
+
+            if (adderMap.has('IMPROVEDNONCOMBAT')) {
+                ncm **= (adderMap.get('IMPROVEDNONCOMBAT') as Obj).levels + 1;
+            }
+        }
+
+        return ncm;
+    }
+
     private getCharacteristicTotalInner(characteristic: Obj, powersMap: Map<unknown, any>, showSecondary: boolean, character: Obj): number {
         let value = characteristic.value;
 

@@ -161,6 +161,44 @@ describe('CharacterDetailScreen', () => {
         expect(current().totals.skillChecks).toBe(1);
     });
 
+    const switchTo = async (tree: ReactTestRenderer, tab: string): Promise<void> => {
+        const segment = tree.root.findAllByProps({testID: `segment-${tab}`}).find((node) => typeof node.props.onPress === 'function');
+        await act(async () => {
+            segment?.props.onPress();
+        });
+    };
+
+    it('shows combat values, defenses, and movement on the Combat tab', async () => {
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({document})));
+
+        await switchTo(tree, 'combat');
+
+        const text = collectText(tree.toJSON());
+        expect(text).toContain('OCV');
+        expect(text).toContain('DCV');
+        expect(text).toContain('PD');
+        expect(text).toContain('Phases');
+        expect(text).toContain('Running'); // a movement mode
+        expect(text.some((value) => value.includes('NC '))).toBe(true); // non-combat movement line
+    });
+
+    it('opens the dice roller in to-hit mode when OCV is tapped on the Combat tab', async () => {
+        const onRollRequest = jest.fn();
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({document})), {onRollRequest});
+
+        await switchTo(tree, 'combat');
+
+        const ocv = tree.root.findAllByProps({testID: 'roll-ocv-OCV'}).find((node) => typeof node.props.onPress === 'function');
+        await act(async () => {
+            ocv?.props.onPress();
+        });
+
+        expect(onRollRequest).toHaveBeenCalledTimes(1);
+        expect(onRollRequest.mock.calls[0][0]).toMatchObject({mode: 'hit', label: 'OCV'});
+    });
+
     it('calls onReady with the loaded character (for the header title)', async () => {
         const onReady = jest.fn();
         await renderScreen(fakeCharacters(character({name: 'Grond'})), {onReady});
