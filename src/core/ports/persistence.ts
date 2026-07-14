@@ -115,3 +115,64 @@ export interface AppStateStore {
     get(key: string): Promise<string | null>;
     set(key: string, value: string): Promise<void>;
 }
+
+export type Edition = '5E' | '6E';
+
+/** The parsed/normalized HERO Designer character document (portrait not embedded). */
+export type CharacterDocument = Record<string, unknown>;
+
+/** Portrait bytes to store, or `null` to clear. */
+export interface PortraitInput {
+    bytes: Uint8Array;
+    mime: string;
+}
+
+/** The list-screen row — lifted columns only, no document parse. */
+export interface CharacterSummary {
+    id: string;
+    name: string;
+    player: string | null;
+    edition: Edition;
+    slot: number | null;
+    isActive: boolean;
+    /** `file://` URI for `<Image>`, or null. */
+    portraitUri: string | null;
+}
+
+/** A full character: summary + the parsed document. */
+export interface Character extends CharacterSummary {
+    filename: string | null;
+    updatedAt: string;
+    document: CharacterDocument;
+}
+
+/** Input to `save` — the caller provides lifted fields + a portrait-free document. */
+export interface SaveCharacter {
+    id: string;
+    name: string;
+    player: string | null;
+    edition: Edition;
+    slot?: number | null;
+    filename?: string | null;
+    document: CharacterDocument;
+    /** Present + object → store new portrait; present + null → clear; absent → keep existing. */
+    portrait?: PortraitInput | null;
+}
+
+export interface CharacterRepository {
+    list(): Promise<CharacterSummary[]>;
+    get(id: string): Promise<Character | null>;
+    save(character: SaveCharacter): Promise<void>;
+    delete(id: string): Promise<void>;
+    setActive(id: string): Promise<void>;
+    getActive(): Promise<Character | null>;
+    /** The `slotCount` slots, each the summary in it or null if empty. */
+    slots(slotCount?: number): Promise<Array<CharacterSummary | null>>;
+}
+
+/** Binary blob store — portrait bytes as files on disk, referenced by id. */
+export interface ImageStore {
+    put(bytes: Uint8Array, mime: string): Promise<string>;
+    uri(imageId: string): string;
+    delete(imageId: string): Promise<void>;
+}
