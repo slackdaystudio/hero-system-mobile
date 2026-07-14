@@ -57,13 +57,14 @@ ends the "thread `db` through every method" pattern.
 
 ```ts
 interface CharacterRepository {
-    list(): Promise<CharacterSummary[]>;      // name, edition, portraitUri, slot, isActive
+    list(): Promise<CharacterSummary[]>;      // name, edition, portraitUri, isActive
     get(id: string): Promise<Character | null>;
     save(character: Character): Promise<void>; // upserts; writes portrait via ImageStore
     delete(id: string): Promise<void>;         // also deletes the portrait file
     setActive(id: string): Promise<void>;
     getActive(): Promise<Character | null>;
-    slots(): Promise<Array<CharacterSummary | null>>;
+    // Slots were retired (migration 003): the library + active pointer replaced
+    // the legacy slot loadout, which the removed character viewer used.
 }
 
 interface SettingsRepository {
@@ -107,14 +108,14 @@ characters(
   name         TEXT NOT NULL,           -- denormalized for the list screen
   player       TEXT,                    -- denormalized (sort/filter)
   edition      TEXT NOT NULL,           -- '5E' | '6E', derived at import via isFifth()
-  slot         INTEGER,                 -- 0..4, NULL = stored but unslotted
+  -- slot column existed in migration 001; retired in migration 003 (see below)
   is_active    INTEGER NOT NULL DEFAULT 0,
   portrait_id  TEXT,                    -- ImageStore id, NULL if no portrait
   filename     TEXT,                    -- .hsmc export name
   data         TEXT NOT NULL,           -- full HD document JSON, portrait bytes stripped
   updated_at   TEXT NOT NULL
 );
-CREATE UNIQUE INDEX ux_characters_slot ON characters(slot) WHERE slot IS NOT NULL;
+-- ux_characters_slot existed in migration 001; dropped in migration 003
 CREATE UNIQUE INDEX ux_characters_active ON characters(is_active) WHERE is_active = 1;
 
 settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);          -- global, k/v

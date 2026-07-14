@@ -15,16 +15,14 @@
 import type {Character, CharacterRepository, CharacterSummary, ImageStore, SaveCharacter} from 'core/ports';
 import type {SqlDatabase, SqlRow} from './driver/sqlDatabase';
 
-const DEFAULT_SLOT_COUNT = 5;
-
-const SUMMARY_COLUMNS = 'id, name, player, edition, slot, is_active, portrait_id';
+const SUMMARY_COLUMNS = 'id, name, player, edition, is_active, portrait_id';
 
 /**
  * Characters in SQLite: one row each, the HD document as a JSON `data` column
- * with the list/rules fields lifted into their own columns. `list()`/`slots()`
- * read only the lifted columns — the document is never parsed for the list
- * screen (the performance fix). Portrait bytes live in the {@link ImageStore},
- * referenced by `portrait_id`, and never bloat the row.
+ * with the list/rules fields lifted into their own columns. `list()` reads only
+ * the lifted columns — the document is never parsed for the list screen (the
+ * performance fix). Portrait bytes live in the {@link ImageStore}, referenced by
+ * `portrait_id`, and never bloat the row.
  */
 export class SqliteCharacterRepository implements CharacterRepository {
     constructor(
@@ -51,17 +49,6 @@ export class SqliteCharacterRepository implements CharacterRepository {
         return rows.length > 0 ? this.toCharacter(rows[0]) : null;
     }
 
-    async slots(slotCount = DEFAULT_SLOT_COUNT): Promise<Array<CharacterSummary | null>> {
-        const {rows} = this.db.execute(`SELECT ${SUMMARY_COLUMNS} FROM characters WHERE slot IS NOT NULL`);
-        const bySlot = new Map<number, CharacterSummary>();
-
-        for (const row of rows) {
-            bySlot.set(row.slot as number, this.toSummary(row));
-        }
-
-        return Array.from({length: slotCount}, (_unused, slot) => bySlot.get(slot) ?? null);
-    }
-
     async save(character: SaveCharacter): Promise<void> {
         const existing = this.db.execute('SELECT portrait_id, is_active FROM characters WHERE id = ?', [character.id]).rows[0];
         const existingPortraitId = (existing?.portrait_id as string | null) ?? null;
@@ -85,18 +72,17 @@ export class SqliteCharacterRepository implements CharacterRepository {
 
         this.db.transaction(() => {
             this.db.execute(
-                `INSERT INTO characters (id, name, player, edition, slot, is_active, portrait_id, filename, data, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `INSERT INTO characters (id, name, player, edition, is_active, portrait_id, filename, data, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                  ON CONFLICT(id) DO UPDATE SET
                     name = excluded.name, player = excluded.player, edition = excluded.edition,
-                    slot = excluded.slot, portrait_id = excluded.portrait_id, filename = excluded.filename,
+                    portrait_id = excluded.portrait_id, filename = excluded.filename,
                     data = excluded.data, updated_at = excluded.updated_at`,
                 [
                     character.id,
                     character.name,
                     character.player,
                     character.edition,
-                    character.slot ?? null,
                     existingIsActive,
                     portraitId,
                     character.filename ?? null,
@@ -138,7 +124,6 @@ export class SqliteCharacterRepository implements CharacterRepository {
             name: row.name as string,
             player: (row.player as string | null) ?? null,
             edition: row.edition as CharacterSummary['edition'],
-            slot: (row.slot as number | null) ?? null,
             isActive: row.is_active === 1,
             portraitUri: portraitId !== null ? this.imageStore.uri(portraitId) : null,
         };

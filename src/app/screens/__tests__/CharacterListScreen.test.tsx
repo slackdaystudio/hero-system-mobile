@@ -25,7 +25,6 @@ const summary = (over: Partial<CharacterSummary> = {}): CharacterSummary => ({
     name: 'Defensor',
     player: 'Phil',
     edition: '6E',
-    slot: 0,
     isActive: false,
     portraitUri: null,
     ...over,

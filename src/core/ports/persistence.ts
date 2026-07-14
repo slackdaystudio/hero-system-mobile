@@ -132,7 +132,6 @@ export interface CharacterSummary {
     name: string;
     player: string | null;
     edition: Edition;
-    slot: number | null;
     isActive: boolean;
     /** `file://` URI for `<Image>`, or null. */
     portraitUri: string | null;
@@ -151,7 +150,6 @@ export interface SaveCharacter {
     name: string;
     player: string | null;
     edition: Edition;
-    slot?: number | null;
     filename?: string | null;
     document: CharacterDocument;
     /** Present + object → store new portrait; present + null → clear; absent → keep existing. */
@@ -165,8 +163,6 @@ export interface CharacterRepository {
     delete(id: string): Promise<void>;
     setActive(id: string): Promise<void>;
     getActive(): Promise<Character | null>;
-    /** The `slotCount` slots, each the summary in it or null if empty. */
-    slots(slotCount?: number): Promise<Array<CharacterSummary | null>>;
 }
 
 /**

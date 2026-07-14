@@ -82,18 +82,12 @@ export function createLegacySource(deps: LegacySourceDeps): LegacySource {
 async function readCharacters(deps: LegacySourceDeps): Promise<LegacyCharacter[]> {
     const {keyValue, fileSystem, unzip, characterDir} = deps;
 
-    // Slot/active pointers from AsyncStorage. `characters` is a slot->char map,
-    // `character` is the active one; we only need their filenames here.
-    const slotMap = parseJson<Record<string, {filename?: string} | null>>(await keyValue.getItem('characters')) ?? {};
+    // Character/active pointers from AsyncStorage. `characters` is a map of the
+    // stored characters (legacy keyed them by slot), `character` is the active
+    // one; we only need their filenames here.
+    const storedMap = parseJson<Record<string, {filename?: string} | null>>(await keyValue.getItem('characters')) ?? {};
     const activeChar = parseJson<{filename?: string}>(await keyValue.getItem('character'));
     const activeFilename = typeof activeChar?.filename === 'string' ? activeChar.filename : null;
-
-    const slotByFilename = new Map<string, number>();
-    for (const [slot, char] of Object.entries(slotMap)) {
-        if (char !== null && typeof char.filename === 'string') {
-            slotByFilename.set(char.filename, Number(slot));
-        }
-    }
 
     const byFilename = new Map<string, LegacyCharacter>();
 
@@ -105,7 +99,7 @@ async function readCharacters(deps: LegacySourceDeps): Promise<LegacyCharacter[]
             const raw = entries[`${file.slice(0, -HSMC.length)}.json`] ?? Object.values(entries)[0] ?? null;
             const document = parseJson<CharacterDocument>(raw);
             if (document !== null) {
-                byFilename.set(file, {document, filename: file, slot: slotByFilename.get(file) ?? null, active: activeFilename === file});
+                byFilename.set(file, {document, filename: file, active: activeFilename === file});
             }
         } catch {
             // Unreadable/corrupt .hsmc — skip; a later AsyncStorage copy may still cover it.
@@ -114,15 +108,14 @@ async function readCharacters(deps: LegacySourceDeps): Promise<LegacyCharacter[]
 
     // Fallback: AsyncStorage character objects whose `.hsmc` is missing on disk,
     // so nothing is lost even if the file was never written / was deleted. The
-    // per-slot map entries are the canonical stored objects, so they take
+    // stored-map entries are the canonical stored objects, so they take
     // precedence over the (possibly thinner) active pointer.
-    for (const char of [...Object.values(slotMap), activeChar]) {
+    for (const char of [...Object.values(storedMap), activeChar]) {
         const filename = (char as {filename?: unknown} | null)?.filename;
         if (typeof filename === 'string' && !byFilename.has(filename)) {
             byFilename.set(filename, {
                 document: char as CharacterDocument,
                 filename,
-                slot: slotByFilename.get(filename) ?? null,
                 active: activeFilename === filename,
             });
         }

@@ -27,7 +27,6 @@ const snapshot = (): LegacySnapshot => ({
     characters: [
         {
             filename: 'defensor.hsmc',
-            slot: 0,
             active: true,
             document: {
                 characterInfo: {characterName: 'Defensor', playerName: 'Phil'},
@@ -37,7 +36,6 @@ const snapshot = (): LegacySnapshot => ({
         },
         {
             filename: 'grond.hsmc',
-            slot: 1,
             active: false,
             document: {
                 characterInfo: {characterName: 'Grond', playerName: 'GM'},
@@ -72,7 +70,7 @@ const setup = () => {
 };
 
 describe('migrateV1 (real SQLite + FileImageStore)', () => {
-    it('imports characters with derived edition, lifted portrait, and preserved slots/active', async () => {
+    it('imports characters with derived edition, lifted portrait, and preserved active', async () => {
         const {repos, fs} = setup();
         const {source, wasCleared} = fakeSource(snapshot());
 
@@ -81,9 +79,9 @@ describe('migrateV1 (real SQLite + FileImageStore)', () => {
         expect(result).toEqual({migrated: true, characters: 2, portraits: 1});
 
         const list = await repos.characters.list();
-        expect(list.map((c) => [c.name, c.edition, c.slot])).toEqual([
-            ['Defensor', '6E', 0],
-            ['Grond', '5E', 1],
+        expect(list.map((c) => [c.name, c.edition])).toEqual([
+            ['Defensor', '6E'],
+            ['Grond', '5E'],
         ]);
 
         // The portrait was lifted to a file and the row references it; the document

@@ -55,7 +55,7 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
     it('round-trips a character: lifted fields + full document', async () => {
         const {repo} = setup();
 
-        await repo.save(character({slot: 0, filename: 'defensor.hsmc'}));
+        await repo.save(character({filename: 'defensor.hsmc'}));
         const got = await repo.get('c1');
 
         expect(got).toMatchObject({
@@ -63,7 +63,6 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
             name: 'Defensor',
             player: 'Phil',
             edition: '6E',
-            slot: 0,
             isActive: false,
             filename: 'defensor.hsmc',
             portraitUri: null,
@@ -125,34 +124,7 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
         });
     });
 
-    describe('slots + active', () => {
-        it('rejects two characters in the same slot', async () => {
-            const {repo} = setup();
-            await repo.save(character({id: 'a', slot: 0}));
-
-            // Explicit try/catch rather than `.rejects.toThrow()`: the promise always
-            // rejects (the DB is provably correct — verified 5000/5000 outside jest),
-            // but jest's async `.rejects` matcher intermittently misfires under full-
-            // suite load. Catching directly is deterministic.
-            let rejected = false;
-            try {
-                await repo.save(character({id: 'b', slot: 0}));
-            } catch {
-                rejected = true;
-            }
-            expect(rejected).toBe(true);
-        });
-
-        it('slots() maps characters to their slots', async () => {
-            const {repo} = setup();
-            await repo.save(character({id: 'a', slot: 0, name: 'A'}));
-            await repo.save(character({id: 'c', slot: 2, name: 'C'}));
-
-            const slots = await repo.slots(3);
-
-            expect(slots.map((s) => s?.name ?? null)).toEqual(['A', null, 'C']);
-        });
-
+    describe('active character', () => {
         it('setActive keeps exactly one active character', async () => {
             const {repo} = setup();
             await repo.save(character({id: 'a', name: 'A'}));

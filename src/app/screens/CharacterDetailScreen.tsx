@@ -540,7 +540,6 @@ function BasicBody({character}: {character: Character}): React.JSX.Element {
         <>
             <Section title="Details">
                 <Row label="Edition" value={character.edition} />
-                <Row label="Slot" value={character.slot === null ? 'Unassigned' : `Slot ${character.slot + 1}`} />
                 <Row label="File" value={character.filename ?? '—'} />
             </Section>
             {characteristics.length > 0 ? (

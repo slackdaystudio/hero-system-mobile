@@ -86,12 +86,11 @@ describe('createLegacySource + migrateV1 (real zip + real legacy SQLite)', () =>
 
         expect(result).toEqual({migrated: true, characters: 2, portraits: 1});
 
-        // Characters, with edition derived from the real .hsmc document and slots
-        // recovered from the AsyncStorage map.
+        // Characters, with edition derived from the real .hsmc document.
         const list = await repos.characters.list();
-        expect(list.map((c) => [c.name, c.edition, c.slot])).toEqual([
-            ['Defensor', '6E', 0],
-            ['Grond', '5E', 2],
+        expect(list.map((c) => [c.name, c.edition])).toEqual([
+            ['Defensor', '6E'],
+            ['Grond', '5E'],
         ]);
         expect((await repos.characters.getActive())?.name).toBe('Defensor');
 
@@ -128,7 +127,6 @@ describe('createLegacySource + migrateV1 (real zip + real legacy SQLite)', () =>
 
         const list = await repos.characters.list();
         expect(list.map((c) => c.name)).toEqual(['Orphan']);
-        expect(list[0].slot).toBe(0);
         expect(list[0].isActive).toBe(true);
     });
 

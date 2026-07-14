@@ -17,13 +17,12 @@ import type {CharacterDocument, RandomHero, Settings, Statistics} from 'core/por
 /**
  * One legacy character, already reconciled by the {@link LegacySource}: the
  * document comes from the authoritative `.hsmc` on disk (portrait still embedded
- * as a `data:` URI on `document.portrait`); the slot/active pointers come from
- * the old AsyncStorage `characters`/`character` keys.
+ * as a `data:` URI on `document.portrait`); the active pointer comes from the old
+ * AsyncStorage `character` key.
  */
 export interface LegacyCharacter {
     document: CharacterDocument;
     filename: string | null;
-    slot: number | null;
     active: boolean;
 }
 

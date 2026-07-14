@@ -117,7 +117,6 @@ async function seedDemoCharacters(repositories: Repositories): Promise<void> {
         name: info.characterName ?? 'Sample Hero',
         player: info.playerName ?? null,
         edition: heroDesignerCharacter.isFifth(document) ? '5E' : '6E',
-        slot: 0,
         filename: 'sample.hsmc',
         document,
         portrait: {bytes: base64ToBytes(DEMO_PORTRAIT_PNG), mime: 'image/png'},
@@ -129,7 +128,6 @@ async function seedDemoCharacters(repositories: Repositories): Promise<void> {
         name: 'Grond',
         player: 'GM',
         edition: '5E',
-        slot: 1,
         filename: 'grond.hsmc',
         document: {
             characterInfo: {characterName: 'Grond'},

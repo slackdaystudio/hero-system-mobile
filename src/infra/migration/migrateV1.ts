@@ -56,7 +56,6 @@ export async function migrateV1(repos: Repositories, source: LegacySource, now: 
             name: info.characterName ?? 'Unnamed',
             player: info.playerName ?? null,
             edition: heroDesignerCharacter.isFifth(document) ? '5E' : '6E',
-            slot: legacy.slot,
             filename: legacy.filename,
             document,
             portrait,

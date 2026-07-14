@@ -62,8 +62,17 @@ const migration002: Migration = {
     },
 };
 
+/** 003 — retire character slots (the library + active pointer replaced the slot loadout). */
+const migration003: Migration = {
+    version: 3,
+    up(db) {
+        db.execute('DROP INDEX IF EXISTS ux_characters_slot');
+        db.execute('ALTER TABLE characters DROP COLUMN slot');
+    },
+};
+
 /** All migrations, in ascending version order. */
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003];
 
 /**
  * Apply every migration newer than the recorded schema version, each in its own

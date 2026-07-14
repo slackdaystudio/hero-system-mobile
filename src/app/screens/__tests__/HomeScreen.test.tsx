@@ -25,7 +25,6 @@ const activeCharacter: Character = {
     name: 'Defensor',
     player: 'Phil',
     edition: '6E',
-    slot: 0,
     isActive: true,
     portraitUri: null,
     filename: 'defensor.hsmc',

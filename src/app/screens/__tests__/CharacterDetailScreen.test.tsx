@@ -57,7 +57,6 @@ const character = (over: Partial<Character> = {}): Character => ({
     name: 'Defensor',
     player: 'Phil',
     edition: '6E',
-    slot: 0,
     isActive: true,
     portraitUri: null,
     filename: 'defensor.hsmc',
@@ -137,7 +136,6 @@ describe('CharacterDetailScreen', () => {
         expect(text).toContain('6E · Phil');
         expect(text).toContain('Active');
         expect(text).toContain('defensor.hsmc'); // File row (basic-body only)
-        expect(text).toContain('Slot 1'); // slot 0 shown 1-indexed
         expect(text).toContain('STR');
         expect(text).toContain('20');
         expect(text).toContain('Force Field');
