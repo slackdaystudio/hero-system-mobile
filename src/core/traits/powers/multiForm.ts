@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {totalAdders} from 'core/util';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class MultiForm extends TraitDecorator {}
+/** Multiform, ported from legacy `powers/MultiForm.js`. */
+export default class MultiForm extends TraitDecorator {
+    cost(): number {
+        const trait = this.characterTrait.trait;
+
+        let cost = (trait.levels / trait.template.lvlval) * trait.template.lvlcost;
+        cost += totalAdders(trait.adder);
+
+        return Math.ceil(cost);
+    }
+}

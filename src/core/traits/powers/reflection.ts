@@ -12,8 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {type Obj} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class Reflection extends TraitDecorator {}
+/** Reflection, ported from legacy `powers/Reflection.js`. */
+export default class Reflection extends TraitDecorator {
+    cost(): number {
+        const trait = this.characterTrait.trait;
+
+        let cost = this.trait.basecost;
+        cost += Math.ceil(trait.levels / trait.template.lvlval) * trait.template.lvlcost;
+        cost += this.addAdder(trait.adder);
+
+        return cost;
+    }
+
+    private addAdder(adder: Obj | Obj[] | undefined | null): number {
+        let cost = 0;
+
+        if (adder === undefined || adder === null) {
+            return cost;
+        }
+
+        if (Array.isArray(adder)) {
+            for (const a of adder) {
+                cost += this.addAdder(a);
+            }
+        } else {
+            cost += adder.basecost;
+
+            if (adder.levels > 0) {
+                cost = (adder.levels / adder.lvlval) * adder.lvlcost;
+            }
+        }
+
+        return cost;
+    }
+}

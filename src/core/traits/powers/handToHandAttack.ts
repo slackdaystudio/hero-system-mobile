@@ -12,8 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {toMap} from 'core/util';
+import {RollType} from 'core/dice';
+import {heroDesignerCharacter} from 'core/hero';
+import {type RollDescriptor} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class HandToHandAttack extends TraitDecorator {}
+/** Hand-to-Hand Attack, ported from legacy `powers/HandToHandAttack.js`. */
+export default class HandToHandAttack extends TraitDecorator {
+    roll(): RollDescriptor {
+        const character = this.characterTrait.getCharacter();
+        const adderMap = toMap(this.characterTrait.trait.adder);
+        let dice = this.characterTrait.trait.levels;
+        const roll: RollDescriptor = {roll: '', type: RollType.NormalDamage};
+        let partialDie = false;
+
+        dice += heroDesignerCharacter.getCharacteristicTotal('STR', character) / 5;
+
+        if (parseFloat((dice % 1).toFixed(1)) !== 0.0) {
+            partialDie = parseFloat((dice % 1).toFixed(1)) >= 0.6;
+            dice = Math.trunc(dice);
+        }
+
+        if (adderMap.has('PLUSONEPIP')) {
+            roll.roll = partialDie ? `${dice + 1}d6` : `${dice}d6+1`;
+        } else if (adderMap.has('PLUSONEHALFDIE')) {
+            roll.roll = partialDie ? `${dice + 1}d6` : `${dice}½d6`;
+        } else {
+            roll.roll = `${dice}d6`;
+        }
+
+        return roll;
+    }
+}

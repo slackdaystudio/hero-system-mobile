@@ -51,34 +51,7 @@ const CATEGORIES: Array<{key: string; subKey: string}> = [
 //   - group 2: an edge in specific contexts (VPP/framework slots, compound-power
 //     children) under investigation — skipped by xmlid for now, which is broader
 //     than the actual failing instances.
-const POWER_SKIP = new Set([
-    // group 1 — pending decorators
-    'DUPLICATION',
-    'FLASH',
-    'MULTIFORM',
-    'POSSESSION',
-    'REFLECTION',
-    'FORCEFIELD',
-    'CONCEALED',
-    'ENHANCEDPERCEPTION',
-    'TELESCOPIC',
-    'MICROSCOPIC',
-    'RAPID',
-    'SUMMON',
-    'TELEKINESIS',
-    'DETECT',
-    'FINDWEAKNESS',
-    'HKA',
-    'HANDTOHANDATTACK',
-    // group 2 — context edge under investigation
-    'ENERGYBLAST',
-    'EGOATTACK',
-    'DRAIN',
-    'RKA',
-    'CHANGEENVIRONMENT',
-    'IMAGES',
-    'COMPOUNDPOWER',
-]);
+const POWER_SKIP = new Set<string>();
 
 describe('golden master: core/traits factory reproduces legacy', () => {
     it('covers the whole corpus', () => {

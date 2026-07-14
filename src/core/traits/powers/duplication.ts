@@ -12,8 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {getMultiplierCost, totalAdders} from 'core/util';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class Duplication extends TraitDecorator {}
+/** Duplication, ported from legacy `powers/Duplication.js`. */
+export default class Duplication extends TraitDecorator {
+    cost(): number {
+        const trait = this.characterTrait.trait;
+        let cost = 0;
+
+        if (trait.points === 0) {
+            cost = 1;
+        } else {
+            cost = Math.round(trait.points / trait.template.lvlval);
+        }
+
+        cost = cost < 1 ? 1 : cost;
+        cost += totalAdders(trait.adder);
+        cost += getMultiplierCost(trait.number, trait.template.multiplierval, trait.template.multipliercost);
+
+        return cost;
+    }
+}

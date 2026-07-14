@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {RollType} from 'core/dice';
+import {type RollDescriptor} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class FindWeakness extends TraitDecorator {}
+/** Find Weakness, ported from legacy `powers/FindWeakness.js`. */
+export default class FindWeakness extends TraitDecorator {
+    roll(): RollDescriptor {
+        return {
+            roll: `${11 + this.characterTrait.trait.levels}-`,
+            type: RollType.SkillCheck,
+        };
+    }
+}

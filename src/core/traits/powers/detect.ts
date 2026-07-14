@@ -12,8 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {toMap} from 'core/util';
+import {RollType} from 'core/dice';
+import {type RollDescriptor} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class Detect extends TraitDecorator {}
+/** Detect sense, ported from legacy `powers/Detect.js`. */
+export default class Detect extends TraitDecorator {
+    roll(): RollDescriptor {
+        let base = 11;
+
+        // Faithful to legacy: the `!== null || !== undefined` guard is always true.
+        if (this.characterTrait.trait.modifier !== null || this.characterTrait.trait.modifier !== undefined) {
+            const modifierMap = toMap(this.characterTrait.trait.modifier);
+
+            if (modifierMap.has('FOCUS')) {
+                base = 9;
+            }
+        }
+
+        return {
+            roll: `${base + this.characterTrait.trait.levels}-`,
+            type: RollType.SkillCheck,
+        };
+    }
+}

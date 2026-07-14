@@ -12,8 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {RollType} from 'core/dice';
+import {heroDesignerCharacter} from 'core/hero';
+import {type RollDescriptor} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class EnhancedPerception extends TraitDecorator {}
+/** Enhanced Perception, ported from legacy `powers/EnhancedPerception.js`. */
+export default class EnhancedPerception extends TraitDecorator {
+    roll(): RollDescriptor {
+        const characteristics = this.characterTrait.getCharacter().characteristics;
+        let base = 0;
+
+        for (const characteristic of characteristics) {
+            if (characteristic.shortName === 'INT') {
+                const totalRoll = heroDesignerCharacter.getRollTotal(characteristic, this.characterTrait.getCharacter())!;
+
+                base += parseInt(totalRoll.substring(0, totalRoll.length - 1), 10);
+
+                break;
+            }
+        }
+
+        return {
+            roll: `${base + this.characterTrait.trait.levels}-`,
+            type: RollType.SkillCheck,
+        };
+    }
+}
