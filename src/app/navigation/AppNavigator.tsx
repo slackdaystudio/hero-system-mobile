@@ -18,6 +18,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Text} from 'app/components';
+import type {RollRequest} from 'app/dice/rollRequest';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {DiceScreen} from 'app/screens/DiceScreen';
@@ -32,7 +33,7 @@ import {useTheme} from 'app/theme';
 export type RootStackParamList = {
     CharacterList: undefined;
     CharacterDetail: {id: string};
-    Dice: undefined;
+    Dice: {request?: RollRequest} | undefined;
     Statistics: undefined;
 };
 
@@ -68,7 +69,11 @@ export function AppNavigator(): React.JSX.Element {
                     </Stack.Screen>
                     <Stack.Screen name="CharacterDetail" options={{title: ''}}>
                         {({route, navigation}) => (
-                            <CharacterDetailScreen characterId={route.params.id} onReady={(character) => navigation.setOptions({title: character.name})} />
+                            <CharacterDetailScreen
+                                characterId={route.params.id}
+                                onReady={(character) => navigation.setOptions({title: character.name})}
+                                onRollRequest={(request) => navigation.navigate('Dice', {request})}
+                            />
                         )}
                     </Stack.Screen>
                     <Stack.Screen
@@ -85,7 +90,7 @@ export function AppNavigator(): React.JSX.Element {
                                 </Pressable>
                             ),
                         })}>
-                        {() => <DiceScreen />}
+                        {({route}) => <DiceScreen initialRequest={route.params?.request} />}
                     </Stack.Screen>
                     <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>
                         {() => <StatisticsScreen />}

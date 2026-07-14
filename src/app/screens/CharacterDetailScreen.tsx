@@ -13,25 +13,35 @@
 // limitations under the License.
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, Image, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
+import {ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
+import type {LastRoll} from 'core/dice';
 import type {Character} from 'core/ports';
-import {Card, Screen, Text} from 'app/components';
-import {useCharacterRepository} from 'app/providers/RepositoriesProvider';
+import {Button, Card, Screen, Text} from 'app/components';
+import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
+import {useDieRoller} from 'app/providers/DiceProvider';
+import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
 import {asHeroCharacter, buildCharacterSheet, type CharacterSheet, type SheetCharacteristic, type SheetTrait} from './characterSheet';
 
 type LoadState = {status: 'loading'} | {status: 'ready'; character: Character} | {status: 'not-found'} | {status: 'error'; message: string};
 
+type RollFlashState = {request: RollRequest; title: string; lines: string[]; dice: number[]};
+
+type RollHandler = (request: RollRequest, immediate: boolean) => void;
+
 export interface CharacterDetailScreenProps {
     characterId: string;
     /** Fired once the character loads — the navigator uses it to set the header title. */
     onReady?: (character: Character) => void;
+    /** Tap a roll → open the dice roller pre-filled. Long-press rolls it inline. */
+    onRollRequest?: (request: RollRequest) => void;
 }
 
 const AVATAR = 96;
 
-export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScreenProps): React.JSX.Element {
-    const repository = useCharacterRepository();
+export function CharacterDetailScreen({characterId, onReady, onRollRequest}: CharacterDetailScreenProps): React.JSX.Element {
+    const {characters: repository, statistics} = useRepositories();
+    const roller = useDieRoller();
     const theme = useTheme();
     const [state, setState] = useState<LoadState>({status: 'loading'});
 
@@ -65,6 +75,29 @@ export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScr
         const hero = asHeroCharacter(character.document);
         return hero === null ? null : buildCharacterSheet(hero);
     }, [character]);
+
+    const [flash, setFlash] = useState<RollFlashState | null>(null);
+
+    const rollNow = useCallback(
+        async (request: RollRequest) => {
+            const result: LastRoll = performRoll(roller, request);
+            setFlash({request, ...describeRoll(result)});
+            const stats = await statistics.get();
+            await statistics.save(recordRoll(stats, result));
+        },
+        [roller, statistics],
+    );
+
+    const handleRoll = useCallback<RollHandler>(
+        (request, immediate) => {
+            if (immediate) {
+                rollNow(request);
+            } else {
+                onRollRequest?.(request);
+            }
+        },
+        [rollNow, onRollRequest],
+    );
 
     if (state.status === 'loading') {
         return (
@@ -120,24 +153,25 @@ export function CharacterDetailScreen({characterId, onReady}: CharacterDetailScr
                     </View>
                 </View>
 
-                {sheet !== null ? <SheetBody sheet={sheet} /> : <BasicBody character={loaded} />}
+                {sheet !== null ? <SheetBody sheet={sheet} onRoll={handleRoll} /> : <BasicBody character={loaded} />}
             </ScrollView>
+            <RollFlash flash={flash} onClose={() => setFlash(null)} onRollAgain={rollNow} />
         </Screen>
     );
 }
 
-function SheetBody({sheet}: {sheet: CharacterSheet}): React.JSX.Element {
+function SheetBody({sheet, onRoll}: {sheet: CharacterSheet; onRoll: RollHandler}): React.JSX.Element {
     return (
         <>
             <Section title="Characteristics">
                 {sheet.characteristics.map((characteristic, index) => (
-                    <CharacteristicRow key={index} characteristic={characteristic} />
+                    <CharacteristicRow key={index} characteristic={characteristic} onRoll={onRoll} />
                 ))}
             </Section>
             {sheet.sections.map((section) => (
                 <Section key={section.title} title={section.title}>
                     {section.traits.map((trait, index) => (
-                        <TraitRow key={index} trait={trait} />
+                        <TraitRow key={index} trait={trait} onRoll={onRoll} />
                     ))}
                 </Section>
             ))}
@@ -145,14 +179,25 @@ function SheetBody({sheet}: {sheet: CharacterSheet}): React.JSX.Element {
     );
 }
 
-function CharacteristicRow({characteristic}: {characteristic: SheetCharacteristic}): React.JSX.Element {
+function CharacteristicRow({characteristic, onRoll}: {characteristic: SheetCharacteristic; onRoll: RollHandler}): React.JSX.Element {
+    const theme = useTheme();
+    const request = characteristicRollRequest(characteristic.roll, characteristic.name);
+
     return (
         <View style={styles.charRow}>
             <Text style={styles.charName}>{characteristic.name}</Text>
             <Text style={styles.charTotal}>{String(characteristic.total)}</Text>
-            <Text variant="caption" muted style={styles.charRoll}>
-                {characteristic.roll ?? ''}
-            </Text>
+            {request !== null ? (
+                <Pressable testID={`roll-char-${characteristic.name}`} style={styles.charRoll} onPress={() => onRoll(request, false)} onLongPress={() => onRoll(request, true)}>
+                    <Text variant="caption" color={theme.colors.primary} style={styles.rollText}>
+                        {characteristic.roll}
+                    </Text>
+                </Pressable>
+            ) : (
+                <Text variant="caption" muted style={[styles.charRoll, styles.rollText]}>
+                    {characteristic.roll ?? ''}
+                </Text>
+            )}
             <Text variant="caption" muted style={styles.charCost}>
                 {`${characteristic.cost}`}
             </Text>
@@ -160,18 +205,21 @@ function CharacteristicRow({characteristic}: {characteristic: SheetCharacteristi
     );
 }
 
-function TraitRow({trait}: {trait: SheetTrait}): React.JSX.Element {
+function TraitRow({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}): React.JSX.Element {
     const theme = useTheme();
     const indent: ViewStyle = {paddingLeft: trait.depth * 16};
+    const request = traitRollRequest(trait.roll, trait.label);
 
     return (
         <View style={[styles.trait, indent]}>
             <View style={styles.traitHead}>
                 <Text style={styles.traitLabel}>{trait.label}</Text>
-                {trait.roll !== null ? (
-                    <Text variant="caption" color={theme.colors.primary}>
-                        {trait.roll.roll}
-                    </Text>
+                {trait.roll !== null && request !== null ? (
+                    <Pressable testID={`roll-trait-${trait.label}`} onPress={() => onRoll(request, false)} onLongPress={() => onRoll(request, true)}>
+                        <Text variant="caption" color={theme.colors.primary}>
+                            {trait.roll.roll}
+                        </Text>
+                    </Pressable>
                 ) : null}
                 <Text variant="caption" muted style={styles.traitCost}>
                     {`${trait.realCost}`}
@@ -183,6 +231,40 @@ function TraitRow({trait}: {trait: SheetTrait}): React.JSX.Element {
                 </Text>
             ) : null}
         </View>
+    );
+}
+
+function RollFlash({flash, onClose, onRollAgain}: {flash: RollFlashState | null; onClose: () => void; onRollAgain: (request: RollRequest) => void}): React.JSX.Element | null {
+    const theme = useTheme();
+    if (flash === null) {
+        return null;
+    }
+    const card: ViewStyle = {backgroundColor: theme.colors.surface, borderRadius: theme.radius.lg};
+
+    return (
+        <Modal transparent visible animationType="fade" onRequestClose={onClose}>
+            <Pressable testID="flash-backdrop" style={styles.backdrop} onPress={onClose}>
+                <Pressable style={[styles.modalCard, card]} onPress={() => undefined}>
+                    <Text variant="subtitle">{flash.title}</Text>
+                    {flash.lines.map((line, index) => (
+                        <Text key={index} variant="title">
+                            {line}
+                        </Text>
+                    ))}
+                    <Text variant="caption" muted>
+                        {flash.dice.join('  ·  ')}
+                    </Text>
+                    <View style={styles.modalActions}>
+                        <View style={styles.grow}>
+                            <Button label="Roll again" variant="secondary" onPress={() => onRollAgain(flash.request)} />
+                        </View>
+                        <View style={styles.grow}>
+                            <Button testID="flash-close" label="Close" onPress={onClose} />
+                        </View>
+                    </View>
+                </Pressable>
+            </Pressable>
+        </Modal>
     );
 }
 
@@ -288,6 +370,9 @@ const styles = StyleSheet.create({
     },
     charRoll: {
         width: 44,
+        alignItems: 'flex-end',
+    },
+    rollText: {
         textAlign: 'right',
     },
     charCost: {
@@ -308,5 +393,28 @@ const styles = StyleSheet.create({
     traitCost: {
         width: 44,
         textAlign: 'right',
+    },
+    backdrop: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalCard: {
+        width: '100%',
+        maxWidth: 340,
+        padding: 20,
+        rowGap: 6,
+        alignItems: 'flex-start',
+    },
+    modalActions: {
+        flexDirection: 'row',
+        columnGap: 12,
+        alignSelf: 'stretch',
+        marginTop: 12,
+    },
+    grow: {
+        flex: 1,
     },
 });

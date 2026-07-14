@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {RollType, PartialDie, type DamageForm, type DamageResult, type LastRoll, type SkillCheckResult, type ToHitResults} from 'core/dice';
-import {accumulateStatistics, type StatisticsRoll} from 'core/statistics';
+import {PartialDie, RollType, type DamageResult, type LastRoll, type SkillCheckResult, type ToHitResults} from 'core/dice';
+import {accumulateStatistics} from 'core/statistics';
 import {Button, Card, NumberField, Screen, SegmentedControl, Text, type Segment} from 'app/components';
+import {performRoll as executeRoll, statisticsRollsFor, type RollRequest} from 'app/dice/rollRequest';
 import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
@@ -38,65 +39,53 @@ const toInt = (value: string, fallback: number): number => {
 
 const diceCount = (value: string): number => Math.max(1, toInt(value, 1));
 
-const damageForm = (dice: number, damageType: RollType.NormalDamage | RollType.KillingDamage): DamageForm => ({
-    dice,
-    damageType,
-    partialDie: PartialDie.None,
-    stunMultiplier: 0,
-    useHitLocations: false,
-    useFifthEdition: false,
-    isMartialManeuver: false,
-    isTargetFlying: false,
-    isTargetInZeroG: false,
-    isTargetUnderwater: false,
-    rollWithPunch: false,
-    isUsingClinging: false,
-    isExplosion: false,
-    fadeRate: 5,
-    sfx: null,
-});
+export interface DiceScreenProps {
+    /** Optional pre-fill from a tapped character-sheet roll (does not auto-roll). */
+    initialRequest?: RollRequest;
+}
 
-const rollFor = (roller: ReturnType<typeof useDieRoller>, mode: Mode, inputs: Record<string, string>): LastRoll => {
-    switch (mode) {
-        case 'skill':
-            return roller.rollCheck(`${toInt(inputs.threshold, 11)}-`);
-        case 'hit':
-            return roller.rollToHit(toInt(inputs.ocv, 0), 1, false, toInt(inputs.dcv, 0));
-        case 'normal':
-            return roller.rollDamage(damageForm(diceCount(inputs.dice), RollType.NormalDamage));
-        case 'killing':
-            return roller.rollDamage(damageForm(diceCount(inputs.dice), RollType.KillingDamage));
-        case 'effect':
-            return roller.rollEffect({dice: diceCount(inputs.dice), partialDie: PartialDie.None});
-        default:
-            throw new Error(`unknown roll mode: ${mode as string}`);
-    }
-};
-
-const toStatisticsRolls = (result: LastRoll): StatisticsRoll[] => {
-    if ('results' in result) {
-        return result.results.map((hit) => ({rollType: hit.rollType, rolls: hit.rolls}));
-    }
-    if (result.rollType === RollType.NormalDamage || result.rollType === RollType.KillingDamage) {
-        return [{rollType: result.rollType, rolls: result.rolls, stun: result.stun, body: result.body, knockback: result.knockback, hitLocationDetails: result.hitLocationDetails}];
-    }
-    return [{rollType: result.rollType, rolls: result.rolls}];
-};
-
-export function DiceScreen(): React.JSX.Element {
+export function DiceScreen({initialRequest}: DiceScreenProps): React.JSX.Element {
     const roller = useDieRoller();
     const {statistics} = useRepositories();
     const [mode, setMode] = useState<Mode>('skill');
     const [inputs, setInputs] = useState<Record<string, string>>({threshold: '11', ocv: '8', dcv: '5', dice: '6'});
+    const [partialDie, setPartialDie] = useState<PartialDie>(PartialDie.None);
     const [last, setLast] = useState<LastRoll | null>(null);
     const [diceRolled, setDiceRolled] = useState<number | null>(null);
 
+    // Pre-fill the form when arriving from a sheet roll.
+    useEffect(() => {
+        if (initialRequest === undefined) {
+            return;
+        }
+        setMode(initialRequest.mode);
+        if (initialRequest.mode === 'skill') {
+            setInputs((prev) => ({...prev, threshold: String(initialRequest.threshold)}));
+        } else if (initialRequest.mode === 'hit') {
+            setInputs((prev) => ({...prev, ocv: String(initialRequest.ocv), dcv: String(initialRequest.dcv)}));
+        } else {
+            setInputs((prev) => ({...prev, dice: String(initialRequest.dice)}));
+            setPartialDie(initialRequest.partialDie);
+        }
+    }, [initialRequest]);
+
     const setInput = (key: string) => (value: string) => setInputs((prev) => ({...prev, [key]: value}));
+
+    const buildRequest = useCallback((): RollRequest => {
+        switch (mode) {
+            case 'skill':
+                return {mode, threshold: toInt(inputs.threshold, 11)};
+            case 'hit':
+                return {mode, ocv: toInt(inputs.ocv, 0), dcv: toInt(inputs.dcv, 0)};
+            default:
+                return {mode, dice: diceCount(inputs.dice), partialDie};
+        }
+    }, [mode, inputs, partialDie]);
 
     const record = useCallback(
         async (result: LastRoll) => {
             let stats = await statistics.get();
-            for (const roll of toStatisticsRolls(result)) {
+            for (const roll of statisticsRollsFor(result)) {
                 stats = accumulateStatistics(stats, roll);
             }
             await statistics.save(stats);
@@ -106,10 +95,10 @@ export function DiceScreen(): React.JSX.Element {
     );
 
     const performRoll = useCallback(async () => {
-        const result = rollFor(roller, mode, inputs);
+        const result = executeRoll(roller, buildRequest());
         setLast(result);
         await record(result);
-    }, [roller, mode, inputs, record]);
+    }, [roller, buildRequest, record]);
 
     const rollAgain = useCallback(async () => {
         if (last === null) {

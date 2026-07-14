@@ -14,13 +14,34 @@
 
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
+import {DieRoller} from 'core/dice';
 import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
-import type {Character, CharacterRepository} from 'core/ports';
+import {DEFAULT_STATISTICS, type Character, type CharacterRepository, type Rng, type Statistics, type StatisticsRepository} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
+import {DiceProvider} from 'app/providers/DiceProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
 import sample from '../../composition/sampleCharacter.json';
 import {CharacterDetailScreen, type CharacterDetailScreenProps} from '../CharacterDetailScreen';
+
+const fakeStatistics = () => {
+    let stored: Statistics = DEFAULT_STATISTICS;
+    const repo = {
+        get: async () => stored,
+        save: async (stats: Statistics) => {
+            stored = stats;
+        },
+        reset: async () => {
+            stored = DEFAULT_STATISTICS;
+        },
+    } as StatisticsRepository;
+    return {repo, current: () => stored};
+};
+
+const scriptedRoller = (faces: number[]): DieRoller => {
+    let index = 0;
+    return new DieRoller({next: () => faces[index++ % faces.length]} as Rng);
+};
 
 const character = (over: Partial<Character> = {}): Character => ({
     id: 'c1',
@@ -58,15 +79,23 @@ const collectText = (node: unknown): string[] => {
     return collectText((node as {children?: unknown}).children);
 };
 
-const renderScreen = async (repo: CharacterRepository, props: Partial<CharacterDetailScreenProps> = {}): Promise<ReactTestRenderer> => {
-    const repositories = {characters: repo} as unknown as Repositories;
+const renderScreen = async (
+    repo: CharacterRepository,
+    props: Partial<CharacterDetailScreenProps> = {},
+    options: {statistics?: StatisticsRepository; roller?: DieRoller} = {},
+): Promise<ReactTestRenderer> => {
+    const statistics = options.statistics ?? fakeStatistics().repo;
+    const repositories = {characters: repo, statistics} as unknown as Repositories;
+    const roller = options.roller ?? scriptedRoller([3]);
 
     let tree!: ReactTestRenderer;
     await act(async () => {
         tree = TestRenderer.create(
             <ThemeProvider colorScheme="dark">
                 <RepositoriesProvider repositories={repositories}>
-                    <CharacterDetailScreen characterId="c1" {...props} />
+                    <DiceProvider dieRoller={roller}>
+                        <CharacterDetailScreen characterId="c1" {...props} />
+                    </DiceProvider>
                 </RepositoriesProvider>
             </ThemeProvider>,
         );
@@ -99,6 +128,37 @@ describe('CharacterDetailScreen', () => {
         expect(text).toContain('Strength'); // real characteristic name from the engine
         expect(text.some((value) => /^\d+-$/.test(value))).toBe(true); // a roll like "13-"
         expect(text).not.toContain('File'); // full sheet, not the basic-body fallback
+    });
+
+    it('opens the dice roller pre-filled when a characteristic roll is tapped (onPress)', async () => {
+        const onRollRequest = jest.fn();
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({document})), {onRollRequest});
+
+        const roll = tree.root.findAllByProps({testID: 'roll-char-Strength'}).find((node) => typeof node.props.onPress === 'function');
+        await act(async () => {
+            roll?.props.onPress();
+        });
+
+        expect(onRollRequest).toHaveBeenCalledTimes(1);
+        expect(onRollRequest.mock.calls[0][0]).toMatchObject({mode: 'skill', label: 'Strength'});
+    });
+
+    it('rolls immediately and shows the result on long-press, recording stats', async () => {
+        const {repo: statistics, current} = fakeStatistics();
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({document})), {}, {statistics, roller: scriptedRoller([3])});
+
+        const roll = tree.root.findAllByProps({testID: 'roll-char-Strength'}).find((node) => typeof node.props.onLongPress === 'function');
+        await act(async () => {
+            roll?.props.onLongPress();
+        });
+        await act(async () => {}); // flush the stats write
+
+        const text = collectText(tree.toJSON());
+        expect(text).toContain('Skill Check'); // result popup title
+        expect(text).toContain('Rolled 9'); // 3d6 of 3s
+        expect(current().totals.skillChecks).toBe(1);
     });
 
     it('calls onReady with the loaded character (for the header title)', async () => {
