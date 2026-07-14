@@ -1,0 +1,99 @@
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * Golden master for the character model's *query* methods (defense/roll/
+ * characteristic totals). Each character is built once via the legacy engine
+ * (the oracle), then both engines' query methods are run against it and compared
+ * — isolating this suite from the getCharacter golden master. Exercised over the
+ * whole corpus and both `showSecondary` settings.
+ */
+import manifest from './fixtures/manifest.json';
+import {heroDesignerCharacter as core} from 'core/hero';
+import {flatten} from 'core/util';
+
+// See goldenMaster.test.ts: react-native/toast are stubbed via moduleNameMapper;
+// the App/Statistics reach-ins are stubbed here.
+jest.mock('../../../../../hero-system-mobile/App', () => ({getRandomNumber: () => 1}));
+jest.mock('../../../../../hero-system-mobile/src/lib/Statistics', () => ({statistics: {add: () => Promise.resolve()}}));
+
+const legacy = require('../../../../../hero-system-mobile/src/lib/HeroDesignerCharacter') as {
+    heroDesignerCharacter: {
+        getCharacter(parsed: unknown): any;
+        getCharacteristicTotal(shortName: string, character: unknown): number;
+        getRollTotal(characteristic: unknown, character: unknown): string | null;
+        getAdditionalCharacteristicPoints(shortName: string, character: unknown): number;
+        getTotalDefense(character: unknown, type: string, withResistant?: boolean): string;
+        getTotalUnusualDefense(character: unknown, powerXmlId: string): string;
+        isFifth(character: unknown): boolean;
+        hasSecondaryCharacteristics(powers: unknown): boolean;
+        getCharacteristicFullName(abbreviation: string): string;
+        isPowerFrameworkItem(item: unknown, character: unknown, type: string): boolean;
+    };
+};
+
+const legacyModel = legacy.heroDesignerCharacter;
+const fixtures = manifest.map((entry) => entry.fixture).sort();
+const clone = (name: string): unknown => JSON.parse(JSON.stringify(require(`./fixtures/${name}.json`)));
+
+describe('golden master: core/hero query methods reproduce legacy', () => {
+    it('covers the whole corpus', () => {
+        expect(fixtures.length).toBe(37);
+    });
+
+    describe.each(fixtures)('%s', (name) => {
+        const character = legacyModel.getCharacter(clone(name));
+
+        it.each([true, false])('characteristic totals + rolls (showSecondary=%s)', (showSecondary) => {
+            character.showSecondary = showSecondary;
+
+            for (const characteristic of character.characteristics) {
+                const shortName = characteristic.shortName;
+
+                expect(core.getCharacteristicTotal(shortName, character)).toBe(legacyModel.getCharacteristicTotal(shortName, character));
+                expect(core.getRollTotal(characteristic, character)).toBe(legacyModel.getRollTotal(characteristic, character));
+                expect(core.getAdditionalCharacteristicPoints(shortName, character)).toBe(legacyModel.getAdditionalCharacteristicPoints(shortName, character));
+            }
+        });
+
+        it.each([true, false])('defenses (showSecondary=%s)', (showSecondary) => {
+            character.showSecondary = showSecondary;
+
+            for (const type of ['PD', 'ED']) {
+                expect(core.getTotalDefense(character, type, true)).toBe(legacyModel.getTotalDefense(character, type, true));
+                expect(core.getTotalDefense(character, type, false)).toBe(legacyModel.getTotalDefense(character, type, false));
+            }
+
+            for (const unusual of ['MENTALDEFENSE', 'POWERDEFENSE', 'FLASHDEFENSE']) {
+                expect(core.getTotalUnusualDefense(character, unusual)).toBe(legacyModel.getTotalUnusualDefense(character, unusual));
+            }
+        });
+
+        it('predicates match legacy', () => {
+            expect(core.isFifth(character)).toBe(legacyModel.isFifth(character));
+            expect(core.hasSecondaryCharacteristics(character.powers)).toBe(legacyModel.hasSecondaryCharacteristics(character.powers));
+
+            for (const abbreviation of ['STR', 'PD', 'OCV', 'dex', 'notacharacteristic']) {
+                expect(core.getCharacteristicFullName(abbreviation)).toBe(legacyModel.getCharacteristicFullName(abbreviation));
+            }
+
+            // Every trait (framework children included) checked against both framework types.
+            for (const power of flatten(character.powers, 'powers')) {
+                for (const type of ['multipower', 'elementalControl']) {
+                    expect(core.isPowerFrameworkItem(power, character, type)).toBe(legacyModel.isPowerFrameworkItem(power, character, type));
+                }
+            }
+        });
+    });
+});

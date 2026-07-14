@@ -13,14 +13,16 @@
 // limitations under the License.
 
 import {getTemplate} from 'core/templates';
-import {roundInPlayersFavor, toCamelCase, toMap, toSnakeCase} from 'core/util';
+import {flatten, hasModifier, isEmptyObject, roundInPlayersFavor, toCamelCase, toMap, toSnakeCase} from 'core/util';
 import {
     BASE_MOVEMENT_MODES,
     CHARACTER_TRAITS,
     CHARACTERISTIC_NAMES,
+    FIGURED_CHARACTERISTICS,
     GENERIC_OBJECT,
     MISSING_CHARACTERISTIC_DESCRIPTIONS,
     SKILL_ENHANCERS,
+    SKILL_ROLL_BASE,
     TYPE_CHARACTERISTIC,
     TYPE_MOVEMENT,
 } from './constants';
@@ -111,6 +113,469 @@ export class HeroDesignerCharacter {
         const characteristic = this.getCharacteristicByShortName(shortName, character);
 
         return characteristic === null ? 0 : characteristic.value;
+    }
+
+    getCharacteristicFullName(abbreviation: string): string {
+        abbreviation = abbreviation.toLowerCase();
+
+        return hasOwn(CHARACTERISTIC_NAMES, abbreviation) ? CHARACTERISTIC_NAMES[abbreviation] : '';
+    }
+
+    hasSecondaryCharacteristics(powers: Obj[]): boolean {
+        for (const power of powers) {
+            if (!power.affectsPrimary && power.affectsTotal) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    isPowerFrameworkItem(item: Obj, character: Obj, type: string): boolean {
+        if (hasOwn(item, 'parentid') && character.powers.length > 0) {
+            const powersMap = toMap(character.powers, 'id');
+
+            if (powersMap.has(item.parentid)) {
+                return (powersMap.get(item.parentid) as Obj).originalType === type;
+            }
+        }
+
+        return false;
+    }
+
+    getAdditionalCharacteristicPoints(shortName: string, character: Obj): number {
+        const characteristic = this.getCharacteristicByShortName(shortName, character);
+        const total = this.getCharacteristicTotal(shortName, character);
+
+        return total - (characteristic as Obj).value;
+    }
+
+    getCharacteristicTotal(shortName: string, character: Obj): number {
+        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+
+        for (const characteristic of character.characteristics) {
+            if (shortName.toUpperCase() === characteristic.shortName.toUpperCase()) {
+                return this.getCharacteristicTotalInner(characteristic, powersMap, character.showSecondary, character);
+            }
+        }
+
+        return 0;
+    }
+
+    getRollTotal(characteristic: Obj, character: Obj): string | null {
+        if (characteristic.roll) {
+            const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+
+            return `${Math.round(this.getCharacteristicTotalInner(characteristic, powersMap, character.showSecondary, character) / 5) + SKILL_ROLL_BASE}-`;
+        }
+
+        return null;
+    }
+
+    getTotalDefense(character: Obj, type: string | null, withResistant = true): string {
+        if (type === null || type === undefined) {
+            return withResistant ? '0/0' : '0';
+        }
+
+        const nonResistant = this.getCharacteristicTotal(type, character);
+        let resistant = 0;
+
+        if (!withResistant) {
+            return nonResistant.toString();
+        }
+
+        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const characteristic = this.getCharacteristicByShortName(type, character);
+        const showSecondary = character.showSecondary;
+
+        if (powersMap.has('ARMOR')) {
+            resistant = this.getTotalArmorDefenseIncrease((characteristic as Obj).shortName.toUpperCase(), powersMap.get('ARMOR'), resistant, showSecondary);
+        }
+
+        if (powersMap.has('FORCEFIELD')) {
+            resistant = this.getTotalResistantDefensesIncrease((characteristic as Obj).shortName.toUpperCase(), powersMap.get('FORCEFIELD'), resistant, showSecondary);
+        }
+
+        if (powersMap.has(type.toUpperCase())) {
+            resistant = this.getResistantDefense(resistant, powersMap.get(type.toUpperCase()), character, showSecondary);
+        }
+
+        if (powersMap.has('COMPOUNDPOWER')) {
+            resistant = this.getDefenseFromCompoundPower(resistant, powersMap.get('COMPOUNDPOWER'), type.toUpperCase(), true, showSecondary);
+        }
+
+        if (powersMap.has('NAKEDMODIFIER')) {
+            resistant = this.getDefenseFromCompoundPower(resistant, powersMap.get('NAKEDMODIFIER'), type.toUpperCase(), true, showSecondary);
+        }
+
+        return `${nonResistant}/${resistant}`;
+    }
+
+    getTotalUnusualDefense(character: Obj, powerXmlId: string): string {
+        const defenses = {nonResistant: 0, resistant: 0};
+        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const showSecondary = character.showSecondary;
+
+        if (powersMap.has(powerXmlId)) {
+            this.getUnusualDefensePoints(defenses, powersMap.get(powerXmlId), character);
+        }
+
+        if (powersMap.has('FORCEFIELD')) {
+            defenses.nonResistant += (powersMap.get('FORCEFIELD') as Obj).mdlevels || 0;
+            defenses.resistant += (powersMap.get('FORCEFIELD') as Obj).mdlevels || 0;
+        }
+
+        if (powersMap.has('COMPOUNDPOWER')) {
+            defenses.nonResistant = this.getDefenseFromCompoundPower(defenses.nonResistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, false, showSecondary);
+            defenses.resistant = this.getDefenseFromCompoundPower(defenses.resistant, powersMap.get('COMPOUNDPOWER'), powerXmlId, true, showSecondary);
+        }
+
+        return `${defenses.nonResistant}/${defenses.resistant}`;
+    }
+
+    private getCharacteristicTotalInner(characteristic: Obj, powersMap: Map<unknown, any>, showSecondary: boolean, character: Obj): number {
+        let value = characteristic.value;
+
+        if (!isEmptyObject(powersMap) && powersMap.has(characteristic.shortName.toUpperCase())) {
+            value = this.getTotalCharacteristicPoints(powersMap.get(characteristic.shortName.toUpperCase()), value, showSecondary);
+        }
+
+        if (powersMap.has('ARMOR')) {
+            value = this.getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), powersMap.get('ARMOR'), value, showSecondary);
+        }
+
+        if (powersMap.has('DENSITYINCREASE')) {
+            value = this.getTotalDensityIncreaseCharacteristics(characteristic, powersMap.get('DENSITYINCREASE'), value, showSecondary);
+        }
+
+        if (powersMap.has('FORCEFIELD')) {
+            value = this.getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), powersMap.get('FORCEFIELD'), value, showSecondary);
+        }
+
+        if (powersMap.has('COMPOUNDPOWER')) {
+            value = this.getTotalCompoundPowerIncrease(characteristic, powersMap.get('COMPOUNDPOWER'), value, showSecondary);
+        }
+
+        if (this.isFifth(character)) {
+            if (FIGURED_CHARACTERISTICS.includes(characteristic.shortName.toUpperCase())) {
+                let total = 0;
+
+                switch (characteristic.shortName.toUpperCase()) {
+                    case 'PD':
+                        total = roundInPlayersFavor(this.getFiguredCharacteristicContribution('STR', powersMap, character) / 5);
+                        value += total;
+                        break;
+                    case 'ED':
+                        total = roundInPlayersFavor(this.getFiguredCharacteristicContribution('CON', powersMap, character) / 5);
+                        value += total;
+                        break;
+                    case 'SPD':
+                        total = this.getFiguredCharacteristicContribution('DEX', powersMap, character) / 10;
+                        value += Math.floor(total);
+                        break;
+                    case 'REC':
+                        total = roundInPlayersFavor(this.getFiguredCharacteristicContribution('STR', powersMap, character) / 5);
+                        total += roundInPlayersFavor(this.getFiguredCharacteristicContribution('CON', powersMap, character) / 5);
+                        value += total;
+                        break;
+                    case 'END':
+                        total = this.getFiguredCharacteristicContribution('CON', powersMap, character) * 2;
+                        value += total;
+                        break;
+                    case 'STUN':
+                        total = this.getFiguredCharacteristicContribution('BODY', powersMap, character);
+                        total += this.getFiguredCharacteristicContribution('STR', powersMap, character) / 2;
+                        total += this.getFiguredCharacteristicContribution('CON', powersMap, character) / 2;
+                        value += total;
+                        break;
+                }
+            }
+        }
+
+        return Math.round(value);
+    }
+
+    private getFiguredCharacteristicContribution(shortName: string, powersMap: Map<unknown, any>, character: Obj): number {
+        const powerCharacteristic = powersMap.get(shortName.toUpperCase());
+
+        if (powerCharacteristic !== undefined) {
+            if (!hasModifier('NOFIGURED', powerCharacteristic)) {
+                return this.getAdditionalCharacteristicPoints(shortName, character);
+            }
+        }
+
+        return 0;
+    }
+
+    // Faithful to legacy: the array branch tests the *array's* (undefined) props,
+    // so it never contributes — the quirk is preserved for byte-identical output.
+    private getTotalCharacteristicPoints(characteristic: Obj | Obj[], value: number, showSecondary?: boolean): number {
+        if (Array.isArray(characteristic)) {
+            for (const char of characteristic) {
+                if (
+                    ((characteristic as Obj).affectsPrimary && (characteristic as Obj).affectsTotal) ||
+                    (!(characteristic as Obj).affectsPrimary && (characteristic as Obj).affectsTotal && showSecondary)
+                ) {
+                    value += this.getTotalCharacteristicPoints(char, showSecondary as unknown as number);
+                }
+            }
+        } else {
+            if (
+                (characteristic.affectsPrimary && characteristic.affectsTotal) ||
+                (!characteristic.affectsPrimary && characteristic.affectsTotal && showSecondary)
+            ) {
+                value += parseInt(characteristic.levels, 10);
+            }
+        }
+
+        return value;
+    }
+
+    private getTotalDensityIncreaseCharacteristics(characteristic: Obj, densityIncrease: Obj | Obj[], value: number, showSecondary?: boolean): number {
+        if (Array.isArray(densityIncrease)) {
+            for (const di of densityIncrease) {
+                if (
+                    ((densityIncrease as Obj).affectsPrimary && (densityIncrease as Obj).affectsTotal) ||
+                    (!(densityIncrease as Obj).affectsPrimary && (densityIncrease as Obj).affectsTotal && showSecondary)
+                ) {
+                    value += this.getTotalDensityIncreaseCharacteristics(characteristic, di, value, showSecondary);
+                }
+            }
+        } else {
+            if (
+                (densityIncrease.affectsPrimary && densityIncrease.affectsTotal) ||
+                (!densityIncrease.affectsPrimary && densityIncrease.affectsTotal && showSecondary)
+            ) {
+                switch (characteristic.shortName.toUpperCase()) {
+                    case 'STR':
+                        value += densityIncrease.levels * 5;
+                        break;
+                    case 'PD':
+                    case 'ED':
+                        value += densityIncrease.levels;
+                        break;
+                    default:
+                    // Do nothing
+                }
+            }
+        }
+
+        return value;
+    }
+
+    private getTotalArmorDefenseIncrease(type: string, resistantDefence: Obj | Obj[], value: number, showSecondary?: boolean): number {
+        if (Array.isArray(resistantDefence)) {
+            for (const rd of resistantDefence) {
+                if (
+                    ((resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal) ||
+                    (!(resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal && showSecondary)
+                ) {
+                    value += this.getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
+                }
+            }
+        } else {
+            if (
+                (resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)
+            ) {
+                switch (type.toUpperCase()) {
+                    case 'PD':
+                        value += resistantDefence.pdlevels;
+                        break;
+                    case 'ED':
+                        value += resistantDefence.edlevels;
+                        break;
+                    default:
+                    // Do nothing
+                }
+            }
+        }
+
+        return value;
+    }
+
+    private getTotalResistantDefensesIncrease(type: string, resistantDefence: Obj | Obj[], value: number, showSecondary?: boolean): number {
+        if (Array.isArray(resistantDefence)) {
+            for (const rd of resistantDefence) {
+                if (
+                    ((resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal) ||
+                    (!(resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal && showSecondary)
+                ) {
+                    value = this.getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
+                }
+            }
+        } else {
+            if (
+                (resistantDefence.affectsPrimary && resistantDefence.affectsTotal) ||
+                (!resistantDefence.affectsPrimary && resistantDefence.affectsTotal && showSecondary)
+            ) {
+                switch (type.toUpperCase()) {
+                    case 'PD':
+                        value += resistantDefence.pdlevels;
+                        break;
+                    case 'ED':
+                        value += resistantDefence.edlevels;
+                        break;
+                    case 'MD':
+                        value += resistantDefence.mdlevels;
+                        break;
+                    case 'PwD':
+                        value += resistantDefence.powdlevels;
+                        break;
+                    default:
+                    // Do nothing
+                }
+            }
+        }
+
+        return value;
+    }
+
+    private getTotalCompoundPowerIncrease(characteristic: Obj, power: Obj | Obj[], value: number, showSecondary?: boolean): number {
+        if (Array.isArray(power)) {
+            for (const p of power) {
+                value = this.getTotalCompoundPowerIncrease(characteristic, p, value, showSecondary);
+            }
+        } else {
+            if (Array.isArray(power.powers)) {
+                for (const cp of power.powers) {
+                    if (cp.xmlid.toUpperCase() === characteristic.shortName.toUpperCase()) {
+                        if ((cp.affectsPrimary && cp.affectsTotal) || (!cp.affectsPrimary && cp.affectsTotal && showSecondary)) {
+                            value += cp.levels;
+                        }
+                    } else if (cp.xmlid.toUpperCase() === 'FORCEFIELD') {
+                        value = this.getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), cp, value, showSecondary);
+                    } else if (cp.xmlid.toUpperCase() === 'DENSITYINCREASE') {
+                        value = this.getTotalDensityIncreaseCharacteristics(characteristic, cp, value, showSecondary);
+                    } else if (cp.xmlid.toUpperCase() === 'ARMOR') {
+                        value = this.getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), cp, value, showSecondary);
+                    }
+                }
+            } else {
+                if (power.xmlid.toUpperCase() === characteristic.shortName.toUpperCase()) {
+                    if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                        value += power.levels;
+                    }
+                } else if (power.xmlid.toUpperCase() === 'FORCEFIELD') {
+                    value = this.getTotalResistantDefensesIncrease(characteristic.shortName.toUpperCase(), power, value, showSecondary);
+                } else if (power.xmlid.toUpperCase() === 'DENSITYINCREASE') {
+                    value = this.getTotalDensityIncreaseCharacteristics(characteristic, power, value, showSecondary);
+                } else if (power.xmlid.toUpperCase() === 'ARMOR') {
+                    value = this.getTotalArmorDefenseIncrease(characteristic.shortName.toUpperCase(), power, value, showSecondary);
+                }
+            }
+        }
+
+        return value;
+    }
+
+    private getDefenseFromCompoundPower(value: number, power: Obj | Obj[], id: string, resistant: boolean, showSecondary?: boolean): number {
+        if (Array.isArray(power)) {
+            for (const p of power) {
+                value = this.getDefenseFromCompoundPower(value, p, id, resistant, showSecondary);
+            }
+        } else {
+            if (Array.isArray(power.powers)) {
+                for (const cp of power.powers) {
+                    value = this.getDefense(cp, id, value, resistant, showSecondary);
+                }
+            } else {
+                value = this.getDefense(power, id, value, resistant, showSecondary);
+            }
+        }
+
+        return value;
+    }
+
+    private getDefense(power: Obj, id: string, value: number, resistant: boolean, showSecondary?: boolean): number {
+        if (power.xmlid.toUpperCase() === id.toUpperCase()) {
+            if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                if (!resistant || (resistant && this.isResistent(power))) {
+                    value += power.levels;
+                }
+            }
+        } else if (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR') {
+            if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                if (id.toUpperCase() === 'PD' || id.toUpperCase() === 'ED') {
+                    value += power[`${id.toLowerCase()}levels`];
+                } else if (id.toUpperCase() === 'MENTALDEFENSE') {
+                    value += power.mdlevels || 0;
+                } else if (id.toUpperCase() === 'POWERDEFENSE') {
+                    value += power.powdlevels || 0;
+                }
+            }
+        } else if (power.xmlid.toUpperCase() === 'NAKEDMODIFIER') {
+            if (power.input !== null && power.input !== undefined && power.input.toUpperCase() === id.toUpperCase()) {
+                if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                    if (!resistant || (resistant && this.isResistent(power))) {
+                        value += power.levels;
+                    }
+                }
+            }
+        }
+
+        return value;
+    }
+
+    private getResistantDefense(resistant: number, power: Obj | Obj[], character: Obj, showSecondary?: boolean): number {
+        if (Array.isArray(power)) {
+            for (const p of power) {
+                if (
+                    ((power as Obj).affectsPrimary && (power as Obj).affectsTotal) ||
+                    (!(power as Obj).affectsPrimary && (power as Obj).affectsTotal && showSecondary)
+                ) {
+                    resistant = this.getResistantDefense(resistant, p, character, showSecondary);
+                }
+            }
+        } else {
+            if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
+                if (this.isResistent(power)) {
+                    if (this.isCharacteristic(power) && power.levels === 0) {
+                        resistant += this.getCharacteristicTotal(power.xmlid, character);
+                    } else {
+                        resistant += power.levels;
+                    }
+                }
+            }
+        }
+
+        return resistant;
+    }
+
+    private isResistent(power: Obj): boolean {
+        if (power?.xmlid && (power.xmlid.toUpperCase() === 'FORCEFIELD' || power.xmlid.toUpperCase() === 'ARMOR')) {
+            return true;
+        }
+
+        if (hasOwn(power, 'modifier')) {
+            if (Array.isArray(power.modifier)) {
+                for (const m of power.modifier) {
+                    if (m.xmlid.toUpperCase() === 'RESISTANT') {
+                        return true;
+                    }
+                }
+            } else {
+                return power.modifier.xmlid === 'RESISTANT';
+            }
+        }
+
+        return false;
+    }
+
+    private getUnusualDefensePoints(defenses: {nonResistant: number; resistant: number}, unusualDefense: Obj, character: Obj): number {
+        let points = unusualDefense.levels || 0;
+
+        if (unusualDefense.xmlid === 'MENTALDEFENSE' && this.isFifth(character)) {
+            points += roundInPlayersFavor(this.getCharacteristicTotal('EGO', character) / 5);
+        }
+
+        defenses.nonResistant = points;
+
+        if (this.isResistent(unusualDefense)) {
+            defenses.resistant = points;
+        }
+
+        return points;
     }
 
     private populateMovementAndCharacteristics(character: Obj, characteristics: Obj, template: Obj): void {
