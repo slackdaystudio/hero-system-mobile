@@ -65,7 +65,16 @@ async function seedDemoCharacters(repositories: Repositories): Promise<void> {
         player: 'Phil',
         edition: '6E',
         slot: 0,
-        document: {characterInfo: {characterName: 'Defensor'}, powers: [{xmlid: 'FORCEFIELD'}]},
+        filename: 'defensor.hsmc',
+        document: {
+            characterInfo: {characterName: 'Defensor'},
+            characteristics: [
+                {name: 'STR', value: 20},
+                {name: 'DEX', value: 18},
+                {name: 'CON', value: 23},
+            ],
+            powers: [{name: 'Force Field', xmlid: 'FORCEFIELD'}, {name: 'Flight', xmlid: 'FLIGHT'}],
+        },
         portrait: {bytes: base64ToBytes(DEMO_PORTRAIT_PNG), mime: 'image/png'},
     });
     await repositories.characters.save({
@@ -74,7 +83,15 @@ async function seedDemoCharacters(repositories: Repositories): Promise<void> {
         player: 'GM',
         edition: '5E',
         slot: 1,
-        document: {characterInfo: {characterName: 'Grond'}},
+        filename: 'grond.hsmc',
+        document: {
+            characterInfo: {characterName: 'Grond'},
+            characteristics: [
+                {name: 'STR', value: 60},
+                {name: 'BODY', value: 30},
+            ],
+            powers: [{name: 'Rampage', xmlid: 'CUSTOMPOWER'}],
+        },
     });
     await repositories.characters.setActive('demo-defensor');
 }

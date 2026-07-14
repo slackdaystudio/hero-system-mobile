@@ -16,8 +16,8 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, StyleSheet} from 'react-native';
 import {Screen, Text} from 'app/components';
 import {createDeviceRepositories} from 'app/composition/deviceRepositories';
+import {AppNavigator} from 'app/navigation/AppNavigator';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
-import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {ThemeProvider} from 'app/theme';
 import type {Repositories} from 'infra/persistence/repositories';
 
@@ -55,7 +55,7 @@ function App(): React.JSX.Element {
         <ThemeProvider>
             {boot.status === 'ready' ? (
                 <RepositoriesProvider repositories={boot.repositories}>
-                    <CharacterListScreen />
+                    <AppNavigator />
                 </RepositoriesProvider>
             ) : (
                 <Screen style={styles.centered}>
