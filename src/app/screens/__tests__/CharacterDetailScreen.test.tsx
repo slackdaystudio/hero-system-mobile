@@ -15,8 +15,17 @@
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import {DieRoller} from 'core/dice';
+import type {CombatState} from 'core/combat';
 import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
-import {DEFAULT_STATISTICS, type Character, type CharacterRepository, type Rng, type Statistics, type StatisticsRepository} from 'core/ports';
+import {
+    DEFAULT_STATISTICS,
+    type Character,
+    type CharacterRepository,
+    type CombatStateRepository,
+    type Rng,
+    type Statistics,
+    type StatisticsRepository,
+} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
 import {DiceProvider} from 'app/providers/DiceProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
@@ -60,6 +69,19 @@ const character = (over: Partial<Character> = {}): Character => ({
     ...over,
 });
 
+const fakeCombatState = (): CombatStateRepository => {
+    const store = new Map<string, CombatState>();
+    return {
+        get: async (id: string) => store.get(id) ?? null,
+        save: async (id: string, s: CombatState) => {
+            store.set(id, s);
+        },
+        clear: async (id: string) => {
+            store.delete(id);
+        },
+    };
+};
+
 const fakeCharacters = (result: Character | null): CharacterRepository =>
     ({
         get: async () => result,
@@ -82,10 +104,11 @@ const collectText = (node: unknown): string[] => {
 const renderScreen = async (
     repo: CharacterRepository,
     props: Partial<CharacterDetailScreenProps> = {},
-    options: {statistics?: StatisticsRepository; roller?: DieRoller} = {},
+    options: {statistics?: StatisticsRepository; roller?: DieRoller; combatState?: CombatStateRepository} = {},
 ): Promise<ReactTestRenderer> => {
     const statistics = options.statistics ?? fakeStatistics().repo;
-    const repositories = {characters: repo, statistics} as unknown as Repositories;
+    const combatState = options.combatState ?? fakeCombatState();
+    const repositories = {characters: repo, statistics, combatState} as unknown as Repositories;
     const roller = options.roller ?? scriptedRoller([3]);
 
     let tree!: ReactTestRenderer;
@@ -166,21 +189,23 @@ describe('CharacterDetailScreen', () => {
         await act(async () => {
             segment?.props.onPress();
         });
+        await act(async () => {}); // flush the tracker's async state load
     };
 
-    it('shows combat values, defenses, and movement on the Combat tab', async () => {
+    it('shows the combat tracker (health, combat values, defenses, movement) on the Combat tab', async () => {
         const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
         const tree = await renderScreen(fakeCharacters(character({document})));
 
         await switchTo(tree, 'combat');
 
         const text = collectText(tree.toJSON());
-        expect(text).toContain('OCV');
-        expect(text).toContain('DCV');
-        expect(text).toContain('PD');
-        expect(text).toContain('Phases');
+        const has = (needle: string) => text.some((value) => value.includes(needle));
+        expect(has('OCV')).toBe(true); // combat value
+        expect(has('STUN')).toBe(true); // health vital
+        expect(has('Recovery')).toBe(true); // recovery action
+        expect(has('PD')).toBe(true); // defense
         expect(text).toContain('Running'); // a movement mode
-        expect(text.some((value) => value.includes('NC '))).toBe(true); // non-combat movement line
+        expect(has('NC ')).toBe(true); // non-combat movement line
     });
 
     it('opens the dice roller in to-hit mode when OCV is tapped on the Combat tab', async () => {
@@ -190,7 +215,7 @@ describe('CharacterDetailScreen', () => {
 
         await switchTo(tree, 'combat');
 
-        const ocv = tree.root.findAllByProps({testID: 'roll-ocv-OCV'}).find((node) => typeof node.props.onPress === 'function');
+        const ocv = tree.root.findAllByProps({testID: 'roll-cv-ocv'}).find((node) => typeof node.props.onPress === 'function');
         await act(async () => {
             ocv?.props.onPress();
         });

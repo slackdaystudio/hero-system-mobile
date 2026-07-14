@@ -121,6 +121,12 @@ settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);          -- global, k/v
 statistics(id INTEGER PRIMARY KEY CHECK (id = 1), stats TEXT NOT NULL);  -- global, single row
 random_hero(id INTEGER PRIMARY KEY CHECK (id = 1), data TEXT NOT NULL);
 app_state(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+
+-- migration 002: live combat state per character (health/CVs/phase chart, JSON)
+combat_state(
+  character_id TEXT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  state        TEXT NOT NULL            -- CombatState JSON (see core/combat/combatTracker)
+);
 ```
 
 Notes:
@@ -135,9 +141,10 @@ Notes:
 A tiny forward-only runner: an ordered list of `{version, up(db)}` steps; on
 startup, apply every step whose `version` exceeds the max in `schema_migrations`,
 each inside a transaction, recording the version on success. `migration 001`
-creates the tables above; `migration 002` is the one-time **user data import**
-(below). Future schema changes (e.g. re-introducing per-character settings if that
-feature is ever built) are just new numbered steps.
+creates the base tables above; `migration 002` adds the `combat_state` table.
+(The one-time **user data import** below is a separate step guarded by a
+`migrated_v1` flag in `app_state`, not a numbered schema migration.) Future
+schema changes are just new numbered steps.
 
 ## Image store (`infra/files`)
 

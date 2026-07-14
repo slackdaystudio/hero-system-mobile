@@ -13,3 +13,21 @@
 // limitations under the License.
 
 export {CombatDetails, combatDetails} from './combatDetails';
+export {
+    adjustCombatValue,
+    combatMaximums,
+    initialCombatState,
+    reconcilePhases,
+    resetCombatValues,
+    resetVital,
+    setVital,
+    startNewTurn,
+    takeRecovery,
+    togglePhaseAborted,
+    togglePhaseUsed,
+    type CombatMaximums,
+    type CombatPhase,
+    type CombatState,
+    type CombatValueKey,
+    type Vital,
+} from './combatTracker';

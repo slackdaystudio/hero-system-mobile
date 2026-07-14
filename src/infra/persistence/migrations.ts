@@ -49,8 +49,21 @@ const migration001: Migration = {
     },
 };
 
+/** 002 — live combat state per character (see combatTracker). */
+const migration002: Migration = {
+    version: 2,
+    up(db) {
+        db.execute(`
+            CREATE TABLE combat_state (
+                character_id TEXT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+                state        TEXT NOT NULL
+            )
+        `);
+    },
+};
+
 /** All migrations, in ascending version order. */
-export const MIGRATIONS: readonly Migration[] = [migration001];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002];
 
 /**
  * Apply every migration newer than the recorded schema version, each in its own

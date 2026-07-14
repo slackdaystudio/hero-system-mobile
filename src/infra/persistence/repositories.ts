@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AppStateStore, CharacterRepository, ImageStore, RandomHeroRepository, SettingsRepository, StatisticsRepository} from 'core/ports';
+import type {AppStateStore, CharacterRepository, CombatStateRepository, ImageStore, RandomHeroRepository, SettingsRepository, StatisticsRepository} from 'core/ports';
 import type {SqlDatabase} from './driver/sqlDatabase';
 import {runMigrations} from './migrations';
 import {SqliteAppStateStore} from './appStateStore';
 import {SqliteCharacterRepository} from './characterRepository';
+import {SqliteCombatStateRepository} from './combatStateRepository';
 import {SqliteRandomHeroRepository} from './randomHeroRepository';
 import {SqliteSettingsRepository} from './settingsRepository';
 import {SqliteStatisticsRepository} from './statisticsRepository';
@@ -24,6 +25,7 @@ import {SqliteStatisticsRepository} from './statisticsRepository';
 /** Every persistence port, wired to one database + image store. */
 export interface Repositories {
     characters: CharacterRepository;
+    combatState: CombatStateRepository;
     settings: SettingsRepository;
     statistics: StatisticsRepository;
     randomHero: RandomHeroRepository;
@@ -42,6 +44,7 @@ export function createRepositories(db: SqlDatabase, imageStore: ImageStore, now:
 
     return {
         characters: new SqliteCharacterRepository(db, imageStore, now),
+        combatState: new SqliteCombatStateRepository(db),
         settings: new SqliteSettingsRepository(db),
         statistics: new SqliteStatisticsRepository(db),
         randomHero: new SqliteRandomHeroRepository(db),

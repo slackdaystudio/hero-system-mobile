@@ -23,10 +23,10 @@ describe('migrations (real SQLite)', () => {
     it('applies the base schema and records the version', () => {
         const db = createBetterSqlite3Database();
 
-        expect(runMigrations(db)).toBe(1);
+        expect(runMigrations(db)).toBe(2);
 
-        expect(tables(db)).toEqual(expect.arrayContaining(['app_state', 'characters', 'random_hero', 'schema_migrations', 'settings', 'statistics']));
-        expect(db.execute('SELECT version FROM schema_migrations').rows).toEqual([{version: 1}]);
+        expect(tables(db)).toEqual(expect.arrayContaining(['app_state', 'characters', 'combat_state', 'random_hero', 'schema_migrations', 'settings', 'statistics']));
+        expect(db.execute('SELECT version FROM schema_migrations ORDER BY version').rows).toEqual([{version: 1}, {version: 2}]);
     });
 
     it('is idempotent — re-running applies nothing', () => {
@@ -36,7 +36,19 @@ describe('migrations (real SQLite)', () => {
         runMigrations(db);
         runMigrations(db);
 
-        expect(db.execute('SELECT COUNT(*) AS n FROM schema_migrations').rows[0].n).toBe(1);
+        expect(db.execute('SELECT COUNT(*) AS n FROM schema_migrations').rows[0].n).toBe(2);
+    });
+
+    it('removes combat state when its character is deleted (ON DELETE CASCADE)', () => {
+        const db = createBetterSqlite3Database();
+        runMigrations(db);
+
+        db.execute('INSERT INTO characters (id, name, edition, data, updated_at) VALUES (?, ?, ?, ?, ?)', ['a', 'A', '6E', '{}', 't']);
+        db.execute('INSERT INTO combat_state (character_id, state) VALUES (?, ?)', ['a', '{}']);
+
+        db.execute('DELETE FROM characters WHERE id = ?', ['a']);
+
+        expect(db.execute('SELECT COUNT(*) AS n FROM combat_state').rows[0].n).toBe(0);
     });
 
     it('enforces the one-active-character partial unique index', () => {

@@ -18,6 +18,8 @@
  * UI never touches a raw database handle. See docs/PERSISTENCE.md.
  */
 
+import type {CombatState} from 'core/combat';
+
 export type ColorScheme = 'system' | 'light' | 'dark';
 
 /** Global, app-wide settings (per-character edition is derived, not stored here). */
@@ -168,6 +170,18 @@ export interface CharacterRepository {
     getActive(): Promise<Character | null>;
     /** The `slotCount` slots, each the summary in it or null if empty. */
     slots(slotCount?: number): Promise<Array<CharacterSummary | null>>;
+}
+
+/**
+ * Live combat state (health, combat values, phase chart) per character. Absent
+ * until a character is first tracked; {@link get} returns null so the caller can
+ * seed it from the character's derived maximums. Rows are removed with their
+ * character (ON DELETE CASCADE).
+ */
+export interface CombatStateRepository {
+    get(characterId: string): Promise<CombatState | null>;
+    save(characterId: string, state: CombatState): Promise<void>;
+    clear(characterId: string): Promise<void>;
 }
 
 /** Binary blob store — portrait bytes as files on disk, referenced by id. */
