@@ -15,6 +15,9 @@ module.exports = {
             transform: {
                 '^.+\\.(ts|tsx|js|jsx)$': 'babel-jest',
             },
+            // change-case is ESM-only; let babel transpile it (everything else in
+            // node_modules stays ignored).
+            transformIgnorePatterns: ['/node_modules/(?!change-case/)'],
         },
         {
             displayName: 'app',
