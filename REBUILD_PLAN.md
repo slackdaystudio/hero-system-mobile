@@ -38,7 +38,12 @@
       and golden-mastered vs the real legacy engine over all 37 fixtures (getCharacter
       byte-identical; query methods across both showSecondary settings). Legacy engine
       loaded in pure node via react-native/toast stubs + App/Statistics mocks.
-    - [ ] **sub-phase 3 — `core/traits`** — the 79 decorators, in complexity tiers *(next)*
+    - [x] **sub-phase 3 — `core/traits`** *(done)* — all 79 decorators ported (cost engine +
+      factory + skill/perk/talent/power sub-factories + frameworks: multipower, elemental
+      control, compound power, VPP, naked modifier + AOE/DOT modifiers + martial-arts
+      maneuvers). The decorator golden master decorates every trait in all 37 fixtures and
+      matches legacy `cost`/`activeCost`/`realCost`/`roll` byte-for-byte (empty skip-list).
+      **`hero/` + `traits/` — the HERO System rules engine — is complete.** 1154 core tests.
     - [ ] **correctness pass** *(deferred, after sub-phase 3)* — the port is faithful
       bug-for-bug so the golden masters can assert parity; the legacy quirks/bugs found
       along the way are catalogued in [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md)
