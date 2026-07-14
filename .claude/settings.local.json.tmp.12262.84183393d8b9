@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx jest *)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm test *)",
+      "Bash(git commit -q -m ' *)",
+      "Bash(DIAG=1 npx jest --selectProjects core traits/__tests__/decorator)",
+      "Bash(awk '{print $2}')",
+      "Bash(npx eslint *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
