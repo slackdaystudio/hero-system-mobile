@@ -27,6 +27,7 @@ const sampleState: CombatState = {
     omcv: 3,
     dmcv: 3,
     phases: {'6': {used: true, aborted: false}, '12': {used: false, aborted: true}},
+    statuses: [{name: 'Flash', label: 'Flashbang', segments: 3}],
 };
 
 const setup = (): {db: SqlDatabase; repo: SqliteCombatStateRepository} => {

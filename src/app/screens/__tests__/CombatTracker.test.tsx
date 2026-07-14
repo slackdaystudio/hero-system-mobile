@@ -150,9 +150,45 @@ describe('CombatTracker', () => {
         expect(Object.values(current()!.phases).every((p) => !p.used && !p.aborted)).toBe(true);
     });
 
+    it('adds, edits, and removes a status effect through the dialog', async () => {
+        const {repo, current} = fakeRepo();
+        const tree = await render(hero(), repo);
+
+        await press(tree, 'add-status'); // opens the dialog seeded as Aid
+        await type(tree, 'status-activePoints', '20');
+        await type(tree, 'status-targetTrait', 'STR');
+        await press(tree, 'status-apply');
+
+        expect(current()!.statuses).toEqual([{name: 'Aid', label: '', activePoints: 20, targetTrait: 'STR'}]);
+        expect(collectText(tree.toJSON())).toContain('Aid: +20 AP to STR');
+
+        await press(tree, 'edit-status-0'); // reopen on the existing status
+        await press(tree, 'segment-Flash'); // switch its type
+        await type(tree, 'status-segments', '5');
+        await press(tree, 'status-apply');
+        expect(current()!.statuses).toEqual([{name: 'Flash', label: '', segments: 5}]);
+
+        await press(tree, 'remove-status-0');
+        expect(current()!.statuses).toEqual([]);
+    });
+
+    it('clears all statuses', async () => {
+        const {repo, current} = fakeRepo();
+        const tree = await render(hero(), repo);
+
+        for (let i = 0; i < 2; i++) {
+            await press(tree, 'add-status');
+            await press(tree, 'status-apply');
+        }
+        expect(current()!.statuses.length).toBe(2);
+
+        await press(tree, 'clear-statuses');
+        expect(current()!.statuses).toEqual([]);
+    });
+
     it('restores a persisted state instead of reseeding', async () => {
         const character = hero();
-        const stored: CombatState = {stun: 7, body: 3, endurance: 9, ocv: 99, dcv: 1, omcv: 0, dmcv: 0, phases: {}};
+        const stored: CombatState = {stun: 7, body: 3, endurance: 9, ocv: 99, dcv: 1, omcv: 0, dmcv: 0, phases: {}, statuses: []};
         const repo: CombatStateRepository = {
             get: async () => stored,
             save: async () => undefined,

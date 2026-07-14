@@ -23,6 +23,26 @@ export interface CombatPhase {
     aborted: boolean;
 }
 
+/** The status effects the tracker models (matches legacy). */
+export const STATUS_NAMES = ['Aid', 'Drain', 'Entangle', 'Flash'] as const;
+export type StatusName = (typeof STATUS_NAMES)[number];
+
+/**
+ * An active status effect on a character. Which of the optional fields matter
+ * depends on `name`: Aid/Drain use activePoints + targetTrait; Entangle uses
+ * body/pd/ed; Flash uses segments. `label` is an optional player-supplied name.
+ */
+export interface CombatStatus {
+    name: StatusName;
+    label: string;
+    activePoints?: number;
+    targetTrait?: string;
+    body?: number;
+    pd?: number;
+    ed?: number;
+    segments?: number;
+}
+
 /**
  * The live, mutable combat state for a character: current health, current combat
  * values (temporary modifiers baked in), and the per-segment phase chart. Derived
@@ -39,6 +59,7 @@ export interface CombatState {
     omcv: number;
     dmcv: number;
     phases: Record<string, CombatPhase>;
+    statuses: CombatStatus[];
 }
 
 /** The character's maximum vitals — recovery and reset ceilings. */
@@ -85,7 +106,13 @@ export function initialCombatState(character: Obj): CombatState {
         omcv: Number(primary.omcv) || 0,
         dmcv: Number(primary.dmcv) || 0,
         phases: clonePhases(primary.phases as Record<string, CombatPhase>),
+        statuses: [],
     };
+}
+
+/** Ensure a state loaded from persistence has every field the current model expects. */
+export function normalizeCombatState(state: CombatState): CombatState {
+    return {...state, statuses: Array.isArray(state.statuses) ? state.statuses : []};
 }
 
 /** Set a vital to an explicit value (e.g. after typing damage taken). */
@@ -150,6 +177,53 @@ export function startNewTurn(state: CombatState): CombatState {
     }
 
     return {...state, phases};
+}
+
+/** Append a status effect. */
+export function addStatus(state: CombatState, status: CombatStatus): CombatState {
+    return {...state, statuses: [...(state.statuses ?? []), status]};
+}
+
+/** Replace the status effect at an index (no-op if out of range). */
+export function updateStatus(state: CombatState, index: number, status: CombatStatus): CombatState {
+    const statuses = state.statuses ?? [];
+    if (index < 0 || index >= statuses.length) {
+        return state;
+    }
+
+    return {...state, statuses: statuses.map((existing, i) => (i === index ? status : existing))};
+}
+
+/** Remove the status effect at an index. */
+export function removeStatus(state: CombatState, index: number): CombatState {
+    return {...state, statuses: (state.statuses ?? []).filter((_, i) => i !== index)};
+}
+
+/** Clear every status effect. */
+export function clearStatuses(state: CombatState): CombatState {
+    return {...state, statuses: []};
+}
+
+/** One-line description of a status effect for the tracker list (ported from legacy). */
+export function describeStatus(status: CombatStatus): string {
+    let text = status.label ? `${status.label} (${status.name})` : status.name;
+
+    switch (status.name) {
+        case 'Aid':
+        case 'Drain': {
+            const activePoints = status.activePoints ?? 0;
+            text += `: ${activePoints < 0 ? activePoints : `+${activePoints}`} AP to ${status.targetTrait ?? ''}`;
+            break;
+        }
+        case 'Entangle':
+            text += `: ${status.body ?? 0} BODY, ${status.pd ?? 0}/${status.ed ?? 0}`;
+            break;
+        case 'Flash':
+            text += `: For ${status.segments ?? 0} segments`;
+            break;
+    }
+
+    return text;
 }
 
 /**

@@ -15,10 +15,15 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Pressable, StyleSheet, View, type ViewStyle} from 'react-native';
 import {
+    addStatus,
     adjustCombatValue,
+    clearStatuses,
     combatMaximums,
+    describeStatus,
     initialCombatState,
+    normalizeCombatState,
     reconcilePhases,
+    removeStatus,
     resetCombatValues,
     resetVital,
     setVital,
@@ -26,13 +31,16 @@ import {
     takeRecovery,
     togglePhaseAborted,
     togglePhaseUsed,
+    updateStatus,
     type CombatState,
+    type CombatStatus,
     type CombatValueKey,
     type Vital,
 } from 'core/combat';
 import {heroDesignerCharacter} from 'core/hero';
 import type {Obj} from 'core/traits';
 import {Button, Card, NumberField, Text} from 'app/components';
+import {StatusDialog} from './StatusDialog';
 import type {RollRequest} from 'app/dice/rollRequest';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
@@ -81,12 +89,13 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
 
     const [state, setState] = useState<CombatState | null>(null);
     const [health, setHealth] = useState<HealthText>({stun: '', body: '', endurance: ''});
+    const [editing, setEditing] = useState<{status: CombatStatus; index: number | null} | null>(null);
 
     useEffect(() => {
         let cancelled = false;
         (async () => {
             const stored = await repository.get(characterId);
-            const base = stored === null ? initialCombatState(character) : reconcilePhases(stored, character);
+            const base = normalizeCombatState(stored === null ? initialCombatState(character) : reconcilePhases(stored, character));
             if (stored === null || JSON.stringify(base) !== JSON.stringify(stored)) {
                 await repository.save(characterId, base);
             }
@@ -124,6 +133,14 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
         },
         [state, apply],
     );
+
+    const applyStatus = (status: CombatStatus) => {
+        if (state === null || editing === null) {
+            return;
+        }
+        apply(editing.index === null ? addStatus(state, status) : updateStatus(state, editing.index, status));
+        setEditing(null);
+    };
 
     if (state === null) {
         return (
@@ -193,6 +210,34 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
                 </Card>
             </Section>
 
+            <Section title="Status Effects">
+                <Card>
+                    {state.statuses.length === 0 ? (
+                        <Text muted>No active status effects.</Text>
+                    ) : (
+                        state.statuses.map((status, index) => (
+                            <StatusRow
+                                key={index}
+                                text={describeStatus(status)}
+                                index={index}
+                                onEdit={() => setEditing({status, index})}
+                                onRemove={() => apply(removeStatus(state, index))}
+                            />
+                        ))
+                    )}
+                    <View style={styles.statusActions}>
+                        <View style={styles.grow}>
+                            <Button testID="add-status" label="Add" onPress={() => setEditing({status: {name: 'Aid', label: ''}, index: null})} />
+                        </View>
+                        {state.statuses.length > 0 ? (
+                            <View style={styles.grow}>
+                                <Button testID="clear-statuses" label="Clear All" variant="secondary" onPress={() => apply(clearStatuses(state))} />
+                            </View>
+                        ) : null}
+                    </View>
+                </Card>
+            </Section>
+
             <Section title="Defenses">
                 <Card>
                     {combat.defenses.map((stat) => (
@@ -213,6 +258,28 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
                     </Card>
                 </Section>
             ) : null}
+
+            <StatusDialog initial={editing?.status ?? null} onApply={applyStatus} onClose={() => setEditing(null)} />
+        </View>
+    );
+}
+
+function StatusRow({text, index, onEdit, onRemove}: {text: string; index: number; onEdit: () => void; onRemove: () => void}): React.JSX.Element {
+    const theme = useTheme();
+
+    return (
+        <View style={styles.statusRow}>
+            <Text style={styles.statusText}>{text}</Text>
+            <Pressable testID={`edit-status-${index}`} accessibilityRole="button" onPress={onEdit}>
+                <Text variant="caption" color={theme.colors.primary}>
+                    Edit
+                </Text>
+            </Pressable>
+            <Pressable testID={`remove-status-${index}`} accessibilityRole="button" onPress={onRemove}>
+                <Text variant="caption" color={theme.colors.danger}>
+                    Remove
+                </Text>
+            </Pressable>
         </View>
     );
 }
@@ -344,5 +411,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 4,
+    },
+    statusRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 12,
+        paddingVertical: 6,
+    },
+    statusText: {
+        flex: 1,
+    },
+    statusActions: {
+        flexDirection: 'row',
+        columnGap: 12,
+        marginTop: 12,
+    },
+    grow: {
+        flex: 1,
     },
 });
