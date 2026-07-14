@@ -14,6 +14,7 @@
 
 import {errorCodes, isErrorWithCode, keepLocalCopy, pick, types} from '@react-native-documents/picker';
 import type {FilePicker, PickedFile} from 'core/ports';
+import {filePathFromUri} from './fileUri';
 import type {FileSystem} from './fileSystem';
 
 /**
@@ -45,7 +46,7 @@ export function createDocumentPickerFilePicker(fileSystem: FileSystem): FilePick
                 throw new Error(copy.copyError ?? 'Could not read the selected file');
             }
 
-            const bytes = await fileSystem.readFile(copy.localUri.replace(/^file:\/\//, ''));
+            const bytes = await fileSystem.readFile(filePathFromUri(copy.localUri));
 
             return {name, bytes};
         },
