@@ -18,13 +18,35 @@ import {characterTraitDecorator, type Obj, type RollDescriptor} from 'core/trait
 import type {CharacterDocument} from 'core/ports';
 import {flatten} from 'core/util';
 
+/** HERO Designer XMLID of the "Only In Heroic/Alternate Identity" limitation. */
+const ONLY_IN_ALTERNATE_ID = 'OIHID';
+
+const TRAIT_KEYS = ['skills', 'perks', 'talents', 'martialArts', 'powers', 'equipment', 'disadvantages'] as const;
+
+const asModifiers = (value: unknown): Obj[] => (Array.isArray(value) ? (value as Obj[]) : value !== null && typeof value === 'object' ? [value as Obj] : []);
+
+/** True when a trait carries the "Only In Alternate Identity" (OIHID) limitation (checks nested modifiers). */
+export function isOnlyInAlternateId(trait: Obj): boolean {
+    for (const modifier of asModifiers(trait.modifier)) {
+        if (String(modifier.xmlid).toUpperCase() === ONLY_IN_ALTERNATE_ID || isOnlyInAlternateId(modifier)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /**
- * True when the character has "only in Alternate Identity" traits — powers/
- * characteristics that only apply in the alternate (super) form. When so, the
- * sheet offers the {@link buildCharacterSheet} `showSecondary` toggle.
+ * True when the character has any form-dependent content: secondary characteristics
+ * (powers that affect total-but-not-primary) or traits limited to the alternate
+ * identity (OIHID). When so, the sheet offers the alternate-ID toggle.
  */
 export function hasAlternateForm(character: Obj): boolean {
-    return heroDesignerCharacter.hasSecondaryCharacteristics(flatten(toArray(character.powers), 'powers'));
+    if (heroDesignerCharacter.hasSecondaryCharacteristics(flatten(toArray(character.powers), 'powers'))) {
+        return true;
+    }
+
+    return TRAIT_KEYS.some((key) => flatten(toArray(character[key]), 'powers').some(isOnlyInAlternateId));
 }
 
 /** The character's alias / alternate identity (super name) from the parsed info, or null. */
@@ -185,15 +207,15 @@ export function buildCharacterSheet(character: Obj, showSecondary = false): Char
 
     const sections: SheetSection[] = [];
     for (const {key, title} of TRAIT_SECTIONS) {
-        const items = toArray(c[key]);
-        if (items.length > 0) {
-            sections.push({title, traits: buildTraits(items, key, c, 0)});
+        const traits = buildTraits(toArray(c[key]), key, c, 0);
+        if (traits.length > 0) {
+            sections.push({title, traits});
         }
     }
 
-    const complications = toArray(c.disadvantages);
+    const complications = buildTraits(toArray(c.disadvantages), 'disadvantages', c, 0);
     if (complications.length > 0) {
-        sections.push({title: heroDesignerCharacter.isFifth(c) ? 'Disadvantages' : 'Complications', traits: buildTraits(complications, 'disadvantages', c, 0)});
+        sections.push({title: heroDesignerCharacter.isFifth(c) ? 'Disadvantages' : 'Complications', traits: complications});
     }
 
     return {characteristics, sections};
@@ -205,6 +227,12 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
     const rows: SheetTrait[] = [];
 
     for (const item of items) {
+        // Suppress "Only In Alternate Identity" traits (and their children) unless
+        // the sheet is showing the alternate-ID form.
+        if (!character.showSecondary && isOnlyInAlternateId(item)) {
+            continue;
+        }
+
         try {
             const decorated = characterTraitDecorator.decorate(item, listKey, () => character);
             rows.push({label: decorated.label(), roll: decorated.roll() ?? null, realCost: decorated.realCost(), definition: decorated.definition(), depth});

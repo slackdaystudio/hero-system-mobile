@@ -16,7 +16,7 @@ import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
 import type {CharacterDocument} from 'core/ports';
 import type {Obj} from 'core/traits';
 import sample from '../../composition/sampleCharacter.json';
-import {alternateIdentities, asHeroCharacter, buildCharacterSheet, buildCombatSheet, hasAlternateForm} from '../characterSheet';
+import {alternateIdentities, asHeroCharacter, buildCharacterSheet, buildCombatSheet, hasAlternateForm, isOnlyInAlternateId} from '../characterSheet';
 
 const processed = (): CharacterDocument => heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as CharacterDocument;
 
@@ -76,6 +76,27 @@ describe('characterSheet', () => {
             const baseForm = buildCombatSheet(gg, false).defenses.map((d) => d.value);
 
             expect(inForm).not.toEqual(baseForm);
+        });
+
+        it('detects the alternate form for a character with OIHID-limited traits', () => {
+            expect(hasAlternateForm(heroOf('spyder2022'))).toBe(true);
+        });
+
+        it('suppresses "Only In Alternate ID" traits when the form is off, and restores them when on', () => {
+            const spyder = heroOf('spyder2022');
+            const count = (secondary: boolean): number => buildCharacterSheet(spyder, secondary).sections.reduce((n, s) => n + s.traits.length, 0);
+
+            const shown = count(true);
+            const hidden = count(false);
+
+            expect(hidden).toBeLessThan(shown); // OIHID-tagged traits are dropped in the base (secret-ID) form
+        });
+
+        it('isOnlyInAlternateId only fires on the OIHID limitation', () => {
+            expect(isOnlyInAlternateId({modifier: {xmlid: 'OIHID'}})).toBe(true);
+            expect(isOnlyInAlternateId({modifier: [{xmlid: 'FOCUS'}, {xmlid: 'OIHID'}]})).toBe(true);
+            expect(isOnlyInAlternateId({modifier: {xmlid: 'AVAD'}})).toBe(false); // "Alternate" defense, not alt-ID
+            expect(isOnlyInAlternateId({})).toBe(false);
         });
     });
 });
