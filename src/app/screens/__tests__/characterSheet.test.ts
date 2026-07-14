@@ -109,11 +109,33 @@ describe('characterSheet', () => {
             expect(section).toBeDefined();
 
             const choke = section!.traits.find((t) => t.label === 'Choke Hold');
-            expect(choke?.maneuver).toEqual({ocv: '-2', dcv: '+0', range: null, damage: 'Grab One Limb; 3½d6 NND', notes: 'Empty Hand · Phase ½'});
+            expect(choke?.maneuver?.ocv).toBe('-2');
+            expect(choke?.maneuver?.dcv).toBe('+0');
+            expect(choke?.maneuver?.range).toBeNull();
 
             // Non-maneuver traits carry no maneuver line.
             const powers = buildCharacterSheet(aoe, true).sections.find((s) => s.title === 'Powers');
             expect(powers?.traits.every((t) => t.maneuver === undefined)).toBe(true);
+        });
+
+        it('keeps a simple damage code in the Damage column but pushes a complex effect to notes', () => {
+            const traits = buildCharacterSheet(heroOf('aoe'), true).sections.find((s) => s.title === 'Martial Arts')!.traits;
+            const move = (label: string) => traits.find((t) => t.label === label)?.maneuver;
+
+            // Simple: "Flash 7d6" stays in the Damage column and is not repeated in notes.
+            expect(move('Martial Flash')?.damage).toBe('Flash 7d6');
+            expect(move('Martial Flash')?.notes).not.toContain('Flash 7d6');
+
+            // Complex: "Grab One Limb; 3½d6 NND" moves to notes; Damage holds just the clean dice.
+            expect(move('Choke Hold')?.notes).toContain('Grab One Limb; 3½d6 NND');
+            expect(move('Choke Hold')?.damage).toBe('3½d6');
+
+            // Complex with no rollable damage: Damage is empty, effect is in the notes.
+            expect(move('Martial Escape')?.damage).toBeNull();
+            expect(move('Martial Escape')?.notes).toContain('87 STR vs. Grabs');
+
+            // Notes never leads with a stray separator.
+            expect(traits.every((t) => !(t.maneuver?.notes ?? '').startsWith(' '))).toBe(true);
         });
 
         it('isOnlyInAlternateId only fires on the OIHID limitation', () => {

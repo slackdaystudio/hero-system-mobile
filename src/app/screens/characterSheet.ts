@@ -115,9 +115,45 @@ const maneuverValue = (attributes: Attribute[], label: string): string | null =>
     return found === undefined ? null : String(found.value);
 };
 
-/** Extract the maneuver combat line from a decorated maneuver's attributes + definition. */
-function buildManeuver(attributes: Attribute[], definition: string): ManeuverDetail {
-    const extras = attributes.filter((attribute) => !MANEUVER_MAIN.has(attribute.label)).map((attribute) => (attribute.label === 'Phase' ? `Phase ${attribute.value}` : String(attribute.value)));
+/**
+ * A "simple damage code" is an effect that is *only* a damage expression — dice
+ * plus damage-type keywords (e.g. "16d6 Strike", "Flash 7d6", "3½d6 NND",
+ * "HKA 5 DC"). Anything with extra descriptive text (Grab, Disarm, Target Falls,
+ * FMove, a STR value, …) is not, and belongs in the notes.
+ */
+const isSimpleDamageCode = (effect: string): boolean => {
+    const remainder = effect
+        .replace(/\d+½?d6/gi, ' ') // 16d6, 3½d6
+        .replace(/½d6/gi, ' ') // bare ½d6
+        .replace(/\+?\s*\d+\s*DC/gi, ' ') // +5 DC, 5 DC
+        .replace(/\b(Strike|NND|Flash|HKA|Normal|Killing)\b/gi, ' ')
+        .replace(/[½\d+,;.\s-]/g, ''); // leftover digits / punctuation / ½
+
+    return remainder === '';
+};
+
+/** Extract the maneuver combat line from a decorated maneuver's attributes, definition, and roll. */
+function buildManeuver(attributes: Attribute[], definition: string, roll: RollDescriptor | null): ManeuverDetail {
+    const effect = maneuverValue(attributes, 'Effect');
+    const extras: string[] = [];
+
+    // A complex effect goes to the notes; the Damage column then holds just the
+    // clean rollable dice (if any). A simple damage code stays in the column.
+    let damage: string | null;
+    if (effect === null) {
+        damage = roll?.roll ?? null;
+    } else if (isSimpleDamageCode(effect)) {
+        damage = effect;
+    } else {
+        damage = roll?.roll ?? null;
+        extras.push(effect);
+    }
+
+    for (const attribute of attributes) {
+        if (!MANEUVER_MAIN.has(attribute.label)) {
+            extras.push(attribute.label === 'Phase' ? `Phase ${attribute.value}` : String(attribute.value));
+        }
+    }
     if (definition.trim() !== '') {
         extras.push(definition.trim());
     }
@@ -126,8 +162,8 @@ function buildManeuver(attributes: Attribute[], definition: string): ManeuverDet
         ocv: maneuverValue(attributes, 'OCV'),
         dcv: maneuverValue(attributes, 'DCV'),
         range: maneuverValue(attributes, 'Range'),
-        damage: maneuverValue(attributes, 'Effect'),
-        notes: extras.join(' · '),
+        damage,
+        notes: extras.filter((entry) => entry.trim() !== '').join(' · '),
     };
 }
 
@@ -289,8 +325,9 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
     for (const item of items) {
         try {
             const decorated = characterTraitDecorator.decorate(item, listKey, () => character);
-            const maneuver = listKey === 'martialArts' ? buildManeuver(decorated.attributes(), decorated.definition()) : undefined;
-            rows.push({label: decorated.label(), roll: decorated.roll() ?? null, realCost: decorated.realCost(), definition: decorated.definition(), depth, maneuver});
+            const roll = decorated.roll() ?? null;
+            const maneuver = listKey === 'martialArts' ? buildManeuver(decorated.attributes(), decorated.definition(), roll) : undefined;
+            rows.push({label: decorated.label(), roll, realCost: decorated.realCost(), definition: decorated.definition(), depth, maneuver});
 
             const children = toArray(item.powers);
             if (children.length > 0) {

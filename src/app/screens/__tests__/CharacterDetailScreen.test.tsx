@@ -254,7 +254,8 @@ describe('CharacterDetailScreen', () => {
         expect(text).toContain('Damage'); // column header
         expect(text).toContain('Choke Hold'); // maneuver name
         expect(text).toContain('-2'); // its OCV (strike)
-        expect(text).toContain('Grab One Limb; 3½d6 NND'); // damage/effect
+        expect(text).toContain('3½d6'); // clean damage dice in the column
+        expect(text.some((value) => value.includes('Grab One Limb; 3½d6 NND'))).toBe(true); // complex effect in the notes row
         expect(text.some((value) => value.includes('Phase ½'))).toBe(true); // notes row
     });
 
