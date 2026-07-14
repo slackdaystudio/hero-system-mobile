@@ -44,3 +44,74 @@ export interface SettingsRepository {
     set<K extends keyof Settings>(key: K, value: Settings[K]): Promise<void>;
     reset(): Promise<void>;
 }
+
+/** Aggregate dice-roll statistics (global). */
+export interface Statistics {
+    sum: number;
+    largestDieRoll: number;
+    largestSum: number;
+    totals: {
+        diceRolled: number;
+        hitRolls: number;
+        skillChecks: number;
+        effectRolls: number;
+        normalDamage: {rolls: number; stun: number; body: number};
+        killingDamage: {rolls: number; stun: number; body: number};
+        knockback: number;
+        hitLocations: {
+            head: number;
+            hands: number;
+            arms: number;
+            shoulders: number;
+            chest: number;
+            stomach: number;
+            vitals: number;
+            thighs: number;
+            legs: number;
+            feet: number;
+        };
+    };
+    distributions: {one: number; two: number; three: number; four: number; five: number; six: number};
+}
+
+export const DEFAULT_STATISTICS: Statistics = {
+    sum: 0,
+    largestDieRoll: 0,
+    largestSum: 0,
+    totals: {
+        diceRolled: 0,
+        hitRolls: 0,
+        skillChecks: 0,
+        effectRolls: 0,
+        normalDamage: {rolls: 0, stun: 0, body: 0},
+        killingDamage: {rolls: 0, stun: 0, body: 0},
+        knockback: 0,
+        hitLocations: {head: 0, hands: 0, arms: 0, shoulders: 0, chest: 0, stomach: 0, vitals: 0, thighs: 0, legs: 0, feet: 0},
+    },
+    distributions: {one: 0, two: 0, three: 0, four: 0, five: 0, six: 0},
+};
+
+export interface StatisticsRepository {
+    get(): Promise<Statistics>;
+    save(statistics: Statistics): Promise<void>;
+    reset(): Promise<void>;
+}
+
+/** A stored randomly-generated character. */
+export interface RandomHero {
+    name?: string;
+    [field: string]: unknown;
+}
+
+export interface RandomHeroRepository {
+    get(): Promise<RandomHero | null>;
+    set(hero: RandomHero): Promise<void>;
+    rename(name: string): Promise<void>;
+    clear(): Promise<void>;
+}
+
+/** Scalar app state (schema/migration flags, version, misc). */
+export interface AppStateStore {
+    get(key: string): Promise<string | null>;
+    set(key: string, value: string): Promise<void>;
+}
