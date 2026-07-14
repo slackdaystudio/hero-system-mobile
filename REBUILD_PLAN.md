@@ -32,9 +32,13 @@
     - [x] **sub-phase 1 — `core/util` + constants** — the pure half of `Common` ported to
       `core/util` (`change-case` pinned 5.4.4), and `core/hero/constants.ts` breaking the
       `HeroDesignerCharacter ⇄ decorators` import cycle.
-    - [ ] **sub-phase 2 — `core/hero` character model** — `getCharacter` normalize/populate
-      pipeline + characteristic/defense/roll calcs, golden-mastered vs legacy over the fixtures *(next)*
-    - [ ] **sub-phase 3 — `core/traits`** — the 79 decorators, in complexity tiers
+    - [x] **sub-phase 2 — `core/hero` character model** *(done)* — `getCharacter`
+      normalize/populate pipeline + all query calcs (characteristic/roll totals,
+      figured-5E, defense/resistant/unusual, framework predicates), ported faithfully
+      and golden-mastered vs the real legacy engine over all 37 fixtures (getCharacter
+      byte-identical; query methods across both showSecondary settings). Legacy engine
+      loaded in pure node via react-native/toast stubs + App/Statistics mocks.
+    - [ ] **sub-phase 3 — `core/traits`** — the 79 decorators, in complexity tiers *(next)*
   - [ ] `combat/` + `random/`
 - [ ] **Phase 2 — Ports + infra adapters** — persistence design is specced in
   [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md): SQLite (op-sqlite) as the runtime source
