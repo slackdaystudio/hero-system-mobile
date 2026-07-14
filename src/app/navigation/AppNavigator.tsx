@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import React, {useState} from 'react';
+import {ActivityIndicator, Alert, Pressable} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import type {ImportResult} from 'infra/import';
 import {Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
+import {useImportCharacter} from 'app/providers/ImportProvider';
 import {useSettings} from 'app/providers/SettingsProvider';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
@@ -47,6 +49,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export function AppNavigator(): React.JSX.Element {
     const theme = useTheme();
     const {settings} = useSettings();
+    // Bumped after a successful import so the character list reloads.
+    const [importToken, setImportToken] = useState(0);
 
     return (
         <SafeAreaProvider>
@@ -77,21 +81,15 @@ export function AppNavigator(): React.JSX.Element {
                             // headerRight is a react-navigation render prop, not a nested component definition.
                             // eslint-disable-next-line react/no-unstable-nested-components
                             headerRight: () => (
-                                <View style={styles.headerActions}>
-                                    <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Dice')}>
-                                        <Text variant="label" color={theme.colors.primary}>
-                                            Dice
-                                        </Text>
-                                    </Pressable>
-                                    <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Settings')}>
-                                        <Text variant="label" color={theme.colors.primary}>
-                                            Settings
-                                        </Text>
-                                    </Pressable>
-                                </View>
+                                <ImportButton
+                                    onImported={(result) => {
+                                        setImportToken((token) => token + 1);
+                                        navigation.navigate('CharacterDetail', {id: result.id});
+                                    }}
+                                />
                             ),
                         })}>
-                        {({navigation}) => <CharacterListScreen onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />}
+                        {({navigation}) => <CharacterListScreen refreshToken={importToken} onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />}
                     </Stack.Screen>
                     <Stack.Screen name="CharacterDetail" options={{title: ''}}>
                         {({route, navigation}) => (
@@ -130,9 +128,38 @@ export function AppNavigator(): React.JSX.Element {
     );
 }
 
-const styles = StyleSheet.create({
-    headerActions: {
-        flexDirection: 'row',
-        columnGap: 16,
-    },
-});
+/** Header action that picks a HERO Designer `.hdc` and imports it, then reports the result. */
+function ImportButton({onImported}: {onImported: (result: ImportResult) => void}): React.JSX.Element {
+    const theme = useTheme();
+    const importCharacter = useImportCharacter();
+    const [busy, setBusy] = useState(false);
+
+    const run = async (): Promise<void> => {
+        if (busy) {
+            return;
+        }
+        setBusy(true);
+        try {
+            const result = await importCharacter();
+            if (result !== null) {
+                onImported(result);
+            }
+        } catch (error) {
+            Alert.alert('Import failed', error instanceof Error ? error.message : 'That file could not be imported.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    if (busy) {
+        return <ActivityIndicator color={theme.colors.primary} />;
+    }
+
+    return (
+        <Pressable accessibilityRole="button" onPress={run}>
+            <Text variant="label" color={theme.colors.primary}>
+                Import
+            </Text>
+        </Pressable>
+    );
+}

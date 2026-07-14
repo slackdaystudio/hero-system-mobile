@@ -74,6 +74,36 @@ const renderScreen = async (characters: CharacterRepository, props: CharacterLis
 };
 
 describe('CharacterListScreen', () => {
+    it('reloads the list when refreshToken changes (e.g. after an import)', async () => {
+        let names = ['Alpha'];
+        const characters = {list: async () => names.map((name, i) => summary({id: String(i), name}))} as unknown as CharacterRepository;
+        const repositories = {characters} as unknown as Repositories;
+        const wrap = (token: number): React.JSX.Element => (
+            <ThemeProvider colorScheme="dark">
+                <RepositoriesProvider repositories={repositories}>
+                    <CharacterListScreen refreshToken={token} />
+                </RepositoriesProvider>
+            </ThemeProvider>
+        );
+
+        let tree!: ReactTestRenderer;
+        await act(async () => {
+            tree = TestRenderer.create(wrap(0));
+        });
+        await act(async () => {});
+        expect(collectText(tree.toJSON())).toContain('Alpha');
+
+        names = ['Beta'];
+        await act(async () => {
+            tree.update(wrap(1));
+        });
+        await act(async () => {});
+
+        const text = collectText(tree.toJSON());
+        expect(text).toContain('Beta');
+        expect(text).not.toContain('Alpha');
+    });
+
     it('renders a row per character with name and edition · player subtitle', async () => {
         const tree = await renderScreen(fakeCharacters([summary({id: 'a', name: 'Alpha'}), summary({id: 'z', name: 'Zed', player: null})]));
 

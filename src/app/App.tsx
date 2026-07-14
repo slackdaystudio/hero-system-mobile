@@ -18,10 +18,17 @@ import {Screen, Text} from 'app/components';
 import {createDeviceRepositories} from 'app/composition/deviceRepositories';
 import {AppNavigator} from 'app/navigation/AppNavigator';
 import {DiceProvider} from 'app/providers/DiceProvider';
+import {ImportProvider} from 'app/providers/ImportProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {SettingsProvider, useSettings} from 'app/providers/SettingsProvider';
 import {ThemeProvider} from 'app/theme';
+import {createDocumentPickerFilePicker} from 'infra/files/documentPickerFilePicker';
+import {nativeFileSystem} from 'infra/files/nativeFileSystem';
 import type {Repositories} from 'infra/persistence/repositories';
+
+// The device document-picker, wired once. Injected via ImportProvider so screens
+// depend only on the FilePicker port (tests supply a fake).
+const filePicker = createDocumentPickerFilePicker(nativeFileSystem());
 
 type Boot = {status: 'loading'} | {status: 'ready'; repositories: Repositories} | {status: 'error'; message: string};
 
@@ -84,9 +91,11 @@ function ThemedApp(): React.JSX.Element {
 
     return (
         <ThemeProvider colorScheme={settings.colorScheme} fontScale={settings.fontScale}>
-            <DiceProvider>
-                <AppNavigator />
-            </DiceProvider>
+            <ImportProvider filePicker={filePicker}>
+                <DiceProvider>
+                    <AppNavigator />
+                </DiceProvider>
+            </ImportProvider>
         </ThemeProvider>
     );
 }

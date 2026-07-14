@@ -23,6 +23,8 @@ type LoadState = {status: 'loading'} | {status: 'ready'; characters: CharacterSu
 
 export interface CharacterListScreenProps {
     onSelect?: (id: string) => void;
+    /** Change this value to force a reload (e.g. after importing a character). */
+    refreshToken?: unknown;
 }
 
 /** Reads the character list straight off the repo's lifted columns (no document parse). */
@@ -35,7 +37,7 @@ const subtitleFor = (character: CharacterSummary): string => {
     return parts.join(' · ');
 };
 
-export function CharacterListScreen({onSelect}: CharacterListScreenProps): React.JSX.Element {
+export function CharacterListScreen({onSelect, refreshToken}: CharacterListScreenProps): React.JSX.Element {
     const repository = useCharacterRepository();
     const theme = useTheme();
     const [state, setState] = useState<LoadState>({status: 'loading'});
@@ -51,7 +53,7 @@ export function CharacterListScreen({onSelect}: CharacterListScreenProps): React
 
     useEffect(() => {
         load();
-    }, [load]);
+    }, [load, refreshToken]);
 
     if (state.status === 'loading') {
         return (

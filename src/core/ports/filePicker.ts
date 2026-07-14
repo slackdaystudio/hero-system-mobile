@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export type {Rng} from './rng';
-export type {FilePicker, PickedFile} from './filePicker';
-export * from './persistence';
+/** A file the user chose, with its display name and raw bytes. */
+export interface PickedFile {
+    name: string;
+    bytes: Uint8Array;
+}
+
+/** Platform document-picker capability. Returns null if the user cancels. */
+export interface FilePicker {
+    pickCharacter(): Promise<PickedFile | null>;
+}

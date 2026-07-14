@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {heroDesignerCharacter} from 'core/hero';
-import type {CharacterDocument, PortraitInput, Settings} from 'core/ports';
+import type {Settings} from 'core/ports';
+import {stripPortrait} from '../files/portrait';
 import type {Repositories} from '../persistence/repositories';
 import type {LegacySource} from './legacySource';
 
@@ -28,34 +29,6 @@ export interface MigrationResult {
     characters: number;
     portraits: number;
 }
-
-/** Decode a legacy `data:<mime>;base64,<data>` portrait into bytes, or undefined. */
-const decodeDataUri = (value: unknown): PortraitInput | undefined => {
-    if (typeof value !== 'string') {
-        return undefined;
-    }
-
-    const match = /^data:([^;]+);base64,(.*)$/s.exec(value);
-    if (match === null) {
-        return undefined;
-    }
-
-    const [, mime, base64] = match;
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-    }
-
-    return {bytes, mime};
-};
-
-/** Lift the embedded portrait out of the document; return the portrait-free doc. */
-const stripPortrait = (document: CharacterDocument): {document: CharacterDocument; portrait: PortraitInput | undefined} => {
-    const {portrait, ...rest} = document as Record<string, unknown>;
-
-    return {document: rest, portrait: decodeDataUri(portrait)};
-};
 
 /**
  * The one-time AsyncStorage/`hsm.db`→SQLite import (see docs/PERSISTENCE.md).

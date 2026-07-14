@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export type {Rng} from './rng';
-export type {FilePicker, PickedFile} from './filePicker';
-export * from './persistence';
+export {decodeCharacterXml} from './decodeCharacterXml';
+export {parseHdc} from './hdcParser';
+export {characterId, importHdc, type ImportResult} from './importCharacter';
