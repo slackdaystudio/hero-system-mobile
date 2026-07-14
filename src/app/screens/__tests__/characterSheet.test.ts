@@ -92,6 +92,17 @@ describe('characterSheet', () => {
             expect(hidden).toBeLessThan(shown); // OIHID-tagged traits are dropped in the base (secret-ID) form
         });
 
+        it('drops OIHID contributions from the combat/movement values in the base form', () => {
+            const spyder = heroOf('spyder2022');
+            const snapshot = (secondary: boolean): string => {
+                const combat = buildCombatSheet(spyder, secondary);
+                return JSON.stringify([combat.movement, combat.defenses, combat.combatValues, combat.info]);
+            };
+
+            // Its OIHID Running/Swimming/Teleport powers stop counting out of the alternate ID.
+            expect(snapshot(false)).not.toEqual(snapshot(true));
+        });
+
         it('isOnlyInAlternateId only fires on the OIHID limitation', () => {
             expect(isOnlyInAlternateId({modifier: {xmlid: 'OIHID'}})).toBe(true);
             expect(isOnlyInAlternateId({modifier: [{xmlid: 'FOCUS'}, {xmlid: 'OIHID'}]})).toBe(true);

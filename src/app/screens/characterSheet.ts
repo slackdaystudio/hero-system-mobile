@@ -36,6 +36,29 @@ export function isOnlyInAlternateId(trait: Obj): boolean {
     return false;
 }
 
+const filterOutAlternateId = (items: Obj[]): Obj[] =>
+    items
+        .filter((item) => !isOnlyInAlternateId(item))
+        .map((item) => (Array.isArray(item.powers) ? {...item, powers: filterOutAlternateId(item.powers as Obj[])} : item));
+
+/**
+ * A copy of the character with every "Only In Alternate Identity" trait removed
+ * (recursively, incl. framework slots). Because the engine reads the trait lists,
+ * this drops those traits from *everything* derived — characteristics, defenses,
+ * combat values, and movement totals — not just their sheet rows. Used to render
+ * the base (secret-ID) form.
+ */
+function withoutAlternateIdTraits(character: Obj): Obj {
+    const stripped: Obj = {...character};
+    for (const key of TRAIT_KEYS) {
+        if (Array.isArray(character[key])) {
+            stripped[key] = filterOutAlternateId(character[key] as Obj[]);
+        }
+    }
+
+    return stripped;
+}
+
 /**
  * True when the character has any form-dependent content: secondary characteristics
  * (powers that affect total-but-not-primary) or traits limited to the alternate
@@ -118,7 +141,8 @@ const COMBAT_VALUE_FIELDS: Array<{key: string; label: string; attack: boolean}> 
  * characteristics, and per-mode movement distances.
  */
 export function buildCombatSheet(character: Obj, showSecondary = false): CombatSheet {
-    const c: Obj = {...character, showSecondary};
+    const source = showSecondary ? character : withoutAlternateIdTraits(character);
+    const c: Obj = {...source, showSecondary};
     const total = (shortName: string): number => heroDesignerCharacter.getCharacteristicTotal(shortName, c);
 
     // init() flips showSecondary while it works, so hand it its own copy and keep `c` primary.
@@ -191,9 +215,11 @@ export function asHeroCharacter(document: CharacterDocument): Obj | null {
 
 /** Build the full sheet from a processed character: characteristics + decorated trait sections. */
 export function buildCharacterSheet(character: Obj, showSecondary = false): CharacterSheet {
-    // Several engine methods read `showSecondary` (the alt-ID form); set it on a
-    // copy so the caller's toggle drives the totals without mutating input.
-    const c: Obj = {...character, showSecondary};
+    // Off = base (secret-ID) form: drop the alt-ID traits at the source so both the
+    // rows and every derived total exclude them. `showSecondary` additionally drives
+    // the affectsPrimary "secondary characteristics" math the engine already does.
+    const source = showSecondary ? character : withoutAlternateIdTraits(character);
+    const c: Obj = {...source, showSecondary};
 
     const characteristics: SheetCharacteristic[] = toArray(c.characteristics).map((entry) => {
         const name = String(entry.name ?? entry.shortName ?? '');
@@ -227,12 +253,6 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
     const rows: SheetTrait[] = [];
 
     for (const item of items) {
-        // Suppress "Only In Alternate Identity" traits (and their children) unless
-        // the sheet is showing the alternate-ID form.
-        if (!character.showSecondary && isOnlyInAlternateId(item)) {
-            continue;
-        }
-
         try {
             const decorated = characterTraitDecorator.decorate(item, listKey, () => character);
             rows.push({label: decorated.label(), roll: decorated.roll() ?? null, realCost: decorated.realCost(), definition: decorated.definition(), depth});
