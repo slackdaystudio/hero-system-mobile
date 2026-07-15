@@ -464,16 +464,27 @@ starts here rather than rediscovering them:
   *enhancers* (`linguist`, `scientist`, `scholar`, `jackOfAllTrades`, `traveler`), which it pushes
   in by name. **A `skillLevels` sub-key is silently dropped** — costing 0, not erroring.
 
-**The blocker the next pass has to solve first.** `Actor/Actress` is 7 skills at 3 (21) plus
-`SL: Interactive Skills +1`, which is a group level — `SIMILAR`, 5 — for **26**. That is *one
-over* 25, and the only lever is +2 steps, which cannot close an odd gap. Either the SL is meant
-to be `RELATED` (3, giving 24 — still odd), or a skill is not a full 3 points, or the set simply
-does not cost 25. Until one set is reconciled, authoring the other ten is guesswork.
+**~~The blocker~~ — resolved (Phil).** The levers are wider than `levels`:
 
-This strongly suggests what the `characteristicsCost` labels and `Warrior`'s 28 already showed:
-**the declared 25 is not reliable**, and the real answer is to derive each set's cost and let the
-allocator take it — as the archetype spreads now do — rather than force all eleven onto a number
-that may never have been true.
+| Lever | Cost | Effect |
+|-------|------|--------|
+| Familiarity | **1** | roll becomes a flat 8- |
+| Proficiency | **2** | roll becomes a flat 10- |
+| Full skill | **3** | the normal roll |
+| `levels` on a skill | **+2** each | +1 to that skill's roll |
+
+Familiarity and Proficiency are what close an **odd** remainder — `levels` alone moves in 2s.
+`Actor/Actress` is 26 as listed (7 skills at 3, plus `SL: Interactive Skills +1` = a `SIMILAR`
+group level at 5), so Seduction drops to a Proficiency and it lands on **25**. The engine
+independently produces the flat `10-` roll, confirming the rule against the data.
+
+**A skill needs its `characteristic`** (`PRE`, `INT`, …) or it has **no roll** — silently, not as
+an error, so the sheet would show a blank roll column. Actor/Actress rolls 12-/13- off PRE and
+INT once it is set.
+
+**1 of 11 authored.** The remaining ten are each a small constraint-solve: price the listed
+skills, then close the gap with a Proficiency, a Familiarity, or levels — recording which, and
+why, in the set's `note`.
 
 **4. `cost: 25` is declared, and structuring will test it.** Same shape as `characteristicsCost`,
 which was wrong twice, and as `Warrior`'s 28 — corrected to 25 on the reading that it was a typo.

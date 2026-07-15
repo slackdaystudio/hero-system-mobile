@@ -1,0 +1,59 @@
+{
+  "_comment": [
+    "5E skillsets, structured — the profession half of a Low Powered build (25 of its 250).",
+    "Authored from the legacy prose in skillsets.json, which stated a list of name strings and a",
+    "hand-typed cost of 25.",
+    "",
+    "As with the powersets and complications, NO cost is stated here: a skill carries its basecost",
+    "on the trait and the engine prices it. The prose's 'skills' is a catch-all over several .hdc",
+    "buckets -- skills, perks, talents -- so `buckets` may carry any of them.",
+    "",
+    "HITTING 25 (Phil's rules). A set's listed skills rarely land on it. The levers:",
+    "   Familiarity   1   roll becomes a flat 8-",
+    "   Proficiency   2   roll becomes a flat 10-",
+    "   Full skill    3   the normal roll",
+    "   levels on a skill  +2 each, +1 to that skill's roll",
+    "Familiarity and Proficiency are what make an ODD remainder closable -- `levels` alone moves in",
+    "2s. Each set's `note` records what it needed.",
+    "",
+    "Skill levels go in the `skill` array itself, NOT a `skillLevels` sub-key: unlike powers,",
+    "nothing folds a skills sub-key in. populateTrait reads only `skill` and `list`, plus the skill",
+    "ENHANCERS (linguist, scientist, scholar...) which it pushes in by name. A skillLevels sub-key",
+    "is silently dropped, costing 0 rather than erroring.",
+    "",
+    "SKILL_LEVELS is a level across SEVERAL skills, priced by option: CHARACTERISTIC 2,",
+    "SINGLEMOVEMENT 2, ALLMOVEMENT 3, RELATED 3 ('any three related Skills'), SIMILAR 5 ('a group",
+    "of similar Skills'), NONCOMBAT 8, OVERALL 10. A level in ONE skill is that skill's own",
+    "`levels`, at 2 apiece.",
+    "",
+    "'Player Defined' is deliberate, not a placeholder: the prose's 'Lang:' and 'SS[INT]:' named no",
+    "language and no science, so the player names their own. These are the fields the",
+    "editable-fields work should reach first.",
+    "",
+    "A skill needs its `characteristic` (PRE, INT, DEX...) or it has NO ROLL -- the sheet shows the",
+    "skill with a blank roll rather than erroring. levelsonly: false is the default.",
+    "",
+    "See docs/RANDOM_CHARACTER.md. Verified in core/random/__tests__/skillset.test.ts -- every set",
+    "must total exactly 25."
+  ],
+  "skillsets": [
+    {
+      "profession": "Actor/Actress",
+      "note": "Its seven skills at 3 plus 'SL: Interactive Skills +1' — a group level, SIMILAR at 5 — come to 26, one over. Seduction is dropped to a Proficiency (2, a flat 10- roll) to land on 25: an odd remainder, so `levels` (+2 steps) could not close it. Seduction is the least load-bearing of the seven for this profession.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {"xmlid": "ACTING", "characteristic": "PRE", "id": 401, "alias": "Acting", "position": 0, "basecost": 3},
+            {"xmlid": "CONVERSATION", "characteristic": "PRE", "id": 402, "alias": "Conversation", "position": 1, "basecost": 3},
+            {"xmlid": "DISGUISE", "characteristic": "INT", "id": 403, "alias": "Disguise", "position": 2, "basecost": 3},
+            {"xmlid": "MIMICRY", "characteristic": "INT", "id": 404, "alias": "Mimicry", "position": 3, "basecost": 3},
+            {"xmlid": "PERSUASION", "characteristic": "PRE", "id": 405, "alias": "Persuasion", "position": 4, "basecost": 3},
+            {"xmlid": "SEDUCTION", "characteristic": "PRE", "id": 406, "alias": "Seduction", "position": 5, "basecost": 2, "proficiency": true},
+            {"xmlid": "NAVIGATION", "characteristic": "INT", "id": 407, "alias": "Navigation", "position": 6, "basecost": 3, "input": "Air or Ground"},
+            {"xmlid": "SKILL_LEVELS", "id": 408, "alias": "Skill Levels", "position": 7, "levels": 1, "option": "SIMILAR", "optionid": "SIMILAR", "input": "Interactive Skills"}
+          ]
+        }
+      }
+    }
+  ]
+}
