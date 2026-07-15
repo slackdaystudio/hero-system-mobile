@@ -24,13 +24,15 @@ export interface ListRowProps {
     imageUri?: string | null;
     active?: boolean;
     onPress?: () => void;
+    /** Long-press action. Used for destructive actions, which should confirm before acting. */
+    onLongPress?: () => void;
     testID?: string;
 }
 
 const initialOf = (title: string): string => (title.trim()[0] ?? '?').toUpperCase();
 
 /** A tappable list row: leading portrait/initial, title + subtitle, active badge. */
-export function ListRow({title, subtitle, imageUri, active = false, onPress, testID}: ListRowProps): React.JSX.Element {
+export function ListRow({title, subtitle, imageUri, active = false, onPress, onLongPress, testID}: ListRowProps): React.JSX.Element {
     const theme = useTheme();
 
     const container: ViewStyle = {
@@ -46,8 +48,9 @@ export function ListRow({title, subtitle, imageUri, active = false, onPress, tes
         <Pressable
             testID={testID}
             accessibilityRole="button"
-            disabled={onPress === undefined}
+            disabled={onPress === undefined && onLongPress === undefined}
             onPress={onPress}
+            onLongPress={onLongPress}
             style={({pressed}) => [styles.row, container, {backgroundColor: pressed ? theme.colors.surfaceAlt : theme.colors.surface}]}>
             <View style={[styles.avatar, avatar]}>
                 {imageUri ? (

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react';
+import {Alert} from 'react-native';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import type {CharacterRepository, CharacterSummary} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
@@ -30,7 +31,7 @@ const summary = (over: Partial<CharacterSummary> = {}): CharacterSummary => ({
     ...over,
 });
 
-const fakeCharacters = (summaries: CharacterSummary[], opts: {fail?: boolean} = {}): CharacterRepository =>
+const fakeCharacters = (summaries: CharacterSummary[], opts: {fail?: boolean; deleted?: string[]; deleteFails?: boolean} = {}): CharacterRepository =>
     ({
         list: async () => {
             if (opts.fail) {
@@ -38,7 +39,34 @@ const fakeCharacters = (summaries: CharacterSummary[], opts: {fail?: boolean} = 
             }
             return summaries;
         },
+        delete: async (id: string) => {
+            if (opts.deleteFails) {
+                throw new Error('rows are load-bearing');
+            }
+            opts.deleted?.push(id);
+        },
     } as unknown as CharacterRepository);
+
+/** The buttons an `Alert.alert` was offered, so a test can pick one. */
+type AlertButton = {text?: string; style?: string; onPress?: () => void};
+
+const alertSpy = () => jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+
+const pressAlertButton = async (spy: jest.SpyInstance, text: string): Promise<void> => {
+    const buttons = spy.mock.calls[spy.mock.calls.length - 1][2] as AlertButton[];
+
+    await act(async () => {
+        buttons.find((button) => button.text === text)?.onPress?.();
+    });
+};
+
+const longPress = async (tree: ReactTestRenderer, id: string): Promise<void> => {
+    const row = tree.root.findAllByProps({testID: `character-${id}`}).find((node) => typeof node.props.onLongPress === 'function');
+
+    await act(async () => {
+        row?.props.onLongPress();
+    });
+};
 
 const collectText = (node: unknown): string[] => {
     if (node === null || node === undefined) {
@@ -153,6 +181,62 @@ describe('CharacterListScreen', () => {
         const tree = await renderScreen(fakeCharacters([], {fail: true}));
 
         expect(collectText(tree.toJSON())).toContain('disk on fire');
+    });
+
+    describe('deleting a character', () => {
+        afterEach(() => jest.restoreAllMocks());
+
+        it('asks before deleting, naming the character and defaulting to Cancel', async () => {
+            const spy = alertSpy();
+            const tree = await renderScreen(fakeCharacters([summary({name: 'Defensor'})]));
+
+            await longPress(tree, 'c1');
+
+            // Deleting is irreversible, so the nag has to name what is about to go.
+            expect(spy).toHaveBeenCalledTimes(1);
+            expect(spy.mock.calls[0][0]).toBe('Delete Defensor?');
+            expect(spy.mock.calls[0][1]).toBe('This cannot be undone.');
+
+            const buttons = spy.mock.calls[0][2] as AlertButton[];
+            expect(buttons.map((button) => [button.text, button.style])).toEqual([
+                ['Cancel', 'cancel'],
+                ['Delete', 'destructive'],
+            ]);
+        });
+
+        it('deletes nothing until the nag is confirmed', async () => {
+            const deleted: string[] = [];
+            const spy = alertSpy();
+            const tree = await renderScreen(fakeCharacters([summary()], {deleted}));
+
+            await longPress(tree, 'c1');
+            expect(deleted).toEqual([]); // the long-press alone must not delete
+
+            await pressAlertButton(spy, 'Cancel');
+            expect(deleted).toEqual([]); // ...and neither must Cancel
+        });
+
+        it('deletes and reloads once confirmed', async () => {
+            const deleted: string[] = [];
+            const spy = alertSpy();
+            const tree = await renderScreen(fakeCharacters([summary({id: 'c1', name: 'Defensor'})], {deleted}));
+
+            await longPress(tree, 'c1');
+            await pressAlertButton(spy, 'Delete');
+
+            expect(deleted).toEqual(['c1']);
+        });
+
+        it('surfaces a failed delete instead of silently doing nothing', async () => {
+            const spy = alertSpy();
+            const tree = await renderScreen(fakeCharacters([summary()], {deleteFails: true}));
+
+            await longPress(tree, 'c1');
+            await pressAlertButton(spy, 'Delete');
+
+            expect(spy.mock.calls[spy.mock.calls.length - 1][0]).toBe('Delete failed');
+            expect(spy.mock.calls[spy.mock.calls.length - 1][1]).toBe('rows are load-bearing');
+        });
     });
 });
 

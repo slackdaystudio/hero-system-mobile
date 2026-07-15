@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, {useCallback, useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList, StyleSheet, type ViewStyle} from 'react-native';
+import {ActivityIndicator, Alert, FlatList, StyleSheet, type ViewStyle} from 'react-native';
 import type {CharacterSummary} from 'core/ports';
 import {ListRow, Screen, Text} from 'app/components';
 import {useCharacterRepository} from 'app/providers/RepositoriesProvider';
@@ -26,6 +26,17 @@ export interface CharacterListScreenProps {
     /** Change this value to force a reload (e.g. after importing a character). */
     refreshToken?: unknown;
 }
+
+/**
+ * Deleting a character is **irreversible** — it drops the row and its portrait file, and an
+ * imported `.hdc` may be the only copy. So a long-press (already hard to hit by accident) still
+ * confirms, names the character being deleted, and defaults to Cancel.
+ */
+const confirmDelete = (name: string, onConfirm: () => void): void =>
+    Alert.alert(`Delete ${name}?`, 'This cannot be undone.', [
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'Delete', style: 'destructive', onPress: onConfirm},
+    ]);
 
 /** Reads the character list straight off the repo's lifted columns (no document parse). */
 const subtitleFor = (character: CharacterSummary): string => {
@@ -54,6 +65,16 @@ export function CharacterListScreen({onSelect, refreshToken}: CharacterListScree
     useEffect(() => {
         load();
     }, [load, refreshToken]);
+
+    const remove = useCallback(
+        (character: CharacterSummary) =>
+            confirmDelete(character.name, () => {
+                repository
+                    .delete(character.id)
+                    .then(load, (error: unknown) => Alert.alert('Delete failed', error instanceof Error ? error.message : 'That character could not be deleted.'));
+            }),
+        [repository, load],
+    );
 
     if (state.status === 'loading') {
         return (
@@ -98,6 +119,7 @@ export function CharacterListScreen({onSelect, refreshToken}: CharacterListScree
                         imageUri={item.portraitUri}
                         active={item.isActive}
                         onPress={onSelect === undefined ? undefined : () => onSelect(item.id)}
+                        onLongPress={() => remove(item)}
                     />
                 )}
             />
