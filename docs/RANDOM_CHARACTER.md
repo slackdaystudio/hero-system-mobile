@@ -449,12 +449,31 @@ buckets the way it just gained `martialarts`.
 | `SS[INT]:` | Scientist (×3) | Default the `input` to **"Player Defined"** |
 | `CSL: HTH Combat +1 or Ranged combat +1` | Warrior, Investigator | **Resolve the `or` per profession** — pick the one that fits, so the player is not asked to choose |
 
-**3. Skills price unlike anything else here.** The skill templates carry **no `basecost`,
-`lvlcost` or `lvlval` at all** — each skill kind has its own rule in its decorator. Observed on
-`aoe`: `BUREAUCRATICS` at `levels: 0` costs 3, `DEMOLITIONS` at `levels: 1` costs 5,
-`KNOWLEDGE_SKILL` costs 2, `CRAMMING` costs 5, `COMBAT_LEVELS` at 3 levels costs 6. So the
-exact-25 constraint has to be solved per set against 41 distinct pricing behaviours — this is not
-the powers job again, and should be its own pass.
+**3. Skills price unlike anything else here** — findings from a first attempt, so the next one
+starts here rather than rediscovering them:
+
+- A skill carries its **`basecost` on the trait**, as everything else in this data does. A full
+  3-point skill is `basecost: 3`; the template carries no cost at all.
+- **A skill's own `levels` is the +2-per-level lever** (Phil's rule). `DEMOLITIONS` at `levels: 1`
+  costs 5 = 3 + 2. This is *not* a `SKILL_LEVELS` trait.
+- **`SKILL_LEVELS` is a different thing** — a level across *several* skills, priced by its option:
+  `CHARACTERISTIC` 2, `SINGLEMOVEMENT` 2, `ALLMOVEMENT` 3, `RELATED` 3 ("any three related
+  Skills"), `SIMILAR` 5 ("a group of similar Skills"), `NONCOMBAT` 8, `OVERALL` 10.
+- **Skill levels live in the `skill` array**, not a `skillLevels` sub-key. Unlike powers, nothing
+  folds a skills sub-key in: `populateTrait` reads only `skill` and `list`, plus the skill
+  *enhancers* (`linguist`, `scientist`, `scholar`, `jackOfAllTrades`, `traveler`), which it pushes
+  in by name. **A `skillLevels` sub-key is silently dropped** — costing 0, not erroring.
+
+**The blocker the next pass has to solve first.** `Actor/Actress` is 7 skills at 3 (21) plus
+`SL: Interactive Skills +1`, which is a group level — `SIMILAR`, 5 — for **26**. That is *one
+over* 25, and the only lever is +2 steps, which cannot close an odd gap. Either the SL is meant
+to be `RELATED` (3, giving 24 — still odd), or a skill is not a full 3 points, or the set simply
+does not cost 25. Until one set is reconciled, authoring the other ten is guesswork.
+
+This strongly suggests what the `characteristicsCost` labels and `Warrior`'s 28 already showed:
+**the declared 25 is not reliable**, and the real answer is to derive each set's cost and let the
+allocator take it — as the archetype spreads now do — rather than force all eleven onto a number
+that may never have been true.
 
 **4. `cost: 25` is declared, and structuring will test it.** Same shape as `characteristicsCost`,
 which was wrong twice, and as `Warrior`'s 28 — corrected to 25 on the reading that it was a typo.
