@@ -276,10 +276,13 @@ silently reshaping an archetype.
       over 2000 budgets. Confirmed the model reproduces the legacy powerset sizes: **8 of 11
       archetypes need zero flex**. The required flex per powerset is pinned as the phase 3
       authoring spec.
-- [ ] **Phase 3 — 5E powersets + skills + complications.** *(1 of 11 archetypes)* Author the
+- [ ] **Phase 3 — 5E powersets + skills + complications.** *(10 of 11 archetypes)* Author the
       legacy prose as structured data, flexing each to its balance — see `REQUIRED_FLEX` in
-      `allocate.test.ts`. **Energy Projector's first powerset is done and costs exactly 125**;
-      the translation approach is proven (see below). The remaining ten are mechanical.
+      `allocate.test.ts`. Every authored powerset costs its balance exactly, checked
+      automatically. **Only `Martial Artist` is left**, and it is blocked: its Martial
+      Block/Disarm/Dodge/Throw are `martialarts` traits, not powers, and the `Powerset` shape has
+      no bucket for them — plus its two powersets state 115 and 140 against a 125 balance, so
+      neither number is trustworthy. Skills and complications are still name strings.
 - [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,

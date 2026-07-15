@@ -430,5 +430,100 @@
         "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Shield Tricks", "position": 1, "basecost": 50}]
       }
     }
+  ],
+  "Weapons Master": [
+    {
+      "label": "Armoury",
+      "approximations": [
+        {
+          "power": "Arrow",
+          "note": "Legacy prose gives most of this multipower's slots '[16c] (-0)' — sixteen charges, which in 5E is a -0 limitation and so changes no cost. Omitted rather than modelled: CHARGES carries no basecost or lvlcost and is driven entirely by adders, so building it would risk mispricing a slot for exactly zero point benefit. The slots cost what the prose says; they just don't say they run out. Add charges if the flavour is ever wanted — the costs will not move."
+        }
+      ],
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Combat Webbing", "position": 0, "levels": 16, "pdlevels": 8, "edlevels": 8},
+
+          {"xmlid": "ENERGYBLAST", "id": 111, "parentid": 110, "alias": "Energy Blast", "name": "Arrow", "position": 1, "levels": 10, "ultraSlot": true},
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 112,
+            "parentid": 110,
+            "alias": "Energy Blast",
+            "name": "Armour-Piercing Arrow",
+            "position": 2,
+            "levels": 6,
+            "modifier": {"xmlid": "ARMORPIERCING", "alias": "Armor Piercing", "basecost": 0.5, "levels": 0},
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 113,
+            "parentid": 110,
+            "alias": "Energy Blast",
+            "name": "Explosive Arrow",
+            "position": 3,
+            "levels": 6,
+            "modifier": {"xmlid": "EXPLOSION", "alias": "Explosion", "basecost": 0.5, "levels": 0},
+            "ultraSlot": true
+          },
+          {"xmlid": "ENTANGLE", "id": 114, "parentid": 110, "alias": "Entangle", "name": "Bola Arrow", "position": 4, "levels": 5, "ultraSlot": true},
+          {
+            "xmlid": "FLASH",
+            "id": 115,
+            "parentid": 110,
+            "alias": "Flash",
+            "name": "Flash Arrow",
+            "position": 5,
+            "levels": 6,
+            "option": "SIGHTGROUP",
+            "optionid": "SIGHTGROUP",
+            "modifier": {"xmlid": "EXPLOSION", "alias": "Explosion", "basecost": 0.5, "levels": 0},
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "HANDTOHANDATTACK",
+            "id": 116,
+            "parentid": 110,
+            "alias": "Hand-To-Hand Attack",
+            "name": "Bow Strike",
+            "position": 6,
+            "levels": 6,
+            "modifier": {"xmlid": "HANDTOHANDATTACK", "alias": "Hand-To-Hand Attack", "basecost": -0.5, "levels": 0},
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "SWINGING",
+            "id": 118,
+            "parentid": 110,
+            "alias": "Swinging",
+            "name": "Grapnel Line",
+            "position": 8,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
+            "ultraSlot": true
+          },
+
+          {"xmlid": "ENHANCEDPERCEPTION", "id": 130, "alias": "Enhanced Perception", "name": "Marksman's Eye", "position": 9, "levels": 2, "option": "SIGHTGROUP", "optionid": "SIGHTGROUP"},
+          {"xmlid": "TELESCOPIC", "id": 131, "alias": "Telescopic", "name": "Rangefinder", "position": 10, "levels": 4, "option": "SIGHTGROUP", "optionid": "SIGHTGROUP"},
+          {"xmlid": "FLASHDEFENSE", "id": 132, "alias": "Flash Defense", "name": "Shaded Visor", "position": 11, "levels": 5, "option": "SIGHTGROUP", "optionid": "SIGHTGROUP"}
+        ],
+        "running": [
+          {
+            "xmlid": "RUNNING",
+            "id": 117,
+            "parentid": 110,
+            "alias": "Running",
+            "name": "Sprint",
+            "position": 7,
+            "levels": 5,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
+            "ultraSlot": true
+          },
+          {"xmlid": "RUNNING", "id": 133, "alias": "Running", "name": "Conditioning", "position": 12, "levels": 4}
+        ],
+        "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Trick Arrows", "position": 1, "basecost": 50}]
+      }
+    }
   ]
 }

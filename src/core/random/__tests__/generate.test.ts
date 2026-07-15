@@ -23,14 +23,23 @@ import {LOW_POWERED_5E} from '../powerLevel';
 
 type Obj = Record<string, any>;
 
+/**
+ * A seeded LCG — deterministic, so generation is reproducible and fuzzable. Kept in modulo form
+ * rather than the usual bitwise one: `state * 1664525 + 1013904223` peaks around 7.2e15, inside
+ * a double's exact integer range (2^53 ≈ 9.0e15), so no precision is lost.
+ *
+ * **Reads the high bits, not the low ones.** An LCG's low bits are famously weak — with
+ * sequential seeds, `state % n` for even `n` barely moves, and a 300-roll fuzz over 10 archetypes
+ * reached only 2 of them. Dividing by 65536 first uses the top half of the word and decorrelates.
+ */
 const seededRng = (seed: number): Rng => {
-    let state = seed % 4294967296;
+    let state = (seed * 2654435761) % 4294967296;
 
     return {
         next: (min: number, max: number): number => {
             state = (state * 1664525 + 1013904223) % 4294967296;
 
-            return min + (state % (max - min + 1));
+            return min + (Math.floor(state / 65536) % (max - min + 1));
         },
     };
 };
@@ -41,7 +50,7 @@ describe('generateRandomCharacter', () => {
     it('only offers archetypes that have a structured powerset', () => {
         const names = generatableArchetypes().map((archetype) => archetype.name);
 
-        expect(names).toEqual(['Energy Projector', 'Gadgeteer', 'Mentalist', 'Metamorph', 'Mystic', 'Patriot', 'Powered Armor', 'Speedster', 'Brick']);
+        expect(names).toEqual(['Energy Projector', 'Gadgeteer', 'Mentalist', 'Metamorph', 'Mystic', 'Patriot', 'Powered Armor', 'Speedster', 'Weapons Master', 'Brick']);
         expect(names.every((name) => powersetsFor(name).length > 0)).toBe(true);
     });
 
