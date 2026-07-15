@@ -92,6 +92,24 @@ const H9_COST_DIVERGENCE: Record<string, Set<string>> = {
     'jane-fawn': new Set(['ENHANCEDPERCEPTION']),
 };
 
+/**
+ * H10 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy's `Clinging.cost()` ended
+ * `return cost + 1`, putting the power's floor at 11. 5E prices it at 10 base +1 per +3 STR, and
+ * the template says so itself — `basecost: 10`, and a `mincost: 10` the stray +1 made
+ * unreachable. Every Clinging in the corpus is therefore one point cheaper:
+ *   - `spyder2022`'s Clinging 14 → **13**
+ *   - `aoe` carries its Clinging inside a **compound power** ("Effect Test"), so the change shows
+ *     on the parent: 44 → **43**. `flatten` never descends into compound children, so the
+ *     compound is the only trait the golden master ever compares for them — hence the xmlid here
+ *     is `COMPOUNDPOWER`, not `CLINGING`.
+ * `mark-li-v5a-433`'s Gecko pads is already skipped by `U2_DIVERGENCE` above (11 → 10 there).
+ * Corrected values pinned in `clinging.test.ts`.
+ */
+const H10_COST_DIVERGENCE: Record<string, Set<string>> = {
+    aoe: new Set(['COMPOUNDPOWER']),
+    spyder2022: new Set(['CLINGING']),
+};
+
 describe('golden master: core/traits factory reproduces legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
@@ -114,7 +132,9 @@ describe('golden master: core/traits factory reproduces legacy', () => {
                 const legacy = legacyDecorator.decorate(trait, key, getCharacter);
                 const ported = core.decorate(trait, key, getCharacter);
 
-                if (!(H9_COST_DIVERGENCE[name]?.has(String(trait.xmlid).toUpperCase()) ?? false)) {
+                const xmlid = String(trait.xmlid).toUpperCase();
+
+                if (!((H9_COST_DIVERGENCE[name]?.has(xmlid) ?? false) || (H10_COST_DIVERGENCE[name]?.has(xmlid) ?? false))) {
                     expect(ported.cost()).toBe(legacy.cost());
                     expect(ported.activeCost()).toBe(legacy.activeCost());
                     expect(ported.realCost()).toBe(legacy.realCost());

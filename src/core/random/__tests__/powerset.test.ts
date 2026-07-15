@@ -204,14 +204,14 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
             {
                 archetype: 'Martial Artist',
                 powerset: 'Adept',
-                power: 'Wall Walk',
-                note: expect.stringContaining('return cost + 1'),
+                power: 'Combat Awareness',
+                note: expect.stringContaining('Raised to +3'),
             },
             {
                 archetype: 'Martial Artist',
                 powerset: 'Adept',
-                power: 'Iron Body',
-                note: expect.stringContaining('Flexed to 11/11'),
+                power: 'Conditioning',
+                note: expect.stringContaining('skipping 34'),
             },
         ]);
     });

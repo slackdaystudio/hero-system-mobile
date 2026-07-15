@@ -36,7 +36,7 @@ const heroOf = (fixture: string): Obj =>
     heroDesignerCharacter.getCharacter(JSON.parse(JSON.stringify(require(`../../hero/__tests__/fixtures/${fixture}.json`))) as ParsedCharacter) as unknown as Obj;
 
 describe('U2 — a zero-level multiplier buys nothing', () => {
-    it('costs mark-li\'s "Gecko pads" (CLINGING, levels 0) at 11, not -Infinity', () => {
+    it('costs mark-li\'s "Gecko pads" (CLINGING, levels 0) at 10, not -Infinity', () => {
         const markLi = heroOf('mark-li-v5a-433');
         const geckoPads = (flatten(markLi.powers, 'powers') as Obj[]).find((power) => power.name === 'Gecko pads')!;
 
@@ -45,12 +45,12 @@ describe('U2 — a zero-level multiplier buys nothing', () => {
         expect(geckoPads.levels).toBe(0);
 
         // The 5E/6E `clinging` template is basecost 10 / lvlval 3 / lvlcost 1, and
-        // Clinging.cost() is `basecost + getMultiplierCost(levels, lvlval, lvlcost) + 1`.
-        // At 0 levels the multiplier term contributes nothing: 10 + 0 + 1 = 11.
-        // (The trailing +1 is a separate, unreviewed legacy oddity — preserved here.)
+        // Clinging.cost() is `basecost + getMultiplierCost(levels, lvlval, lvlcost)`.
+        // At 0 levels the multiplier term contributes nothing: 10 + 0 = 10, the template's own
+        // `mincost`. (This read 11 until H10 removed a stray +1 — see KNOWN_DEVIATIONS.)
         const decorated = characterTraitDecorator.decorate(geckoPads, 'powers', () => markLi);
 
-        expect(decorated.cost()).toBe(11);
+        expect(decorated.cost()).toBe(10);
         expect(Number.isFinite(decorated.activeCost())).toBe(true);
         expect(Number.isFinite(decorated.realCost())).toBe(true);
     });

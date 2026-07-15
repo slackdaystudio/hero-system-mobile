@@ -46,6 +46,7 @@
 | H7 | Resistant Protection's `mdlevels` fed *every* unusual-defense total | ✅ **fixed** — was real bug, active | yes — defensor, adamantine | hero query (re-based) |
 | H8 | Unusual defenses ignored `affectsPrimary`/`affectsTotal` | ✅ **fixed** — was real bug, active | **yes — 14 fixtures (base form)** | hero query (re-based) |
 | H9 | Enhanced Perception ignores `allcost` | ✅ **fixed** — was real bug, active | yes — adamantine (9→27), jane-fawn (2→6) | traits (decorator, re-based) |
+| H10 | `Clinging.cost()` adds a stray `+1` | ✅ **fixed** — was real bug, active | yes — mark-li, aoe, spyder2022 | traits (decorator, re-based) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -235,6 +236,29 @@ powers, tracking resistant points separately.
   compound's Resistant Protection `powdlevels`) = **25**.
 - **Pinned by:** `core/hero/__tests__/unusualDefenses.test.ts`; golden master skips these
   queries via `UNUSUAL_DEFENSE_DIVERGENCE`.
+
+## H10 — Clinging adds a stray point — ✅ FIXED
+
+- **Where:** `core/traits/powers/clinging.ts` ended `return cost + 1`, putting the power's floor
+  at 11.
+- **Legacy:** same — `Clinging.js` is byte-identical, so this has been shipping.
+- **Correct:** 5E prices Clinging at **10 base, +1 per +3 STR**. Nothing in the rules adds a
+  point. The template says so itself: `basecost: 10`, `lvlcost: 1`, `lvlval: 3`, and a
+  **`mincost: 10`** that the stray +1 made unreachable — the engine's own data contradicted the
+  engine.
+- **Three sources agreed against the code**, which is what made this safe to fix without an
+  oracle: that `mincost`, the rules text the template quotes (5E p94), and the legacy
+  random-character prose, which prices `Clinging 20 STR` at 10. The same shape as H9.
+- **Corpus impact:** every Clinging is one point cheaper — `mark-li-v5a-433`'s Gecko pads 11 →
+  **10**, `spyder2022` 14 → **13**, and `aoe` 44 → **43** (its Clinging sits inside a compound
+  power, so the change surfaces on the parent — `flatten` never descends into compound children,
+  so the compound is the only trait the golden master compares for them).
+- **Found via the random character generator**, not the corpus: Martial Artist's powerset priced
+  `Clinging 20 STR` at 10 while the engine said 11. First noticed in passing during **U2**, whose
+  entry called the +1 "a separate, unreviewed legacy oddity" and pinned Gecko pads at 11 —
+  that pin now reads 10.
+- **Pinned by:** `traits/__tests__/clinging.test.ts`; the decorator golden master skips these via
+  `H10_COST_DIVERGENCE`.
 
 ## H9 — Enhanced Perception ignores what it enhances — ✅ FIXED
 
@@ -461,7 +485,9 @@ returning `-Infinity` for "no levels" was the actual defect.
 - **Fix + verify:** guard the total in `getMultiplications` (`if (!(total > 0)) return 0;`,
   which also absorbs negatives/`NaN`); unit test pinning `getMultiplications(0, 3) === 0`;
   correctness test pinning `Gecko pads` at 11; re-base the decorator golden master for
-  `mark-li-v5a-433` as an intentional divergence linking here.
+  `mark-li-v5a-433` as an intentional divergence linking here. *(That pin now reads **10** — the
+  trailing `+1` this entry flagged as "a separate, unreviewed legacy oddity" turned out to be a
+  real bug, fixed as **H10**.)*
 
 ## U3 — `getMultiplications` overshoots on exact powers of a non-2 step — ✅ FIXED
 

@@ -17,11 +17,15 @@ import {TraitDecorator} from '../traitDecorator';
 
 /** Clinging, ported from legacy `powers/Clinging.js`. */
 export default class Clinging extends TraitDecorator {
+    /**
+     * H10 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy ended `return cost + 1`,
+     * which put Clinging's floor at 11. 5E prices it at **10 base, +1 per +3 STR**, and the
+     * template says so itself — `basecost: 10`, `lvlcost: 1`, `lvlval: 3`, and a **`mincost: 10`**
+     * that the stray +1 made unreachable. Nothing in the rules adds a point.
+     */
     cost(): number {
-        let cost = this.characterTrait.trait.basecost;
+        const trait = this.characterTrait.trait;
 
-        cost += getMultiplierCost(this.characterTrait.trait.levels, this.characterTrait.trait.template.lvlval, this.characterTrait.trait.template.lvlcost);
-
-        return cost + 1;
+        return trait.basecost + getMultiplierCost(trait.levels, trait.template.lvlval, trait.template.lvlcost);
     }
 }

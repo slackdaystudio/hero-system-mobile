@@ -531,17 +531,17 @@
       "label": "Adept",
       "approximations": [
         {
-          "power": "Wall Walk",
-          "note": "Legacy prose prices 'Clinging 20 STR' at 10 — its template basecost. The engine gives 11, because Clinging.cost() ends `return cost + 1`, an unreviewed legacy oddity first noticed during U2. That +1 is probably a bug: the prose is independent evidence against it, exactly as it was for H9. Fixing it is a golden-master re-base of its own, so it is priced at 11 here and the armour absorbs the difference."
+          "power": "Combat Awareness",
+          "note": "Legacy prose says 'ES: PER +1' (3). Raised to +3 (9) as part of flexing this powerset to its 125 balance — its own content sums to 115 (powers exactly 100 + maneuvers exactly 15), so it is 10 light. Paired with Conditioning below; between them they carry the +10 and leave every characterful line at exactly what the prose says."
         },
         {
-          "power": "Iron Body",
-          "note": "Legacy prose says 'Armor +8 rPD +8 rED' (24). Flexed to 11/11 (33) to fit the 125 balance: the prose's own content sums to 115 (powers 100 + maneuvers 15), 10 light, and Clinging costs 1 more than the prose claims, so the armour carries +9. Armour is the only line that can: its cost moves in steps of 1.5, and every other line is a round number the prose pins exactly — Running moves only in 2s, and widening the elemental control would re-price all three of its slots."
+          "power": "Conditioning",
+          "note": "Legacy prose says 'Running +4\"' (8). Raised to +6\" (12) — the other half of the +10 flex (see Combat Awareness). Armour would have been the obvious lever but cannot land on +10: its cost steps 24 → 26 → 27 → 29 → 30 → 32 → 33 → 35, skipping 34. Enhanced Perception (+3s) and Running (+2s) together hit it exactly, and are the two least characterful lines here."
         }
       ],
       "powers": {
         "power": [
-          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Iron Body", "position": 0, "levels": 22, "pdlevels": 11, "edlevels": 11},
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Iron Body", "position": 0, "levels": 16, "pdlevels": 8, "edlevels": 8},
           {"xmlid": "CLINGING", "id": 102, "alias": "Clinging", "name": "Wall Walk", "position": 1, "levels": 0, "basecost": 10},
 
           {
@@ -568,7 +568,7 @@
             "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "No END"}
           },
 
-          {"xmlid": "ENHANCEDPERCEPTION", "id": 130, "alias": "Enhanced Perception", "name": "Combat Awareness", "position": 5, "levels": 1, "option": "ALL", "optionid": "ALL"}
+          {"xmlid": "ENHANCEDPERCEPTION", "id": 130, "alias": "Enhanced Perception", "name": "Combat Awareness", "position": 5, "levels": 3, "option": "ALL", "optionid": "ALL"}
         ],
         "running": [
           {
@@ -582,7 +582,7 @@
             "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
             "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "No END"}
           },
-          {"xmlid": "RUNNING", "id": 131, "alias": "Running", "name": "Conditioning", "position": 6, "levels": 4}
+          {"xmlid": "RUNNING", "id": 131, "alias": "Running", "name": "Conditioning", "position": 6, "levels": 6}
         ],
         "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Martial Arts", "position": 1, "basecost": 15}]
       },
