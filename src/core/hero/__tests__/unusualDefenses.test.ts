@@ -65,6 +65,39 @@ describe('H6 — duplicated unusual-defense powers contribute', () => {
     });
 });
 
+describe('H8 — the unusual defenses obey the standard visibility rule', () => {
+    // Legacy checked nothing here, so a secondary-only defence contributed in the base form
+    // too — unlike every other total, and unlike `getDefense` on the compound-power path.
+    // The rule: (affectsPrimary && affectsTotal) || (!affectsPrimary && affectsTotal && showSecondary).
+    it('drops defensor\'s defences in the base form — every one of them is secondary-only', () => {
+        const baseForm = heroOf('defensor', false);
+
+        expect(hd.getTotalUnusualDefense(baseForm, 'POWERDEFENSE')).toBe('0/0');
+        expect(hd.getTotalUnusualDefense(baseForm, 'MENTALDEFENSE')).toBe('0/0');
+        expect(hd.getTotalUnusualDefense(baseForm, 'FLASHDEFENSE')).toBe('0/0');
+    });
+
+    it('keeps them in the alternate-ID form', () => {
+        const altForm = heroOf('defensor');
+
+        expect(hd.getTotalUnusualDefense(altForm, 'POWERDEFENSE')).toBe('25/15');
+        expect(hd.getTotalUnusualDefense(altForm, 'MENTALDEFENSE')).toBe('15/10');
+    });
+
+    it('keeps a primary-affecting Resistant Protection in the base form', () => {
+        // The rule must discriminate, not blanket-zero: adamantine's Resistant Protection is
+        // affectsPrimary, so its 1 point of mental/power defence survives into the base form
+        // while its secondary-only powers drop away.
+        const baseForm = heroOf('adamantinerebuild210109', false);
+
+        expect(hd.getTotalUnusualDefense(baseForm, 'MENTALDEFENSE')).toBe('1/1');
+        expect(hd.getTotalUnusualDefense(baseForm, 'POWERDEFENSE')).toBe('1/1');
+
+        // ...and the full totals still appear in the alternate-ID form.
+        expect(hd.getTotalUnusualDefense(heroOf('adamantinerebuild210109'), 'MENTALDEFENSE')).toBe('10/1');
+    });
+});
+
 describe('H7 — Resistant Protection feeds the defense it actually provides', () => {
     it('gives defensor no Flash Defense, having neither a Flash power nor flashlevels', () => {
         // Legacy reported 5/5 here — Resistant Protection's mdlevels, invented out of nothing.

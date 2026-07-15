@@ -44,6 +44,7 @@
 | H5 | VPP contents counted toward totals | ✅ **fixed** — was real bug, active | yes — adamantine (Leaping), m-championsmush | hero query / movement |
 | H6 | Unusual-defense duplicates read off the collapsed array | ✅ **fixed** — was real bug, active | yes — defensor, m-championsmush | hero query (re-based) |
 | H7 | Resistant Protection's `mdlevels` fed *every* unusual-defense total | ✅ **fixed** — was real bug, active | yes — defensor, adamantine | hero query (re-based) |
+| H8 | Unusual defenses ignored `affectsPrimary`/`affectsTotal` | ✅ **fixed** — was real bug, active | **yes — 14 fixtures (base form)** | hero query (re-based) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -233,6 +234,36 @@ powers, tracking resistant points separately.
   compound's Resistant Protection `powdlevels`) = **25**.
 - **Pinned by:** `core/hero/__tests__/unusualDefenses.test.ts`; golden master skips these
   queries via `UNUSUAL_DEFENSE_DIVERGENCE`.
+
+## H8 — The unusual defenses ignored `affectsPrimary`/`affectsTotal` — ✅ FIXED
+
+- **Where:** `getTotalUnusualDefense` / `getUnusualDefensePoints` — neither the Mental / Power /
+  Flash Defense powers nor the Resistant Protection contribution were gated on visibility, so
+  a secondary-only power fed these totals **in the base form too**.
+- **Legacy:** same. Spotted while fixing H7 and logged there rather than folded in; Phil's
+  ruling — *"those powers in Defensor's list should follow standard rules for visibility"* —
+  settled it.
+- **Correct:** the same rule the rest of the engine inlines at ~40 sites, and which
+  `getDefense` already applied to compound-power children two functions away:
+  `(affectsPrimary && affectsTotal) || (!affectsPrimary && affectsTotal && showSecondary)`.
+  This entry makes the top-level path agree with the compound path; it was an internal
+  inconsistency, not a policy choice.
+- **Corpus impact: 14 of 37 fixtures**, base form only — nearly every character who owns these
+  defences at all had a wrong base form. The alternate-ID column is untouched.
+  - `defensor`: Mental `10/5 → 0/0`, Power `20/10 → 0/0`. Every one of his unusual-defense
+    powers is `affectsPrimary: false`, so his base form correctly has none.
+  - `adamantinerebuild210109`: Mental `10/1 → 1/1`, Power `5/1 → 1/1`. Its Resistant Protection
+    *is* primary-affecting, so 1 point survives — the rule discriminates rather than
+    blanket-zeroing, which is the case worth keeping a test on.
+- **What it looked like:** toggling Alternate Identity off dropped defensor's PD from 17 to 7
+  (PD honoured visibility) while Mental stayed at 10 and Power at 20 — one sheet showing his
+  base-form physical defences beside his alternate-form mental defences. The four now move
+  together.
+- **Fix:** the rule is now a named `countsTowardTotal(power, showSecondary)` helper rather than
+  a 41st inlining. The other ~40 sites were left alone — a mechanical sweep of them is its own
+  change, and not one to make while the golden master is already re-basing.
+- **Pinned by:** `core/hero/__tests__/unusualDefenses.test.ts` (H8 block); golden master skips
+  the base-form column for the 14 fixtures via `H8_BASE_FORM_DIVERGENCE`.
 
 ## H7 — Resistant Protection's `mdlevels` fed every unusual-defense total — ✅ FIXED
 

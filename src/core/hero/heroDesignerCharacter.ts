@@ -134,6 +134,16 @@ export class HeroDesignerCharacter {
         return hasOwn(CHARACTERISTIC_NAMES, abbreviation) ? CHARACTERISTIC_NAMES[abbreviation] : '';
     }
 
+    /**
+     * The standard visibility rule, inlined at ~40 sites across this engine: a power counts
+     * toward a total when it affects the total, and a secondary-only power counts only in the
+     * alternate-ID form. `getDefense` already applied it to compound-power children; H8 brings
+     * the unusual-defense path in line.
+     */
+    private countsTowardTotal(power: Obj, showSecondary?: boolean): boolean {
+        return Boolean((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary));
+    }
+
     hasSecondaryCharacteristics(powers: Obj[]): boolean {
         for (const power of powers) {
             if (!power.affectsPrimary && power.affectsTotal) {
@@ -257,7 +267,7 @@ export class HeroDesignerCharacter {
         const showSecondary = character.showSecondary;
 
         if (powersMap.has(powerXmlId)) {
-            this.getUnusualDefensePoints(defenses, powersMap.get(powerXmlId), character);
+            this.getUnusualDefensePoints(defenses, powersMap.get(powerXmlId), character, showSecondary);
         }
 
         // H7 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy added Force Field /
@@ -267,9 +277,16 @@ export class HeroDesignerCharacter {
         // corresponding field (Flash — no `flashlevels` exists in the data) gets nothing.
         // Also H6: `powersMap.get` yields an array when the xmlid repeats, and reading
         // `.mdlevels` off the array itself silently contributed 0.
+        // H8: legacy also ignored affectsPrimary/affectsTotal here, so a secondary-form
+        // Resistant Protection fed these totals even in the base form — unlike every other
+        // total, and unlike `getDefense` on the compound-power path right below.
         const forceFieldField = UNUSUAL_DEFENSE_FORCE_FIELD_LEVELS[powerXmlId.toUpperCase()];
         if (powersMap.has('FORCEFIELD') && forceFieldField !== undefined) {
             for (const forceField of asArray(powersMap.get('FORCEFIELD'))) {
+                if (!this.countsTowardTotal(forceField, showSecondary)) {
+                    continue;
+                }
+
                 const levels = (forceField[forceFieldField] as number) || 0;
 
                 defenses.nonResistant += levels;
@@ -686,8 +703,11 @@ export class HeroDesignerCharacter {
      * array, `unusualDefense.levels` was `undefined` and **every** one of them contributed 0.
      * `defensor` buys Power Defense twice (10 and 5) and received none of it.
      */
-    private getUnusualDefensePoints(defenses: {nonResistant: number; resistant: number}, unusualDefense: Obj | Obj[], character: Obj): number {
-        const unusualDefenses = asArray(unusualDefense);
+    private getUnusualDefensePoints(defenses: {nonResistant: number; resistant: number}, unusualDefense: Obj | Obj[], character: Obj, showSecondary?: boolean): number {
+        // H8: only powers visible in the current form count — the same rule every other total
+        // applies. Legacy checked nothing here, so a secondary-only Mental/Power Defense
+        // contributed even in the base form.
+        const unusualDefenses = asArray(unusualDefense).filter((defense) => this.countsTowardTotal(defense, showSecondary));
         let points = 0;
         let resistantPoints = 0;
         let anyResistant = false;
@@ -703,7 +723,8 @@ export class HeroDesignerCharacter {
             }
         }
 
-        // 5E Mental Defense adds EGO/5 — once for the character, not once per power.
+        // 5E Mental Defense adds EGO/5 — once for the character, not once per power, and only
+        // when a Mental Defense power actually counts in this form.
         if (this.isFifth(character) && unusualDefenses.some((defense) => defense.xmlid === 'MENTALDEFENSE')) {
             const egoBonus = roundInPlayersFavor(this.getCharacteristicTotal('EGO', character) / 5);
 

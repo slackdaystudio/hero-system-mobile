@@ -85,6 +85,35 @@ const UNUSUAL_DEFENSE_DIVERGENCE: Record<string, Set<string>> = {
     'm-championsmush': new Set(['MENTALDEFENSE']),
 };
 
+/**
+ * H8 (docs/KNOWN_DEVIATIONS.md) — intentional divergence, **base form only**. Legacy ignored
+ * `affectsPrimary`/`affectsTotal` on the unusual-defense path, so a secondary-only Mental /
+ * Power / Flash Defense — or a secondary-only Resistant Protection — contributed even at
+ * `showSecondary: false`. `core` applies the standard visibility rule (the one `getDefense`
+ * already applied to compound-power children), so the base form correctly drops them.
+ *
+ * Every fixture here has at least one secondary-only unusual-defense power. That is 14 of the
+ * 37 — i.e. nearly every character who owns these defences at all had a wrong base form.
+ * The `showSecondary: true` column is unaffected by H8 and stays compared to legacy, minus
+ * the four H6/H7 cases above. Corrected values are pinned in `unusualDefenses.test.ts`.
+ */
+const H8_BASE_FORM_DIVERGENCE = new Set([
+    'adamantinerebuild210109',
+    'defensor',
+    'indigo-bunting',
+    'm-championsmush',
+    'mark-li-v5a-433',
+    'mikayla-priestess',
+    'mikayla-priestess-reduce-vpp',
+    'psi-blade6',
+    'psi-blade6-boostable',
+    'starborne',
+    'the-witch',
+    'the-witch-kitchen-sink',
+    'twilight',
+    'venomenhancedxenovore',
+]);
+
 describe('golden master: core/hero query methods reproduce legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
@@ -123,6 +152,10 @@ describe('golden master: core/hero query methods reproduce legacy', () => {
             for (const unusual of ['MENTALDEFENSE', 'POWERDEFENSE', 'FLASHDEFENSE']) {
                 if (UNUSUAL_DEFENSE_DIVERGENCE[name]?.has(unusual)) {
                     continue; // H6/H7 — corrected values pinned in unusualDefenses.test.ts
+                }
+
+                if (!showSecondary && H8_BASE_FORM_DIVERGENCE.has(name)) {
+                    continue; // H8 — the base form now hides secondary-only defences
                 }
 
                 expect(core.getTotalUnusualDefense(character, unusual)).toBe(legacyModel.getTotalUnusualDefense(character, unusual));

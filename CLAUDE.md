@@ -92,9 +92,9 @@ component-local and resets to on at every mount, where legacy persisted `showSec
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 14 entries; 7 fixed (H3, H4, H5, H6, H7, U2, U3) — every corpus-triggered bug
-> that was known is now fixed. It explains why a "wrong-looking" line in `core/` may be
-> load-bearing, and why a green golden master does not mean correct.
+> `core/`.** 15 entries; 8 fixed (H3–H8, U2, U3) — every known corpus-triggered bug is now
+> fixed. It explains why a "wrong-looking" line in `core/` may be load-bearing, and why a
+> green golden master does not mean correct.
 
 Process per fix — follow it; the ledger explains the reasoning:
 
@@ -105,14 +105,17 @@ Process per fix — follow it; the ledger explains the reasoning:
 3. Re-base the affected golden master to an explicit intentional divergence, with a comment
    linking back to the ledger entry (see `H3_DIVERGENCE` / `U2_DIVERGENCE` for the shape).
 
-Still open:
+Still open — all cosmetic, latent, or template-only; none is corpus-triggered:
 
-- **Unusual defenses ignore `affectsPrimary`/`affectsTotal`** (noted under H7, no entry of its
-  own yet): a secondary-form Resistant Protection still feeds the Mental/Power totals at
-  `showSecondary: false`, unlike every other total. Visible on `defensor` (`20/10` in his base
-  form). **Needs a rules call before it can be fixed** — legacy is not an oracle for it.
+- **H2** is the only one with real behaviour attached (a boolean-returning sort comparator,
+  so trait *order* may be wrong). **T1–T4** are template-output only, **H1** and **U1** are
+  cosmetic.
 
-Then the cosmetic/latent tail: T1–T4, H1, H2, U1.
+A known non-quirk worth knowing: the visibility rule
+`(affectsPrimary && affectsTotal) || (!affectsPrimary && affectsTotal && showSecondary)` is
+inlined at ~40 sites. H8 introduced `countsTowardTotal()` for it, but only the two sites it
+touched use the helper. Folding in the rest is a mechanical sweep worth doing on its own,
+never alongside a behaviour change.
 
 A lesson worth keeping from H4: `characterSheet.ts:333` wraps every trait in a try/catch that
 degrades a throwing trait to a stub row (cost 0, no combat line). **A core bug can therefore
