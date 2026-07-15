@@ -1527,5 +1527,97 @@
         ]
       }
     }
+  ],
+  "Weapons Master": [
+    {
+      "label": "Armory",
+      "_note": "Arrowhead is the model — Phil's own weapons master, X = 100.0 exactly. Its shape is SPD 6 and OCV 12, paid for with thin defences (its dAP term is 1.16 against a baseline of 5).\n\nIt is also the archetype that proves the no-CSL rule needs a matching investment. Arrowhead leans on CSL 3 — worth +2.5 of X — so a faithful copy of it WITHOUT those levels scores -7.5%, and this did exactly that on the first pass (-8.1%). The fix is Phil's own: 'I would rather re-invest those points into base OCV/DCV.' OCV 10 and DCV 10, bought outright. The weapon is a power; the aim is a characteristic.\n\nLeathers a shade thicker than Arrowhead's, because DCV 10 makes armour worth more here — the dAP term compounds against DCV, so an evasive fighter gets more out of the same plate.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 1101,
+            "alias": "Resistant Protection",
+            "name": "Reinforced Leathers",
+            "position": 0,
+            "levels": 22,
+            "pdlevels": 11,
+            "edlevels": 11,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "RUNNING",
+            "id": 1102,
+            "alias": "Running",
+            "name": "Sure-Footed",
+            "position": 1,
+            "levels": 14
+          },
+          {
+            "xmlid": "MISSILEDEFLECTION",
+            "id": 1103,
+            "alias": "Deflection",
+            "name": "Parry",
+            "position": 2,
+            "levels": 0,
+            "basecost": 20
+          },
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 1111,
+            "parentid": 1110,
+            "alias": "Blast",
+            "name": "Bow",
+            "position": 4,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "RKA",
+            "id": 1112,
+            "parentid": 1110,
+            "alias": "Killing Attack - Ranged",
+            "name": "Blade",
+            "position": 5,
+            "levels": 4,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "ENTANGLE",
+            "id": 1113,
+            "parentid": 1110,
+            "alias": "Entangle",
+            "name": "Net",
+            "position": 6,
+            "levels": 4,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "FLASH",
+            "id": 1114,
+            "parentid": 1110,
+            "alias": "Flash",
+            "name": "Flash Bolt",
+            "position": 7,
+            "levels": 8,
+            "ultraSlot": true,
+            "option": "SIGHTGROUP",
+            "optionid": "SIGHTGROUP",
+            "optionAlias": "Sight Group"
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 1110,
+            "alias": "Multipower",
+            "name": "The Rack",
+            "position": 8,
+            "basecost": 60
+          }
+        ]
+      }
+    }
   ]
 }
