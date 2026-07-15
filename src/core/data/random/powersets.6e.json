@@ -1097,5 +1097,115 @@
         ]
       }
     }
+  ],
+  "Patriot": [
+    {
+      "label": "Sentinel",
+      "_note": "Defender is the model — Phil's own all-rounder, +1.0% of X. The shield is a multipower: thrown, braced, blocked, or swung.\n\nThe all-rounder is the awkward one to author, because it has nothing above baseline to trade. Every other archetype buys an identity (the Mentalist's OMCV +10, the Speedster's SPD +8) and pays for it elsewhere; this one just has to BE near baseline everywhere, so a shade under on four stats put it 4 colder than the pack with no obvious culprit. Defender's own CON 30 / DEX 25 / OMCV 4 / DMCV 5 is the answer.\n\nVelocity 28, not 40: a super-soldier runs fast for a human and that's the joke. It costs about 0.9 of X and it's worth it.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 801,
+            "alias": "Resistant Protection",
+            "name": "Shield And Training",
+            "position": 0,
+            "levels": 24,
+            "pdlevels": 12,
+            "edlevels": 12,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "RUNNING",
+            "id": 802,
+            "alias": "Running",
+            "name": "Peak Conditioning",
+            "position": 1,
+            "levels": 18
+          },
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 811,
+            "parentid": 810,
+            "alias": "Blast",
+            "name": "Shield Throw",
+            "position": 2,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "HANDTOHANDATTACK",
+            "id": 812,
+            "parentid": 810,
+            "alias": "Hand-To-Hand Attack",
+            "name": "Shield Bash",
+            "position": 3,
+            "levels": 7,
+            "addstr": true,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "MISSILEDEFLECTION",
+            "id": 813,
+            "parentid": 810,
+            "alias": "Deflection",
+            "name": "Shield Block",
+            "position": 4,
+            "levels": 0,
+            "basecost": 20,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "FORCEWALL",
+            "id": 814,
+            "parentid": 810,
+            "alias": "Barrier",
+            "name": "Braced Shield",
+            "position": 5,
+            "levels": 0,
+            "pdlevels": 8,
+            "edlevels": 8,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "lengthlevels": 2,
+            "heightlevels": 2,
+            "bodylevels": 0,
+            "widthlevels": 0,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 804,
+            "alias": "Life Support",
+            "name": "Enhanced Metabolism",
+            "position": 7,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "LONGEVITY",
+                "alias": "Longevity:",
+                "basecost": 5,
+                "levels": 0,
+                "option": "400YEARS",
+                "optionid": "400YEARS",
+                "optionAlias": "400 Years"
+              }
+            ]
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 810,
+            "alias": "Multipower",
+            "name": "The Shield",
+            "position": 8,
+            "basecost": 60
+          }
+        ]
+      }
+    }
   ]
 }
