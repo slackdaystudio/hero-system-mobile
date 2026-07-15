@@ -276,13 +276,10 @@ silently reshaping an archetype.
       over 2000 budgets. Confirmed the model reproduces the legacy powerset sizes: **8 of 11
       archetypes need zero flex**. The required flex per powerset is pinned as the phase 3
       authoring spec.
-- [ ] **Phase 3 — 5E powersets + skills + complications.** *(10 of 11 archetypes)* Author the
-      legacy prose as structured data, flexing each to its balance — see `REQUIRED_FLEX` in
-      `allocate.test.ts`. Every authored powerset costs its balance exactly, checked
-      automatically. **Only `Martial Artist` is left**, and it is blocked: its Martial
-      Block/Disarm/Dodge/Throw are `martialarts` traits, not powers, and the `Powerset` shape has
-      no bucket for them — plus its two powersets state 115 and 140 against a 125 balance, so
-      neither number is trustworthy. Skills and complications are still name strings.
+- [ ] **Phase 3 — 5E powersets + skills + complications.** *(powersets done — 11 of 11)* Every
+      archetype has a structured powerset, and each costs its balance **exactly**, checked
+      automatically for all of them. Remaining: **skills and complications are still name strings
+      and prose**, which is what keeps a generated character at 225 of 250.
 - [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,
@@ -346,7 +343,7 @@ work, not the cost:
 Energy Projector was the simplest case in the set, and calling the rest "mechanical" was wrong.
 Two things make them harder:
 
-**1. Five powersets do not sum to their own stated total.** Pinned in
+**1. Five powersets do not sum to their own stated total.** *(three now resolved)* Pinned in
 `allocate.test.ts`. For these, *neither* number is trustworthy — the listed powers and the
 `powersCost` disagree, so authoring one means first deciding which is wrong:
 
@@ -356,7 +353,7 @@ Two things make them harder:
 | `Speedster [1]` | 110 | 100 | +10 | ✅ **Resolved.** `Desolid` is listed at 35; Desolidification's basecost is 40, so 40 − 15 = **25**, and at 25 it sums to exactly 100. Authored at 25 |
 | `Patriot [1]` | 102 | 100 | +2 | needs a call |
 | `Brick [1]` | 65 | 75 | −10 | needs a call |
-| `Martial Artist [1]` | 115 | 140 | −25 | needs a call — and its sibling `[0]` states 115 against a 125 balance, so this archetype is doubly adrift |
+| `Martial Artist [1]` | 115 | 140 | −25 | ✅ **Resolved.** Its stated 140 is simply wrong: both its powersets carry identical content, and both sum to 115 (powers **exactly 100** + maneuvers **exactly 15**). See below |
 
 Both resolved typos were **the same error** — an elemental-control slot priced as if it were
 standalone — which is worth knowing when the remaining three are looked at.
@@ -368,11 +365,18 @@ Patriot is now authored and costs its balance exactly. Worth noting the archetyp
 independent evidence for that fix — written a decade ago, it prices a +1 to all senses at 3,
 siding with the template against the code.
 
-**2. One structural gap** left, now that Multiform is dropped:
+**2. ~~One structural gap~~ — resolved.** `Powerset` now carries an optional `martialarts` block
+alongside `powers`, and `attachPowerset` fills its `.hdc` boilerplate the same way.
 
-- **Martial maneuvers.** `Martial Artist` lists `Martial Block`/`Disarm`/`Dodge`/`Throw` as part
-  of its powerset. Those are `martialarts` traits, not powers — a `.hdc` carries them in their
-  own trait bucket. `Powerset` would need to carry `martialarts` alongside `powers`.
+**The maneuvers' cost was folded into `powersCost`** (Phil's hypothesis, and the arithmetic is
+exact): Martial Artist's stated 115 is **powers 100 + maneuvers 15**, in *both* its powersets.
+Powers landing on precisely 100 — the same round number Patriot and Speedster get — is what
+confirms it. So maneuvers live in the `martialarts` bucket but their cost counts against the
+**powers** balance, and the balance check sums both.
+
+A maneuver is `xmlid: 'MANEUVER'` with its **cost as `basecost`** on the trait (tazimmaad's "Cut"
+is `basecost: 3`); `populateTrait` derives the real xmlid from its `display`. Nothing reads the
+maneuver template for cost.
 - ~~**`Multiform: 250 Points`.**~~ ✅ **Resolved: dropped.** `Metamorph [2]` is the only powerset
   that uses it, and a Multiform references *another whole character* — a recursive generation
   problem far out of proportion to one powerset out of 37. Metamorph keeps its other three

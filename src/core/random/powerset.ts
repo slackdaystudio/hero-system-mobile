@@ -41,6 +41,12 @@ export interface Approximation {
 export interface Powerset {
     readonly label: string;
     readonly powers: Obj;
+    /**
+     * Martial maneuvers, when the archetype has them. They are **not powers** — a `.hdc` carries
+     * them in their own trait bucket — but their cost comes out of the powers balance: the legacy
+     * prose folds them into `powersCost` (Martial Artist's 115 is powers 100 + maneuvers 15).
+     */
+    readonly martialarts?: Obj;
     readonly approximations?: readonly Approximation[];
 }
 
@@ -79,15 +85,25 @@ export const POWERSETS_5E = powersetData as unknown as Record<string, Powerset[]
 /** Every powerset authored for an archetype, or `[]` while its data is still to be written. */
 export const powersetsFor = (archetype: string): Powerset[] => (Array.isArray(POWERSETS_5E[archetype]) ? POWERSETS_5E[archetype] : []);
 
-/** Attach a powerset to a `ParsedCharacter`, filling in the `.hdc` boilerplate. */
-export function attachPowerset(parsed: ParsedCharacter, powerset: Powerset): ParsedCharacter {
-    const powers: Obj = {};
+const withBoilerplate = (block: Obj): Obj => {
+    const filled: Obj = {};
 
-    for (const [frameworkKey, entries] of Object.entries(powerset.powers)) {
-        powers[frameworkKey] = (entries as Obj[]).map(withDefaults);
+    for (const [subKey, entries] of Object.entries(block)) {
+        filled[subKey] = (entries as Obj[]).map(withDefaults);
     }
 
-    return {...parsed, powers} as unknown as ParsedCharacter;
+    return filled;
+};
+
+/** Attach a powerset to a `ParsedCharacter`, filling in the `.hdc` boilerplate. */
+export function attachPowerset(parsed: ParsedCharacter, powerset: Powerset): ParsedCharacter {
+    const attached: Obj = {...parsed, powers: withBoilerplate(powerset.powers)};
+
+    if (powerset.martialarts !== undefined) {
+        attached.martialarts = withBoilerplate(powerset.martialarts);
+    }
+
+    return attached as unknown as ParsedCharacter;
 }
 
 /**

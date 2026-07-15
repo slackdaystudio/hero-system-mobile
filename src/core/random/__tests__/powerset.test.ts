@@ -45,8 +45,22 @@ const powerRows = (character: Obj): Array<{label: string; realCost: number; acti
         return {label: String(power.name), realCost: decorated.realCost(), active: decorated.activeCost()};
     });
 
+/**
+ * Martial maneuvers are not powers, but their cost comes out of the powers balance — the legacy
+ * prose folds them into `powersCost` (Martial Artist's 115 is powers 100 + maneuvers 15). So the
+ * balance check has to count both, or an archetype with maneuvers looks short by exactly them.
+ */
+const martialRows = (character: Obj): Array<{label: string; realCost: number}> =>
+    ((character.martialArts ?? []) as Obj[]).map((maneuver) => ({
+        label: String(maneuver.name ?? maneuver.alias),
+        realCost: characterTraitDecorator.decorate(maneuver, 'martialArts', () => character).realCost(),
+    }));
+
+const totalSpent = (character: Obj): number =>
+    [...powerRows(character), ...martialRows(character)].reduce((total, row) => total + row.realCost, 0);
+
 /** Archetypes with structured powersets so far. The rest are still legacy prose. */
-const AUTHORED = ['Energy Projector', 'Gadgeteer', 'Mentalist', 'Metamorph', 'Mystic', 'Patriot', 'Powered Armor', 'Speedster', 'Weapons Master', 'Brick'];
+const AUTHORED = ['Energy Projector', 'Gadgeteer', 'Martial Artist', 'Mentalist', 'Metamorph', 'Mystic', 'Patriot', 'Powered Armor', 'Speedster', 'Weapons Master', 'Brick'];
 
 /**
  * The check that makes authoring safe: whatever a powerset is, the engine's price for it must
@@ -63,9 +77,8 @@ describe('every authored powerset costs exactly its balance', () => {
         const budget = allocate(LOW_POWERED_5E, candidate, scientist);
         const parsed = attachPowerset(buildCharacteristics(candidate.characteristics, LOW_POWERED_5E.template, name), powersetsFor(name)[index]);
         const character = heroDesignerCharacter.getCharacter(parsed) as unknown as Obj;
-        const spent = powerRows(character).reduce((total, row) => total + row.realCost, 0);
 
-        expect({archetype: name, spent}).toEqual({archetype: name, spent: budget.powers});
+        expect({archetype: name, spent: totalSpent(character)}).toEqual({archetype: name, spent: budget.powers});
     });
 });
 
@@ -187,6 +200,18 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
                 powerset: 'Armoury',
                 power: 'Arrow',
                 note: expect.stringContaining('sixteen charges'),
+            },
+            {
+                archetype: 'Martial Artist',
+                powerset: 'Adept',
+                power: 'Wall Walk',
+                note: expect.stringContaining('return cost + 1'),
+            },
+            {
+                archetype: 'Martial Artist',
+                powerset: 'Adept',
+                power: 'Iron Body',
+                note: expect.stringContaining('Flexed to 11/11'),
             },
         ]);
     });

@@ -525,5 +525,75 @@
         "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Trick Arrows", "position": 1, "basecost": 50}]
       }
     }
+  ],
+  "Martial Artist": [
+    {
+      "label": "Adept",
+      "approximations": [
+        {
+          "power": "Wall Walk",
+          "note": "Legacy prose prices 'Clinging 20 STR' at 10 — its template basecost. The engine gives 11, because Clinging.cost() ends `return cost + 1`, an unreviewed legacy oddity first noticed during U2. That +1 is probably a bug: the prose is independent evidence against it, exactly as it was for H9. Fixing it is a golden-master re-base of its own, so it is priced at 11 here and the armour absorbs the difference."
+        },
+        {
+          "power": "Iron Body",
+          "note": "Legacy prose says 'Armor +8 rPD +8 rED' (24). Flexed to 11/11 (33) to fit the 125 balance: the prose's own content sums to 115 (powers 100 + maneuvers 15), 10 light, and Clinging costs 1 more than the prose claims, so the armour carries +9. Armour is the only line that can: its cost moves in steps of 1.5, and every other line is a round number the prose pins exactly — Running moves only in 2s, and widening the elemental control would re-price all three of its slots."
+        }
+      ],
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Iron Body", "position": 0, "levels": 22, "pdlevels": 11, "edlevels": 11},
+          {"xmlid": "CLINGING", "id": 102, "alias": "Clinging", "name": "Wall Walk", "position": 1, "levels": 0, "basecost": 10},
+
+          {
+            "xmlid": "HANDTOHANDATTACK",
+            "id": 121,
+            "parentid": 120,
+            "alias": "Hand-To-Hand Attack",
+            "name": "Iron Fist",
+            "position": 2,
+            "levels": 6,
+            "modifier": {"xmlid": "HANDTOHANDATTACK", "alias": "Hand-To-Hand Attack", "basecost": -0.5, "levels": 0}
+          },
+          {
+            "xmlid": "INVISIBILITY",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Invisibility",
+            "name": "Silent Step",
+            "position": 3,
+            "levels": 0,
+            "basecost": 20,
+            "option": "HEARINGGROUP",
+            "optionid": "HEARINGGROUP",
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "No END"}
+          },
+
+          {"xmlid": "ENHANCEDPERCEPTION", "id": 130, "alias": "Enhanced Perception", "name": "Combat Awareness", "position": 5, "levels": 1, "option": "ALL", "optionid": "ALL"}
+        ],
+        "running": [
+          {
+            "xmlid": "RUNNING",
+            "id": 123,
+            "parentid": 120,
+            "alias": "Running",
+            "name": "Swift",
+            "position": 4,
+            "levels": 5,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "No END"}
+          },
+          {"xmlid": "RUNNING", "id": 131, "alias": "Running", "name": "Conditioning", "position": 6, "levels": 4}
+        ],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Martial Arts", "position": 1, "basecost": 15}]
+      },
+      "martialarts": {
+        "maneuver": [
+          {"xmlid": "MANEUVER", "id": 201, "alias": "Martial Block", "display": "Martial Block", "name": null, "position": 0, "basecost": 4},
+          {"xmlid": "MANEUVER", "id": 202, "alias": "Martial Disarm", "display": "Martial Disarm", "name": null, "position": 1, "basecost": 4},
+          {"xmlid": "MANEUVER", "id": 203, "alias": "Martial Dodge", "display": "Martial Dodge", "name": null, "position": 2, "basecost": 4},
+          {"xmlid": "MANEUVER", "id": 204, "alias": "Martial Throw", "display": "Martial Throw", "name": null, "position": 3, "basecost": 3}
+        ]
+      }
+    }
   ]
 }

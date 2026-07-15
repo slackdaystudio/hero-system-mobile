@@ -50,7 +50,7 @@ describe('generateRandomCharacter', () => {
     it('only offers archetypes that have a structured powerset', () => {
         const names = generatableArchetypes().map((archetype) => archetype.name);
 
-        expect(names).toEqual(['Energy Projector', 'Gadgeteer', 'Mentalist', 'Metamorph', 'Mystic', 'Patriot', 'Powered Armor', 'Speedster', 'Weapons Master', 'Brick']);
+        expect(names).toEqual(['Energy Projector', 'Gadgeteer', 'Martial Artist', 'Mentalist', 'Metamorph', 'Mystic', 'Patriot', 'Powered Armor', 'Speedster', 'Weapons Master', 'Brick']);
         expect(names.every((name) => powersetsFor(name).length > 0)).toBe(true);
     });
 
@@ -107,13 +107,18 @@ describe('generateRandomCharacter', () => {
     });
 
     it('spends exactly its powers budget however the dice fall', () => {
-        for (let seed = 0; seed < 60; seed++) {
-            const generated = generateRandomCharacter(seededRng(seed));
-            const character = characterFrom(seed);
-            const spent = (character.powers as Obj[]).reduce(
-                (total, power) => total + characterTraitDecorator.decorate(power, 'powers', () => character).realCost(),
+        // Martial maneuvers are not powers, but their cost comes out of the powers balance — the
+        // legacy prose folds them into `powersCost`. Count both or Martial Artist looks 15 short.
+        const spentBy = (character: Obj): number =>
+            (character.powers as Obj[]).reduce((total, power) => total + characterTraitDecorator.decorate(power, 'powers', () => character).realCost(), 0) +
+            ((character.martialArts ?? []) as Obj[]).reduce(
+                (total, maneuver) => total + characterTraitDecorator.decorate(maneuver, 'martialArts', () => character).realCost(),
                 0,
             );
+
+        for (let seed = 0; seed < 60; seed++) {
+            const generated = generateRandomCharacter(seededRng(seed));
+            const spent = spentBy(characterFrom(seed));
 
             expect({archetype: generated.archetype, spent}).toEqual({archetype: generated.archetype, spent: generated.budget.powers});
         }
