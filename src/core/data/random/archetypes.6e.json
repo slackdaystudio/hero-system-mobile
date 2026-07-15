@@ -190,7 +190,7 @@
     },
     {
       "name": "Powered Armor",
-      "_note": "The suit is powers; INT drives it and the defences are the pilot's own. Slightly tougher than the blaster, slightly slower.",
+      "_note": "The suit is powers; INT drives it, and the defences are the suit's. DCV 7 rather than 6 — a hardsuit is not nimble, but the Rule of X compounds dAP against DCV, so a slow tank gets LESS credit for its own armour. That's true at the table: armour on something you can't hit is worth far more than armour on something you can. Being a shade under baseline cost it twice.",
       "characteristics": {
         "str": 20,
         "dex": 18,
@@ -200,9 +200,9 @@
         "ego": 13,
         "pre": 15,
         "ocv": 7,
-        "dcv": 6,
+        "dcv": 7,
         "omcv": 3,
-        "dmcv": 3,
+        "dmcv": 4,
         "pd": 10,
         "ed": 10,
         "spd": 5,

@@ -1405,5 +1405,127 @@
         ]
       }
     }
+  ],
+  "Powered Armor": [
+    {
+      "label": "Hardsuit",
+      "_note": "The suit IS the powerset; INT drives it. Tanky and not especially dodgy — which the Rule of X prices honestly, and twice over: dAP compounds against DCV, so armour on something hard to hit is worth more than the same armour on something slow. That's true at the table.\n\nWhich is why DCV 7 rather than 6. Authored at DCV 6 / DMCV 3 it came in at -6.5%, and the DCV cost it on both sides of the ledger: once directly (weight 10) and again through its own armour. The all-rounder trap, third time — the Patriot and the Metamorph got caught by the same thing.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 1001,
+            "alias": "Resistant Protection",
+            "name": "Powered Plate",
+            "position": 0,
+            "levels": 36,
+            "pdlevels": 18,
+            "edlevels": 18,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "FLIGHT",
+            "id": 1002,
+            "alias": "Flight",
+            "name": "Boot Jets",
+            "position": 1,
+            "levels": 35
+          },
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 1011,
+            "parentid": 1010,
+            "alias": "Blast",
+            "name": "Repulsor",
+            "position": 2,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "RKA",
+            "id": 1012,
+            "parentid": 1010,
+            "alias": "Killing Attack - Ranged",
+            "name": "Lance",
+            "position": 3,
+            "levels": 4,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "FORCEWALL",
+            "id": 1013,
+            "parentid": 1010,
+            "alias": "Barrier",
+            "name": "Deployable Shield",
+            "position": 4,
+            "levels": 0,
+            "pdlevels": 8,
+            "edlevels": 8,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "lengthlevels": 4,
+            "heightlevels": 2,
+            "bodylevels": 0,
+            "widthlevels": 0,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 1003,
+            "alias": "Life Support",
+            "name": "Sealed Suit",
+            "position": 5,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "SELFCONTAINEDBREATHING",
+                "alias": "Self-Contained Breathing",
+                "basecost": 4,
+                "levels": 0
+              },
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "VACUUM",
+                "optionid": "VACUUM",
+                "optionAlias": "Vacuum/Pressure"
+              },
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "HIGHRAD",
+                "optionid": "HIGHRAD",
+                "optionAlias": "High Radiation"
+              }
+            ]
+          },
+          {
+            "xmlid": "RADIOPERCEIVETRANSMIT",
+            "id": 1004,
+            "alias": "Radio Perception/Transmission",
+            "name": "Suit Comms",
+            "position": 6,
+            "levels": 0,
+            "basecost": 10
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 1010,
+            "alias": "Multipower",
+            "name": "Suit Systems",
+            "position": 9,
+            "basecost": 60
+          }
+        ]
+      }
+    }
   ]
 }
