@@ -21,7 +21,7 @@
  */
 import {heroDesignerCharacter} from 'core/hero';
 import archetypeData from '../../data/random/archetypes.5e.json';
-import {buildCharacteristics, characteristicsCost, SUPERHEROIC_5E, type CharacteristicSpread} from '../characteristics';
+import {buildCharacteristics, characteristicsCost, SUPERHEROIC_5E, SUPERHEROIC_6E, type CharacteristicSpread} from '../characteristics';
 
 type Obj = Record<string, any>;
 
@@ -101,3 +101,83 @@ describe('random character — characteristics (5E)', () => {
         expect((character.characteristics as Obj[]).every((c) => Number.isFinite(c.value) && Number.isFinite(c.cost))).toBe(true);
     });
 });
+
+/**
+ * The 6E half of the generator (docs/RANDOM_CHARACTER.md: 400 is 6E, and it's an edition fork).
+ *
+ * The editions differ in **both** directions, which is why a 5E spread can't simply be reused:
+ * COM is gone, OCV/DCV/OMCV/DMCV are bought outright, and nothing is figured.
+ */
+describe('random character — characteristics (6E)', () => {
+    const buildFor = (spread: CharacteristicSpread, template: string): Obj =>
+        heroDesignerCharacter.getCharacter(buildCharacteristics(spread, template, 'T')) as unknown as Obj;
+
+    const shortNames = (character: Obj): string[] => (character.characteristics as Obj[]).map((row) => String(row.shortName).toUpperCase());
+    const valueOf = (character: Obj, name: string): number =>
+        (character.characteristics as Obj[]).find((row) => String(row.shortName).toUpperCase() === name)?.value as number;
+
+    /**
+     * The regression. `parsedCharacterFrom` emitted a fixed 5E list, so a 6E template got a COM it
+     * has no entry for — and `getCharacteristicFields` reads `templateCharacteristic.definition`
+     * with no guard. The 6E path threw on the first character it was ever asked to build; a comment
+     * claiming COM "is skipped" had been sitting there untested the whole time.
+     */
+    it('builds at all — a 5E-shaped characteristic list throws on a 6E template', () => {
+        expect(() => buildFor({str: 20}, SUPERHEROIC_6E)).not.toThrow();
+        expect(heroDesignerCharacter.isFifth(buildFor({str: 20}, SUPERHEROIC_6E))).toBe(false);
+    });
+
+    it('drops COM and sells OCV/DCV/OMCV/DMCV instead', () => {
+        const sixth = shortNames(buildFor({str: 20}, SUPERHEROIC_6E));
+        const fifth = shortNames(buildFor({str: 20}, SUPERHEROIC_5E));
+
+        expect(sixth).not.toContain('COM'); // deleted in 6E
+        expect(sixth).toEqual(expect.arrayContaining(['OCV', 'DCV', 'OMCV', 'DMCV']));
+
+        expect(fifth).toContain('COM'); // ...and 5E must not grow them
+        expect(fifth).not.toEqual(expect.arrayContaining(['OCV']));
+    });
+
+    it('lands every characteristic on its target, combat values included', () => {
+        const spread: CharacteristicSpread = {str: 40, dex: 18, con: 25, body: 14, ocv: 8, dcv: 8, spd: 5, pd: 15, ed: 12, stun: 45};
+        const character = buildFor(spread, SUPERHEROIC_6E);
+
+        for (const [key, target] of Object.entries(spread)) {
+            expect({key, value: valueOf(character, key.toUpperCase())}).toEqual({key, value: target});
+        }
+    });
+
+    /**
+     * The fact that forces 6E archetypes to be authored rather than ported: in 5E, PD/ED/SPD/REC/
+     * END/STUN are *figured* from the primaries and come free. In 6E they start at their base and
+     * stay there. A 5E Brick's spread dropped into 6E is a Brick with PD 2 and SPD 2.
+     */
+    it('figures nothing — defences and speed stay at base unless bought', () => {
+        const brickish: CharacteristicSpread = {str: 60, con: 30, dex: 20};
+        const figured = (character: Obj) => ({
+            pd: valueOf(character, 'PD'),
+            spd: valueOf(character, 'SPD'),
+            rec: valueOf(character, 'REC'),
+            end: valueOf(character, 'END'),
+            stun: valueOf(character, 'STUN'),
+        });
+
+        // 5E hands all of this to the Brick for free, off STR/CON/DEX.
+        expect(figured(buildFor(brickish, SUPERHEROIC_5E))).toEqual({pd: 12, spd: 3, rec: 18, end: 60, stun: 55});
+
+        // The identical spread in 6E: base values, untouched. It has to buy every one of them.
+        expect(figured(buildFor(brickish, SUPERHEROIC_6E))).toEqual({pd: 2, spd: 2, rec: 4, end: 20, stun: 20});
+    });
+
+    it('prices the same spread differently per edition — it is a ruleset, not a scale', () => {
+        // DEX is 3/point in 5E and 2 in 6E; CON 2 and 1. Same numbers, different bill.
+        expect(characteristicsCost(buildFor({str: 20, dex: 20, con: 20}, SUPERHEROIC_5E))).toBe(60);
+        expect(characteristicsCost(buildFor({str: 20, dex: 20, con: 20}, SUPERHEROIC_6E))).toBe(40);
+    });
+
+    it('charges 6E the template price for a combat value', () => {
+        // OCV base 3, 5 points per +1 — the engine's number, not one restated here.
+        expect(characteristicsCost(buildFor({ocv: 8}, SUPERHEROIC_6E))).toBe(25);
+    });
+});
+

@@ -21,6 +21,7 @@
  */
 import {heroDesignerCharacter} from 'core/hero';
 import type {ParsedCharacter} from 'core/hero';
+import {getTemplate} from 'core/templates';
 
 type Obj = Record<string, any>;
 
@@ -34,12 +35,33 @@ export const SUPERHEROIC_6E = 'builtIn.Superheroic6E.hdt';
 /**
  * Insertion order is load-bearing: `populateMovementAndCharacteristics` walks the object in key
  * order, and the 5E figured characteristics (PD/ED/SPD/REC/END/STUN) read the *already
- * populated* primaries. Primaries must therefore come first, exactly as a real `.hdc` orders
- * them. COM is 5E-only; on a 6E template it has no entry and is skipped.
+ * populated* primaries. Primaries must therefore come first, exactly as a real `.hdc` orders them.
+ *
+ * These lists are the **union** of both editions and are filtered per template by
+ * {@link definedBy} — the editions differ in both directions:
+ *
+ * - COM is 5E-only (deleted in 6E).
+ * - OCV/DCV/OMCV/DMCV are 6E-only. 5E figures them from DEX/EGO; 6E sells them at 5 points each.
+ *
+ * The template's own key order can't be used for this: it's alphabetical, so `ed` would land
+ * before `ego` and 5E's figured maths would read an unpopulated primary.
  */
 const PRIMARY = ['str', 'dex', 'con', 'body', 'int', 'ego', 'pre', 'com'] as const;
+/** 6E-only, and bought outright rather than figured. Ordered as HERO Designer writes them. */
+const COMBAT = ['ocv', 'dcv', 'omcv', 'dmcv'] as const;
 const DERIVED = ['pd', 'ed', 'spd', 'rec', 'end', 'stun'] as const;
 const MOVEMENT = ['running', 'swimming', 'leaping'] as const;
+
+/**
+ * The characteristics a template actually defines.
+ *
+ * Asked of the template rather than hardcoded per edition, because a second list of what 6E has
+ * would be a copy of the template free to drift from it. Sending a characteristic the template
+ * lacks is not survivable: `getCharacteristicFields` reads `templateCharacteristic.definition`
+ * with no guard, so an emitted COM on a 6E template throws before anything can skip it.
+ */
+const definedBy = (template: string): ReadonlySet<string> =>
+    new Set(Object.keys((getTemplate(template) as unknown as {characteristics?: Obj}).characteristics ?? {}));
 
 const characteristicEntry = (key: string, levels: number): Obj => ({
     xmlid: key.toUpperCase(),
@@ -55,9 +77,12 @@ const characteristicEntry = (key: string, levels: number): Obj => ({
 /** A `ParsedCharacter` carrying just characteristics — no traits yet (phase 1). */
 export function parsedCharacterFrom(levels: Record<string, number>, template: string, name = ''): ParsedCharacter {
     const characteristics: Obj = {};
+    const defined = definedBy(template);
 
-    for (const key of [...PRIMARY, ...DERIVED, ...MOVEMENT]) {
-        characteristics[key] = characteristicEntry(key, levels[key] ?? 0);
+    for (const key of [...PRIMARY, ...COMBAT, ...DERIVED, ...MOVEMENT]) {
+        if (defined.has(key)) {
+            characteristics[key] = characteristicEntry(key, levels[key] ?? 0);
+        }
     }
 
     return {
@@ -108,7 +133,9 @@ export function buildCharacteristics(spread: CharacteristicSpread, template: str
         }
     };
 
-    settle(PRIMARY, probe(levels));
+    // Two passes because 5E's figured characteristics read the primaries. 6E figures nothing, so
+    // its second pass is a no-op — one code path rather than an edition branch.
+    settle([...PRIMARY, ...COMBAT], probe(levels));
     settle(DERIVED, probe(levels));
 
     return parsedCharacterFrom(levels, template, name);
