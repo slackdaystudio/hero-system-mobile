@@ -224,10 +224,10 @@ describe('CharacterDetailScreen', () => {
     });
 
     it('shows the alias and an alternate-ID toggle that recomputes the stats', async () => {
-        const gg = heroDesignerCharacter.getCharacter(
-            JSON.parse(JSON.stringify(require('../../../core/hero/__tests__/fixtures/gravity-girl.json'))) as ParsedCharacter,
+        const archon = heroDesignerCharacter.getCharacter(
+            JSON.parse(JSON.stringify(require('../../../core/hero/__tests__/fixtures/stone-archon.json'))) as ParsedCharacter,
         ) as unknown as Character['document'];
-        const tree = await renderScreen(fakeCharacters(character({name: 'Gravity Girl', document: gg})));
+        const tree = await renderScreen(fakeCharacters(character({name: 'Stone Archon', document: archon})));
 
         expect(collectText(tree.toJSON())).toContain('Jane Smith'); // alias in the header
 
@@ -240,6 +240,18 @@ describe('CharacterDetailScreen', () => {
         });
 
         expect(collectText(tree.toJSON())).not.toEqual(before); // totals recomputed for the base form
+    });
+
+    it('omits the alternate-ID toggle for a character with no only-in-alternate-ID trait', async () => {
+        // Gravity Girl has secondary characteristics but no OIHID trait: no second identity
+        // to switch to, so the toggle stays off the sheet even though she has an alias.
+        const gg = heroDesignerCharacter.getCharacter(
+            JSON.parse(JSON.stringify(require('../../../core/hero/__tests__/fixtures/gravity-girl.json'))) as ParsedCharacter,
+        ) as unknown as Character['document'];
+        const tree = await renderScreen(fakeCharacters(character({name: 'Gravity Girl', document: gg})));
+
+        expect(collectText(tree.toJSON())).toContain('Jane Smith'); // alias still renders
+        expect(tree.root.findAllByProps({testID: 'toggle-alternate-id'})).toHaveLength(0);
     });
 
     it('renders martial-arts maneuvers as a two-row table (strike/evasion/damage + notes)', async () => {

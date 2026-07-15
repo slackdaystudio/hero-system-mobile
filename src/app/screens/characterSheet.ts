@@ -16,7 +16,6 @@ import {combatDetails} from 'core/combat';
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
-import {flatten} from 'core/util';
 
 /** HERO Designer XMLID of the "Only In Heroic/Alternate Identity" limitation. */
 const ONLY_IN_ALTERNATE_ID = 'OIHID';
@@ -42,6 +41,15 @@ const filterOutAlternateId = (items: Obj[]): Obj[] =>
         .map((item) => (Array.isArray(item.powers) ? {...item, powers: filterOutAlternateId(item.powers as Obj[])} : item));
 
 /**
+ * True when `predicate` holds for any trait in `items`, or for any trait nested inside
+ * one (framework slots, compound powers). Mirrors the descent `filterOutAlternateId`
+ * does — `core/util.flatten` is not a substitute, as it only splices `type: 'list'`
+ * containers and never visits the children of anything else.
+ */
+const someTrait = (items: Obj[], predicate: (item: Obj) => boolean): boolean =>
+    items.some((item) => predicate(item) || (Array.isArray(item.powers) ? someTrait(item.powers as Obj[], predicate) : false));
+
+/**
  * A copy of the character with every "Only In Alternate Identity" trait removed
  * (recursively, incl. framework slots). Because the engine reads the trait lists,
  * this drops those traits from *everything* derived — characteristics, defenses,
@@ -60,16 +68,13 @@ function withoutAlternateIdTraits(character: Obj): Obj {
 }
 
 /**
- * True when the character has any form-dependent content: secondary characteristics
- * (powers that affect total-but-not-primary) or traits limited to the alternate
- * identity (OIHID). When so, the sheet offers the alternate-ID toggle.
+ * True when any trait is limited to the alternate identity (OIHID) — the only thing
+ * that gates the alternate-ID toggle. Secondary characteristics deliberately do *not*
+ * count: they are situational boosts (Density Increase, Growth) with no second identity
+ * to switch to, so for those characters the sheet shows the alternate-ID form outright.
  */
 export function hasAlternateForm(character: Obj): boolean {
-    if (heroDesignerCharacter.hasSecondaryCharacteristics(flatten(toArray(character.powers), 'powers'))) {
-        return true;
-    }
-
-    return TRAIT_KEYS.some((key) => flatten(toArray(character[key]), 'powers').some(isOnlyInAlternateId));
+    return TRAIT_KEYS.some((key) => someTrait(toArray(character[key]), isOnlyInAlternateId));
 }
 
 /** The character's alias / alternate identity (super name) from the parsed info, or null. */

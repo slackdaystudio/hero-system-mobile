@@ -64,7 +64,16 @@ describe('characterSheet', () => {
 
     describe('alternate identity (showSecondary)', () => {
         it('detects the alternate (super) form only when a trait is only-in-alternate-ID', () => {
-            expect(hasAlternateForm(heroOf('gravity-girl'))).toBe(true);
+            // Both carry OIHID nested inside multipower frameworks, so the detection has to
+            // descend into framework slots rather than only splicing `type: 'list'` containers.
+            expect(hasAlternateForm(heroOf('stone-archon'))).toBe(true);
+            expect(hasAlternateForm(heroOf('spyder2022'))).toBe(true);
+
+            // Secondary characteristics alone are not an alternate identity: these have powers
+            // that affect total-but-not-primary, but no OIHID trait and so no second identity.
+            expect(hasAlternateForm(heroOf('gravity-girl'))).toBe(false);
+            expect(hasAlternateForm(heroOf('twilight'))).toBe(false);
+
             expect(hasAlternateForm(heroOf('champions-9-11-teen-supers-blank'))).toBe(false);
         });
 
