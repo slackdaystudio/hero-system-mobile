@@ -45,6 +45,7 @@
 | H6 | Unusual-defense duplicates read off the collapsed array | ✅ **fixed** — was real bug, active | yes — defensor, m-championsmush | hero query (re-based) |
 | H7 | Resistant Protection's `mdlevels` fed *every* unusual-defense total | ✅ **fixed** — was real bug, active | yes — defensor, adamantine | hero query (re-based) |
 | H8 | Unusual defenses ignored `affectsPrimary`/`affectsTotal` | ✅ **fixed** — was real bug, active | **yes — 14 fixtures (base form)** | hero query (re-based) |
+| H9 | Enhanced Perception ignores `allcost`/`groupcost`/`sensecost` | **real bug, active** | yes — adamantine (9 where the rules say 27) | none (legacy equally wrong) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -234,6 +235,27 @@ powers, tracking resistant points separately.
   compound's Resistant Protection `powdlevels`) = **25**.
 - **Pinned by:** `core/hero/__tests__/unusualDefenses.test.ts`; golden master skips these
   queries via `UNUSUAL_DEFENSE_DIVERGENCE`.
+
+## H9 — Enhanced Perception ignores what it enhances (**active bug**)
+
+- **Where:** `core/traits/powers/enhancedPerception.ts` overrides only `roll()`. Its cost falls
+  through to `TraitDecorator`, which prices `basecost + round((levels / lvlval) * lvlcost)` —
+  but the `enhancedperception` template has **no `lvlcost`**. What it has is `allcost: 3`,
+  `groupcost: 2`, `sensecost: 1`, and none of them is ever read. The observable: cost comes out
+  as *1 per level*, whatever the power enhances.
+- **Legacy:** same — `adamantine`'s reads 9 in both engines.
+- **Correct:** 5E prices Enhanced Perception by *what* it enhances: **+1 to all Sense Groups = 3**,
+  to a single Sense Group = 2, to a single Sense = 1 — which is exactly what those three template
+  fields are. The power carries an `optionid` (`ALL`, a group, or a sense) selecting between them.
+- **Corpus impact:** `adamantinerebuild210109` has Enhanced Perception at `levels: 9`,
+  `optionid: ALL`. Priced **9**; the rules say **27**. Eighteen points light.
+- **Also blocks the random character generator.** `Patriot`'s legacy powerset prices
+  `ES: PER +1` at **3** — the `allcost` — while the engine says 1, so its powerset cannot be
+  authored to hit its balance until this is fixed. See docs/RANDOM_CHARACTER.md.
+- **Fix + verify:** select on `optionid` and price from `allcost`/`groupcost`/`sensecost` ×
+  levels; correctness test pinning adamantine at 27; re-base the decorator golden master for it.
+  Note the archetype prose is a useful second opinion here — it independently prices a +1 to all
+  senses at 3, agreeing with the template against the code.
 
 ## H8 — The unusual defenses ignored `affectsPrimary`/`affectsTotal` — ✅ FIXED
 
