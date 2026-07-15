@@ -643,5 +643,157 @@
         ]
       }
     }
+  ],
+  "Mentalist": [
+    {
+      "label": "Telepath",
+      "_note": "greyman is the corpus model, and this lands where greyman lands. It reads DC 6 / oAP 60 — a mental blast costs 10 points a die, so 60 active points is 6 DC where a blaster's is 12. Phil's IF(DC*5 > oAP) picks the oAP term, which is the honest read: the attack is expensive, not weak.\n\nOMCV/DMCV 8/8 is +10 of X on its own — the archetype's whole identity, and greyman runs the same. It pays for it in OCV 4, DCV 6, DEX 15 and thin defences.\n\nBuilt with a 40-point Resistant Protection first and it scored +5.9%. A term-by-term diff against greyman put 70% of the gap in ONE place: dAP compounds against DCV x DEF x rDEF, so doubling the force field nearly quadrupled the term (2.0 -> 8.8). greyman's shape — DEF 18, rDEF 12, dAP 36 — is the right one. A mentalist is squishy on purpose.\n\nMental Defense is genre-essential AND deliberate: Phil's sheet folds it into EGO ('include Mental Defense in this total'), so 10 points of it takes EGO 20 -> 30 and is worth ~+4 of X. It is the only archetype where a defensive power scores on the offensive side of the ledger.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 501,
+            "alias": "Resistant Protection",
+            "name": "Mental Bulwark",
+            "position": 0,
+            "levels": 24,
+            "pdlevels": 12,
+            "edlevels": 12,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "FLIGHT",
+            "id": 502,
+            "alias": "Flight",
+            "name": "Levitation",
+            "position": 1,
+            "levels": 40
+          },
+          {
+            "xmlid": "EGOATTACK",
+            "id": 511,
+            "parentid": 510,
+            "alias": "Mental Blast",
+            "name": "Mind Blast",
+            "position": 2,
+            "levels": 6,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "MINDCONTROL",
+            "id": 512,
+            "parentid": 510,
+            "alias": "Mind Control",
+            "name": "Suggestion",
+            "position": 3,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "TELEPATHY",
+            "id": 513,
+            "parentid": 510,
+            "alias": "Telepathy",
+            "name": "Read Thoughts",
+            "position": 4,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "MENTALILLUSIONS",
+            "id": 514,
+            "parentid": 510,
+            "alias": "Mental Illusions",
+            "name": "Phantasm",
+            "position": 5,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "MENTALAWARENESS",
+            "id": 503,
+            "alias": "Mental Awareness",
+            "name": "Psychic Sense",
+            "position": 6,
+            "levels": 0,
+            "basecost": 5
+          },
+          {
+            "xmlid": "POWERDEFENSE",
+            "id": 504,
+            "alias": "Power Defense",
+            "name": "Iron Will",
+            "position": 8,
+            "levels": 10,
+            "basecost": 0
+          },
+          {
+            "xmlid": "CLAIRSENTIENCE",
+            "id": 515,
+            "parentid": 510,
+            "alias": "Clairsentience",
+            "name": "Remote Viewing",
+            "position": 10,
+            "levels": 0,
+            "basecost": 20,
+            "ultraSlot": true,
+            "adder": [
+              {
+                "xmlid": "SENSEGROUP",
+                "alias": "Sense Group:",
+                "basecost": 5,
+                "levels": 0,
+                "option": "SIGHTGROUP",
+                "optionid": "SIGHTGROUP",
+                "optionAlias": "Sight Group"
+              }
+            ]
+          },
+          {
+            "xmlid": "MENTALDEFENSE",
+            "id": 506,
+            "alias": "Mental Defense",
+            "name": "Shielded Mind",
+            "position": 11,
+            "levels": 10,
+            "basecost": 0
+          },
+          {
+            "xmlid": "ENDURANCERESERVE",
+            "id": 507,
+            "alias": "Endurance Reserve",
+            "name": "Deep Well",
+            "position": 12,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "ENDURANCERESERVEREC",
+                "alias": "Recovery",
+                "basecost": 0,
+                "levels": 1,
+                "lvlval": 1,
+                "lvlcost": 1
+              }
+            ],
+            "power": {
+              "xmlid": "ENDURANCERESERVE",
+              "levels": 15
+            }
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 510,
+            "alias": "Multipower",
+            "name": "Mental Powers",
+            "position": 7,
+            "basecost": 60
+          }
+        ]
+      }
+    }
   ]
 }
