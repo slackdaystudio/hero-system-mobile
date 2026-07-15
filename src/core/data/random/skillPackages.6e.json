@@ -1,0 +1,184 @@
+{
+  "_note": [
+    "6E Standard (400) skillsets — the profession half of a build. AUTHORED at ~50 points; the 5E sets",
+    "are 25, and that is a 250-point hero's skill list.",
+    "",
+    "50 comes from the corpus: the five real 400-point 6E characters spend 30-69 on skills (median 59).",
+    "It is a NO-CSL budget and always was — four of those five carry no Combat Skill Levels at all, so",
+    "their 30-69 is already all real skills. Which matches Phil's rule: no CSLs at character creation,",
+    "because a CSL is a thing you must remember to apply and an OCV is just your OCV. The 5E",
+    "Investigator, Soldier and Warrior each carry one; none of these do.",
+    "",
+    "A real 400-point character carries ~20 skills at 1-3 points each, not the 7-8 a 25-point set has.",
+    "So these are broad rather than deep: familiarities (1) and full skills (3), with the odd talent.",
+    "",
+    "PROFESSION, not archetype. Any archetype can be a Soldier. Lightning Reflexes lives on the Warrior",
+    "for that reason — a Martial Artist gets it by being a Warrior, not by being a Martial Artist.",
+    "",
+    "No cost is declared. The engine prices every skill; a set passes by totalling 50 when built."
+  ],
+  "skillsets": [
+    {
+      "profession": "Actor/Actress",
+      "note": "Broad rather than deep, the way a real 400-point character's skills actually are: the 5E set's interactive core, plus the physical craft an actor has and the trade knowledge around it.\n\nCharm, not Seduction — 6E deleted Seduction and folded it into Charm. KS, not AK — 6E has no generic Area Knowledge; an area is a Knowledge Skill.\n\nTrading is a Proficiency (2) to close an odd remainder: Familiarity moves in 2s, so only the Proficiency lever can shave a single point. Same trick the 5E sets use.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "ACTING",
+              "characteristic": "PRE",
+              "id": 1201,
+              "alias": "Acting",
+              "position": 0,
+              "basecost": 3
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "characteristic": "PRE",
+              "id": 1202,
+              "alias": "Conversation",
+              "position": 1,
+              "basecost": 3
+            },
+            {
+              "xmlid": "DISGUISE",
+              "characteristic": "INT",
+              "id": 1203,
+              "alias": "Disguise",
+              "position": 2,
+              "basecost": 3
+            },
+            {
+              "xmlid": "MIMICRY",
+              "characteristic": "INT",
+              "id": 1204,
+              "alias": "Mimicry",
+              "position": 3,
+              "basecost": 3
+            },
+            {
+              "xmlid": "PERSUASION",
+              "characteristic": "PRE",
+              "id": 1205,
+              "alias": "Persuasion",
+              "position": 4,
+              "basecost": 3
+            },
+            {
+              "xmlid": "CHARM",
+              "characteristic": "PRE",
+              "id": 1206,
+              "alias": "Charm",
+              "position": 5,
+              "basecost": 3
+            },
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "characteristic": "PRE",
+              "id": 1207,
+              "alias": "High Society",
+              "position": 6,
+              "basecost": 3
+            },
+            {
+              "xmlid": "ACROBATICS",
+              "characteristic": "DEX",
+              "id": 1208,
+              "alias": "Acrobatics",
+              "position": 7,
+              "basecost": 3
+            },
+            {
+              "xmlid": "BREAKFALL",
+              "characteristic": "DEX",
+              "id": 1209,
+              "alias": "Breakfall",
+              "position": 8,
+              "basecost": 3
+            },
+            {
+              "xmlid": "STREETWISE",
+              "characteristic": "PRE",
+              "id": 1210,
+              "alias": "Streetwise",
+              "position": 9,
+              "basecost": 3
+            },
+            {
+              "xmlid": "SHADOWING",
+              "characteristic": "INT",
+              "id": 1211,
+              "alias": "Shadowing",
+              "position": 10,
+              "basecost": 3
+            },
+            {
+              "xmlid": "STEALTH",
+              "characteristic": "DEX",
+              "id": 1212,
+              "alias": "Stealth",
+              "position": 11,
+              "basecost": 3
+            },
+            {
+              "xmlid": "PROFESSIONAL_SKILL",
+              "characteristic": "PRE",
+              "id": 1213,
+              "alias": "PS",
+              "input": "Actor",
+              "position": 12,
+              "basecost": 3
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "characteristic": "INT",
+              "id": 1214,
+              "alias": "KS",
+              "input": "The Theatre",
+              "position": 13,
+              "basecost": 1,
+              "familiarity": true
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "characteristic": "INT",
+              "id": 1215,
+              "alias": "KS",
+              "input": "Home City",
+              "position": 14,
+              "basecost": 2,
+              "familiarity": false
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "alias": "Language",
+              "id": 1216,
+              "position": 15,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "characteristic": "INT",
+              "id": 1217,
+              "alias": "Concealment",
+              "position": 16,
+              "basecost": 3
+            },
+            {
+              "xmlid": "TRADING",
+              "characteristic": "PRE",
+              "id": 1218,
+              "alias": "Trading",
+              "position": 17,
+              "basecost": 2,
+              "proficiency": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
