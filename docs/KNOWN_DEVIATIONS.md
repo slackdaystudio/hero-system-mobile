@@ -39,8 +39,10 @@
 | T4 | Item-add into a missing base sub-key → `[undefined, item]` | real bug (edge) | unknown / no | templates |
 | H1 | `character.template` always `undefined` | cosmetic | yes | hero |
 | H2 | Trait sort uses a boolean-returning comparator | real bug | likely (trait order) | hero |
-| H3 | Char/defense totals skip **duplicate** powers | **real bug, active** | **yes — 17 fixtures** | hero query |
+| H3 | Char/defense totals skip **duplicate** powers | ✅ **fixed** — was real bug, active | yes — junkyard, mark-li-v5a-433 | hero query (re-based) |
 | H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | **real bug, active** | **yes — tazimmaad (JAB)** | traits |
+| H5 | VPP contents counted toward totals | ✅ **fixed** — was real bug, active | yes — adamantine (Leaping), m-championsmush | hero query / movement |
+| H6 | Unusual-defense duplicates read off the collapsed array | **real bug, active** | yes — defensor, junkyard | none (legacy equally wrong) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | **real bug, active** | **yes — mark-li-v5a-433 (Gecko pads)** | traits (decorator) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | real bug (latent) | no — step 3 occurs, never on an exact power | traits (decorator) |
@@ -123,7 +125,35 @@
 - **Fix + verify:** proper numeric comparator; unit test with shuffled positions;
   re-base hero golden master for reordered characters.
 
-## H3 — Characteristic/defense totals skip duplicate powers (**active bug**)
+## H3 — Characteristic/defense totals skip duplicate powers — ✅ FIXED
+
+**Fixed.** The five array branches now delegate each element to their own scalar branch,
+which applies the `affectsPrimary`/`affectsTotal` guard per power — the shape
+`getTotalCompoundPowerIncrease` already used. Three of them additionally `+=`'d a recursion
+that already returned the running total (a latent double-count), and
+`getTotalCharacteristicPoints` passed `showSecondary` as its `value` argument; both are gone.
+
+- **Corrected values** (derived from the characters' data, not from legacy) are pinned in
+  `core/hero/__tests__/duplicatePowers.test.ts`; `queryGoldenMaster.test.ts` skips exactly
+  these cases via `H3_DIVERGENCE`, and still compares everything else — including the whole
+  `showSecondary: false` column — against legacy.
+- **Actual corpus impact: 2 fixtures, not the 17 estimated below.** 17 fixtures *carry*
+  duplicate xmlids, but only `junkyard` (Force Field ×2 → 12/0 becomes 20/8; the second,
+  "Force Bubble", stays excluded by `affectsTotal: false`) and `mark-li-v5a-433` (Armor ×2,
+  "Hide" + "Scales" → PD 8/0 becomes 18/10, ED 6/0 becomes 16/10) actually change. All 16
+  divergences are `showSecondary: true` only, since every contributing duplicate is
+  `affectsPrimary: false`.
+- **The original plan below was wrong in one respect.** "Each duplicate power contributes"
+  assumed all duplicates are cumulative. `m-championsmush` has 8 Force Fields *in a
+  Variable Power Pool* — alternative configurations — and summing them read 118/116. That
+  is not a duplicate-counting question at all; it is **H5**, fixed separately. With H5 in
+  place, m-championsmush no longer diverges here.
+- **Scope was under-counted too:** the same quirk has two more sites in the unusual-defense
+  path that these five branches don't cover. Logged as **H6**.
+
+### Original entry (for reference)
+
+## H3 (original) — Characteristic/defense totals skip duplicate powers (**active bug**)
 
 - **Where:** the array branches of `getTotalCharacteristicPoints`,
   `getTotalDensityIncreaseCharacteristics`, `getTotalArmorDefenseIncrease`,
@@ -143,6 +173,63 @@
   from the rules (sum the duplicates), **not** from legacy. Re-base the query golden
   master for the affected characters, and add a hand-built test (a character with two
   Force Fields) pinning the summed total. Highest-value fix here.
+
+## H5 — Variable Power Pool contents counted toward totals — ✅ FIXED
+
+- **Where:** every `powersMap` construction in `core/hero/heroDesignerCharacter.ts` — six
+  sites that each built `toMap(flatten(character.powers, 'powers'))` and so swept a VPP's
+  contents in alongside everything else.
+- **Legacy:** same.
+- **Correct (rules, confirmed with Phil):** a VPP holds prefabricated powers the player
+  swaps between for different occasions; **none of them is active until the player allocates
+  pool points to it.** So no pooled power may contribute to characteristics, defenses or
+  movement. This is specific to VPPs — multipower / elemental-control slots are a separate
+  question and are deliberately untouched.
+- **Fix:** the six sites now call `powersForTotals(character)`, which filters powers whose
+  parent's `originalType === 'vpp'` before indexing. It mirrors
+  `isPowerFrameworkItem(…, 'vpp')` but resolves parents against one shared id map rather
+  than rebuilding it per power (that helper is O(n) per call).
+- **Corpus impact:** 3 fixtures hold pooled powers — `adamantinerebuild210109` (19 slots),
+  `m-championsmush` (41), `mikayla-priestess` (10). Two visible effects:
+  **(a)** `adamantine`'s Leaping was **40**, of which 20 came from the pooled "Leap Tall
+  Buildings…"; it is now **20**. No golden master covers this — `movement.test.ts` pins
+  hand-derived values because legacy's `getMovementTotal` lived in a React component and has
+  no lib to compare against — so it was previously unpinned. Now pinned.
+  **(b)** `m-championsmush`'s 8 pooled Force Fields (Undercover 10/10, Heavy 20/20,
+  Hardened 17/17, Impenetrable 17/17, Anti-Physical 32/10, Subtle 10/10, Anti-Energy 10/26,
+  Core Shielding 0/0). Legacy read 2/0 by accident — its duplicate-skipping bug (H3) masked
+  them. Fixing H3 alone would have read **118/116**, i.e. all eight configurations worn at
+  once. It now reads 2/0 for the right reason, so this entry is a **prerequisite of H3**,
+  not an independent cleanup.
+- **Verify:** `core/hero/__tests__/duplicatePowers.test.ts` (H5 block) pins the pooled Force
+  Fields out of m-championsmush's defenses, adamantine's Leaping at 20, and — as the control
+  — mark-li's *unpooled* Armors still counting, so the guard keys on pool membership rather
+  than on the power.
+
+## H6 — Unusual-defense duplicates read off the collapsed array (**active bug**)
+
+- **Where:** two sites the H3 entry's "five array branches" didn't enumerate:
+  1. `getTotalUnusualDefense` — `(powersMap.get('FORCEFIELD') as Obj).mdlevels || 0`, run
+     twice. With Force Field duplicated, `powersMap.get` returns an **array**, `.mdlevels` is
+     `undefined`, and `|| 0` silently contributes nothing.
+  2. `getUnusualDefensePoints` — takes `unusualDefense: Obj` and has **no array branch at
+     all**, so `unusualDefense.levels || 0` is `0` for any duplicated xmlid.
+- **Legacy:** same. Same root cause as H3 (`toMap` collapses a repeated xmlid into an array,
+  then the code reads properties off the array itself), so H3's fix does **not** reach these.
+- **Correct:** sum across the duplicates, as H3 does for the other five branches.
+- **Corpus impact:** `defensor` carries `POWERDEFENSE` ×2 (levels 10 and 5 — should total 15)
+  and `FORCEFIELD` ×2; `junkyard` carries `FORCEFIELD` ×2. Both collapse to arrays, so both
+  array reads yield 0. **Not fully traced:** `defensor` currently reports `PowD=10/10`, which
+  is neither 0 nor 15, so a third contributor (the `COMPOUNDPOWER` path, which also feeds
+  these totals) is involved. Trace it before fixing — the corrected value must come out of
+  the rules, and the mechanism here is not yet fully understood.
+- **Fix + verify:** give both sites an array branch; hand-built character with two Power
+  Defenses pinning the summed total. Note `getUnusualDefensePoints` assigns
+  (`defenses.nonResistant = points`) rather than accumulating, so the array branch needs care
+  — a naive recursion will clobber rather than sum. Also worth a look while in there:
+  `getTotalUnusualDefense` adds Force Field's **mental** defense (`mdlevels`) to *every*
+  unusual-defense query, including `POWERDEFENSE` and `FLASHDEFENSE`, which looks wrong
+  independently of the array bug.
 
 ## H4 — `Maneuver.roll()` crashes on an unresolved-template maneuver
 

@@ -131,6 +131,33 @@ export class HeroDesignerCharacter {
         return false;
     }
 
+    /**
+     * The powers that count toward totals, indexed by xmlid.
+     *
+     * H5 (docs/KNOWN_DEVIATIONS.md) — intentional divergence from legacy: powers held in a
+     * Variable Power Pool are excluded. A VPP holds prefabricated powers the player swaps
+     * between for different occasions; none is active until points are allocated to it, so
+     * none may contribute to characteristics, defenses or movement. Legacy counted them all
+     * unconditionally, which let a pool's every configuration apply at once.
+     *
+     * Mirrors `isPowerFrameworkItem(…, 'vpp')` but resolves parents against one shared id
+     * map instead of rebuilding it per power.
+     */
+    private powersForTotals(character: Obj): Map<unknown, any> {
+        const byId = toMap(character.powers, 'id');
+        const inVariablePowerPool = (power: Obj): boolean => {
+            if (!hasOwn(power, 'parentid')) {
+                return false;
+            }
+
+            const parent = byId.get(power.parentid);
+
+            return parent !== undefined && !Array.isArray(parent) && (parent as Obj).originalType === 'vpp';
+        };
+
+        return toMap(flatten(character.powers, 'powers').filter((power: Obj) => !inVariablePowerPool(power)));
+    }
+
     isPowerFrameworkItem(item: Obj, character: Obj, type: string): boolean {
         if (hasOwn(item, 'parentid') && character.powers.length > 0) {
             const powersMap = toMap(character.powers, 'id');
@@ -151,7 +178,7 @@ export class HeroDesignerCharacter {
     }
 
     getCharacteristicTotal(shortName: string, character: Obj): number {
-        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const powersMap: Map<unknown, any> = this.powersForTotals(character);
 
         for (const characteristic of character.characteristics) {
             if (shortName.toUpperCase() === characteristic.shortName.toUpperCase()) {
@@ -164,7 +191,7 @@ export class HeroDesignerCharacter {
 
     getRollTotal(characteristic: Obj, character: Obj): string | null {
         if (characteristic.roll) {
-            const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+            const powersMap: Map<unknown, any> = this.powersForTotals(character);
 
             return `${Math.round(this.getCharacteristicTotalInner(characteristic, powersMap, character.showSecondary, character) / 5) + SKILL_ROLL_BASE}-`;
         }
@@ -184,7 +211,7 @@ export class HeroDesignerCharacter {
             return nonResistant.toString();
         }
 
-        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const powersMap: Map<unknown, any> = this.powersForTotals(character);
         const characteristic = this.getCharacteristicByShortName(type, character);
         const showSecondary = character.showSecondary;
 
@@ -213,7 +240,7 @@ export class HeroDesignerCharacter {
 
     getTotalUnusualDefense(character: Obj, powerXmlId: string): string {
         const defenses = {nonResistant: 0, resistant: 0};
-        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const powersMap: Map<unknown, any> = this.powersForTotals(character);
         const showSecondary = character.showSecondary;
 
         if (powersMap.has(powerXmlId)) {
@@ -239,7 +266,7 @@ export class HeroDesignerCharacter {
      * `formatFraction` renders a trailing ½ as the legacy sheet does.
      */
     getMovementTotal(characteristic: Obj, character: Obj, formatFraction = false): number | string {
-        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const powersMap: Map<unknown, any> = this.powersForTotals(character);
         const shortName = String(characteristic.shortName).toUpperCase();
         let meters: number = characteristic.value;
 
@@ -271,7 +298,7 @@ export class HeroDesignerCharacter {
 
     /** Non-combat movement multiplier (default x2), raised by IMPROVEDNONCOMBAT adders. */
     getTotalNcm(characteristic: Obj, character: Obj): number {
-        const powersMap: Map<unknown, any> = toMap(flatten(character.powers, 'powers'));
+        const powersMap: Map<unknown, any> = this.powersForTotals(character);
         const shortName = String(characteristic.shortName).toUpperCase();
         let ncm = 2;
 
@@ -388,17 +415,16 @@ export class HeroDesignerCharacter {
         return 0;
     }
 
-    // Faithful to legacy: the array branch tests the *array's* (undefined) props,
-    // so it never contributes — the quirk is preserved for byte-identical output.
+    // H3 (docs/KNOWN_DEVIATIONS.md) — intentional divergence from legacy. When an xmlid
+    // appears more than once, `toMap` collapses the powers into an array; legacy's array
+    // branch then tested the *array's* own (undefined) affectsPrimary/affectsTotal, so none
+    // of the duplicates contributed. Each element is delegated to the scalar branch instead,
+    // which applies the guard per power — the shape `getTotalCompoundPowerIncrease` already
+    // used. (Legacy also passed `showSecondary` as the `value` argument here.)
     private getTotalCharacteristicPoints(characteristic: Obj | Obj[], value: number, showSecondary?: boolean): number {
         if (Array.isArray(characteristic)) {
             for (const char of characteristic) {
-                if (
-                    ((characteristic as Obj).affectsPrimary && (characteristic as Obj).affectsTotal) ||
-                    (!(characteristic as Obj).affectsPrimary && (characteristic as Obj).affectsTotal && showSecondary)
-                ) {
-                    value += this.getTotalCharacteristicPoints(char, showSecondary as unknown as number);
-                }
+                value = this.getTotalCharacteristicPoints(char, value, showSecondary);
             }
         } else {
             if (
@@ -414,13 +440,10 @@ export class HeroDesignerCharacter {
 
     private getTotalDensityIncreaseCharacteristics(characteristic: Obj, densityIncrease: Obj | Obj[], value: number, showSecondary?: boolean): number {
         if (Array.isArray(densityIncrease)) {
+            // H3 — see getTotalCharacteristicPoints. (Legacy also `+=`'d a recursion that
+            // already returned the running total, which would have double-counted `value`.)
             for (const di of densityIncrease) {
-                if (
-                    ((densityIncrease as Obj).affectsPrimary && (densityIncrease as Obj).affectsTotal) ||
-                    (!(densityIncrease as Obj).affectsPrimary && (densityIncrease as Obj).affectsTotal && showSecondary)
-                ) {
-                    value += this.getTotalDensityIncreaseCharacteristics(characteristic, di, value, showSecondary);
-                }
+                value = this.getTotalDensityIncreaseCharacteristics(characteristic, di, value, showSecondary);
             }
         } else {
             if (
@@ -446,13 +469,10 @@ export class HeroDesignerCharacter {
 
     private getTotalArmorDefenseIncrease(type: string, resistantDefence: Obj | Obj[], value: number, showSecondary?: boolean): number {
         if (Array.isArray(resistantDefence)) {
+            // H3 — see getTotalCharacteristicPoints. (Legacy also `+=`'d a recursion that
+            // already returned the running total, which would have double-counted `value`.)
             for (const rd of resistantDefence) {
-                if (
-                    ((resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal) ||
-                    (!(resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal && showSecondary)
-                ) {
-                    value += this.getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
-                }
+                value = this.getTotalArmorDefenseIncrease(type, rd, value, showSecondary);
             }
         } else {
             if (
@@ -477,13 +497,9 @@ export class HeroDesignerCharacter {
 
     private getTotalResistantDefensesIncrease(type: string, resistantDefence: Obj | Obj[], value: number, showSecondary?: boolean): number {
         if (Array.isArray(resistantDefence)) {
+            // H3 — see getTotalCharacteristicPoints.
             for (const rd of resistantDefence) {
-                if (
-                    ((resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal) ||
-                    (!(resistantDefence as Obj).affectsPrimary && (resistantDefence as Obj).affectsTotal && showSecondary)
-                ) {
-                    value = this.getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
-                }
+                value = this.getTotalResistantDefensesIncrease(type, rd, value, showSecondary);
             }
         } else {
             if (
@@ -600,13 +616,9 @@ export class HeroDesignerCharacter {
 
     private getResistantDefense(resistant: number, power: Obj | Obj[], character: Obj, showSecondary?: boolean): number {
         if (Array.isArray(power)) {
+            // H3 — see getTotalCharacteristicPoints.
             for (const p of power) {
-                if (
-                    ((power as Obj).affectsPrimary && (power as Obj).affectsTotal) ||
-                    (!(power as Obj).affectsPrimary && (power as Obj).affectsTotal && showSecondary)
-                ) {
-                    resistant = this.getResistantDefense(resistant, p, character, showSecondary);
-                }
+                resistant = this.getResistantDefense(resistant, p, character, showSecondary);
             }
         } else {
             if ((power.affectsPrimary && power.affectsTotal) || (!power.affectsPrimary && power.affectsTotal && showSecondary)) {
