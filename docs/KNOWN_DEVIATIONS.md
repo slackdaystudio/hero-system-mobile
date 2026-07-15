@@ -46,7 +46,7 @@
 | H7 | Resistant Protection's `mdlevels` fed *every* unusual-defense total | ✅ **fixed** — was real bug, active | yes — defensor, adamantine | hero query (re-based) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
-| U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | real bug (latent) | no — step 3 occurs, never on an exact power | traits (decorator) |
+| U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
 
 ---
 
@@ -382,7 +382,40 @@ returning `-Infinity` for "no levels" was the actual defect.
   correctness test pinning `Gecko pads` at 11; re-base the decorator golden master for
   `mark-li-v5a-433` as an intentional divergence linking here.
 
-## U3 — `getMultiplications` overshoots on exact powers of a non-2 step
+## U3 — `getMultiplications` overshoots on exact powers of a non-2 step — ✅ FIXED
+
+**Fixed.** `total` is an exact power of `step` iff `step ** n === total`, so the code now asks
+that question directly rather than rounding a log:
+
+```ts
+const exact = Math.log(total) / Math.log(step);
+const nearest = Math.round(exact);
+
+return Math.pow(step, nearest) === total ? nearest : Math.ceil(exact);
+```
+
+- **Deviates from the plan below, deliberately.** That said "epsilon-snap"; this is exact
+  instead. An epsilon has to be *chosen*, and it gets less safe as the exponent grows — a
+  genuinely fractional exponent at a large magnitude can fall within any fixed epsilon of an
+  integer and be snapped down wrongly. Integer powers are exact in a double up to 2^53, far
+  beyond anything the template data holds (`lvlval` tops out at 16000), so the direct test has
+  no tuning parameter and no failure mode here. Non-integer/negative `step` keeps legacy's
+  behaviour: `Math.log` of a negative is `NaN`, and `NaN` propagates exactly as before.
+- **Corpus impact: none, as predicted.** Both golden masters passed **unchanged, with no
+  re-base** — which is the evidence that this was latent rather than active. Compare U2, which
+  shared this function and required one.
+- **It was reachable, not theoretical.** `lvlval` takes 3, 5, 7, 9, …, so e.g. a Clinging
+  bought at 9 levels (`lvlval 3`) was charged for 3 multiplications instead of 2 — one
+  `lvlcost` of silent overcharge. `getMultiplierCost(9, 3, 4)` is now 8, was 12.
+- **Pinned by:** `core/util/__tests__/common.test.ts` — the exact powers that were wrong
+  (9/3, 27/3, 125/5, 49/7), base 2 which was always right, and genuine fractions that must
+  still round up (10/3, 5/2, 126/5). The old entry's failing-by-design pin
+  (`getMultiplications(9, 3) === 3`) is gone, having done its job of forcing this fix to be
+  deliberate.
+
+### Original entry (for reference)
+
+## U3 (original) — `getMultiplications` overshoots on exact powers of a non-2 step
 
 - **Where:** `core/util/common.ts` `getMultiplications` — `Math.log(total) / Math.log(step)`
   is inexact, so an exact power can land just above the integer and `Math.ceil` rounds it up:

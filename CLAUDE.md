@@ -92,8 +92,9 @@ component-local and resets to on at every mount, where legacy persisted `showSec
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 14 entries; 6 fixed (H3, H4, H5, H6, H7, U2). It explains why a "wrong-looking"
-> line in `core/` may be load-bearing, and why a green golden master does not mean correct.
+> `core/`.** 14 entries; 7 fixed (H3, H4, H5, H6, H7, U2, U3) — every corpus-triggered bug
+> that was known is now fixed. It explains why a "wrong-looking" line in `core/` may be
+> load-bearing, and why a green golden master does not mean correct.
 
 Process per fix — follow it; the ledger explains the reasoning:
 
@@ -104,14 +105,12 @@ Process per fix — follow it; the ledger explains the reasoning:
 3. Re-base the affected golden master to an explicit intentional divergence, with a comment
    linking back to the ledger entry (see `H3_DIVERGENCE` / `U2_DIVERGENCE` for the shape).
 
-Still open and **active**:
+Still open:
 
-- **U3** — latent float overshoot in `getMultiplications`. Cheapest one left;
-  `common.test.ts` pins the current *wrong* value on purpose so the fix must change it
-  deliberately.
-- **Unusual defenses ignore `affectsPrimary`/`affectsTotal`** (noted under H7, not yet its own
-  entry): a secondary-form Resistant Protection still feeds the Mental/Power totals at
-  `showSecondary: false`, unlike every other total. Needs a rules check before fixing.
+- **Unusual defenses ignore `affectsPrimary`/`affectsTotal`** (noted under H7, no entry of its
+  own yet): a secondary-form Resistant Protection still feeds the Mental/Power totals at
+  `showSecondary: false`, unlike every other total. Visible on `defensor` (`20/10` in his base
+  form). **Needs a rules call before it can be fixed** — legacy is not an oracle for it.
 
 Then the cosmetic/latent tail: T1–T4, H1, H2, U1.
 

@@ -67,8 +67,33 @@ describe('core/util common helpers', () => {
         expect(getMultiplierCost(0, 3, 1)).toBe(0); // the Gecko pads case — was -Infinity
 
         // The guard must not disturb a genuine multiplication.
-        expect(getMultiplications(9, 3)).toBe(3); // U3: should be 2; still overshooting, tracked separately
         expect(getMultiplierCost(4, 2, 3)).toBe(6);
+    });
+
+    // U3 (docs/KNOWN_DEVIATIONS.md) — intentional divergence from legacy, whose
+    // Math.ceil(Math.log(t) / Math.log(s)) overshot on exact powers of any base but 2:
+    // Math.log(9) / Math.log(3) is 2.0000000000000004.
+    it('getMultiplications is exact on exact powers of a non-2 step (U3)', () => {
+        expect(getMultiplications(9, 3)).toBe(2); // was 3
+        expect(getMultiplications(27, 3)).toBe(3); // was 4
+        expect(getMultiplications(125, 5)).toBe(3); // was 4
+        expect(getMultiplications(49, 7)).toBe(2);
+        expect(getMultiplications(1000, 10)).toBe(3);
+        expect(getMultiplications(3, 3)).toBe(1);
+        expect(getMultiplications(1, 3)).toBe(0); // step^0
+
+        // Base 2 was always exact in binary — must stay so.
+        expect(getMultiplications(8, 2)).toBe(3);
+        expect(getMultiplications(1024, 2)).toBe(10);
+
+        // A genuine fraction still rounds up: 3^2 = 9 < 10, so 10 needs 3.
+        expect(getMultiplications(10, 3)).toBe(3);
+        expect(getMultiplications(20, 3)).toBe(3);
+        expect(getMultiplications(5, 2)).toBe(3); // ceil(2.32)
+        expect(getMultiplications(126, 5)).toBe(4); // just past 5^3
+
+        // Feeds through to the cost.
+        expect(getMultiplierCost(9, 3, 4)).toBe(8); // 2 multiplications * 4 — was 12
     });
 
     it('totalAdders (recursive, level-aware)', () => {

@@ -42,8 +42,27 @@ export const isFloat = (value: number | string): boolean => (!isNaN(value as num
  * and callers added that straight into a cost. The same guard absorbs negative and `NaN`
  * totals, which are equally undefined and previously yielded `-Infinity`/`NaN`.
  * (`getMultiplications(1, …)` was already 0; zero is the same case.)
+ *
+ * U3 — intentional divergence: `Math.log(total) / Math.log(step)` is inexact, so an exact
+ * power could land a hair above its integer and `Math.ceil` would round it up —
+ * `Math.log(9) / Math.log(3)` is `2.0000000000000004`, giving 3 instead of 2. Base 2 is exact
+ * in binary and so never showed the fault. Rather than snap within an epsilon (which would
+ * have to be picked, and gets less safe as the exponent grows), ask the question exactly:
+ * `total` is an exact power of `step` iff `step ** n === total`. Integer powers are exact in
+ * a double up to 2^53, far beyond anything the template data holds, and a genuine fraction
+ * still rounds up. Non-integer or negative `step` keeps legacy's behaviour — `Math.log` of a
+ * negative is `NaN`, and `NaN` propagates as before.
  */
-export const getMultiplications = (total: number, step = 2): number => (total > 0 ? Math.ceil(Math.log(total) / Math.log(step)) : 0);
+export const getMultiplications = (total: number, step = 2): number => {
+    if (!(total > 0)) {
+        return 0;
+    }
+
+    const exact = Math.log(total) / Math.log(step);
+    const nearest = Math.round(exact);
+
+    return Math.pow(step, nearest) === total ? nearest : Math.ceil(exact);
+};
 
 export const getMultiplierCost = (total: number, step: number, cost: number): number => {
     if (step === 1) {
