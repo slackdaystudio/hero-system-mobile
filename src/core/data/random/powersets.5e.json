@@ -78,5 +78,117 @@
         "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Energy", "position": 2, "basecost": 15}]
       }
     }
+  ],
+  "Mentalist": [
+    {
+      "label": "Mind Blaster",
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Mental Shell", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},
+
+          {"xmlid": "EGOATTACK", "id": 111, "parentid": 110, "alias": "Ego Attack", "name": "Mind Blast", "position": 1, "levels": 5, "ultraSlot": true},
+          {"xmlid": "ENERGYBLAST", "id": 112, "parentid": 110, "alias": "Energy Blast", "name": "Psi-Bolt", "position": 2, "levels": 10, "ultraSlot": true},
+          {"xmlid": "MINDCONTROL", "id": 113, "parentid": 110, "alias": "Mind Control", "name": "Dominate", "position": 3, "levels": 10, "ultraSlot": true},
+
+          {
+            "xmlid": "FLIGHT",
+            "id": 121,
+            "parentid": 120,
+            "alias": "Flight",
+            "name": "Levitate",
+            "position": 4,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2}
+          },
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Force Field",
+            "name": "Mind Shield",
+            "position": 5,
+            "levels": 20,
+            "pdlevels": 10,
+            "edlevels": 10,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "1/2 END"}
+          }
+        ],
+        "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Mental Powers", "position": 1, "basecost": 50}],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Mental Powers", "position": 2, "basecost": 15}]
+      }
+    }
+  ],
+  "Mystic": [
+    {
+      "label": "Sorcerer",
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Warding Sigil", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},
+
+          {"xmlid": "ENERGYBLAST", "id": 111, "parentid": 110, "alias": "Energy Blast", "name": "Eldritch Bolt", "position": 1, "levels": 10, "ultraSlot": true},
+          {"xmlid": "MENTALILLUSIONS", "id": 112, "parentid": 110, "alias": "Mental Illusions", "name": "Glamour", "position": 2, "levels": 10, "ultraSlot": true},
+          {"xmlid": "TELEPATHY", "id": 113, "parentid": 110, "alias": "Telepathy", "name": "Mind Read", "position": 3, "levels": 10, "ultraSlot": true},
+
+          {
+            "xmlid": "FLIGHT",
+            "id": 121,
+            "parentid": 120,
+            "alias": "Flight",
+            "name": "Ride the Wind",
+            "position": 4,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2}
+          },
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Force Field",
+            "name": "Mystic Aegis",
+            "position": 5,
+            "levels": 20,
+            "pdlevels": 10,
+            "edlevels": 10,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "1/2 END"}
+          }
+        ],
+        "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Spells", "position": 1, "basecost": 50}],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Magic", "position": 2, "basecost": 15}]
+      }
+    }
+  ],
+  "Powered Armor": [
+    {
+      "label": "Battlesuit",
+      "approximations": [
+        {
+          "power": "Battlesuit Plating",
+          "note": "Legacy prose says 'Armor +15 rPD +15 rED' (45). Flexed to 14/14 (42) to fit this archetype's balance of 122 — its spread really costs 103, not the 100 its (dropped, wrong) characteristicsCost label claimed. The armour is the natural place to absorb 3 points: the EC slots are all round numbers the prose pins exactly."
+        }
+      ],
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Battlesuit Plating", "position": 0, "levels": 28, "pdlevels": 14, "edlevels": 14},
+
+          {"xmlid": "ENERGYBLAST", "id": 121, "parentid": 120, "alias": "Energy Blast", "name": "Repulsor", "position": 1, "levels": 10},
+          {
+            "xmlid": "FLIGHT",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Flight",
+            "name": "Boot Jets",
+            "position": 2,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2}
+          }
+        ],
+        "str": [{"xmlid": "STR", "id": 123, "parentid": 120, "alias": "STR", "name": "Servo-Assist", "position": 3, "levels": 30}],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Powered Armor", "position": 1, "basecost": 15}]
+      }
+    }
   ]
 }

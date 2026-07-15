@@ -45,6 +45,30 @@ const powerRows = (character: Obj): Array<{label: string; realCost: number; acti
         return {label: String(power.name), realCost: decorated.realCost(), active: decorated.activeCost()};
     });
 
+/** Archetypes with structured powersets so far. The rest are still legacy prose. */
+const AUTHORED = ['Energy Projector', 'Mentalist', 'Mystic', 'Powered Armor'];
+
+/**
+ * The check that makes authoring safe: whatever a powerset is, the engine's price for it must
+ * equal the balance the allocator leaves. Every powerset, automatically — so adding data is all
+ * that a new archetype costs, and a mis-shaped power fails here rather than shipping quietly.
+ */
+describe('every authored powerset costs exactly its balance', () => {
+    const cases = ARCHETYPES_5E.flatMap((candidate) =>
+        powersetsFor(candidate.name).map((powerset, index) => [candidate.name, index, powerset.label] as [string, number, string]),
+    );
+
+    it.each(cases)('%s [%i] %s', (name, index) => {
+        const candidate = ARCHETYPES_5E.find((a) => a.name === name)!;
+        const budget = allocate(LOW_POWERED_5E, candidate, scientist);
+        const parsed = attachPowerset(buildCharacteristics(candidate.characteristics, LOW_POWERED_5E.template, name), powersetsFor(name)[index]);
+        const character = heroDesignerCharacter.getCharacter(parsed) as unknown as Obj;
+        const spent = powerRows(character).reduce((total, row) => total + row.realCost, 0);
+
+        expect({archetype: name, spent}).toEqual({archetype: name, spent: budget.powers});
+    });
+});
+
 describe('Energy Projector powerset — 5E Low Powered', () => {
     it('costs exactly the balance the allocator leaves for powers', () => {
         // 250 total − 100 characteristics − 25 skills = 125.
@@ -92,10 +116,9 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
         expect(heroDesignerCharacter.isPowerFrameworkItem(flight, character, 'elementalControl')).toBe(true);
     });
 
-    it('has powersets for exactly the archetypes authored so far', () => {
-        // The other ten are still prose. This fails when one lands, which is the point.
-        expect(ARCHETYPES_5E.filter((a) => powersetsFor(a.name).length > 0).map((a) => a.name)).toEqual(['Energy Projector']);
-        expect(powersetsFor('Brick')).toEqual([]);
+    it('tracks which archetypes are authored', () => {
+        // Fails when one lands, which is the point — it forces the count below to stay honest.
+        expect(ARCHETYPES_5E.filter((a) => powersetsFor(a.name).length > 0).map((a) => a.name)).toEqual(AUTHORED);
     });
 
     describe('a generated character has no alternate identity', () => {
@@ -124,12 +147,18 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
         });
     });
 
-    it('declares every knowingly-loose corner of the build — currently none', () => {
+    it('declares every knowingly-loose corner of the build', () => {
         // Faithfulness to the legacy prose beats invented precision, so approximations are
         // allowed — but they must be declared, never smuggled in. Pinning the list means a new
-        // one fails here until someone writes down what they fudged and why. Empty so far: the
-        // Energy Projector translates exactly.
-        expect(approximations()).toEqual([]);
+        // one fails here until someone writes down what they fudged and why.
+        expect(approximations()).toEqual([
+            {
+                archetype: 'Powered Armor',
+                powerset: 'Battlesuit',
+                power: 'Battlesuit Plating',
+                note: expect.stringContaining('Flexed to 14/14'),
+            },
+        ]);
     });
 
     it('leaves the Barrier at its base 2m x 2m — a real wall, deliberately', () => {
