@@ -10,18 +10,20 @@
     "originalType from it — and slots are siblings linked to their container by parentid.",
     "`ultraSlot: true` makes a multipower slot cost active/10 rather than active/5.",
     "",
+    "A powerset may carry an `approximations` list naming any knowingly-loose corner and why —",
+    "the legacy prose is sometimes vague, and being faithful to it beats inventing precision it",
+    "never had. Declare them; approximations() lists every one for review and a test pins them.",
+    "",
+    "Force Wall length/height/body/width levels are bought ABOVE the base 2m x 2m wall, so 0",
+    "means base size — a real, legal wall, not a wall with no extent. Its 50 active points are",
+    "pure defence (10 rPD + 10 rED), which is exactly what the prose priced at 5u.",
+    "",
     "See docs/RANDOM_CHARACTER.md. Verified against the allocator's balance in",
     "core/random/__tests__/powerset.test.ts."
   ],
   "Energy Projector": [
     {
       "label": "Energy Blaster",
-      "approximations": [
-        {
-          "power": "Barrier",
-          "note": "Zero length/height/body/width. The legacy prose ('Force Wall 10 rPD 10 rED', 5u) gave dimensions for none of them, and any would push it past the 50 active points that 5u implies. Physically a wall with no extent — faithful to the source, but nonsense if you look at it. Give it real dimensions if the slot's cost is ever allowed to move."
-        }
-      ],
       "powers": {
         "power": [
           {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Energy Aura", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},

@@ -98,24 +98,21 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
         expect(powersetsFor('Brick')).toEqual([]);
     });
 
-    it('declares every knowingly-loose corner of the build', () => {
+    it('declares every knowingly-loose corner of the build — currently none', () => {
         // Faithfulness to the legacy prose beats invented precision, so approximations are
         // allowed — but they must be declared, never smuggled in. Pinning the list means a new
-        // one fails here until someone writes down what they fudged and why.
-        expect(approximations()).toEqual([
-            {
-                archetype: 'Energy Projector',
-                powerset: 'Energy Blaster',
-                power: 'Barrier',
-                note: expect.stringContaining('Zero length/height'),
-            },
-        ]);
+        // one fails here until someone writes down what they fudged and why. Empty so far: the
+        // Energy Projector translates exactly.
+        expect(approximations()).toEqual([]);
     });
 
-    it("keeps the Barrier's approximation honest — it really has no extent", () => {
+    it('leaves the Barrier at its base 2m x 2m — a real wall, deliberately', () => {
         const barrier = powersetsFor('Energy Projector')[0].powers.power.find((power: Obj) => power.name === 'Barrier');
 
-        // If someone gives it dimensions, the note is stale and its 5u slot cost has moved.
+        // These levels buy extent ABOVE the base 2m x 2m, so 0 is the base-size wall — not a
+        // wall with no extent. Its 50 active points are pure defence (10 rPD + 10 rED), which is
+        // what the prose priced at 5u. Adding any would move the slot's cost off the balance.
         expect(barrier).toMatchObject({lengthlevels: 0, heightlevels: 0, bodylevels: 0, widthlevels: 0});
+        expect(barrier).toMatchObject({pdlevels: 10, edlevels: 10});
     });
 });

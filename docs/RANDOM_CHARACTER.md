@@ -305,10 +305,13 @@ characteristics intact underneath.
 faithful to it beats inventing precision the original never had — so a powerset may carry an
 `approximations` list naming each knowingly-wrong corner and why. `approximations()` flattens
 every one across the data for review, and a test pins the list, so a new fudge fails until
-somebody writes down what they did. First entry: Energy Projector's Force Wall has **zero
-length, height, body and width** — the prose gave none, and any would push it past the 50 active
-points its `5u` implies. A wall with no extent is nonsense; it is also exactly what the source
-said.
+somebody writes down what they did. **Currently empty** — the Energy Projector translates
+exactly.
+
+> The Force Wall's `lengthlevels: 0` looked like a fudge and is not: those levels buy extent
+> **above the base 2m × 2m wall**, so 0 is the base-size wall — real and legal, not a wall with
+> no extent. Its 50 active points are pure defence (10 rPD + 10 rED), exactly what the prose
+> priced at `5u`. Worth knowing before the same reflex fires on the other ten archetypes.
 
 **What the authoring actually costs**, learned the hard way on this one — the shape is the
 work, not the cost:
