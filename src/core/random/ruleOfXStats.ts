@@ -30,33 +30,34 @@ import {characterTraitDecorator, type Obj} from 'core/traits';
 import type {RuleOfXStats} from './ruleOfX';
 
 /**
- * Powers that grant defence, for dAP — "the largest defensive power (INCLUDES PD/ED/Resistant
- * Protection)".
+ * HERO Designer classifies its own powers, and its word is better than a list of ours.
  *
- * **A judgement call.** The engine has no notion of a defensive power (it has `doesdamage` for
- * attacks and nothing for the other side), so this list is ours. It is the powers that put a number
- * between the character and damage; things like Desolidification or Missile Deflection avoid damage
- * without adding defence and are deliberately out.
+ * Every power template carries a `type`: Entangle is `["STANDARD","ATTACK"]`, Resistant Protection
+ * is `["STANDARD","DEFENSE"]`, Flight is neither. Two hand-maintained sets used to live here and
+ * both were wrong — they had Missile Deflection and Knockback Resistance out on the reasoning that
+ * they avoid damage rather than add defence, and HD calls both DEFENSE.
+ *
+ * **ATTACK and `doesdamage` are different questions, and both are needed.** Entangle is an attack
+ * that deals no damage: it counts for oAP ("the largest attack power") and contributes nothing to
+ * DC. Reading `doesdamage` for oAP is what made an Entangle specialist score as unarmed.
  */
-const DEFENSIVE_POWERS: ReadonlySet<string> = new Set([
-    'FORCEFIELD', // 6E's Resistant Protection still carries the 5E xmlid
-    'ARMOR',
-    'DAMAGERESISTANCE',
-    'DAMAGENEGATION',
-    'DAMAGEREDUCTION',
-    'PD',
-    'ED',
-    'FORCEWALL',
-    'BARRIER',
-    'MENTALDEFENSE',
-    'POWERDEFENSE',
-    'FLASHDEFENSE',
-    'LACKOFWEAKNESS',
-]);
+const typesOf = (power: Obj): string[] => {
+    const type: unknown = power.template?.type;
+
+    return Array.isArray(type) ? type.map(String) : typeof type === 'string' ? [type] : [];
+};
+
+const isAttack = (power: Obj): boolean => typesOf(power).includes('ATTACK');
+
+const isDefensive = (power: Obj): boolean => typesOf(power).includes('DEFENSE');
+
+/** Whether a power actually deals damage — only these can raise a character's DC. */
+const doesDamage = (power: Obj): boolean => power.template?.doesdamage === true;
 
 /**
  * Movement powers that count toward velocity.
  *
+ * These aren't typed by HD (they're neither ATTACK nor DEFENSE), so this list is ours.
  * `TELEPORTATION` is absent by instruction — "DO NOT include Teleportation". It moves you without
  * ever giving you a speed to hit something with.
  */
@@ -113,8 +114,6 @@ const activeCostOf = (trait: Obj, key: string, character: Obj): number => {
     }
 };
 
-const isAttack = (power: Obj): boolean => power.template?.doesdamage === true;
-
 /**
  * Read the Rule of X inputs off a character the engine has already built.
  *
@@ -141,7 +140,7 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
 
     const powers = toArray(character.powers);
     const attacks = powers.filter(isAttack);
-    const defences = powers.filter((power) => DEFENSIVE_POWERS.has(String(power.xmlid).toUpperCase()));
+    const defences = powers.filter(isDefensive);
 
     // "Characters EGO, include Mental Defense in this total".
     const ego = total('EGO') + splitDefense(heroDesignerCharacter.getTotalUnusualDefense(character, 'MENTALDEFENSE')).total;
@@ -160,13 +159,14 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
     /**
      * "The maximum DC a character can generate."
      *
-     * Three sources, and the largest wins. `roll()` already folds STR into a hand-to-hand power's
-     * dice, so the bare punch is only counted for a character with no HTH power at all — otherwise
-     * STR would land twice.
+     * Three sources, and the largest wins. Only powers that actually *do damage* count — an
+     * Entangle is an attack but deals none, so it raises oAP and not this. `roll()` already folds
+     * STR into a hand-to-hand power's dice, so the bare punch is only counted for a character with
+     * no HTH power at all — otherwise STR would land twice.
      */
     const punch = Math.floor(total('STR') / 5);
     const maneuvers = toArray(character.martialArts).map((maneuver) => (Number(maneuver.dc) || 0) + punch);
-    const dc = Math.max(punch, ...attacks.map((power) => damageClassesOf(power, character)), ...maneuvers);
+    const dc = Math.max(punch, ...attacks.filter(doesDamage).map((power) => damageClassesOf(power, character)), ...maneuvers);
 
     /**
      * "The maximum velocity the character can generate."

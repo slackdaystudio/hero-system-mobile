@@ -114,20 +114,31 @@ describe('ruleOfXStats — real 400-point characters', () => {
     });
 
     /**
-     * A known and deliberate gap, recorded rather than hidden.
+     * Entangle is an attack that deals no damage, and both halves of that matter.
      *
-     * jane-fawn scores -27% because the model sees no attack: her Entangle is 60 active points but
-     * is not `doesdamage`, so it counts for neither DC nor oAP, and her DC 3 is a bare punch. That
-     * may be right — Entangle is control, not damage — or `oAP` may be meant to read "largest
-     * offensive power" rather than "largest damaging one". It is Phil's model and Phil's call.
+     * Reading `doesdamage` for oAP scored jane-fawn as unarmed (-27%) — the model saw a hero whose
+     * best attack was a punch, when she carries a 60-point Entangle. Phil: "Entangle counts, it's an
+     * attack". HD agrees: its template type is ["STANDARD","ATTACK"]. So it raises oAP and still
+     * contributes nothing to DC, because it genuinely does no damage.
      */
-    it('scores an Entangle specialist as unarmed — flagged, not fixed', () => {
+    it('counts an Entangle as an attack, and still not as damage', () => {
         const stats = ruleOfXStats(load('jane-fawn'));
 
-        expect(stats.oap).toBe(0);
-        expect(stats.dc).toBe(3); // floor(STR 15 / 5)
-        expect(isBalanced(stats)).toBe(false);
-        expect(deviation(stats)).toBeLessThan(-25);
+        expect(stats.oap).toBe(60); // the Entangle
+        expect(stats.dc).toBe(3); // ...but her damage is still just floor(STR 15 / 5)
+        expect(deviation(stats)).toBeCloseTo(-12.4, 0);
+    });
+
+    /**
+     * These five came from a GM, built for a *starting* Champions group — Phil: "I doubt they were
+     * very optimal". So the whole cast reading a little under the campaign's 100 is the model
+     * working, not the extraction drifting: a starting hero should sit below a seasoned baseline.
+     */
+    it('reads the starting group as a starting group — under the baseline, together', () => {
+        const cast = ['jack-diamond', 'starborne', 'greyman', 'indigo-bunting', 'jane-fawn'].map((name) => deviation(ruleOfXStats(load(name))));
+
+        expect(cast.every((value) => value < 0)).toBe(true);
+        expect(cast.every((value) => value > -15)).toBe(true);
     });
 });
 
