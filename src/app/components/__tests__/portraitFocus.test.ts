@@ -23,7 +23,7 @@
  * are at the top" rule would have framed the sky.
  */
 import {CENTERED_PORTRAIT, type PortraitFocus} from 'core/ports';
-import {clampScale, coverStyle, draggableAxes, focusAfterDrag, focusAfterZoom, MAX_SCALE, MIN_SCALE, overflowOf} from '../portraitFocus';
+import {clampScale, coverStyle, draggableAxes, focusAfterDrag, focusAfterZoom, MAX_SCALE, MIN_SCALE, overflowOf, pinchSpread, ZOOM_STEP, zoomedBy, type TouchTrack} from '../portraitFocus';
 
 /** The corpus portrait: 200 wide, 300 tall. */
 const TALL = 200 / 300;
@@ -208,6 +208,64 @@ describe('zoomed framing', () => {
         // The whole library renders through this. Zoom must be inert until someone uses it.
         expect(rowsShown(TALL, CENTERED_PORTRAIT)).toEqual([50, 250]);
         expect(coverStyle(TALL, CENTERED_PORTRAIT)).toMatchObject({width: '100%', height: '150%', top: '-25%', left: '0%'});
+    });
+});
+
+/**
+ * Pinch reads RN's touch bank, not `nativeEvent.touches`.
+ *
+ * The first cut read the latter — which is filtered to the event's target — and pinch simply never
+ * fired. The bank is what RN's own `TouchHistoryMath` uses, and reading it is pure, so unlike the
+ * gesture the *detection* can be tested.
+ */
+describe('pinchSpread', () => {
+    const touch = (x: number, y: number, active = true): TouchTrack => ({touchActive: active, currentPageX: x, currentPageY: y});
+
+    it('measures the span between two live fingers', () => {
+        // 3-4-5 triangle.
+        expect(pinchSpread({numberActiveTouches: 2, touchBank: [touch(0, 0), touch(30, 40)]})).toBe(50);
+    });
+
+    it('is null with fewer than two fingers', () => {
+        expect(pinchSpread({numberActiveTouches: 1, touchBank: [touch(0, 0)]})).toBeNull();
+        expect(pinchSpread({numberActiveTouches: 0, touchBank: []})).toBeNull();
+    });
+
+    /**
+     * The bank is indexed by touch identifier, so a lifted finger leaves its entry behind with
+     * `touchActive: false`. Counting entries instead of live ones would make the second pinch of a
+     * session read a ghost finger.
+     */
+    it('ignores fingers that have been lifted', () => {
+        // The ghost is parked far away on purpose: a fixture where including it happens to give the
+        // same answer would pass against a filter that ignores `touchActive` entirely.
+        const bank = [touch(1000, 1000, false), touch(0, 0), touch(30, 40)];
+
+        expect(pinchSpread({numberActiveTouches: 2, touchBank: bank})).toBe(50); // the two live ones
+    });
+
+    it('survives the holes a sparse bank leaves', () => {
+        const bank = [undefined, touch(0, 0), undefined, touch(0, 10)];
+
+        expect(pinchSpread({numberActiveTouches: 2, touchBank: bank})).toBe(10);
+    });
+
+    it('reports a zero span rather than dividing by it later', () => {
+        // Two fingers at the same point: real, and 0 is the honest answer. The framer guards it.
+        expect(pinchSpread({numberActiveTouches: 2, touchBank: [touch(5, 5), touch(5, 5)]})).toBe(0);
+    });
+});
+
+describe('zoomedBy', () => {
+    it('steps multiplicatively, so a press feels the same at any zoom', () => {
+        expect(zoomedBy(CENTERED_PORTRAIT, TALL, ZOOM_STEP).scale).toBeCloseTo(1.25);
+        expect(zoomedBy({x: 0.5, y: 0.5, scale: 2}, TALL, ZOOM_STEP).scale).toBeCloseTo(2.5);
+        expect(zoomedBy({x: 0.5, y: 0.5, scale: 2}, TALL, 1 / ZOOM_STEP).scale).toBeCloseTo(1.6);
+    });
+
+    it('stops at the ends rather than running past them', () => {
+        expect(zoomedBy({x: 0.5, y: 0.5, scale: MAX_SCALE}, TALL, ZOOM_STEP).scale).toBe(MAX_SCALE);
+        expect(zoomedBy(CENTERED_PORTRAIT, TALL, 1 / ZOOM_STEP).scale).toBe(MIN_SCALE);
     });
 });
 });

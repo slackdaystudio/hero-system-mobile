@@ -34,7 +34,24 @@ import React, {useMemo, useRef, useState} from 'react';
 import {Modal, PanResponder, Pressable, StyleSheet, View, type GestureResponderEvent, type ViewStyle} from 'react-native';
 import {CENTERED_PORTRAIT, type PortraitFocus} from 'core/ports';
 import {Button, PortraitImage, Text} from 'app/components';
-import {draggableAxes, focusAfterDrag, focusAfterZoom, MAX_SCALE, MIN_SCALE, touchDistance} from 'app/components/portraitFocus';
+import {
+    draggableAxes,
+    focusAfterDrag,
+    focusAfterZoom,
+    MAX_SCALE,
+    MIN_SCALE,
+    pinchSpread,
+    ZOOM_STEP,
+    zoomedBy,
+    type TouchHistoryLike,
+} from 'app/components/portraitFocus';
+
+/**
+ * RN's **TypeScript** types declare `GestureResponderEvent` as a plain `NativeSyntheticEvent` and
+ * omit `touchHistory` — but Flow types it as a `ResponderSyntheticEvent`, which has it, and
+ * PanResponder reads it on every move. The types are wrong, not the event.
+ */
+type ResponderEvent = GestureResponderEvent & {touchHistory: TouchHistoryLike};
 import {useTheme} from 'app/theme';
 
 const PREVIEW = 260;
@@ -85,14 +102,15 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
                         return;
                     }
 
-                    const touches = event.nativeEvent.touches;
+                    // `gestureState.numberActiveTouches` and `touchHistory`, not
+                    // `nativeEvent.touches` — the latter is filtered to the event's target and did
+                    // not reliably carry the second finger, which is why pinch never fired at all.
+                    const spread = gesture.numberActiveTouches >= 2 ? pinchSpread((event as ResponderEvent).touchHistory) : null;
 
-                    if (touches.length >= 2) {
-                        const spread = touchDistance(touches[0], touches[1]);
-
+                    if (spread !== null && spread > 0) {
                         // First frame of the pinch: remember the span and the scale to grow from, so
                         // a second finger arriving mid-drag doesn't jump.
-                        if (pinchFrom.current === null || pinchFrom.current === 0) {
+                        if (pinchFrom.current === null) {
                             pinchFrom.current = spread;
                             start.current = live.current;
                             return;
@@ -119,6 +137,10 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
         [],
     );
 
+    // Buttons as well as pinch. A gesture is the nice way in, but it's the one thing here that
+    // can't be tested, so zoom does not depend on it working.
+    const zoom = (factor: number): void => setDraft((current) => (aspect === undefined ? current : zoomedBy(current, aspect, factor)));
+
     const axes = aspect === undefined ? {x: false, y: false} : draggableAxes(aspect, draft.scale);
     const canDrag = axes.x || axes.y;
     const sheet: ViewStyle = {backgroundColor: theme.colors.surface, borderRadius: theme.radius.md};
@@ -135,8 +157,16 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
                         <PortraitImage uri={uri} focus={draft} size={PREVIEW} radius={theme.radius.sm} testID="framer-image" />
                     </View>
 
+                    <View style={styles.zoom}>
+                        <Button label="–" variant="secondary" disabled={draft.scale <= MIN_SCALE} onPress={() => zoom(1 / ZOOM_STEP)} testID="framer-zoom-out" />
+                        <Text variant="label" muted>
+                            {`${draft.scale.toFixed(1)}×`}
+                        </Text>
+                        <Button label="+" variant="secondary" disabled={draft.scale >= MAX_SCALE} onPress={() => zoom(ZOOM_STEP)} testID="framer-zoom-in" />
+                    </View>
+
                     <Text variant="caption" muted style={styles.hint}>
-                        {`This is exactly what the square will show${draft.scale > MIN_SCALE ? ` · ${draft.scale.toFixed(1)}×` : ''}. The image itself is never changed.`}
+                        This is exactly what the square will show. The image itself is never changed.
                     </Text>
 
                     <View style={styles.actions}>
@@ -180,6 +210,11 @@ const styles = StyleSheet.create({
     hint: {
         maxWidth: PREVIEW,
         textAlign: 'center',
+    },
+    zoom: {
+        alignItems: 'center',
+        columnGap: 12,
+        flexDirection: 'row',
     },
     actions: {
         columnGap: 8,

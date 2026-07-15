@@ -125,7 +125,45 @@ export function focusAfterZoom(focus: PortraitFocus, aspect: number, scale: numb
     };
 }
 
-/** Distance between two touch points — the raw material of a pinch. */
-export function touchDistance(a: {pageX: number; pageY: number}, b: {pageX: number; pageY: number}): number {
-    return Math.hypot(a.pageX - b.pageX, a.pageY - b.pageY);
+/** What a zoom button moves per press. Multiplicative, so each press feels the same at any zoom. */
+export const ZOOM_STEP = 1.25;
+
+export const zoomedBy = (focus: PortraitFocus, aspect: number, factor: number): PortraitFocus => focusAfterZoom(focus, aspect, focus.scale * factor);
+
+/**
+ * One live touch, as RN's own touch bank records it.
+ *
+ * Deliberately structural rather than RN's type: this is the shape `TouchHistoryMath` reads, and
+ * describing it here is what lets a pinch be tested without a running responder system.
+ */
+export interface TouchTrack {
+    touchActive: boolean;
+    currentPageX: number;
+    currentPageY: number;
+}
+
+export interface TouchHistoryLike {
+    numberActiveTouches: number;
+    touchBank: ReadonlyArray<TouchTrack | undefined>;
+}
+
+/**
+ * The distance between the two live fingers, or null if there aren't two.
+ *
+ * Reads `touchHistory.touchBank` — the bank RN maintains and its own multitouch maths uses — and
+ * **not** `nativeEvent.touches`, which is filtered to the event's target and cannot be relied on to
+ * hold both fingers. Reading the latter is why the first cut of pinch never fired.
+ *
+ * The bank is sparse: it's indexed by touch identifier, so lifted fingers leave holes and stale
+ * entries stay behind with `touchActive: false`. Filtering on `touchActive` is what makes the
+ * second pinch of a session behave like the first.
+ */
+export function pinchSpread(history: TouchHistoryLike): number | null {
+    const live = history.touchBank.filter((touch): touch is TouchTrack => touch?.touchActive === true);
+
+    if (live.length < 2) {
+        return null;
+    }
+
+    return Math.hypot(live[0].currentPageX - live[1].currentPageX, live[0].currentPageY - live[1].currentPageY);
 }

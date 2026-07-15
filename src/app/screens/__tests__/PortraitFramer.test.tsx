@@ -122,11 +122,51 @@ describe('PortraitFramer', () => {
         expect(saved).toEqual([{x: 0.5, y: 0.1, scale: 2}]);
     });
 
-    it('shows the zoom only once there is some', async () => {
+    it('always reads out the zoom, so the buttons say what they did', async () => {
         const plain = await render({x: 0.5, y: 0.2, scale: 1});
-        expect(JSON.stringify(plain.toJSON())).not.toContain('×');
+        expect(JSON.stringify(plain.toJSON())).toContain('1.0×');
 
         const zoomed = await render({x: 0.5, y: 0.2, scale: 2.5});
         expect(JSON.stringify(zoomed.toJSON())).toContain('2.5×');
+    });
+
+    /**
+     * Zoom has buttons as well as pinch, on purpose. The pinch gesture is the one thing here that
+     * can't be tested, and it shipped broken once — so zoom does not depend on it.
+     */
+    describe('the zoom buttons', () => {
+        const scaleShown = (tree: ReactTestRenderer): string => {
+            const text = JSON.stringify(tree.toJSON());
+            return /(\d\.\d)×/.exec(text)?.[1] ?? '';
+        };
+
+        it('zooms in and out without a gesture', async () => {
+            const tree = await render(null);
+            expect(scaleShown(tree)).toBe('1.0');
+
+            await press(tree, 'framer-zoom-in');
+            expect(scaleShown(tree)).toBe('1.3'); // 1.25, one decimal
+
+            await press(tree, 'framer-zoom-out');
+            expect(scaleShown(tree)).toBe('1.0');
+        });
+
+        it('stops offering a direction it cannot go', async () => {
+            const tree = await render(null);
+            const button = (testID: string) => tree.root.findAllByProps({testID}).find((node) => node.props.disabled !== undefined)!;
+
+            expect(button('framer-zoom-out').props.disabled).toBe(true); // already at cover
+            expect(button('framer-zoom-in').props.disabled).toBe(false);
+        });
+
+        it('saves the zoom it was given', async () => {
+            const saved: Array<PortraitFocus | null> = [];
+            const tree = await render(null, saved);
+
+            await press(tree, 'framer-zoom-in');
+            await press(tree, 'framer-done');
+
+            expect(saved[0]?.scale).toBeCloseTo(1.25);
+        });
     });
 });

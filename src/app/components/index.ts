@@ -23,4 +23,18 @@ export {SegmentedControl, type Segment, type SegmentedControlProps} from './Segm
 export {SelectField, type SelectFieldProps} from './SelectField';
 export {TrashIcon, type IconProps} from './icons';
 export {PortraitImage, type PortraitImageProps} from './PortraitImage';
-export {clampScale, coverStyle, draggableAxes, focusAfterDrag, focusAfterZoom, MAX_SCALE, MIN_SCALE, overflowOf, touchDistance} from './portraitFocus';
+export {
+    clampScale,
+    coverStyle,
+    draggableAxes,
+    focusAfterDrag,
+    focusAfterZoom,
+    MAX_SCALE,
+    MIN_SCALE,
+    overflowOf,
+    pinchSpread,
+    ZOOM_STEP,
+    zoomedBy,
+    type TouchHistoryLike,
+    type TouchTrack,
+} from './portraitFocus';

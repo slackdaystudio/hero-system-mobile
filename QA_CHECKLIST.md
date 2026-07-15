@@ -50,8 +50,13 @@ native module (`npm run android`).
 - [ ] Tap a portrait on the sheet → the framer opens showing the current crop.
 - [ ] Drag: the image follows the finger and **stays where you put it** (it used to snap back —
       the responder was being rebuilt mid-gesture). Stops at the edges.
-- [ ] Pinch to zoom, 1x to 4x. Zoomed in, a tall portrait can now be dragged sideways too.
-- [ ] Pinch out past 1x → stops at cover; the square never letterboxes.
+- [ ] **Zoom –/+ buttons work** (these are the guaranteed path; pinch is the nice one).
+- [ ] Pinch to zoom, 1x to 4x. Pinch reads RN's touch bank now — the first cut read
+      nativeEvent.touches, which is target-filtered, and never fired at all.
+- [ ] Pinch a second time in the same session — lifted fingers leave stale entries in the bank,
+      so this is where a ghost finger would show up.
+- [ ] Zoomed in, a tall portrait can be dragged sideways too.
+- [ ] Zoom out past 1x → stops at cover; the square never letterboxes.
 - [ ] Start a drag, add a second finger to pinch, lift it, keep dragging — no jump at each change.
 - [ ] Done → the new crop shows on the sheet, the list AND Home (all three draw portraits).
 - [ ] Reset → back to centred. Cancel → nothing changes.
