@@ -163,5 +163,127 @@
         ]
       }
     }
+  ],
+  "Brick": [
+    {
+      "label": "Powerhouse",
+      "_note": "jack-diamond is the corpus model, and the archetype that buys its powerset away: STR 60 IS the attack (DC 12 off the punch, and NO attack power at all — the Rule of X's IF(DC*5 > oAP) is the only reason it doesn't read as unarmed), so the 121 left over goes on staying up. Leaping, not Running, for a Brick's kind of speed. Note Lack Of Weakness is NOT here: 6E deleted it, and with no template it prices at 0 — see the 'resolves against the template' test.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 201,
+            "alias": "Resistant Protection",
+            "name": "Dense Body",
+            "position": 0,
+            "levels": 34,
+            "pdlevels": 17,
+            "edlevels": 17,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "LEAPING",
+            "id": 202,
+            "alias": "Leaping",
+            "name": "Bound",
+            "position": 1,
+            "levels": 40
+          },
+          {
+            "xmlid": "KBRESISTANCE",
+            "id": 203,
+            "alias": "Knockback Resistance",
+            "name": "Rooted",
+            "position": 2,
+            "levels": 20,
+            "basecost": 0
+          },
+          {
+            "xmlid": "REGENERATION",
+            "id": 204,
+            "alias": "Regeneration",
+            "name": "Shrug It Off",
+            "position": 3,
+            "levels": 1,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "REGENRATE",
+                "alias": "Regeneration:",
+                "basecost": 0,
+                "levels": 0,
+                "option": "TURN",
+                "optionid": "TURN",
+                "optionAlias": "1 Turn"
+              }
+            ]
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 205,
+            "alias": "Life Support",
+            "name": "Inhuman Constitution",
+            "position": 4,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "INTENSECOLD",
+                "optionid": "INTENSECOLD",
+                "optionAlias": "Intense Cold"
+              },
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "INTENSEHEAT",
+                "optionid": "INTENSEHEAT",
+                "optionAlias": "Intense Heat"
+              },
+              {
+                "xmlid": "SELFCONTAINEDBREATHING",
+                "alias": "Self-Contained Breathing",
+                "basecost": 4,
+                "levels": 0
+              }
+            ]
+          },
+          {
+            "xmlid": "POWERDEFENSE",
+            "id": 206,
+            "alias": "Power Defense",
+            "name": "Unyielding",
+            "position": 5,
+            "levels": 10,
+            "basecost": 0
+          },
+          {
+            "xmlid": "DAMAGENEGATION",
+            "id": 208,
+            "alias": "Damage Negation",
+            "name": "Take The Hit",
+            "position": 7,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "PHYSICAL",
+                "alias": "Physical DCs",
+                "basecost": 0,
+                "levels": 2,
+                "lvlval": 1,
+                "lvlcost": 5
+              }
+            ]
+          }
+        ]
+      }
+    }
   ]
 }

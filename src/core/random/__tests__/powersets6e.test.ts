@@ -26,6 +26,7 @@
  * finished character — so a powerset cannot pass here by declaring anything about itself.
  */
 import {heroDesignerCharacter} from 'core/hero';
+import {getTemplate} from 'core/templates';
 import {characterTraitDecorator, type Obj} from 'core/traits';
 import {ARCHETYPES_6E, characteristicsBudget} from '../allocate';
 import {buildCharacteristics} from '../characteristics';
@@ -80,6 +81,45 @@ describe('6E powersets', () => {
 
         expect({label: _label, deviation: Math.round(deviation(stats))}).toEqual({label: _label, deviation: expect.any(Number)});
         expect(isBalanced(stats)).toBe(true);
+    });
+
+    /**
+     * A power the edition doesn't have resolves to no template and prices at **zero** — silently.
+     * Lack Of Weakness is the one that caught this: a 5E power, deleted in 6E, that sat in the
+     * Brick's set costing nothing and reading as authored. Nothing else here would notice; the
+     * budget test only fails if the total drifts, and the Rule of X can't see a power that isn't a
+     * combat stat.
+     */
+    it.each(cases)('%s / %s uses only powers this edition actually has', (name, _label, set) => {
+        const character = build(name, set);
+        const template = getTemplate(STANDARD_6E.template) as unknown as {powers?: Record<string, unknown>; characteristics?: Record<string, unknown>};
+
+        // Movement bought as a power (Leaping, Flight) resolves against the *characteristic*
+        // template, not the power one — which is exactly why Leaping prices correctly at 1 point
+        // per 2m while Lack Of Weakness, in neither, priced at nothing.
+        const known = new Set([...Object.keys(template.powers ?? {}), ...Object.keys(template.characteristics ?? {})].map((key) => key.toUpperCase()));
+
+        // GENERIC_OBJECT is the framework container itself and has no template of its own.
+        const unknown = (character.powers as Obj[]).map((power) => String(power.xmlid).toUpperCase()).filter((id) => id !== 'GENERIC_OBJECT' && !known.has(id));
+
+        expect(unknown).toEqual([]);
+    });
+
+    it.each(cases)('%s / %s buys nothing for free', (name, _label, set) => {
+        // The other half of the same trap: a power that costs 0 is either a data error or a power
+        // that isn't there. Framework containers are priced by their reserve, so they're real.
+        const character = build(name, set);
+        const free = (character.powers as Obj[])
+            .filter((power) => {
+                try {
+                    return characterTraitDecorator.decorate(power, 'powers', () => character).realCost() === 0;
+                } catch {
+                    return true;
+                }
+            })
+            .map((power) => String(power.xmlid));
+
+        expect(free).toEqual([]);
     });
 
     it('states no cost anywhere in the data — every price is the engine’s', () => {
