@@ -96,14 +96,12 @@ describe('GenerateProvider', () => {
         expect(document.powers.length).toBeGreaterThan(0);
     });
 
-    it('reports what it built rather than implying a finished character', async () => {
+    it('builds a whole character — the full 250', async () => {
         const saved: SaveCharacter[] = [];
         const result = await generateOnce(saved, seededRng(5));
 
-        // Phase 3 is unfinished: no skills, no complications. The UI shows this, so it must not
-        // silently become the total.
         expect(result.total).toBe(250);
-        expect(result.spent).toBeLessThan(result.total);
+        expect(result.spent).toBe(result.total);
         expect(result.archetype).toBeTruthy();
     });
 

@@ -19,10 +19,9 @@
  * caller runs it through `heroDesignerCharacter.getCharacter()` and saves it exactly as an
  * imported `.hdc` is, so a generated character is indistinguishable from an imported one.
  *
- * **Incomplete while phase 3 is in progress.** A character carries characteristics, powers and
- * complications, but **no skills** — that data set is still legacy prose. So it spends 225 of a
- * Low Powered build's 250. {@link generateRandomCharacter} reports what it spent, so callers can
- * be honest about it rather than implying a finished character.
+ * A character now carries characteristics, powers, skills and complications — the full 250 of a
+ * Low Powered build. {@link generateRandomCharacter} still reports what it spent, so a caller can
+ * say so rather than assert it.
  */
 import type {ParsedCharacter} from 'core/hero';
 import type {Rng} from 'core/ports';
@@ -30,6 +29,7 @@ import {ARCHETYPES_5E, allocate, pick, SKILLSETS, SPECIAL_FX, type Archetype, ty
 import {buildCharacteristics} from './characteristics';
 import {attachComplications, COMPLICATION_SETS_5E, type ComplicationSet} from './complications';
 import {attachPowerset, powersetsFor, type Powerset} from './powerset';
+import {attachSkillset, structuredSkillset} from './skillset';
 import {LOW_POWERED_5E, type PowerLevel} from './powerLevel';
 
 export interface GeneratedCharacter {
@@ -38,6 +38,7 @@ export interface GeneratedCharacter {
     readonly archetype: string;
     readonly powerset: string;
     readonly complications: string;
+    readonly skillset: string;
     readonly specialFx: string;
     readonly level: PowerLevel;
     readonly budget: Budget;
@@ -49,19 +50,18 @@ export interface GeneratedCharacter {
 export const generatableArchetypes = (): Archetype[] => ARCHETYPES_5E.filter((archetype) => powersetsFor(archetype.name).length > 0);
 
 /**
- * The skillsets an authored powerset can absorb — **currently all of them**.
+ * The skillsets that can actually be rolled: those with a **structured** set, priced at the 25 the
+ * powersets are sized against.
  *
- * Every powerset is sized against a 25-point skills bucket, so a skillset costing anything else
- * would move the powers balance and leave the character short. `Warrior` used to state 28 (the
- * only one that did), which is what made this filter necessary; it was a data error and is now
- * 25, so nothing is excluded today.
- *
- * Kept as a guard rather than deleted: a future skillset that does not cost 25 should be left
- * out of the roll loudly here, not silently produce a character that misses its total.
+ * `Warrior` once stated 28 — the only one that did — and at 28 it fit nothing. Phil corrected it
+ * to 25, and structuring settled the question: its content really is dearer (a 5-point CSL,
+ * Defense Maneuver, Lightning Reflexes), so it reaches 25 only by dropping Concealment to a
+ * Familiarity. The 25 holds, but only just.
  */
 const SKILLSET_COST_THAT_FITS = 25;
 
-export const fittableSkillsets = (): typeof SKILLSETS => SKILLSETS.filter((skillset) => skillset.cost === SKILLSET_COST_THAT_FITS);
+export const fittableSkillsets = (): typeof SKILLSETS =>
+    SKILLSETS.filter((skillset) => skillset.cost === SKILLSET_COST_THAT_FITS && structuredSkillset(skillset.profession) !== undefined);
 
 /**
  * A random character at the given level. Throws if nothing is authored for that level yet,
@@ -81,7 +81,8 @@ export function generateRandomCharacter(rng: Rng, level: PowerLevel = LOW_POWERE
     const specialFx = pick(rng, SPECIAL_FX);
     const name = `${specialFx} ${archetype.name}`;
 
-    const parsed = attachComplications(attachPowerset(buildCharacteristics(archetype.characteristics, level.template, name), powerset), complications);
+    const built = attachSkillset(attachPowerset(buildCharacteristics(archetype.characteristics, level.template, name), powerset), structuredSkillset(skillset.profession)!);
+    const parsed = attachComplications(built, complications);
     const budget = allocate(level, archetype, skillset);
 
     return {
@@ -90,11 +91,12 @@ export function generateRandomCharacter(rng: Rng, level: PowerLevel = LOW_POWERE
         archetype: archetype.name,
         powerset: powerset.label,
         complications: complications.label,
+        skillset: skillset.profession,
         specialFx,
         level,
         budget,
-        // Skills are not built yet, so they are not counted as spent. Complications are taken at
-        // the fixed limit and fund the build rather than being spent out of it.
-        spent: budget.characteristics + budget.powers,
+        // Complications are taken at the fixed limit and fund the build rather than being spent
+        // out of it, so they are not counted here.
+        spent: budget.characteristics + budget.powers + budget.skills,
     };
 }

@@ -65,13 +65,13 @@ describe('generateRandomCharacter', () => {
         expect(generated.name).not.toContain('undefined');
     });
 
-    it('reports what it actually built, not what a finished character would cost', () => {
-        // Honest about phase 3 being unfinished: characteristics + powers, no skills or
-        // complications. If this ever equals the total, the message in the UI is a lie.
+    it('spends its whole total — characteristics, skills and powers', () => {
+        // Complications fund the build rather than being spent out of it, so they are not counted:
+        // the three spending buckets must come to the level's total on their own.
         const generated = generateRandomCharacter(seededRng(11));
 
-        expect(generated.spent).toBe(generated.budget.characteristics + generated.budget.powers);
-        expect(generated.spent).toBeLessThan(generated.level.total);
+        expect(generated.spent).toBe(generated.budget.characteristics + generated.budget.skills + generated.budget.powers);
+        expect(generated.spent).toBe(generated.level.total);
         expect(generated.level).toBe(LOW_POWERED_5E);
     });
 

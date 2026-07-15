@@ -58,6 +58,9 @@ const SKILL_DEFAULTS: Obj = {
     notes: null,
     familiarity: false,
     proficiency: false,
+    /** `null`, not absent: a missing `name` renders as the literal "undefined (Acting)" on the sheet. */
+    name: null,
+    levelsonly: false,
 };
 
 const withDefaults = (trait: Obj): Obj => ({...SKILL_DEFAULTS, ...trait});

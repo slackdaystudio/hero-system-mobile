@@ -1,6 +1,6 @@
 {
   "_comment": [
-    "5E skillsets, structured — the profession half of a Low Powered build (25 of its 250).",
+    "5E skillsets, structured \u2014 the profession half of a Low Powered build (25 of its 250).",
     "Authored from the legacy prose in skillsets.json, which stated a list of name strings and a",
     "hand-typed cost of 25.",
     "",
@@ -39,18 +39,910 @@
   "skillsets": [
     {
       "profession": "Actor/Actress",
-      "note": "Its seven skills at 3 plus 'SL: Interactive Skills +1' — a group level, SIMILAR at 5 — come to 26, one over. Seduction is dropped to a Proficiency (2, a flat 10- roll) to land on 25: an odd remainder, so `levels` (+2 steps) could not close it. Seduction is the least load-bearing of the seven for this profession.",
+      "note": "Its seven skills at 3 plus 'SL: Interactive Skills +1' \u2014 a group level, SIMILAR at 5 \u2014 come to 26, one over. Seduction is dropped to a Proficiency (2, a flat 10- roll) to land on 25: an odd remainder, so `levels` (+2 steps) could not close it. Seduction is the least load-bearing of the seven for this profession.",
       "buckets": {
         "skills": {
           "skill": [
-            {"xmlid": "ACTING", "characteristic": "PRE", "id": 401, "alias": "Acting", "position": 0, "basecost": 3},
-            {"xmlid": "CONVERSATION", "characteristic": "PRE", "id": 402, "alias": "Conversation", "position": 1, "basecost": 3},
-            {"xmlid": "DISGUISE", "characteristic": "INT", "id": 403, "alias": "Disguise", "position": 2, "basecost": 3},
-            {"xmlid": "MIMICRY", "characteristic": "INT", "id": 404, "alias": "Mimicry", "position": 3, "basecost": 3},
-            {"xmlid": "PERSUASION", "characteristic": "PRE", "id": 405, "alias": "Persuasion", "position": 4, "basecost": 3},
-            {"xmlid": "SEDUCTION", "characteristic": "PRE", "id": 406, "alias": "Seduction", "position": 5, "basecost": 2, "proficiency": true},
-            {"xmlid": "NAVIGATION", "characteristic": "INT", "id": 407, "alias": "Navigation", "position": 6, "basecost": 3, "input": "Air or Ground"},
-            {"xmlid": "SKILL_LEVELS", "id": 408, "alias": "Skill Levels", "position": 7, "levels": 1, "option": "SIMILAR", "optionid": "SIMILAR", "input": "Interactive Skills"}
+            {
+              "xmlid": "ACTING",
+              "characteristic": "PRE",
+              "id": 401,
+              "alias": "Acting",
+              "position": 0,
+              "basecost": 3
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "characteristic": "PRE",
+              "id": 402,
+              "alias": "Conversation",
+              "position": 1,
+              "basecost": 3
+            },
+            {
+              "xmlid": "DISGUISE",
+              "characteristic": "INT",
+              "id": 403,
+              "alias": "Disguise",
+              "position": 2,
+              "basecost": 3
+            },
+            {
+              "xmlid": "MIMICRY",
+              "characteristic": "INT",
+              "id": 404,
+              "alias": "Mimicry",
+              "position": 3,
+              "basecost": 3
+            },
+            {
+              "xmlid": "PERSUASION",
+              "characteristic": "PRE",
+              "id": 405,
+              "alias": "Persuasion",
+              "position": 4,
+              "basecost": 3
+            },
+            {
+              "xmlid": "SEDUCTION",
+              "characteristic": "PRE",
+              "id": 406,
+              "alias": "Seduction",
+              "position": 5,
+              "basecost": 2,
+              "proficiency": true
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "characteristic": "INT",
+              "id": 407,
+              "alias": "Navigation",
+              "position": 6,
+              "basecost": 3,
+              "input": "Air or Ground"
+            },
+            {
+              "xmlid": "SKILL_LEVELS",
+              "id": 408,
+              "alias": "Skill Levels",
+              "position": 7,
+              "levels": 1,
+              "option": "SIMILAR",
+              "optionid": "SIMILAR",
+              "input": "Interactive Skills",
+              "optionAlias": "with a group of similar Skills"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Entrepreneur",
+      "note": "Its seven skills at 3 plus 'Money: Well Off' (a WELL_OFF perk, 5) come to 26, one over. Trading drops to a Proficiency (2, a flat 10-) to land on 25 \u2014 an odd remainder, so levels (+2 steps) could not close it. Trading is the most redundant here beside Bribery and Persuasion.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "BRIBERY",
+              "alias": "Bribery",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 500
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "alias": "Bureaucratics",
+              "position": 1,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 501
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "alias": "Conversation",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 502
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 503
+            },
+            {
+              "xmlid": "ORATORY",
+              "alias": "Oratory",
+              "position": 4,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 504
+            },
+            {
+              "xmlid": "PERSUASION",
+              "alias": "Persuasion",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 505
+            },
+            {
+              "xmlid": "TRADING",
+              "alias": "Trading",
+              "position": 6,
+              "basecost": 2,
+              "characteristic": "PRE",
+              "proficiency": true,
+              "id": 506
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "WELL_OFF",
+              "alias": "Money",
+              "position": 0,
+              "basecost": 5,
+              "id": 507
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Investigator",
+      "note": "The CSL 'or' resolves to Ranged: an investigator carries a sidearm rather than fighting hand to hand (Phil: pick the one that fits, do not ask the player). CSL Ranged (5) plus seven skills at 3 is 26, one over, so Conversation drops to a Proficiency (2) \u2014 Criminology, Deduction and Shadowing are the profession, Conversation is not.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "COMBAT_LEVELS",
+              "alias": "Combat Skill Levels",
+              "position": 0,
+              "basecost": 0,
+              "levels": 1,
+              "option": "RANGED",
+              "optionid": "RANGED",
+              "input": "Ranged Combat",
+              "id": 508,
+              "optionAlias": "with Ranged Combat",
+              "characteristic": "GENERAL"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "alias": "Conversation",
+              "position": 1,
+              "basecost": 2,
+              "characteristic": "PRE",
+              "proficiency": true,
+              "id": 509
+            },
+            {
+              "xmlid": "CRIMINOLOGY",
+              "alias": "Criminology",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 510
+            },
+            {
+              "xmlid": "DEDUCTION",
+              "alias": "Deduction",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 511
+            },
+            {
+              "xmlid": "INTERROGATION",
+              "alias": "Interrogation",
+              "position": 4,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 512
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 513
+            },
+            {
+              "xmlid": "SHADOWING",
+              "alias": "Shadowing",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 514
+            },
+            {
+              "xmlid": "STREETWISE",
+              "alias": "Streetwise",
+              "position": 7,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 515
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Physician",
+      "note": "Comes to 27: six skills at 3, a PROFESSIONALLICENSE perk (1), and 'SL: Intellect Skills +1' as a SIMILAR group level (5). Forensic Medicine drops to a Familiarity (1, a flat 8-) to shed 2 \u2014 a practising physician knows of forensics without practising it, and an even remainder needs the 2-point lever. Navigation cannot carry it: NAVIGATION routes to SkillWithAdders, which overrides cost() and ignores familiarity/proficiency entirely, so it is always 3 here.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "DEDUCTION",
+              "alias": "Deduction",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 516
+            },
+            {
+              "xmlid": "FORENSIC_MEDICINE",
+              "alias": "Forensic Medicine",
+              "position": 1,
+              "basecost": 1,
+              "characteristic": "INT",
+              "id": 517,
+              "familiarity": true
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 518
+            },
+            {
+              "xmlid": "PARAMEDICS",
+              "alias": "Paramedics",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 519
+            },
+            {
+              "xmlid": "PROFESSIONAL_SKILL",
+              "alias": "PS",
+              "position": 4,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Physician",
+              "id": 520
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "alias": "SS",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Medicine",
+              "id": 521
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "alias": "SS",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined",
+              "id": 522
+            },
+            {
+              "xmlid": "SKILL_LEVELS",
+              "alias": "Skill Levels",
+              "position": 7,
+              "basecost": 0,
+              "levels": 1,
+              "option": "SIMILAR",
+              "optionid": "SIMILAR",
+              "input": "Intellect Skills",
+              "id": 523,
+              "optionAlias": "with a group of similar Skills"
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "PROFESSIONALLICENSE",
+              "alias": "FB",
+              "position": 0,
+              "basecost": 1,
+              "input": "Medical License",
+              "id": 524
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Playboy/Socialite",
+      "note": "Lands on 25 with nothing flexed, once 'Lang:' is read as a 2-point Fluent. Its 'Lang:' named no language (Phil: default to Player Defined), so the player names their own \u2014 this is one of the fields the editable-fields work should reach first.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "BRIBERY",
+              "alias": "Bribery",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 525
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "alias": "Bureaucratics",
+              "position": 1,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 526
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "alias": "Conversation",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 527
+            },
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "alias": "High Society",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 528
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "alias": "Language",
+              "position": 4,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT",
+              "id": 529
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 530
+            },
+            {
+              "xmlid": "SEDUCTION",
+              "alias": "Seduction",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 531
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "WELL_OFF",
+              "alias": "Money",
+              "position": 0,
+              "basecost": 5,
+              "id": 532
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Royalty",
+      "note": "Lands on 25 with nothing flexed, once 'Lang:' is read as a 2-point Fluent (Player Defined \u2014 see Playboy/Socialite). AK[INT]: Home Country is a KNOWLEDGE_SKILL at 3.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "alias": "AK",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Home Country",
+              "id": 533
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "alias": "Bureaucratics",
+              "position": 1,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 534
+            },
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "alias": "High Society",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 535
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "alias": "Language",
+              "position": 3,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT",
+              "id": 536
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 4,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 537
+            },
+            {
+              "xmlid": "ORATORY",
+              "alias": "Oratory",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 538
+            },
+            {
+              "xmlid": "TACTICS",
+              "alias": "Tactics",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 539
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "ARISTOCRACY",
+              "alias": "FB",
+              "position": 0,
+              "basecost": 5,
+              "input": "Member of the Aristocracy",
+              "id": 540
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Soldier",
+      "note": "Lands on 25 with nothing flexed, once 'Lang:' is read as a 2-point Fluent (Player Defined). The CSL 'or' resolves to Ranged \u2014 a soldier's weapon is a rifle.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "BUREAUCRATICS",
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 541
+            },
+            {
+              "xmlid": "COMBAT_LEVELS",
+              "alias": "Combat Skill Levels",
+              "position": 1,
+              "basecost": 0,
+              "levels": 1,
+              "option": "RANGED",
+              "optionid": "RANGED",
+              "input": "Ranged Combat",
+              "id": 542,
+              "optionAlias": "with Ranged Combat",
+              "characteristic": "GENERAL"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "alias": "Concealment",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 543
+            },
+            {
+              "xmlid": "DEMOLITIONS",
+              "alias": "Demolitions",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 544
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "alias": "Language",
+              "position": 4,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT",
+              "id": 545
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 546
+            },
+            {
+              "xmlid": "SYSTEMS_OPERATION",
+              "alias": "Systems Operation",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 547
+            },
+            {
+              "xmlid": "TACTICS",
+              "alias": "Tactics",
+              "position": 7,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 548
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Spy",
+      "note": "Lands on 25 with nothing flexed, once 'Lang:' is read as a 2-point Fluent (Player Defined). Cramming is a 5-point talent-like skill, which is what absorbs the difference against the other sets.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "ACTING",
+              "alias": "Acting",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 549
+            },
+            {
+              "xmlid": "CRAMMING",
+              "alias": "Cramming",
+              "position": 1,
+              "basecost": 5,
+              "id": 550
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "alias": "Conversation",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 551
+            },
+            {
+              "xmlid": "CRYPTOGRAPHY",
+              "alias": "Cryptography",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 552
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "alias": "Language",
+              "position": 4,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT",
+              "id": 553
+            },
+            {
+              "xmlid": "LOCKPICKING",
+              "alias": "Lockpicking",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "DEX",
+              "id": 554
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 555
+            },
+            {
+              "xmlid": "SEDUCTION",
+              "alias": "Seduction",
+              "position": 7,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 556
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Technician",
+      "note": "Its seven skills at 3 plus 'SL: Intellect Skills +1' as a SIMILAR group level (5) come to 26, one over. Bugging drops to a Proficiency (2) \u2014 it is the narrowest of the seven, and Electronics/Mechanics/Security Systems are the profession.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "BUGGING",
+              "alias": "Bugging",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "proficiency": true,
+              "id": 557
+            },
+            {
+              "xmlid": "COMPUTER_PROGRAMMING",
+              "alias": "Computer Programming",
+              "position": 1,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 558
+            },
+            {
+              "xmlid": "ELECTRONICS",
+              "alias": "Electronics",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 559
+            },
+            {
+              "xmlid": "MECHANICS",
+              "alias": "Mechanics",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 560
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 4,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 561
+            },
+            {
+              "xmlid": "SECURITY_SYSTEMS",
+              "alias": "Security Systems",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 562
+            },
+            {
+              "xmlid": "SYSTEMS_OPERATION",
+              "alias": "Systems Operation",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 563
+            },
+            {
+              "xmlid": "SKILL_LEVELS",
+              "alias": "Skill Levels",
+              "position": 7,
+              "basecost": 0,
+              "levels": 1,
+              "option": "SIMILAR",
+              "optionid": "SIMILAR",
+              "input": "Intellect Skills",
+              "id": 564,
+              "optionAlias": "with a group of similar Skills"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Warrior",
+      "note": "The set that prompted the Warrior=25 correction, and it does reach 25 \u2014 but only just. The CSL 'or' resolves to HTH: a warrior fights hand to hand. CSL HTH (5) + Defense Maneuver (3) + Lightning Reflexes (1) + five skills at 3 is 27, so Concealment drops to a Familiarity (1, a flat 8-) to shed 2. Its content really is dearer than an ordinary set's, which is why its label stated 28; at 25 something has to give, and Concealment is the least warrior-ish of its skills.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "COMBAT_LEVELS",
+              "alias": "Combat Skill Levels",
+              "position": 0,
+              "basecost": 0,
+              "levels": 1,
+              "option": "HTH",
+              "optionid": "HTH",
+              "input": "HTH Combat",
+              "id": 565,
+              "optionAlias": "with HTH Combat",
+              "characteristic": "GENERAL"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "alias": "Concealment",
+              "position": 1,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true,
+              "id": 566
+            },
+            {
+              "xmlid": "DEFENSE_MANEUVER",
+              "alias": "Defense Maneuver",
+              "position": 2,
+              "basecost": 0,
+              "option": "ONE",
+              "optionid": "ONE",
+              "id": 567,
+              "optionAlias": "One Maneuver"
+            },
+            {
+              "xmlid": "INTERROGATION",
+              "alias": "Interrogation",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 568
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 4,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 569
+            },
+            {
+              "xmlid": "ORATORY",
+              "alias": "Oratory",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "id": 570
+            },
+            {
+              "xmlid": "PARAMEDICS",
+              "alias": "Paramedics",
+              "position": 6,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 571
+            },
+            {
+              "xmlid": "TRACKING",
+              "alias": "Tracking",
+              "position": 7,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 572
+            }
+          ]
+        },
+        "talents": {
+          "talent": [
+            {
+              "xmlid": "LIGHTNING_REFLEXES_SINGLE",
+              "alias": "Lightning Reflexes",
+              "position": 0,
+              "basecost": 0,
+              "levels": 1,
+              "display": "Lightning Reflexes: Single Action",
+              "id": 573
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Scientist",
+      "note": "Comes to 26, one over: three Science Skills at 3, Inventor and Computer Programming at 3, Navigation at 3, plus Eidetic Memory (5) and Lightning Calculator (3) as talents. Computer Programming drops to a Proficiency (2) \u2014 an odd remainder, so only the 1-point lever fits. NOTE: the legacy prose also lists 'Scientist', which is a skill ENHANCER (it discounts Science Skills) rather than a skill; it is omitted, as including it would push the set to 29 with no room to come back. Its three 'SS[INT]:' entries named no science, so they are Player Defined.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "COMPUTER_PROGRAMMING",
+              "alias": "Computer Programming",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "id": 574,
+              "proficiency": true
+            },
+            {
+              "xmlid": "INVENTOR",
+              "alias": "Inventor",
+              "position": 1,
+              "basecost": 3,
+              "characteristic": "INT",
+              "id": 575
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "alias": "Navigation",
+              "position": 2,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Air or Ground",
+              "id": 576
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "alias": "SS",
+              "position": 3,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined",
+              "id": 577
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "alias": "SS",
+              "position": 4,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined",
+              "id": 578
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "alias": "SS",
+              "position": 5,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined",
+              "id": 579
+            }
+          ]
+        },
+        "talents": {
+          "talent": [
+            {
+              "xmlid": "EIDETIC_MEMORY",
+              "alias": "Eidetic Memory",
+              "position": 0,
+              "basecost": 5,
+              "id": 580
+            },
+            {
+              "xmlid": "LIGHTNING_CALCULATOR",
+              "alias": "Lightning Calculator",
+              "position": 1,
+              "basecost": 3,
+              "id": 581
+            }
           ]
         }
       }

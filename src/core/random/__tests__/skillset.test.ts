@@ -23,7 +23,19 @@ import {LOW_POWERED_5E} from '../powerLevel';
 type Obj = Record<string, any>;
 
 /** Professions with a structured skillset. The other ten are still legacy name strings. */
-const AUTHORED = ['Actor/Actress'];
+const AUTHORED = [
+    'Actor/Actress',
+    'Entrepreneur',
+    'Investigator',
+    'Physician',
+    'Playboy/Socialite',
+    'Royalty',
+    'Soldier',
+    'Spy',
+    'Technician',
+    'Warrior',
+    'Scientist',
+];
 
 const build = (skillset: StructuredSkillset): Obj => {
     const archetype = ARCHETYPES_5E.find((candidate) => candidate.name === 'Energy Projector')!;
@@ -32,19 +44,25 @@ const build = (skillset: StructuredSkillset): Obj => {
     return heroDesignerCharacter.getCharacter(parsed) as unknown as Obj;
 };
 
-const rows = (character: Obj): Array<{xmlid: string; cost: number; roll: string | null}> =>
-    (character.skills as Obj[]).map((skill) => {
-        const decorated = characterTraitDecorator.decorate(skill, 'skills', () => character);
+const rows = (character: Obj, bucket = 'skills'): Array<{xmlid: string; cost: number; roll: string | null}> =>
+    ((character[bucket === 'skills' ? 'skills' : bucket] ?? []) as Obj[]).map((trait) => {
+        const decorated = characterTraitDecorator.decorate(trait, bucket, () => character);
 
-        return {xmlid: String(skill.xmlid), cost: decorated.cost(), roll: (decorated.roll()?.roll as string) ?? null};
+        return {xmlid: String(trait.xmlid), cost: decorated.cost(), roll: (decorated.roll()?.roll as string) ?? null};
     });
 
-const total = (character: Obj): number => rows(character).reduce((sum, row) => sum + row.cost, 0);
+/**
+ * The prose's "skills" is a catch-all: a set's 25 is spread over `skills`, `perks` and `talents`.
+ * Counting only `skills` makes any set with a perk look short by exactly it — Entrepreneur's
+ * `Money: Well Off` is 5 of its 25.
+ */
+const total = (character: Obj): number =>
+    ['skills', 'perks', 'talents'].reduce((sum, bucket) => sum + rows(character, bucket).reduce((n, row) => n + row.cost, 0), 0);
 
 describe('structured skillsets — 5E Low Powered', () => {
     it('tracks which professions are authored', () => {
         expect(SKILLSETS_5E.map((skillset) => skillset.profession)).toEqual(AUTHORED);
-        expect(structuredSkillset('Warrior')).toBeUndefined();
+        expect(structuredSkillset('Warrior')).toBeDefined();
     });
 
     /**

@@ -278,10 +278,9 @@ silently reshaping an archetype.
       authoring spec.
 - [ ] **Phase 3 — 5E powersets + skills + complications.** *(powersets done — 11 of 11)* Every
       archetype has a structured powerset, and each costs its balance **exactly**, checked
-      automatically for all of them. **Complications are done too** — all four packages total
-      exactly the 100-point limit, priced from their adders, and every generated character
-      carries one. Remaining: **skills are still name strings**, which is the whole of the
-      225-of-250 gap. Scoped below, with three blockers.
+      automatically for all of them. **Complications and skills are done too** — all four
+      complication packages total exactly the 100-point limit, and all eleven skillsets total
+      exactly 25. **A generated character now spends its full 250.**
 - [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,
@@ -482,9 +481,29 @@ independently produces the flat `10-` roll, confirming the rule against the data
 an error, so the sheet would show a blank roll column. Actor/Actress rolls 12-/13- off PRE and
 INT once it is set.
 
-**1 of 11 authored.** The remaining ten are each a small constraint-solve: price the listed
-skills, then close the gap with a Proficiency, a Familiarity, or levels — recording which, and
-why, in the set's `note`.
+**All 11 authored, each exactly 25.** How they landed:
+
+| Outcome | Sets | What it took |
+|---------|------|--------------|
+| **25 as listed** | Playboy/Socialite, Royalty, Soldier, Spy | nothing — once `Lang:` is read as a 2-point **Fluent** |
+| **26 → one Proficiency** | Actor/Actress, Entrepreneur, Investigator, Technician, Scientist | −1, an odd remainder only Familiarity/Proficiency can close |
+| **27 → one Familiarity** | Physician, Warrior | −2 |
+
+Four landing on 25 dead with `Lang:` = Fluent (2) is good evidence that is what it always meant.
+
+**The Warrior question is settled.** Its 28 was corrected to 25 on the reading that it was a typo,
+and structuring tested that: its content *really is* dearer — a 5-point CSL, Defense Maneuver, and
+Lightning Reflexes — and it reaches 25 only by dropping Concealment to a Familiarity. The 25
+holds, but only just, which is presumably why someone once wrote 28.
+
+**Two more silent-zero traps**, both the same class as the `skillLevels` sub-key:
+
+- **`NAVIGATION` cannot be a Familiarity or Proficiency.** It routes to `SkillWithAdders`, which
+  overrides `cost()` and ignores both flags — it is always 3. Physician's flex had to move to
+  Forensic Medicine.
+- **A skill needs `name: null`, not a missing `name`** — the sheet renders the literal
+  `"undefined (Acting)"` otherwise. And `COMBAT_LEVELS`/`SKILL_LEVELS` need an **`optionAlias`**
+  (`"with Ranged Combat"`), or the row reads `+1 undefined`.
 
 **4. `cost: 25` is declared, and structuring will test it.** Same shape as `characteristicsCost`,
 which was wrong twice, and as `Warrior`'s 28 — corrected to 25 on the reading that it was a typo.

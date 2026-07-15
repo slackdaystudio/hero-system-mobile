@@ -137,13 +137,7 @@ export function AppNavigator(): React.JSX.Element {
     );
 }
 
-/**
- * Header action that generates a random character and opens it (docs/RANDOM_CHARACTER.md).
- *
- * A **preview** while phase 3 is in progress: only archetypes with structured powersets can be
- * rolled, and a generated character has no skills or complications yet — so it says what it
- * actually built rather than implying a finished character.
- */
+/** Header action that generates a random character and opens it (docs/RANDOM_CHARACTER.md). */
 function GenerateButton({onGenerated}: {onGenerated: (result: GenerateResult) => void}): React.JSX.Element {
     const theme = useTheme();
     const generateCharacter = useGenerateCharacter();
@@ -157,9 +151,7 @@ function GenerateButton({onGenerated}: {onGenerated: (result: GenerateResult) =>
         try {
             const result = await generateCharacter();
 
-            Alert.alert(result.name, `${result.archetype} — ${result.spent} of ${result.total} points.\n\nSkills and complications aren't generated yet.`, [
-                {text: 'View', onPress: () => onGenerated(result)},
-            ]);
+            Alert.alert(result.name, `${result.archetype} — ${result.spent} of ${result.total} points.`, [{text: 'View', onPress: () => onGenerated(result)}]);
         } catch (error) {
             Alert.alert('Generate failed', error instanceof Error ? error.message : 'That character could not be generated.');
         } finally {
