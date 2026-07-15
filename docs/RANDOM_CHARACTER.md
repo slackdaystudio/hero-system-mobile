@@ -40,12 +40,24 @@ engine cost the result.
 
 | # | Decision | Choice |
 |---|---|---|
+| 0 | Alternate identity | **None.** Every power is `affectsPrimary` + `affectsTotal` — a generated character's powers always apply |
 | 1 | Output shape | Generate a **`ParsedCharacter`** — the `.hdc`-shaped *input* — not a finished character |
 | 2 | 250 vs 400 | **Two editions**: 250 = 5E, 400 = 6E. Not a scaling knob |
 | 3 | Power generation | **Curated shapes, random selection.** Structured powersets per archetype; flex `levels` to fit |
 | 4 | Legality | **Legal by construction**, engine as the cost oracle, thin validator for the rest |
 | 5 | Randomness | Via the existing `Rng` port — seedable, therefore testable and fuzzable |
 | 6 | Persistence | None new. A generated character saves through `characterRepository`, exactly as an import does |
+
+### 0 — A generated character has no alternate identity
+
+So every power is `affectsPrimary: true, affectsTotal: true`: they always apply. Imported
+characters often carry `affectsPrimary: false` on defensive powers, and it is tempting to copy —
+but that marks a power **alternate-form only**, which is something a player decided about *their*
+character, not a default.
+
+Consequences, all pinned in `powerset.test.ts`: a generated character totals identically in both
+forms, carries no `OIHID` trait, and so the sheet offers it no Alternate Identity toggle — which
+is right, as it has no second identity to toggle to.
 
 ### 1 — Generate the input, not the output
 

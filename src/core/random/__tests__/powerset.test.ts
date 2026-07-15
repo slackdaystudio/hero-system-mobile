@@ -98,6 +98,32 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
         expect(powersetsFor('Brick')).toEqual([]);
     });
 
+    describe('a generated character has no alternate identity', () => {
+        // So every power is affectsPrimary + affectsTotal: they always apply. Imported characters
+        // often carry affectsPrimary: false on defences, but that marks them alternate-form only
+        // — a decision a player made about their character, not a default to copy.
+        it('marks every power as always-on', () => {
+            expect((build(0).powers as Obj[]).every((power) => power.affectsPrimary && power.affectsTotal)).toBe(true);
+        });
+
+        it('totals the same in both forms, so there is nothing to toggle', () => {
+            const character = build(0);
+            const totals = (showSecondary: boolean) => {
+                character.showSecondary = showSecondary;
+
+                return ['PD', 'ED', 'STR', 'SPD'].map((shortName) => heroDesignerCharacter.getCharacteristicTotal(shortName, character));
+            };
+
+            expect(totals(false)).toEqual(totals(true));
+        });
+
+        it('carries no Only-In-Alternate-Identity trait', () => {
+            // The OIHID limitation is what earns a character the sheet's Alternate Identity
+            // toggle; a generated one has no second identity, so it must have none.
+            expect(JSON.stringify(build(0).powers)).not.toContain('OIHID');
+        });
+    });
+
     it('declares every knowingly-loose corner of the build — currently none', () => {
         // Faithfulness to the legacy prose beats invented precision, so approximations are
         // allowed — but they must be declared, never smuggled in. Pinning the list means a new

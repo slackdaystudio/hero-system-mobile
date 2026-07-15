@@ -47,6 +47,14 @@ export interface Powerset {
 /**
  * Cosmetic fields every HERO Designer power carries. Kept out of the data so a powerset entry
  * says only what matters — the rest is noise inherited from the `.hdc` format.
+ *
+ * `affectsPrimary` / `affectsTotal` are **not** cosmetic, and both are `true` deliberately:
+ * a generated character has no alternate identity, so its powers always apply. Imported
+ * characters often carry `affectsPrimary: false` on defensive powers — that marks them as
+ * alternate-form only, which is a thing a *player* decided about *their* character, not a
+ * default. Consequence: a generated character's totals are identical in both forms and the
+ * sheet offers no Alternate Identity toggle, which is correct — it has no second identity to
+ * toggle to.
  */
 const POWER_DEFAULTS: Obj = {
     basecost: 0,
