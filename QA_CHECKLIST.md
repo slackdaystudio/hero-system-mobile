@@ -75,3 +75,13 @@ native module (`npm run android`).
 
 ## Migration (if testing over a legacy install)
 - [ ] First launch imported your legacy characters + settings + stats.
+
+## Upgrading over the previous build (2.5.0: schema 4 → 5, first time on a device)
+- [ ] Install the **previous** build first, import a character or two, roll a random one.
+- [ ] Install this build over the top → every character is still there, opens, and renders.
+- [ ] The random character you rolled on the old build is **still editable** (migration 005
+      backfills edit rights from the `generated-` id prefix — that's the only thing carrying
+      them over).
+- [ ] An imported `.hdc` shows **no** edit card.
+- [ ] Costs may differ from 2.4.1 on imported characters — that's H3–H10/U2 landing, not a
+      regression. Spot-check one against HERO Designer before reporting it.
