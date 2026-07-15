@@ -60,24 +60,45 @@ disagreeing with the engine about it.
 ### 2 — 250 is 5E, 400 is 6E
 
 The legacy archetype data is 5E throughout: it has `com` (Comeliness, deleted in 6E) and
-figured characteristics. 250 is classic 5E Champions; 400 is standard 6E superheroic. These are
-different rulesets — different characteristic costs, no figured stats in 6E — so this is an
-**edition fork, not a multiplier**.
+figured characteristics. These are different rulesets — different characteristic costs, no
+figured stats in 6E — so this is an **edition fork, not a multiplier**.
+
+#### A ceiling is a power level, not a number
+
+This is the part that is easy to get wrong (and was, first time round). A build is a
+**(base points, disadvantage limit)** pair, and what the buckets spend is the *sum*:
+
+| 5E power level | Base | Disads | **Total spend** |
+|----------------|------|--------|-----------------|
+| Low Powered Superheroic | 150 | 100 | **250** |
+| Standard Superheroic | 200 | 150 | **350** |
+
+**The legacy templates are Low Powered Superheroic (150/100).** That is what makes them
+internally consistent, and it is why they are a legal build rather than a sloppy one:
+
+```
+chars 100 + powers 125 + skills 25 = 250   ✓ every archetype
+disadvantage packages              = 100   ✓ all four
+```
+
+Disadvantages are taken at the **fixed limit** — in theory you may take fewer; in practice
+nobody does — so the limit is a constant, not a variable to solve for.
 
 The engine already handles both, and the fork is one string:
 
-| Ceiling | Edition | `ParsedCharacter.template` |
-|---------|---------|----------------------------|
-| 250     | 5E      | `builtIn.Superheroic.hdt`   |
-| 400     | 6E      | `builtIn.Superheroic6E.hdt` |
+| Ceiling | Edition | Power level | `ParsedCharacter.template` |
+|---------|---------|-------------|----------------------------|
+| 250     | 5E      | Low Powered Superheroic, 150/100 | `builtIn.Superheroic.hdt`   |
+| 400     | 6E      | **TBD** — need the base/complication split | `builtIn.Superheroic6E.hdt` |
 
 Both ids are already resolved by `getTemplate` and golden-mastered (26 of the 37 fixtures use
 one or the other). Emitting the right string drives `isFifth`, the characteristic set, and every
 cost in the engine.
 
 **Cost of this decision:** two archetype sets and two powerset sets. 5E lifts from the legacy
-data; **6E must be authored from scratch** — 11 archetypes and their powersets. That authoring
-is the bulk of this project, and it is content work, not engineering.
+data **as-is** — it is already a coherent Low Powered set and needs no resizing. **6E must be
+authored from scratch** — 11 archetypes and their powersets. That authoring is the bulk of this
+project, and it is content work, not engineering.
 
 ### 3 — Strict cutoffs as sub-budgets
 
@@ -88,8 +109,22 @@ their own `cost`. (The budget is now *computed* from each spread rather than dec
 below.)
 
 Each bucket is an independent sub-budget, which is what makes generation tractable: hitting a
-400-point total by rolling dice and hoping is a bad search; hitting 100 points of characteristics
+250-point total by rolling dice and hoping is a bad search; hitting 100 points of characteristics
 against a profile is not.
+
+**The model is already latent in the legacy data.** `powers = total − chars − skills` reproduces
+its powerset sizes exactly, which is strong evidence the cutoffs were the original's design too:
+
+| Archetype | chars | balance | legacy powerset |
+|-----------|-------|---------|-----------------|
+| Energy Projector | 100 | 125 | **125** ✓ |
+| Patriot | 125 | 100 | **100** ✓ |
+| Speedster | 125 | 100 | **100** ✓ |
+| Brick | 150 | 75 | **75** ✓ |
+
+So the powerset flexes to fill whatever the balance is, which is also how the two corrected
+archetypes absorb cleanly: Gadgeteer (93) takes a 132-point balance, Powered Armor (103) takes
+122. Worth a look in phase 2: `Martial Artist` states 115 where the balance implies 125.
 
 ### 4 — Legal by construction
 
