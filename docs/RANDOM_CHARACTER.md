@@ -358,12 +358,12 @@ Two things make them harder:
 Both resolved typos were **the same error** — an elemental-control slot priced as if it were
 standalone — which is worth knowing when the remaining three are looked at.
 
-**1b. Patriot is blocked by an engine bug, not a data one.** Its powerset prices `ES: PER +1`
-at 3 — the template's `allcost` — but the engine prices Enhanced Perception at 1 per level,
-ignoring `allcost`/`groupcost`/`sensecost` entirely. Logged as **H9** in
-`docs/KNOWN_DEVIATIONS.md`; `adamantine` is mispriced by it too (9 where the rules say 27). Fix
-H9 and Patriot follows. Pleasingly, the archetype prose is independent evidence for the fix — it
-prices a +1 to all senses at 3, siding with the template against the code.
+**1b. ~~Patriot is blocked by an engine bug~~ — resolved.** Its powerset priced `ES: PER +1` at 3
+while the engine said 1: Enhanced Perception ignored the template's `allcost`. Fixed as **H9**
+(`docs/KNOWN_DEVIATIONS.md`); `adamantine` was mispriced by it too (9 where the rules say 27).
+Patriot is now authored and costs its balance exactly. Worth noting the archetype prose was
+independent evidence for that fix — written a decade ago, it prices a +1 to all senses at 3,
+siding with the template against the code.
 
 **2. One structural gap** left, now that Multiform is dropped:
 

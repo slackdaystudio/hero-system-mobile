@@ -368,5 +368,67 @@
         "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Metamorph", "position": 2, "basecost": 15}]
       }
     }
+  ],
+  "Patriot": [
+    {
+      "label": "Sentinel",
+      "approximations": [
+        {
+          "power": "Shield Work",
+          "note": "Legacy prose says 'Missile Deflection [All Ranged Attacks] +5\"' at 3u, i.e. 30 real. The [All Ranged Attacks] is the ANY option (20), but nothing in the template represents a '+5\"' — missiledeflection's only adders are REFLECTION (20) and ANYTARGET (10). ANYTARGET is the sole route to the remaining 10, so it stands in for the +5\". That changes what the power *does* (reflect at any target, rather than whatever +5\" meant) while keeping what it costs. Revisit if the +5\" is ever decoded."
+        }
+      ],
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Battle Plate", "position": 0, "levels": 16, "pdlevels": 8, "edlevels": 8},
+
+          {"xmlid": "ENERGYBLAST", "id": 111, "parentid": 110, "alias": "Energy Blast", "name": "Shield Throw", "position": 1, "levels": 10, "ultraSlot": true},
+          {
+            "xmlid": "MISSILEDEFLECTION",
+            "id": 113,
+            "parentid": 110,
+            "alias": "Missile Deflection",
+            "name": "Shield Work",
+            "position": 3,
+            "levels": 0,
+            "basecost": 20,
+            "option": "ANY",
+            "optionid": "ANY",
+            "adder": {"xmlid": "ANYTARGET", "alias": "Reflect At Any Target", "basecost": 10, "levels": 0},
+            "ultraSlot": true
+          },
+          {"xmlid": "ENHANCEDPERCEPTION", "id": 130, "alias": "Enhanced Perception", "name": "Battle Sense", "position": 6, "levels": 1, "option": "ALL", "optionid": "ALL"}
+        ],
+        "leaping": [
+          {
+            "xmlid": "LEAPING",
+            "id": 112,
+            "parentid": 110,
+            "alias": "Leaping",
+            "name": "Vault",
+            "position": 2,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
+            "ultraSlot": true
+          }
+        ],
+        "running": [
+          {
+            "xmlid": "RUNNING",
+            "id": 114,
+            "parentid": 110,
+            "alias": "Running",
+            "name": "Charge",
+            "position": 4,
+            "levels": 5,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
+            "ultraSlot": true
+          },
+          {"xmlid": "RUNNING", "id": 131, "alias": "Running", "name": "Conditioning", "position": 7, "levels": 4}
+        ],
+        "str": [{"xmlid": "STR", "id": 115, "parentid": 110, "alias": "STR", "name": "Surge", "position": 5, "levels": 30, "ultraSlot": true}],
+        "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Shield Tricks", "position": 1, "basecost": 50}]
+      }
+    }
   ]
 }

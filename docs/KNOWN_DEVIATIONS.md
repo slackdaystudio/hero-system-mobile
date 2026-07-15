@@ -45,7 +45,7 @@
 | H6 | Unusual-defense duplicates read off the collapsed array | ✅ **fixed** — was real bug, active | yes — defensor, m-championsmush | hero query (re-based) |
 | H7 | Resistant Protection's `mdlevels` fed *every* unusual-defense total | ✅ **fixed** — was real bug, active | yes — defensor, adamantine | hero query (re-based) |
 | H8 | Unusual defenses ignored `affectsPrimary`/`affectsTotal` | ✅ **fixed** — was real bug, active | **yes — 14 fixtures (base form)** | hero query (re-based) |
-| H9 | Enhanced Perception ignores `allcost`/`groupcost`/`sensecost` | **real bug, active** | yes — adamantine (9 where the rules say 27) | none (legacy equally wrong) |
+| H9 | Enhanced Perception ignores `allcost` | ✅ **fixed** — was real bug, active | yes — adamantine (9→27), jane-fawn (2→6) | traits (decorator, re-based) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -236,7 +236,35 @@ powers, tracking resistant points separately.
 - **Pinned by:** `core/hero/__tests__/unusualDefenses.test.ts`; golden master skips these
   queries via `UNUSUAL_DEFENSE_DIVERGENCE`.
 
-## H9 — Enhanced Perception ignores what it enhances (**active bug**)
+## H9 — Enhanced Perception ignores what it enhances — ✅ FIXED
+
+**Fixed**, and not where the entry below guessed. The cost never reached
+`enhancedPerception.ts` at all: `powerDecorator` wraps it in **`SenseAffectingPower`**, which is
+the outer decorator and overrides `cost()`. That class *did* read `groupcost` and `sensecost` —
+it simply had no branch for `ALL`, so `isGroup('ALL')` was false and an all-senses power fell
+through to the **sense** branch at 1 point a level.
+
+`SenseAffectingPower` now tallies `all`/`group`/`sense` and prices each from its own template
+field, for the power's own option and for its adders alike.
+
+- **Corrected values** (from the rules, not legacy): `adamantine` 9 → **27** (9 levels ×
+  `allcost` 3), `jane-fawn` 2 → **6**. Pinned in `traits/__tests__/enhancedPerception.test.ts`;
+  the decorator golden master skips just these two via `H9_COST_DIVERGENCE` and still compares
+  their `roll()`, which was never wrong.
+- **Guarded, deliberately:** of the five powers routed through `SenseAffectingPower` (`CONCEALED`,
+  `ENHANCEDPERCEPTION`, `MICROSCOPIC`, `RAPID`, `TELESCOPIC`) **only Enhanced Perception has an
+  `allcost`**. So `ALL` counts as all-senses *only where the template prices it*; the others keep
+  legacy's behaviour rather than being handed a price the rules data never stated for them. The
+  `?? 0` on `allcost` is load-bearing for the same reason — `0 * undefined` is `NaN`.
+- **Two sources agreed against the code**, which is what made the fix safe without an oracle: the
+  template's own `allcost: 3`, and the legacy archetype prose, which independently prices
+  `ES: PER +1` at 3.
+- **Unblocked the random character generator** — `Patriot`'s powerset now costs its balance
+  exactly, with `ES: PER +1` finally priced at 3.
+
+### Original entry (for reference)
+
+## H9 (original) — Enhanced Perception ignores what it enhances (**active bug**)
 
 - **Where:** `core/traits/powers/enhancedPerception.ts` overrides only `roll()`. Its cost falls
   through to `TraitDecorator`, which prices `basecost + round((levels / lvlval) * lvlcost)` —

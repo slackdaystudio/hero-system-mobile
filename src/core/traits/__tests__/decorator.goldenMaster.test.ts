@@ -78,6 +78,20 @@ const U2_DIVERGENCE: Record<string, Set<string>> = {
     'mark-li-v5a-433': new Set(['Gecko pads']),
 };
 
+/**
+ * H9 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy priced Enhanced Perception at a
+ * flat 1 per level, never reading the template's `allcost`, so a +1 to *every* sense group cost
+ * the same as a +1 to one sense. Keyed by fixture → trait xmlid (these have no `name`).
+ *   - `adamantinerebuild210109` — `levels: 9`, `optionid: ALL`: 9 → **27** (9 × allcost 3)
+ *   - `jane-fawn` — `levels: 2`, `optionid: ALL`: 2 → **6**
+ * Only the cost diverges; `roll()` is untouched and stays compared. Corrected values are pinned
+ * in `enhancedPerception.test.ts`.
+ */
+const H9_COST_DIVERGENCE: Record<string, Set<string>> = {
+    adamantinerebuild210109: new Set(['ENHANCEDPERCEPTION']),
+    'jane-fawn': new Set(['ENHANCEDPERCEPTION']),
+};
+
 describe('golden master: core/traits factory reproduces legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
@@ -100,9 +114,11 @@ describe('golden master: core/traits factory reproduces legacy', () => {
                 const legacy = legacyDecorator.decorate(trait, key, getCharacter);
                 const ported = core.decorate(trait, key, getCharacter);
 
-                expect(ported.cost()).toBe(legacy.cost());
-                expect(ported.activeCost()).toBe(legacy.activeCost());
-                expect(ported.realCost()).toBe(legacy.realCost());
+                if (!(H9_COST_DIVERGENCE[name]?.has(String(trait.xmlid).toUpperCase()) ?? false)) {
+                    expect(ported.cost()).toBe(legacy.cost());
+                    expect(ported.activeCost()).toBe(legacy.activeCost());
+                    expect(ported.realCost()).toBe(legacy.realCost());
+                }
 
                 // Only roll() diverges for H4 — the costs still match legacy exactly.
                 if (!H4_ROLL_DIVERGENCE[name]?.has(String(trait.xmlid).toUpperCase())) {
