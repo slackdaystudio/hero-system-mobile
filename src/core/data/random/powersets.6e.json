@@ -983,5 +983,119 @@
         ]
       }
     }
+  ],
+  "Speedster": [
+    {
+      "label": "Blur",
+      "_note": "Kinetic — Phil's own SPD 7 / DEX 26 speedster — is the model, and its Rule of X breakdown IS the archetype: it buys SPD +8.00 and DCV +2.50, then pays for them with a weak attack (-5.00), thin defences (-2.12/-1.94) and a collapsed dAP term (-3.98). Fast, fragile, hits softly.\n\nTwo things Kinetic taught that guesswork got wrong. Its OCV is 10: a speedster hits often AND accurately, and the debt for SPD 7 is paid in damage and defence, not in aim — authored at OCV 7, this came in at -10.2%. And its velocity is 40, the campaign baseline: Phil's own speedster is not faster than the norm, it just acts more often. SPD is the archetype; Running is scenery.\n\nNo Desolidification: a speedster that also walks through walls is two archetypes, and it didn't fit once the CVs were bought. The vibration survives in its cheaper forms — Deflection and Damage Negation.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "RUNNING",
+            "id": 701,
+            "alias": "Running",
+            "name": "Blur",
+            "position": 0,
+            "levels": 34
+          },
+          {
+            "xmlid": "HANDTOHANDATTACK",
+            "id": 702,
+            "alias": "Hand-To-Hand Attack",
+            "name": "Flurry Of Blows",
+            "position": 1,
+            "levels": 8,
+            "addstr": true
+          },
+          {
+            "xmlid": "PD",
+            "id": 703,
+            "alias": "PD",
+            "name": "Wiry",
+            "position": 2,
+            "levels": 3,
+            "basecost": 0
+          },
+          {
+            "xmlid": "ED",
+            "id": 704,
+            "alias": "ED",
+            "name": "Wiry",
+            "position": 3,
+            "levels": 3,
+            "basecost": 0
+          },
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 705,
+            "alias": "Resistant Protection",
+            "name": "Kinetic Sheath",
+            "position": 4,
+            "levels": 16,
+            "pdlevels": 8,
+            "edlevels": 8,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "MISSILEDEFLECTION",
+            "id": 707,
+            "alias": "Deflection",
+            "name": "Outrun The Bullet",
+            "position": 6,
+            "levels": 0,
+            "basecost": 20
+          },
+          {
+            "xmlid": "CLINGING",
+            "id": 708,
+            "alias": "Clinging",
+            "name": "Run Up Walls",
+            "position": 7,
+            "levels": 0,
+            "basecost": 10
+          },
+          {
+            "xmlid": "DAMAGENEGATION",
+            "id": 709,
+            "alias": "Damage Negation",
+            "name": "Roll With It",
+            "position": 8,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "PHYSICAL",
+                "alias": "Physical DCs",
+                "basecost": 0,
+                "levels": 2,
+                "lvlval": 1,
+                "lvlcost": 5
+              }
+            ]
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 710,
+            "alias": "Life Support",
+            "name": "Metabolism",
+            "position": 9,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "INTENSECOLD",
+                "optionid": "INTENSECOLD",
+                "optionAlias": "Intense Cold"
+              }
+            ]
+          }
+        ]
+      }
+    }
   ]
 }

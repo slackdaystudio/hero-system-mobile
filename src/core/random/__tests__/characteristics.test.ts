@@ -206,12 +206,14 @@ describe('random character — 6E archetype spreads', () => {
         expect(slow).toEqual([]);
     });
 
-    it('keeps every archetype in the shape the corpus shows', () => {
-        // The five real ones run SPD 5-6, DCV 6-8, CON 18-20. Nothing here should sit outside what
-        // a human actually built at 400 points.
+    it('keeps every archetype in the shape a real 400-point character has', () => {
+        // The fixture five run SPD 5-6 and DCV 6-8, but they're a GM's *starting* group and are not
+        // the whole range. The Rule of X spreadsheet's own cast reaches further: Kinetic is a SPD 7
+        // / DCV 10 speedster, Green Dragon DCV 11, Shrinker DCV 23. The ceiling here is Kinetic's,
+        // because that's the fastest thing Phil scored as balanced (-5.3%).
         for (const {name, characteristics} of ARCHETYPES_6E) {
             expect({name, ok: characteristics.spd >= 5 && characteristics.spd <= 7}).toEqual({name, ok: true});
-            expect({name, ok: characteristics.dcv >= 6 && characteristics.dcv <= 9}).toEqual({name, ok: true});
+            expect({name, ok: characteristics.dcv >= 6 && characteristics.dcv <= 10}).toEqual({name, ok: true});
         }
     });
 

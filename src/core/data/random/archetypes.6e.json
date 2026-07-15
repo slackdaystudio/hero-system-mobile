@@ -213,7 +213,7 @@
     },
     {
       "name": "Speedster",
-      "_note": "DEX and SPD are the identity, and DCV is where the speed shows in combat. 6E decouples CV from DEX, so the DCV here is a deliberate buy rather than a side effect.",
+      "_note": "Kinetic is the model — Phil's own SPD 7 / DEX 26 speedster. DEX and SPD are the identity, and 6E decouples CV from DEX, so the CVs here are a deliberate buy rather than a side effect. Authored at OCV 7 first and the character came in at -10.2%: Kinetic runs OCV 10 / DCV 10, because a speedster hits often AND accurately. SPD 7 is +8 of X on its own and has to be paid for somewhere — Kinetic pays in a weak attack and thin defences, not in accuracy.",
       "characteristics": {
         "str": 13,
         "dex": 26,
@@ -222,10 +222,10 @@
         "int": 13,
         "ego": 13,
         "pre": 13,
-        "ocv": 7,
-        "dcv": 9,
+        "ocv": 9,
+        "dcv": 10,
         "omcv": 3,
-        "dmcv": 3,
+        "dmcv": 4,
         "pd": 6,
         "ed": 6,
         "spd": 7,
