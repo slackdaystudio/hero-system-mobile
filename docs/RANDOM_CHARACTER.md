@@ -66,14 +66,17 @@ figured stats in 6E — so this is an **edition fork, not a multiplier**.
 #### A ceiling is a power level, not a number
 
 This is the part that is easy to get wrong (and was, first time round). A build is a
-**(base points, disadvantage limit)** pair, and what the buckets spend is the *sum*:
+**(base points, disadvantage/complication limit)** pair, and what the buckets spend is the
+*sum*:
 
-| 5E power level | Base | Disads | **Total spend** |
-|----------------|------|--------|-----------------|
-| Low Powered Superheroic | 150 | 100 | **250** |
-| Standard Superheroic | 200 | 150 | **350** |
+| Edition | Power level | Base | Limit | **Total spend** |
+|---------|-------------|------|-------|-----------------|
+| 5E | Low Powered Superheroic | 150 | 100 | **250** |
+| 5E | Standard Superheroic | 200 | 150 | **350** |
+| 6E | Low-Powered | 300 | 60 | **360** |
+| 6E | Standard | 400 | 75 | **475** |
 
-**The legacy templates are Low Powered Superheroic (150/100).** That is what makes them
+**The legacy templates are 5E Low Powered Superheroic (150/100).** That is what makes them
 internally consistent, and it is why they are a legal build rather than a sloppy one:
 
 ```
@@ -81,24 +84,38 @@ chars 100 + powers 125 + skills 25 = 250   ✓ every archetype
 disadvantage packages              = 100   ✓ all four
 ```
 
-Disadvantages are taken at the **fixed limit** — in theory you may take fewer; in practice
-nobody does — so the limit is a constant, not a variable to solve for.
+Disadvantages/complications are taken at the **fixed limit** — in theory you may take fewer; in
+practice nobody does — so the limit is a constant, not a variable to solve for.
+
+> **Pick power levels in the UI, not point numbers.** "250 or 400" mixes conventions: 250 is a
+> *total* (5E Low Powered) while 400 is a *base* (6E Standard, which spends 475). Naming the
+> level instead of the number removes the ambiguity — the user chooses "6E Standard" and the
+> arithmetic follows from the table. Point totals are shown, not typed.
 
 The engine already handles both, and the fork is one string:
 
-| Ceiling | Edition | Power level | `ParsedCharacter.template` |
-|---------|---------|-------------|----------------------------|
-| 250     | 5E      | Low Powered Superheroic, 150/100 | `builtIn.Superheroic.hdt`   |
-| 400     | 6E      | **TBD** — need the base/complication split | `builtIn.Superheroic6E.hdt` |
+| Edition | `ParsedCharacter.template` | Serves |
+|---------|----------------------------|--------|
+| 5E      | `builtIn.Superheroic.hdt`   | Low Powered (250), Standard (350) |
+| 6E      | `builtIn.Superheroic6E.hdt` | Low-Powered (360), Standard (475) |
 
 Both ids are already resolved by `getTemplate` and golden-mastered (26 of the 37 fixtures use
 one or the other). Emitting the right string drives `isFifth`, the characteristic set, and every
 cost in the engine.
 
-**Cost of this decision:** two archetype sets and two powerset sets. 5E lifts from the legacy
-data **as-is** — it is already a coherent Low Powered set and needs no resizing. **6E must be
-authored from scratch** — 11 archetypes and their powersets. That authoring is the bulk of this
-project, and it is content work, not engineering.
+**Cost of this decision:** archetypes and powersets **per edition per power level**. Only one of
+the four is free:
+
+| Level | Total | Data |
+|-------|-------|------|
+| 5E Low Powered | 250 | ✅ lifted from legacy, as-is — needs no resizing |
+| 5E Standard | 350 | archetypes + powersets resized (+100) |
+| 6E Low-Powered | 360 | authored from scratch |
+| 6E Standard | 475 | authored from scratch |
+
+The machinery is shared — a level is just a `(base, limit, template)` triple — so this is
+**content work, not engineering**, and it is the bulk of the project. Ship 5E Low Powered first
+precisely because its data already exists and is proven.
 
 ### 3 — Strict cutoffs as sub-budgets
 
@@ -226,9 +243,11 @@ silently reshaping an archetype.
       exactly. Fuzz with a seeded `Rng`.
 - [ ] **Phase 3 — 5E powersets + skills + complications.** Author the legacy prose as structured
       data. The bulk of the 250-point work.
-- [ ] **Phase 4 — 6E at 400.** Archetypes and powersets authored fresh.
-- [ ] **Phase 5 — UI.** Ceiling picker → generate → save. The screen is thin; everything real
-      happens in `core/random`.
+- [ ] **Phase 4 — the other power levels.** 5E Standard (350) resizes the existing archetypes and
+      powersets; 6E Low-Powered (360) and Standard (475) are authored fresh. Each level is a
+      `(base, limit, template)` triple over the same machinery, so this is data, not code.
+- [ ] **Phase 5 — UI.** Power-level picker (named levels, not typed numbers) → generate → save.
+      The screen is thin; everything real happens in `core/random`.
 
 ## Open questions
 
@@ -237,6 +256,8 @@ silently reshaping an archetype.
   SPD ≥ 4") would let one archetype definition serve any ceiling, instead of hand-authoring a
   second set of eleven for 6E. Phase 1 uses the spreads as-is; revisit before Phase 4, which is
   where the duplication would otherwise bite.
-- **Complications/disadvantages.** 5E is 250 + 150 disadvantages; 6E is 400 with a complications
-  cap. Needs a rules check on what the ceiling means before Phase 2 fixes the arithmetic.
+- ~~**Complications/disadvantages.**~~ **Resolved:** taken at the fixed limit, always. The four
+  power levels and their arithmetic are in the table above.
+- **Which levels ship?** All four are nearly free in machinery but each needs its own archetype
+  and powerset data. 5E Low Powered is done and proven; the other three are authoring.
 - **Name generation.** Legacy left `name: ''`. Out of scope for now.
