@@ -64,6 +64,17 @@ const CATEGORIES: Array<{key: string; subKey: string}> = [
 //     than the actual failing instances.
 const POWER_SKIP = new Set<string>();
 
+/**
+ * U2 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: `core` is deliberately *more
+ * correct* than legacy here, so "== legacy" no longer holds for these traits. Legacy's
+ * `getMultiplications` had no guard on `total`, so `Math.log(0)` made a Clinging power
+ * bought at 0 levels cost `-Infinity`; core costs it 11. Keyed by fixture → trait name.
+ * The corrected value is pinned in `multiplierCost.test.ts`.
+ */
+const U2_DIVERGENCE: Record<string, Set<string>> = {
+    'mark-li-v5a-433': new Set(['Gecko pads']),
+};
+
 describe('golden master: core/traits factory reproduces legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
@@ -77,6 +88,10 @@ describe('golden master: core/traits factory reproduces legacy', () => {
             for (const trait of flatten(character[key], subKey)) {
                 if (key === 'powers' && POWER_SKIP.has((trait.xmlid as string).toUpperCase())) {
                     continue;
+                }
+
+                if (U2_DIVERGENCE[name]?.has(String(trait.name))) {
+                    continue; // U2 — see U2_DIVERGENCE; corrected value pinned in multiplierCost.test.ts
                 }
 
                 const legacy = legacyDecorator.decorate(trait, key, getCharacter);

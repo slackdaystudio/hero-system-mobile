@@ -44,7 +44,7 @@
 | H5 | VPP contents counted toward totals | ✅ **fixed** — was real bug, active | yes — adamantine (Leaping), m-championsmush | hero query / movement |
 | H6 | Unusual-defense duplicates read off the collapsed array | **real bug, active** | yes — defensor, junkyard | none (legacy equally wrong) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
-| U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | **real bug, active** | **yes — mark-li-v5a-433 (Gecko pads)** | traits (decorator) |
+| U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | real bug (latent) | no — step 3 occurs, never on an exact power | traits (decorator) |
 
 ---
@@ -246,7 +246,30 @@ that already returned the running total (a latent double-count), and
 - **Fix + verify:** add the truthy `template` guard; hand-built maneuver with an unresolved
   template asserting the delegated roll; drop the `safeRoll` tolerance for this case.
 
-## U2 — `getMultiplications(0, …)` returns `-Infinity` (**active bug**)
+## U2 — `getMultiplications(0, …)` returns `-Infinity` — ✅ FIXED
+
+**Fixed.** `getMultiplications` now returns `0` unless `total > 0`, which also absorbs the
+negative and `NaN` totals that previously yielded `-Infinity`/`NaN`. The callers were left
+alone deliberately: guarding `levels > 0` at each call site (as `baseCost.ts:103` does) would
+have fixed the two known ones and left the next one to rediscover this, whereas the helper
+returning `-Infinity` for "no levels" was the actual defect.
+
+- **Verified:** `mark-li-v5a-433`'s "Gecko pads" now costs **11** (`basecost 10` + `0` + the
+  trailing `+1`), and renders `11` on the sheet where it rendered the literal string
+  `-Infinity`. The corpus-wide sweep for non-finite costs — which is how this was found —
+  is now clean.
+- **Pinned by:** `core/traits/__tests__/multiplierCost.test.ts` (the character, end to end,
+  plus a standing sweep guarding against a new non-finite cost) and the non-positive cases
+  in `core/util/__tests__/common.test.ts`. The decorator golden master skips exactly this
+  trait via `U2_DIVERGENCE` and still compares every other trait in the corpus to legacy.
+- **U3 is untouched and still open:** it lives in the same function but is a different
+  quirk (float overshoot on exact powers of a non-2 step), is latent, and gets its own
+  commit. `common.test.ts` pins the current, still-wrong `getMultiplications(9, 3) === 3`
+  so the U3 fix has to come back and change it deliberately.
+
+### Original entry (for reference)
+
+## U2 (original) — `getMultiplications(0, …)` returns `-Infinity` (**active bug**)
 
 - **Where:** `core/util/common.ts` `getMultiplications` / `getMultiplierCost` (legacy
   `Common.js`). `Math.log(0)` is `-Infinity`, so `Math.ceil(-Infinity / Math.log(step))`

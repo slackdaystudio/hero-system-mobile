@@ -56,6 +56,21 @@ describe('core/util common helpers', () => {
         expect(getMultiplierCost(5, 1, 10)).toBe(50); // step 1 -> total * cost
     });
 
+    // U2 (docs/KNOWN_DEVIATIONS.md) — intentional divergence from legacy, which had no
+    // guard: Math.log(0) made these -Infinity and callers added that into a cost.
+    it('getMultiplications buys nothing for a non-positive total (U2)', () => {
+        expect(getMultiplications(0, 3)).toBe(0);
+        expect(getMultiplications(0)).toBe(0);
+        expect(getMultiplications(1, 3)).toBe(0); // already 0 before the guard; same case
+        expect(getMultiplications(-4, 2)).toBe(0); // was NaN
+        expect(getMultiplications(NaN, 2)).toBe(0);
+        expect(getMultiplierCost(0, 3, 1)).toBe(0); // the Gecko pads case — was -Infinity
+
+        // The guard must not disturb a genuine multiplication.
+        expect(getMultiplications(9, 3)).toBe(3); // U3: should be 2; still overshooting, tracked separately
+        expect(getMultiplierCost(4, 2, 3)).toBe(6);
+    });
+
     it('totalAdders (recursive, level-aware)', () => {
         expect(totalAdders(null)).toBe(0);
         expect(totalAdders({basecost: 5})).toBe(5);

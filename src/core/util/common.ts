@@ -33,7 +33,17 @@ export const isInt = (value: number | string): boolean => !isNaN(value as number
 
 export const isFloat = (value: number | string): boolean => (!isNaN(value as number) ? (value as number) % 1 !== 0 : false);
 
-export const getMultiplications = (total: number, step = 2): number => Math.ceil(Math.log(total) / Math.log(step));
+/**
+ * How many times `step` must be applied to reach `total` — i.e. log-base-`step` of `total`,
+ * rounded up.
+ *
+ * U2 (docs/KNOWN_DEVIATIONS.md) — intentional divergence from legacy: a `total` of zero
+ * buys zero multiplications. Legacy had no guard, so `Math.log(0)` made this `-Infinity`
+ * and callers added that straight into a cost. The same guard absorbs negative and `NaN`
+ * totals, which are equally undefined and previously yielded `-Infinity`/`NaN`.
+ * (`getMultiplications(1, …)` was already 0; zero is the same case.)
+ */
+export const getMultiplications = (total: number, step = 2): number => (total > 0 ? Math.ceil(Math.log(total) / Math.log(step)) : 0);
 
 export const getMultiplierCost = (total: number, step: number, cost: number): number => {
     if (step === 1) {
