@@ -71,15 +71,90 @@ export const SKILLSETS_5E = (skillsetData as unknown as {skillsets: StructuredSk
 export const structuredSkillset = (profession: string): StructuredSkillset | undefined =>
     SKILLSETS_5E.find((skillset) => skillset.profession === profession);
 
-/** Attach a skillset to a `ParsedCharacter`, filling in the `.hdc` boilerplate. */
-export function attachSkillset(parsed: ParsedCharacter, skillset: StructuredSkillset): ParsedCharacter {
+/**
+ * The `input` of a skill the data deliberately leaves to the player.
+ *
+ * The legacy prose's `Lang:` and `SS[INT]:` named no language and no science, so there is nothing
+ * to generate — a random pick would be inventing a fact about someone else's character. The skill
+ * is real and costed; only its subject is blank until the player says.
+ */
+export const PLAYER_DEFINED = 'Player Defined';
+
+/** A skill whose subject the player names. */
+export interface PlayerDefinedSlot {
+    /**
+     * Stable key for the player's answer: xmlid plus which one of them, e.g. `SCIENCE_SKILL#1`.
+     *
+     * Not the trait's `id`, deliberately. What the player named their language is a fact about
+     * *them*, not about the profession's data row — keyed this way it survives a profession change,
+     * because every set's `LANGUAGES#0` is the same question. And the Scientist's three Science
+     * Skills are identical in the data, so their order carries no meaning to lose.
+     */
+    readonly slot: string;
+    readonly xmlid: string;
+    /** The sheet's short name for it — "Language", "SS". */
+    readonly alias: string;
+}
+
+const slotKey = (xmlid: string, ordinal: number): string => `${xmlid}#${ordinal}`;
+
+/**
+ * Walk a skillset's player-defined skills in a fixed order, so {@link playerDefinedSlots} and
+ * {@link attachSkillset} always agree on which slot is which.
+ */
+function eachPlayerDefined(skillset: StructuredSkillset, visit: (trait: Obj, slot: string) => void): void {
+    const counts = new Map<string, number>();
+
+    for (const block of Object.values(skillset.buckets)) {
+        for (const entries of Object.values(block)) {
+            for (const trait of entries as Obj[]) {
+                if (trait.input !== PLAYER_DEFINED) {
+                    continue;
+                }
+
+                const xmlid = String(trait.xmlid);
+                const ordinal = counts.get(xmlid) ?? 0;
+
+                counts.set(xmlid, ordinal + 1);
+                visit(trait, slotKey(xmlid, ordinal));
+            }
+        }
+    }
+}
+
+/** The skills this profession leaves to the player, in sheet order. */
+export function playerDefinedSlots(skillset: StructuredSkillset): PlayerDefinedSlot[] {
+    const slots: PlayerDefinedSlot[] = [];
+
+    eachPlayerDefined(skillset, (trait, slot) => slots.push({slot, xmlid: String(trait.xmlid), alias: String(trait.alias ?? trait.xmlid)}));
+
+    return slots;
+}
+
+/**
+ * Attach a skillset to a `ParsedCharacter`, filling in the `.hdc` boilerplate.
+ *
+ * `named` supplies the player's answers by slot. An answer only ever replaces the `input` string,
+ * which feeds the sheet's label and nothing else — so naming a skill cannot move a cost, and the
+ * set still totals its 25.
+ */
+export function attachSkillset(parsed: ParsedCharacter, skillset: StructuredSkillset, named: Readonly<Record<string, string>> = {}): ParsedCharacter {
     const attached: Obj = {...parsed};
+    const bySlot = new Map<Obj, string>();
+
+    eachPlayerDefined(skillset, (trait, slot) => bySlot.set(trait, slot));
 
     for (const [traitKey, block] of Object.entries(skillset.buckets)) {
         const filled: Obj = {};
 
         for (const [subKey, entries] of Object.entries(block)) {
-            filled[subKey] = (entries as Obj[]).map(withDefaults);
+            filled[subKey] = (entries as Obj[]).map((entry) => {
+                const trait = withDefaults(entry);
+                const slot = bySlot.get(entry);
+                const chosen = slot === undefined ? undefined : named[slot];
+
+                return chosen === undefined || chosen === '' ? trait : {...trait, input: chosen};
+            });
         }
 
         attached[traitKey] = filled;

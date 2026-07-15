@@ -31,11 +31,14 @@ import {
     changeSpecialFx,
     fittableSkillsets,
     generatableArchetypes,
+    namedSkillSlots,
+    nameSkill,
     parseRecipe,
     renameRecipe,
     rerollArchetype,
     SPECIAL_FX,
     type CharacterRecipe,
+    type PlayerDefinedSlot,
 } from 'core/random';
 import {Card, SelectField, Text, TextField} from 'app/components';
 import {useGeneratorRng, useReviseCharacter} from 'app/providers/GenerateProvider';
@@ -147,8 +150,83 @@ export function CharacterEditor({character, recipe, onRevised}: CharacterEditorP
                     disabled={busy}
                     testID="edit-sfx"
                 />
+
+                <PlayerDefinedSkills recipe={recipe} onName={(slot, value) => apply(nameSkill(recipe, slot, value))} />
             </View>
         </Card>
+    );
+}
+
+/** The sheet's short name for a player-defined skill, and what to prompt for. */
+const SKILL_FIELDS: Record<string, {label: string; placeholder: string}> = {
+    LANGUAGES: {label: 'Language', placeholder: 'Name a language'},
+    SCIENCE_SKILL: {label: 'Science Skill', placeholder: 'Name a science'},
+};
+
+const fieldFor = (slot: PlayerDefinedSlot): {label: string; placeholder: string} =>
+    SKILL_FIELDS[slot.xmlid] ?? {label: slot.alias, placeholder: `Name a ${slot.alias.toLowerCase()}`};
+
+/**
+ * The skills this profession leaves blank on purpose — the prose's `Lang:` and `SS[INT]:` named no
+ * language and no science, so only the player can say.
+ *
+ * They render on the sheet as "Language: Player Defined" until answered. An answer replaces that
+ * text and nothing else, so the skill keeps its cost and roll either way.
+ */
+function PlayerDefinedSkills({recipe, onName}: {recipe: CharacterRecipe; onName: (slot: string, value: string) => void}): React.JSX.Element | null {
+    const slots = namedSkillSlots(recipe);
+
+    if (slots.length === 0) {
+        return null;
+    }
+
+    // Only number them when there's more than one to tell apart — the Scientist's three sciences.
+    const counts = slots.reduce<Record<string, number>>((tally, slot) => ({...tally, [slot.xmlid]: (tally[slot.xmlid] ?? 0) + 1}), {});
+    const ordinals: Record<string, number> = {};
+
+    return (
+        <>
+            {slots.map((slot) => {
+                const field = fieldFor(slot);
+                ordinals[slot.xmlid] = (ordinals[slot.xmlid] ?? 0) + 1;
+                const label = counts[slot.xmlid] > 1 ? `${field.label} ${ordinals[slot.xmlid]}` : field.label;
+
+                return <NamedSkillField key={slot.slot} label={label} placeholder={field.placeholder} value={recipe.skills?.[slot.slot] ?? ''} onCommit={(value) => onName(slot.slot, value)} testID={`edit-skill-${slot.slot}`} />;
+            })}
+        </>
+    );
+}
+
+/** One player-defined skill. Committed on blur — each save rebuilds the character. */
+function NamedSkillField({
+    label,
+    placeholder,
+    value,
+    onCommit,
+    testID,
+}: {
+    label: string;
+    placeholder: string;
+    value: string;
+    onCommit: (value: string) => void;
+    testID: string;
+}): React.JSX.Element {
+    const [draft, setDraft] = useState(value);
+
+    return (
+        <TextField
+            label={label}
+            value={draft}
+            onChangeText={setDraft}
+            placeholder={placeholder}
+            maxLength={40}
+            onBlur={() => {
+                if (draft.trim() !== value) {
+                    onCommit(draft);
+                }
+            }}
+            testID={testID}
+        />
     );
 }
 

@@ -34,6 +34,16 @@ native module (`npm run android`).
 - [ ] Scroll the list with a thumb over the rows — no accidental deletes.
 - [ ] Long-press a row still confirms too (the older, hidden path).
 
+## Generated characters
+- [ ] Roll a Soldier/Spy/Royalty/Playboy → the editor asks for a **Language**; type one → the
+      sheet reads "Language: French" instead of "Language: Player Defined".
+- [ ] Roll a Scientist → three numbered Science Skill fields; fill two → the third still reads
+      "Player Defined" and doesn't shift up.
+- [ ] Name a language, then re-roll the Archetype → the language survives.
+- [ ] Change Profession to another set with a language → it's still there.
+- [ ] Clear a skill field → back to "Player Defined".
+- [ ] Point total stays 250 through all of it (naming a skill must not move a cost).
+
 ## Character sheet
 - [ ] Character tab: characteristics + all trait sections render; costs/rolls look right.
 - [ ] Tap a characteristic/skill roll → dice roller opens pre-filled.

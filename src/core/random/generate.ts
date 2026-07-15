@@ -92,6 +92,8 @@ export function rollRecipe(rng: Rng, level: PowerLevel = LOW_POWERED_5E): Charac
         complications: pick(rng, COMPLICATION_SETS_5E).label,
         specialFx,
         name: autoName({specialFx, archetype: archetype.name}),
+        // A fresh roll answers nothing for the player — see CharacterRecipe.skills.
+        skills: {},
     };
 }
 

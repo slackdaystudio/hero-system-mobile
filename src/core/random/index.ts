@@ -18,6 +18,8 @@ export {LOW_POWERED_5E, POWER_LEVELS, powerLevel, STANDARD_6E, type Edition, typ
 export {
     autoName,
     buildFromRecipe,
+    nameSkill,
+    namedSkillSlots,
     changeProfession,
     changeSpecialFx,
     parseRecipe,
@@ -44,5 +46,6 @@ export {
     type ComplicationPackage,
     type Skillset,
 } from './allocate';
+export {attachSkillset, playerDefinedSlots, PLAYER_DEFINED, SKILLSETS_5E, structuredSkillset, type PlayerDefinedSlot, type StructuredSkillset} from './skillset';
 export {approximations, attachPowerset, POWERSETS_5E, powersetsFor, type Approximation, type Powerset} from './powerset';
 export {budgetFor, buildRecipe, fittableSkillsets, generatableArchetypes, generateRandomCharacter, rollRecipe, type GeneratedCharacter} from './generate';

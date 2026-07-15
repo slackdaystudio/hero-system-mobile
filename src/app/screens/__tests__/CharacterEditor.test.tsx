@@ -22,7 +22,7 @@ import React from 'react';
 import {Alert} from 'react-native';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import type {Character, CharacterRepository, Rng, SaveCharacter} from 'core/ports';
-import {rollRecipe, type CharacterRecipe} from 'core/random';
+import {changeProfession, nameSkill, rollRecipe, type CharacterRecipe} from 'core/random';
 import type {Repositories} from 'infra/persistence/repositories';
 import {GenerateProvider} from 'app/providers/GenerateProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
@@ -246,5 +246,73 @@ describe('CharacterEditor', () => {
 
         expect(spy.mock.calls[spy.mock.calls.length - 1][0]).toBe('Could not save');
         expect(spy.mock.calls[spy.mock.calls.length - 1][1]).toBe('disk is full of bricks');
+    });
+
+    /**
+     * The data leaves `Lang:` and `SS[INT]:` to the player on purpose — the legacy prose named no
+     * language and no science, so there is nothing to generate.
+     */
+    describe('player-defined skills', () => {
+        const SOLDIER = changeProfession(RECIPE, 'Soldier');
+        const SCIENTIST = changeProfession(RECIPE, 'Scientist');
+
+        /** The testID rides the wrapper, the TextField and the TextInput — take the one wired up. */
+        const field = (tree: ReactTestRenderer, testID: string) =>
+            tree.root.findAllByProps({testID}).find((node) => typeof node.props.onChangeText === 'function')!;
+
+        const type = async (tree: ReactTestRenderer, testID: string, value: string): Promise<void> => {
+            await act(async () => {
+                field(tree, testID).props.onChangeText(value);
+            });
+            await act(async () => {
+                field(tree, testID).props.onBlur();
+            });
+            await act(async () => {});
+        };
+
+        it('asks for the language a Soldier speaks, and saves the answer', async () => {
+            const {tree, saved} = await renderEditor({}, SOLDIER);
+
+            expect(field(tree, 'edit-skill-LANGUAGES#0').props.label).toBe('Language');
+
+            await type(tree, 'edit-skill-LANGUAGES#0', 'French');
+
+            expect((saved[0].recipe as unknown as CharacterRecipe).skills).toEqual({'LANGUAGES#0': 'French'});
+        });
+
+        it('numbers the Scientist\'s three sciences so they can be told apart', async () => {
+            const {tree, saved} = await renderEditor({}, SCIENTIST);
+
+            expect(field(tree, 'edit-skill-SCIENCE_SKILL#0').props.label).toBe('Science Skill 1');
+            expect(field(tree, 'edit-skill-SCIENCE_SKILL#2').props.label).toBe('Science Skill 3');
+
+            await type(tree, 'edit-skill-SCIENCE_SKILL#1', 'Xenobiology');
+
+            expect((saved[0].recipe as unknown as CharacterRecipe).skills).toEqual({'SCIENCE_SKILL#1': 'Xenobiology'});
+        });
+
+        it('does not ask a profession that leaves nothing to the player', async () => {
+            const {tree} = await renderEditor({}, changeProfession(RECIPE, 'Warrior'));
+
+            expect(tree.root.findAllByProps({testID: 'edit-skill-LANGUAGES#0'})).toEqual([]);
+        });
+
+        it('shows an answer already given, and saves nothing when it is unchanged', async () => {
+            const named = nameSkill(SOLDIER, 'LANGUAGES#0', 'French');
+            const {tree, saved} = await renderEditor({}, named);
+
+            expect(field(tree, 'edit-skill-LANGUAGES#0').props.value).toBe('French');
+
+            await type(tree, 'edit-skill-LANGUAGES#0', 'French');
+            expect(saved).toEqual([]); // a blur that changed nothing must not rebuild the character
+        });
+
+        it('clears an answer back to Player Defined', async () => {
+            const {tree, saved} = await renderEditor({}, nameSkill(SOLDIER, 'LANGUAGES#0', 'French'));
+
+            await type(tree, 'edit-skill-LANGUAGES#0', '');
+
+            expect((saved[0].recipe as unknown as CharacterRecipe).skills).toEqual({});
+        });
     });
 });

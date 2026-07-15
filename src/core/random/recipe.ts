@@ -33,7 +33,7 @@ import {ARCHETYPES_5E, pick, type Archetype} from './allocate';
 import {buildCharacteristics} from './characteristics';
 import {attachComplications, COMPLICATION_SETS_5E, type ComplicationSet} from './complications';
 import {attachPowerset, powersetsFor, type Powerset} from './powerset';
-import {attachSkillset, structuredSkillset, type StructuredSkillset} from './skillset';
+import {attachSkillset, playerDefinedSlots, structuredSkillset, type PlayerDefinedSlot, type StructuredSkillset} from './skillset';
 import {POWER_LEVELS, type PowerLevel} from './powerLevel';
 
 /**
@@ -55,6 +55,18 @@ export type CharacterRecipe = {
     /** Cosmetic: the first half of an auto name. Nothing else reads it. */
     readonly specialFx: string;
     readonly name: string;
+    /**
+     * The skills the player has named, by {@link PlayerDefinedSlot.slot} — `LANGUAGES#0` → "French".
+     * A slot with no answer stays "Player Defined"; `{}` means none are answered.
+     *
+     * Lives on the recipe because the recipe is the whole character: a rebuild regenerates the
+     * skills bucket from the tables, so an answer kept anywhere else would be erased by the next
+     * re-roll.
+     *
+     * Required, though *stored* recipes written before players could answer have no such key —
+     * {@link parseRecipe} normalises those to `{}`, so every recipe in memory has one.
+     */
+    readonly skills: Readonly<Record<string, string>>;
 };
 
 /** Everything a recipe names, resolved against the current data. */
@@ -104,9 +116,36 @@ export function parseRecipe(value: unknown): CharacterRecipe | null {
         return null;
     }
 
-    const recipe = Object.fromEntries(fields.map((field) => [field, candidate[field]])) as CharacterRecipe;
+    const skills = parseNamedSkills(candidate.skills);
+
+    if (skills === null) {
+        return null;
+    }
+
+    const recipe = {...Object.fromEntries(fields.map((field) => [field, candidate[field]])), skills} as CharacterRecipe;
 
     return resolveRecipe(recipe) === null ? null : recipe;
+}
+
+/**
+ * The player's skill answers, or null if the value is there but malformed.
+ *
+ * Absent is fine and means "none named" — recipes predate this field. A slot naming a skill this
+ * build no longer has is kept rather than dropped: professions come and go as data is authored, and
+ * silently forgetting what someone typed is worse than carrying a key nothing reads.
+ */
+function parseNamedSkills(value: unknown): Record<string, string> | null {
+    if (value === undefined || value === null) {
+        return {};
+    }
+
+    if (typeof value !== 'object' || Array.isArray(value)) {
+        return null;
+    }
+
+    const entries = Object.entries(value as Record<string, unknown>);
+
+    return entries.every(([slot, name]) => slot !== '' && isNonEmptyString(name)) ? (Object.fromEntries(entries) as Record<string, string>) : null;
 }
 
 /**
@@ -126,6 +165,33 @@ export function reviseRecipe(recipe: CharacterRecipe, changes: Partial<Omit<Char
 
 /** Rename outright — always the player's choice, so it never auto-generates. */
 export const renameRecipe = (recipe: CharacterRecipe, name: string): CharacterRecipe => ({...recipe, name});
+
+/** The skills this character's profession leaves to the player to name. */
+export function namedSkillSlots(recipe: CharacterRecipe): PlayerDefinedSlot[] {
+    const skillset = structuredSkillset(recipe.profession);
+
+    return skillset === undefined ? [] : playerDefinedSlots(skillset);
+}
+
+/**
+ * Answer a player-defined skill — "French" for the Soldier's language.
+ *
+ * Blank clears it back to "Player Defined" rather than storing an empty subject. Never touches the
+ * character's name: naming a skill is not naming a character, so this doesn't route through
+ * {@link reviseRecipe}'s auto-name rule.
+ */
+export function nameSkill(recipe: CharacterRecipe, slot: string, name: string): CharacterRecipe {
+    const skills = {...recipe.skills};
+    const trimmed = name.trim();
+
+    if (trimmed === '') {
+        delete skills[slot];
+    } else {
+        skills[slot] = trimmed;
+    }
+
+    return {...recipe, skills};
+}
 
 /**
  * Re-roll onto a new archetype. The old powerset belonged to the old archetype, so a new one is
@@ -166,5 +232,5 @@ export function buildFromRecipe(recipe: CharacterRecipe): ParsedCharacter {
 
     const characteristics = buildCharacteristics(resolved.archetype.characteristics, resolved.level.template, recipe.name);
 
-    return attachComplications(attachSkillset(attachPowerset(characteristics, resolved.powerset), resolved.skillset), resolved.complications);
+    return attachComplications(attachSkillset(attachPowerset(characteristics, resolved.powerset), resolved.skillset, recipe.skills), resolved.complications);
 }
