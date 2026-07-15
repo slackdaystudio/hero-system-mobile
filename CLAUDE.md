@@ -153,3 +153,32 @@ degrades a throwing trait to a stub row (cost 0, no combat line). **A core bug c
 surface as quietly wrong data rather than a crash** — H4 mis-rendered one of tazimmaad's
 maneuvers for the whole life of the port without anyone seeing an error. When checking impact,
 build the sheet and read the values; don't just look for exceptions.
+
+## Gestures are testable — don't assume otherwise
+
+react-test-renderer does no hit testing, so a finger can't be simulated. It is tempting to
+conclude gestures can't be tested, extract the maths, test that, and call the rest untestable
+wiring. **That reasoning shipped the portrait framer broken twice, and neither bug was in the
+maths.**
+
+Everything below `panHandlers` is RN's own code. Driving them with a synthetic `touchHistory`
+runs the real `PanResponder`, deriving `gestureState` exactly as a device does — see
+`src/app/screens/__tests__/PortraitFramer.test.tsx`. Only touch *delivery* is missing, so what
+a phone still settles is narrow: does a finger land on the view you think it does.
+
+Two RN traps the framer hit, both worth knowing before writing another gesture:
+
+- **`event.nativeEvent.touches` is filtered to the event's target** and does not reliably carry a
+  second finger. RN's own multitouch maths reads `event.touchHistory.touchBank`
+  (`touchActive`, `currentPageX/Y`) plus `gestureState.numberActiveTouches`. Note RN's
+  **TypeScript** types omit `touchHistory` from `GestureResponderEvent`; Flow has it, and
+  PanResponder reads it every move. The types are wrong, not the event.
+- **A multi-touch move never reaches `onPanResponderMove`.** RN dispatches
+  `onMoveShouldSetResponderCapture` to the current responder (its own source calls this
+  "incorrect"); that stamps `_accountsForMovesUpTo`, and `onResponderMove` then returns early.
+  A one-finger drag skips the capture dispatch, so pan works while pinch silently never fires.
+  Handle the move from both paths, guarded on `touchHistory.mostRecentTimeStamp`.
+
+Also: never put live state in a `PanResponder`'s `useMemo` deps. Rebuilding it mid-gesture swaps
+the View's handlers under an in-flight touch, and the next move arrives as a fresh gesture with
+`dx/dy` of 0 — the image snaps back to where the drag started. Read mutable values through refs.

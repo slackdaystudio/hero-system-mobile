@@ -131,8 +131,8 @@ describe('PortraitFramer', () => {
     });
 
     /**
-     * Zoom has buttons as well as pinch, on purpose. The pinch gesture is the one thing here that
-     * can't be tested, and it shipped broken once — so zoom does not depend on it.
+     * Zoom has buttons as well as pinch, on purpose: pinch shipped broken twice, and a phone is
+     * still the only thing that proves a finger lands where you think it does.
      */
     describe('the zoom buttons', () => {
         const scaleShown = (tree: ReactTestRenderer): string => {

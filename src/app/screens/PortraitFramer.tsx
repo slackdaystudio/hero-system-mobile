@@ -27,8 +27,10 @@
  * back to where the drag started, so the image visibly snaps back. Everything the handlers need to
  * read is a ref for that reason; the deps array is empty and must stay empty.
  *
- * The maths lives in `components/portraitFocus` where it can be tested. Gestures can't be exercised
- * by react-test-renderer, so the untestable part is kept as thin as possible.
+ * **Gestures here are tested**, contrary to the obvious assumption. react-test-renderer does no hit
+ * testing, so a finger can't be simulated — but everything below `panHandlers` is RN's own code, and
+ * feeding it a synthetic `touchHistory` derives gestureState exactly as a device does. Both bugs
+ * this shipped with were found that way, and neither was in the maths. See its test.
  */
 import React, {useMemo, useRef, useState} from 'react';
 import {Modal, PanResponder, Pressable, StyleSheet, View, type GestureResponderEvent, type PanResponderGestureState, type ViewStyle} from 'react-native';
@@ -168,8 +170,8 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
         [],
     );
 
-    // Buttons as well as pinch. A gesture is the nice way in, but it's the one thing here that
-    // can't be tested, so zoom does not depend on it working.
+    // Buttons as well as pinch. Pinch shipped broken twice, and a phone is still the only place
+    // that proves a finger lands where you think — so zoom does not depend on the gesture.
     const zoom = (factor: number): void => setDraft((current) => (aspect === undefined ? current : zoomedBy(current, aspect, factor)));
 
     const axes = aspect === undefined ? {x: false, y: false} : draggableAxes(aspect, draft.scale);

@@ -15,8 +15,9 @@
 /**
  * The framing maths.
  *
- * This is where the risk is: the gesture on top of it can't be exercised by react-test-renderer
- * (no hit testing), so the part that can be wrong is kept pure and pinned here.
+ * The maths, pinned on its own. It is *not* the whole of the risk: both bugs this feature shipped
+ * with were in the gesture plumbing above it, which is driven directly in
+ * `screens/__tests__/PortraitFramer.test.tsx`.
  *
  * Worked against the real portrait in the corpus — `Indigo Bunting.hdc`, 200×300, a figure on a
  * hilltop with their head near mid-height. It is the reason there is no clever default: a "faces

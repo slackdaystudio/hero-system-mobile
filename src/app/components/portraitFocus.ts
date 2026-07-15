@@ -15,9 +15,10 @@
 /**
  * The maths behind framing a portrait: where a square shows, and what a drag or a pinch does to it.
  *
- * Pure and separate from the components on purpose. Gestures can't be exercised by
- * react-test-renderer (it does no hit testing), so the part that can be wrong lives here where it
- * can be tested, and the components are left as thin wiring over it.
+ * Pure and separate from the components so it can be reasoned about on its own. Note that keeping
+ * it here is *not* what makes gestures testable — the handlers can be driven directly (see
+ * `screens/__tests__/PortraitFramer.test.tsx`), and both bugs this feature shipped with were in the
+ * plumbing rather than in here.
  */
 import type {ImageStyle} from 'react-native';
 import {CENTERED_PORTRAIT, type PortraitFocus} from 'core/ports';
