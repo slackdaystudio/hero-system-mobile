@@ -441,18 +441,22 @@ strings: **41 skills, 4 skill levels, 3 perks** (`Money: Well Off`, `FB: Medical
 `Eidetic Memory`). Perks belong in `perks`, talents in `talents` — so `Powerset` needs those
 buckets the way it just gained `martialarts`.
 
-**2. Some strings are damaged and cannot be authored as they stand:**
+**2. ~~Some strings are damaged~~ — resolved (Phil):**
 
-| String | Where | Problem |
-|--------|-------|---------|
-| `Lang:` | Playboy/Socialite, Royalty, Soldier, Spy | **Incomplete** — no language named |
-| `SS[INT]:` | Scientist (×3) | **Incomplete** — no science named, and it wants three of them |
-| `CSL: HTH Combat +1 or Ranged combat +1` | Warrior | Case-differs from the same string elsewhere; and `or` is a choice the data never resolves |
+| String | Where | Resolution |
+|--------|-------|------------|
+| `Lang:` | Playboy/Socialite, Royalty, Soldier, Spy | Default the `input` to **"Player Defined"** |
+| `SS[INT]:` | Scientist (×3) | Default the `input` to **"Player Defined"** |
+| `CSL: HTH Combat +1 or Ranged combat +1` | Warrior, Investigator | **Resolve the `or` per profession** — pick the one that fits, so the player is not asked to choose |
 
-`Lang:` and `SS[INT]:` need someone to say what they are. `or` needs a rule: pick one, or is it
-the player's choice?
+**3. Skills price unlike anything else here.** The skill templates carry **no `basecost`,
+`lvlcost` or `lvlval` at all** — each skill kind has its own rule in its decorator. Observed on
+`aoe`: `BUREAUCRATICS` at `levels: 0` costs 3, `DEMOLITIONS` at `levels: 1` costs 5,
+`KNOWLEDGE_SKILL` costs 2, `CRAMMING` costs 5, `COMBAT_LEVELS` at 3 levels costs 6. So the
+exact-25 constraint has to be solved per set against 41 distinct pricing behaviours — this is not
+the powers job again, and should be its own pass.
 
-**3. `cost: 25` is declared, and structuring will test it.** Same shape as `characteristicsCost`,
+**4. `cost: 25` is declared, and structuring will test it.** Same shape as `characteristicsCost`,
 which was wrong twice, and as `Warrior`'s 28 — corrected to 25 on the reading that it was a typo.
 Once the engine can price a skillset, that reading gets checked: **Warrior's list carries
 `CSL: HTH Combat +1` and `Defense Maneuver`, both dearer than an ordinary 3-point skill**, so its
@@ -460,6 +464,19 @@ content may genuinely come to 28 and the correction may need revisiting. Expect 
 surface discrepancies in several of the eleven, exactly as it did for the archetype spreads.
 
 Once priced, `cost` should be **dropped** and derived, as `characteristicsCost` was.
+
+## Editable fields (Phil, not yet built)
+
+A generated character is a starting point, not a finished one, so some of it should be the
+player's to change:
+
+- **Name**, **Archetype**, **special effect**, **Profession** (the skillset)
+- The **"Player Defined"** skills above — `Lang:` and `SS[INT]:` exist precisely so the player
+  names their own language and sciences, so they must be editable or the default is a dead end.
+
+Not started. Worth noting the shape it implies: editing the archetype or profession re-rolls the
+build, while editing a name or a Player-Defined input does not — so they are two different
+features wearing one label, and only the second is cheap.
 
 ## Open questions
 
