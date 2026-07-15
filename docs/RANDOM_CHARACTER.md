@@ -73,8 +73,20 @@ This is the part that is easy to get wrong (and was, first time round). A build 
 |---------|-------------|------|-------|-----------------|
 | 5E | Low Powered Superheroic | 150 | 100 | **250** |
 | 5E | Standard Superheroic | 200 | 150 | **350** |
-| 6E | Low-Powered | 300 | 60 | **360** |
-| 6E | Standard | 400 | 75 | **475** |
+| 6E | Low-Powered | 240 | 60 | **300** |
+| 6E | Standard | 325 | 75 | **400** |
+
+> ⚠️ **The two editions state their tiers differently.** This is the single easiest thing to get
+> wrong here, and it has caught this document twice.
+>
+> ```
+> 5E is quoted  base / disads         → ADD       150/100 → 250 total
+> 6E is quoted  total / complications → SUBTRACT  400/75  → 325 base, 400 total
+> ```
+>
+> So a 5E "150/100" and a 6E "400/75" are not the same kind of pair. Always reduce a tier to
+> `(base, limit, total)` before reasoning about it, and never compare the quoted numbers
+> directly.
 
 **The legacy templates are 5E Low Powered Superheroic (150/100).** That is what makes them
 internally consistent, and it is why they are a legal build rather than a sloppy one:
@@ -87,17 +99,15 @@ disadvantage packages              = 100   ✓ all four
 Disadvantages/complications are taken at the **fixed limit** — in theory you may take fewer; in
 practice nobody does — so the limit is a constant, not a variable to solve for.
 
-> **Pick power levels in the UI, not point numbers.** "250 or 400" mixes conventions: 250 is a
-> *total* (5E Low Powered) while 400 is a *base* (6E Standard, which spends 475). Naming the
-> level instead of the number removes the ambiguity — the user chooses "6E Standard" and the
-> arithmetic follows from the table. Point totals are shown, not typed.
+**"250 or 400" — the original ask — is exactly 5E Low Powered and 6E Standard**, and both are
+*totals*, so the two numbers are directly comparable. Those are the two levels to ship first.
 
 The engine already handles both, and the fork is one string:
 
 | Edition | `ParsedCharacter.template` | Serves |
 |---------|----------------------------|--------|
 | 5E      | `builtIn.Superheroic.hdt`   | Low Powered (250), Standard (350) |
-| 6E      | `builtIn.Superheroic6E.hdt` | Low-Powered (360), Standard (475) |
+| 6E      | `builtIn.Superheroic6E.hdt` | Low-Powered (300), Standard (400) |
 
 Both ids are already resolved by `getTemplate` and golden-mastered (26 of the 37 fixtures use
 one or the other). Emitting the right string drives `isFifth`, the characteristic set, and every
@@ -108,14 +118,15 @@ the four is free:
 
 | Level | Total | Data |
 |-------|-------|------|
-| 5E Low Powered | 250 | ✅ lifted from legacy, as-is — needs no resizing |
+| **5E Low Powered** | **250** | ✅ lifted from legacy, as-is — needs no resizing |
 | 5E Standard | 350 | archetypes + powersets resized (+100) |
-| 6E Low-Powered | 360 | authored from scratch |
-| 6E Standard | 475 | authored from scratch |
+| 6E Low-Powered | 300 | authored from scratch |
+| **6E Standard** | **400** | authored from scratch |
 
-The machinery is shared — a level is just a `(base, limit, template)` triple — so this is
-**content work, not engineering**, and it is the bulk of the project. Ship 5E Low Powered first
-precisely because its data already exists and is proven.
+The two in bold are the original ask. The machinery is shared — a level is just a
+`(base, limit, template)` triple — so this is **content work, not engineering**, and it is the
+bulk of the project. Ship 5E Low Powered first precisely because its data already exists and is
+proven; 6E Standard is the one with real authoring behind it.
 
 ### 3 — Strict cutoffs as sub-budgets
 
@@ -243,11 +254,12 @@ silently reshaping an archetype.
       exactly. Fuzz with a seeded `Rng`.
 - [ ] **Phase 3 — 5E powersets + skills + complications.** Author the legacy prose as structured
       data. The bulk of the 250-point work.
-- [ ] **Phase 4 — the other power levels.** 5E Standard (350) resizes the existing archetypes and
-      powersets; 6E Low-Powered (360) and Standard (475) are authored fresh. Each level is a
-      `(base, limit, template)` triple over the same machinery, so this is data, not code.
-- [ ] **Phase 5 — UI.** Power-level picker (named levels, not typed numbers) → generate → save.
-      The screen is thin; everything real happens in `core/random`.
+- [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
+      powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
+      each level is a `(base, limit, template)` triple over the same machinery, so they are data,
+      not code.
+- [ ] **Phase 5 — UI.** Power-level picker → generate → save. The screen is thin; everything real
+      happens in `core/random`.
 
 ## Open questions
 
