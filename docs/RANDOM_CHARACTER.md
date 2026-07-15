@@ -345,20 +345,24 @@ Two things make them harder:
 
 | Powerset | Listed sum | States | Δ | Read |
 |----------|-----------|--------|---|------|
-| `Brick [0]` | 95 | 75 | +20 | **Inferable.** `Flight 10", 8x NCM` is listed at 35; in a 15-point EC it is 30 active − 15 = **15**, and at 15 the powerset sums to exactly 75 |
-| `Speedster [1]` | 110 | 100 | +10 | **Inferable.** `Desolid` is listed at 35; Desolidification's basecost is 40, so 40 − 15 = **25**, and at 25 it sums to exactly 100 |
+| `Brick [0]` | 95 | 75 | +20 | ✅ **Resolved.** `Flight 10", 8x NCM` is listed at 35; in a 15-point EC it is 30 active − 15 = **15**, and at 15 the powerset sums to exactly 75. Authored at 15 |
+| `Speedster [1]` | 110 | 100 | +10 | ✅ **Resolved.** `Desolid` is listed at 35; Desolidification's basecost is 40, so 40 − 15 = **25**, and at 25 it sums to exactly 100. Authored at 25 |
 | `Patriot [1]` | 102 | 100 | +2 | needs a call |
 | `Brick [1]` | 65 | 75 | −10 | needs a call |
 | `Martial Artist [1]` | 115 | 140 | −25 | needs a call — and its sibling `[0]` states 115 against a 125 balance, so this archetype is doubly adrift |
 
-**2. Two structural gaps**, neither of which the `Powerset` shape handles today:
+Both resolved typos were **the same error** — an elemental-control slot priced as if it were
+standalone — which is worth knowing when the remaining three are looked at.
+
+**2. One structural gap** left, now that Multiform is dropped:
 
 - **Martial maneuvers.** `Martial Artist` lists `Martial Block`/`Disarm`/`Dodge`/`Throw` as part
   of its powerset. Those are `martialarts` traits, not powers — a `.hdc` carries them in their
   own trait bucket. `Powerset` would need to carry `martialarts` alongside `powers`.
-- **`Multiform: 250 Points`.** `Metamorph [2]` has two. A Multiform references *another whole
-  character*, so this needs a decision: generate a nested character, stub it, or drop the
-  powerset.
+- ~~**`Multiform: 250 Points`.**~~ ✅ **Resolved: dropped.** `Metamorph [2]` is the only powerset
+  that uses it, and a Multiform references *another whole character* — a recursive generation
+  problem far out of proportion to one powerset out of 37. Metamorph keeps its other three
+  ([0] Density Increase, [1] Growth, [3] Shape Shift).
 
 The rest of the vocabulary is confirmed to exist in the 5E template and priced: `EGOATTACK`,
 `MINDCONTROL`, `TELEPATHY`, `MENTALILLUSIONS` (plural), `CLINGING`, `INVISIBILITY`, `TUNNELING`,

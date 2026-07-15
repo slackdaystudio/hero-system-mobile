@@ -190,5 +190,88 @@
         "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Powered Armor", "position": 1, "basecost": 15}]
       }
     }
+  ],
+  "Brick": [
+    {
+      "label": "Powerhouse",
+      "approximations": [
+        {
+          "power": "Leap",
+          "note": "Legacy prose lists 'Flight 10\", 8x NCM' at 35 in this powerset, which is what its listed powers summing to 95 against a stated 75 comes from. 35 is the standalone price; inside a 15-point elemental control it is 30 active - 15 = 15, and at 15 the powerset sums to exactly 75 = the balance. Priced at 15 per Phil. Same mistake appears in Speedster [1]'s Desolid."
+        }
+      ],
+      "powers": {
+        "power": [
+          {"xmlid": "DAMAGERESISTANCE", "id": 101, "alias": "Damage Resistance", "name": "Thick Hide", "position": 0, "levels": 20, "pdlevels": 10, "edlevels": 10},
+
+          {"xmlid": "ENERGYBLAST", "id": 121, "parentid": 120, "alias": "Energy Blast", "name": "Haymaker", "position": 1, "levels": 10},
+          {
+            "xmlid": "FLIGHT",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Flight",
+            "name": "Leap",
+            "position": 2,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2}
+          }
+        ],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Super-Strength", "position": 1, "basecost": 15}]
+      }
+    }
+  ],
+  "Speedster": [
+    {
+      "label": "Blur",
+      "approximations": [
+        {
+          "power": "Phase",
+          "note": "Legacy prose (its powerset [1]) lists 'Desolid [Magic]' at 35, which is what its listed powers summing to 110 against a stated 100 comes from. Desolidification's basecost is 40, so inside a 15-point elemental control it is 40 - 15 = 25, and at 25 the powerset sums to exactly 100 = the balance. Priced at 25 per Phil. Same mistake as Brick [0]'s Flight: an EC slot priced as if it were standalone."
+        }
+      ],
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Friction Field", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},
+
+          {"xmlid": "DESOLIDIFICATION", "id": 121, "parentid": 120, "alias": "Desolidification", "name": "Phase", "position": 1, "basecost": 40, "levels": 0},
+          {
+            "xmlid": "FLIGHT",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Flight",
+            "name": "Sprint",
+            "position": 2,
+            "levels": 15,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
+            "modifier": {"xmlid": "ONLYONSURFACE", "alias": "Only When In Contact With The Ground", "basecost": -0.25, "levels": 0}
+          },
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 123,
+            "parentid": 120,
+            "alias": "Force Field",
+            "name": "Slipstream",
+            "position": 3,
+            "levels": 20,
+            "pdlevels": 10,
+            "edlevels": 10,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "1/2 END"}
+          },
+          {
+            "xmlid": "HANDTOHANDATTACK",
+            "id": 124,
+            "parentid": 120,
+            "alias": "Hand-To-Hand Attack",
+            "name": "Flurry",
+            "position": 4,
+            "levels": 6,
+            "modifier": {"xmlid": "HANDTOHANDATTACK", "alias": "Hand-To-Hand Attack", "basecost": -0.5, "levels": 0}
+          }
+        ],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Super-Speed", "position": 1, "basecost": 15}]
+      }
+    }
   ]
 }

@@ -46,7 +46,7 @@ const powerRows = (character: Obj): Array<{label: string; realCost: number; acti
     });
 
 /** Archetypes with structured powersets so far. The rest are still legacy prose. */
-const AUTHORED = ['Energy Projector', 'Mentalist', 'Mystic', 'Powered Armor'];
+const AUTHORED = ['Energy Projector', 'Mentalist', 'Mystic', 'Powered Armor', 'Speedster', 'Brick'];
 
 /**
  * The check that makes authoring safe: whatever a powerset is, the engine's price for it must
@@ -157,6 +157,18 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
                 powerset: 'Battlesuit',
                 power: 'Battlesuit Plating',
                 note: expect.stringContaining('Flexed to 14/14'),
+            },
+            {
+                archetype: 'Brick',
+                powerset: 'Powerhouse',
+                power: 'Leap',
+                note: expect.stringContaining('35 is the standalone price'),
+            },
+            {
+                archetype: 'Speedster',
+                powerset: 'Blur',
+                power: 'Phase',
+                note: expect.stringContaining("Desolidification's basecost is 40"),
             },
         ]);
     });
