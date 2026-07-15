@@ -22,8 +22,8 @@
  * hilltop with their head near mid-height. It is the reason there is no clever default: a "faces
  * are at the top" rule would have framed the sky.
  */
-import {CENTERED_PORTRAIT} from 'core/ports';
-import {coverStyle, croppedAxis, focusAfterDrag, overflowOf} from '../portraitFocus';
+import {CENTERED_PORTRAIT, type PortraitFocus} from 'core/ports';
+import {clampScale, coverStyle, draggableAxes, focusAfterDrag, focusAfterZoom, MAX_SCALE, MIN_SCALE, overflowOf} from '../portraitFocus';
 
 /** The corpus portrait: 200 wide, 300 tall. */
 const TALL = 200 / 300;
@@ -33,7 +33,7 @@ const WIDE = 300 / 200;
 const noMinusZero = (value: number): number => (value === 0 ? 0 : value);
 
 /** Which source rows a square shows, given the style — the thing a player actually sees. */
-const rowsShown = (aspect: number, focus: {x: number; y: number}, sourceHeight = 300): [number, number] => {
+const rowsShown = (aspect: number, focus: PortraitFocus, sourceHeight = 300): [number, number] => {
     const style = coverStyle(aspect, focus) as {height: string; top: string};
     const scale = sourceHeight / parseFloat(style.height); // container% -> source px
     const top = (-parseFloat(style.top) / 100) * 100 * scale;
@@ -41,21 +41,60 @@ const rowsShown = (aspect: number, focus: {x: number; y: number}, sourceHeight =
     return [noMinusZero(Math.round(top)), noMinusZero(Math.round(top + 100 * scale))];
 };
 
-describe('croppedAxis', () => {
-    it('names the only axis that can move', () => {
+describe('draggableAxes', () => {
+    it('offers only the axis with something spare, unzoomed', () => {
         // Covering a square scales the short side to fit, so only the long side has anything spare.
-        expect(croppedAxis(TALL)).toBe('y');
-        expect(croppedAxis(WIDE)).toBe('x');
-        expect(croppedAxis(1)).toBeNull();
+        expect(draggableAxes(TALL)).toEqual({x: false, y: true});
+        expect(draggableAxes(WIDE)).toEqual({x: true, y: false});
+        expect(draggableAxes(1)).toEqual({x: false, y: false});
+    });
+
+    it('opens up both axes once zoomed in — the point of zoom', () => {
+        expect(draggableAxes(TALL, 1.5)).toEqual({x: true, y: true});
+        expect(draggableAxes(1, 2)).toEqual({x: true, y: true});
     });
 });
 
 describe('overflowOf', () => {
-    it('measures what falls outside the square', () => {
-        // A 200x300 image covering a 200-square: 100px of it is cropped away.
-        expect(overflowOf(TALL, 200)).toBeCloseTo(100);
-        expect(overflowOf(WIDE, 200)).toBeCloseTo(100);
-        expect(overflowOf(1, 200)).toBe(0);
+    it('measures what falls outside the square, per axis', () => {
+        // A 200x300 image covering a 200-square: 100px of height is cropped away, no width.
+        expect(overflowOf(TALL, 200)).toEqual({x: 0, y: 100});
+        expect(overflowOf(WIDE, 200)).toEqual({x: 100, y: 0});
+        expect(overflowOf(1, 200)).toEqual({x: 0, y: 0});
+    });
+
+    it('grows both axes with zoom', () => {
+        // 2x on a square: 200px wide image in a 100 box -> 100 spare each way.
+        expect(overflowOf(1, 100, 2)).toEqual({x: 100, y: 100});
+    });
+});
+
+describe('clampScale', () => {
+    it('never zooms out past cover — that would letterbox, not frame', () => {
+        expect(clampScale(0.2)).toBe(MIN_SCALE);
+        expect(clampScale(99)).toBe(MAX_SCALE);
+        expect(clampScale(2)).toBe(2);
+    });
+});
+
+describe('focusAfterZoom', () => {
+    it('closes in on what is already framed rather than jumping to the middle', () => {
+        const framed = {x: 0.5, y: 0.2, scale: 1};
+
+        expect(focusAfterZoom(framed, TALL, 2)).toMatchObject({y: 0.2, scale: 2});
+    });
+
+    it('re-centres an axis that zooming back to cover just made meaningless', () => {
+        // At cover a tall image has no horizontal choice, so a stale x would be state nobody set,
+        // waiting to reappear the next time they zoom in.
+        const zoomed = {x: 0.9, y: 0.2, scale: 2};
+
+        expect(focusAfterZoom(zoomed, TALL, 1)).toEqual({x: 0.5, y: 0.2, scale: 1});
+    });
+
+    it('clamps to the offered range', () => {
+        expect(focusAfterZoom(CENTERED_PORTRAIT, TALL, 0.1).scale).toBe(MIN_SCALE);
+        expect(focusAfterZoom(CENTERED_PORTRAIT, TALL, 50).scale).toBe(MAX_SCALE);
     });
 });
 
@@ -71,8 +110,8 @@ describe('coverStyle', () => {
     });
 
     it('pins the top and bottom edges at the extremes', () => {
-        expect(rowsShown(TALL, {x: 0.5, y: 0})).toEqual([0, 200]);
-        expect(rowsShown(TALL, {x: 0.5, y: 1})).toEqual([100, 300]);
+        expect(rowsShown(TALL, {x: 0.5, y: 0, scale: 1})).toEqual([0, 200]);
+        expect(rowsShown(TALL, {x: 0.5, y: 1, scale: 1})).toEqual([100, 300]);
     });
 
     it('scales the tall image to fill the width, and hangs the rest below', () => {
@@ -89,17 +128,17 @@ describe('coverStyle', () => {
         expect(style.height).toBe('100%');
         expect(style.width).toBe('150%');
         expect(style.left).toBe('-25%');
-        expect(style.top).toBe(0);
+        expect(style.top).toBe('0%'); // no vertical overflow to offset
     });
 
     it('leaves a square image alone — there is nothing to crop', () => {
-        expect(coverStyle(1, {x: 0, y: 0})).toMatchObject({width: '100%', height: '100%', left: '0%'});
+        expect(coverStyle(1, {x: 0, y: 0, scale: 1})).toMatchObject({width: '100%', height: '100%', left: '0%'});
     });
 
     it('clamps a focus from outside the image', () => {
         // Storage is only two numbers; a bad one must not push the image off its frame.
-        expect(rowsShown(TALL, {x: 0.5, y: 5})).toEqual(rowsShown(TALL, {x: 0.5, y: 1}));
-        expect(rowsShown(TALL, {x: 0.5, y: -3})).toEqual(rowsShown(TALL, {x: 0.5, y: 0}));
+        expect(rowsShown(TALL, {x: 0.5, y: 5, scale: 1})).toEqual(rowsShown(TALL, {x: 0.5, y: 1, scale: 1}));
+        expect(rowsShown(TALL, {x: 0.5, y: -3, scale: 1})).toEqual(rowsShown(TALL, {x: 0.5, y: 0, scale: 1}));
     });
 });
 
@@ -145,4 +184,30 @@ describe('focusAfterDrag', () => {
         expect(full.y).toBeCloseTo(0.5 - 0.4);
         expect(halfway.y).toBeCloseTo(0.5 - 0.2);
     });
+
+describe('zoomed framing', () => {
+    it('scales both axes, so a tall image can finally move sideways', () => {
+        const style = coverStyle(TALL, {x: 0, y: 0.5, scale: 2});
+
+        // 2x: the width is twice the square, so there is real horizontal travel now.
+        expect(style.width).toBe('200%');
+        expect(style.height).toBe('300%'); // (100/0.667) * 2
+        expect(style.left).toBe('0%'); // x=0 pins the left edge (-0 stringifies to "0")
+    });
+
+    it('drags on both axes when zoomed', () => {
+        const zoomed = {x: 0.5, y: 0.5, scale: 2};
+        const dragged = focusAfterDrag(zoomed, TALL, 200, 40, 40);
+
+        expect(dragged.x).toBeLessThan(0.5);
+        expect(dragged.y).toBeLessThan(0.5);
+        expect(dragged.scale).toBe(2); // a drag never changes the zoom
+    });
+
+    it('is still exactly cover at scale 1', () => {
+        // The whole library renders through this. Zoom must be inert until someone uses it.
+        expect(rowsShown(TALL, CENTERED_PORTRAIT)).toEqual([50, 250]);
+        expect(coverStyle(TALL, CENTERED_PORTRAIT)).toMatchObject({width: '100%', height: '150%', top: '-25%', left: '0%'});
+    });
+});
 });

@@ -48,7 +48,11 @@ native module (`npm run android`).
 - [ ] **Every unframed portrait looks exactly as it did before this build** — framing is opt-in and
       centred is the old crop. This is the one to check first; it affects every character.
 - [ ] Tap a portrait on the sheet → the framer opens showing the current crop.
-- [ ] Drag: the image follows the finger, and stops at the top and bottom edges.
+- [ ] Drag: the image follows the finger and **stays where you put it** (it used to snap back —
+      the responder was being rebuilt mid-gesture). Stops at the edges.
+- [ ] Pinch to zoom, 1x to 4x. Zoomed in, a tall portrait can now be dragged sideways too.
+- [ ] Pinch out past 1x → stops at cover; the square never letterboxes.
+- [ ] Start a drag, add a second finger to pinch, lift it, keep dragging — no jump at each change.
 - [ ] Done → the new crop shows on the sheet, the list AND Home (all three draw portraits).
 - [ ] Reset → back to centred. Cancel → nothing changes.
 - [ ] A wide portrait drags sideways; a square one says there's nothing to frame.

@@ -427,7 +427,7 @@ describe('CharacterDetailScreen', () => {
         it('stores a reset as unframed, not as a deliberate centre', async () => {
             // Null is "never framed" — the state the app has always had. Reset really resets.
             const framed: Array<PortraitFocus | null> = [];
-            const tree = await renderScreen(fakeCharacters(withPortrait({portraitFocus: {x: 0.5, y: 0.1}}), framed));
+            const tree = await renderScreen(fakeCharacters(withPortrait({portraitFocus: {x: 0.5, y: 0.1, scale: 1}}), framed));
 
             await press(tree, 'frame-portrait');
             await press(tree, 'framer-reset');
@@ -437,7 +437,7 @@ describe('CharacterDetailScreen', () => {
         });
 
         it('shows the crop the character is already framed to', async () => {
-            const tree = await renderScreen(fakeCharacters(withPortrait({portraitFocus: {x: 0.5, y: 0}})));
+            const tree = await renderScreen(fakeCharacters(withPortrait({portraitFocus: {x: 0.5, y: 0, scale: 1}})));
 
             await press(tree, 'frame-portrait');
 

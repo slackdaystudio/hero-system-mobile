@@ -119,8 +119,24 @@ const migration006: Migration = {
     },
 };
 
+/**
+ * 007 — zoom, alongside the framing offset.
+ *
+ * Its own migration rather than a line added to 006: 006 has already run on a dev device, and a
+ * migration that has run anywhere is history. Editing it would leave that device on schema 6 with
+ * no `portrait_focus_scale` column and a query that references it.
+ *
+ * NULL reads as 1 (cover), so rows framed before zoom existed keep exactly the crop they had.
+ */
+const migration007: Migration = {
+    version: 7,
+    up(db) {
+        db.execute('ALTER TABLE characters ADD COLUMN portrait_focus_scale REAL');
+    },
+};
+
 /** All migrations, in ascending version order. */
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006, migration007];
 
 /**
  * Apply every migration newer than the recorded schema version, each in its own

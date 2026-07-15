@@ -258,19 +258,19 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
             const {repo} = setup();
             await repo.save(character());
 
-            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2});
+            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2, scale: 1});
 
             // The sheet, the list and Home all draw portraits — framing that only reached `get`
             // would look broken on every other screen.
-            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.5, y: 0.2});
-            expect((await repo.list())[0].portraitFocus).toEqual({x: 0.5, y: 0.2});
-            expect((await repo.recent())[0].portraitFocus).toEqual({x: 0.5, y: 0.2});
+            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.5, y: 0.2, scale: 1});
+            expect((await repo.list())[0].portraitFocus).toEqual({x: 0.5, y: 0.2, scale: 1});
+            expect((await repo.recent())[0].portraitFocus).toEqual({x: 0.5, y: 0.2, scale: 1});
         });
 
         it('resets to unframed on null', async () => {
             const {repo} = setup();
             await repo.save(character());
-            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2});
+            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2, scale: 1});
 
             await repo.setPortraitFocus('c1', null);
 
@@ -280,12 +280,32 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
         it('survives a re-save — framing is not part of the document', async () => {
             const {repo} = setup();
             await repo.save(character());
-            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2});
+            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2, scale: 1});
 
             // Re-importing the same .hdc, or any other full save, must not un-frame it.
             await repo.save(character({name: 'Defensor Reloaded'}));
 
-            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.5, y: 0.2});
+            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.5, y: 0.2, scale: 1});
+        });
+    });
+
+    describe('portrait zoom', () => {
+        it('round-trips a zoom', async () => {
+            const {repo} = setup();
+            await repo.save(character());
+
+            await repo.setPortraitFocus('c1', {x: 0.4, y: 0.2, scale: 2.5});
+
+            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.4, y: 0.2, scale: 2.5});
+        });
+
+        it('reads a pre-zoom framing as cover, so nothing it framed moves', async () => {
+            const {db, repo} = setup();
+            await repo.save(character());
+            // What a row framed by the 006-era build looks like: offset, no scale column value.
+            db.execute('UPDATE characters SET portrait_focus_x = 0.5, portrait_focus_y = 0.2 WHERE id = ?', ['c1']);
+
+            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.5, y: 0.2, scale: 1});
         });
     });
 });

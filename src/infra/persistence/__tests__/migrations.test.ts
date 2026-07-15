@@ -23,10 +23,10 @@ describe('migrations (real SQLite)', () => {
     it('applies the base schema and records the version', () => {
         const db = createBetterSqlite3Database();
 
-        expect(runMigrations(db)).toBe(6);
+        expect(runMigrations(db)).toBe(7);
 
         expect(tables(db)).toEqual(expect.arrayContaining(['app_state', 'characters', 'combat_state', 'random_hero', 'schema_migrations', 'settings', 'statistics']));
-        expect(db.execute('SELECT version FROM schema_migrations ORDER BY version').rows).toEqual([{version: 1}, {version: 2}, {version: 3}, {version: 4}, {version: 5}, {version: 6}]);
+        expect(db.execute('SELECT version FROM schema_migrations ORDER BY version').rows).toEqual([{version: 1}, {version: 2}, {version: 3}, {version: 4}, {version: 5}, {version: 6}, {version: 7}]);
         // Slots are retired — migration 003 drops the column.
         expect(tables(db)).not.toContain('slot');
         expect(db.execute('PRAGMA table_info(characters)').rows.some((row) => row.name === 'slot')).toBe(false);
@@ -39,7 +39,7 @@ describe('migrations (real SQLite)', () => {
         runMigrations(db);
         runMigrations(db);
 
-        expect(db.execute('SELECT COUNT(*) AS n FROM schema_migrations').rows[0].n).toBe(6);
+        expect(db.execute('SELECT COUNT(*) AS n FROM schema_migrations').rows[0].n).toBe(7);
     });
 
     it('removes combat state when its character is deleted (ON DELETE CASCADE)', () => {
@@ -107,6 +107,37 @@ describe('migrations (real SQLite)', () => {
             runMigrations(db);
 
             expect(db.execute('SELECT origin, recipe FROM characters').rows[0]).toEqual({origin: 'imported', recipe: null});
+        });
+    });
+
+    /**
+     * 007 is its own migration rather than a line in 006 because 006 had already run on a device.
+     * A migration that has run anywhere is history — editing it would strand that device on schema 6
+     * with queries referencing a column it never got.
+     */
+    it('007 — adds zoom without disturbing a portrait framed before it existed', () => {
+        const db = createBetterSqlite3Database();
+        runMigrations(
+            db,
+            MIGRATIONS.filter((migration) => migration.version <= 6),
+        );
+        db.execute('INSERT INTO characters (id, name, edition, data, updated_at, portrait_focus_x, portrait_focus_y) VALUES (?, ?, ?, ?, ?, ?, ?)', [
+            'c1',
+            'Defensor',
+            '5E',
+            '{}',
+            't',
+            0.5,
+            0.2,
+        ]);
+
+        runMigrations(db);
+
+        // NULL scale reads as 1 (cover), so the crop it already had is exactly the crop it keeps.
+        expect(db.execute('SELECT portrait_focus_x, portrait_focus_y, portrait_focus_scale FROM characters').rows[0]).toEqual({
+            portrait_focus_x: 0.5,
+            portrait_focus_y: 0.2,
+            portrait_focus_scale: null,
         });
     });
 });

@@ -13,22 +13,28 @@
 // limitations under the License.
 
 /**
- * Choose which part of a portrait the square shows.
+ * Choose which part of a portrait the square shows: drag to move, pinch to zoom.
  *
  * The preview *is* the crop — the same {@link PortraitImage} the list and the sheet draw, just
  * bigger — so what you drag is what you get, rather than a representation of it.
  *
- * Non-destructive: this stores two numbers and never touches the image bytes, so Reset always gets
- * the original framing back and nothing can be lost by fiddling.
+ * Non-destructive: this stores three numbers and never touches the image bytes, so Reset always
+ * gets the original framing back and nothing can be lost by fiddling.
  *
- * The drag itself is wiring; the maths lives in `components/portraitFocus` where it can be tested.
- * A pan gesture can't be exercised by react-test-renderer, so the thin part is the untested part.
+ * **The responder is built exactly once.** Rebuilding it mid-gesture — which is what happens if the
+ * live focus is a dependency — swaps the View's handlers under an in-flight touch, RN drops the
+ * responder, and the next move arrives as a *fresh* gesture with dx/dy of 0. That computes straight
+ * back to where the drag started, so the image visibly snaps back. Everything the handlers need to
+ * read is a ref for that reason; the deps array is empty and must stay empty.
+ *
+ * The maths lives in `components/portraitFocus` where it can be tested. Gestures can't be exercised
+ * by react-test-renderer, so the untestable part is kept as thin as possible.
  */
 import React, {useMemo, useRef, useState} from 'react';
-import {Modal, PanResponder, Pressable, StyleSheet, View, type ViewStyle} from 'react-native';
+import {Modal, PanResponder, Pressable, StyleSheet, View, type GestureResponderEvent, type ViewStyle} from 'react-native';
 import {CENTERED_PORTRAIT, type PortraitFocus} from 'core/ports';
 import {Button, PortraitImage, Text} from 'app/components';
-import {croppedAxis, focusAfterDrag} from 'app/components/portraitFocus';
+import {draggableAxes, focusAfterDrag, focusAfterZoom, MAX_SCALE, MIN_SCALE, touchDistance} from 'app/components/portraitFocus';
 import {useTheme} from 'app/theme';
 
 const PREVIEW = 260;
@@ -40,36 +46,81 @@ export interface PortraitFramerProps {
     aspect: number | undefined;
     visible: boolean;
     onCancel: () => void;
-    /** null = reset to centred (stored as "never framed"). */
+    /** null = reset to centred and unzoomed (stored as "never framed"). */
     onSave: (focus: PortraitFocus | null) => void;
 }
+
+const isUnframed = (focus: PortraitFocus): boolean =>
+    focus.x === CENTERED_PORTRAIT.x && focus.y === CENTERED_PORTRAIT.y && focus.scale === CENTERED_PORTRAIT.scale;
 
 export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: PortraitFramerProps): React.JSX.Element {
     const theme = useTheme();
     const [draft, setDraft] = useState<PortraitFocus>(focus ?? CENTERED_PORTRAIT);
 
-    // The focus the gesture started from. Deltas are cumulative from the touch down, so applying
-    // them to a moving `draft` would accelerate the image away from the finger.
+    // Read by the handlers, which are built once and would otherwise close over the first render's
+    // values forever.
+    const live = useRef(draft);
+    live.current = draft;
+    const aspectRef = useRef(aspect);
+    aspectRef.current = aspect;
+
+    // Where the gesture began. PanResponder deltas are cumulative from touch-down, so applying them
+    // to a moving draft would accelerate the image away from the finger.
     const start = useRef<PortraitFocus>(draft);
-    const axis = aspect === undefined ? null : croppedAxis(aspect);
+    const pinchFrom = useRef<number | null>(null);
 
     const responder = useMemo(
         () =>
             PanResponder.create({
-                onStartShouldSetPanResponder: () => axis !== null,
-                onMoveShouldSetPanResponder: () => axis !== null,
+                onStartShouldSetPanResponder: () => true,
+                onMoveShouldSetPanResponder: () => true,
                 onPanResponderGrant: () => {
-                    start.current = draft;
+                    start.current = live.current;
+                    pinchFrom.current = null;
                 },
-                onPanResponderMove: (_event, gesture) => {
-                    if (aspect !== undefined) {
-                        setDraft(focusAfterDrag(start.current, aspect, PREVIEW, gesture.dx, gesture.dy));
+                onPanResponderMove: (event: GestureResponderEvent, gesture) => {
+                    const currentAspect = aspectRef.current;
+
+                    if (currentAspect === undefined) {
+                        return;
                     }
+
+                    const touches = event.nativeEvent.touches;
+
+                    if (touches.length >= 2) {
+                        const spread = touchDistance(touches[0], touches[1]);
+
+                        // First frame of the pinch: remember the span and the scale to grow from, so
+                        // a second finger arriving mid-drag doesn't jump.
+                        if (pinchFrom.current === null || pinchFrom.current === 0) {
+                            pinchFrom.current = spread;
+                            start.current = live.current;
+                            return;
+                        }
+
+                        setDraft(focusAfterZoom(start.current, currentAspect, start.current.scale * (spread / pinchFrom.current)));
+                        return;
+                    }
+
+                    // Back to one finger: re-anchor so the pan doesn't inherit the pinch's travel.
+                    if (pinchFrom.current !== null) {
+                        pinchFrom.current = null;
+                        start.current = live.current;
+                        return;
+                    }
+
+                    setDraft(focusAfterDrag(start.current, currentAspect, PREVIEW, gesture.dx, gesture.dy));
+                },
+                onPanResponderRelease: () => {
+                    pinchFrom.current = null;
                 },
             }),
-        [aspect, axis, draft],
+        // Must stay empty — see the note above. Everything mutable is read through a ref.
+        [],
     );
 
+    const axes = aspect === undefined ? {x: false, y: false} : draggableAxes(aspect, draft.scale);
+    const canDrag = axes.x || axes.y;
     const sheet: ViewStyle = {backgroundColor: theme.colors.surface, borderRadius: theme.radius.md};
 
     return (
@@ -77,7 +128,7 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
             <View style={styles.backdrop}>
                 <View style={[styles.sheet, sheet]}>
                     <Text variant="label" muted>
-                        {axis === null ? 'NOTHING TO FRAME' : axis === 'y' ? 'DRAG UP AND DOWN' : 'DRAG LEFT AND RIGHT'}
+                        {canDrag ? 'DRAG TO MOVE · PINCH TO ZOOM' : 'PINCH TO ZOOM'}
                     </Text>
 
                     <View testID="framer-preview" style={styles.preview} {...responder.panHandlers}>
@@ -85,9 +136,7 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
                     </View>
 
                     <Text variant="caption" muted style={styles.hint}>
-                        {axis === null
-                            ? 'This portrait is already square — the whole image fits.'
-                            : 'This is exactly what the square will show. The image itself is never changed.'}
+                        {`This is exactly what the square will show${draft.scale > MIN_SCALE ? ` · ${draft.scale.toFixed(1)}×` : ''}. The image itself is never changed.`}
                     </Text>
 
                     <View style={styles.actions}>
@@ -95,9 +144,9 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
                         <Button label="Cancel" variant="secondary" onPress={onCancel} testID="framer-cancel" />
                         <Button
                             label="Done"
-                            // Centred is stored as "never framed" — the state the app has always had —
-                            // rather than as a deliberate 0.5/0.5. Reset really resets.
-                            onPress={() => onSave(draft.x === 0.5 && draft.y === 0.5 ? null : draft)}
+                            // Centred and unzoomed is stored as "never framed" — the state the app
+                            // has always had — rather than as a deliberate 0.5/0.5/1. Reset resets.
+                            onPress={() => onSave(isUnframed(draft) ? null : draft)}
                             testID="framer-done"
                         />
                     </View>
@@ -107,6 +156,9 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
         </Modal>
     );
 }
+
+/** Exported for its test: the zoom bounds the framer offers. */
+export const ZOOM_RANGE = {min: MIN_SCALE, max: MAX_SCALE};
 
 const styles = StyleSheet.create({
     backdrop: {

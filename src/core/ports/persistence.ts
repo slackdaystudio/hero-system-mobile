@@ -156,10 +156,18 @@ export interface PortraitInput {
 export interface PortraitFocus {
     x: number;
     y: number;
+    /**
+     * Zoom, where 1 is "cover" — the whole square filled by the least of the image that fills it.
+     * Never below 1: zooming out past cover would letterbox, which is a worse picture rather than a
+     * framing choice.
+     *
+     * At 1 only the long axis has any overflow, so only one of x/y does anything. Zoomed in, both do.
+     */
+    scale: number;
 }
 
 /** The centre crop every portrait gets until someone says otherwise. */
-export const CENTERED_PORTRAIT: PortraitFocus = {x: 0.5, y: 0.5};
+export const CENTERED_PORTRAIT: PortraitFocus = {x: 0.5, y: 0.5, scale: 1};
 
 /** The list-screen row — lifted columns only, no document parse. */
 export interface CharacterSummary {

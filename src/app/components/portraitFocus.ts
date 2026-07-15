@@ -13,66 +13,119 @@
 // limitations under the License.
 
 /**
- * The maths behind framing a portrait: where a square shows, and what a drag does to it.
+ * The maths behind framing a portrait: where a square shows, and what a drag or a pinch does to it.
  *
- * Pure and separate from the components on purpose. A drag gesture can't be exercised by
+ * Pure and separate from the components on purpose. Gestures can't be exercised by
  * react-test-renderer (it does no hit testing), so the part that can be wrong lives here where it
- * can be tested, and the component is left as thin wiring over it.
+ * can be tested, and the components are left as thin wiring over it.
  */
 import type {ImageStyle} from 'react-native';
-import type {PortraitFocus} from 'core/ports';
-
-const clamp = (value: number): number => Math.min(1, Math.max(0, value));
+import {CENTERED_PORTRAIT, type PortraitFocus} from 'core/ports';
 
 /**
- * Which axis a square actually crops.
- *
- * Only one ever does: covering a square scales the short side to fit, so the long side is the only
- * one with anything to spare. The framer uses this to drag on the axis that can move — offering the
- * other would be a control that does nothing.
+ * Zoom is bounded below at 1 — "cover" — so the square is always full. Letting it go lower would
+ * mean bars down the sides, which is a worse picture, not a framing choice.
  */
-export const croppedAxis = (aspect: number): 'y' | 'x' | null => (aspect < 1 ? 'y' : aspect > 1 ? 'x' : null);
+export const MIN_SCALE = 1;
+export const MAX_SCALE = 4;
 
-/** How much image, in pixels, falls outside a `size`-square — all of it on one axis. */
-export function overflowOf(aspect: number, size: number): number {
-    return aspect < 1 ? size * (1 / aspect - 1) : size * (aspect - 1);
+const clamp = (value: number, low = 0, high = 1): number => Math.min(high, Math.max(low, value));
+
+export const clampScale = (scale: number): number => clamp(scale, MIN_SCALE, MAX_SCALE);
+
+/**
+ * How big the image is, as a percentage of the square, once it covers and is zoomed.
+ *
+ * At `scale: 1` the short side is exactly 100% and only the long side overflows — which is what
+ * `resizeMode="cover"` does, and what every portrait did before framing existed. Zoom scales both.
+ */
+function scaledPercent(aspect: number, scale: number): {width: number; height: number} {
+    const cover = aspect < 1 ? {width: 100, height: 100 / aspect} : {width: 100 * aspect, height: 100};
+
+    return {width: cover.width * scale, height: cover.height * scale};
+}
+
+/** How much image, in pixels, falls outside a `size`-square, per axis. */
+export function overflowOf(aspect: number, size: number, scale = 1): {x: number; y: number} {
+    const percent = scaledPercent(aspect, scale);
+
+    return {x: (size * (percent.width - 100)) / 100, y: (size * (percent.height - 100)) / 100};
+}
+
+/**
+ * Which axes a drag can actually move.
+ *
+ * Unzoomed, only one ever can: covering a square scales the short side to fit, so the long side is
+ * the only one with anything spare. **Zoomed in, both can** — which is the point of zoom, and why
+ * this returns a pair rather than the single axis it used to.
+ */
+export function draggableAxes(aspect: number, scale = 1): {x: boolean; y: boolean} {
+    const overflow = overflowOf(aspect, 100, scale);
+
+    // A hair of tolerance: floating point leaves ~1e-14 of "overflow" on an exactly square image,
+    // which would offer a drag that visibly does nothing.
+    return {x: overflow.x > 0.001, y: overflow.y > 0.001};
 }
 
 /**
  * How to place an image inside a square so it covers, anchored at `focus`.
  *
  * Percentages, not pixels — they resolve against the parent, so this needs no measurement of the
- * container and behaves identically at 44pt in a list and 240pt in the framer.
+ * container and behaves identically at 44pt in a list and 260pt in the framer.
  *
- * `{x: 0.5, y: 0.5}` reproduces `resizeMode="cover"` exactly, which is what every portrait did
- * before framing existed. Nothing moves until someone moves it.
+ * `{x: 0.5, y: 0.5, scale: 1}` reproduces `resizeMode="cover"` exactly, which is what every
+ * portrait did before framing existed. Nothing moves until someone moves it.
  */
 export function coverStyle(aspect: number, focus: PortraitFocus): ImageStyle {
-    if (aspect < 1) {
-        // Taller than wide: fills the width, overflows below.
-        const height = 100 / aspect;
+    const scale = clampScale(focus.scale);
+    const percent = scaledPercent(aspect, scale);
 
-        return {position: 'absolute', left: 0, width: '100%', height: `${height}%`, top: `${-(height - 100) * clamp(focus.y)}%`};
-    }
-
-    // Wider than tall (or square, where the shift is zero either way): fills the height.
-    const width = 100 * aspect;
-
-    return {position: 'absolute', top: 0, height: '100%', width: `${width}%`, left: `${-(width - 100) * clamp(focus.x)}%`};
+    return {
+        position: 'absolute',
+        width: `${percent.width}%`,
+        height: `${percent.height}%`,
+        left: `${-(percent.width - 100) * clamp(focus.x)}%`,
+        top: `${-(percent.height - 100) * clamp(focus.y)}%`,
+    };
 }
 
 /**
  * The focus after dragging the image by (dx, dy) inside a `size`-square preview.
  *
  * Dragging **down** reveals what's **above** — the image follows the finger — so the focus moves
- * against the gesture. Both ends clamp, so a drag can't push the image off its own frame.
+ * against the gesture. Both ends clamp, so a drag can't push the image off its own frame. An axis
+ * with nothing to spare is left exactly alone rather than divided by zero.
  */
 export function focusAfterDrag(focus: PortraitFocus, aspect: number, size: number, dx: number, dy: number): PortraitFocus {
-    const overflow = overflowOf(aspect, size);
+    const overflow = overflowOf(aspect, size, clampScale(focus.scale));
 
-    if (overflow <= 0) {
-        return focus; // a square image in a square crop: nothing to move
-    }
+    return {
+        ...focus,
+        x: overflow.x > 0 ? clamp(focus.x - dx / overflow.x) : focus.x,
+        y: overflow.y > 0 ? clamp(focus.y - dy / overflow.y) : focus.y,
+    };
+}
 
-    return croppedAxis(aspect) === 'y' ? {x: focus.x, y: clamp(focus.y - dy / overflow)} : {x: clamp(focus.x - dx / overflow), y: focus.y};
+/**
+ * The focus after pinching to `scale`.
+ *
+ * Zooming keeps x/y, so it closes in on whatever is already framed rather than jumping to the
+ * middle. Zooming back to 1 re-centres the axis that just lost its overflow — at cover there is
+ * only one thing that axis can show, so leaving a stale fraction there would be meaningless state
+ * that reappears the next time someone zooms in.
+ */
+export function focusAfterZoom(focus: PortraitFocus, aspect: number, scale: number): PortraitFocus {
+    const next = clampScale(scale);
+    const axes = draggableAxes(aspect, next);
+
+    return {
+        x: axes.x ? clamp(focus.x) : CENTERED_PORTRAIT.x,
+        y: axes.y ? clamp(focus.y) : CENTERED_PORTRAIT.y,
+        scale: next,
+    };
+}
+
+/** Distance between two touch points — the raw material of a pinch. */
+export function touchDistance(a: {pageX: number; pageY: number}, b: {pageX: number; pageY: number}): number {
+    return Math.hypot(a.pageX - b.pageX, a.pageY - b.pageY);
 }

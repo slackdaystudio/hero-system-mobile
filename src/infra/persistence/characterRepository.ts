@@ -15,7 +15,7 @@
 import type {Character, CharacterOrigin, CharacterRepository, CharacterSummary, ImageStore, PortraitFocus, SaveCharacter, StoredRecipe} from 'core/ports';
 import type {SqlDatabase, SqlRow} from './driver/sqlDatabase';
 
-const SUMMARY_COLUMNS = 'id, name, player, edition, is_active, portrait_id, portrait_focus_x, portrait_focus_y';
+const SUMMARY_COLUMNS = 'id, name, player, edition, is_active, portrait_id, portrait_focus_x, portrait_focus_y, portrait_focus_scale';
 
 /**
  * Characters in SQLite: one row each, the HD document as a JSON `data` column
@@ -129,7 +129,12 @@ export class SqliteCharacterRepository implements CharacterRepository {
     }
 
     async setPortraitFocus(id: string, focus: PortraitFocus | null): Promise<void> {
-        this.db.execute('UPDATE characters SET portrait_focus_x = ?, portrait_focus_y = ? WHERE id = ?', [focus?.x ?? null, focus?.y ?? null, id]);
+        this.db.execute('UPDATE characters SET portrait_focus_x = ?, portrait_focus_y = ?, portrait_focus_scale = ? WHERE id = ?', [
+            focus?.x ?? null,
+            focus?.y ?? null,
+            focus?.scale ?? null,
+            id,
+        ]);
     }
 
     async setActive(id: string): Promise<void> {
@@ -153,8 +158,9 @@ export class SqliteCharacterRepository implements CharacterRepository {
             edition: row.edition as CharacterSummary['edition'],
             isActive: row.is_active === 1,
             portraitUri: portraitId !== null ? this.imageStore.uri(portraitId) : null,
-            // Both or neither — a half-written focus would silently frame one axis.
-            portraitFocus: x === null || y === null ? null : {x, y},
+            // x/y both or neither — a half-written focus would silently frame one axis. Scale is
+            // allowed to be missing: rows framed before zoom existed read as 1, which is cover.
+            portraitFocus: x === null || y === null ? null : {x, y, scale: (row.portrait_focus_scale as number | null) ?? 1},
         };
     }
 
