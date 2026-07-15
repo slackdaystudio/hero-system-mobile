@@ -18,7 +18,6 @@
         "end": 50,
         "stun": 32
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -210,8 +209,8 @@
         "dex": 18,
         "con": 20,
         "body": 12,
-        "int": 13,
-        "ego": 18,
+        "int": 18,
+        "ego": 13,
         "pre": 15,
         "com": 18,
         "pd": 6,
@@ -221,7 +220,6 @@
         "end": 40,
         "stun": 32
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -350,7 +348,6 @@
         "end": 40,
         "stun": 32
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -486,7 +483,6 @@
         "end": 40,
         "stun": 32
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -619,7 +615,6 @@
         "end": 50,
         "stun": 32
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -831,7 +826,6 @@
         "end": 40,
         "stun": 32
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -960,7 +954,6 @@
         "end": 50,
         "stun": 35
       },
-      "characteristicsCost": 125,
       "powersets": [
         {
           "powers": [
@@ -1064,7 +1057,6 @@
         "end": 50,
         "stun": 35
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -1111,7 +1103,6 @@
         "end": 50,
         "stun": 32
       },
-      "characteristicsCost": 125,
       "powersets": [
         {
           "powers": [
@@ -1307,7 +1298,6 @@
         "end": 40,
         "stun": 32
       },
-      "characteristicsCost": 100,
       "powersets": [
         {
           "powers": [
@@ -1443,7 +1433,6 @@
         "end": 50,
         "stun": 52
       },
-      "characteristicsCost": 150,
       "powersets": [
         {
           "powers": [

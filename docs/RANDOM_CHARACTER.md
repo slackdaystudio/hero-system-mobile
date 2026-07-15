@@ -82,9 +82,10 @@ is the bulk of this project, and it is content work, not engineering.
 ### 3 — Strict cutoffs as sub-budgets
 
 Structured as the original was: a fixed allocation per bucket, with the line moving by archetype.
-The legacy data already carries this and it is **real, not decorative** — `characteristicsCost`
-is 100 for most archetypes, 125 for Patriot and Speedster, 150 for Brick; skillsets carry their
-own `cost`.
+The legacy data already carries this and it is **real, not decorative** — the characteristics
+budget is 100 for most archetypes, 125 for Patriot and Speedster, 150 for Brick; skillsets carry
+their own `cost`. (The budget is now *computed* from each spread rather than declared — see
+below.)
 
 Each bucket is an independent sub-budget, which is what makes generation tractable: hitting a
 400-point total by rolling dice and hoping is a bad search; hitting 100 points of characteristics
@@ -116,7 +117,9 @@ That is a stronger guarantee than the corpus gives us anywhere else.
 
 ```
 core/data/random/
-  archetypes.5e.json     # lifted from legacy public/templates/archtypes.json
+  archetypes.5e.json     # lifted from legacy public/templates/archtypes.json, with two
+                         #   corrections: the derived characteristicsCost label dropped, and
+                         #   the Gadgeteer's transposed INT/EGO un-swapped
   archetypes.6e.json     # authored fresh at 400
   powersets.5e.json      # authored: legacy prose -> {xmlid, levels, modifiers}
   powersets.6e.json      # authored fresh
@@ -148,26 +151,34 @@ COM 18 →  8 lv ×½ =  4                        total     100
 These were built by someone doing real 5E math. **Phase 1 verified that claim against the engine
 for all 11** rather than trusting one hand-check — see the result below.
 
-### Verified: the spreads are sound, two labels are not
+### Verified: the spreads are sound, two labels were not
 
 Phase 1 result. All 11 archetypes hit **every characteristic in their spread exactly**, and 9 of
-11 cost precisely what they claim. Two labels are wrong — hand-summed, never checked:
+11 cost precisely what they claimed. Two labels were wrong — hand-summed, never checked:
 
-| Archetype | Claims | Actually costs | Why |
-|-----------|--------|----------------|-----|
+| Archetype | Claimed | Actually costs | Why |
+|-----------|---------|----------------|-----|
 | `Gadgeteer` | 100 | **98** | vs Energy Projector: int 18→13, ego 11→18, rec 10→7, end 50→40 → `100 − 5 + 14 − 6 − 5` |
 | `Powered Armor` | 100 | **103** | identical to Energy Projector but `stun: 35` vs `32`; STUN figures at 32, so +3 costs 3 |
 
-**The spread is authoritative** — it *is* the character; `characteristicsCost` is only a claim
-about it, and a derived one at that. So the generator computes the cost and the label is
-redundant. Both real costs are pinned in `core/random/__tests__/characteristics.test.ts`, along
-with an assertion that *exactly* these two disagree, so a later data fix has to come through
-deliberately.
+**Resolved: the label is gone.** `characteristicsCost` has been dropped from all 11 entries. The
+spread *is* the character; its cost is **derived, not declared** — and a hand-maintained number
+sitting next to a computable one is exactly how these two drifted. The generator asks the engine.
 
-Open, for a rules/design call: whether to nudge those two spreads onto a flat 100 (preserving a
-strict cutoff) or accept 98/103 and let the balance flow to powers. Note the cutoff is not flat
-anyway — Patriot and Speedster are 125, Brick 150. Also worth a look: INT 13 / EGO 18 on a
-*Gadgeteer* reads like a transposition.
+**Resolved: the Gadgeteer's INT/EGO was a transposition.** Legacy had `int 13 / ego 18` — the
+exact mirror of Energy Projector's `int 18 / ego 11`, and an odd build for a gadgeteer. Un-swapped.
+Note this *moves* its cost again: +5 for the INT, −10 for the EGO, so **93**, not the 98 above.
+
+The characteristics budget per archetype is therefore:
+
+| 100 | 125 | Other |
+|-----|-----|-------|
+| Energy Projector, Martial Artist, Mentalist, Metamorph, Mystic, Weapons Master | Patriot, Speedster | Gadgeteer **93**, Powered Armor **103**, Brick **150** |
+
+Not flat, by design — the attribute line moves per archetype, as it did in the original. The
+allocator spends against these; the balance flows to powers. Pinned as a table in
+`core/random/__tests__/characteristics.test.ts`, so editing a spread fails loudly rather than
+silently reshaping an archetype.
 
 ## Phasing
 

@@ -28,7 +28,6 @@ type Obj = Record<string, any>;
 interface Archetype {
     name: string;
     characteristics: CharacteristicSpread;
-    characteristicsCost: number;
 }
 
 const archetypes = (archetypeData as unknown as {archtypes: Archetype[]}).archtypes;
@@ -51,30 +50,46 @@ describe('random character — characteristics (5E)', () => {
     });
 
     /**
-     * Two of the eleven `characteristicsCost` labels are wrong — they were hand-summed and
-     * never checked. The **spread is authoritative** (it is the character; the label is only a
-     * claim about it), and the engine's arithmetic is right in both cases:
+     * What each archetype's spread actually buys, per the engine. The legacy data carried a
+     * hand-summed `characteristicsCost` label alongside the spread; two of the eleven were
+     * wrong, so the label was dropped — the spread *is* the character, and its cost is derived,
+     * not declared. This table is the pin: it documents each archetype's characteristics budget
+     * (which the allocator will spend against) and fails loudly if a spread is edited.
      *
-     *   - `Powered Armor` is identical to `Energy Projector` except `stun: 35` vs `32`. STUN's
-     *     figured value is 32, so the 3 extra points cost 3 → 103, not the stated 100.
-     *   - `Gadgeteer` differs from `Energy Projector` by int 18→13, ego 11→18, rec 10→7,
-     *     end 50→40: 100 − 5 + 14 − 6 − 5 = 98, not the stated 100.
-     *
-     * Pinned at their real costs so a later data fix has to come through here deliberately.
+     * Not flat by design — the "attribute line" moves per archetype, as it did in the original.
+     * Gadgeteer's 93 is the post-fix value: its INT and EGO were transposed in the legacy data
+     * (int 13 / ego 18 on a *gadgeteer*), and un-swapping them costs 5 more INT but 10 less EGO.
      */
-    const STATED_COST_IS_WRONG: Record<string, number> = {
-        Gadgeteer: 98,
+    const CHARACTERISTICS_BUDGET: Record<string, number> = {
+        'Energy Projector': 100,
+        Gadgeteer: 93,
+        'Martial Artist': 100,
+        Mentalist: 100,
+        Metamorph: 100,
+        Mystic: 100,
+        Patriot: 125,
         'Powered Armor': 103,
+        Speedster: 125,
+        'Weapons Master': 100,
+        Brick: 150,
     };
 
-    it.each(archetypes.map((a) => [a.name, a] as const))('%s costs what its spread actually buys', (name, archetype) => {
-        expect(characteristicsCost(build(archetype))).toBe(STATED_COST_IS_WRONG[name] ?? archetype.characteristicsCost);
+    it.each(archetypes.map((a) => [a.name, a] as const))('%s spends what its spread buys', (name, archetype) => {
+        expect(characteristicsCost(build(archetype))).toBe(CHARACTERISTICS_BUDGET[name]);
     });
 
-    it('has exactly two archetypes whose stated cost is wrong', () => {
-        const wrong = archetypes.filter((a) => characteristicsCost(build(a)) !== a.characteristicsCost).map((a) => a.name);
+    it('carries no declared cost — the spread is the source of truth', () => {
+        expect(archetypes.every((archetype) => !Object.prototype.hasOwnProperty.call(archetype, 'characteristicsCost'))).toBe(true);
+        expect(Object.keys(CHARACTERISTICS_BUDGET).sort()).toEqual(archetypes.map((a) => a.name).sort());
+    });
 
-        expect(wrong.sort()).toEqual(['Gadgeteer', 'Powered Armor']);
+    it('gives the Gadgeteer the INT its archetype implies', () => {
+        // Legacy had int 13 / ego 18 — the mirror of Energy Projector's int 18 / ego 11, and a
+        // strange build for a gadgeteer. Un-swapped here; this guards the fix.
+        const gadgeteer = archetypes.find((archetype) => archetype.name === 'Gadgeteer')!;
+
+        expect(gadgeteer.characteristics.int).toBe(18);
+        expect(gadgeteer.characteristics.ego).toBe(13);
     });
 
     it('produces a 5E character the rest of the engine accepts', () => {
