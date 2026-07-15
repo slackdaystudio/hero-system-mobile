@@ -32,14 +32,17 @@ const legacyDecorator = (require('../../../../../hero-system-mobile/src/decorato
     characterTraitDecorator: {decorate(item: unknown, listKey: string, getCharacter: () => unknown): any};
 }).characterTraitDecorator;
 
-// roll() can throw (a faithfully-ported legacy crash); treat "both threw the same"
-// as a match by comparing value-or-error rather than calling toEqual on a throw.
-const safeRoll = (decorated: {roll(): unknown}): unknown => {
-    try {
-        return {value: decorated.roll()};
-    } catch (error) {
-        return {threw: (error as Error).message};
-    }
+/**
+ * H4 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy's `Maneuver.roll()` throws
+ * on a maneuver whose `template` property exists with an `undefined` value, and core now
+ * falls through to the delegated roll instead. Keyed by fixture → trait xmlid (these
+ * maneuvers have no `name`). `tazimmaad`'s JAB is the only trait in the whole corpus whose
+ * legacy `roll()` throws, which is why comparing rolls directly below is safe now — the
+ * previous `safeRoll` helper existed solely to let "both engines threw identically" count as
+ * a match. The corrected behaviour is pinned in `maneuverTemplate.test.ts`.
+ */
+const H4_ROLL_DIVERGENCE: Record<string, Set<string>> = {
+    tazimmaad: new Set(['JAB']),
 };
 
 const fixtures = manifest.map((entry) => entry.fixture).sort();
@@ -100,10 +103,11 @@ describe('golden master: core/traits factory reproduces legacy', () => {
                 expect(ported.cost()).toBe(legacy.cost());
                 expect(ported.activeCost()).toBe(legacy.activeCost());
                 expect(ported.realCost()).toBe(legacy.realCost());
-                // roll() faithfully reproduces a legacy crash on a maneuver whose
-                // `effect` references a template that didn't resolve (see
-                // KNOWN_DEVIATIONS H4): both throw identically, which counts as a match.
-                expect(safeRoll(ported)).toEqual(safeRoll(legacy));
+
+                // Only roll() diverges for H4 — the costs still match legacy exactly.
+                if (!H4_ROLL_DIVERGENCE[name]?.has(String(trait.xmlid).toUpperCase())) {
+                    expect(ported.roll()).toEqual(legacy.roll());
+                }
             }
         });
     });

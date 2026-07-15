@@ -92,7 +92,7 @@ component-local and resets to on at every mount, where legacy persisted `showSec
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 13 entries; 3 fixed (H3, H5, U2). It explains why a "wrong-looking" line in
+> `core/`.** 13 entries; 4 fixed (H3, H4, H5, U2). It explains why a "wrong-looking" line in
 > `core/` may be load-bearing, and why a green golden master does not mean correct.
 
 Process per fix — follow it; the ledger explains the reasoning:
@@ -104,11 +104,20 @@ Process per fix — follow it; the ledger explains the reasoning:
 3. Re-base the affected golden master to an explicit intentional divergence, with a comment
    linking back to the ledger entry (see `H3_DIVERGENCE` / `U2_DIVERGENCE` for the shape).
 
-**Next: H4** — `Maneuver.roll()` crashes on `tazimmaad`'s JAB (a maneuver carrying a
-`template` property whose *value* is `undefined`). Fix is specified in the ledger.
+Still open and **active**:
 
-Also open and active: **H6** (unusual-defense duplicates read off a collapsed array; the
-mechanism is *not yet understood* — `defensor` reports `10/10` where it should be 0 or 15, so
-a third contributor is involved — trace it before fixing) and **U3** (latent float overshoot;
-`common.test.ts` pins the current *wrong* value on purpose so the fix must change it
-deliberately).
+- **H6** — unusual-defense duplicates read off a collapsed array. The mechanism is **not yet
+  understood**: `defensor` reports `10/10` where it should be 0 or 15, so a third contributor
+  (the `COMPOUNDPOWER` path) is involved. Trace it before fixing; unlike the others, this
+  entry is not a ready-to-execute plan.
+- **U3** — latent float overshoot in `getMultiplications`. Cheapest one left;
+  `common.test.ts` pins the current *wrong* value on purpose so the fix must change it
+  deliberately.
+
+Then the cosmetic/latent tail: T1–T4, H1, H2, U1.
+
+A lesson worth keeping from H4: `characterSheet.ts:333` wraps every trait in a try/catch that
+degrades a throwing trait to a stub row (cost 0, no combat line). **A core bug can therefore
+surface as quietly wrong data rather than a crash** — H4 mis-rendered one of tazimmaad's
+maneuvers for the whole life of the port without anyone seeing an error. When checking impact,
+build the sheet and read the values; don't just look for exceptions.

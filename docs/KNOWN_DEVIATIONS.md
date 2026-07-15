@@ -40,7 +40,7 @@
 | H1 | `character.template` always `undefined` | cosmetic | yes | hero |
 | H2 | Trait sort uses a boolean-returning comparator | real bug | likely (trait order) | hero |
 | H3 | Char/defense totals skip **duplicate** powers | ✅ **fixed** — was real bug, active | yes — junkyard, mark-li-v5a-433 | hero query (re-based) |
-| H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | **real bug, active** | **yes — tazimmaad (JAB)** | traits |
+| H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | ✅ **fixed** — was real bug, active | yes — tazimmaad ("Cut") | traits (decorator, re-based) |
 | H5 | VPP contents counted toward totals | ✅ **fixed** — was real bug, active | yes — adamantine (Leaping), m-championsmush | hero query / movement |
 | H6 | Unusual-defense duplicates read off the collapsed array | **real bug, active** | yes — defensor, junkyard | none (legacy equally wrong) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
@@ -231,7 +231,41 @@ that already returned the running total (a latent double-count), and
   unusual-defense query, including `POWERDEFENSE` and `FLASHDEFENSE`, which looks wrong
   independently of the array bug.
 
-## H4 — `Maneuver.roll()` crashes on an unresolved-template maneuver
+## H4 — `Maneuver.roll()` crashes on an unresolved-template maneuver — ✅ FIXED
+
+**Fixed.** The guard is now `hasOwn(trait, 'effect') && trait.template` — the *value*, not
+just the property — so an unresolved maneuver falls through to the delegated roll.
+
+- **The symptom was not a crash.** `characterSheet.ts:333` wraps each trait in a try/catch
+  that degrades a throwing trait to a stub row, so the throw never reached the user. It
+  reached them as **silent data loss**: `tazimmaad`'s maneuver — xmlid `JAB`, but displayed
+  under its own name **"Cut"** — rendered with `realCost: 0` and **no combat line**, where it
+  should read cost 3 at OCV +2 / DCV +1. Every other maneuver on the sheet was fine, which is
+  what made it invisible. Correct the entry's old framing accordingly: `roll()` does throw in
+  isolation, but nothing in the app calls it outside that try/catch.
+- **Why the template is `undefined`, and why that is correct data:** maneuver templates are
+  keyed by **display name**, and there are 53 standard ones — no "Jab" among them. A
+  hand-named maneuver therefore resolves to `undefined`. That is not a lookup bug; there is
+  genuinely nothing to resolve. `JAB` is the corpus' only such maneuver, and the only trait
+  in the whole corpus whose legacy `roll()` throws.
+- **Why the delegated roll is the right answer, not just a safe one:** `JAB` is
+  `useweapon: true`, and the damage branch requires `!useweapon`. So a *resolved* template
+  would have declined it and delegated too — the corrected value is what the working path
+  already produces. All of tazimmaad's maneuvers are weapon-using and roll `null`; JAB now
+  agrees with its siblings instead of being special.
+- **Golden master:** `safeRoll` is **gone**. It existed solely to let "both engines threw
+  identically" count as a match for this one trait; with JAB's roll skipped via
+  `H4_ROLL_DIVERGENCE`, every other trait's roll is now compared directly — a strictly
+  stronger assertion than before. Only `roll()` is skipped for JAB; its costs still match
+  legacy exactly.
+- **Pinned by:** `core/traits/__tests__/maneuverTemplate.test.ts` — the real character, the
+  agrees-with-siblings property, a hand-built unresolved maneuver (`useweapon: false`, so it
+  would otherwise take the damage branch), and a control that `aoe`'s Choke Hold still rolls
+  damage, so the guard cannot silence a working maneuver.
+
+### Original entry (for reference)
+
+## H4 (original) — `Maneuver.roll()` crashes on an unresolved-template maneuver
 
 - **Where:** `core/traits/maneuver.ts` `roll()` (legacy `decorators/Maneuver.js`). The
   guard is `hasOwnProperty('effect') && hasOwnProperty('template')`, but a maneuver can

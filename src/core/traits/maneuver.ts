@@ -67,7 +67,13 @@ export default class Maneuver extends TraitDecorator {
             return this.characterTrait.roll();
         }
 
-        if (hasOwn(trait, 'effect') && hasOwn(trait, 'template')) {
+        // H4 (docs/KNOWN_DEVIATIONS.md) — intentional divergence from legacy, which tested for
+        // the *presence* of `template` rather than its value. A maneuver whose name is not one
+        // of the 53 standard ones (the templates are keyed by display name) still gets a
+        // `template` property, set to `undefined` — so `trait.template.doesdamage` threw. Fall
+        // through to the delegated roll instead, which is what a resolved template would also
+        // yield for any maneuver this branch declines.
+        if (hasOwn(trait, 'effect') && trait.template) {
             if (trait.template.doesdamage && trait.category === 'Hand To Hand' && !trait.useweapon) {
                 if (trait.effect.indexOf('[KILLINGDC]') > -1) {
                     return {roll: this.getUnarmedKillingDamage(), type: RollType.KillingDamage};
