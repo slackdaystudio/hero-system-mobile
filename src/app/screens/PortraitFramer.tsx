@@ -31,7 +31,7 @@
  * by react-test-renderer, so the untestable part is kept as thin as possible.
  */
 import React, {useMemo, useRef, useState} from 'react';
-import {Modal, PanResponder, Pressable, StyleSheet, View, type GestureResponderEvent, type ViewStyle} from 'react-native';
+import {Modal, PanResponder, Pressable, StyleSheet, View, type GestureResponderEvent, type PanResponderGestureState, type ViewStyle} from 'react-native';
 import {CENTERED_PORTRAIT, type PortraitFocus} from 'core/ports';
 import {Button, PortraitImage, Text} from 'app/components';
 import {
@@ -86,52 +86,83 @@ export function PortraitFramer({uri, focus, aspect, visible, onCancel, onSave}: 
     const start = useRef<PortraitFocus>(draft);
     const pinchFrom = useRef<number | null>(null);
 
+    /**
+     * One move handler, reached from **both** dispatch paths.
+     *
+     * `onPanResponderMove` alone is not enough. RN dispatches `onMoveShouldSetResponderCapture` to
+     * the current responder too — its own source calls that "incorrect" — and that handler runs
+     * `_updateGestureStateOnMove`, which stamps `_accountsForMovesUpTo`. `onResponderMove` then sees
+     * the timestamp already accounted for and returns *before* calling `onPanResponderMove`. A
+     * single-finger drag skips the capture dispatch (the responder is its own common ancestor), so
+     * pan worked and pinch never fired once — the second finger is exactly what brings capture in.
+     *
+     * So: handle it from whichever arrives, and guard on the timestamp so it only counts once.
+     * gestureState is already updated by the time either calls us.
+     */
+    const handled = useRef(0);
+
+    const onMove = (event: GestureResponderEvent, gesture: PanResponderGestureState): void => {
+        const currentAspect = aspectRef.current;
+        const history = (event as ResponderEvent).touchHistory;
+
+        if (currentAspect === undefined || handled.current === history.mostRecentTimeStamp) {
+            return;
+        }
+
+        handled.current = history.mostRecentTimeStamp;
+
+        // `numberActiveTouches` + `touchHistory`, not `nativeEvent.touches` — the latter is filtered
+        // to the event's target and does not reliably carry the second finger.
+        const spread = gesture.numberActiveTouches >= 2 ? pinchSpread(history) : null;
+
+        if (spread !== null && spread > 0) {
+            // First frame of the pinch: remember the span and the scale to grow from, so a second
+            // finger arriving mid-drag doesn't jump.
+            if (pinchFrom.current === null) {
+                pinchFrom.current = spread;
+                start.current = live.current;
+                return;
+            }
+
+            setDraft(focusAfterZoom(start.current, currentAspect, start.current.scale * (spread / pinchFrom.current)));
+            return;
+        }
+
+        // Back to one finger: re-anchor so the pan doesn't inherit the pinch's travel.
+        if (pinchFrom.current !== null) {
+            pinchFrom.current = null;
+            start.current = live.current;
+            return;
+        }
+
+        setDraft(focusAfterDrag(start.current, currentAspect, PREVIEW, gesture.dx, gesture.dy));
+    };
+
+    const onMoveRef = useRef(onMove);
+    onMoveRef.current = onMove;
+
     const responder = useMemo(
         () =>
             PanResponder.create({
                 onStartShouldSetPanResponder: () => true,
                 onMoveShouldSetPanResponder: () => true,
+                // Not a claim — the responder is already ours. This is the only place a multi-touch
+                // move reliably arrives, so it does the work and declines the capture.
+                onMoveShouldSetPanResponderCapture: (event, gesture) => {
+                    onMoveRef.current(event, gesture);
+                    return false;
+                },
                 onPanResponderGrant: () => {
                     start.current = live.current;
                     pinchFrom.current = null;
+                    handled.current = 0;
                 },
-                onPanResponderMove: (event: GestureResponderEvent, gesture) => {
-                    const currentAspect = aspectRef.current;
-
-                    if (currentAspect === undefined) {
-                        return;
-                    }
-
-                    // `gestureState.numberActiveTouches` and `touchHistory`, not
-                    // `nativeEvent.touches` — the latter is filtered to the event's target and did
-                    // not reliably carry the second finger, which is why pinch never fired at all.
-                    const spread = gesture.numberActiveTouches >= 2 ? pinchSpread((event as ResponderEvent).touchHistory) : null;
-
-                    if (spread !== null && spread > 0) {
-                        // First frame of the pinch: remember the span and the scale to grow from, so
-                        // a second finger arriving mid-drag doesn't jump.
-                        if (pinchFrom.current === null) {
-                            pinchFrom.current = spread;
-                            start.current = live.current;
-                            return;
-                        }
-
-                        setDraft(focusAfterZoom(start.current, currentAspect, start.current.scale * (spread / pinchFrom.current)));
-                        return;
-                    }
-
-                    // Back to one finger: re-anchor so the pan doesn't inherit the pinch's travel.
-                    if (pinchFrom.current !== null) {
-                        pinchFrom.current = null;
-                        start.current = live.current;
-                        return;
-                    }
-
-                    setDraft(focusAfterDrag(start.current, currentAspect, PREVIEW, gesture.dx, gesture.dy));
-                },
+                onPanResponderMove: (event, gesture) => onMoveRef.current(event, gesture),
                 onPanResponderRelease: () => {
                     pinchFrom.current = null;
                 },
+                // Nothing may take the gesture mid-frame.
+                onPanResponderTerminationRequest: () => false,
             }),
         // Must stay empty — see the note above. Everything mutable is read through a ref.
         [],

@@ -15,10 +15,10 @@
 /**
  * The framer's wiring.
  *
- * The drag itself can't be exercised here — react-test-renderer does no hit testing and RN's
- * responder system isn't running — so the maths lives in `components/portraitFocus` and is tested
- * there. What *is* testable, and what actually broke in the first cut, is the identity of the
- * gesture handlers. See the regression below.
+ * react-test-renderer does no hit testing, so a real finger can't be simulated. But the handlers RN
+ * would call *can* be — driving `panHandlers` with a synthetic `touchHistory` runs the real
+ * PanResponder, which computes gestureState exactly as it does on a device. That is enough to catch
+ * both bugs this feature shipped with, and neither was in the maths.
  */
 import React from 'react';
 import {Image} from 'react-native';
@@ -170,3 +170,128 @@ describe('PortraitFramer', () => {
         });
     });
 });
+/**
+ * Gestures, driven through the real PanResponder.
+ *
+ * Everything below `panHandlers` is RN's own code — it derives gestureState from the touch history
+ * the same way here as on a phone. Only the platform delivering the touches is missing.
+ */
+describe('PortraitFramer gestures', () => {
+    beforeEach(() => {
+        jest.spyOn(Image, 'getSize').mockImplementation((_uri, success) => success(200, 300));
+    });
+    afterEach(() => jest.restoreAllMocks());
+
+    /** One finger, as RN's touch bank records it. */
+    const track = (x: number, y: number, at: number, from?: {x: number; y: number; at: number}) => ({
+        touchActive: true,
+        currentPageX: x,
+        currentPageY: y,
+        currentTimeStamp: at,
+        previousPageX: from?.x ?? x,
+        previousPageY: from?.y ?? y,
+        previousTimeStamp: from?.at ?? at,
+        startPageX: x,
+        startPageY: y,
+        startTimeStamp: 0,
+    });
+
+    const event = (bank: ReturnType<typeof track>[], at: number) =>
+        ({
+            nativeEvent: {touches: bank.map((t) => ({pageX: t.currentPageX, pageY: t.currentPageY}))},
+            touchHistory: {numberActiveTouches: bank.length, indexOfSingleActiveTouch: 0, mostRecentTimeStamp: at, touchBank: bank},
+        }) as never;
+
+    const gestures = (tree: ReactTestRenderer) => tree.root.findByProps({testID: 'framer-preview'}).props;
+    const scaleOf = (tree: ReactTestRenderer): string => /(\d\.\d)×/.exec(JSON.stringify(tree.toJSON()))?.[1] ?? '';
+    const topOf = (tree: ReactTestRenderer): number =>
+        parseFloat((tree.root.findAllByProps({testID: 'framer-image'}).find((node) => node.props.source !== undefined)!.props.style as {top: string}).top);
+
+    /**
+     * The second bug this shipped with, and the subtle one.
+     *
+     * RN dispatches `onMoveShouldSetResponderCapture` to the current responder — its own source
+     * calls that "incorrect" — and that handler stamps `_accountsForMovesUpTo`. `onResponderMove`
+     * then sees the frame already accounted for and returns *before* calling `onPanResponderMove`.
+     * A one-finger drag skips the capture dispatch, so pan worked while pinch never fired once: the
+     * second finger is precisely what brings capture into play.
+     */
+    it('zooms when the move arrives via the capture dispatch — where pinch actually lands', async () => {
+        const tree = await render(null);
+        const handlers = gestures(tree);
+
+        await act(async () => {
+            handlers.onStartShouldSetResponder(event([track(100, 100, 1)], 1));
+            handlers.onResponderGrant(event([track(100, 100, 1)], 1));
+        });
+
+        // Two fingers, 100px apart: the anchoring frame.
+        await act(async () => {
+            handlers.onResponderMove(event([track(100, 100, 2), track(200, 100, 2)], 2));
+        });
+        expect(scaleOf(tree)).toBe('1.0');
+
+        // Spread to 200px — 2x — arriving the way a real multi-touch move does.
+        await act(async () => {
+            const frame = event([track(50, 100, 3), track(250, 100, 3)], 3);
+            handlers.onMoveShouldSetResponderCapture(frame);
+            handlers.onResponderMove(frame);
+        });
+
+        expect(scaleOf(tree)).toBe('2.0');
+    });
+
+    it('declines the capture — handling a move is not a claim on the responder', async () => {
+        const tree = await render(null);
+
+        expect(gestures(tree).onMoveShouldSetResponderCapture(event([track(0, 0, 1), track(10, 0, 1)], 1))).toBe(false);
+    });
+
+    it('pans on one finger, following it', async () => {
+        const tree = await render(null);
+        const handlers = gestures(tree);
+
+        await act(async () => {
+            handlers.onResponderGrant(event([track(100, 100, 1)], 1));
+        });
+        const before = topOf(tree);
+
+        // Drag down 40px: reveals what is above, so the offset gets less negative.
+        await act(async () => {
+            handlers.onResponderMove(event([track(100, 140, 2, {x: 100, y: 100, at: 1})], 2));
+        });
+
+        expect(topOf(tree)).toBeGreaterThan(before);
+    });
+
+    it('counts one frame once, however many paths deliver it', async () => {
+        // Both dispatches fire for the same move. Without the timestamp guard the image would
+        // travel twice as far as the finger.
+        const tree = await render(null);
+        const handlers = gestures(tree);
+
+        await act(async () => {
+            handlers.onResponderGrant(event([track(100, 100, 1)], 1));
+        });
+
+        const frame = event([track(100, 140, 2, {x: 100, y: 100, at: 1})], 2);
+        await act(async () => {
+            handlers.onMoveShouldSetResponderCapture(frame);
+            handlers.onResponderMove(frame);
+        });
+        const once = topOf(tree);
+
+        await act(async () => {
+            handlers.onResponderMove(frame);
+        });
+
+        expect(topOf(tree)).toBe(once);
+    });
+
+    it('refuses to hand the gesture over mid-frame', async () => {
+        const tree = await render(null);
+
+        expect(gestures(tree).onResponderTerminationRequest(event([track(0, 0, 1)], 1))).toBe(false);
+    });
+});
+

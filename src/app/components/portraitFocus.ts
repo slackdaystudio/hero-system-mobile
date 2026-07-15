@@ -144,6 +144,8 @@ export interface TouchTrack {
 
 export interface TouchHistoryLike {
     numberActiveTouches: number;
+    /** Identifies the frame. Two dispatch paths can deliver the same move; this tells them apart. */
+    mostRecentTimeStamp: number;
     touchBank: ReadonlyArray<TouchTrack | undefined>;
 }
 

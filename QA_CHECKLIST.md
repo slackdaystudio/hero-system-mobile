@@ -51,8 +51,10 @@ native module (`npm run android`).
 - [ ] Drag: the image follows the finger and **stays where you put it** (it used to snap back —
       the responder was being rebuilt mid-gesture). Stops at the edges.
 - [ ] **Zoom –/+ buttons work** (these are the guaranteed path; pinch is the nice one).
-- [ ] Pinch to zoom, 1x to 4x. Pinch reads RN's touch bank now — the first cut read
-      nativeEvent.touches, which is target-filtered, and never fired at all.
+- [ ] Pinch to zoom, 1x to 4x. Two bugs lived here: reading nativeEvent.touches (target-filtered,
+      never carried the 2nd finger), and only handling onPanResponderMove (RN routes multi-touch
+      moves through the capture dispatch instead, so the handler never ran). Both now covered by
+      tests that drive the real PanResponder.
 - [ ] Pinch a second time in the same session — lifted fingers leave stale entries in the bank,
       so this is where a ghost finger would show up.
 - [ ] Zoomed in, a tall portrait can be dragged sideways too.

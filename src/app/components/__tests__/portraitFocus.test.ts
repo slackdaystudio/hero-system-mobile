@@ -223,12 +223,12 @@ describe('pinchSpread', () => {
 
     it('measures the span between two live fingers', () => {
         // 3-4-5 triangle.
-        expect(pinchSpread({numberActiveTouches: 2, touchBank: [touch(0, 0), touch(30, 40)]})).toBe(50);
+        expect(pinchSpread({numberActiveTouches: 2, mostRecentTimeStamp: 1, touchBank: [touch(0, 0), touch(30, 40)]})).toBe(50);
     });
 
     it('is null with fewer than two fingers', () => {
-        expect(pinchSpread({numberActiveTouches: 1, touchBank: [touch(0, 0)]})).toBeNull();
-        expect(pinchSpread({numberActiveTouches: 0, touchBank: []})).toBeNull();
+        expect(pinchSpread({numberActiveTouches: 1, mostRecentTimeStamp: 1, touchBank: [touch(0, 0)]})).toBeNull();
+        expect(pinchSpread({numberActiveTouches: 0, mostRecentTimeStamp: 1, touchBank: []})).toBeNull();
     });
 
     /**
@@ -241,18 +241,18 @@ describe('pinchSpread', () => {
         // same answer would pass against a filter that ignores `touchActive` entirely.
         const bank = [touch(1000, 1000, false), touch(0, 0), touch(30, 40)];
 
-        expect(pinchSpread({numberActiveTouches: 2, touchBank: bank})).toBe(50); // the two live ones
+        expect(pinchSpread({numberActiveTouches: 2, mostRecentTimeStamp: 1, touchBank: bank})).toBe(50); // the two live ones
     });
 
     it('survives the holes a sparse bank leaves', () => {
         const bank = [undefined, touch(0, 0), undefined, touch(0, 10)];
 
-        expect(pinchSpread({numberActiveTouches: 2, touchBank: bank})).toBe(10);
+        expect(pinchSpread({numberActiveTouches: 2, mostRecentTimeStamp: 1, touchBank: bank})).toBe(10);
     });
 
     it('reports a zero span rather than dividing by it later', () => {
         // Two fingers at the same point: real, and 0 is the honest answer. The framer guards it.
-        expect(pinchSpread({numberActiveTouches: 2, touchBank: [touch(5, 5), touch(5, 5)]})).toBe(0);
+        expect(pinchSpread({numberActiveTouches: 2, mostRecentTimeStamp: 1, touchBank: [touch(5, 5), touch(5, 5)]})).toBe(0);
     });
 });
 
