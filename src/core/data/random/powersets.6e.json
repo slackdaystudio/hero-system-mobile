@@ -474,5 +474,174 @@
         ]
       }
     }
+  ],
+  "Martial Artist": [
+    {
+      "label": "Adept",
+      "_note": "jane-fawn is the corpus model, and the defensive shape is hers: plain PD/ED with almost nothing resistant (she runs PD 2 / rDEF 3). A martial artist's defence is not being where the punch lands, so Resistant Protection here is 'Combat Luck' and nothing more. Built with a 60-point Resistant Protection first, it scored +8.6% — the Rule of X compounds dAP against DCV x DEF x rDEF, and a force field on a DCV 9 character is worth +8 on its own.\n\nThe maneuvers are NOT powers — a .hdc keeps them in their own bucket — but their cost comes out of the powers balance, exactly as the 5E prose folds them into powersCost. STR 18 only punches for DC 3; Offensive Strike (+4) and five Extra DCs carry it to the campaign's DC 12, because a martial artist's damage is technique rather than muscle.\n\nAuthoring a maneuver needs four fields HD writes into a .hdc and a template does not supply on its own: dc/ocv/dcv, `effect` (the engine gates its damage roll on hasOwn(trait,'effect')), `category`, and `addstr` (Y for Martial/Offensive Strike, N for Nerve Strike — an NND is technique, not muscle). Miss `effect` and the maneuver rolls nothing; miss `addstr` and it loses STR silently.\n\nNo Lightning Reflexes here, though a martial artist wants it: it is a TALENT, and a powerset carries only powers and maneuvers. It belongs in the skillset — and Phil's sheet counts it toward DEX, which ruleOfXStats reads from character.talents.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "PD",
+            "id": 401,
+            "alias": "PD",
+            "name": "Rolls With It",
+            "position": 0,
+            "levels": 16,
+            "basecost": 0
+          },
+          {
+            "xmlid": "ED",
+            "id": 402,
+            "alias": "ED",
+            "name": "Conditioned",
+            "position": 1,
+            "levels": 16,
+            "basecost": 0
+          },
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 403,
+            "alias": "Resistant Protection",
+            "name": "Combat Luck",
+            "position": 2,
+            "levels": 6,
+            "pdlevels": 3,
+            "edlevels": 3,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "RUNNING",
+            "id": 404,
+            "alias": "Running",
+            "name": "Fleet Of Foot",
+            "position": 3,
+            "levels": 32
+          },
+          {
+            "xmlid": "CLINGING",
+            "id": 405,
+            "alias": "Clinging",
+            "name": "Wall Walk",
+            "position": 4,
+            "levels": 0,
+            "basecost": 10
+          },
+          {
+            "xmlid": "MENTALDEFENSE",
+            "id": 407,
+            "alias": "Mental Defense",
+            "name": "Centred",
+            "position": 6,
+            "levels": 9,
+            "basecost": 0
+          },
+          {
+            "xmlid": "MISSILEDEFLECTION",
+            "id": 408,
+            "alias": "Deflection",
+            "name": "Catch The Arrow",
+            "position": 7,
+            "levels": 0,
+            "basecost": 20
+          }
+        ]
+      },
+      "martialarts": {
+        "maneuver": [
+          {
+            "xmlid": "MANEUVER",
+            "id": 411,
+            "alias": "Martial Block",
+            "display": "Martial Block",
+            "name": null,
+            "position": 0,
+            "basecost": 4,
+            "dc": 0,
+            "ocv": 2,
+            "dcv": 2,
+            "category": "Hand To Hand",
+            "useweapon": false,
+            "effect": "Block, Abort",
+            "addstr": false
+          },
+          {
+            "xmlid": "MANEUVER",
+            "id": 412,
+            "alias": "Martial Dodge",
+            "display": "Martial Dodge",
+            "name": null,
+            "position": 1,
+            "basecost": 4,
+            "dc": 0,
+            "ocv": 0,
+            "dcv": 5,
+            "category": "Hand To Hand",
+            "useweapon": false,
+            "effect": "Dodge, Affects All Attacks, Abort",
+            "addstr": false
+          },
+          {
+            "xmlid": "MANEUVER",
+            "id": 413,
+            "alias": "Martial Strike",
+            "display": "Martial Strike",
+            "name": null,
+            "position": 2,
+            "basecost": 4,
+            "dc": 2,
+            "ocv": 0,
+            "dcv": 2,
+            "category": "Hand To Hand",
+            "useweapon": false,
+            "effect": "[NORMALDC] Strike",
+            "addstr": true
+          },
+          {
+            "xmlid": "MANEUVER",
+            "id": 414,
+            "alias": "Offensive Strike",
+            "display": "Offensive Strike",
+            "name": null,
+            "position": 3,
+            "basecost": 5,
+            "dc": 4,
+            "ocv": -2,
+            "dcv": 1,
+            "category": "Hand To Hand",
+            "useweapon": false,
+            "effect": "[NORMALDC] Strike",
+            "addstr": true
+          },
+          {
+            "xmlid": "MANEUVER",
+            "id": 415,
+            "alias": "Nerve Strike",
+            "display": "Nerve Strike",
+            "name": null,
+            "position": 4,
+            "basecost": 4,
+            "dc": 4,
+            "ocv": -1,
+            "dcv": 1,
+            "category": "Hand To Hand",
+            "useweapon": false,
+            "effect": "[NNDDC]",
+            "addstr": false
+          },
+          {
+            "xmlid": "EXTRADC",
+            "id": 416,
+            "alias": "Extra DCs",
+            "display": "+5 HTH Damage Classes",
+            "name": null,
+            "position": 5,
+            "levels": 5,
+            "basecost": 0
+          }
+        ]
+      }
+    }
   ]
 }

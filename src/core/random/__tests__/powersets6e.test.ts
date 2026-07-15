@@ -54,14 +54,27 @@ const budgetFor = (name: string): number => {
     return STANDARD_6E.total - characteristicsBudget(archetype, STANDARD_6E) - SKILLS_BUDGET;
 };
 
+/**
+ * What the powerset costs — powers **and** martial maneuvers.
+ *
+ * Maneuvers are not powers: a `.hdc` keeps them in their own bucket. But their cost comes out of the
+ * powers balance, which is the 5E precedent too (the legacy prose folds them into `powersCost` —
+ * Martial Artist's 115 is powers 100 + maneuvers 15). Counting only `powers` reads the Martial
+ * Artist 41 points under.
+ */
 const powersSpent = (character: Obj): number =>
-    (character.powers as Obj[]).reduce((total, power) => {
-        try {
-            return total + characterTraitDecorator.decorate(power, 'powers', () => character).realCost();
-        } catch {
-            return total;
-        }
-    }, 0);
+    (['powers', 'martialArts'] as const).reduce(
+        (total, key) =>
+            total +
+            ((character[key] ?? []) as Obj[]).reduce((sum, trait) => {
+                try {
+                    return sum + characterTraitDecorator.decorate(trait, key, () => character).realCost();
+                } catch {
+                    return sum;
+                }
+            }, 0),
+        0,
+    );
 
 describe('6E powersets', () => {
     it('is authored against archetypes that exist', () => {

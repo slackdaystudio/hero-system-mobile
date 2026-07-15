@@ -63,6 +63,14 @@ const doesDamage = (power: Obj): boolean => power.template?.doesdamage === true;
  */
 const MOVEMENT_POWERS: ReadonlySet<string> = new Set(['RUNNING', 'SWIMMING', 'LEAPING', 'FLIGHT', 'GLIDING', 'SWINGING', 'TUNNELING', 'FTL', 'EXTRADIMENSIONALMOVEMENT']);
 
+/**
+ * The three modes everyone already has, which a power of the same name **adds to**.
+ *
+ * Flight starts at nothing, so a Flight power's levels *are* its metres. Running starts at 12, so a
+ * Running +24 power is a 36m character — reading the power alone under-reads them by the base.
+ */
+const BASE_MOVEMENT: ReadonlySet<string> = new Set(['RUNNING', 'SWIMMING', 'LEAPING']);
+
 const toArray = (value: unknown): Obj[] => (Array.isArray(value) ? (value as Obj[]) : value === undefined || value === null ? [] : [value as Obj]);
 
 /** `getTotalDefense` hands back `"total/resistant"`; `getTotalUnusualDefense` does the same. */
@@ -93,17 +101,24 @@ export function diceOf(roll: string | null | undefined): number {
     return parseInt(whole, 10) + (half ? 0.5 : 0) + (pip === '+' ? 1 / 3 : pip === '-' ? -1 / 3 : 0);
 }
 
-/** A power's damage classes. Killing attacks are 3 DC to the die; everything else is 1. */
-function damageClassesOf(power: Obj, character: Obj): number {
+/**
+ * A trait's damage classes, from the dice the engine says it throws.
+ *
+ * `roll()` is the authority and is used rather than any arithmetic here, because it already folds in
+ * everything that moves a number: STR into a hand-to-hand power, and **Extra DCs into a martial
+ * maneuver**. Reading `maneuver.dc` alone under-reads a martial artist badly — their damage is
+ * mostly technique, and Extra DCs are where the technique is bought.
+ */
+function damageClassesOf(trait: Obj, key: string, character: Obj): number {
     let roll: string | null = null;
 
     try {
-        roll = (characterTraitDecorator.decorate(power, 'powers', () => character).roll()?.roll as string) ?? null;
+        roll = (characterTraitDecorator.decorate(trait, key, () => character).roll()?.roll as string) ?? null;
     } catch {
-        return 0; // a power the engine can't roll contributes nothing rather than throwing
+        return 0; // a trait the engine can't roll contributes nothing rather than throwing
     }
 
-    return diceOf(roll) * (power.template?.killing === true ? 3 : 1);
+    return diceOf(roll) * (trait.template?.killing === true ? 3 : 1);
 }
 
 const activeCostOf = (trait: Obj, key: string, character: Obj): number => {
@@ -157,16 +172,22 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
         .reduce((sum, skill) => sum + (Number(skill.levels) || 0), 0);
 
     /**
-     * "The maximum DC a character can generate."
+     * "The maximum DC a character can generate ... DO include martial maneuvers."
      *
-     * Three sources, and the largest wins. Only powers that actually *do damage* count — an
-     * Entangle is an attack but deals none, so it raises oAP and not this. `roll()` already folds
-     * STR into a hand-to-hand power's dice, so the bare punch is only counted for a character with
-     * no HTH power at all — otherwise STR would land twice.
+     * Three sources and the largest wins. Only traits that actually *do damage* count — an Entangle
+     * is an attack but deals none, so it raises oAP and not this. Every one is priced by the
+     * engine's own `roll()`, which folds in STR and Extra DCs alike: a martial artist with STR 18
+     * punches for 3, and reaches the campaign's 12 through Offensive Strike and five Extra DCs.
+     *
+     * The bare punch is the floor, for a Brick with no attack power at all.
      */
     const punch = Math.floor(total('STR') / 5);
-    const maneuvers = toArray(character.martialArts).map((maneuver) => (Number(maneuver.dc) || 0) + punch);
-    const dc = Math.max(punch, ...attacks.filter(doesDamage).map((power) => damageClassesOf(power, character)), ...maneuvers);
+    const maneuvers = toArray(character.martialArts).filter(doesDamage);
+    const dc = Math.max(
+        punch,
+        ...attacks.filter(doesDamage).map((power) => damageClassesOf(power, 'powers', character)),
+        ...maneuvers.map((maneuver) => damageClassesOf(maneuver, 'martialArts', character)),
+    );
 
     /**
      * "The maximum velocity the character can generate."
@@ -175,9 +196,17 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
      * never reaches it — so the movement powers are read separately. starborne is the proof: 12m of
      * Running on the movement rows, 40m of Flight in the powers.
      */
-    const baseMovement = toArray(character.movement).map((mode) => Number(mode.value) || 0);
-    const movementPowers = powers.filter((power) => MOVEMENT_POWERS.has(String(power.xmlid).toUpperCase())).map((power) => Number(power.levels) || 0);
-    const velocity = Math.max(0, ...baseMovement, ...movementPowers);
+    const modes = toArray(character.movement);
+    const baseOf = (mode: string): number => Number(modes.find((row) => String(row.shortName).toUpperCase() === mode)?.value) || 0;
+    const movementPowers = powers
+        .filter((power) => MOVEMENT_POWERS.has(String(power.xmlid).toUpperCase()))
+        .map((power) => {
+            const mode = String(power.xmlid).toUpperCase();
+
+            // A Running power adds to the 12m everyone walks; a Flight power is all there is.
+            return (Number(power.levels) || 0) + (BASE_MOVEMENT.has(mode) ? baseOf(mode) : 0);
+        });
+    const velocity = Math.max(0, ...modes.map((mode) => Number(mode.value) || 0), ...movementPowers);
 
     return {
         ego,
