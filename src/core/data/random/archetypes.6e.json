@@ -121,7 +121,7 @@
     },
     {
       "name": "Metamorph",
-      "_note": "All-rounder — the shapes are powers, so the base body is solid rather than specialised. PRE carries the 5E identity.",
+      "_note": "All-rounder — the shapes are powers, so the base body is solid rather than specialised, and PRE carries the 5E identity. Same trap as the Patriot: an archetype with nothing above baseline has nothing to trade, so being a shade under on DCV and DMCV cost it 2.5 of X for no reason. Both sit on the baseline now.",
       "characteristics": {
         "str": 20,
         "dex": 18,
@@ -131,9 +131,9 @@
         "ego": 13,
         "pre": 20,
         "ocv": 7,
-        "dcv": 7,
+        "dcv": 8,
         "omcv": 3,
-        "dmcv": 3,
+        "dmcv": 4,
         "pd": 8,
         "ed": 8,
         "spd": 5,

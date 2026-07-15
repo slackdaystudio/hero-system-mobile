@@ -1207,5 +1207,189 @@
         ]
       }
     }
+  ],
+  "Metamorph": [
+    {
+      "label": "Changeling",
+      "_note": "The body IS the powerset — no gear, no gadget, nothing it didn't grow. Bone blades, limbs that reach, spare arms, flesh that closes, and nothing vital in there to hit.\n\nIt reads DC 12 / oAP 40, and the Rule of X handles that correctly on its own: 12*5 = 60 > 40, so the blades score on their damage rather than their active points. A killing attack is cheap per DC.\n\nTuning it taught the sharpest lesson of the eleven. Resistant Protection raises DEF, rDEF AND dAP at once, and the dAP term multiplies all three — so it grows CUBICALLY. Going 14/14 -> 20/20 moved this character from -7.7% to +1.4% on 18 points. It is the single most X-dense thing a powerset can buy, and it is exactly why three archetypes before this one came in too hot.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 901,
+            "alias": "Resistant Protection",
+            "name": "Hardened Hide",
+            "position": 0,
+            "levels": 36,
+            "pdlevels": 18,
+            "edlevels": 18,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "SHAPESHIFT",
+            "id": 902,
+            "alias": "Shape Shift",
+            "name": "Wear Another Face",
+            "position": 1,
+            "levels": 0,
+            "basecost": 10,
+            "option": "SIGHTGROUP",
+            "optionid": "SIGHTGROUP",
+            "optionAlias": "Sight Group"
+          },
+          {
+            "xmlid": "EXTRALIMBS",
+            "id": 903,
+            "alias": "Extra Limbs",
+            "name": "Spare Arms",
+            "position": 2,
+            "levels": 0,
+            "basecost": 5
+          },
+          {
+            "xmlid": "REGENERATION",
+            "id": 904,
+            "alias": "Regeneration",
+            "name": "Knit Shut",
+            "position": 3,
+            "levels": 1,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "REGENRATE",
+                "alias": "Regeneration:",
+                "basecost": 0,
+                "levels": 0,
+                "option": "TURN",
+                "optionid": "TURN",
+                "optionAlias": "1 Turn"
+              }
+            ]
+          },
+          {
+            "xmlid": "DAMAGENEGATION",
+            "id": 905,
+            "alias": "Damage Negation",
+            "name": "Nothing Vital There",
+            "position": 4,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "PHYSICAL",
+                "alias": "Physical DCs",
+                "basecost": 0,
+                "levels": 1,
+                "lvlval": 1,
+                "lvlcost": 5
+              }
+            ]
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 906,
+            "alias": "Life Support",
+            "name": "No Lungs To Speak Of",
+            "position": 5,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "SELFCONTAINEDBREATHING",
+                "alias": "Self-Contained Breathing",
+                "basecost": 4,
+                "levels": 0
+              },
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "INTENSECOLD",
+                "optionid": "INTENSECOLD",
+                "optionAlias": "Intense Cold"
+              },
+              {
+                "xmlid": "LONGEVITY",
+                "alias": "Longevity:",
+                "basecost": 5,
+                "levels": 0,
+                "option": "IMMORTAL",
+                "optionid": "IMMORTAL",
+                "optionAlias": "Immortal"
+              }
+            ]
+          },
+          {
+            "xmlid": "RUNNING",
+            "id": 907,
+            "alias": "Running",
+            "name": "Lope",
+            "position": 6,
+            "levels": 18
+          },
+          {
+            "xmlid": "HKA",
+            "id": 911,
+            "parentid": 910,
+            "alias": "Killing Attack - Hand-To-Hand",
+            "name": "Bone Blades",
+            "position": 7,
+            "levels": 2,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "STRETCHING",
+            "id": 912,
+            "parentid": 910,
+            "alias": "Stretching",
+            "name": "Reach",
+            "position": 8,
+            "levels": 10,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "HANDTOHANDATTACK",
+            "id": 913,
+            "parentid": 910,
+            "alias": "Hand-To-Hand Attack",
+            "name": "Battering Mass",
+            "position": 9,
+            "levels": 8,
+            "addstr": true,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "ENTANGLE",
+            "id": 914,
+            "parentid": 910,
+            "alias": "Entangle",
+            "name": "Engulf",
+            "position": 10,
+            "levels": 4,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "STRETCHING",
+            "id": 908,
+            "alias": "Stretching",
+            "name": "It Doesn't Sit Right",
+            "position": 12,
+            "levels": 6
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 910,
+            "alias": "Multipower",
+            "name": "Reshape",
+            "position": 11,
+            "basecost": 60
+          }
+        ]
+      }
+    }
   ]
 }
