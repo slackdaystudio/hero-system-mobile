@@ -35,7 +35,12 @@ import {attachPowerset, POWERSETS_6E, type Powerset} from '../powerset';
 import {deviation, isBalanced} from '../ruleOfX';
 import {ruleOfXStats} from '../ruleOfXStats';
 
-/** What the 6E skillsets will cost. Real 400-point characters spend 30–69; the corpus median is 59. */
+/**
+ * What the 6E skillsets will cost. Real 400-point characters spend 30–69; the corpus median is 59.
+ *
+ * It is a **no-CSL** budget, and always was: four of those five carry no Combat Skill Levels at all,
+ * so their 30–69 is already all real skills. Nothing here is being held back for them.
+ */
 const SKILLS_BUDGET = 50;
 
 const authored = Object.entries(POWERSETS_6E).filter(([name]) => !name.startsWith('_'));
@@ -147,6 +152,21 @@ describe('6E powersets', () => {
     it('gives nobody a VPP', () => {
         expect(JSON.stringify(POWERSETS_6E)).not.toContain('"vpp"');
         expect(JSON.stringify(POWERSETS_6E).toUpperCase()).not.toContain('VARIABLEPOWERPOOL');
+    });
+
+    /**
+     * A standing rule, and Phil's reason is cognitive load rather than balance: "I dislike CSLs at
+     * character creation unless you have a very specific concept like an old master or grizzled vet.
+     * I would rather re-invest those points into base OCV/DCV and keep the cognitive load lighter for
+     * new players." A CSL is a thing you must remember to apply; an OCV is just your OCV.
+     *
+     * His own corpus already agrees — four of the five real 400-point characters carry CSL 0.
+     *
+     * It costs every generated character ~5 of X, because the baseline expects CSL 2 at weight 5.
+     * That is deliberate and permanent, not a gap to be closed: the real five eat the same -5.
+     */
+    it.each(cases)('%s / %s gives nobody a combat skill level', (name, _label, set) => {
+        expect(ruleOfXStats(build(name, set)).csl).toBe(0);
     });
 
     it('states no cost anywhere in the data — every price is the engine’s', () => {
