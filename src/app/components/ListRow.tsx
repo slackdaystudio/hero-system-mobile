@@ -15,6 +15,7 @@
 import React from 'react';
 import {Image, Pressable, StyleSheet, View, type ViewStyle} from 'react-native';
 import {useTheme} from 'app/theme';
+import {TrashIcon} from './icons';
 import {Text} from './Text';
 
 export interface ListRowProps {
@@ -26,13 +27,20 @@ export interface ListRowProps {
     onPress?: () => void;
     /** Long-press action. Used for destructive actions, which should confirm before acting. */
     onLongPress?: () => void;
+    /**
+     * Shows a trash button at the trailing edge. Destructive, so it must confirm before acting —
+     * a visible control is easier to hit by accident than the long-press it supplements.
+     */
+    onDelete?: () => void;
+    /** Names the target for screen readers: "Delete Defensor", not a bare "Delete". */
+    deleteLabel?: string;
     testID?: string;
 }
 
 const initialOf = (title: string): string => (title.trim()[0] ?? '?').toUpperCase();
 
-/** A tappable list row: leading portrait/initial, title + subtitle, active badge. */
-export function ListRow({title, subtitle, imageUri, active = false, onPress, onLongPress, testID}: ListRowProps): React.JSX.Element {
+/** A tappable list row: leading portrait/initial, title + subtitle, active badge, trailing delete. */
+export function ListRow({title, subtitle, imageUri, active = false, onPress, onLongPress, onDelete, deleteLabel, testID}: ListRowProps): React.JSX.Element {
     const theme = useTheme();
 
     const container: ViewStyle = {
@@ -78,6 +86,21 @@ export function ListRow({title, subtitle, imageUri, active = false, onPress, onL
                     </Text>
                 </View>
             ) : null}
+            {onDelete !== undefined ? (
+                <Pressable
+                    testID={testID !== undefined ? `${testID}-delete` : 'delete'}
+                    accessibilityRole="button"
+                    accessibilityLabel={deleteLabel ?? `Delete ${title}`}
+                    // A nested Pressable consumes the touch, so this never also opens the row.
+                    onPress={onDelete}
+                    // The icon is small; the target must not be. Padding takes it to ~44pt without
+                    // widening the trash itself, and it sits at the trailing edge, away from where
+                    // a thumb lands to open the row.
+                    hitSlop={8}
+                    style={({pressed}) => [styles.delete, {opacity: pressed ? 0.5 : 1}]}>
+                    <TrashIcon color={theme.colors.danger} />
+                </Pressable>
+            ) : null}
         </Pressable>
     );
 }
@@ -103,6 +126,12 @@ const styles = StyleSheet.create({
     },
     body: {
         flex: 1,
+    },
+    delete: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 13,
     },
     badge: {
         paddingHorizontal: 8,

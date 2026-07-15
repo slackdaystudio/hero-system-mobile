@@ -29,8 +29,13 @@ export interface CharacterListScreenProps {
 
 /**
  * Deleting a character is **irreversible** — it drops the row and its portrait file, and an
- * imported `.hdc` may be the only copy. So a long-press (already hard to hit by accident) still
- * confirms, names the character being deleted, and defaults to Cancel.
+ * imported `.hdc` may be the only copy. The confirmation names the character and defaults to
+ * Cancel.
+ *
+ * It carries more weight now than it did: delete began as a long-press, which was safe but
+ * undiscoverable. A trash button on every row fixes the discoverability and hands back the
+ * fat-finger risk the long-press was avoiding, so this is the only thing standing between a
+ * mis-tap and a character that is gone.
  */
 const confirmDelete = (name: string, onConfirm: () => void): void =>
     Alert.alert(`Delete ${name}?`, 'This cannot be undone.', [
@@ -119,7 +124,10 @@ export function CharacterListScreen({onSelect, refreshToken}: CharacterListScree
                         imageUri={item.portraitUri}
                         active={item.isActive}
                         onPress={onSelect === undefined ? undefined : () => onSelect(item.id)}
+                        // Both reach the same confirmation. The trash is the discoverable one; the
+                        // long-press stays for anyone who already learned it.
                         onLongPress={() => remove(item)}
+                        onDelete={() => remove(item)}
                     />
                 )}
             />

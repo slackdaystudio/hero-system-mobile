@@ -25,6 +25,15 @@ native module (`npm run android`).
 - [ ] Cancel the picker → no error, nothing changes.
 - [ ] Import a couple of your trickier builds (VPP, multipower, frameworks).
 
+## Delete a character
+- [ ] The trash button is legible against both themes, and hittable without aiming.
+- [ ] Tapping it confirms, names the right character, and does **not** open that character.
+      (The unit test can only prove the wiring — react-test-renderer does no hit testing, so
+      whether the nested Pressable really swallows the touch is only knowable on a device.)
+- [ ] Cancel leaves the character alone; Delete removes it and the row goes.
+- [ ] Scroll the list with a thumb over the rows — no accidental deletes.
+- [ ] Long-press a row still confirms too (the older, hidden path).
+
 ## Character sheet
 - [ ] Character tab: characteristics + all trait sections render; costs/rolls look right.
 - [ ] Tap a characteristic/skill roll → dice roller opens pre-filled.

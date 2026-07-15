@@ -68,6 +68,15 @@ const longPress = async (tree: ReactTestRenderer, id: string): Promise<void> => 
     });
 };
 
+/** Tap the row's trash button — the discoverable path to the same confirmation. */
+const pressTrash = async (tree: ReactTestRenderer, id: string): Promise<void> => {
+    const trash = tree.root.findAllByProps({testID: `character-${id}-delete`}).find((node) => typeof node.props.onPress === 'function');
+
+    await act(async () => {
+        trash?.props.onPress();
+    });
+};
+
 const collectText = (node: unknown): string[] => {
     if (node === null || node === undefined) {
         return [];
@@ -236,6 +245,50 @@ describe('CharacterListScreen', () => {
 
             expect(spy.mock.calls[spy.mock.calls.length - 1][0]).toBe('Delete failed');
             expect(spy.mock.calls[spy.mock.calls.length - 1][1]).toBe('rows are load-bearing');
+        });
+    });
+
+    describe('the trash button', () => {
+        afterEach(() => jest.restoreAllMocks());
+
+        it('offers one per row, naming its character for screen readers', async () => {
+            const spy = alertSpy();
+            const tree = await renderScreen(fakeCharacters([summary({id: 'c1', name: 'Defensor'}), summary({id: 'c2', name: 'Grond'})]));
+
+            const trash = tree.root.findByProps({testID: 'character-c2-delete'});
+            expect(trash.props.accessibilityLabel).toBe('Delete Grond');
+
+            await pressTrash(tree, 'c2');
+            expect(spy.mock.calls[0][0]).toBe('Delete Grond?');
+        });
+
+        it('does not open the character it deletes', async () => {
+            // The trash sits inside the row's own Pressable. If the touch fell through, a delete
+            // would also navigate to the character being deleted.
+            const spy = alertSpy();
+            const onSelect = jest.fn();
+            const tree = await renderScreen(fakeCharacters([summary()]), {onSelect});
+
+            await pressTrash(tree, 'c1');
+
+            expect(onSelect).not.toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledTimes(1);
+        });
+
+        it('still confirms — a visible button is easier to mis-tap than a long-press', async () => {
+            const deleted: string[] = [];
+            const spy = alertSpy();
+            const tree = await renderScreen(fakeCharacters([summary()], {deleted}));
+
+            await pressTrash(tree, 'c1');
+            expect(deleted).toEqual([]);
+
+            await pressAlertButton(spy, 'Cancel');
+            expect(deleted).toEqual([]);
+
+            await pressTrash(tree, 'c1');
+            await pressAlertButton(spy, 'Delete');
+            expect(deleted).toEqual(['c1']);
         });
     });
 });
