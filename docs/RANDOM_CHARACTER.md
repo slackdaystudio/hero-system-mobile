@@ -279,7 +279,8 @@ silently reshaping an archetype.
 - [ ] **Phase 3 — 5E powersets + skills + complications.** *(powersets done — 11 of 11)* Every
       archetype has a structured powerset, and each costs its balance **exactly**, checked
       automatically for all of them. Remaining: **skills and complications are still name strings
-      and prose**, which is what keeps a generated character at 225 of 250.
+      and prose**, which is what keeps a generated character at 225 of 250. Both are scoped
+      below; complications are the tractable half.
 - [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,
@@ -407,6 +408,48 @@ misses its total.
 > carries `CSL: HTH Combat +1` and `Defense Maneuver`, which are dearer than ordinary skills in
 > 5E — so its real cost may well not land on 25, and that is a conversation for when the engine
 > can price it rather than a number to keep hand-maintaining.
+
+## Skills and complications — scoped, not started
+
+The last 25 (skills) and 100 (complications) of a Low Powered build. Complications are the
+cleaner half; skills carry two blockers.
+
+### Complications — tractable
+
+Four packages, **each exactly 100**, no damaged data. ~30 entries over six disadvantage kinds
+(`DEPENDENTNPC`, `HUNTED`, `PSYCHOLOGICALLIMITATION`, `SOCIALLIMITATION`, `VULNERABILITY`, and
+Normal Characteristics Maxima). Every cost is **adder-driven**, so the shape is the work, as it
+was for powers: `PSYCHOLOGICALLIMITATION` has `basecost: 0` and two adders, `SITUATION` and
+`INTENSITY`, whose options carry the points — `PsyL: Code Of The Hero (Very Common/Strong)` is
+Very Common (15) + Strong (5) = 20.
+
+### Skills — two blockers first
+
+**1. It is not one bucket, it is four.** The prose's "skills" is a catch-all over 51 distinct
+strings: **41 skills, 4 skill levels, 3 perks** (`Money: Well Off`, `FB: Medical License`,
+`FB: Member of the Aristocracy`) and **3 talents** (`Lightning Reflexes`, `Defense Maneuver`,
+`Eidetic Memory`). Perks belong in `perks`, talents in `talents` — so `Powerset` needs those
+buckets the way it just gained `martialarts`.
+
+**2. Some strings are damaged and cannot be authored as they stand:**
+
+| String | Where | Problem |
+|--------|-------|---------|
+| `Lang:` | Playboy/Socialite, Royalty, Soldier, Spy | **Incomplete** — no language named |
+| `SS[INT]:` | Scientist (×3) | **Incomplete** — no science named, and it wants three of them |
+| `CSL: HTH Combat +1 or Ranged combat +1` | Warrior | Case-differs from the same string elsewhere; and `or` is a choice the data never resolves |
+
+`Lang:` and `SS[INT]:` need someone to say what they are. `or` needs a rule: pick one, or is it
+the player's choice?
+
+**3. `cost: 25` is declared, and structuring will test it.** Same shape as `characteristicsCost`,
+which was wrong twice, and as `Warrior`'s 28 — corrected to 25 on the reading that it was a typo.
+Once the engine can price a skillset, that reading gets checked: **Warrior's list carries
+`CSL: HTH Combat +1` and `Defense Maneuver`, both dearer than an ordinary 3-point skill**, so its
+content may genuinely come to 28 and the correction may need revisiting. Expect structuring to
+surface discrepancies in several of the eleven, exactly as it did for the archetype spreads.
+
+Once priced, `cost` should be **dropped** and derived, as `characteristicsCost` was.
 
 ## Open questions
 
