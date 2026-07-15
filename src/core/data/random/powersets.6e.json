@@ -23,6 +23,17 @@
     "   The characteristics are already fixed by archetypes.6e.json, so a powerset's job is the rest:",
     "   DEF/rDEF (via Resistant Protection), oAP/DC (the attack), dAP, and Velocity.",
     "",
+    "NO VPPs. Standing rule, and the reason is design rather than mechanics: multipowers are better",
+    "for new players, and a VPP is a character killer — 'there's not much to want for when you have",
+    "one' (Phil). A player with a utility belt asks what they've got; a player with a VPP never asks,",
+    "because the answer is always whatever they need. Generated characters are somebody's first",
+    "character more often than not, so they get frameworks with a shape.",
+    "",
+    "It happens to be mechanically necessary too: VPP contents are inert until points are allocated",
+    "(H5 in docs/KNOWN_DEVIATIONS.md), so a VPP's gear is invisible to the engine's totals and to the",
+    "Rule of X — a VPP gadgeteer would score as a hero holding nothing. But the design reason is the",
+    "one that would still apply if the mechanics changed.",
+    "",
     "Shape (same as the 5E sets): a framework container lives under its own key with its reserve in",
     "`basecost`, and its slots are siblings in `power` linked by `parentid`. The key IS the framework",
     "type — normalizeCharacterData stamps originalType from it.",
@@ -289,7 +300,7 @@
   "Gadgeteer": [
     {
       "label": "Gadgeteer",
-      "_note": "The biggest budget (228) on the weakest body — chars 122, the lowest of the eleven — so the gear does nearly all the work. A MULTIPOWER, not a VPP: VPP contents are inert until points are allocated (H5), so a VPP's gadgets would be invisible to the engine's totals and to the Rule of X alike. A utility belt is real powers.",
+      "_note": "The biggest budget (228) on the weakest body — chars the lowest of the eleven — so the gear does nearly all the work. A utility-belt multipower rather than the VPP the archetype invites: see the NO VPPs note at the top of this file.",
       "powers": {
         "power": [
           {

@@ -122,6 +122,20 @@ describe('6E powersets', () => {
         expect(free).toEqual([]);
     });
 
+    /**
+     * A standing rule, and Phil's reason is design rather than mechanics: multipowers are better for
+     * new players, and a VPP is a character killer — "there's not much to want for when you have
+     * one". A generated character is somebody's first character more often than not.
+     *
+     * It's also mechanically necessary (VPP contents are inert until allocated — H5 — so they'd be
+     * invisible to the Rule of X), but that's the lesser reason: it would still be the right call if
+     * the mechanics changed.
+     */
+    it('gives nobody a VPP', () => {
+        expect(JSON.stringify(POWERSETS_6E)).not.toContain('"vpp"');
+        expect(JSON.stringify(POWERSETS_6E).toUpperCase()).not.toContain('VARIABLEPOWERPOOL');
+    });
+
     it('states no cost anywhere in the data — every price is the engine’s', () => {
         expect(JSON.stringify(POWERSETS_6E)).not.toContain('"cost"');
         expect(JSON.stringify(POWERSETS_6E)).not.toContain('"powersCost"');
