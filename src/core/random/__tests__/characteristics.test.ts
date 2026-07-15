@@ -21,6 +21,7 @@
  */
 import {heroDesignerCharacter} from 'core/hero';
 import archetypeData from '../../data/random/archetypes.5e.json';
+import {ARCHETYPES_5E, ARCHETYPES_6E} from '../allocate';
 import {buildCharacteristics, characteristicsCost, SUPERHEROIC_5E, SUPERHEROIC_6E, type CharacteristicSpread} from '../characteristics';
 
 type Obj = Record<string, any>;
@@ -180,4 +181,50 @@ describe('random character — characteristics (6E)', () => {
         expect(characteristicsCost(buildFor({ocv: 8}, SUPERHEROIC_6E))).toBe(25);
     });
 });
+
+/**
+ * The 6E archetype spreads, against the tier they're written for.
+ *
+ * These are authored, so they need a check the lifted 5E ones don't: nothing stops a spread from
+ * being written by feel. The corpus's five real 400-point characters are the reality, and Phil's
+ * Rule of X weights are what say which numbers are expensive.
+ */
+describe('random character — 6E archetype spreads', () => {
+    /**
+     * **SPD is not flavour.** It carries weight 20 in the Rule of X — tied heaviest — so a SPD 4
+     * archetype is -4 of X before anything else happens. The Gadgeteer was authored at SPD 4 and
+     * scored -10.7% with a powerset already dead on the campaign baseline; the Mentalist and Mystic
+     * had the same problem waiting.
+     *
+     * And the corpus agrees: not one real 400-point 6E character runs below SPD 5 (jack-diamond and
+     * jane-fawn are SPD 6). SPD 4 is a 250-point 5E habit — the legacy templates are SPD 4 — and it
+     * does not belong at this tier.
+     */
+    it('gives every archetype the SPD a 400-point hero has', () => {
+        const slow = ARCHETYPES_6E.filter((archetype) => archetype.characteristics.spd < 5).map((archetype) => archetype.name);
+
+        expect(slow).toEqual([]);
+    });
+
+    it('keeps every archetype in the shape the corpus shows', () => {
+        // The five real ones run SPD 5-6, DCV 6-8, CON 18-20. Nothing here should sit outside what
+        // a human actually built at 400 points.
+        for (const {name, characteristics} of ARCHETYPES_6E) {
+            expect({name, ok: characteristics.spd >= 5 && characteristics.spd <= 7}).toEqual({name, ok: true});
+            expect({name, ok: characteristics.dcv >= 6 && characteristics.dcv <= 9}).toEqual({name, ok: true});
+        }
+    });
+
+    it('buys the combat values 6E sells, and no COM', () => {
+        for (const {name, characteristics} of ARCHETYPES_6E) {
+            expect({name, ocv: typeof characteristics.ocv}).toEqual({name, ocv: 'number'});
+            expect({name, com: characteristics.com}).toEqual({name, com: undefined}); // deleted in 6E
+        }
+    });
+
+    it('names all eleven archetypes, matching 5E', () => {
+        expect(ARCHETYPES_6E.map((archetype) => archetype.name).sort()).toEqual(ARCHETYPES_5E.map((archetype) => archetype.name).sort());
+    });
+});
+
 

@@ -285,5 +285,183 @@
         ]
       }
     }
+  ],
+  "Gadgeteer": [
+    {
+      "label": "Gadgeteer",
+      "_note": "The biggest budget (228) on the weakest body — chars 122, the lowest of the eleven — so the gear does nearly all the work. A MULTIPOWER, not a VPP: VPP contents are inert until points are allocated (H5), so a VPP's gadgets would be invisible to the engine's totals and to the Rule of X alike. A utility belt is real powers.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 301,
+            "alias": "Resistant Protection",
+            "name": "Armoured Suit",
+            "position": 0,
+            "levels": 40,
+            "pdlevels": 20,
+            "edlevels": 20,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "FLIGHT",
+            "id": 302,
+            "alias": "Flight",
+            "name": "Jet Boots",
+            "position": 1,
+            "levels": 40
+          },
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 311,
+            "parentid": 310,
+            "alias": "Blast",
+            "name": "Blaster Pistol",
+            "position": 2,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "ENTANGLE",
+            "id": 312,
+            "parentid": 310,
+            "alias": "Entangle",
+            "name": "Glue Gun",
+            "position": 3,
+            "levels": 4,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "FLASH",
+            "id": 313,
+            "parentid": 310,
+            "alias": "Flash",
+            "name": "Flash-Bang",
+            "position": 4,
+            "levels": 8,
+            "ultraSlot": true,
+            "option": "SIGHTGROUP",
+            "optionid": "SIGHTGROUP",
+            "optionAlias": "Sight Group"
+          },
+          {
+            "xmlid": "FORCEWALL",
+            "id": 314,
+            "parentid": 310,
+            "alias": "Barrier",
+            "name": "Deployable Cover",
+            "position": 5,
+            "levels": 0,
+            "pdlevels": 8,
+            "edlevels": 8,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "lengthlevels": 4,
+            "heightlevels": 2,
+            "bodylevels": 0,
+            "widthlevels": 0,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "DRAIN",
+            "id": 315,
+            "parentid": 310,
+            "alias": "Drain",
+            "name": "Power Siphon",
+            "position": 6,
+            "levels": 6,
+            "ultraSlot": true,
+            "option": "END",
+            "optionid": "END",
+            "optionAlias": "END"
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 303,
+            "alias": "Life Support",
+            "name": "Sealed Suit",
+            "position": 7,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "SELFCONTAINEDBREATHING",
+                "alias": "Self-Contained Breathing",
+                "basecost": 4,
+                "levels": 0
+              },
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "HIGHPRESSURE",
+                "optionid": "HIGHPRESSURE",
+                "optionAlias": "High Pressure"
+              },
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "INTENSECOLD",
+                "optionid": "INTENSECOLD",
+                "optionAlias": "Intense Cold"
+              }
+            ]
+          },
+          {
+            "xmlid": "RADIOPERCEIVETRANSMIT",
+            "id": 304,
+            "alias": "Radio Perception/Transmission",
+            "name": "Comms Rig",
+            "position": 8,
+            "levels": 0,
+            "basecost": 10
+          },
+          {
+            "xmlid": "NIGHTVISION",
+            "id": 305,
+            "alias": "Nightvision",
+            "name": "Low-Light Optics",
+            "position": 9,
+            "levels": 0,
+            "basecost": 5
+          },
+          {
+            "xmlid": "POWERDEFENSE",
+            "id": 306,
+            "alias": "Power Defense",
+            "name": "Shielded Circuits",
+            "position": 10,
+            "levels": 5,
+            "basecost": 0
+          },
+          {
+            "xmlid": "FLASHDEFENSE",
+            "id": 307,
+            "alias": "Flash Defense",
+            "name": "Polarising Visor",
+            "position": 11,
+            "levels": 2,
+            "basecost": 0,
+            "option": "SIGHTGROUP",
+            "optionid": "SIGHTGROUP",
+            "optionAlias": "Sight Group"
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 310,
+            "alias": "Multipower",
+            "name": "Utility Belt",
+            "position": 10,
+            "basecost": 60
+          }
+        ]
+      }
+    }
   ]
 }
