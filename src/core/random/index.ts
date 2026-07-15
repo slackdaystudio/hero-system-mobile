@@ -48,6 +48,8 @@ export {
     type ComplicationPackage,
     type Skillset,
 } from './allocate';
+export {ARCHETYPES_6E, archetypesFor} from './allocate';
+export {POWERSETS_6E, powersetsForEdition} from './powerset';
 export {attachSkillset, playerDefinedSlots, PLAYER_DEFINED, SKILLSETS_5E, structuredSkillset, type PlayerDefinedSlot, type StructuredSkillset} from './skillset';
 export {approximations, attachPowerset, POWERSETS_5E, powersetsFor, type Approximation, type Powerset} from './powerset';
 export {budgetFor, buildRecipe, fittableSkillsets, generatableArchetypes, generateRandomCharacter, rollRecipe, type GeneratedCharacter} from './generate';

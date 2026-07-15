@@ -23,6 +23,7 @@
  */
 import type {ParsedCharacter} from 'core/hero';
 import powersetData from '../data/random/powersets.5e.json';
+import powersetData6E from '../data/random/powersets.6e.json';
 
 type Obj = Record<string, any>;
 
@@ -81,6 +82,10 @@ const POWER_DEFAULTS: Obj = {
 const withDefaults = (power: Obj): Obj => ({...POWER_DEFAULTS, ...power});
 
 export const POWERSETS_5E = powersetData as unknown as Record<string, Powerset[]>;
+export const POWERSETS_6E = powersetData6E as unknown as Record<string, Powerset[]>;
+
+/** The powersets for an edition. */
+export const powersetsForEdition = (edition: string): Record<string, Powerset[]> => (edition === '6e' ? POWERSETS_6E : POWERSETS_5E);
 
 /** Every powerset authored for an archetype, or `[]` while its data is still to be written. */
 export const powersetsFor = (archetype: string): Powerset[] => (Array.isArray(POWERSETS_5E[archetype]) ? POWERSETS_5E[archetype] : []);

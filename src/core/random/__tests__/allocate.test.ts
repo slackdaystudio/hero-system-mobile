@@ -127,7 +127,7 @@ describe('powerset sizing — the phase 3 authoring spec', () => {
         const scientist = SKILLSETS.find((s) => s.profession === 'Scientist')!;
         const {powers} = allocate(LOW_POWERED_5E, archetype, scientist);
 
-        expect(archetype.powersets.map((powerset) => powers - powerset.powersCost)).toEqual(REQUIRED_FLEX[name]);
+        expect(archetype.powersets!.map((powerset) => powers - powerset.powersCost)).toEqual(REQUIRED_FLEX[name]);
     });
 
     it('needs no flex at all for eight of the eleven archetypes', () => {
@@ -169,7 +169,7 @@ describe('powerset internal arithmetic — the phase 3 authoring hazard', () => 
         const mismatched: Record<string, number> = {};
 
         for (const archetype of ARCHETYPES_5E) {
-            archetype.powersets.forEach((powerset, index) => {
+            archetype.powersets!.forEach((powerset, index) => {
                 const sum = powerset.powers.reduce((total, power) => total + statedCost(power.cost), 0);
 
                 if (sum !== powerset.powersCost) {
@@ -182,7 +182,7 @@ describe('powerset internal arithmetic — the phase 3 authoring hazard', () => 
     });
 
     it('leaves 32 of the 37 powersets internally consistent', () => {
-        const total = ARCHETYPES_5E.reduce((count, archetype) => count + archetype.powersets.length, 0);
+        const total = ARCHETYPES_5E.reduce((count, archetype) => count + archetype.powersets!.length, 0);
 
         expect(total - Object.keys(KNOWN_MISMATCH).length).toBe(32);
     });

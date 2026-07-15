@@ -33,6 +33,7 @@
 import {heroDesignerCharacter} from 'core/hero';
 import type {Rng} from 'core/ports';
 import archetypeData from '../data/random/archetypes.5e.json';
+import archetypeData6E from '../data/random/archetypes.6e.json';
 import skillsetData from '../data/random/skillsets.json';
 import complicationData from '../data/random/complications.5e.json';
 import specialFxData from '../data/random/specialfx.json';
@@ -44,7 +45,12 @@ type Obj = Record<string, any>;
 export interface Archetype {
     readonly name: string;
     readonly characteristics: CharacteristicSpread;
-    readonly powersets: ReadonlyArray<{powers: ReadonlyArray<{cost: number | string; power: string}>; powersCost: number}>;
+    /**
+     * The legacy prose's own powerset listing — reference material the 5E structured powersets were
+     * authored *from*, not something the generator reads. Absent on 6E, which has no legacy prose:
+     * its archetypes were authored against the corpus and the Rule of X instead.
+     */
+    readonly powersets?: ReadonlyArray<{powers: ReadonlyArray<{cost: number | string; power: string}>; powersCost: number}>;
 }
 
 export interface Skillset {
@@ -58,6 +64,11 @@ export interface ComplicationPackage {
 }
 
 export const ARCHETYPES_5E = (archetypeData as unknown as {archtypes: Archetype[]}).archtypes;
+/** Authored, not lifted — hence the correct spelling of the key. See archetypes.6e.json. */
+export const ARCHETYPES_6E = (archetypeData6E as unknown as {archetypes: Archetype[]}).archetypes;
+
+/** The archetypes for an edition. */
+export const archetypesFor = (edition: string): Archetype[] => (edition === '6e' ? ARCHETYPES_6E : ARCHETYPES_5E);
 export const SKILLSETS = (skillsetData as unknown as {skillsets: Skillset[]}).skillsets;
 export const COMPLICATIONS_5E = (complicationData as unknown as {disadvantagePackages: ComplicationPackage[]}).disadvantagePackages;
 export const SPECIAL_FX = (specialFxData as unknown as {effects: string[]}).effects;

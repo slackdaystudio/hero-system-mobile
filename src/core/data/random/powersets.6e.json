@@ -1,0 +1,167 @@
+{
+  "_note": [
+    "6E Standard (400) powersets. AUTHORED — there is no legacy 6E prose to lift, unlike the 5E sets.",
+    "",
+    "Two things aim these, and neither is a point total:",
+    "",
+    "1. The powers BUDGET is whatever the archetype's characteristics leave of the 400, minus the",
+    "   50-point skills bucket. It is computed, never declared — see allocate/characteristicsBudget.",
+    "      Brick 121 · Patriot 148 · Martial Artist 153 · Speedster 164 · Energy Projector 185",
+    "      Powered Armor 190 · Metamorph 191 · Weapons Master 191 · Mentalist 204 · Mystic 208",
+    "      Gadgeteer 228",
+    "",
+    "2. The RULE OF X (core/random/ruleOfX, ported from Phil's Rule of X.xlsx) is what says whether",
+    "   the finished character is balanced. Spending the budget exactly proves nothing — two",
+    "   archetypes can both spend 400 and be wildly apart. The 400pt campaign baseline is:",
+    "",
+    "      EGO 13 · CON 20 · DEX 24 · SPD 5 · CSL 2 · OCV 8 · DCV 8 · OMCV 3 · DMCV 4",
+    "      DC 12 · oAP 60 · DEF 26 · rDEF 17 · STUN 40 · BODY 10 · dAP 30 · Velocity 40",
+    "",
+    "   ...and the band is ±10%. SPD and DC/oAP carry weight 20 each — the heaviest — so an",
+    "   archetype that runs hot on either has to give the points back somewhere.",
+    "",
+    "   The characteristics are already fixed by archetypes.6e.json, so a powerset's job is the rest:",
+    "   DEF/rDEF (via Resistant Protection), oAP/DC (the attack), dAP, and Velocity.",
+    "",
+    "Shape (same as the 5E sets): a framework container lives under its own key with its reserve in",
+    "`basecost`, and its slots are siblings in `power` linked by `parentid`. The key IS the framework",
+    "type — normalizeCharacterData stamps originalType from it.",
+    "",
+    "6E notes: ARMOR is gone (Resistant Protection, still xmlid FORCEFIELD, does both jobs), Force",
+    "Wall is Barrier, and Flight is 1 point per metre — so Velocity 40 costs 40."
+  ],
+  "Energy Projector": [
+    {
+      "label": "Energy Blaster",
+      "_note": "starborne is the corpus model: a 12d6 blast (oAP 60, DC 12 — dead on the baseline), Resistant Protection carrying the defences, and Flight for the velocity. The last 18 go on flavour starborne itself carries (Flash Defense, Nightvision, Life Support) — it spends the budget and the Rule of X barely sees it, which is the point: not every power is a combat stat.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 101,
+            "alias": "Resistant Protection",
+            "name": "Energy Aura",
+            "position": 0,
+            "levels": 36,
+            "pdlevels": 18,
+            "edlevels": 18,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "FLIGHT",
+            "id": 102,
+            "alias": "Flight",
+            "name": "Soar",
+            "position": 1,
+            "levels": 40
+          },
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 111,
+            "parentid": 110,
+            "alias": "Blast",
+            "name": "Energy Blast",
+            "position": 2,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "ENTANGLE",
+            "id": 112,
+            "parentid": 110,
+            "alias": "Entangle",
+            "name": "Bind",
+            "position": 3,
+            "levels": 4,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "FORCEWALL",
+            "id": 113,
+            "parentid": 110,
+            "alias": "Barrier",
+            "name": "Wall Of Force",
+            "position": 4,
+            "levels": 0,
+            "pdlevels": 8,
+            "edlevels": 8,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "lengthlevels": 4,
+            "heightlevels": 2,
+            "bodylevels": 0,
+            "widthlevels": 0,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "FLASHDEFENSE",
+            "id": 103,
+            "alias": "Flash Defense",
+            "name": "Glare Filters",
+            "position": 5,
+            "levels": 5,
+            "basecost": 0,
+            "option": "SIGHTGROUP",
+            "optionid": "SIGHTGROUP",
+            "optionAlias": "Sight Group"
+          },
+          {
+            "xmlid": "NIGHTVISION",
+            "id": 104,
+            "alias": "Nightvision",
+            "name": "Eyes Of Light",
+            "position": 6,
+            "levels": 0,
+            "basecost": 5
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 105,
+            "alias": "Life Support",
+            "name": "Photonic Body",
+            "position": 7,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "HIGHRAD",
+                "optionid": "HIGHRAD",
+                "optionAlias": "High Radiation"
+              },
+              {
+                "xmlid": "SAFEENVIRONMENT",
+                "alias": "Safe Environment:",
+                "basecost": 2,
+                "levels": 0,
+                "option": "INTENSEHEAT",
+                "optionid": "INTENSEHEAT",
+                "optionAlias": "Intense Heat"
+              },
+              {
+                "xmlid": "SELFCONTAINEDBREATHING",
+                "alias": "Self-Contained Breathing",
+                "basecost": 4,
+                "levels": 0
+              }
+            ]
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 110,
+            "alias": "Multipower",
+            "name": "Energy Powers",
+            "position": 5,
+            "basecost": 60
+          }
+        ]
+      }
+    }
+  ]
+}
