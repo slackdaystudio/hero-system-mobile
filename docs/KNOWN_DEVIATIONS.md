@@ -42,6 +42,8 @@
 | H3 | Char/defense totals skip **duplicate** powers | **real bug, active** | **yes — 17 fixtures** | hero query |
 | H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | **real bug, active** | **yes — tazimmaad (JAB)** | traits |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
+| U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | **real bug, active** | **yes — mark-li-v5a-433 (Gecko pads)** | traits (decorator) |
+| U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | real bug (latent) | no — step 3 occurs, never on an exact power | traits (decorator) |
 
 ---
 
@@ -156,6 +158,52 @@
   error" as a match; the corrected behaviour needs a purpose-built test.
 - **Fix + verify:** add the truthy `template` guard; hand-built maneuver with an unresolved
   template asserting the delegated roll; drop the `safeRoll` tolerance for this case.
+
+## U2 — `getMultiplications(0, …)` returns `-Infinity` (**active bug**)
+
+- **Where:** `core/util/common.ts` `getMultiplications` / `getMultiplierCost` (legacy
+  `Common.js`). `Math.log(0)` is `-Infinity`, so `Math.ceil(-Infinity / Math.log(step))`
+  is `-Infinity` and the caller adds it straight into a cost.
+- **Legacy:** same — `Clinging.js` is byte-identical, so the shipped app has this too.
+- **Correct:** zero levels buys zero multiplications, so the multiplier term must
+  contribute **0**. (`getMultiplications(1, …)` is already `0`; `0` is the same case.)
+  Negative and `NaN` totals are equally undefined and should not yield `±Infinity`.
+- **Corpus impact:** **triggered by `mark-li-v5a-433`** — its `Gecko pads` power is
+  `CLINGING` with `levels: 0`, and the 5E/6E `clinging` template is
+  `basecost 10 / lvlval 3 / lvlcost 1`. So `cost()` = `10 + getMultiplierCost(0, 3, 1) + 1`
+  = `-Infinity`; `activeCost()`/`realCost()` follow, and the sheet renders the literal
+  string `-Infinity` as that power's cost. The decorator golden master is blind to it
+  (legacy is equally wrong). Correct value: **11** (`10 + 0 + 1`) — noting the trailing
+  `+1` in `Clinging.cost()` is a separate, unreviewed legacy oddity.
+- **Callers at risk:** `powers/clinging.ts:23` and `talents/lightningReflexes.ts:35` pass
+  `levels` with **no `> 0` guard**; `baseCost.ts:103` guards with `levels > 0` and so is
+  safe. `perks/followerAndBase.ts:27` / `powers/duplication.ts:32` pass `trait.number`.
+- **Fix + verify:** guard the total in `getMultiplications` (`if (!(total > 0)) return 0;`,
+  which also absorbs negatives/`NaN`); unit test pinning `getMultiplications(0, 3) === 0`;
+  correctness test pinning `Gecko pads` at 11; re-base the decorator golden master for
+  `mark-li-v5a-433` as an intentional divergence linking here.
+
+## U3 — `getMultiplications` overshoots on exact powers of a non-2 step
+
+- **Where:** `core/util/common.ts` `getMultiplications` — `Math.log(total) / Math.log(step)`
+  is inexact, so an exact power can land just above the integer and `Math.ceil` rounds it up:
+  `Math.log(9) / Math.log(3)` is `2.0000000000000004` → **3**, not 2. Likewise
+  `(27, 3)` → 4 (want 3) and `(125, 5)` → 4 (want 3). Base 2 is exact in binary and unaffected,
+  which is why this has gone unnoticed.
+- **Legacy:** same.
+- **Correct:** snap to the nearest integer when the quotient is within float noise, then
+  `ceil` only genuine fractions.
+- **Corpus impact:** **not currently triggered.** Instrumenting `getMultiplierCost` across all
+  37 fixtures yields 572 calls over just three step values (1, 2, 3); `step: 1` is
+  special-cased and `step: 2` is exact, and the only totals paired with `step: 3` are 0, 10
+  and 20 — none an exact power of 3. It is **reachable, not theoretical**: `lvlval` in the
+  template data takes values 3, 5, 7, 9, … so a character with e.g. Clinging at 9 levels
+  (`lvlval 3`) would be silently overcharged by one `lvlcost`.
+- **Fix + verify:** epsilon-snap before `ceil`; unit tests pinning `(9, 3) === 2`,
+  `(27, 3) === 3`, `(125, 5) === 3` while keeping `(5, 2) === 3` (a real fraction still
+  rounds up). Existing `common.test.ts` coverage only exercises the default `step: 2`, so
+  it cannot catch this. No golden-master re-base expected (no corpus divergence) — verify
+  by re-running it.
 
 ## U1 — `capitalize` only upper-cases the first character
 
