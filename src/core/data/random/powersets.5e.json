@@ -273,5 +273,100 @@
         "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Super-Speed", "position": 1, "basecost": 15}]
       }
     }
+  ],
+  "Gadgeteer": [
+    {
+      "label": "Inventor",
+      "approximations": [
+        {
+          "power": "Gadget Pool",
+          "note": "Legacy prose says 'Multipower' with a 50-point reserve. Flexed to 57 to fit this archetype's balance of 132 — its spread costs 93, not the 100 its (dropped, wrong) characteristicsCost label claimed, because its INT and EGO were transposed and are now un-swapped. The reserve is the natural place to absorb +7: every other line is a round number the prose pins exactly, and the slots price off their own active cost, not the reserve, so widening it leaves them untouched."
+        }
+      ],
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Deflector Vest", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},
+
+          {"xmlid": "ENERGYBLAST", "id": 111, "parentid": 110, "alias": "Energy Blast", "name": "Blaster", "position": 1, "levels": 10, "ultraSlot": true},
+          {"xmlid": "ENTANGLE", "id": 112, "parentid": 110, "alias": "Entangle", "name": "Net Gun", "position": 2, "levels": 5, "ultraSlot": true},
+          {"xmlid": "MINDCONTROL", "id": 113, "parentid": 110, "alias": "Mind Control", "name": "Persuader", "position": 3, "levels": 10, "ultraSlot": true},
+
+          {
+            "xmlid": "FLIGHT",
+            "id": 121,
+            "parentid": 120,
+            "alias": "Flight",
+            "name": "Jet Pack",
+            "position": 4,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2}
+          },
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Force Field",
+            "name": "Deflector Screen",
+            "position": 5,
+            "levels": 20,
+            "pdlevels": 10,
+            "edlevels": 10,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "1/2 END"}
+          }
+        ],
+        "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Gadget Pool", "position": 1, "basecost": 57}],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Gadgetry", "position": 2, "basecost": 15}]
+      }
+    }
+  ],
+  "Metamorph": [
+    {
+      "label": "Shifter",
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Toughened Hide", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},
+          {
+            "xmlid": "ARMOR",
+            "id": 102,
+            "alias": "Armor",
+            "name": "Compressed Mass",
+            "position": 1,
+            "levels": 8,
+            "pdlevels": 4,
+            "edlevels": 4,
+            "modifier": {"xmlid": "LINKED", "alias": "Linked", "basecost": -0.5, "levels": 0, "comments": "Density Increase"}
+          },
+
+          {
+            "xmlid": "DENSITYINCREASE",
+            "id": 121,
+            "parentid": 120,
+            "alias": "Density Increase",
+            "name": "Compress",
+            "position": 2,
+            "levels": 7,
+            "modifier": {"xmlid": "COSTSENDONLYTOACTIVATE", "alias": "Costs END Only To Activate", "basecost": 0.25, "levels": 0}
+          },
+          {"xmlid": "ENERGYBLAST", "id": 122, "parentid": 120, "alias": "Energy Blast", "name": "Slam", "position": 3, "levels": 10},
+          {"xmlid": "TUNNELING", "id": 124, "parentid": 120, "alias": "Tunneling", "name": "Burrow", "position": 5, "levels": 6}
+        ],
+        "leaping": [
+          {
+            "xmlid": "LEAPING",
+            "id": 123,
+            "parentid": 120,
+            "alias": "Leaping",
+            "name": "Bound",
+            "position": 4,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2},
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "No END"}
+          }
+        ],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Metamorph", "position": 2, "basecost": 15}]
+      }
+    }
   ]
 }

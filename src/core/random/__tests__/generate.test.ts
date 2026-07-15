@@ -41,7 +41,7 @@ describe('generateRandomCharacter', () => {
     it('only offers archetypes that have a structured powerset', () => {
         const names = generatableArchetypes().map((archetype) => archetype.name);
 
-        expect(names).toEqual(['Energy Projector', 'Mentalist', 'Mystic', 'Powered Armor', 'Speedster', 'Brick']);
+        expect(names).toEqual(['Energy Projector', 'Gadgeteer', 'Mentalist', 'Metamorph', 'Mystic', 'Powered Armor', 'Speedster', 'Brick']);
         expect(names.every((name) => powersetsFor(name).length > 0)).toBe(true);
     });
 
