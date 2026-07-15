@@ -1,0 +1,74 @@
+{
+  "_comment": [
+    "5E powersets, structured. Authored from the legacy prose in public/templates/archtypes.json,",
+    "which stated each power as a string with a hand-typed cost ('EB 10d6', cost '5u'). Here the",
+    "costs are DERIVED: the engine prices each power from the template data, and the framework",
+    "arithmetic (multipower ultra slots /10, elemental-control discount) falls out of the",
+    "decorators. Nothing below states a cost.",
+    "",
+    "Shape is a .hdc `powers` block. The KEY is the framework type — normalizeCharacterData stamps",
+    "originalType from it — and slots are siblings linked to their container by parentid.",
+    "`ultraSlot: true` makes a multipower slot cost active/10 rather than active/5.",
+    "",
+    "See docs/RANDOM_CHARACTER.md. Verified against the allocator's balance in",
+    "core/random/__tests__/powerset.test.ts."
+  ],
+  "Energy Projector": [
+    {
+      "label": "Energy Blaster",
+      "powers": {
+        "power": [
+          {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Energy Aura", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},
+
+          {"xmlid": "ENERGYBLAST", "id": 111, "parentid": 110, "alias": "Energy Blast", "name": "Blast", "position": 1, "levels": 10, "ultraSlot": true},
+          {"xmlid": "ENTANGLE", "id": 112, "parentid": 110, "alias": "Entangle", "name": "Bind", "position": 2, "levels": 5, "ultraSlot": true},
+          {
+            "xmlid": "FORCEWALL",
+            "id": 113,
+            "parentid": 110,
+            "alias": "Force Wall",
+            "name": "Barrier",
+            "position": 3,
+            "levels": 20,
+            "pdlevels": 10,
+            "edlevels": 10,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "lengthlevels": 0,
+            "heightlevels": 0,
+            "bodylevels": 0,
+            "widthlevels": 0,
+            "ultraSlot": true
+          },
+
+          {
+            "xmlid": "FLIGHT",
+            "id": 121,
+            "parentid": 120,
+            "alias": "Flight",
+            "name": "Soar",
+            "position": 4,
+            "levels": 10,
+            "adder": {"xmlid": "IMPROVEDNONCOMBAT", "alias": "x8 Noncombat", "basecost": 0, "levels": 2, "lvlval": 1, "lvlcost": 5, "lvlmultiplier": 2}
+          },
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 122,
+            "parentid": 120,
+            "alias": "Force Field",
+            "name": "Shield",
+            "position": 5,
+            "levels": 20,
+            "pdlevels": 10,
+            "edlevels": 10,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "modifier": {"xmlid": "REDUCEDEND", "alias": "Reduced Endurance", "basecost": 0.5, "levels": 0, "comments": "1/2 END"}
+          }
+        ],
+        "multipower": [{"xmlid": "GENERIC_OBJECT", "id": 110, "alias": "Multipower", "name": "Energy Powers", "position": 1, "basecost": 50}],
+        "elementalControl": [{"xmlid": "GENERIC_OBJECT", "id": 120, "alias": "Elemental Control", "name": "Energy", "position": 2, "basecost": 15}]
+      }
+    }
+  ]
+}

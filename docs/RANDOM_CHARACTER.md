@@ -264,15 +264,51 @@ silently reshaping an archetype.
       over 2000 budgets. Confirmed the model reproduces the legacy powerset sizes: **8 of 11
       archetypes need zero flex**. The required flex per powerset is pinned as the phase 3
       authoring spec.
-- [ ] **Phase 3 — 5E powersets + skills + complications.** Author the legacy prose as structured
-      data (`{xmlid, levels, modifiers}`), flexing each to its balance — see `REQUIRED_FLEX` in
-      `allocate.test.ts`. The bulk of the 250-point work.
+- [ ] **Phase 3 — 5E powersets + skills + complications.** *(1 of 11 archetypes)* Author the
+      legacy prose as structured data, flexing each to its balance — see `REQUIRED_FLEX` in
+      `allocate.test.ts`. **Energy Projector's first powerset is done and costs exactly 125**;
+      the translation approach is proven (see below). The remaining ten are mechanical.
 - [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,
       not code.
 - [ ] **Phase 5 — UI.** Power-level picker → generate → save. The screen is thin; everything real
       happens in `core/random`.
+
+### Proven: prose → structured, priced by the engine
+
+Energy Projector's first powerset, authored from the legacy strings and costed end to end.
+**No cost is stated anywhere in the data** — every number is derived:
+
+| Legacy prose | Structured | Active | Real |
+|--------------|-----------|--------|------|
+| `Armor +5 rPD +5 rED`, 15 | `ARMOR levels 10, pd 5, ed 5` | 15 | **15** |
+| `Multipower`, 50 | `powers.multipower` → `GENERIC_OBJECT basecost 50` | 50 | **50** |
+| `EB 10d6`, `5u` | `ENERGYBLAST levels 10, ultraSlot` | 50 | **5** |
+| `Entangle 5d6 DEF 5`, `5u` | `ENTANGLE levels 5, ultraSlot` | 50 | **5** |
+| `Force Wall 10 rPD 10 rED`, `5u` | `FORCEWALL pd 10, ed 10, ultraSlot` | 50 | **5** |
+| `EC [Energy]`, 15 | `powers.elementalControl` → `GENERIC_OBJECT basecost 15` | 15 | **15** |
+| `1) Flight 10", 8x NCM`, 15 | `FLIGHT levels 10` + `IMPROVEDNONCOMBAT levels 2` | 30 | **15** |
+| `2) FF +10/+10, No END (+1/2)`, 15 | `FORCEFIELD pd 10, ed 10` + `REDUCEDEND` | 30 | **15** |
+| | | | **125** ✓ |
+
+The `5u` and the elemental-control discount are **derived, not written**: `multipowerItem`
+divides active by 10 for an ultra slot, and `elementalControlItem` subtracts the reserve. That
+is the whole point of authoring the shape rather than the arithmetic — the engine is the
+oracle, and the allocator's balance is the check.
+
+Rendered end to end it reads as a real character: 8 power rows with rulebook definitions,
+`PD 21/15` (base 6 + Armor 5 + Force Field 10, of which 15 resistant), and the archetype's
+characteristics intact underneath.
+
+**What the authoring actually costs**, learned the hard way on this one — the shape is the
+work, not the cost:
+
+- A power carries **both** `levels` *and* its split (`pdlevels`/`edlevels`). `levels` is what
+  prices; the split is descriptive. Omit `levels` and the power silently costs 0.
+- `FORCEWALL` routes to the `Barrier` decorator, which reads `lengthlevels`, `heightlevels`,
+  `bodylevels` and `widthlevels`. Omit them and the cost is `NaN`, not an error.
+- `name` supplies the sheet label; `alias` does not.
 
 ## Open questions
 
