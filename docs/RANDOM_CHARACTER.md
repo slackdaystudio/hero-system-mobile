@@ -284,8 +284,12 @@ silently reshaping an archetype.
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,
       not code.
-- [ ] **Phase 5 — UI.** Power-level picker → generate → save. The screen is thin; everything real
-      happens in `core/random`.
+- [ ] **Phase 5 — UI.** *(preview shipped)* A **Generate** action sits beside Import in the
+      Characters header: it rolls one of the authored archetypes, saves it through
+      `characterRepository` exactly as an import does, and opens it on the normal sheet. It says
+      what it built (`225 of 250 — skills and complications aren't generated yet`) rather than
+      implying a finished character. Still to come: the power-level picker, once more than one
+      level has data.
 
 ### Proven: prose → structured, priced by the engine
 
@@ -370,6 +374,17 @@ The rest of the vocabulary is confirmed to exist in the 5E template and priced: 
 `MISSILEDEFLECTION`, `KBRESISTANCE`, `DESOLIDIFICATION`, `DARKNESS`, `ENHANCEDPERCEPTION`,
 `LIFESUPPORT`. `STR`/`RUNNING`/`LEAPING` are **characteristics**, so they live under
 `powers.str` etc. and are priced by the `Characteristic` decorator.
+
+### Open data question: the Warrior skillset fits nothing
+
+`Warrior` costs 28 where every other skillset costs 25, which moves the powers balance by −3 —
+and **no powerset is sized for it, in this data or the legacy data**: `100` characteristics
+`+ 125` powerset `+ 28` skills is 253, not 250, for *every* archetype. Either the powersets need
+a −3 variant or that 28 is wrong.
+
+Until it is resolved, `fittableSkillsets()` rolls only the 25-point skillsets, so a generated
+character cannot quietly miss its total by 3. Skills are not built yet, so this currently costs
+nothing but a name on a list.
 
 ## Open questions
 

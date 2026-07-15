@@ -13,13 +13,14 @@
 // limitations under the License.
 
 import React, {useState} from 'react';
-import {ActivityIndicator, Alert, Pressable} from 'react-native';
+import {ActivityIndicator, Alert, Pressable, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import type {ImportResult} from 'infra/import';
 import {Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
+import {useGenerateCharacter, type GenerateResult} from 'app/providers/GenerateProvider';
 import {useImportCharacter} from 'app/providers/ImportProvider';
 import {useSettings} from 'app/providers/SettingsProvider';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
@@ -81,12 +82,20 @@ export function AppNavigator(): React.JSX.Element {
                             // headerRight is a react-navigation render prop, not a nested component definition.
                             // eslint-disable-next-line react/no-unstable-nested-components
                             headerRight: () => (
-                                <ImportButton
-                                    onImported={(result) => {
-                                        setImportToken((token) => token + 1);
-                                        navigation.navigate('CharacterDetail', {id: result.id});
-                                    }}
-                                />
+                                <View style={styles.headerActions}>
+                                    <GenerateButton
+                                        onGenerated={(result) => {
+                                            setImportToken((token) => token + 1);
+                                            navigation.navigate('CharacterDetail', {id: result.id});
+                                        }}
+                                    />
+                                    <ImportButton
+                                        onImported={(result) => {
+                                            setImportToken((token) => token + 1);
+                                            navigation.navigate('CharacterDetail', {id: result.id});
+                                        }}
+                                    />
+                                </View>
                             ),
                         })}>
                         {({navigation}) => <CharacterListScreen refreshToken={importToken} onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />}
@@ -128,6 +137,49 @@ export function AppNavigator(): React.JSX.Element {
     );
 }
 
+/**
+ * Header action that generates a random character and opens it (docs/RANDOM_CHARACTER.md).
+ *
+ * A **preview** while phase 3 is in progress: only archetypes with structured powersets can be
+ * rolled, and a generated character has no skills or complications yet — so it says what it
+ * actually built rather than implying a finished character.
+ */
+function GenerateButton({onGenerated}: {onGenerated: (result: GenerateResult) => void}): React.JSX.Element {
+    const theme = useTheme();
+    const generateCharacter = useGenerateCharacter();
+    const [busy, setBusy] = useState(false);
+
+    const run = async (): Promise<void> => {
+        if (busy) {
+            return;
+        }
+        setBusy(true);
+        try {
+            const result = await generateCharacter();
+
+            Alert.alert(result.name, `${result.archetype} — ${result.spent} of ${result.total} points.\n\nSkills and complications aren't generated yet.`, [
+                {text: 'View', onPress: () => onGenerated(result)},
+            ]);
+        } catch (error) {
+            Alert.alert('Generate failed', error instanceof Error ? error.message : 'That character could not be generated.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    if (busy) {
+        return <ActivityIndicator color={theme.colors.primary} />;
+    }
+
+    return (
+        <Pressable accessibilityRole="button" onPress={run} testID="generate-character">
+            <Text variant="label" color={theme.colors.primary}>
+                Generate
+            </Text>
+        </Pressable>
+    );
+}
+
 /** Header action that picks a HERO Designer `.hdc` and imports it, then reports the result. */
 function ImportButton({onImported}: {onImported: (result: ImportResult) => void}): React.JSX.Element {
     const theme = useTheme();
@@ -163,3 +215,12 @@ function ImportButton({onImported}: {onImported: (result: ImportResult) => void}
         </Pressable>
     );
 }
+
+const styles = StyleSheet.create({
+    /** Generate sits beside Import in the Characters header. */
+    headerActions: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        gap: 16,
+    },
+});

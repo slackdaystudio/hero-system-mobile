@@ -18,6 +18,7 @@ import {Screen, Text} from 'app/components';
 import {createDeviceRepositories} from 'app/composition/deviceRepositories';
 import {AppNavigator} from 'app/navigation/AppNavigator';
 import {DiceProvider} from 'app/providers/DiceProvider';
+import {GenerateProvider} from 'app/providers/GenerateProvider';
 import {ImportProvider} from 'app/providers/ImportProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {SettingsProvider, useSettings} from 'app/providers/SettingsProvider';
@@ -92,9 +93,11 @@ function ThemedApp(): React.JSX.Element {
     return (
         <ThemeProvider colorScheme={settings.colorScheme} fontScale={settings.fontScale}>
             <ImportProvider filePicker={filePicker}>
-                <DiceProvider>
-                    <AppNavigator />
-                </DiceProvider>
+                <GenerateProvider>
+                    <DiceProvider>
+                        <AppNavigator />
+                    </DiceProvider>
+                </GenerateProvider>
             </ImportProvider>
         </ThemeProvider>
     );

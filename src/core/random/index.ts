@@ -30,4 +30,5 @@ export {
     type ComplicationPackage,
     type Skillset,
 } from './allocate';
-export {attachPowerset, POWERSETS_5E, powersetsFor, type Powerset} from './powerset';
+export {approximations, attachPowerset, POWERSETS_5E, powersetsFor, type Approximation, type Powerset} from './powerset';
+export {fittableSkillsets, generatableArchetypes, generateRandomCharacter, type GeneratedCharacter} from './generate';
