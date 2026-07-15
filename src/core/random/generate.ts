@@ -19,15 +19,16 @@
  * caller runs it through `heroDesignerCharacter.getCharacter()` and saves it exactly as an
  * imported `.hdc` is, so a generated character is indistinguishable from an imported one.
  *
- * **Incomplete while phase 3 is in progress.** A character currently carries characteristics
- * and powers — 225 of a Low Powered build's 250 — but no skills and no complications: those
- * data sets are still legacy prose. {@link generateRandomCharacter} reports what it spent, so
- * callers can be honest about it rather than implying a finished character.
+ * **Incomplete while phase 3 is in progress.** A character carries characteristics, powers and
+ * complications, but **no skills** — that data set is still legacy prose. So it spends 225 of a
+ * Low Powered build's 250. {@link generateRandomCharacter} reports what it spent, so callers can
+ * be honest about it rather than implying a finished character.
  */
 import type {ParsedCharacter} from 'core/hero';
 import type {Rng} from 'core/ports';
 import {ARCHETYPES_5E, allocate, pick, SKILLSETS, SPECIAL_FX, type Archetype, type Budget} from './allocate';
 import {buildCharacteristics} from './characteristics';
+import {attachComplications, COMPLICATION_SETS_5E, type ComplicationSet} from './complications';
 import {attachPowerset, powersetsFor, type Powerset} from './powerset';
 import {LOW_POWERED_5E, type PowerLevel} from './powerLevel';
 
@@ -36,10 +37,11 @@ export interface GeneratedCharacter {
     readonly name: string;
     readonly archetype: string;
     readonly powerset: string;
+    readonly complications: string;
     readonly specialFx: string;
     readonly level: PowerLevel;
     readonly budget: Budget;
-    /** What is actually built so far — see the module note. Powers + characteristics only. */
+    /** What is actually built so far — see the module note. Skills are still missing. */
     readonly spent: number;
 }
 
@@ -74,11 +76,12 @@ export function generateRandomCharacter(rng: Rng, level: PowerLevel = LOW_POWERE
 
     const archetype = pick(rng, candidates);
     const powerset: Powerset = pick(rng, powersetsFor(archetype.name));
+    const complications: ComplicationSet = pick(rng, COMPLICATION_SETS_5E);
     const skillset = pick(rng, fittableSkillsets());
     const specialFx = pick(rng, SPECIAL_FX);
     const name = `${specialFx} ${archetype.name}`;
 
-    const parsed = attachPowerset(buildCharacteristics(archetype.characteristics, level.template, name), powerset);
+    const parsed = attachComplications(attachPowerset(buildCharacteristics(archetype.characteristics, level.template, name), powerset), complications);
     const budget = allocate(level, archetype, skillset);
 
     return {
@@ -86,10 +89,12 @@ export function generateRandomCharacter(rng: Rng, level: PowerLevel = LOW_POWERE
         name,
         archetype: archetype.name,
         powerset: powerset.label,
+        complications: complications.label,
         specialFx,
         level,
         budget,
-        // Skills and complications are not built yet, so they are not counted as spent.
+        // Skills are not built yet, so they are not counted as spent. Complications are taken at
+        // the fixed limit and fund the build rather than being spent out of it.
         spent: budget.characteristics + budget.powers,
     };
 }

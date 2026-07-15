@@ -278,9 +278,10 @@ silently reshaping an archetype.
       authoring spec.
 - [ ] **Phase 3 — 5E powersets + skills + complications.** *(powersets done — 11 of 11)* Every
       archetype has a structured powerset, and each costs its balance **exactly**, checked
-      automatically for all of them. Remaining: **skills and complications are still name strings
-      and prose**, which is what keeps a generated character at 225 of 250. Both are scoped
-      below; complications are the tractable half.
+      automatically for all of them. **Complications are done too** — all four packages total
+      exactly the 100-point limit, priced from their adders, and every generated character
+      carries one. Remaining: **skills are still name strings**, which is the whole of the
+      225-of-250 gap. Scoped below, with three blockers.
 - [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,
@@ -414,16 +415,25 @@ misses its total.
 The last 25 (skills) and 100 (complications) of a Low Powered build. Complications are the
 cleaner half; skills carry two blockers.
 
-### Complications — tractable
+### Complications — ✅ done
 
-Four packages, **each exactly 100**, no damaged data. ~30 entries over six disadvantage kinds
-(`DEPENDENTNPC`, `HUNTED`, `PSYCHOLOGICALLIMITATION`, `SOCIALLIMITATION`, `VULNERABILITY`, and
-Normal Characteristics Maxima). Every cost is **adder-driven**, so the shape is the work, as it
-was for powers: `PSYCHOLOGICALLIMITATION` has `basecost: 0` and two adders, `SITUATION` and
-`INTENSITY`, whose options carry the points — `PsyL: Code Of The Hero (Very Common/Strong)` is
-Very Common (15) + Strong (5) = 20.
+Four packages in `complicationPackages.5e.json`, **each totalling exactly the 100-point limit**,
+priced entirely from their adders — no cost is stated in the data. Every generated character now
+carries one, and a fuzz asserts all 40 rolls take exactly `level.limit`.
 
-### Skills — two blockers first
+A disadvantage's cost is the **sum of its adder basecosts**; the description lives in `input`,
+and `optionid` is recorded for fidelity but does not price. So
+`PsyL: Code Of The Hero (Very Common/Strong)` is `SITUATION` 15 + `INTENSITY` 5 = 20.
+
+Two things worth knowing for the 6E port:
+
+- **Normal Characteristic Maxima is `xmlid: NCM`**, and it is *not* one of the template's 16
+  disadvantage kinds — it carries its 20 as a plain `basecost` with no adders.
+- The `Hunted: Government Agency (More Powerful/NCI/Watch)` entry is the shape to copy when a
+  cost looks impossible: More Powerful (15) + NCI (5) **− Watching (10)** nets back to the
+  prose's 10. A negative adder, not an error.
+
+### Skills — three blockers first
 
 **1. It is not one bucket, it is four.** The prose's "skills" is a catch-all over 51 distinct
 strings: **41 skills, 4 skill levels, 3 perks** (`Money: Well Off`, `FB: Medical License`,

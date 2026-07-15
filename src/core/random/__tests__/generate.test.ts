@@ -96,6 +96,20 @@ describe('generateRandomCharacter', () => {
         expect(seen.size).toBe(generatableArchetypes().length);
     });
 
+    it('gives every character its complications, at the level\'s fixed limit', () => {
+        // Complications are always taken in full, so every roll carries exactly `level.limit`.
+        for (let seed = 0; seed < 40; seed++) {
+            const generated = generateRandomCharacter(seededRng(seed));
+            const character = characterFrom(seed);
+            const taken = (character.disadvantages as Obj[]).reduce(
+                (total, disadvantage) => total + characterTraitDecorator.decorate(disadvantage, 'disadvantages', () => character).cost(),
+                0,
+            );
+
+            expect({label: generated.complications, taken}).toEqual({label: generated.complications, taken: generated.level.limit});
+        }
+    });
+
     it('can roll every skillset, now that they all fit', () => {
         // Every powerset is sized against a 25-point skills bucket. Warrior used to state 28 —
         // the only one that did, and a data error; at 28 it left every archetype 3 short. The
