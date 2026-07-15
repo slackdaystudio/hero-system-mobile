@@ -44,6 +44,17 @@ native module (`npm run android`).
 - [ ] Clear a skill field → back to "Player Defined".
 - [ ] Point total stays 250 through all of it (naming a skill must not move a cost).
 
+## Portrait framing
+- [ ] **Every unframed portrait looks exactly as it did before this build** — framing is opt-in and
+      centred is the old crop. This is the one to check first; it affects every character.
+- [ ] Tap a portrait on the sheet → the framer opens showing the current crop.
+- [ ] Drag: the image follows the finger, and stops at the top and bottom edges.
+- [ ] Done → the new crop shows on the sheet, the list AND Home (all three draw portraits).
+- [ ] Reset → back to centred. Cancel → nothing changes.
+- [ ] A wide portrait drags sideways; a square one says there's nothing to frame.
+- [ ] Re-import the same `.hdc` → the framing survives (it's a column, not part of the document).
+- [ ] Scroll a long list — portraits shouldn't flicker or re-measure visibly.
+
 ## Character sheet
 - [ ] Character tab: characteristics + all trait sections render; costs/rolls look right.
 - [ ] Tap a characteristic/skill roll → dice roller opens pre-filled.

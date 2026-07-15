@@ -28,6 +28,8 @@ const summary = (over: Partial<CharacterSummary> = {}): CharacterSummary => ({
     edition: '6E',
     isActive: false,
     portraitUri: null,
+    /** Unframed — reads as the centre crop every portrait got before framing existed. */
+    portraitFocus: null,
     ...over,
 });
 
@@ -293,4 +295,6 @@ describe('CharacterListScreen', () => {
     });
 });
 
-const tree_portraitUri = (tree: ReactTestRenderer): string => tree.root.findByProps({testID: 'portrait'}).props.source.uri;
+/** testID rides both PortraitImage and the <Image> it renders; read the one that draws. */
+const tree_portraitUri = (tree: ReactTestRenderer): string =>
+    tree.root.findAllByProps({testID: 'portrait'}).find((node) => node.props.source !== undefined)!.props.source.uri;

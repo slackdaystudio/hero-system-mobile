@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react';
+import {Image} from 'react-native';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import {DieRoller} from 'core/dice';
 import type {CombatState} from 'core/combat';
@@ -22,6 +23,7 @@ import {
     type Character,
     type CharacterRepository,
     type CombatStateRepository,
+    type PortraitFocus,
     type Rng,
     type Statistics,
     type StatisticsRepository,
@@ -61,6 +63,8 @@ const character = (over: Partial<Character> = {}): Character => ({
     edition: '6E',
     isActive: true,
     portraitUri: null,
+    /** Unframed — reads as the centre crop every portrait got before framing existed. */
+    portraitFocus: null,
     filename: 'defensor.hsmc',
     updatedAt: '2026-01-01T00:00:00.000Z',
     document: {
@@ -86,10 +90,13 @@ const fakeCombatState = (): CombatStateRepository => {
     };
 };
 
-const fakeCharacters = (result: Character | null): CharacterRepository =>
+const fakeCharacters = (result: Character | null, framed?: Array<PortraitFocus | null>): CharacterRepository =>
     ({
         get: async () => result,
         markAccessed: async () => undefined,
+        setPortraitFocus: async (_id: string, focus: PortraitFocus | null) => {
+            framed?.push(focus);
+        },
     } as unknown as CharacterRepository);
 
 const collectText = (node: unknown): string[] => {
@@ -133,6 +140,16 @@ const renderScreen = async (
     await act(async () => {});
 
     return tree;
+};
+
+/** Tap the first node with this testID that's actually wired to a handler. */
+const press = async (tree: ReactTestRenderer, testID: string): Promise<void> => {
+    const target = tree.root.findAllByProps({testID}).find((node) => typeof node.props.onPress === 'function');
+
+    await act(async () => {
+        target?.props.onPress();
+    });
+    await act(async () => {});
 };
 
 describe('CharacterDetailScreen', () => {
@@ -325,7 +342,10 @@ describe('CharacterDetailScreen', () => {
     it('renders the portrait when present', async () => {
         const tree = await renderScreen(fakeCharacters(character({portraitUri: 'file:///images/p1.png'})));
 
-        expect(tree.root.findByProps({testID: 'portrait'}).props.source.uri).toBe('file:///images/p1.png');
+        // testID rides both PortraitImage and the <Image> it renders; assert on the one that draws.
+        const image = tree.root.findAllByProps({testID: 'portrait'}).find((node) => node.props.source !== undefined)!;
+
+        expect(image.props.source.uri).toBe('file:///images/p1.png');
     });
 
     /**
@@ -355,6 +375,75 @@ describe('CharacterDetailScreen', () => {
 
             expect(collectText(tree.toJSON())).not.toContain('GENERATED CHARACTER');
             expect(collectText(tree.toJSON())).toContain('Defensor');
+        });
+    });
+
+    /**
+     * Portraits render in a square and get centre-cropped. HERO portraits are artwork, not
+     * headshots, so no default is right for all of them — the player frames it. Tapping the portrait
+     * is the way in, because an import-time-only flow could never reach a character already saved.
+     */
+    describe('framing the portrait', () => {
+        const withPortrait = (over: Partial<Character> = {}): Character => character({portraitUri: 'file:///p.jpg', ...over});
+
+        beforeEach(() => {
+            // getSize would try to read a real file. 200x300 — the corpus portrait's shape.
+            jest.spyOn(Image, 'getSize').mockImplementation((_uri, success) => success(200, 300));
+        });
+        afterEach(() => jest.restoreAllMocks());
+
+        it('opens the framer when the portrait is tapped', async () => {
+            const tree = await renderScreen(fakeCharacters(withPortrait()));
+
+            expect(tree.root.findAllByProps({testID: 'framer-preview'})).toEqual([]);
+
+            await press(tree, 'frame-portrait');
+
+            expect(tree.root.findAllByProps({testID: 'framer-preview'}).length).toBeGreaterThan(0);
+        });
+
+        it('offers no framing when there is no portrait to frame', async () => {
+            const tree = await renderScreen(fakeCharacters(character({portraitUri: null})));
+
+            expect(tree.root.findAllByProps({testID: 'frame-portrait'})).toEqual([]);
+        });
+
+        it('names the character for screen readers', async () => {
+            const tree = await renderScreen(fakeCharacters(withPortrait({name: 'Defensor'})));
+
+            expect(tree.root.findByProps({testID: 'frame-portrait'}).props.accessibilityLabel).toBe("Reframe Defensor's portrait");
+        });
+
+        it('saves nothing when the framer is cancelled', async () => {
+            const framed: Array<PortraitFocus | null> = [];
+            const tree = await renderScreen(fakeCharacters(withPortrait(), framed));
+
+            await press(tree, 'frame-portrait');
+            await press(tree, 'framer-cancel');
+
+            expect(framed).toEqual([]);
+        });
+
+        it('stores a reset as unframed, not as a deliberate centre', async () => {
+            // Null is "never framed" — the state the app has always had. Reset really resets.
+            const framed: Array<PortraitFocus | null> = [];
+            const tree = await renderScreen(fakeCharacters(withPortrait({portraitFocus: {x: 0.5, y: 0.1}}), framed));
+
+            await press(tree, 'frame-portrait');
+            await press(tree, 'framer-reset');
+            await press(tree, 'framer-done');
+
+            expect(framed).toEqual([null]);
+        });
+
+        it('shows the crop the character is already framed to', async () => {
+            const tree = await renderScreen(fakeCharacters(withPortrait({portraitFocus: {x: 0.5, y: 0}})));
+
+            await press(tree, 'frame-portrait');
+
+            // The preview IS the crop, so it must open where the character already is, not centred.
+            const image = tree.root.findAllByProps({testID: 'framer-image'}).find((node) => node.props.source !== undefined)!;
+            expect(image.props.style).toMatchObject({top: '0%', height: '150%'});
         });
     });
 });

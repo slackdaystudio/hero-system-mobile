@@ -241,4 +241,51 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
             expect(saved?.recipe).toBeNull();
         });
     });
+
+    /**
+     * Framing is two numbers and nothing else — the portrait bytes are never touched, so it is
+     * always reversible and can never cost anyone their image.
+     */
+    describe('portrait framing', () => {
+        it('starts unframed, which reads as the centre crop it always had', async () => {
+            const {repo} = setup();
+            await repo.save(character());
+
+            expect((await repo.get('c1'))?.portraitFocus).toBeNull();
+        });
+
+        it('round-trips a focus, and lifts it onto the list and recent rows', async () => {
+            const {repo} = setup();
+            await repo.save(character());
+
+            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2});
+
+            // The sheet, the list and Home all draw portraits — framing that only reached `get`
+            // would look broken on every other screen.
+            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.5, y: 0.2});
+            expect((await repo.list())[0].portraitFocus).toEqual({x: 0.5, y: 0.2});
+            expect((await repo.recent())[0].portraitFocus).toEqual({x: 0.5, y: 0.2});
+        });
+
+        it('resets to unframed on null', async () => {
+            const {repo} = setup();
+            await repo.save(character());
+            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2});
+
+            await repo.setPortraitFocus('c1', null);
+
+            expect((await repo.get('c1'))?.portraitFocus).toBeNull();
+        });
+
+        it('survives a re-save — framing is not part of the document', async () => {
+            const {repo} = setup();
+            await repo.save(character());
+            await repo.setPortraitFocus('c1', {x: 0.5, y: 0.2});
+
+            // Re-importing the same .hdc, or any other full save, must not un-frame it.
+            await repo.save(character({name: 'Defensor Reloaded'}));
+
+            expect((await repo.get('c1'))?.portraitFocus).toEqual({x: 0.5, y: 0.2});
+        });
+    });
 });

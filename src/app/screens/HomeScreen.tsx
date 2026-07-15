@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React, {useCallback, useEffect, useState} from 'react';
-import {Image, Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
 import type {CharacterSummary} from 'core/ports';
-import {Card, Screen, Text} from 'app/components';
+import {Card, PortraitImage, Screen, Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
@@ -137,7 +137,7 @@ function RecentCard({character, onOpen}: {character: CharacterSummary; onOpen: (
         <Pressable testID={`recent-${character.id}`} accessibilityRole="button" onPress={() => onOpen(character.id)} style={styles.recentCard}>
             <View style={[styles.recentSquare, square]}>
                 {character.portraitUri ? (
-                    <Image testID={`recent-portrait-${character.id}`} source={{uri: character.portraitUri}} style={styles.recentImage} />
+                    <PortraitImage testID={`recent-portrait-${character.id}`} uri={character.portraitUri} focus={character.portraitFocus} />
                 ) : (
                     <Text variant="title" muted>
                         {(character.name.trim()[0] ?? '?').toUpperCase()}
@@ -212,10 +212,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-    },
-    recentImage: {
-        width: '100%',
-        height: '100%',
     },
     recentName: {
         textAlign: 'center',

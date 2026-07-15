@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, Animated, Image, Modal, Pressable, ScrollView, StyleSheet, Switch, View, type ViewStyle} from 'react-native';
+import {ActivityIndicator, Alert, Animated, Image, Modal, Pressable, ScrollView, StyleSheet, Switch, View, type ViewStyle} from 'react-native';
 import type {LastRoll} from 'core/dice';
-import type {Character} from 'core/ports';
+import type {Character, PortraitFocus} from 'core/ports';
 import type {Obj} from 'core/traits';
-import {Button, Card, Screen, SegmentedControl, Text, type Segment} from 'app/components';
+import {Button, Card, PortraitImage, Screen, SegmentedControl, Text, type Segment} from 'app/components';
 import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
 import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
@@ -34,6 +34,7 @@ import {
     type SheetTrait,
 } from './characterSheet';
 import {CharacterEditor, editableRecipe} from './CharacterEditor';
+import {PortraitFramer} from './PortraitFramer';
 import {CombatTracker} from './CombatTracker';
 
 type LoadState = {status: 'loading'} | {status: 'ready'; character: Character} | {status: 'not-found'} | {status: 'error'; message: string};
@@ -107,6 +108,34 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
     }, [character, showSecondary]);
 
     const [flash, setFlash] = useState<RollFlashState | null>(null);
+    const [framing, setFraming] = useState(false);
+    // Measured here rather than inside the framer so the modal opens already knowing which axis can
+    // move — a framer that starts inert for a frame reads as broken.
+    const [portraitAspect, setPortraitAspect] = useState<number | undefined>(undefined);
+
+    const portraitUri = character?.portraitUri ?? null;
+
+    useEffect(() => {
+        if (portraitUri === null) {
+            return;
+        }
+
+        Image.getSize(
+            portraitUri,
+            (width, height) => setPortraitAspect(height > 0 ? width / height : undefined),
+            () => setPortraitAspect(undefined),
+        );
+    }, [portraitUri]);
+
+    const frame = useCallback(
+        (focus: PortraitFocus | null) => {
+            setFraming(false);
+            repository.setPortraitFocus(characterId, focus).then(load, () => {
+                Alert.alert('Could not save', 'That framing could not be saved.');
+            });
+        },
+        [repository, characterId, load],
+    );
 
     const rollNow = useCallback(
         async (request: RollRequest) => {
@@ -162,15 +191,22 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
         <Screen>
             <ScrollView contentContainerStyle={content}>
                 <View style={styles.header}>
-                    <View style={[styles.avatar, avatarStyle]}>
-                        {loaded.portraitUri ? (
-                            <Image testID="portrait" source={{uri: loaded.portraitUri}} style={styles.avatarImage} />
-                        ) : (
+                    {loaded.portraitUri !== null ? (
+                        <Pressable
+                            testID="frame-portrait"
+                            accessibilityRole="button"
+                            accessibilityLabel={`Reframe ${loaded.name}'s portrait`}
+                            onPress={() => setFraming(true)}
+                            style={[styles.avatar, avatarStyle]}>
+                            <PortraitImage testID="portrait" uri={loaded.portraitUri} focus={loaded.portraitFocus} size={AVATAR} radius={theme.radius.md} />
+                        </Pressable>
+                    ) : (
+                        <View style={[styles.avatar, avatarStyle]}>
                             <Text variant="title" muted>
                                 {(loaded.name.trim()[0] ?? '?').toUpperCase()}
                             </Text>
-                        )}
-                    </View>
+                        </View>
+                    )}
                     <View style={styles.headerText}>
                         <Text variant="title">{loaded.name}</Text>
                         {alias !== null ? (
@@ -201,6 +237,19 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                 )}
             </ScrollView>
             <RollFlash flash={flash} onClose={() => setFlash(null)} onRollAgain={rollNow} />
+            {loaded.portraitUri !== null ? (
+                <PortraitFramer
+                    // Remount per open so the draft always starts from what's saved, not from a
+                    // cancelled drag.
+                    key={framing ? 'open' : 'closed'}
+                    uri={loaded.portraitUri}
+                    focus={loaded.portraitFocus}
+                    aspect={portraitAspect}
+                    visible={framing}
+                    onCancel={() => setFraming(false)}
+                    onSave={frame}
+                />
+            ) : null}
         </Screen>
     );
 }

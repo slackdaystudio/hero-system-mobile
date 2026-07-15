@@ -101,8 +101,26 @@ const migration005: Migration = {
     },
 };
 
+/**
+ * 006 — which part of a portrait to show.
+ *
+ * Portraits render in a square, and `<Image>`'s default `cover` centre-crops. HERO portraits are
+ * artwork, not headshots — composition varies enough that no default is right for all of them, so
+ * the player says. Two fractions in 0..1, both defaulting to the centre the app has always used.
+ *
+ * NULL rather than 0.5: a row that has never been framed is not the same as one deliberately
+ * centred, and it means existing characters need no backfill.
+ */
+const migration006: Migration = {
+    version: 6,
+    up(db) {
+        db.execute('ALTER TABLE characters ADD COLUMN portrait_focus_x REAL');
+        db.execute('ALTER TABLE characters ADD COLUMN portrait_focus_y REAL');
+    },
+};
+
 /** All migrations, in ascending version order. */
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006];
 
 /**
  * Apply every migration newer than the recorded schema version, each in its own

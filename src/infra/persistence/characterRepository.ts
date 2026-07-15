@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Character, CharacterOrigin, CharacterRepository, CharacterSummary, ImageStore, SaveCharacter, StoredRecipe} from 'core/ports';
+import type {Character, CharacterOrigin, CharacterRepository, CharacterSummary, ImageStore, PortraitFocus, SaveCharacter, StoredRecipe} from 'core/ports';
 import type {SqlDatabase, SqlRow} from './driver/sqlDatabase';
 
-const SUMMARY_COLUMNS = 'id, name, player, edition, is_active, portrait_id';
+const SUMMARY_COLUMNS = 'id, name, player, edition, is_active, portrait_id, portrait_focus_x, portrait_focus_y';
 
 /**
  * Characters in SQLite: one row each, the HD document as a JSON `data` column
@@ -128,6 +128,10 @@ export class SqliteCharacterRepository implements CharacterRepository {
         }
     }
 
+    async setPortraitFocus(id: string, focus: PortraitFocus | null): Promise<void> {
+        this.db.execute('UPDATE characters SET portrait_focus_x = ?, portrait_focus_y = ? WHERE id = ?', [focus?.x ?? null, focus?.y ?? null, id]);
+    }
+
     async setActive(id: string): Promise<void> {
         // Clear then set inside one transaction so the one-active partial unique
         // index is never violated mid-flight.
@@ -139,6 +143,8 @@ export class SqliteCharacterRepository implements CharacterRepository {
 
     private toSummary(row: SqlRow): CharacterSummary {
         const portraitId = row.portrait_id as string | null;
+        const x = row.portrait_focus_x as number | null;
+        const y = row.portrait_focus_y as number | null;
 
         return {
             id: row.id as string,
@@ -147,6 +153,8 @@ export class SqliteCharacterRepository implements CharacterRepository {
             edition: row.edition as CharacterSummary['edition'],
             isActive: row.is_active === 1,
             portraitUri: portraitId !== null ? this.imageStore.uri(portraitId) : null,
+            // Both or neither — a half-written focus would silently frame one axis.
+            portraitFocus: x === null || y === null ? null : {x, y},
         };
     }
 

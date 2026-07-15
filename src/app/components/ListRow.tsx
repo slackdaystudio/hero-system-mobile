@@ -13,9 +13,11 @@
 // limitations under the License.
 
 import React from 'react';
-import {Image, Pressable, StyleSheet, View, type ViewStyle} from 'react-native';
+import {Pressable, StyleSheet, View, type ViewStyle} from 'react-native';
+import type {PortraitFocus} from 'core/ports';
 import {useTheme} from 'app/theme';
 import {TrashIcon} from './icons';
+import {PortraitImage} from './PortraitImage';
 import {Text} from './Text';
 
 export interface ListRowProps {
@@ -23,6 +25,8 @@ export interface ListRowProps {
     subtitle?: string | null;
     /** Portrait `file://` uri; falls back to the title's initial when absent. */
     imageUri?: string | null;
+    /** Which part of the portrait to show; null/absent is the centre crop. */
+    imageFocus?: PortraitFocus | null;
     active?: boolean;
     onPress?: () => void;
     /** Long-press action. Used for destructive actions, which should confirm before acting. */
@@ -40,7 +44,7 @@ export interface ListRowProps {
 const initialOf = (title: string): string => (title.trim()[0] ?? '?').toUpperCase();
 
 /** A tappable list row: leading portrait/initial, title + subtitle, active badge, trailing delete. */
-export function ListRow({title, subtitle, imageUri, active = false, onPress, onLongPress, onDelete, deleteLabel, testID}: ListRowProps): React.JSX.Element {
+export function ListRow({title, subtitle, imageUri, imageFocus, active = false, onPress, onLongPress, onDelete, deleteLabel, testID}: ListRowProps): React.JSX.Element {
     const theme = useTheme();
 
     const container: ViewStyle = {
@@ -62,7 +66,7 @@ export function ListRow({title, subtitle, imageUri, active = false, onPress, onL
             style={({pressed}) => [styles.row, container, {backgroundColor: pressed ? theme.colors.surfaceAlt : theme.colors.surface}]}>
             <View style={[styles.avatar, avatar]}>
                 {imageUri ? (
-                    <Image testID="portrait" source={{uri: imageUri}} style={styles.avatarImage} />
+                    <PortraitImage testID="portrait" uri={imageUri} focus={imageFocus} size={AVATAR_SIZE} />
                 ) : (
                     <Text variant="subtitle" muted>
                         {initialOf(title)}
@@ -119,10 +123,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-    },
-    avatarImage: {
-        width: AVATAR_SIZE,
-        height: AVATAR_SIZE,
     },
     body: {
         flex: 1,

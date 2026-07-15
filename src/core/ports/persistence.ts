@@ -142,6 +142,25 @@ export interface PortraitInput {
     mime: string;
 }
 
+/**
+ * Which part of a portrait a square shows, as fractions of the cropped-away overflow.
+ *
+ * `{x: 0.5, y: 0.5}` is dead centre — what `<Image resizeMode="cover">` does by itself, and what
+ * every portrait did before this existed. `{y: 0}` pins the top edge, `{y: 1}` the bottom. Only the
+ * axis that actually overflows has any effect: a tall image in a square has nothing to move
+ * sideways.
+ *
+ * Non-destructive by design — the stored bytes are never touched, so re-framing is always free and
+ * always reversible.
+ */
+export interface PortraitFocus {
+    x: number;
+    y: number;
+}
+
+/** The centre crop every portrait gets until someone says otherwise. */
+export const CENTERED_PORTRAIT: PortraitFocus = {x: 0.5, y: 0.5};
+
 /** The list-screen row — lifted columns only, no document parse. */
 export interface CharacterSummary {
     id: string;
@@ -151,6 +170,12 @@ export interface CharacterSummary {
     isActive: boolean;
     /** `file://` URI for `<Image>`, or null. */
     portraitUri: string | null;
+    /**
+     * Null when never framed, which reads as centred. Lifted onto the summary because the list and
+     * Home draw portraits too — framing that only applied on the sheet would be a bug you'd notice
+     * on every other screen.
+     */
+    portraitFocus: PortraitFocus | null;
 }
 
 /** A full character: summary + the parsed document. */
@@ -193,6 +218,14 @@ export interface CharacterRepository {
     delete(id: string): Promise<void>;
     setActive(id: string): Promise<void>;
     getActive(): Promise<Character | null>;
+    /**
+     * Frame a portrait; `null` resets it to centred.
+     *
+     * Its own operation rather than a field on `save`, like {@link setActive} and
+     * {@link markAccessed}: moving a crop is two numbers, and rewriting a whole character document
+     * to do it would be both wasteful and a chance to get something else wrong.
+     */
+    setPortraitFocus(id: string, focus: PortraitFocus | null): Promise<void>;
     /** Record that a character was just opened (drives the Home "recent" list). */
     markAccessed(id: string): Promise<void>;
     /** Recently opened characters (falling back to recently updated), most-recent first. */

@@ -50,6 +50,8 @@ const character = (over: Partial<Character> = {}): Character => ({
     edition: '5E',
     isActive: false,
     portraitUri: null,
+    /** Unframed — reads as the centre crop every portrait got before framing existed. */
+    portraitFocus: null,
     filename: 'generated-brick-1',
     updatedAt: '2026-01-01T00:00:00.000Z',
     document: {},

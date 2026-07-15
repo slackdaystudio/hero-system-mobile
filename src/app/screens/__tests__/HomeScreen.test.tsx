@@ -27,6 +27,8 @@ const summary = (over: Partial<CharacterSummary> = {}): CharacterSummary => ({
     edition: '6E',
     isActive: false,
     portraitUri: null,
+    /** Unframed — reads as the centre crop every portrait got before framing existed. */
+    portraitFocus: null,
     ...over,
 });
 

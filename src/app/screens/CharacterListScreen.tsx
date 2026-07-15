@@ -122,6 +122,7 @@ export function CharacterListScreen({onSelect, refreshToken}: CharacterListScree
                         title={item.name}
                         subtitle={subtitleFor(item)}
                         imageUri={item.portraitUri}
+                        imageFocus={item.portraitFocus}
                         active={item.isActive}
                         onPress={onSelect === undefined ? undefined : () => onSelect(item.id)}
                         // Both reach the same confirmation. The trash is the discoverable one; the
