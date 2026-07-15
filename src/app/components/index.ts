@@ -20,3 +20,4 @@ export {Button, type ButtonProps} from './Button';
 export {NumberField, type NumberFieldProps} from './NumberField';
 export {TextField, type TextFieldProps} from './TextField';
 export {SegmentedControl, type Segment, type SegmentedControlProps} from './SegmentedControl';
+export {SelectField, type SelectFieldProps} from './SelectField';

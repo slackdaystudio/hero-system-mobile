@@ -24,11 +24,13 @@ export interface TextFieldProps {
     placeholder?: string;
     keyboardType?: KeyboardTypeOptions;
     maxLength?: number;
+    /** Fired when editing finishes. Use for commits too expensive to run per keystroke. */
+    onBlur?: () => void;
     testID?: string;
 }
 
 /** Labelled free-text input. Sibling of {@link NumberField} for non-numeric values. */
-export function TextField({label, value, onChangeText, placeholder, keyboardType = 'default', maxLength, testID}: TextFieldProps): React.JSX.Element {
+export function TextField({label, value, onChangeText, placeholder, keyboardType = 'default', maxLength, onBlur, testID}: TextFieldProps): React.JSX.Element {
     const theme = useTheme();
     const inputStyle: TextStyle = {
         color: theme.colors.text,
@@ -50,6 +52,8 @@ export function TextField({label, value, onChangeText, placeholder, keyboardType
                 placeholder={placeholder}
                 placeholderTextColor={theme.colors.textMuted}
                 maxLength={maxLength}
+                onBlur={onBlur}
+                onSubmitEditing={onBlur}
                 style={[styles.input, inputStyle]}
             />
         </View>

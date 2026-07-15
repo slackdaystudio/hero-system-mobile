@@ -33,6 +33,7 @@ import {
     type SheetCharacteristic,
     type SheetTrait,
 } from './characterSheet';
+import {CharacterEditor, editableRecipe} from './CharacterEditor';
 import {CombatTracker} from './CombatTracker';
 
 type LoadState = {status: 'loading'} | {status: 'ready'; character: Character} | {status: 'not-found'} | {status: 'error'; message: string};
@@ -83,6 +84,8 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
 
     // Decorate the whole sheet once per character (engine work), not per render.
     const character = state.status === 'ready' ? state.character : null;
+    // Non-null only for a generated character whose recipe still resolves — see editableRecipe.
+    const recipe = useMemo(() => (character === null ? null : editableRecipe(character)), [character]);
     // "Only in Alternate Identity" form. Default on — matches legacy (which loaded
     // characters with showSecondary = true), so alt-ID stat boosts count by default.
     const [showSecondary, setShowSecondary] = useState(true);
@@ -185,6 +188,8 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                         ) : null}
                     </View>
                 </View>
+
+                {recipe !== null ? <CharacterEditor character={loaded} recipe={recipe} onRevised={load} /> : null}
 
                 {sheet !== null ? (
                     <>

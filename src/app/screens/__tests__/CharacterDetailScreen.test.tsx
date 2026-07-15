@@ -26,8 +26,10 @@ import {
     type Statistics,
     type StatisticsRepository,
 } from 'core/ports';
+import {rollRecipe} from 'core/random';
 import type {Repositories} from 'infra/persistence/repositories';
 import {DiceProvider} from 'app/providers/DiceProvider';
+import {GenerateProvider} from 'app/providers/GenerateProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
 import sample from '../../composition/sampleCharacter.json';
@@ -119,9 +121,11 @@ const renderScreen = async (
         tree = TestRenderer.create(
             <ThemeProvider colorScheme="dark">
                 <RepositoriesProvider repositories={repositories}>
-                    <DiceProvider dieRoller={roller}>
-                        <CharacterDetailScreen characterId="c1" {...props} />
-                    </DiceProvider>
+                    <GenerateProvider rng={{next: (min) => min}}>
+                        <DiceProvider dieRoller={roller}>
+                            <CharacterDetailScreen characterId="c1" {...props} />
+                        </DiceProvider>
+                    </GenerateProvider>
                 </RepositoriesProvider>
             </ThemeProvider>,
         );
@@ -322,5 +326,35 @@ describe('CharacterDetailScreen', () => {
         const tree = await renderScreen(fakeCharacters(character({portraitUri: 'file:///images/p1.png'})));
 
         expect(tree.root.findByProps({testID: 'portrait'}).props.source.uri).toBe('file:///images/p1.png');
+    });
+
+    /**
+     * Only a generated character is editable. The sheet renders either way — it reads the document,
+     * which is an ordinary HERO Designer character whatever the row says about provenance.
+     */
+    describe('the edit affordance', () => {
+        const recipe = rollRecipe({next: (min: number) => min});
+
+        it('offers editing on a generated character', async () => {
+            const tree = await renderScreen(fakeCharacters(character({origin: 'generated', recipe})));
+
+            expect(collectText(tree.toJSON())).toContain('GENERATED CHARACTER');
+            expect(tree.root.findAllByProps({testID: 'edit-archetype'}).length).toBeGreaterThan(0);
+        });
+
+        it('leaves an imported character read-only, even on a generated-looking id', async () => {
+            const tree = await renderScreen(fakeCharacters(character({id: 'generated-brick-1', origin: 'imported', recipe})));
+
+            expect(collectText(tree.toJSON())).not.toContain('GENERATED CHARACTER');
+            expect(tree.root.findAllByProps({testID: 'edit-archetype'})).toEqual([]);
+        });
+
+        it('still opens a generated character whose recipe no longer resolves', async () => {
+            // A recipe from an older build. It costs the character its edit rights, not its sheet.
+            const tree = await renderScreen(fakeCharacters(character({origin: 'generated', recipe: {...recipe, archetype: 'Sorcerer Supreme'}})));
+
+            expect(collectText(tree.toJSON())).not.toContain('GENERATED CHARACTER');
+            expect(collectText(tree.toJSON())).toContain('Defensor');
+        });
     });
 });
