@@ -1,0 +1,130 @@
+{
+  "_note": [
+    "6E Standard (400) archetype characteristics. AUTHORED, not lifted — there is no legacy 6E prose.",
+    "",
+    "Why authored: 6E figures nothing. In 5E, PD/ED/SPD/REC/END/STUN fall out of STR/CON/DEX for free,",
+    "and OCV/DCV come off DEX. In 6E every one of those is bought, and OCV/DCV/OMCV/DMCV are sold",
+    "outright at 5 points per +1 over a base of 3. A 5E spread dropped into 6E is a hero with PD 2 and",
+    "SPD 2 — see characteristics.test.ts, 'figures nothing'.",
+    "",
+    "Benchmarked against the five real 400-point 6E characters in the fixture corpus — identified by",
+    "spending ~400 and taking exactly 75 in complications, which is the 6E Standard limit:",
+    "",
+    "                 chars powers skills | STR DEX CON INT EGO PRE OCV DCV OMCV DMCV SPD  PD  ED REC END BODY STUN",
+    "  jack-diamond     254     63     69 |  61  20  20  19  15  15   7   6    3    3   6  20  10  18  85   13   66   (a Brick)",
+    "  starborne        174    201     30 |  10  23  18  23  10  13  10   8    3    3   5   8   8  10  50   10   40   (an Energy Projector)",
+    "  greyman          176    167     62 |   8  18  18  23  18  18   3   8    8    8   5   8   8  12  80    8   40   (a Mentalist)",
+    "  indigo-bunting   172    174     59 |  15  20  18  13  15  10   7   7    7   6   5  10  10  10  40   14   40",
+    "  jane-fawn        167    167     50 |  15  18  18  18  13  20   9   8    3    3   6   2   2  10  50   10   40   (a Martial Artist)",
+    "",
+    "So the shape of a real 400-point hero is roughly chars ~170 / skills ~55 / powers ~170, with the",
+    "Brick trading powers away for characteristics (254/69/63). These spreads keep each archetype's 5E",
+    "identity — the Gadgeteer's INT, the Mentalist's EGO, the Brick's STR — at 6E's conventions.",
+    "",
+    "No cost is declared anywhere. The engine prices every spread (see characteristicsBudget), and the",
+    "powers budget is whatever is left of the 400.",
+    "",
+    "Spelling: 'archetypes', not the legacy file's 'archtypes' typo. This file is new, not lifted."
+  ],
+  "archetypes": [
+    {
+      "name": "Energy Projector",
+      "_note": "starborne is the model: a ranged blaster. High OCV to land the blast, DEX and END to keep throwing it.",
+      "characteristics": {
+        "str": 15, "dex": 20, "con": 20, "body": 12, "int": 18, "ego": 13, "pre": 15,
+        "ocv": 8, "dcv": 7, "omcv": 3, "dmcv": 4,
+        "pd": 8, "ed": 8, "spd": 5, "rec": 10, "end": 50, "stun": 40
+      }
+    },
+    {
+      "name": "Gadgeteer",
+      "_note": "The INT of the set — the gadgets are powers, so the body behind them is ordinary.",
+      "characteristics": {
+        "str": 13, "dex": 18, "con": 18, "body": 12, "int": 23, "ego": 13, "pre": 13,
+        "ocv": 6, "dcv": 6, "omcv": 3, "dmcv": 3,
+        "pd": 6, "ed": 6, "spd": 4, "rec": 8, "end": 40, "stun": 35
+      }
+    },
+    {
+      "name": "Martial Artist",
+      "_note": "jane-fawn is the model: OCV 9 and SPD 6, and famously no bought defences — the skill IS the defence.",
+      "characteristics": {
+        "str": 18, "dex": 23, "con": 20, "body": 12, "int": 13, "ego": 15, "pre": 20,
+        "ocv": 9, "dcv": 9, "omcv": 3, "dmcv": 4,
+        "pd": 6, "ed": 6, "spd": 6, "rec": 10, "end": 50, "stun": 40
+      }
+    },
+    {
+      "name": "Mentalist",
+      "_note": "greyman is the model: the mental combat values are the whole point, and 6E is the edition that finally sells them separately. OCV stays low.",
+      "characteristics": {
+        "str": 10, "dex": 15, "con": 18, "body": 10, "int": 20, "ego": 23, "pre": 15,
+        "ocv": 4, "dcv": 6, "omcv": 8, "dmcv": 8,
+        "pd": 6, "ed": 6, "spd": 4, "rec": 10, "end": 60, "stun": 35
+      }
+    },
+    {
+      "name": "Metamorph",
+      "_note": "All-rounder — the shapes are powers, so the base body is solid rather than specialised. PRE carries the 5E identity.",
+      "characteristics": {
+        "str": 20, "dex": 18, "con": 20, "body": 13, "int": 13, "ego": 13, "pre": 20,
+        "ocv": 7, "dcv": 7, "omcv": 3, "dmcv": 3,
+        "pd": 8, "ed": 8, "spd": 5, "rec": 10, "end": 50, "stun": 40
+      }
+    },
+    {
+      "name": "Mystic",
+      "_note": "EGO and END feed the magic; ED over PD, because what a mystic soaks is rarely a fist. Mental defence bought, mental offence left to powers.",
+      "characteristics": {
+        "str": 10, "dex": 15, "con": 18, "body": 10, "int": 18, "ego": 20, "pre": 18,
+        "ocv": 5, "dcv": 6, "omcv": 6, "dmcv": 7,
+        "pd": 6, "ed": 8, "spd": 4, "rec": 10, "end": 60, "stun": 35
+      }
+    },
+    {
+      "name": "Patriot",
+      "_note": "The super-soldier: good at everything, best at nothing. The 5E spread already spent the most here (125 of 250) and this keeps that shape.",
+      "characteristics": {
+        "str": 25, "dex": 20, "con": 23, "body": 15, "int": 18, "ego": 15, "pre": 20,
+        "ocv": 8, "dcv": 8, "omcv": 3, "dmcv": 4,
+        "pd": 10, "ed": 10, "spd": 5, "rec": 12, "end": 50, "stun": 45
+      }
+    },
+    {
+      "name": "Powered Armor",
+      "_note": "The suit is powers; INT drives it and the defences are the pilot's own. Slightly tougher than the blaster, slightly slower.",
+      "characteristics": {
+        "str": 20, "dex": 18, "con": 20, "body": 13, "int": 20, "ego": 13, "pre": 15,
+        "ocv": 7, "dcv": 6, "omcv": 3, "dmcv": 3,
+        "pd": 10, "ed": 10, "spd": 5, "rec": 10, "end": 50, "stun": 40
+      }
+    },
+    {
+      "name": "Speedster",
+      "_note": "DEX and SPD are the identity, and DCV is where the speed shows in combat. 6E decouples CV from DEX, so the DCV here is a deliberate buy rather than a side effect.",
+      "characteristics": {
+        "str": 13, "dex": 26, "con": 20, "body": 12, "int": 13, "ego": 13, "pre": 13,
+        "ocv": 7, "dcv": 9, "omcv": 3, "dmcv": 3,
+        "pd": 6, "ed": 6, "spd": 7, "rec": 10, "end": 60, "stun": 35
+      }
+    },
+    {
+      "name": "Weapons Master",
+      "_note": "The weapon is a power; the aim is a characteristic. OCV over DCV — this one hits rather than dodges.",
+      "characteristics": {
+        "str": 18, "dex": 20, "con": 18, "body": 12, "int": 18, "ego": 13, "pre": 18,
+        "ocv": 8, "dcv": 7, "omcv": 3, "dmcv": 3,
+        "pd": 8, "ed": 6, "spd": 5, "rec": 8, "end": 40, "stun": 38
+      }
+    },
+    {
+      "name": "Brick",
+      "_note": "jack-diamond is the model, and the one archetype that buys its powerset away: STR, PD and STUN eat the budget, and what is left over is small on purpose. That is what a Brick is.",
+      "characteristics": {
+        "str": 60, "dex": 15, "con": 25, "body": 15, "int": 13, "ego": 13, "pre": 20,
+        "ocv": 7, "dcv": 6, "omcv": 3, "dmcv": 3,
+        "pd": 20, "ed": 12, "spd": 5, "rec": 16, "end": 60, "stun": 60
+      }
+    }
+  ]
+}
