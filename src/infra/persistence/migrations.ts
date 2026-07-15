@@ -79,8 +79,30 @@ const migration004: Migration = {
     },
 };
 
+/**
+ * 005 — record where a character came from, and (when generated) the recipe it came from.
+ *
+ * Only generated characters are editable: an imported `.hdc` is a faithful view of a file the
+ * player owns, and the app has no business rewriting it. The `generated-` id prefix nearly says
+ * this already, but an import's id is its sanitised filename, so `generated-brick-1.hdc` would
+ * import as a forgery. `origin` is written on every save, so re-importing a real `.hdc` over a
+ * generated id correctly flips it back to 'imported' — which the prefix alone gets wrong.
+ *
+ * The backfill reads the prefix precisely because that *was* the rule until now; characters
+ * generated before this migration keep their edit rights.
+ */
+const migration005: Migration = {
+    version: 5,
+    up(db) {
+        db.execute("ALTER TABLE characters ADD COLUMN origin TEXT NOT NULL DEFAULT 'imported'");
+        // JSON, and generated-only — see core/random's CharacterRecipe. Null for imports.
+        db.execute('ALTER TABLE characters ADD COLUMN recipe TEXT');
+        db.execute("UPDATE characters SET origin = 'generated' WHERE id LIKE 'generated-%'");
+    },
+};
+
 /** All migrations, in ascending version order. */
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005];
 
 /**
  * Apply every migration newer than the recorded schema version, each in its own

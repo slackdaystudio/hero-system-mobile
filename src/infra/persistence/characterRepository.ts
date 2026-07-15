@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Character, CharacterRepository, CharacterSummary, ImageStore, SaveCharacter} from 'core/ports';
+import type {Character, CharacterOrigin, CharacterRepository, CharacterSummary, ImageStore, SaveCharacter, StoredRecipe} from 'core/ports';
 import type {SqlDatabase, SqlRow} from './driver/sqlDatabase';
 
 const SUMMARY_COLUMNS = 'id, name, player, edition, is_active, portrait_id';
@@ -62,9 +62,15 @@ export class SqliteCharacterRepository implements CharacterRepository {
     }
 
     async save(character: SaveCharacter): Promise<void> {
-        const existing = this.db.execute('SELECT portrait_id, is_active FROM characters WHERE id = ?', [character.id]).rows[0];
+        const existing = this.db.execute('SELECT portrait_id, is_active, origin, recipe FROM characters WHERE id = ?', [character.id]).rows[0];
         const existingPortraitId = (existing?.portrait_id as string | null) ?? null;
         const existingIsActive = existing ? (existing.is_active as number) : 0;
+
+        // Provenance and recipe resolve like the portrait does: absent keeps what's there. A new
+        // row is 'imported' unless told otherwise — see SaveCharacter.origin for why this isn't a
+        // plain default on every save.
+        const origin = character.origin ?? (existing?.origin as CharacterOrigin | undefined) ?? 'imported';
+        const recipe = character.recipe === undefined ? ((existing?.recipe as string | null) ?? null) : character.recipe === null ? null : JSON.stringify(character.recipe);
 
         // Resolve the portrait: keep (undefined), clear (null), or store new (bytes).
         // Write the file before the row so a failed upsert only orphans an image
@@ -84,12 +90,13 @@ export class SqliteCharacterRepository implements CharacterRepository {
 
         this.db.transaction(() => {
             this.db.execute(
-                `INSERT INTO characters (id, name, player, edition, is_active, portrait_id, filename, data, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `INSERT INTO characters (id, name, player, edition, is_active, portrait_id, filename, data, updated_at, origin, recipe)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                  ON CONFLICT(id) DO UPDATE SET
                     name = excluded.name, player = excluded.player, edition = excluded.edition,
                     portrait_id = excluded.portrait_id, filename = excluded.filename,
-                    data = excluded.data, updated_at = excluded.updated_at`,
+                    data = excluded.data, updated_at = excluded.updated_at,
+                    origin = excluded.origin, recipe = excluded.recipe`,
                 [
                     character.id,
                     character.name,
@@ -100,6 +107,8 @@ export class SqliteCharacterRepository implements CharacterRepository {
                     character.filename ?? null,
                     JSON.stringify(character.document),
                     this.now(),
+                    origin,
+                    recipe,
                 ],
             );
         });
@@ -142,11 +151,17 @@ export class SqliteCharacterRepository implements CharacterRepository {
     }
 
     private toCharacter(row: SqlRow): Character {
+        const recipe = (row.recipe as string | null) ?? null;
+
         return {
             ...this.toSummary(row),
             filename: (row.filename as string | null) ?? null,
             updatedAt: row.updated_at as string,
             document: JSON.parse(row.data as string) as Character['document'],
+            origin: (row.origin as CharacterOrigin | null) ?? 'imported',
+            // Shape is not checked here — `core/random` validates on the way back in, so a recipe
+            // from an older build fails to parse there and the character simply isn't editable.
+            recipe: recipe === null ? null : (JSON.parse(recipe) as StoredRecipe),
         };
     }
 }

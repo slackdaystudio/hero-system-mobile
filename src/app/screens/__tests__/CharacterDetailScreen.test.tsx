@@ -65,6 +65,9 @@ const character = (over: Partial<Character> = {}): Character => ({
         characteristics: [{name: 'STR', value: 20}],
         powers: [{name: 'Force Field', xmlid: 'FORCEFIELD'}],
     },
+    // Defensor is an import — the read-only default. Generated cases override both.
+    origin: 'imported',
+    recipe: null,
     ...over,
 });
 

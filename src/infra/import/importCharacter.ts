@@ -63,6 +63,11 @@ export async function importHdc(bytes: Uint8Array, fileName: string, repos: Repo
         filename: id,
         document,
         portrait,
+        // Stated, not defaulted: ids come from the file name, so `generated-brick-1.hdc` would
+        // otherwise land on a generated character's row and inherit its edit rights. An imported
+        // `.hdc` is the player's file and stays read-only. Clears any recipe for the same reason.
+        origin: 'imported',
+        recipe: null,
     });
 
     return {id, name};

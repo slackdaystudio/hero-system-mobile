@@ -120,6 +120,22 @@ export type Edition = '5E' | '6E';
 /** The parsed/normalized HERO Designer character document (portrait not embedded). */
 export type CharacterDocument = Record<string, unknown>;
 
+/**
+ * Where a character came from. Only a generated one is editable: an imported `.hdc` is a faithful
+ * view of a file the player owns, and the app has no business rewriting it.
+ */
+export type CharacterOrigin = 'generated' | 'imported';
+
+/**
+ * The generator's recipe, round-tripped as JSON so a generated character can be re-rolled.
+ *
+ * Opaque here for the same reason {@link CharacterDocument} is: persistence stores it and hands it
+ * back, and has no stake in its shape. `core/random` owns that (its `CharacterRecipe`, which
+ * validates on the way back in — typing it here would make ports depend on the module that already
+ * depends on ports).
+ */
+export type StoredRecipe = Record<string, unknown>;
+
 /** Portrait bytes to store, or `null` to clear. */
 export interface PortraitInput {
     bytes: Uint8Array;
@@ -142,6 +158,9 @@ export interface Character extends CharacterSummary {
     filename: string | null;
     updatedAt: string;
     document: CharacterDocument;
+    origin: CharacterOrigin;
+    /** The recipe it was rolled from; null for imports, and for rolls predating the recipe column. */
+    recipe: StoredRecipe | null;
 }
 
 /** Input to `save` — the caller provides lifted fields + a portrait-free document. */
@@ -154,6 +173,17 @@ export interface SaveCharacter {
     document: CharacterDocument;
     /** Present + object → store new portrait; present + null → clear; absent → keep existing. */
     portrait?: PortraitInput | null;
+    /**
+     * Present → store; absent → keep existing, and a **new** row defaults to 'imported' (a caller
+     * that hasn't thought about provenance is not handing us something to let the player rewrite).
+     *
+     * Both producers state it: import writes 'imported', so re-importing a real `.hdc` over a
+     * generated id correctly demotes it. Defaulting to 'imported' on *every* save would instead
+     * strip a generated character's edit rights the first time it was renamed.
+     */
+    origin?: CharacterOrigin;
+    /** Present → store; absent → keep existing (so a rename needn't restate the recipe). */
+    recipe?: StoredRecipe | null;
 }
 
 export interface CharacterRepository {

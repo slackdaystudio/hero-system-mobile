@@ -186,4 +186,59 @@ describe('SqliteCharacterRepository (real SQLite)', () => {
             expect((await repo.getActive())?.name).toBe('Edited');
         });
     });
+
+    /**
+     * Only a generated character is editable, so `origin` decides whether the app may rewrite a
+     * row. The `generated-` id prefix nearly says this already — these pin the cases where it and
+     * the column disagree.
+     */
+    describe('origin + recipe', () => {
+        it('round-trips a generated character with its recipe', async () => {
+            const {repo} = setup();
+            const recipe = {archetype: 'Brick', profession: 'Soldier', specialFx: 'Fire'};
+
+            await repo.save(character({id: 'generated-brick-1', origin: 'generated', recipe}));
+
+            const saved = await repo.get('generated-brick-1');
+            expect(saved?.origin).toBe('generated');
+            expect(saved?.recipe).toEqual(recipe);
+        });
+
+        it('defaults a new row to imported — nothing is editable by accident', async () => {
+            const {repo} = setup();
+
+            await repo.save(character());
+
+            const saved = await repo.get('c1');
+            expect(saved?.origin).toBe('imported');
+            expect(saved?.recipe).toBeNull();
+        });
+
+        it('keeps origin and recipe when a save omits them, so a rename cannot strip edit rights', async () => {
+            const {repo} = setup();
+            const recipe = {archetype: 'Brick'};
+            await repo.save(character({id: 'g1', origin: 'generated', recipe}));
+
+            // What renaming looks like: same row, new name, provenance not restated.
+            await repo.save(character({id: 'g1', name: 'Ember'}));
+
+            const saved = await repo.get('g1');
+            expect(saved?.name).toBe('Ember');
+            expect(saved?.origin).toBe('generated');
+            expect(saved?.recipe).toEqual(recipe);
+        });
+
+        it('demotes to imported when a real .hdc lands on a generated id', async () => {
+            const {repo} = setup();
+            await repo.save(character({id: 'generated-brick-1', origin: 'generated', recipe: {archetype: 'Brick'}}));
+
+            // An import of `generated-brick-1.hdc` — the id prefix still says "generated", but this
+            // is the player's own file now and must not be rewritable.
+            await repo.save(character({id: 'generated-brick-1', name: 'Real Character', origin: 'imported', recipe: null}));
+
+            const saved = await repo.get('generated-brick-1');
+            expect(saved?.origin).toBe('imported');
+            expect(saved?.recipe).toBeNull();
+        });
+    });
 });
