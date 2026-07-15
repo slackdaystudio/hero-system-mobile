@@ -795,5 +795,193 @@
         ]
       }
     }
+  ],
+  "Mystic": [
+    {
+      "label": "Sorcerer",
+      "_note": "The Mentalist's cousin, and the other archetype a VPP invites — see the NO VPPs note at the top. Spells go in a multipower instead: the same reach, but the player can see what they've got.\n\nED over PD, in the spread and in the sigil, because what a mystic soaks is rarely a fist. Unlike the Mentalist it attacks with a Blast rather than a thought, so it reads DC 12 / oAP 60 — the campaign baseline — where the Mentalist reads DC 6 for the same 60 active points.\n\nDefences held near greyman's shape (DEF 20, rDEF 13, dAP 39) rather than the Energy Projector's: dAP compounds against DCV x DEF x rDEF in the Rule of X, and this is a DCV 6 character. That term is where a defensive stack runs away, and it has caught two archetypes already.",
+      "powers": {
+        "power": [
+          {
+            "xmlid": "FORCEFIELD",
+            "id": 601,
+            "alias": "Resistant Protection",
+            "name": "Warding Sigil",
+            "position": 0,
+            "levels": 24,
+            "pdlevels": 10,
+            "edlevels": 14,
+            "mdlevels": 0,
+            "powdlevels": 0
+          },
+          {
+            "xmlid": "FLIGHT",
+            "id": 602,
+            "alias": "Flight",
+            "name": "Levitate",
+            "position": 1,
+            "levels": 40
+          },
+          {
+            "xmlid": "ENERGYBLAST",
+            "id": 611,
+            "parentid": 610,
+            "alias": "Blast",
+            "name": "Eldritch Bolt",
+            "position": 2,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "ENTANGLE",
+            "id": 612,
+            "parentid": 610,
+            "alias": "Entangle",
+            "name": "Binding",
+            "position": 3,
+            "levels": 4,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "FORCEWALL",
+            "id": 613,
+            "parentid": 610,
+            "alias": "Barrier",
+            "name": "Circle Of Protection",
+            "position": 4,
+            "levels": 0,
+            "pdlevels": 8,
+            "edlevels": 8,
+            "mdlevels": 0,
+            "powdlevels": 0,
+            "lengthlevels": 4,
+            "heightlevels": 2,
+            "bodylevels": 0,
+            "widthlevels": 0,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "DISPEL",
+            "id": 614,
+            "parentid": 610,
+            "alias": "Dispel",
+            "name": "Unweave",
+            "position": 5,
+            "levels": 20,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "MENTALILLUSIONS",
+            "id": 615,
+            "parentid": 610,
+            "alias": "Mental Illusions",
+            "name": "Glamour",
+            "position": 6,
+            "levels": 12,
+            "ultraSlot": true
+          },
+          {
+            "xmlid": "CLAIRSENTIENCE",
+            "id": 616,
+            "parentid": 610,
+            "alias": "Clairsentience",
+            "name": "Scrying",
+            "position": 7,
+            "levels": 0,
+            "basecost": 20,
+            "ultraSlot": true,
+            "adder": [
+              {
+                "xmlid": "SENSEGROUP",
+                "alias": "Sense Group:",
+                "basecost": 5,
+                "levels": 0,
+                "option": "SIGHTGROUP",
+                "optionid": "SIGHTGROUP",
+                "optionAlias": "Sight Group"
+              }
+            ]
+          },
+          {
+            "xmlid": "MENTALDEFENSE",
+            "id": 603,
+            "alias": "Mental Defense",
+            "name": "Occult Discipline",
+            "position": 8,
+            "levels": 7,
+            "basecost": 0
+          },
+          {
+            "xmlid": "POWERDEFENSE",
+            "id": 604,
+            "alias": "Power Defense",
+            "name": "Anchored Soul",
+            "position": 9,
+            "levels": 10,
+            "basecost": 0
+          },
+          {
+            "xmlid": "DETECT",
+            "id": 605,
+            "alias": "Detect",
+            "name": "Detect Magic",
+            "position": 10,
+            "levels": 0,
+            "basecost": 5,
+            "adder": [
+              {
+                "xmlid": "SENSE",
+                "alias": "Sense",
+                "basecost": 2,
+                "levels": 0
+              }
+            ]
+          },
+          {
+            "xmlid": "DRAIN",
+            "id": 617,
+            "parentid": 610,
+            "alias": "Drain",
+            "name": "Siphon Vitality",
+            "position": 12,
+            "levels": 6,
+            "ultraSlot": true,
+            "option": "STR",
+            "optionid": "STR",
+            "optionAlias": "STR"
+          },
+          {
+            "xmlid": "LIFESUPPORT",
+            "id": 606,
+            "alias": "Life Support",
+            "name": "Ageless",
+            "position": 13,
+            "levels": 0,
+            "basecost": 0,
+            "adder": [
+              {
+                "xmlid": "LONGEVITY",
+                "alias": "Longevity:",
+                "basecost": 5,
+                "levels": 0,
+                "option": "IMMORTAL",
+                "optionid": "IMMORTAL",
+                "optionAlias": "Immortal"
+              }
+            ]
+          }
+        ],
+        "multipower": [
+          {
+            "xmlid": "GENERIC_OBJECT",
+            "id": 610,
+            "alias": "Multipower",
+            "name": "Spells",
+            "position": 11,
+            "basecost": 60
+          }
+        ]
+      }
+    }
   ]
 }
