@@ -61,9 +61,11 @@ resolve in build and tests.
 
 ## Status
 
-**The rebuild ships.** It is on the store past legacy's cutover, and the rules engine is
-fully ported and golden-mastered. What remains is Phase 4's last screen and the Phase 5
-correctness pass.
+**The rebuild ships.** It is on the store past legacy's cutover, the rules engine is fully
+ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.5.0
+(versionCode 65) is in review with Google** — the first build to carry schema 5 and the
+first to change costs on characters people already have. What remains is CostCruncher and
+the cosmetic tail of the correctness pass.
 
 | Phase | State |
 |---|---|
@@ -71,8 +73,8 @@ correctness pass.
 | 1 — Core port | ✅ done — `dice`, `templates`, `util`, `hero`, `traits`, `combat`; golden-mastered over all 37 fixtures |
 | 2 — Ports + infra | ✅ done — `rng`, `files`, `import`, `migration`, `persistence`; sound dropped |
 | 3 — State (RTK) | ❌ **not done, and deliberately reversed** — see below |
-| 4 — UI | 8 screens built; **CostCruncher** is the only one outstanding. RandomCharacter dropped (being reimagined) |
-| 5 — Migration + parity + release | migration done + device-validated; **releases shipping**; correctness pass in progress |
+| 4 — UI | 9 screens; **CostCruncher** is the only one outstanding. Random characters are built — reimagined, not ported (see below) |
+| 5 — Migration + parity + release | migration done + device-validated; **releases shipping**; every corpus-triggered bug fixed, cosmetic tail open |
 
 `REBUILD_PLAN.md`'s Progress section has drifted (it still shows Phase 1 unchecked and
 prescribes redux). **This section is the source of truth for status.**
@@ -86,15 +88,44 @@ component-local and resets to on at every mount, where legacy persisted `showSec
 
 `DiceScreen` consolidates legacy's five Skill/Hit/Damage/Effect/Result screens into one.
 
-## The correctness pass (current work)
+**Random characters were reimagined, not ported.** `src/core/random/` (see
+[`docs/RANDOM_CHARACTER.md`](docs/RANDOM_CHARACTER.md)) is clean-room: legacy's
+`RandomCharacter.js` is **not an oracle for it** and it is deliberately not golden-mastered —
+the same discipline as `core/`, for the opposite reason. It emits a `ParsedCharacter` (the
+`.hdc`-shaped *input*) and runs it through `heroDesignerCharacter.getCharacter()`, so a
+generated character is priced by the same engine that reads a real `.hdc` and is saved down
+the same path. Currently 5E Low Powered (250) only; **6E at 400 is authored data, not code.**
+
+Two consequences worth knowing:
+
+- **Building characters found engine bugs the 37-fixture corpus never did** — H9 and H10 were
+  both caught by generating, not by importing. The decade-old archetype prose acts as a second
+  oracle: it independently priced `ES: PER +1` at 3 and `Clinging 20 STR` at 10, siding with
+  the template against the code. Both were real shipped bugs.
+- **A generated character carries a recipe** (`core/random/recipe.ts`), stored in its own
+  column beside the document. Editing revises the recipe and rebuilds — there is no partial
+  mutation path. Only `origin: 'generated'` rows are editable; an imported `.hdc` is the
+  player's file and stays read-only.
+
+`RandomHeroRepository` / the `random_hero` table are a **legacy relic**: `migrateV1` still
+writes the old app's saved random hero there, and nothing reads it. The new generator saves
+generated characters as ordinary character rows. Don't wire it up expecting it to matter —
+it's data preservation, not a feature.
+
+## The correctness pass
 
 `core/*` reproduces the legacy engine **byte-for-byte**, so the golden masters prove
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 15 entries; 8 fixed (H3–H8, U2, U3) — every known corpus-triggered bug is now
+> `core/`.** 17 entries; 10 fixed (H3–H10, U2, U3) — every known corpus-triggered bug is now
 > fixed. It explains why a "wrong-looking" line in `core/` may be load-bearing, and why a
 > green golden master does not mean correct.
+
+**These fixes are visible to users.** They ship in 2.5.0, and eight of them re-based golden
+masters — H8 alone moves 14 of the 37 fixtures. Roughly a third of real characters read
+differently than they did in 2.4.1. When a tester reports a changed cost, the question is not
+"did we break it" but "do we now agree with HERO Designer".
 
 Process per fix — follow it; the ledger explains the reasoning:
 
