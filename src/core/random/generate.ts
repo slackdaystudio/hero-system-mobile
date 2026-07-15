@@ -22,27 +22,30 @@
  * A character now carries characteristics, powers, skills and complications — the full 250 of a
  * Low Powered build. {@link generateRandomCharacter} still reports what it spent, so a caller can
  * say so rather than assert it.
+ *
+ * Rolling happens in two steps — {@link rollRecipe} then {@link buildRecipe} — because editing a
+ * saved character is the second step on its own. See `core/random/recipe`.
  */
 import type {ParsedCharacter} from 'core/hero';
 import type {Rng} from 'core/ports';
 import {ARCHETYPES_5E, allocate, pick, SKILLSETS, SPECIAL_FX, type Archetype, type Budget} from './allocate';
-import {buildCharacteristics} from './characteristics';
-import {attachComplications, COMPLICATION_SETS_5E, type ComplicationSet} from './complications';
-import {attachPowerset, powersetsFor, type Powerset} from './powerset';
-import {attachSkillset, structuredSkillset} from './skillset';
-import {LOW_POWERED_5E, type PowerLevel} from './powerLevel';
+import {COMPLICATION_SETS_5E} from './complications';
+import {powersetsFor} from './powerset';
+import {structuredSkillset} from './skillset';
+import {autoName, buildFromRecipe, type CharacterRecipe} from './recipe';
+import {LOW_POWERED_5E, powerLevel, type PowerLevel} from './powerLevel';
 
 export interface GeneratedCharacter {
     readonly parsed: ParsedCharacter;
-    readonly name: string;
-    readonly archetype: string;
-    readonly powerset: string;
-    readonly complications: string;
-    readonly skillset: string;
-    readonly specialFx: string;
+    /**
+     * What it was rolled from, and the only record of it: the saved document is an ordinary HERO
+     * Designer character and has nowhere to say "Fire Brick, Soldier". Persisted alongside so the
+     * character can be re-rolled later (see `core/random/recipe`).
+     */
+    readonly recipe: CharacterRecipe;
     readonly level: PowerLevel;
     readonly budget: Budget;
-    /** What is actually built so far — see the module note. Skills are still missing. */
+    /** The full total — characteristics + powers + skills. Complications fund the build. */
     readonly spent: number;
 }
 
@@ -64,10 +67,14 @@ export const fittableSkillsets = (): typeof SKILLSETS =>
     SKILLSETS.filter((skillset) => skillset.cost === SKILLSET_COST_THAT_FITS && structuredSkillset(skillset.profession) !== undefined);
 
 /**
- * A random character at the given level. Throws if nothing is authored for that level yet,
- * rather than quietly handing back an empty character.
+ * Roll a build. Throws if nothing is authored for that level yet, rather than quietly handing back
+ * an empty character.
+ *
+ * Rolling and building are separate so that editing an existing character is the *same* operation:
+ * revise the recipe, rebuild. There is no second code path that a fix could be applied to only one
+ * of.
  */
-export function generateRandomCharacter(rng: Rng, level: PowerLevel = LOW_POWERED_5E): GeneratedCharacter {
+export function rollRecipe(rng: Rng, level: PowerLevel = LOW_POWERED_5E): CharacterRecipe {
     const candidates = generatableArchetypes();
 
     if (candidates.length === 0) {
@@ -75,24 +82,41 @@ export function generateRandomCharacter(rng: Rng, level: PowerLevel = LOW_POWERE
     }
 
     const archetype = pick(rng, candidates);
-    const powerset: Powerset = pick(rng, powersetsFor(archetype.name));
-    const complications: ComplicationSet = pick(rng, COMPLICATION_SETS_5E);
-    const skillset = pick(rng, fittableSkillsets());
     const specialFx = pick(rng, SPECIAL_FX);
-    const name = `${specialFx} ${archetype.name}`;
-
-    const built = attachSkillset(attachPowerset(buildCharacteristics(archetype.characteristics, level.template, name), powerset), structuredSkillset(skillset.profession)!);
-    const parsed = attachComplications(built, complications);
-    const budget = allocate(level, archetype, skillset);
 
     return {
-        parsed,
-        name,
+        level: level.id,
         archetype: archetype.name,
-        powerset: powerset.label,
-        complications: complications.label,
-        skillset: skillset.profession,
+        powerset: pick(rng, powersetsFor(archetype.name)).label,
+        profession: pick(rng, fittableSkillsets()).profession,
+        complications: pick(rng, COMPLICATION_SETS_5E).label,
         specialFx,
+        name: autoName({specialFx, archetype: archetype.name}),
+    };
+}
+
+/** What a recipe costs, per bucket — the allocator's view of it. */
+export function budgetFor(recipe: CharacterRecipe, level: PowerLevel): Budget {
+    const archetype = ARCHETYPES_5E.find((candidate) => candidate.name === recipe.archetype)!;
+    const skillset = SKILLSETS.find((candidate) => candidate.profession === recipe.profession)!;
+
+    return allocate(level, archetype, skillset);
+}
+
+/** A random character at the given level: roll a recipe, then build exactly what it describes. */
+export function generateRandomCharacter(rng: Rng, level: PowerLevel = LOW_POWERED_5E): GeneratedCharacter {
+    const recipe = rollRecipe(rng, level);
+
+    return buildRecipe(recipe, level);
+}
+
+/** Build a character from a recipe — used by a fresh roll and by every edit alike. */
+export function buildRecipe(recipe: CharacterRecipe, level: PowerLevel = powerLevel(recipe.level)): GeneratedCharacter {
+    const budget = budgetFor(recipe, level);
+
+    return {
+        parsed: buildFromRecipe(recipe),
+        recipe,
         level,
         budget,
         // Complications are taken at the fixed limit and fund the build rather than being spent

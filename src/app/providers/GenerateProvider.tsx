@@ -59,19 +59,23 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
 
         // Unique per generation: a generated character is a new one every time, never an upsert
         // over a previous roll (unlike an import, whose id comes from its file name).
-        const id = `generated-${generated.archetype.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${await nextSuffix(repositories)}`;
+        const id = `generated-${generated.recipe.archetype.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${await nextSuffix(repositories)}`;
 
         await repositories.characters.save({
             id,
-            name: generated.name,
+            name: generated.recipe.name,
             player: null,
             edition: heroDesignerCharacter.isFifth(document) ? '5E' : '6E',
             filename: id,
             document,
             portrait: null,
+            // Stated, not inferred from the id prefix: this is the row the player is allowed to
+            // edit, and the recipe is the only record of what it was rolled from.
+            origin: 'generated',
+            recipe: generated.recipe,
         });
 
-        return {id, name: generated.name, archetype: generated.archetype, spent: generated.spent, total: generated.level.total};
+        return {id, name: generated.recipe.name, archetype: generated.recipe.archetype, spent: generated.spent, total: generated.level.total};
     }, [generator, repositories]);
 
     return <GenerateContext.Provider value={generateCharacter}>{children}</GenerateContext.Provider>;

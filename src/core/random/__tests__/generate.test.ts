@@ -55,14 +55,14 @@ describe('generateRandomCharacter', () => {
     });
 
     it('is deterministic for a seeded Rng', () => {
-        expect(generateRandomCharacter(seededRng(7)).name).toBe(generateRandomCharacter(seededRng(7)).name);
+        expect(generateRandomCharacter(seededRng(7)).recipe.name).toBe(generateRandomCharacter(seededRng(7)).recipe.name);
     });
 
     it('names the character from its special effect and archetype', () => {
         const generated = generateRandomCharacter(seededRng(3));
 
-        expect(generated.name).toBe(`${generated.specialFx} ${generated.archetype}`);
-        expect(generated.name).not.toContain('undefined');
+        expect(generated.recipe.name).toBe(`${generated.recipe.specialFx} ${generated.recipe.archetype}`);
+        expect(generated.recipe.name).not.toContain('undefined');
     });
 
     it('spends its whole total — characteristics, skills and powers', () => {
@@ -89,7 +89,7 @@ describe('generateRandomCharacter', () => {
                 expect(Number.isFinite(characterTraitDecorator.decorate(power, 'powers', () => character).realCost())).toBe(true);
             }
 
-            seen.add(generated.archetype);
+            seen.add(generated.recipe.archetype);
         }
 
         // ...and it reaches every generatable archetype.
@@ -106,7 +106,7 @@ describe('generateRandomCharacter', () => {
                 0,
             );
 
-            expect({label: generated.complications, taken}).toEqual({label: generated.complications, taken: generated.level.limit});
+            expect({label: generated.recipe.complications, taken}).toEqual({label: generated.recipe.complications, taken: generated.level.limit});
         }
     });
 
@@ -134,7 +134,7 @@ describe('generateRandomCharacter', () => {
             const generated = generateRandomCharacter(seededRng(seed));
             const spent = spentBy(characterFrom(seed));
 
-            expect({archetype: generated.archetype, spent}).toEqual({archetype: generated.archetype, spent: generated.budget.powers});
+            expect({archetype: generated.recipe.archetype, spent}).toEqual({archetype: generated.recipe.archetype, spent: generated.budget.powers});
         }
     });
 });

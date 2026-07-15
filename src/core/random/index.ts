@@ -16,6 +16,20 @@
 export {buildCharacteristics, characteristicsCost, parsedCharacterFrom, SUPERHEROIC_5E, SUPERHEROIC_6E, type CharacteristicSpread} from './characteristics';
 export {LOW_POWERED_5E, POWER_LEVELS, powerLevel, STANDARD_6E, type Edition, type PowerLevel} from './powerLevel';
 export {
+    autoName,
+    buildFromRecipe,
+    changeProfession,
+    changeSpecialFx,
+    parseRecipe,
+    renameRecipe,
+    rerollArchetype,
+    rerollPowerset,
+    resolveRecipe,
+    reviseRecipe,
+    type CharacterRecipe,
+    type ResolvedRecipe,
+} from './recipe';
+export {
     allocate,
     ARCHETYPES_5E,
     characteristicsBudget,
@@ -31,4 +45,4 @@ export {
     type Skillset,
 } from './allocate';
 export {approximations, attachPowerset, POWERSETS_5E, powersetsFor, type Approximation, type Powerset} from './powerset';
-export {fittableSkillsets, generatableArchetypes, generateRandomCharacter, type GeneratedCharacter} from './generate';
+export {budgetFor, buildRecipe, fittableSkillsets, generatableArchetypes, generateRandomCharacter, rollRecipe, type GeneratedCharacter} from './generate';
