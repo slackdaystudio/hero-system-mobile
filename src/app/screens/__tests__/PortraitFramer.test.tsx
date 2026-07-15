@@ -218,24 +218,24 @@ describe('PortraitFramer gestures', () => {
      */
     it('zooms when the move arrives via the capture dispatch — where pinch actually lands', async () => {
         const tree = await render(null);
-        const handlers = gestures(tree);
+        const pan = gestures(tree);
 
         await act(async () => {
-            handlers.onStartShouldSetResponder(event([track(100, 100, 1)], 1));
-            handlers.onResponderGrant(event([track(100, 100, 1)], 1));
+            pan.onStartShouldSetResponder(event([track(100, 100, 1)], 1));
+            pan.onResponderGrant(event([track(100, 100, 1)], 1));
         });
 
         // Two fingers, 100px apart: the anchoring frame.
         await act(async () => {
-            handlers.onResponderMove(event([track(100, 100, 2), track(200, 100, 2)], 2));
+            pan.onResponderMove(event([track(100, 100, 2), track(200, 100, 2)], 2));
         });
         expect(scaleOf(tree)).toBe('1.0');
 
         // Spread to 200px — 2x — arriving the way a real multi-touch move does.
         await act(async () => {
             const frame = event([track(50, 100, 3), track(250, 100, 3)], 3);
-            handlers.onMoveShouldSetResponderCapture(frame);
-            handlers.onResponderMove(frame);
+            pan.onMoveShouldSetResponderCapture(frame);
+            pan.onResponderMove(frame);
         });
 
         expect(scaleOf(tree)).toBe('2.0');
@@ -249,16 +249,16 @@ describe('PortraitFramer gestures', () => {
 
     it('pans on one finger, following it', async () => {
         const tree = await render(null);
-        const handlers = gestures(tree);
+        const pan = gestures(tree);
 
         await act(async () => {
-            handlers.onResponderGrant(event([track(100, 100, 1)], 1));
+            pan.onResponderGrant(event([track(100, 100, 1)], 1));
         });
         const before = topOf(tree);
 
         // Drag down 40px: reveals what is above, so the offset gets less negative.
         await act(async () => {
-            handlers.onResponderMove(event([track(100, 140, 2, {x: 100, y: 100, at: 1})], 2));
+            pan.onResponderMove(event([track(100, 140, 2, {x: 100, y: 100, at: 1})], 2));
         });
 
         expect(topOf(tree)).toBeGreaterThan(before);
@@ -268,21 +268,21 @@ describe('PortraitFramer gestures', () => {
         // Both dispatches fire for the same move. Without the timestamp guard the image would
         // travel twice as far as the finger.
         const tree = await render(null);
-        const handlers = gestures(tree);
+        const pan = gestures(tree);
 
         await act(async () => {
-            handlers.onResponderGrant(event([track(100, 100, 1)], 1));
+            pan.onResponderGrant(event([track(100, 100, 1)], 1));
         });
 
         const frame = event([track(100, 140, 2, {x: 100, y: 100, at: 1})], 2);
         await act(async () => {
-            handlers.onMoveShouldSetResponderCapture(frame);
-            handlers.onResponderMove(frame);
+            pan.onMoveShouldSetResponderCapture(frame);
+            pan.onResponderMove(frame);
         });
         const once = topOf(tree);
 
         await act(async () => {
-            handlers.onResponderMove(frame);
+            pan.onResponderMove(frame);
         });
 
         expect(topOf(tree)).toBe(once);
