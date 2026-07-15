@@ -152,7 +152,15 @@ its powerset sizes exactly, which is strong evidence the cutoffs were the origin
 
 So the powerset flexes to fill whatever the balance is, which is also how the two corrected
 archetypes absorb cleanly: Gadgeteer (93) takes a 132-point balance, Powered Armor (103) takes
-122. Worth a look in phase 2: `Martial Artist` states 115 where the balance implies 125.
+122. **Confirmed in phase 2**, with a 25-point skillset: eight of the eleven need **zero** flex — the
+legacy powersets are already exactly the right size. The three exceptions are all data, not
+model:
+
+| Archetype | Flex needed | Why |
+|-----------|-------------|-----|
+| Gadgeteer | **+7** | its spread costs 93 after the INT/EGO fix, not 100 |
+| Powered Armor | **−3** | its spread costs 103, not the 100 its dropped label claimed |
+| Martial Artist | **+10 / −15** | the only archetype whose two powersets disagree (115, 140) — and neither matches its 125 balance. A genuine slip; resolve when authoring |
 
 ### 4 — Legal by construction
 
@@ -250,10 +258,15 @@ silently reshaping an archetype.
       archetype and the engine costs it. All 11 hit their spreads exactly; 9 of 11 match their
       stated cost, and the two that don't are the data's fault, not the engine's (see above).
       The pipeline is proven and the 250-point spreads are safe to build on.
-- [ ] **Phase 2 — allocator.** Cutoffs as sub-budgets; flex `levels` to land on the ceiling
-      exactly. Fuzz with a seeded `Rng`.
+- [x] **Phase 2 — allocator.** *(done)* `core/random/powerLevel.ts` (the four levels, reduced to
+      `(base, limit, total)` triples) and `core/random/allocate.ts` (cutoffs as sub-budgets;
+      powers take the balance; complications fixed at the limit). Seeded-`Rng` selection, fuzzed
+      over 2000 budgets. Confirmed the model reproduces the legacy powerset sizes: **8 of 11
+      archetypes need zero flex**. The required flex per powerset is pinned as the phase 3
+      authoring spec.
 - [ ] **Phase 3 — 5E powersets + skills + complications.** Author the legacy prose as structured
-      data. The bulk of the 250-point work.
+      data (`{xmlid, levels, modifiers}`), flexing each to its balance — see `REQUIRED_FLEX` in
+      `allocate.test.ts`. The bulk of the 250-point work.
 - [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
       powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
       each level is a `(base, limit, template)` triple over the same machinery, so they are data,
