@@ -127,6 +127,57 @@ describe('powerset sizing — the phase 3 authoring spec', () => {
     });
 });
 
+describe('powerset internal arithmetic — the phase 3 authoring hazard', () => {
+    /**
+     * Whether each powerset's listed power costs sum to its own `powersCost`. Most do; five do
+     * not, and for those **neither number can be trusted** — the prose and the total disagree, so
+     * authoring one means deciding which is wrong first.
+     *
+     * Two are inferable typos that resolve cleanly, both in an elemental control (30 active − a
+     * 15-point reserve = 15 real):
+     *   - `Brick [0]` states `Flight 10", 8x NCM` at 35; at 15 the powerset sums to exactly 75.
+     *   - `Speedster [1]` states `Desolid` at 35; Desolidification's basecost is 40, so 40 − 15
+     *     = 25, and at 25 it sums to exactly 100.
+     * The remaining three need a rules/design call — see docs/RANDOM_CHARACTER.md.
+     */
+    const KNOWN_MISMATCH: Record<string, number> = {
+        'Martial Artist|1': -25,
+        'Patriot|1': 2,
+        'Speedster|1': 10,
+        'Brick|0': 20,
+        'Brick|1': -10,
+    };
+
+    const statedCost = (cost: number | string): number => {
+        // Slot costs are strings like "5u" / "2u"; the number is the real cost, the u is the slot type.
+        const match = /^\s*(\d+(?:\.\d+)?)/.exec(String(cost));
+
+        return match === null ? 0 : Number(match[1]);
+    };
+
+    it('flags exactly the powersets whose listed powers do not sum to their stated total', () => {
+        const mismatched: Record<string, number> = {};
+
+        for (const archetype of ARCHETYPES_5E) {
+            archetype.powersets.forEach((powerset, index) => {
+                const sum = powerset.powers.reduce((total, power) => total + statedCost(power.cost), 0);
+
+                if (sum !== powerset.powersCost) {
+                    mismatched[`${archetype.name}|${index}`] = sum - powerset.powersCost;
+                }
+            });
+        }
+
+        expect(mismatched).toEqual(KNOWN_MISMATCH);
+    });
+
+    it('leaves 32 of the 37 powersets internally consistent', () => {
+        const total = ARCHETYPES_5E.reduce((count, archetype) => count + archetype.powersets.length, 0);
+
+        expect(total - Object.keys(KNOWN_MISMATCH).length).toBe(32);
+    });
+});
+
 describe('complications', () => {
     it('every 5E package is worth exactly the Low Powered limit', () => {
         // 100 — which is what makes the legacy data a coherent Low Powered set.

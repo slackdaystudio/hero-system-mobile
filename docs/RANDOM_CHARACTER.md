@@ -334,6 +334,39 @@ work, not the cost:
   `bodylevels` and `widthlevels`. Omit them and the cost is `NaN`, not an error.
 - `name` supplies the sheet label; `alias` does not.
 
+### The remaining seven are not mechanical
+
+Energy Projector was the simplest case in the set, and calling the rest "mechanical" was wrong.
+Two things make them harder:
+
+**1. Five powersets do not sum to their own stated total.** Pinned in
+`allocate.test.ts`. For these, *neither* number is trustworthy — the listed powers and the
+`powersCost` disagree, so authoring one means first deciding which is wrong:
+
+| Powerset | Listed sum | States | Δ | Read |
+|----------|-----------|--------|---|------|
+| `Brick [0]` | 95 | 75 | +20 | **Inferable.** `Flight 10", 8x NCM` is listed at 35; in a 15-point EC it is 30 active − 15 = **15**, and at 15 the powerset sums to exactly 75 |
+| `Speedster [1]` | 110 | 100 | +10 | **Inferable.** `Desolid` is listed at 35; Desolidification's basecost is 40, so 40 − 15 = **25**, and at 25 it sums to exactly 100 |
+| `Patriot [1]` | 102 | 100 | +2 | needs a call |
+| `Brick [1]` | 65 | 75 | −10 | needs a call |
+| `Martial Artist [1]` | 115 | 140 | −25 | needs a call — and its sibling `[0]` states 115 against a 125 balance, so this archetype is doubly adrift |
+
+**2. Two structural gaps**, neither of which the `Powerset` shape handles today:
+
+- **Martial maneuvers.** `Martial Artist` lists `Martial Block`/`Disarm`/`Dodge`/`Throw` as part
+  of its powerset. Those are `martialarts` traits, not powers — a `.hdc` carries them in their
+  own trait bucket. `Powerset` would need to carry `martialarts` alongside `powers`.
+- **`Multiform: 250 Points`.** `Metamorph [2]` has two. A Multiform references *another whole
+  character*, so this needs a decision: generate a nested character, stub it, or drop the
+  powerset.
+
+The rest of the vocabulary is confirmed to exist in the 5E template and priced: `EGOATTACK`,
+`MINDCONTROL`, `TELEPATHY`, `MENTALILLUSIONS` (plural), `CLINGING`, `INVISIBILITY`, `TUNNELING`,
+`DENSITYINCREASE`, `GROWTH`, `SHAPESHIFT`, `STRETCHING`, `HANDTOHANDATTACK`, `TELEPORTATION`,
+`MISSILEDEFLECTION`, `KBRESISTANCE`, `DESOLIDIFICATION`, `DARKNESS`, `ENHANCEDPERCEPTION`,
+`LIFESUPPORT`. `STR`/`RUNNING`/`LEAPING` are **characteristics**, so they live under
+`powers.str` etc. and are priced by the `Characteristic` decorator.
+
 ## Open questions
 
 - **Archetype spreads vs spending profiles.** Fixed spreads are what the legacy data gives us and
