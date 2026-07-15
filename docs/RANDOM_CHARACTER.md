@@ -375,16 +375,24 @@ The rest of the vocabulary is confirmed to exist in the 5E template and priced: 
 `LIFESUPPORT`. `STR`/`RUNNING`/`LEAPING` are **characteristics**, so they live under
 `powers.str` etc. and are priced by the `Characteristic` decorator.
 
-### Open data question: the Warrior skillset fits nothing
+### Resolved: the Warrior skillset was a data error
 
-`Warrior` costs 28 where every other skillset costs 25, which moves the powers balance by −3 —
-and **no powerset is sized for it, in this data or the legacy data**: `100` characteristics
-`+ 125` powerset `+ 28` skills is 253, not 250, for *every* archetype. Either the powersets need
-a −3 variant or that 28 is wrong.
+`Warrior` stated 28 where every other skillset states 25 — the only one that did. At 28 it fits
+nothing: `100` characteristics `+ 125` powerset `+ 28` skills is 253, not 250, for *every*
+archetype, in this data and the legacy data alike. **Corrected to 25** (Phil). All eleven
+skillsets now cost 25, so every one can be rolled.
 
-Until it is resolved, `fittableSkillsets()` rolls only the 25-point skillsets, so a generated
-character cannot quietly miss its total by 3. Skills are not built yet, so this currently costs
-nothing but a name on a list.
+`fittableSkillsets()` stays as a guard rather than being deleted: a future skillset that does not
+cost 25 should be dropped from the roll loudly there, not silently produce a character that
+misses its total.
+
+> **This number is still declared, not derived** — the same shape as the `characteristicsCost`
+> labels that turned out to be wrong twice. Skills are name strings today, so nothing computes
+> the cost. When phase 3 structures them, `cost` should be **dropped** and computed from the
+> skills themselves, exactly as the archetype spreads now are. Worth flagging: Warrior's list
+> carries `CSL: HTH Combat +1` and `Defense Maneuver`, which are dearer than ordinary skills in
+> 5E — so its real cost may well not land on 25, and that is a conversation for when the engine
+> can price it rather than a number to keep hand-maintaining.
 
 ## Open questions
 

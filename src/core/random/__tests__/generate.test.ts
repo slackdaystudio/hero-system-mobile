@@ -87,13 +87,14 @@ describe('generateRandomCharacter', () => {
         expect(seen.size).toBe(generatableArchetypes().length);
     });
 
-    it('only rolls skillsets an authored powerset can absorb', () => {
-        // Warrior costs 28 where every other skillset costs 25, moving the balance by −3 — and
-        // no powerset is sized for that, in this data or the legacy data (100 + 125 + 28 = 253).
-        // Rolling it would silently produce a character 3 points short.
-        expect(fittableSkillsets().map((s) => s.profession)).not.toContain('Warrior');
-        expect(fittableSkillsets()).toHaveLength(SKILLSETS.length - 1);
-        expect(fittableSkillsets().every((s) => s.cost === 25)).toBe(true);
+    it('can roll every skillset, now that they all fit', () => {
+        // Every powerset is sized against a 25-point skills bucket. Warrior used to state 28 —
+        // the only one that did, and a data error; at 28 it left every archetype 3 short. The
+        // filter stays as a guard: a future skillset that does not cost 25 gets left out here
+        // rather than silently producing a character that misses its total.
+        expect(fittableSkillsets()).toHaveLength(SKILLSETS.length);
+        expect(fittableSkillsets().map((s) => s.profession)).toContain('Warrior');
+        expect(SKILLSETS.every((s) => s.cost === 25)).toBe(true);
     });
 
     it('spends exactly its powers budget however the dice fall', () => {

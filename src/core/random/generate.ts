@@ -47,16 +47,15 @@ export interface GeneratedCharacter {
 export const generatableArchetypes = (): Archetype[] => ARCHETYPES_5E.filter((archetype) => powersetsFor(archetype.name).length > 0);
 
 /**
- * The skillsets an authored powerset can actually absorb.
+ * The skillsets an authored powerset can absorb — **currently all of them**.
  *
- * `Warrior` costs 28 where every other skillset costs 25, which moves the powers balance by −3
- * — and **no powerset is sized for it, in this data or the legacy data**: `100` characteristics
- * `+ 125` powerset `+ 28` skills is 253, not 250, for every archetype. Either the powersets need
- * a −3 variant or that 28 is wrong; it is one of the open data questions.
+ * Every powerset is sized against a 25-point skills bucket, so a skillset costing anything else
+ * would move the powers balance and leave the character short. `Warrior` used to state 28 (the
+ * only one that did), which is what made this filter necessary; it was a data error and is now
+ * 25, so nothing is excluded today.
  *
- * Until then the generator picks only skillsets that keep the budget whole, rather than rolling
- * a character that quietly misses its total by 3. Skills are not built yet anyway, so this
- * currently costs nothing but a name.
+ * Kept as a guard rather than deleted: a future skillset that does not cost 25 should be left
+ * out of the roll loudly here, not silently produce a character that misses its total.
  */
 const SKILLSET_COST_THAT_FITS = 25;
 

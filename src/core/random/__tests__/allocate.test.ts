@@ -76,13 +76,14 @@ describe('allocator (5E Low Powered, 250)', () => {
         expect(budgetFor('Gadgeteer')).toMatchObject({characteristics: 93, skills: 25, powers: 132});
     });
 
-    it('charges the dearer skillset out of the powers budget', () => {
-        const warrior = SKILLSETS.find((s) => s.profession === 'Warrior')!;
-        const scientist = SKILLSETS.find((s) => s.profession === 'Scientist')!;
+    it('charges skills out of the powers budget, whichever skillset is picked', () => {
+        // All eleven cost 25, so the balance no longer moves with the choice. Warrior stated 28
+        // until Phil corrected it — a data error that left every archetype 3 points short.
         const brick = ARCHETYPES_5E.find((a) => a.name === 'Brick')!;
 
-        expect(allocate(LOW_POWERED_5E, brick, warrior)).toMatchObject({skills: 28, powers: 72});
-        expect(allocate(LOW_POWERED_5E, brick, scientist)).toMatchObject({skills: 25, powers: 75});
+        for (const skillset of SKILLSETS) {
+            expect(allocate(LOW_POWERED_5E, brick, skillset)).toMatchObject({skills: 25, powers: 75});
+        }
     });
 });
 
