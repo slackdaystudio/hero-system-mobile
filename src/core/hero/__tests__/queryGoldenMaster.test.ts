@@ -66,6 +66,25 @@ const H3_DIVERGENCE: Record<string, Set<string>> = {
 const divergesHere = (fixture: string, key: string, showSecondary: boolean): boolean =>
     showSecondary && (H3_DIVERGENCE[fixture]?.has(key.toUpperCase()) ?? false);
 
+/**
+ * H6 + H7 (docs/KNOWN_DEVIATIONS.md) — intentional divergence on the unusual-defense totals,
+ * in both `showSecondary` columns. Keyed by fixture → the queried xmlid.
+ *   - `defensor` POWERDEFENSE — H6: its two Power Defense powers (10 and 5) collapsed into an
+ *     array and contributed nothing; legacy's 10 was its *mental* defense leaking in via H7
+ *     plus the compound power. Now 25.
+ *   - `defensor` FLASHDEFENSE — H7: legacy reported 5 from that same mdlevels leak. Now 0.
+ *   - `adamantinerebuild210109` FLASHDEFENSE — H7: legacy reported 1 purely from Resistant
+ *     Protection's `mdlevels`; it has no Flash power and there is no `flashlevels` field.
+ *   - `m-championsmush` MENTALDEFENSE — H6: four Mental Defences (12+10+10+10) in plain
+ *     `list` folders (not frameworks, so they do stack) all dropped. Now 42.
+ * Corrected values are pinned in `unusualDefenses.test.ts`.
+ */
+const UNUSUAL_DEFENSE_DIVERGENCE: Record<string, Set<string>> = {
+    defensor: new Set(['POWERDEFENSE', 'FLASHDEFENSE']),
+    adamantinerebuild210109: new Set(['FLASHDEFENSE']),
+    'm-championsmush': new Set(['MENTALDEFENSE']),
+};
+
 describe('golden master: core/hero query methods reproduce legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
@@ -102,6 +121,10 @@ describe('golden master: core/hero query methods reproduce legacy', () => {
             }
 
             for (const unusual of ['MENTALDEFENSE', 'POWERDEFENSE', 'FLASHDEFENSE']) {
+                if (UNUSUAL_DEFENSE_DIVERGENCE[name]?.has(unusual)) {
+                    continue; // H6/H7 — corrected values pinned in unusualDefenses.test.ts
+                }
+
                 expect(core.getTotalUnusualDefense(character, unusual)).toBe(legacyModel.getTotalUnusualDefense(character, unusual));
             }
         });

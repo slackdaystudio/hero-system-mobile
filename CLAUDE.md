@@ -92,8 +92,8 @@ component-local and resets to on at every mount, where legacy persisted `showSec
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 13 entries; 4 fixed (H3, H4, H5, U2). It explains why a "wrong-looking" line in
-> `core/` may be load-bearing, and why a green golden master does not mean correct.
+> `core/`.** 14 entries; 6 fixed (H3, H4, H5, H6, H7, U2). It explains why a "wrong-looking"
+> line in `core/` may be load-bearing, and why a green golden master does not mean correct.
 
 Process per fix — follow it; the ledger explains the reasoning:
 
@@ -106,13 +106,12 @@ Process per fix — follow it; the ledger explains the reasoning:
 
 Still open and **active**:
 
-- **H6** — unusual-defense duplicates read off a collapsed array. The mechanism is **not yet
-  understood**: `defensor` reports `10/10` where it should be 0 or 15, so a third contributor
-  (the `COMPOUNDPOWER` path) is involved. Trace it before fixing; unlike the others, this
-  entry is not a ready-to-execute plan.
 - **U3** — latent float overshoot in `getMultiplications`. Cheapest one left;
   `common.test.ts` pins the current *wrong* value on purpose so the fix must change it
   deliberately.
+- **Unusual defenses ignore `affectsPrimary`/`affectsTotal`** (noted under H7, not yet its own
+  entry): a secondary-form Resistant Protection still feeds the Mental/Power totals at
+  `showSecondary: false`, unlike every other total. Needs a rules check before fixing.
 
 Then the cosmetic/latent tail: T1–T4, H1, H2, U1.
 

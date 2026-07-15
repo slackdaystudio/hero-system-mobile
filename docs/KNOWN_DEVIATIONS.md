@@ -42,7 +42,8 @@
 | H3 | Char/defense totals skip **duplicate** powers | ✅ **fixed** — was real bug, active | yes — junkyard, mark-li-v5a-433 | hero query (re-based) |
 | H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | ✅ **fixed** — was real bug, active | yes — tazimmaad ("Cut") | traits (decorator, re-based) |
 | H5 | VPP contents counted toward totals | ✅ **fixed** — was real bug, active | yes — adamantine (Leaping), m-championsmush | hero query / movement |
-| H6 | Unusual-defense duplicates read off the collapsed array | **real bug, active** | yes — defensor, junkyard | none (legacy equally wrong) |
+| H6 | Unusual-defense duplicates read off the collapsed array | ✅ **fixed** — was real bug, active | yes — defensor, m-championsmush | hero query (re-based) |
+| H7 | Resistant Protection's `mdlevels` fed *every* unusual-defense total | ✅ **fixed** — was real bug, active | yes — defensor, adamantine | hero query (re-based) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | real bug (latent) | no — step 3 occurs, never on an exact power | traits (decorator) |
@@ -206,7 +207,61 @@ that already returned the running total (a latent double-count), and
   — mark-li's *unpooled* Armors still counting, so the guard keys on pool membership rather
   than on the power.
 
-## H6 — Unusual-defense duplicates read off the collapsed array (**active bug**)
+## H6 — Unusual-defense duplicates read off the collapsed array — ✅ FIXED
+
+**Fixed.** `getUnusualDefensePoints` took a single `Obj` and had no array branch at all, so a
+repeated xmlid — which `toMap` collapses into an array — read `.levels` off the array itself
+(`undefined`) and **every one of the duplicates contributed 0**. It now sums the collapsed
+powers, tracking resistant points separately.
+
+- **The 5E EGO bonus is added once per character, not once per power.** The old code added
+  `EGO/5` inside the single-power path; naively looping it would have multiplied the bonus by
+  the number of duplicated Mental Defence powers. No 5E fixture currently has duplicated
+  Mental Defence, so the corpus could not have caught this — it is guarded by construction.
+- **Corpus impact:** `defensor` buys Power Defense **twice** (two standalone powers, 10 and 5)
+  and received **none** of it → now 25 (see H7 for the rest of that arithmetic).
+  `m-championsmush` holds four Mental Defences (12 + 10 + 10 + 10) and received **none** → now
+  42. Both containers there (`Defense Baseline`, `Psychic Shroud`) are `originalType: 'list'`
+  — organisational folders, **not** frameworks — so they genuinely stack. This is the H3/H5
+  distinction again: a `list` is not a VPP, and its contents are all active.
+- **The original entry's premise was wrong**, kept below for the record. It assumed defensor's
+  two Power Defences "should total 15" and flagged the reported 10 as un-traced. The 10 was
+  two separate faults landing on a plausible number: the duplicates contributing 0, plus 5 of
+  *mental* defence leaking in via **H7**, plus 5 from the compound power. Phil confirmed the
+  rule: Resistant Protection feeds each unusual defense through its matching field, so the
+  answer is `10 + 5` (the two powers) `+ 5` (Resistant Protection `powdlevels`) `+ 5` (the
+  compound's Resistant Protection `powdlevels`) = **25**.
+- **Pinned by:** `core/hero/__tests__/unusualDefenses.test.ts`; golden master skips these
+  queries via `UNUSUAL_DEFENSE_DIVERGENCE`.
+
+## H7 — Resistant Protection's `mdlevels` fed every unusual-defense total — ✅ FIXED
+
+- **Where:** `getTotalUnusualDefense` — `defenses.nonResistant += powersMap.get('FORCEFIELD').mdlevels || 0`
+  (and the same for `resistant`), run for **every** query regardless of `powerXmlId`. So a
+  Power Defense query collected the character's *mental* defense, and a Flash Defense query
+  collected a number from nothing at all.
+- **Legacy:** same. Found while tracing H6 — the two faults were compounding, which is exactly
+  why H6's reported figure (10) matched neither the buggy value (0) nor the naive fix (15).
+- **Correct (rules, confirmed with Phil):** Resistant Protection splits its points across the
+  defenses — `defensor`'s is `levels: 20` = 5 PD + 5 ED + 5 Mental + 5 Power — and feeds each
+  unusual-defense total through **the field matching that defense**. There is no `flashlevels`
+  field anywhere in the HERO Designer data, so it contributes **nothing** to Flash.
+- **Fix:** `UNUSUAL_DEFENSE_FORCE_FIELD_LEVELS` maps `MENTALDEFENSE → mdlevels`,
+  `POWERDEFENSE → powdlevels`; a query with no entry (Flash) gets nothing. The lookup also
+  reads through `asArray`, since Force Field can itself be duplicated (H6's mechanism —
+  `junkyard` and `m-championsmush` both carry two or more).
+- **Corpus impact:** `defensor` Flash `5/5 → 0/0` and `adamantine` Flash `1/1 → 0/0` — both
+  were pure leak, neither character has a Flash Defense power. Mental Defence is unchanged
+  everywhere, because `mdlevels` was the one query the old line got right.
+- **Not addressed (pre-existing, still open):** this Force Field block ignores
+  `affectsPrimary`/`affectsTotal` entirely, so a secondary-form Resistant Protection feeds the
+  unusual-defense totals even at `showSecondary: false`, unlike every other total. Visible on
+  `defensor` (`20/10` in the base form). Left alone deliberately — it is a distinct quirk from
+  the field confusion, and needs its own rules check.
+
+### Original entry (for reference)
+
+## H6 (original) — Unusual-defense duplicates read off the collapsed array (**active bug**)
 
 - **Where:** two sites the H3 entry's "five array branches" didn't enumerate:
   1. `getTotalUnusualDefense` — `(powersMap.get('FORCEFIELD') as Obj).mdlevels || 0`, run

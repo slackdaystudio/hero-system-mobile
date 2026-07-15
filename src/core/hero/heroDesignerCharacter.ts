@@ -35,6 +35,19 @@ type Obj = Record<string, any>;
 
 const hasOwn = (obj: object, key: string): boolean => Object.prototype.hasOwnProperty.call(obj, key);
 
+/** `toMap` collapses a repeated xmlid into an array; single and repeated read the same way. */
+const asArray = (value: unknown): Obj[] => (Array.isArray(value) ? (value as Obj[]) : value === null || value === undefined ? [] : [value as Obj]);
+
+/**
+ * Which Force Field / Resistant Protection field feeds each unusual-defense total. Flash is
+ * absent on purpose: no `flashlevels` field exists in the HERO Designer data, so Resistant
+ * Protection contributes nothing to a Flash Defense total.
+ */
+const UNUSUAL_DEFENSE_FORCE_FIELD_LEVELS: Record<string, string> = {
+    MENTALDEFENSE: 'mdlevels',
+    POWERDEFENSE: 'powdlevels',
+};
+
 /**
  * The HERO Designer character model, ported from legacy
  * `src/lib/HeroDesignerCharacter.js`.
@@ -247,9 +260,21 @@ export class HeroDesignerCharacter {
             this.getUnusualDefensePoints(defenses, powersMap.get(powerXmlId), character);
         }
 
-        if (powersMap.has('FORCEFIELD')) {
-            defenses.nonResistant += (powersMap.get('FORCEFIELD') as Obj).mdlevels || 0;
-            defenses.resistant += (powersMap.get('FORCEFIELD') as Obj).mdlevels || 0;
+        // H7 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy added Force Field /
+        // Resistant Protection's *mental* defense to every unusual-defense total, whatever was
+        // asked for, so Power Defense collected mdlevels and Flash Defense collected a figure
+        // out of thin air. Read the field matching the query instead; a query with no
+        // corresponding field (Flash — no `flashlevels` exists in the data) gets nothing.
+        // Also H6: `powersMap.get` yields an array when the xmlid repeats, and reading
+        // `.mdlevels` off the array itself silently contributed 0.
+        const forceFieldField = UNUSUAL_DEFENSE_FORCE_FIELD_LEVELS[powerXmlId.toUpperCase()];
+        if (powersMap.has('FORCEFIELD') && forceFieldField !== undefined) {
+            for (const forceField of asArray(powersMap.get('FORCEFIELD'))) {
+                const levels = (forceField[forceFieldField] as number) || 0;
+
+                defenses.nonResistant += levels;
+                defenses.resistant += levels;
+            }
         }
 
         if (powersMap.has('COMPOUNDPOWER')) {
@@ -655,17 +680,44 @@ export class HeroDesignerCharacter {
         return false;
     }
 
-    private getUnusualDefensePoints(defenses: {nonResistant: number; resistant: number}, unusualDefense: Obj, character: Obj): number {
-        let points = unusualDefense.levels || 0;
+    /**
+     * H6 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: this took a single `Obj` and had
+     * no array branch, so when an xmlid repeated and `toMap` collapsed the powers into an
+     * array, `unusualDefense.levels` was `undefined` and **every** one of them contributed 0.
+     * `defensor` buys Power Defense twice (10 and 5) and received none of it.
+     */
+    private getUnusualDefensePoints(defenses: {nonResistant: number; resistant: number}, unusualDefense: Obj | Obj[], character: Obj): number {
+        const unusualDefenses = asArray(unusualDefense);
+        let points = 0;
+        let resistantPoints = 0;
+        let anyResistant = false;
 
-        if (unusualDefense.xmlid === 'MENTALDEFENSE' && this.isFifth(character)) {
-            points += roundInPlayersFavor(this.getCharacteristicTotal('EGO', character) / 5);
+        for (const defense of unusualDefenses) {
+            const levels = defense.levels || 0;
+
+            points += levels;
+
+            if (this.isResistent(defense)) {
+                anyResistant = true;
+                resistantPoints += levels;
+            }
+        }
+
+        // 5E Mental Defense adds EGO/5 — once for the character, not once per power.
+        if (this.isFifth(character) && unusualDefenses.some((defense) => defense.xmlid === 'MENTALDEFENSE')) {
+            const egoBonus = roundInPlayersFavor(this.getCharacteristicTotal('EGO', character) / 5);
+
+            points += egoBonus;
+
+            if (anyResistant) {
+                resistantPoints += egoBonus;
+            }
         }
 
         defenses.nonResistant = points;
 
-        if (this.isResistent(unusualDefense)) {
-            defenses.resistant = points;
+        if (anyResistant) {
+            defenses.resistant = resistantPoints;
         }
 
         return points;
