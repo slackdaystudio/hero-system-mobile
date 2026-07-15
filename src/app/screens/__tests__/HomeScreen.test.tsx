@@ -115,4 +115,47 @@ describe('HomeScreen', () => {
         expect(props.onOpenStatistics).toHaveBeenCalledTimes(1);
         expect(props.onOpenSettings).toHaveBeenCalledTimes(1);
     });
+
+    /**
+     * "Recent" is ordered by `accessed_at`, so it restates itself every time it is looked at. Home
+     * never unmounts (it is the stack root), so a mount-only load would freeze the list at its
+     * launch-time order for the whole session — the navigator bumps `refreshToken` on focus.
+     */
+    it('reloads the recent list when refreshToken changes (e.g. on returning to Home)', async () => {
+        let recent = [summary({id: 'c1', name: 'Defensor'})];
+        const characters = {recent: async () => recent} as unknown as CharacterRepository;
+        const repositories = {characters} as unknown as Repositories;
+        const wrap = (token: number): React.JSX.Element => (
+            <ThemeProvider colorScheme="dark">
+                <RepositoriesProvider repositories={repositories}>
+                    <HomeScreen {...callbacks()} refreshToken={token} />
+                </RepositoriesProvider>
+            </ThemeProvider>
+        );
+
+        let tree!: ReactTestRenderer;
+        await act(async () => {
+            tree = TestRenderer.create(wrap(0));
+        });
+        await act(async () => {});
+        expect(collectText(tree.toJSON())).toContain('Defensor');
+
+        // Someone opened Grond, which reorders `recent`, and deleted Defensor.
+        recent = [summary({id: 'c2', name: 'Grond'})];
+
+        await act(async () => {
+            tree.update(wrap(0)); // same token: still the stale list
+        });
+        await act(async () => {});
+        expect(collectText(tree.toJSON())).toContain('Defensor');
+
+        await act(async () => {
+            tree.update(wrap(1));
+        });
+        await act(async () => {});
+
+        const text = collectText(tree.toJSON());
+        expect(text).toContain('Grond');
+        expect(text).not.toContain('Defensor');
+    });
 });

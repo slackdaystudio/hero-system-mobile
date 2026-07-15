@@ -31,6 +31,13 @@ export interface HomeScreenProps {
     onOpenDice: (mode?: DiceMode) => void;
     onOpenStatistics: () => void;
     onOpenSettings: () => void;
+    /**
+     * Change this value to force a reload. "Recent" is ordered by `accessed_at`, which opening a
+     * character updates, so the list goes stale the moment you leave — and Home sits at the root of
+     * the stack and never unmounts, so mounting alone can't reload it. The navigator bumps this on
+     * focus; knowing *when* that is stays a navigator concern.
+     */
+    refreshToken?: unknown;
 }
 
 const DICE_TILES: Array<{label: string; mode: DiceMode}> = [
@@ -45,7 +52,7 @@ const DICE_TILES: Array<{label: string; mode: DiceMode}> = [
  * dice rollers, and the game tools. Screen stays props-driven — the navigator
  * wires each callback — and reads the recent list through the repository port.
  */
-export function HomeScreen({onOpenCharacters, onOpenCharacter, onOpenDice, onOpenStatistics, onOpenSettings}: HomeScreenProps): React.JSX.Element {
+export function HomeScreen({onOpenCharacters, onOpenCharacter, onOpenDice, onOpenStatistics, onOpenSettings, refreshToken}: HomeScreenProps): React.JSX.Element {
     const {characters} = useRepositories();
     const [recent, setRecent] = useState<CharacterSummary[] | undefined>(undefined);
 
@@ -59,7 +66,7 @@ export function HomeScreen({onOpenCharacters, onOpenCharacter, onOpenDice, onOpe
 
     useEffect(() => {
         load();
-    }, [load]);
+    }, [load, refreshToken]);
 
     return (
         <Screen>

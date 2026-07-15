@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {ActivityIndicator, Alert, Pressable, StyleSheet, View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {NavigationContainer, useFocusEffect} from '@react-navigation/native';
+import {createNativeStackNavigator, type NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import type {ImportResult} from 'infra/import';
 import {Text} from 'app/components';
@@ -65,15 +65,7 @@ export function AppNavigator(): React.JSX.Element {
                         animation: settings.showAnimations ? 'default' : 'none',
                     }}>
                     <Stack.Screen name="Home" options={{title: 'HERO System Mobile'}}>
-                        {({navigation}) => (
-                            <HomeScreen
-                                onOpenCharacters={() => navigation.navigate('CharacterList')}
-                                onOpenCharacter={(id) => navigation.navigate('CharacterDetail', {id})}
-                                onOpenDice={(mode) => navigation.navigate('Dice', {mode})}
-                                onOpenStatistics={() => navigation.navigate('Statistics')}
-                                onOpenSettings={() => navigation.navigate('Settings')}
-                            />
-                        )}
+                        {({navigation}) => <HomeRoute navigation={navigation} />}
                     </Stack.Screen>
                     <Stack.Screen
                         name="CharacterList"
@@ -134,6 +126,47 @@ export function AppNavigator(): React.JSX.Element {
                 </Stack.Navigator>
             </NavigationContainer>
         </SafeAreaProvider>
+    );
+}
+
+/**
+ * Home, reloaded whenever it comes back into focus.
+ *
+ * Home is the stack's root, so opening a character *pushes on top of it* — it never unmounts, and
+ * its mount effect fires exactly once per app launch. Its "Recent" list is ordered by `accessed_at`
+ * (which `CharacterDetailScreen` updates on open) and a character can be deleted while Home is
+ * parked, so without this the list would show the launch-time order for the whole session.
+ *
+ * Focus lives here rather than in the screen: `HomeScreen` stays props-driven and testable without
+ * a navigation container.
+ *
+ * Exported for its test, which mounts it in a real stack — the skip-first-focus below is the kind
+ * of thing that only a real navigator can falsify.
+ */
+export function HomeRoute({navigation}: {navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>}): React.JSX.Element {
+    const [focusToken, setFocusToken] = useState(0);
+    const mounted = useRef(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            // Home mounts already focused and loads itself, so the first focus needs no nudge —
+            // only the returns from a pushed screen do.
+            if (mounted.current) {
+                setFocusToken((token) => token + 1);
+            }
+            mounted.current = true;
+        }, []),
+    );
+
+    return (
+        <HomeScreen
+            refreshToken={focusToken}
+            onOpenCharacters={() => navigation.navigate('CharacterList')}
+            onOpenCharacter={(id) => navigation.navigate('CharacterDetail', {id})}
+            onOpenDice={(mode) => navigation.navigate('Dice', {mode})}
+            onOpenStatistics={() => navigation.navigate('Statistics')}
+            onOpenSettings={() => navigation.navigate('Settings')}
+        />
     );
 }
 
