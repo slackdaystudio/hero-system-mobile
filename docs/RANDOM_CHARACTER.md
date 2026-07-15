@@ -301,6 +301,15 @@ Rendered end to end it reads as a real character: 8 power rows with rulebook def
 `PD 21/15` (base 6 + Armor 5 + Force Field 10, of which 15 resistant), and the archetype's
 characteristics intact underneath.
 
+**Sloppy is allowed, but it must be declared.** The legacy prose is loose in places, and being
+faithful to it beats inventing precision the original never had — so a powerset may carry an
+`approximations` list naming each knowingly-wrong corner and why. `approximations()` flattens
+every one across the data for review, and a test pins the list, so a new fudge fails until
+somebody writes down what they did. First entry: Energy Projector's Force Wall has **zero
+length, height, body and width** — the prose gave none, and any would push it past the 50 active
+points its `5u` implies. A wall with no extent is nonsense; it is also exactly what the source
+said.
+
 **What the authoring actually costs**, learned the hard way on this one — the shape is the
 work, not the cost:
 

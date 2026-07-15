@@ -26,9 +26,22 @@ import powersetData from '../data/random/powersets.5e.json';
 
 type Obj = Record<string, any>;
 
+/**
+ * Somewhere the structured build is knowingly not quite right — almost always because the
+ * legacy prose it was translated from was itself loose, and being faithful to it beats
+ * inventing precision the original never had. Declared here rather than left as a comment, so
+ * `approximations()` can list every one across the whole data set for review.
+ */
+export interface Approximation {
+    /** The power's `name`, as it appears on the sheet. */
+    readonly power: string;
+    readonly note: string;
+}
+
 export interface Powerset {
     readonly label: string;
     readonly powers: Obj;
+    readonly approximations?: readonly Approximation[];
 }
 
 /**
@@ -67,4 +80,16 @@ export function attachPowerset(parsed: ParsedCharacter, powerset: Powerset): Par
     }
 
     return {...parsed, powers} as unknown as ParsedCharacter;
+}
+
+/**
+ * Every knowingly-loose corner of the authored data, flattened for review. Grows as powersets
+ * land; a test pins the list, so a new approximation has to be declared rather than smuggled in.
+ */
+export function approximations(): Array<Approximation & {archetype: string; powerset: string}> {
+    return Object.entries(POWERSETS_5E)
+        .filter(([, powersets]) => Array.isArray(powersets))
+        .flatMap(([archetype, powersets]) =>
+            powersets.flatMap((powerset) => (powerset.approximations ?? []).map((approximation) => ({archetype, powerset: powerset.label, ...approximation}))),
+        );
 }

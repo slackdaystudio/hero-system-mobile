@@ -23,7 +23,7 @@ import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator} from 'core/traits';
 import {allocate, ARCHETYPES_5E, SKILLSETS} from '../allocate';
 import {buildCharacteristics} from '../characteristics';
-import {attachPowerset, powersetsFor} from '../powerset';
+import {approximations, attachPowerset, powersetsFor} from '../powerset';
 import {LOW_POWERED_5E} from '../powerLevel';
 
 type Obj = Record<string, any>;
@@ -96,5 +96,26 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
         // The other ten are still prose. This fails when one lands, which is the point.
         expect(ARCHETYPES_5E.filter((a) => powersetsFor(a.name).length > 0).map((a) => a.name)).toEqual(['Energy Projector']);
         expect(powersetsFor('Brick')).toEqual([]);
+    });
+
+    it('declares every knowingly-loose corner of the build', () => {
+        // Faithfulness to the legacy prose beats invented precision, so approximations are
+        // allowed — but they must be declared, never smuggled in. Pinning the list means a new
+        // one fails here until someone writes down what they fudged and why.
+        expect(approximations()).toEqual([
+            {
+                archetype: 'Energy Projector',
+                powerset: 'Energy Blaster',
+                power: 'Barrier',
+                note: expect.stringContaining('Zero length/height'),
+            },
+        ]);
+    });
+
+    it("keeps the Barrier's approximation honest — it really has no extent", () => {
+        const barrier = powersetsFor('Energy Projector')[0].powers.power.find((power: Obj) => power.name === 'Barrier');
+
+        // If someone gives it dimensions, the note is stale and its 5u slot cost has moved.
+        expect(barrier).toMatchObject({lengthlevels: 0, heightlevels: 0, bodylevels: 0, widthlevels: 0});
     });
 });

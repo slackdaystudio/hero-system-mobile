@@ -16,6 +16,12 @@
   "Energy Projector": [
     {
       "label": "Energy Blaster",
+      "approximations": [
+        {
+          "power": "Barrier",
+          "note": "Zero length/height/body/width. The legacy prose ('Force Wall 10 rPD 10 rED', 5u) gave dimensions for none of them, and any would push it past the 50 active points that 5u implies. Physically a wall with no extent — faithful to the source, but nonsense if you look at it. Give it real dimensions if the slot's cost is ever allowed to move."
+        }
+      ],
       "powers": {
         "power": [
           {"xmlid": "ARMOR", "id": 101, "alias": "Armor", "name": "Energy Aura", "position": 0, "levels": 10, "pdlevels": 5, "edlevels": 5},
