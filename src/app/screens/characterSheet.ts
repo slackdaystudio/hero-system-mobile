@@ -269,7 +269,8 @@ export function buildCombatSheet(character: Obj, showSecondary = false): CombatS
         {label: 'BODY', value: String(total('BODY'))},
     ];
 
-    const unit = heroDesignerCharacter.isFifth(c) ? '"' : 'm';
+    const isFifth = heroDesignerCharacter.isFifth(c);
+    const unit = isFifth ? '"' : 'm';
     const movement: MovementRow[] = toArray(c.movement).map((mode) => {
         const distance = heroDesignerCharacter.getMovementTotal(mode, c, true);
         const raw = Number(heroDesignerCharacter.getMovementTotal(mode, c));
@@ -278,7 +279,8 @@ export function buildCombatSheet(character: Obj, showSecondary = false): CombatS
             name: String(mode.name ?? mode.shortName ?? ''),
             combat: `${distance}${unit}`,
             nonCombat: `${raw * ncm}${unit} (×${ncm})`,
-            endurance: movementEnduranceCost(raw),
+            // END is charged on distance in metres; 5E quotes movement in inches (1" = 2m), so convert.
+            endurance: movementEnduranceCost(isFifth ? raw * 2 : raw),
         };
     });
 

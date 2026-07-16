@@ -102,6 +102,9 @@ export function strengthEnduranceCost(strength: number): number {
  * END to move a mode's full distance in a Phase: 1 END per 10 Active Points, minimum 1 (6E — e.g.
  * the free 12m of Running costs 1 END).
  *
+ * `metres` is the distance in metres — 5E quotes movement in inches, so the caller converts (1" = 2m)
+ * to keep the two editions on one distance-based rule.
+ *
  * APPROXIMATION: it prices each metre at ~1 Active Point, since the stored movement mode carries no
  * template to read a true Active-Point cost from. That is exact for the 1-point/metre modes (Running,
  * Flight, and most combat movement) and reads a touch high for the cheaper base modes (Swimming,

@@ -155,6 +155,25 @@ describe('characterSheet', () => {
         expect(sheet.characteristics.filter((c) => !/strength/i.test(c.name)).every((c) => c.endurance === null)).toBe(true);
     });
 
+    it('charges STR END at 1 per 10 in 5E too (same rate as 6E)', () => {
+        const str = buildCharacterSheet(heroOf('spyder2022'), true).characteristics.find((c) => /strength/i.test(c.name))!;
+        expect(str.total).toBe(20);
+        expect(str.endurance).toBe(2);
+    });
+
+    it('charges 5E movement END on the metre-equivalent distance (1" = 2m)', () => {
+        const running = buildCombatSheet(heroOf('bridget')).movement.find((m) => /running/i.test(m.name))!;
+        // 10" of Running is 20m → 2 END, not the 1 a raw-inch reading would give.
+        expect(running.combat).toBe('10"');
+        expect(running.endurance).toBe(2);
+    });
+
+    it('leaves 6E movement END on its metre distance unchanged', () => {
+        const running = buildCombatSheet(heroOf('twilight')).movement.find((m) => /running/i.test(m.name))!;
+        expect(running.combat).toBe('12m');
+        expect(running.endurance).toBe(1);
+    });
+
     describe('alternate identity (showSecondary)', () => {
         it('detects the alternate (super) form only when a trait is only-in-alternate-ID', () => {
             // Both carry OIHID nested inside multipower frameworks, so the detection has to
