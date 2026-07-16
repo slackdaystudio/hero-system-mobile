@@ -137,6 +137,29 @@ export function takeRecovery(state: CombatState, max: CombatMaximums): CombatSta
     };
 }
 
+/**
+ * Spend END. The pool floors at 0; the **shortfall** — the END the character did not have — is what
+ * the 6E "Using STUN for END" rule charges to STUN instead (see {@link enduranceBurnDice}). Returned
+ * alongside the new state rather than settled here, because paying it is a die roll the caller owns:
+ * a pure reducer cannot roll. A shortfall of 0 means the pool covered the whole cost.
+ */
+export function spendEndurance(state: CombatState, amount: number): {state: CombatState; shortfall: number} {
+    const available = Math.max(0, state.endurance);
+    const spend = Math.max(0, Math.trunc(amount));
+    const shortfall = Math.max(0, spend - available);
+
+    return {state: {...state, endurance: available - (spend - shortfall)}, shortfall};
+}
+
+/**
+ * How many d6 of STUN an END shortfall costs: 1d6 per 2 END short, any fraction rounding up (6E —
+ * "Using STUN for END", 6E2 132). That STUN takes no defenses; the caller rolls this many d6 and
+ * subtracts the total from STUN.
+ */
+export function enduranceBurnDice(shortfall: number): number {
+    return Math.ceil(Math.max(0, shortfall) / 2);
+}
+
 /** Nudge a combat value by a delta (temporary modifiers from levels, maneuvers, etc.). */
 export function adjustCombatValue(state: CombatState, key: CombatValueKey, delta: number): CombatState {
     return {...state, [key]: state[key] + delta};

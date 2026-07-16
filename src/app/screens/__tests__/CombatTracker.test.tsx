@@ -15,10 +15,12 @@
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import {combatMaximums, type CombatState} from 'core/combat';
+import {DieRoller} from 'core/dice';
 import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
-import type {CombatStateRepository} from 'core/ports';
+import type {CombatStateRepository, Rng} from 'core/ports';
 import type {Obj} from 'core/traits';
 import type {Repositories} from 'infra/persistence/repositories';
+import {DiceProvider} from 'app/providers/DiceProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
 import sample from '../../composition/sampleCharacter.json';
@@ -54,15 +56,30 @@ const fakeRepo = () => {
     return {repo, current: () => saved};
 };
 
-const render = async (character: Obj, repo: CombatStateRepository): Promise<ReactTestRenderer> => {
+/** A deterministic Rng that hands out a fixed sequence, throwing if the roller draws past its end. */
+const scriptedRng = (values: number[]): Rng => {
+    let i = 0;
+    return {
+        next: (): number => {
+            if (i >= values.length) {
+                throw new Error('scriptedRng exhausted');
+            }
+            return values[i++];
+        },
+    };
+};
+
+const render = async (character: Obj, repo: CombatStateRepository, rng: Rng = scriptedRng([])): Promise<ReactTestRenderer> => {
     const repositories = {combatState: repo} as unknown as Repositories;
     let tree!: ReactTestRenderer;
     await act(async () => {
         tree = TestRenderer.create(
             <ThemeProvider colorScheme="dark">
-                <RepositoriesProvider repositories={repositories}>
-                    <CombatTracker character={character} characterId="c1" combat={buildCombatSheet(character)} onRoll={() => undefined} />
-                </RepositoriesProvider>
+                <DiceProvider dieRoller={new DieRoller(rng)}>
+                    <RepositoriesProvider repositories={repositories}>
+                        <CombatTracker character={character} characterId="c1" combat={buildCombatSheet(character)} onRoll={() => undefined} />
+                    </RepositoriesProvider>
+                </DiceProvider>
             </ThemeProvider>,
         );
     });
@@ -108,6 +125,37 @@ describe('CombatTracker', () => {
 
         await press(tree, 'recovery');
         expect(current()!.stun).toBe(Math.min(max.stun, 5 + max.recovery));
+    });
+
+    it('spends END from the pool with the quick buttons, no STUN burn while it covers the cost', async () => {
+        const character = hero();
+        const {repo, current} = fakeRepo();
+        const tree = await render(character, repo);
+
+        await type(tree, 'vital-endurance', '20');
+        const stunBefore = current()!.stun;
+
+        await press(tree, 'spend-end-10');
+        expect(current()!.endurance).toBe(10);
+        await press(tree, 'spend-end-5');
+        expect(current()!.endurance).toBe(5);
+        expect(current()!.stun).toBe(stunBefore); // pool covered it — no burn
+    });
+
+    it('burns STUN when a spend exceeds the pool: 1d6 per 2 END short', async () => {
+        const character = hero();
+        // END 3, spend 5 → 2 short → ceil(2/2) = 1d6 STUN; the scripted die rolls a 4.
+        const {repo, current} = fakeRepo();
+        const tree = await render(character, repo, scriptedRng([4]));
+
+        await type(tree, 'vital-endurance', '3');
+        const stunBefore = current()!.stun;
+
+        await type(tree, 'spend-end-amount', '5');
+        await press(tree, 'spend-end');
+
+        expect(current()!.endurance).toBe(0); // floored
+        expect(current()!.stun).toBe(stunBefore - 4); // 1d6 = 4 STUN, no defenses
     });
 
     it('resets a vital to its maximum', async () => {

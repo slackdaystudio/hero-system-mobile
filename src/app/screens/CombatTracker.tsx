@@ -20,6 +20,7 @@ import {
     clearStatuses,
     combatMaximums,
     describeStatus,
+    enduranceBurnDice,
     initialCombatState,
     normalizeCombatState,
     reconcilePhases,
@@ -27,6 +28,7 @@ import {
     resetCombatValues,
     resetVital,
     setVital,
+    spendEndurance,
     startNewTurn,
     takeRecovery,
     togglePhaseAborted,
@@ -37,11 +39,13 @@ import {
     type CombatValueKey,
     type Vital,
 } from 'core/combat';
+import {PartialDie} from 'core/dice';
 import {heroDesignerCharacter} from 'core/hero';
 import type {Obj} from 'core/traits';
 import {Button, Card, NumberField, Text} from 'app/components';
 import {StatusDialog} from './StatusDialog';
 import type {RollRequest} from 'app/dice/rollRequest';
+import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
 import type {CombatSheet} from './characterSheet';
@@ -84,11 +88,14 @@ const healthText = (state: CombatState): HealthText => ({stun: String(state.stun
  */
 export function CombatTracker({character, characterId, combat, onRoll}: {character: Obj; characterId: string; combat: CombatSheet; onRoll: RollHandler}): React.JSX.Element {
     const {combatState: repository} = useRepositories();
+    const roller = useDieRoller();
     const max = useMemo(() => combatMaximums(character), [character]);
     const valueRows = useMemo(() => (heroDesignerCharacter.isFifth(character) ? FIFTH_VALUES : SIX_E_VALUES), [character]);
 
     const [state, setState] = useState<CombatState | null>(null);
     const [health, setHealth] = useState<HealthText>({stun: '', body: '', endurance: ''});
+    const [spendText, setSpendText] = useState('');
+    const [burnNote, setBurnNote] = useState<string | null>(null);
     const [editing, setEditing] = useState<{status: CombatStatus; index: number | null} | null>(null);
 
     useEffect(() => {
@@ -134,6 +141,29 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
         [state, apply],
     );
 
+    /**
+     * Spend END from the pool. Any shortfall is paid in STUN per the 6E rule: roll `enduranceBurnDice`
+     * d6 through the die roller and subtract the total (no defenses apply). The note reports what happened.
+     */
+    const spendEnd = useCallback(
+        (amount: number) => {
+            if (state === null || amount <= 0) {
+                return;
+            }
+            const {state: next, shortfall} = spendEndurance(state, amount);
+            if (shortfall > 0) {
+                const dice = enduranceBurnDice(shortfall);
+                const stun = roller.rollEffect({dice, partialDie: PartialDie.None}).total;
+                apply(setVital(next, 'stun', next.stun - stun));
+                setBurnNote(`Spent ${amount} END · ${shortfall} short → ${dice}d6 STUN = −${stun}`);
+            } else {
+                apply(next);
+                setBurnNote(`Spent ${amount} END`);
+            }
+        },
+        [state, roller, apply],
+    );
+
     const applyStatus = (status: CombatStatus) => {
         if (state === null || editing === null) {
             return;
@@ -171,6 +201,45 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
                             <Button testID={`reset-${vital.key}`} label="Max" variant="secondary" onPress={() => apply(resetVital(state, vital.key, max))} />
                         </View>
                     ))}
+
+                    <View style={styles.spendHeader}>
+                        <Text variant="label" muted>
+                            SPEND END
+                        </Text>
+                        {burnNote !== null ? (
+                            <Text variant="caption" muted>
+                                {burnNote}
+                            </Text>
+                        ) : null}
+                    </View>
+                    <View style={styles.spendRow}>
+                        <View style={styles.grow}>
+                            <Button testID="spend-end-1" label="–1" variant="secondary" onPress={() => spendEnd(1)} />
+                        </View>
+                        <View style={styles.grow}>
+                            <Button testID="spend-end-5" label="–5" variant="secondary" onPress={() => spendEnd(5)} />
+                        </View>
+                        <View style={styles.grow}>
+                            <Button testID="spend-end-10" label="–10" variant="secondary" onPress={() => spendEnd(10)} />
+                        </View>
+                    </View>
+                    <View style={styles.spendRow}>
+                        <View style={styles.vitalField}>
+                            <NumberField testID="spend-end-amount" label="Amount" value={spendText} onChangeText={setSpendText} />
+                        </View>
+                        <Button
+                            testID="spend-end"
+                            label="Spend"
+                            onPress={() => {
+                                const amount = Number.parseInt(spendText, 10);
+                                if (!Number.isNaN(amount)) {
+                                    spendEnd(amount);
+                                    setSpendText('');
+                                }
+                            }}
+                        />
+                    </View>
+
                     <View style={styles.recovery}>
                         <Button testID="recovery" label={`Recovery (+${max.recovery} STUN & END)`} onPress={() => apply(takeRecovery(state, max))} />
                     </View>
@@ -372,6 +441,19 @@ const styles = StyleSheet.create({
     },
     recovery: {
         marginTop: 12,
+    },
+    spendHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 12,
+        columnGap: 12,
+    },
+    spendRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        columnGap: 8,
+        marginTop: 8,
     },
     cvRow: {
         flexDirection: 'row',

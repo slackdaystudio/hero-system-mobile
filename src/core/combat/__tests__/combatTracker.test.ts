@@ -20,6 +20,7 @@ import {
     clearStatuses,
     combatMaximums,
     describeStatus,
+    enduranceBurnDice,
     initialCombatState,
     normalizeCombatState,
     reconcilePhases,
@@ -27,6 +28,7 @@ import {
     resetCombatValues,
     resetVital,
     setVital,
+    spendEndurance,
     startNewTurn,
     takeRecovery,
     togglePhaseAborted,
@@ -80,6 +82,43 @@ describe('combatTracker', () => {
             expect(recovered.stun).toBe(15); // 5 + 10
             expect(recovered.endurance).toBe(40); // 35 + 10 capped at 40
             expect(recovered.body).toBe(3); // untouched
+        });
+    });
+
+    describe('spendEndurance', () => {
+        it('deducts from the pool when it covers the cost, with no shortfall', () => {
+            const result = spendEndurance(state({endurance: 20}), 6);
+            expect(result.state.endurance).toBe(14);
+            expect(result.shortfall).toBe(0);
+        });
+
+        it('floors the pool at 0 and reports the uncovered END as the shortfall', () => {
+            const result = spendEndurance(state({endurance: 3}), 10);
+            expect(result.state.endurance).toBe(0);
+            expect(result.shortfall).toBe(7); // 10 spent, 3 covered
+        });
+
+        it('charges the whole cost to the shortfall when the pool is already empty', () => {
+            const result = spendEndurance(state({endurance: 0}), 4);
+            expect(result.state.endurance).toBe(0);
+            expect(result.shortfall).toBe(4);
+        });
+
+        it('is a pure reducer — the input state is not mutated', () => {
+            const before = state({endurance: 5});
+            spendEndurance(before, 8);
+            expect(before.endurance).toBe(5);
+        });
+    });
+
+    describe('enduranceBurnDice', () => {
+        it('rolls 1d6 of STUN per 2 END short, rounding a fraction up', () => {
+            expect(enduranceBurnDice(0)).toBe(0);
+            expect(enduranceBurnDice(1)).toBe(1); // 1/2 → 1d6
+            expect(enduranceBurnDice(2)).toBe(1);
+            expect(enduranceBurnDice(3)).toBe(2); // 3/2 → 2d6
+            expect(enduranceBurnDice(7)).toBe(4); // 7/2 → 4d6
+            expect(enduranceBurnDice(8)).toBe(4);
         });
     });
 
