@@ -15,9 +15,11 @@ the headline there, and this build doesn't repeat them.
 ## Short version (Play Console, ~500 char limit)
 
 ```
-6th Edition random characters! Characters → Generate now asks which edition and
-rolls a full, legal 400-point 6E hero — or the 250-point 5E one you already had.
-Same engine, so if it says 400 it really spends 400.
+Generate now deals you a HAND of five characters — pick the one you like, or roll
+again. Nothing is saved until you choose.
+
+And they can be 6th Edition: a full, legal 400-point 6E hero, or the 250-point 5E
+one you already had. Same engine, so if it says 400 it really spends 400.
 
 Also: frame your portraits. Drag and pinch to choose which part of the picture the
 square shows, instead of always getting the middle.
@@ -31,19 +33,33 @@ No character costs change in this build.
 that moved costs; the engine is untouched here. If a number moves in 2.6.0, that is a
 real regression and we want to hear about it — the opposite of last build.
 
-### New: 6th Edition random characters
+### New: Generate deals you a hand
 
-Characters → **Generate** is now a proper dialog. Pick an edition at the top, watch it
-roll, and read what you got:
+Characters → **Generate** is now a proper dialog, and it doesn't hand you one character
+— it deals **five**, all different archetypes, and you pick the one you like:
 
-> **You are an Ice Powered Armor Socialite**
+> **An Ice Powered Armor Socialite**
 > Hardsuit · 400 of 400 points
+> 10d6 · SPD 5 · OCV 7 / DCV 7 · DEF 28
+>
+> **A Fire Brick Soldier**
+> Powerhouse · 400 of 400 points
+> 12d6 · SPD 5 · OCV 7 / DCV 6 · DEF 32
 
-- **5E** rolls the 250-point Low Powered hero you already had.
-- **6E** rolls a **400-point Standard hero** — new, and the other half of the original
+Tap one, then **View**. Don't fancy any of them? **Roll Again** deals five more.
+**Nothing is saved until you tap View** — the four you didn't take never existed.
+
+The stat line is there so you can actually argue about it. Sit the table down, let
+everyone deal a hand, and sort out who's taking what: *"I've got a Brick and a
+Mentalist — what do we need?"* That's the point. Your phone can't see anyone else's,
+so it can't balance a party for you; five options each and a conversation does that
+better than any amount of cleverness on our end.
+
+### New: 6th Edition characters
+
+- **5E** deals the 250-point Low Powered heroes you already had.
+- **6E** deals **400-point Standard heroes** — new, and the other half of the original
   idea. Eleven archetypes, eleven professions, all authored from scratch.
-- Don't like it? **Roll Again**. Nothing is saved until you tap **View**, so you can
-  roll all day and only keep the one you want.
 
 The edition pills start on whichever edition you've set in Settings, since you've
 already answered that question once.
@@ -85,15 +101,18 @@ Existing portraits are untouched and still show the centre — reframe them if y
 
 ## What to hammer on
 
-1. **Roll a pile of 6E characters and look at them like a GM.** These spreads are
-   authored, not lifted from anything — there's no legacy 6E data to have copied. If
-   one looks overpowered, underpowered, or just silly, that's the single most valuable
-   thing you can tell us. You are the oracle here, not a fixture file.
-2. **Edit a 6E character.** Re-roll its archetype, retrain its profession, name its
+1. **Deal a pile of 6E hands and look at them like a GM.** These spreads are authored,
+   not lifted from anything — there's no legacy 6E data to have copied. If one looks
+   overpowered, underpowered, or just silly, that's the single most valuable thing you
+   can tell us. You are the oracle here, not a fixture file.
+2. **Use it at a real table.** Everyone deals a hand, argue it out, see whether five
+   options each is enough to land on a party you're happy with. If it isn't, say so —
+   the hand size is one number.
+3. **Edit a 6E character.** Re-roll its archetype, retrain its profession, name its
    languages. Confirm it stays a 400-point 6E character and doesn't drift.
-3. **Upgrade, don't reinstall.** The schema moves 5 → 7 (portrait framing). Your
+4. **Upgrade, don't reinstall.** The schema moves 5 → 7 (portrait framing). Your
    characters should all still be there.
-4. **Frame a few portraits**, including a wide one and a tall one, and check the crop
+5. **Frame a few portraits**, including a wide one and a tall one, and check the crop
    survives a restart.
 
 ## Known gaps
@@ -103,4 +122,8 @@ Existing portraits are untouched and still show the centre — reframe them if y
 - The 5E archetypes have never been graded against the Rule of X — they're lifted from
   the old app's prose, and the nearest model campaign is 225, not 250. They're legal
   and on-budget; whether they're balanced *against each other* is unmeasured.
+- **Each archetype has exactly one powerset**, so two Bricks have the same powers and
+  differ only in their skills. A hand never deals the same archetype twice, so you
+  won't see it *within* your five — but two players who both pick the Brick will notice.
+  More powersets per archetype is the fix, and it's the next big authoring job.
 - Cost Cruncher isn't built yet.

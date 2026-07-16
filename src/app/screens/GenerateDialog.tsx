@@ -15,38 +15,38 @@
 /**
  * Rolling a random character (docs/RANDOM_CHARACTER.md).
  *
- * This replaces a "Generate" link that rolled, saved and dropped an `Alert` on you. It had outgrown
- * the shape: there are two editions to choose between now, and a roll is a thing worth watching
- * arrive.
- *
- * Three states, and the middle one is deliberate:
+ * Three states:
  *
  * ```
- * choosing  edition pills          [Cancel] [Generate]
- * rolling   a bar, for 3s flat     [Cancel]
- * revealed  "You are an Ice ..."   [Roll Again] [View]
+ * choosing  edition pills                     [Cancel]     [Generate]
+ * dealing   a bar, ~3s                        [Cancel]
+ * dealt     five cards, tap one               [Roll Again] [View]
  * ```
  *
- * **The 3s hold is a floor, not a wait.** The roll itself is synchronous and takes ~45ms, so the
- * character exists before the bar has moved; the bar is not reporting progress and does not pretend
- * to. It is there because a reveal you waited for lands differently from one that blinks into
- * existence. That makes it pure drama, which is why {@link Settings.showAnimations} skips both the
- * bar and the hold rather than just the bar — someone who turned animations off is not asking for
- * a slower reveal.
+ * **A hand, not a character.** Four players rolling on four phones cannot coordinate, so no
+ * distribution can promise a table anything — deal five and let the player keep one, and the
+ * coordination happens at the table instead: "I've got a Brick and a Mentalist, which do we need?"
+ * A bad draw also stops mattering. See `core/random/hand.ts` for why weighting the archetypes was
+ * the wrong lever (briefly: uniform is the minimum-collision distribution, so weighting makes two
+ * players clashing *more* likely).
  *
- * **Nothing is saved until "View".** Rolling used to write the character before the player had read
- * a word of it, so dismissing the dialog left one behind; "Roll Again" would have turned that into
- * a pile. `roll` is pure and `keep` is the only write — see `GenerateProvider`.
+ * **Nothing is saved until "View".** `deal` is pure and `keep` is the only write, so the four cards
+ * the player didn't take leave no trace — there is nothing to clean up because nothing was created.
+ *
+ * **The 3s hold is a floor on the whole deal, not a wait bolted on after it.** Dealing five is real
+ * work now (~200ms on a dev machine, more on a phone), so the bar runs for whatever is left of the
+ * three seconds. It is still mostly theatre, which is why {@link Settings.showAnimations} skips the
+ * hold as well as the bar — someone who turned animations off is not asking for a slower reveal.
  */
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Animated, Modal, Pressable, StyleSheet, View, type ViewStyle} from 'react-native';
-import {LOW_POWERED_5E, revealSentence, STANDARD_6E, type GeneratedCharacter, type PowerLevel} from 'core/random';
+import {Animated, Modal, Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
+import {describeBuild, LOW_POWERED_5E, STANDARD_6E, type Candidate, type PowerLevel} from 'core/random';
 import {Button, SegmentedControl, Text, type Segment} from 'app/components';
-import {useKeepCharacter, useRollCharacter, type GenerateResult} from 'app/providers/GenerateProvider';
+import {useDealHand, useKeepCharacter, type GenerateResult} from 'app/providers/GenerateProvider';
 import {useSettings} from 'app/providers/SettingsProvider';
 import {useTheme} from 'app/theme';
 
-/** How long the bar runs. Phil's "3s or so", and the only number here that is a matter of taste. */
+/** The floor on a deal. Phil's "3s or so", and the only number here that is a matter of taste. */
 export const ROLL_DURATION_MS = 3000;
 
 /**
@@ -61,11 +61,11 @@ const LEVELS: readonly PowerLevel[] = [LOW_POWERED_5E, STANDARD_6E];
 
 const SEGMENTS: Segment[] = LEVELS.map((level) => ({value: level.id, label: level.edition.toUpperCase()}));
 
-type Phase = {kind: 'choosing'} | {kind: 'rolling'; rolled: GeneratedCharacter} | {kind: 'revealed'; rolled: GeneratedCharacter};
+type Phase = {kind: 'choosing'} | {kind: 'dealing'} | {kind: 'dealt'; hand: Candidate[]; selected: number | null};
 
 export interface GenerateDialogProps {
     visible: boolean;
-    /** Fired when the player keeps a roll — the character is saved by then. */
+    /** Fired when the player keeps a card — the character is saved by then. */
     onGenerated: (result: GenerateResult) => void;
     onClose: () => void;
 }
@@ -73,7 +73,7 @@ export interface GenerateDialogProps {
 export function GenerateDialog({visible, onGenerated, onClose}: GenerateDialogProps): React.JSX.Element {
     const theme = useTheme();
     const {settings} = useSettings();
-    const roll = useRollCharacter();
+    const deal = useDealHand();
     const keep = useKeepCharacter();
 
     // The player's edition preference is already on record, and it is the same question. It only
@@ -95,11 +95,11 @@ export function GenerateDialog({visible, onGenerated, onClose}: GenerateDialogPr
         }
     }, []);
 
-    // A dialog closed mid-roll must not reveal into a corpse: the timeout outlives the unmount.
+    // The timeout outlives the unmount, and a dialog closed mid-deal must not deal into a corpse.
     useEffect(() => clearTimer, [clearTimer]);
 
-    // Reopening starts over. Without this, a dialog cancelled at "revealed" reopens still showing
-    // the character it was told to forget.
+    // Reopening starts over. Without this, a dialog cancelled at "dealt" reopens still showing the
+    // hand it was told to forget.
     useEffect(() => {
         if (!visible) {
             clearTimer();
@@ -112,43 +112,48 @@ export function GenerateDialog({visible, onGenerated, onClose}: GenerateDialogPr
     const generate = useCallback(() => {
         setError(null);
 
-        let rolled: GeneratedCharacter;
+        const started = Date.now();
+        let hand: Candidate[];
 
         try {
-            // Synchronous and pure. Rolling *before* the bar rather than after means a level with
-            // no data fails here, in front of the player, instead of 3s into a lie.
-            rolled = roll(level);
+            // Synchronous and pure. Dealing *before* the bar rather than after means a level with no
+            // data fails here, in front of the player, instead of 3s into a lie.
+            hand = deal(level);
         } catch (thrown: unknown) {
-            setError(thrown instanceof Error ? thrown.message : 'That character could not be rolled.');
+            setError(thrown instanceof Error ? thrown.message : 'Those characters could not be rolled.');
             return;
         }
 
         if (!settings.showAnimations) {
-            setPhase({kind: 'revealed', rolled});
+            setPhase({kind: 'dealt', hand, selected: null});
             return;
         }
 
-        setPhase({kind: 'rolling', rolled});
+        // The hold is a floor on the whole deal: the dealing already spent some of the three
+        // seconds, so the bar runs for what's left rather than adding three more on top.
+        const remaining = Math.max(0, ROLL_DURATION_MS - (Date.now() - started));
+
+        setPhase({kind: 'dealing'});
         progress.setValue(0);
         Animated.timing(progress, {
             toValue: 1,
-            duration: ROLL_DURATION_MS,
-            // Width is not a transform, so this cannot run on the UI thread. It is a 3s linear fill
-            // with nothing competing for the JS thread — the roll has already finished.
+            duration: remaining,
+            // Width is not a transform, so this cannot run on the UI thread. The deal has already
+            // finished by now, so nothing is competing for the JS thread while it runs.
             useNativeDriver: false,
         }).start();
 
         clearTimer();
-        timer.current = setTimeout(() => setPhase({kind: 'revealed', rolled}), ROLL_DURATION_MS);
-    }, [roll, level, settings.showAnimations, progress, clearTimer]);
+        timer.current = setTimeout(() => setPhase({kind: 'dealt', hand, selected: null}), remaining);
+    }, [deal, level, settings.showAnimations, progress, clearTimer]);
 
     const view = useCallback(() => {
-        if (phase.kind !== 'revealed' || busy) {
+        if (phase.kind !== 'dealt' || phase.selected === null || busy) {
             return;
         }
 
         setBusy(true);
-        keep(phase.rolled)
+        keep(phase.hand[phase.selected].rolled)
             .then(onGenerated, (thrown: unknown) => setError(thrown instanceof Error ? thrown.message : 'That character could not be saved.'))
             .finally(() => setBusy(false));
     }, [phase, busy, keep, onGenerated]);
@@ -158,46 +163,50 @@ export function GenerateDialog({visible, onGenerated, onClose}: GenerateDialogPr
         onClose();
     }, [clearTimer, onClose]);
 
+    const select = useCallback((index: number) => setPhase((prev) => (prev.kind === 'dealt' ? {...prev, selected: index} : prev)), []);
+
+    const dealt = phase.kind === 'dealt';
     const card: ViewStyle = {backgroundColor: theme.colors.surface, borderRadius: theme.radius.lg};
 
     return (
         <Modal transparent visible={visible} animationType="fade" onRequestClose={cancel}>
             <Pressable testID="generate-backdrop" style={styles.backdrop} onPress={cancel}>
                 <Pressable style={[styles.card, card]} onPress={() => undefined}>
-                    <Text variant="subtitle">Random Character</Text>
+                    <Text variant="subtitle">{dealt ? 'Pick one' : 'Random Character'}</Text>
 
                     <SegmentedControl
                         segments={SEGMENTS}
                         value={levelId}
                         onChange={(value) => {
-                            // Mid-roll the pills are hidden, and at "revealed" a new edition means a
-                            // new character — so this only ever fires while choosing.
+                            // A different edition means a different hand — keeping the old cards on
+                            // screen would let the player take one from the edition they just left.
                             setLevelId(value);
                             setPhase({kind: 'choosing'});
                         }}
                     />
 
                     <View style={styles.pane}>
-                        <Pane phase={phase} level={level} progress={progress} error={error} />
+                        <Pane phase={phase} level={level} progress={progress} error={error} onSelect={select} />
                     </View>
 
                     <View style={styles.actions}>
                         <View style={styles.grow}>
                             <Button
                                 testID="generate-cancel"
-                                label={phase.kind === 'revealed' ? 'Roll Again' : 'Cancel'}
+                                label={dealt ? 'Roll Again' : 'Cancel'}
                                 variant="secondary"
                                 disabled={busy}
-                                onPress={phase.kind === 'revealed' ? generate : cancel}
+                                onPress={dealt ? generate : cancel}
                             />
                         </View>
-                        {phase.kind !== 'rolling' && (
+                        {phase.kind !== 'dealing' && (
                             <View style={styles.grow}>
                                 <Button
                                     testID="generate-confirm"
-                                    label={phase.kind === 'revealed' ? 'View' : 'Generate'}
-                                    disabled={busy}
-                                    onPress={phase.kind === 'revealed' ? view : generate}
+                                    label={dealt ? 'View' : 'Generate'}
+                                    // Nothing is chosen yet, so there is nothing to view.
+                                    disabled={busy || (dealt && phase.selected === null)}
+                                    onPress={dealt ? view : generate}
                                 />
                             </View>
                         )}
@@ -208,8 +217,20 @@ export function GenerateDialog({visible, onGenerated, onClose}: GenerateDialogPr
     );
 }
 
-/** The content pane: what the player is choosing, watching, or reading. */
-function Pane({phase, level, progress, error}: {phase: Phase; level: PowerLevel; progress: Animated.Value; error: string | null}): React.JSX.Element {
+/** The content pane: what the player is choosing, watching, or picking from. */
+function Pane({
+    phase,
+    level,
+    progress,
+    error,
+    onSelect,
+}: {
+    phase: Phase;
+    level: PowerLevel;
+    progress: Animated.Value;
+    error: string | null;
+    onSelect: (index: number) => void;
+}): React.JSX.Element {
     const theme = useTheme();
 
     if (error !== null) {
@@ -220,22 +241,23 @@ function Pane({phase, level, progress, error}: {phase: Phase; level: PowerLevel;
         );
     }
 
-    if (phase.kind === 'rolling') {
-        return <RollingBar progress={progress} />;
+    if (phase.kind === 'dealing') {
+        return <DealingBar progress={progress} />;
     }
 
-    if (phase.kind === 'revealed') {
-        const {recipe, spent} = phase.rolled;
-
+    if (phase.kind === 'dealt') {
         return (
-            <View style={styles.reveal}>
-                <Text testID="generate-reveal" variant="title" style={styles.centered}>
-                    {revealSentence(recipe)}
-                </Text>
-                <Text testID="generate-points" variant="caption" muted style={styles.centered}>
-                    {`${recipe.powerset} · ${spent} of ${phase.rolled.level.total} points`}
-                </Text>
-            </View>
+            <ScrollView style={styles.hand} contentContainerStyle={styles.handContent}>
+                {phase.hand.map((candidate, index) => (
+                    <CandidateCard
+                        key={candidate.rolled.recipe.archetype}
+                        candidate={candidate}
+                        index={index}
+                        selected={phase.selected === index}
+                        onSelect={onSelect}
+                    />
+                ))}
+            </ScrollView>
         );
     }
 
@@ -247,12 +269,63 @@ function Pane({phase, level, progress, error}: {phase: Phase; level: PowerLevel;
 }
 
 /**
- * The 3s bar.
+ * One option, with enough of its numbers to argue about.
+ *
+ * The stat line is read off the built character (`Candidate.stats`) rather than the recipe — the
+ * point of a hand is choosing, and "a Fire Brick Soldier" alone doesn't tell a new player what
+ * they'd be signing up for. These are the Rule of X's own inputs, so they cost nothing to obtain.
+ */
+function CandidateCard({
+    candidate,
+    index,
+    selected,
+    onSelect,
+}: {
+    candidate: Candidate;
+    index: number;
+    selected: boolean;
+    onSelect: (index: number) => void;
+}): React.JSX.Element {
+    const theme = useTheme();
+    const {recipe, spent, level} = candidate.rolled;
+    const {dc, spd, ocv, dcv, def} = candidate.stats;
+
+    const chrome: ViewStyle = {
+        backgroundColor: selected ? theme.colors.active : theme.colors.surfaceAlt,
+        borderColor: selected ? theme.colors.primary : 'transparent',
+        borderRadius: theme.radius.md,
+    };
+
+    return (
+        <Pressable
+            testID={`candidate-${index}`}
+            accessibilityRole="button"
+            accessibilityState={{selected}}
+            onPress={() => onSelect(index)}
+            style={[styles.candidate, chrome]}>
+            <Text testID={`candidate-${index}-name`} variant="body">
+                {/* Capitalised: it opens the card, where the reveal sentence used to open a line. */}
+                {capitalise(describeBuild(recipe))}
+            </Text>
+            <Text testID={`candidate-${index}-set`} variant="caption" muted>
+                {`${recipe.powerset} · ${spent} of ${level.total} points`}
+            </Text>
+            <Text testID={`candidate-${index}-stats`} variant="caption" color={theme.colors.primary}>
+                {`${dc}d6 · SPD ${spd} · OCV ${ocv} / DCV ${dcv} · DEF ${def}`}
+            </Text>
+        </Pressable>
+    );
+}
+
+const capitalise = (phrase: string): string => phrase.charAt(0).toUpperCase() + phrase.slice(1);
+
+/**
+ * The bar.
  *
  * Owned rather than a Lottie or a third-party spinner — it is two Views and an interpolation, and
- * the app draws its own icons for the same reason (see the design-system decision in the theme).
+ * the app draws its own icons for the same reason.
  */
-function RollingBar({progress}: {progress: Animated.Value}): React.JSX.Element {
+function DealingBar({progress}: {progress: Animated.Value}): React.JSX.Element {
     const theme = useTheme();
     const width = progress.interpolate({inputRange: [0, 1], outputRange: ['0%', '100%']});
 
@@ -262,7 +335,7 @@ function RollingBar({progress}: {progress: Animated.Value}): React.JSX.Element {
                 <Animated.View style={[styles.fill, {width, backgroundColor: theme.colors.primary, borderRadius: theme.radius.pill}]} />
             </View>
             <Text variant="caption" muted style={styles.centered}>
-                Rolling…
+                Dealing…
             </Text>
         </View>
     );
@@ -282,11 +355,23 @@ const styles = StyleSheet.create({
         padding: 20,
         rowGap: 12,
     },
-    // Fixed, so the card doesn't jump between the three states.
+    // Tall enough for the hand, floored so the card doesn't jump between the three states.
     pane: {
         minHeight: 120,
+        maxHeight: 380,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    hand: {
+        width: '100%',
+    },
+    handContent: {
+        rowGap: 8,
+    },
+    candidate: {
+        padding: 12,
+        rowGap: 2,
+        borderWidth: 2,
     },
     reveal: {
         width: '100%',

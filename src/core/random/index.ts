@@ -42,6 +42,7 @@ export {
     complicationsTotal,
     COMPLICATIONS_5E,
     pick,
+    pickDistinct,
     randomBudget,
     SKILLSETS,
     SPECIAL_FX,
@@ -54,4 +55,5 @@ export {ARCHETYPES_6E, archetypesFor} from './allocate';
 export {POWERSETS_6E, powersetsForEdition} from './powerset';
 export {attachSkillset, playerDefinedSlots, PLAYER_DEFINED, SKILLSETS_5E, structuredSkillset, type PlayerDefinedSlot, type StructuredSkillset} from './skillset';
 export {approximations, attachPowerset, POWERSETS_5E, powersetsFor, type Approximation, type Powerset} from './powerset';
-export {budgetFor, buildRecipe, fittableSkillsets, generatableArchetypes, generateRandomCharacter, rollRecipe, type GeneratedCharacter} from './generate';
+export {budgetFor, buildRecipe, fittableSkillsets, generatableArchetypes, generateRandomCharacter, rollRecipe, rollRecipeFor, type GeneratedCharacter} from './generate';
+export {dealHand, HAND_SIZE, type Candidate} from './hand';

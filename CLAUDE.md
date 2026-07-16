@@ -117,6 +117,12 @@ Three consequences worth knowing:
   column beside the document. Editing revises the recipe and rebuilds — there is no partial
   mutation path. Only `origin: 'generated'` rows are editable; an imported `.hdc` is the
   player's file and stays read-only.
+- **Generate deals a hand of five and keeps one** (`core/random/hand.ts`), rather than weighting the
+  archetype distribution. Weighting was asked for and lost on the maths: **uniform is the
+  minimum-collision distribution**, so weighting makes two players clashing *more* likely, not less.
+  Four phones can't coordinate anyway. Archetypes within a hand are forced distinct because **every
+  archetype has exactly one powerset** — a repeated archetype is a repeated character, not just a
+  repeated label. That 1:1 is also the strongest argument for authoring more powersets.
 - **`level` is the only thing that says which edition a recipe means**, and the editions share
   nearly every name: all eleven archetypes, all eleven professions, the four complication
   labels, and six of the eleven powerset labels (Powerhouse, Adept, Sorcerer, Blur, Sentinel,

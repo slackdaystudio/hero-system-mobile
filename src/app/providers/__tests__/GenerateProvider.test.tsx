@@ -16,7 +16,7 @@
  * The generate action, end to end: roll → engine → save. Drives the same repository contract the
  * import path writes through, so a generated character lands in the library identically.
  *
- * Rolling and keeping are separate actions, and the split is the subject of half of these: a roll
+ * Dealing and keeping are separate actions, and the split is the subject of half of these: a deal
  * writes nothing, and only `keep` reaches storage. See the header of `GenerateProvider`.
  */
 import React from 'react';
@@ -24,8 +24,8 @@ import {act, create} from 'react-test-renderer';
 import type {Rng, SaveCharacter} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
 import {heroDesignerCharacter} from 'core/hero';
-import {LOW_POWERED_5E, STANDARD_6E, type GeneratedCharacter, type PowerLevel} from 'core/random';
-import {GenerateProvider, useKeepCharacter, useRollCharacter, type GenerateResult} from 'app/providers/GenerateProvider';
+import {HAND_SIZE, LOW_POWERED_5E, STANDARD_6E, type Candidate, type GeneratedCharacter, type PowerLevel} from 'core/random';
+import {GenerateProvider, useDealHand, useKeepCharacter, type GenerateResult} from 'app/providers/GenerateProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 
 const seededRng = (seed: number): Rng => {
@@ -51,14 +51,18 @@ const fakeRepositories = (saved: SaveCharacter[]) =>
     } as unknown as Repositories);
 
 /** Mounts the provider and hands the two actions to `run`. */
-const withProvider = async (saved: SaveCharacter[], rng: Rng, run: (actions: {roll: (level: PowerLevel) => GeneratedCharacter; keep: (rolled: GeneratedCharacter) => Promise<GenerateResult>}) => void): Promise<void> => {
+const withProvider = async (
+    saved: SaveCharacter[],
+    rng: Rng,
+    run: (actions: {deal: (level: PowerLevel, size?: number) => Candidate[]; keep: (rolled: GeneratedCharacter) => Promise<GenerateResult>}) => void,
+): Promise<void> => {
     function Probe(): React.JSX.Element | null {
-        const roll = useRollCharacter();
+        const deal = useDealHand();
         const keep = useKeepCharacter();
 
         React.useEffect(() => {
-            run({roll, keep});
-        }, [roll, keep]);
+            run({deal, keep});
+        }, [deal, keep]);
 
         return null;
     }
@@ -74,12 +78,12 @@ const withProvider = async (saved: SaveCharacter[], rng: Rng, run: (actions: {ro
     });
 };
 
-/** Rolls once and keeps it — what the dialog does when the player taps Generate then View. */
+/** Deals and keeps the first card — what the dialog does when the player taps Generate then View. */
 const generateOnce = async (saved: SaveCharacter[], rng: Rng, level: PowerLevel = LOW_POWERED_5E): Promise<GenerateResult> => {
     let result: GenerateResult | undefined;
 
-    await withProvider(saved, rng, ({roll, keep}) => {
-        keep(roll(level)).then((value) => {
+    await withProvider(saved, rng, ({deal, keep}) => {
+        keep(deal(level)[0].rolled).then((value) => {
             result = value;
         }, undefined);
     });
@@ -87,15 +91,15 @@ const generateOnce = async (saved: SaveCharacter[], rng: Rng, level: PowerLevel 
     return result!;
 };
 
-/** Rolls without keeping — what the dialog does when the player taps Generate and walks away. */
-const rollOnce = async (saved: SaveCharacter[], rng: Rng, level: PowerLevel = LOW_POWERED_5E): Promise<GeneratedCharacter> => {
-    let rolled: GeneratedCharacter | undefined;
+/** Deals without keeping — what the dialog does when the player taps Generate and walks away. */
+const dealOnce = async (saved: SaveCharacter[], rng: Rng, level: PowerLevel = LOW_POWERED_5E): Promise<Candidate[]> => {
+    let hand: Candidate[] | undefined;
 
-    await withProvider(saved, rng, ({roll}) => {
-        rolled = roll(level);
+    await withProvider(saved, rng, ({deal}) => {
+        hand = deal(level);
     });
 
-    return rolled!;
+    return hand!;
 };
 
 describe('GenerateProvider', () => {
@@ -142,54 +146,55 @@ describe('GenerateProvider', () => {
      * The whole reason rolling and keeping are two actions.
      *
      * `generate()` used to roll, build and save in one go, before the player had read a word of the
-     * result — dismissing the dialog left a character behind in the library. The dialog now offers
-     * "Roll Again", which would have turned one stray character into a pile of them.
+     * result — dismissing the dialog left a character behind in the library. The dialog now deals a
+     * hand of five and offers "Roll Again", so save-on-roll would bury the library five at a time.
      */
-    describe('a roll is not a save', () => {
-        it('writes nothing at all', async () => {
+    describe('a deal is not a save', () => {
+        it('deals a whole hand and writes nothing at all', async () => {
             const saved: SaveCharacter[] = [];
-            const rolled = await rollOnce(saved, seededRng(42));
+            const hand = await dealOnce(saved, seededRng(42));
 
-            expect(rolled.recipe.name).toBeTruthy();
+            expect(hand).toHaveLength(HAND_SIZE);
             expect(saved).toEqual([]);
         });
 
         it('writes nothing however many times the player rolls again', async () => {
             const saved: SaveCharacter[] = [];
 
-            await withProvider(saved, seededRng(42), ({roll}) => {
+            await withProvider(saved, seededRng(42), ({deal}) => {
                 for (let attempt = 0; attempt < 5; attempt++) {
-                    roll(LOW_POWERED_5E);
+                    deal(LOW_POWERED_5E);
                 }
             });
 
+            // Five hands of five: twenty-five characters built, none written.
             expect(saved).toEqual([]);
         });
 
-        it('saves exactly the character that was rolled, and only when kept', async () => {
+        it('saves exactly the card that was kept, and none of its siblings', async () => {
             const saved: SaveCharacter[] = [];
-            let rolled: GeneratedCharacter | undefined;
+            let kept: GeneratedCharacter | undefined;
 
-            await withProvider(saved, seededRng(7), ({roll, keep}) => {
-                // Three rolls, one kept — the pile the player rejected leaves no trace.
-                roll(LOW_POWERED_5E);
-                roll(LOW_POWERED_5E);
-                rolled = roll(LOW_POWERED_5E);
-                keep(rolled).then(undefined, undefined);
+            await withProvider(saved, seededRng(7), ({deal, keep}) => {
+                const hand = deal(LOW_POWERED_5E);
+
+                kept = hand[2].rolled;
+                keep(kept).then(undefined, undefined);
             });
 
             expect(saved).toHaveLength(1);
-            expect(saved[0].name).toBe(rolled!.recipe.name);
-            expect(saved[0].recipe).toEqual(rolled!.recipe);
+            expect(saved[0].name).toBe(kept!.recipe.name);
+            expect(saved[0].recipe).toEqual(kept!.recipe);
         });
     });
 
     /**
      * **The level has to be passed, and this is where it was lost.**
      *
-     * `generateRandomCharacter(rng, level = LOW_POWERED_5E)` defaults, and the provider called it
-     * bare — so every roll the app ever made was 5E Low Powered while the entire 6E dataset sat
-     * authored and unreachable. Nothing in `src/app/` so much as imported a `PowerLevel`.
+     * `dealHand(rng, level = LOW_POWERED_5E)` defaults, as `generateRandomCharacter` did before it,
+     * and the provider called it bare — so every roll the app ever made was 5E Low Powered while the
+     * entire 6E dataset sat authored and unreachable. Nothing in `src/app/` so much as imported a
+     * `PowerLevel`.
      */
     describe('the level reaches the domain', () => {
         it('rolls 5E Low Powered when asked for it', async () => {

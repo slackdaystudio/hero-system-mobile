@@ -15,9 +15,10 @@
 /**
  * The roll dialog.
  *
- * Two things here are worth more than the rest: **nothing is written until the player says View**,
- * and **the pills reach the domain** — a 6E pill has to produce a 400-point 6E character, because
- * for the whole life of the app every roll was silently 5E.
+ * Three things here are worth more than the rest: **nothing is written until the player picks one**,
+ * **the pills reach the domain** (for the whole life of the app every roll was silently 5E), and
+ * **the card the player tapped is the character they get** — with five on screen, an off-by-one
+ * would hand someone the wrong hero and look entirely plausible doing it.
  *
  * The 3s hold is driven with fake timers, so these tests take no wall-clock time.
  */
@@ -26,6 +27,7 @@ import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import type {Rng, SaveCharacter, Settings, SettingsRepository} from 'core/ports';
 import {DEFAULT_SETTINGS} from 'core/ports';
 import {heroDesignerCharacter} from 'core/hero';
+import {HAND_SIZE} from 'core/random';
 import type {Repositories} from 'infra/persistence/repositories';
 import {GenerateProvider, type GenerateResult} from 'app/providers/GenerateProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
@@ -104,12 +106,15 @@ const label = (tree: ReactTestRenderer, testID: string): string | null => {
 
 const exists = (tree: ReactTestRenderer, testID: string): boolean => tree.root.findAllByProps({testID}).length > 0;
 
-/** Button labels, which are how the footer says which state it is in. */
-const buttonLabel = (tree: ReactTestRenderer, testID: string): string | undefined =>
-    tree.root.findAllByProps({testID}).find((node) => typeof node.props.label === 'string')?.props.label;
+const buttonProps = (tree: ReactTestRenderer, testID: string): {label?: string; disabled?: boolean} =>
+    tree.root.findAllByProps({testID}).find((node) => typeof node.props.label === 'string')?.props ?? {};
 
-/** Roll, and run out the mandatory hold. */
-const rollAndReveal = async (tree: ReactTestRenderer): Promise<void> => {
+/** How many cards are on screen. */
+const handSize = (tree: ReactTestRenderer): number =>
+    Array.from({length: 12}, (_, index) => index).filter((index) => exists(tree, `candidate-${index}`)).length;
+
+/** Deal, and run out the mandatory hold. */
+const dealAndReveal = async (tree: ReactTestRenderer): Promise<void> => {
     await press(tree, 'generate-confirm');
     await act(async () => {
         jest.advanceTimersByTime(ROLL_DURATION_MS);
@@ -130,12 +135,6 @@ describe('GenerateDialog', () => {
             expect(label(sixth.tree, 'generate-level')).toContain('400');
         });
 
-        it('names the level it will roll, so the pill is not the only clue', async () => {
-            const {tree} = await render({useFifthEdition: true});
-
-            expect(label(tree, 'generate-level')).toBe('5E Low Powered Superheroic · 250 points');
-        });
-
         it('offers exactly the two levels that have data', async () => {
             const {tree} = await render();
 
@@ -147,7 +146,7 @@ describe('GenerateDialog', () => {
             expect(exists(tree, 'segment-6e-low')).toBe(false);
         });
 
-        it('cancels without rolling anything', async () => {
+        it('cancels without dealing anything', async () => {
             const {tree, saved, closed} = await render();
 
             await press(tree, 'generate-cancel');
@@ -158,119 +157,207 @@ describe('GenerateDialog', () => {
     });
 
     describe('the mandatory hold', () => {
-        it('shows the bar and withholds the reveal until the 3s is up', async () => {
+        it('shows the bar and withholds the hand until the 3s is up', async () => {
             const {tree} = await render();
 
             await press(tree, 'generate-confirm');
 
             expect(exists(tree, 'generate-progress')).toBe(true);
-            expect(exists(tree, 'generate-reveal')).toBe(false);
-
-            // One millisecond short: still rolling.
-            await act(async () => {
-                jest.advanceTimersByTime(ROLL_DURATION_MS - 1);
-            });
-            expect(exists(tree, 'generate-reveal')).toBe(false);
+            expect(handSize(tree)).toBe(0);
 
             await act(async () => {
-                jest.advanceTimersByTime(1);
+                jest.advanceTimersByTime(ROLL_DURATION_MS);
             });
-            expect(exists(tree, 'generate-reveal')).toBe(true);
+
+            expect(handSize(tree)).toBe(HAND_SIZE);
             expect(exists(tree, 'generate-progress')).toBe(false);
         });
 
-        /** Nothing to accept yet, so there is no second button to press. */
-        it('offers only Cancel while rolling', async () => {
+        /** Nothing to pick yet, so there is no second button to press. */
+        it('offers only Cancel while dealing', async () => {
             const {tree} = await render();
 
             await press(tree, 'generate-confirm');
 
             expect(exists(tree, 'generate-confirm')).toBe(false);
-            expect(buttonLabel(tree, 'generate-cancel')).toBe('Cancel');
+            expect(buttonProps(tree, 'generate-cancel').label).toBe('Cancel');
         });
 
         /**
-         * The hold is drama, not work — the character exists before the bar moves. Someone who
-         * turned animations off is not asking for a slower reveal, so they get the reveal.
+         * The hold is mostly drama — dealing is real work now, but the bar still runs out a floor
+         * rather than reporting progress. Someone who turned animations off is not asking for a
+         * slower reveal.
          */
         it('skips the hold entirely when animations are off', async () => {
             const {tree} = await render({showAnimations: false});
 
             await press(tree, 'generate-confirm');
 
-            expect(exists(tree, 'generate-reveal')).toBe(true);
+            expect(handSize(tree)).toBe(HAND_SIZE);
             expect(exists(tree, 'generate-progress')).toBe(false);
         });
 
-        it('does not reveal into a closed dialog', async () => {
+        it('does not deal into a closed dialog', async () => {
             const {tree} = await render();
 
             await press(tree, 'generate-confirm');
             await press(tree, 'generate-cancel');
 
-            // The timeout outlives the close; firing it must not resurrect the reveal.
+            // The timeout outlives the close; firing it must not resurrect the hand.
             await act(async () => {
                 jest.advanceTimersByTime(ROLL_DURATION_MS);
             });
 
-            expect(exists(tree, 'generate-reveal')).toBe(false);
+            expect(handSize(tree)).toBe(0);
         });
     });
 
-    describe('the reveal', () => {
-        it('reads the roll back as a sentence', async () => {
+    describe('the hand', () => {
+        it('deals five to choose between', async () => {
             const {tree} = await render();
 
-            await rollAndReveal(tree);
+            await dealAndReveal(tree);
 
-            expect(label(tree, 'generate-reveal')).toMatch(/^You are an? .+\.$/);
-            expect(label(tree, 'generate-reveal')).not.toContain('/');
-            expect(label(tree, 'generate-reveal')).not.toContain('Other');
+            expect(handSize(tree)).toBe(HAND_SIZE);
         });
 
-        it('says what it spent', async () => {
+        /**
+         * One powerset per archetype, so two cards sharing an archetype would share their powers —
+         * a wasted slot. Dealt uniformly it would happen to about two hands in three.
+         */
+        it('never deals the same archetype twice', async () => {
+            const {tree, saved} = await render();
+
+            await dealAndReveal(tree);
+
+            const names = Array.from({length: HAND_SIZE}, (_, index) => label(tree, `candidate-${index}-name`));
+
+            expect(new Set(names).size).toBe(HAND_SIZE);
+            expect(saved).toEqual([]);
+        });
+
+        it('names each card as a sentence, capitalised', async () => {
+            const {tree} = await render();
+
+            await dealAndReveal(tree);
+
+            for (let index = 0; index < HAND_SIZE; index++) {
+                const name = label(tree, `candidate-${index}-name`)!;
+
+                expect(name).toMatch(/^An? .+$/);
+                expect(name).not.toContain('/'); // Playboy/Socialite reads "Socialite"
+                expect(name).not.toContain('Other'); // the unthemed roll prints no effect word
+            }
+        });
+
+        it('shows what each card spends and what it does', async () => {
             const {tree} = await render({useFifthEdition: false});
 
-            await rollAndReveal(tree);
+            await dealAndReveal(tree);
 
-            expect(label(tree, 'generate-points')).toContain('400 of 400 points');
+            expect(label(tree, 'candidate-0-set')).toContain('400 of 400 points');
+            // The stat line is the reason a hand is worth dealing — "a Fire Brick Soldier" alone
+            // doesn't tell a new player what they'd be signing up for.
+            expect(label(tree, 'candidate-0-stats')).toMatch(/^\d+d6 · SPD \d+ · OCV \d+ \/ DCV \d+ · DEF \d+$/);
         });
 
         it('swaps the footer to Roll Again / View', async () => {
             const {tree} = await render();
 
-            await rollAndReveal(tree);
+            await dealAndReveal(tree);
 
-            expect(buttonLabel(tree, 'generate-cancel')).toBe('Roll Again');
-            expect(buttonLabel(tree, 'generate-confirm')).toBe('View');
+            expect(buttonProps(tree, 'generate-cancel').label).toBe('Roll Again');
+            expect(buttonProps(tree, 'generate-confirm').label).toBe('View');
+        });
+
+        it('deals a fresh hand on Roll Again', async () => {
+            const {tree, saved} = await render();
+
+            await dealAndReveal(tree);
+            const first = label(tree, 'candidate-0-name');
+
+            await press(tree, 'generate-cancel');
+            await act(async () => {
+                jest.advanceTimersByTime(ROLL_DURATION_MS);
+            });
+
+            expect(label(tree, 'candidate-0-name')).not.toBe(first);
+            expect(saved).toEqual([]);
         });
     });
 
-    /**
-     * The reason `roll` and `keep` are separate actions. Rolling used to save before the player had
-     * read a word of the result, and "Roll Again" would have turned one stray character into a pile.
-     */
-    describe('nothing is saved until View', () => {
-        it('saves nothing on a reveal the player has not accepted', async () => {
+    describe('picking one', () => {
+        it('cannot View until a card is chosen', async () => {
+            const {tree} = await render();
+
+            await dealAndReveal(tree);
+            expect(buttonProps(tree, 'generate-confirm').disabled).toBe(true);
+
+            await press(tree, 'candidate-2');
+            expect(buttonProps(tree, 'generate-confirm').disabled).toBe(false);
+        });
+
+        it('does nothing but select when a card is tapped', async () => {
+            const {tree, saved, generated} = await render();
+
+            await dealAndReveal(tree);
+            await press(tree, 'candidate-2');
+
+            // Tapping is choosing, not confirming — the whole point is to be able to change your mind.
+            expect(saved).toEqual([]);
+            expect(generated()).toEqual([]);
+        });
+
+        it('lets the player change their mind before committing', async () => {
             const {tree, saved} = await render();
 
-            await rollAndReveal(tree);
+            await dealAndReveal(tree);
+            await press(tree, 'candidate-1');
+            await press(tree, 'candidate-3');
+            await press(tree, 'candidate-0');
 
-            expect(exists(tree, 'generate-reveal')).toBe(true);
             expect(saved).toEqual([]);
         });
 
-        it('saves nothing when the player rolls again, however many times', async () => {
+        /**
+         * The off-by-one that would look entirely plausible: five cards on screen, and the one that
+         * gets saved has to be the one under the finger.
+         */
+        it.each([0, 1, 2, 3, 4])('saves the card at index %i — the one the player actually tapped', async (index) => {
+            const {tree, saved, generated} = await render();
+
+            await dealAndReveal(tree);
+            const chosen = label(tree, `candidate-${index}-name`)!;
+
+            await press(tree, `candidate-${index}`);
+            await press(tree, 'generate-confirm');
+
+            expect(saved).toHaveLength(1);
+            expect(generated()).toHaveLength(1);
+            expect(generated()[0].id).toBe(saved[0].id);
+            // The card's sentence names the archetype of the character that got written.
+            expect(chosen).toContain((saved[0].recipe as {archetype: string}).archetype);
+        });
+
+        it('saves nothing when the hand is dismissed', async () => {
+            const {tree, saved, closed} = await render();
+
+            await dealAndReveal(tree);
+            await press(tree, 'candidate-2'); // even after choosing
+            await press(tree, 'generate-backdrop');
+
+            expect(closed()).toBe(1);
+            expect(saved).toEqual([]);
+        });
+
+        it('saves nothing however many hands the player rolls through', async () => {
             const {tree, saved} = await render();
 
-            await rollAndReveal(tree);
+            await dealAndReveal(tree);
 
-            // "Roll Again" is the cancel slot re-labelled — the confirm slot is View by now, and
-            // pressing that is precisely the one thing that *should* save.
             for (let attempt = 0; attempt < 4; attempt++) {
-                expect(buttonLabel(tree, 'generate-cancel')).toBe('Roll Again');
-
-                await press(tree, 'generate-cancel');
+                await press(tree, 'candidate-1'); // pick one up, put it back
+                await press(tree, 'generate-cancel'); // Roll Again
                 await act(async () => {
                     jest.advanceTimersByTime(ROLL_DURATION_MS);
                 });
@@ -278,97 +365,74 @@ describe('GenerateDialog', () => {
                 expect(saved).toEqual([]);
             }
 
-            expect(exists(tree, 'generate-reveal')).toBe(true);
+            // Five hands of five: twenty-five characters built, none written.
+            expect(handSize(tree)).toBe(HAND_SIZE);
             expect(saved).toEqual([]);
         });
 
-        it('saves nothing when the dialog is dismissed at the reveal', async () => {
-            const {tree, saved, closed} = await render();
+        it('forgets the selection when a fresh hand is dealt', async () => {
+            const {tree} = await render();
 
-            await rollAndReveal(tree);
-            await press(tree, 'generate-backdrop');
+            await dealAndReveal(tree);
+            await press(tree, 'candidate-2');
 
-            expect(closed()).toBe(1);
-            expect(saved).toEqual([]);
-        });
-
-        it('saves exactly the revealed character on View, and reports it', async () => {
-            const {tree, saved, generated} = await render();
-
-            await rollAndReveal(tree);
-            const revealed = label(tree, 'generate-reveal');
-
-            await press(tree, 'generate-confirm');
-
-            expect(saved).toHaveLength(1);
-            expect(generated()).toHaveLength(1);
-            expect(generated()[0].id).toBe(saved[0].id);
-            // The sentence names what was saved: same archetype, same profession, same effect.
-            expect(revealed).toContain((saved[0].recipe as {archetype: string}).archetype);
-        });
-
-        it('keeps the one the player accepted, not the one before it', async () => {
-            const {tree, saved} = await render();
-
-            await rollAndReveal(tree);
-            await press(tree, 'generate-cancel'); // Roll Again
+            await press(tree, 'generate-cancel');
             await act(async () => {
                 jest.advanceTimersByTime(ROLL_DURATION_MS);
             });
 
-            const second = label(tree, 'generate-reveal');
-            await press(tree, 'generate-confirm');
-
-            expect(saved).toHaveLength(1);
-            expect(second).toContain((saved[0].recipe as {archetype: string}).archetype);
+            // Otherwise View would keep card 2 of a hand the player has never looked at.
+            expect(buttonProps(tree, 'generate-confirm').disabled).toBe(true);
         });
     });
 
     /**
      * **The pills have to reach the domain.**
      *
-     * `generateRandomCharacter(rng, level = LOW_POWERED_5E)` defaults, and every call the app made
-     * was bare — so every character it ever rolled was 5E Low Powered while the whole 6E dataset sat
-     * authored and unreachable. A pill that only changes a label would reproduce that exactly.
+     * `dealHand(rng, level = LOW_POWERED_5E)` defaults, and every call the app made was bare — so
+     * every character it ever rolled was 5E Low Powered while the whole 6E dataset sat authored and
+     * unreachable. A pill that only changes a label would reproduce that exactly.
      */
     describe('the pills reach the domain', () => {
-        const pickEdition = async (tree: ReactTestRenderer, levelId: string): Promise<void> => press(tree, `segment-${levelId}`);
+        const keepFirst = async (tree: ReactTestRenderer): Promise<void> => {
+            await dealAndReveal(tree);
+            await press(tree, 'candidate-0');
+            await press(tree, 'generate-confirm');
+        };
 
-        it('rolls a real 400-point 6E character on the 6E pill', async () => {
+        it('deals real 400-point 6E characters on the 6E pill', async () => {
             const {tree, saved} = await render({useFifthEdition: true}); // opens on 5E
 
-            await pickEdition(tree, '6e-standard');
-            await rollAndReveal(tree);
-            await press(tree, 'generate-confirm');
+            await press(tree, 'segment-6e-standard');
+            await keepFirst(tree);
 
             expect(saved[0].edition).toBe('6E');
             expect(heroDesignerCharacter.isFifth(saved[0].document as unknown as Record<string, any>)).toBe(false);
             expect((saved[0].recipe as {level: string}).level).toBe('6e-standard');
         });
 
-        it('rolls a real 250-point 5E character on the 5E pill', async () => {
+        it('deals real 250-point 5E characters on the 5E pill', async () => {
             const {tree, saved} = await render({useFifthEdition: false}); // opens on 6E
 
-            await pickEdition(tree, '5e-low');
-            await rollAndReveal(tree);
-            await press(tree, 'generate-confirm');
+            await press(tree, 'segment-5e-low');
+            await keepFirst(tree);
 
             expect(saved[0].edition).toBe('5E');
             expect(heroDesignerCharacter.isFifth(saved[0].document as unknown as Record<string, any>)).toBe(true);
             expect((saved[0].recipe as {level: string}).level).toBe('5e-low');
         });
 
-        it('throws away a reveal when the edition changes under it', async () => {
+        it('throws away a hand when the edition changes under it', async () => {
             const {tree} = await render({useFifthEdition: true});
 
-            await rollAndReveal(tree);
-            expect(exists(tree, 'generate-reveal')).toBe(true);
+            await dealAndReveal(tree);
+            expect(handSize(tree)).toBe(HAND_SIZE);
 
-            // A different edition is a different character; keeping the old reveal on screen would
-            // let the player tap View and get one from the edition they just moved away from.
-            await pickEdition(tree, '6e-standard');
+            // A different edition is a different set of characters; keeping the old hand on screen
+            // would let the player take one from the edition they just moved away from.
+            await press(tree, 'segment-6e-standard');
 
-            expect(exists(tree, 'generate-reveal')).toBe(false);
+            expect(handSize(tree)).toBe(0);
             expect(label(tree, 'generate-level')).toContain('400');
         });
     });

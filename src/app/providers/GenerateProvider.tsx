@@ -15,7 +15,7 @@
 import React, {createContext, useCallback, useContext, useMemo} from 'react';
 import {heroDesignerCharacter} from 'core/hero';
 import type {Character, CharacterDocument, Rng} from 'core/ports';
-import {buildRecipe, generateRandomCharacter, type CharacterRecipe, type GeneratedCharacter, type PowerLevel} from 'core/random';
+import {buildRecipe, dealHand, type Candidate, type CharacterRecipe, type GeneratedCharacter, type PowerLevel} from 'core/random';
 import {mathRandomRng} from 'infra/rng/mathRandomRng';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 
@@ -26,18 +26,18 @@ import {useRepositories} from 'app/providers/RepositoriesProvider';
  * input an import produces — and it is run through the engine and saved down the identical path,
  * so a generated character is indistinguishable from an imported one.
  *
- * **Rolling and keeping are separate, and that is the point.** This used to be one `generate()`
+ * **Dealing and keeping are separate, and that is the point.** This used to be one `generate()`
  * that rolled, built and saved before the player had seen a single word of the result — dismissing
- * the dialog left a character behind in the library. The Generate dialog offers "Roll Again", which
- * turns that into a pile of them, so:
+ * the dialog left a character behind in the library. The dialog now deals a *hand* of five and
+ * offers "Roll Again", so a save-on-roll would bury the library under characters nobody chose:
  *
  * ```
- * roll(level)   pure and synchronous — nothing is written
- * keep(rolled)  the only thing that touches storage
+ * deal(level)   pure and synchronous — five candidates, nothing written
+ * keep(rolled)  the only thing that touches storage, and only "View" calls it
  * ```
  *
- * A rejected roll is now simply never saved, and there is nothing to clean up because nothing was
- * created. `revise` keeps the same save shape, so a generated character, a re-rolled one and a kept
+ * Four of every five candidates are thrown away, and that costs nothing because nothing was
+ * created. `revise` keeps the same save shape, so a kept character, a re-rolled one and a generated
  * one are all stored identically.
  */
 export interface GenerateResult {
@@ -50,15 +50,15 @@ export interface GenerateResult {
 }
 
 /**
- * Roll a character without saving it.
+ * Deal a hand of candidates without saving any of them.
  *
  * Synchronous because it is pure — the domain does no I/O, and pretending otherwise would make the
  * dialog await something that never yields. The `Rng` is the provider's, so a seeded one reaches it
  * in tests.
  */
-type RollCharacter = (level: PowerLevel) => GeneratedCharacter;
+type DealHand = (level: PowerLevel, size?: number) => Candidate[];
 
-/** Save a rolled character. The only write on the generate path, and only the player triggers it. */
+/** Save the one card the player kept. The only write on the generate path, and only "View" triggers it. */
 type KeepCharacter = (rolled: GeneratedCharacter) => Promise<GenerateResult>;
 
 /**
@@ -71,7 +71,7 @@ type KeepCharacter = (rolled: GeneratedCharacter) => Promise<GenerateResult>;
 type ReviseCharacter = (character: Character, recipe: CharacterRecipe) => Promise<GenerateResult>;
 
 interface GenerateApi {
-    readonly roll: RollCharacter;
+    readonly deal: DealHand;
     readonly keep: KeepCharacter;
     readonly revise: ReviseCharacter;
     /** The same generator a roll uses — recipe edits that re-draw a powerset need it. */
@@ -90,9 +90,9 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
     const repositories = useRepositories();
     const generator = useMemo(() => rng ?? mathRandomRng(), [rng]);
 
-    // The level is passed, never defaulted: `generateRandomCharacter` falls back to 5E Low Powered,
-    // and calling it bare is how every roll was silently 5E while the whole 6E dataset sat unreachable.
-    const roll = useCallback<RollCharacter>((level) => generateRandomCharacter(generator, level), [generator]);
+    // The level is passed, never defaulted: `dealHand` falls back to 5E Low Powered, and calling it
+    // bare is how every roll was silently 5E while the whole 6E dataset sat unreachable.
+    const deal = useCallback<DealHand>((level, size) => dealHand(generator, level, size), [generator]);
 
     const keep = useCallback<KeepCharacter>(
         async (rolled) => {
@@ -147,7 +147,7 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
         [repositories],
     );
 
-    const api = useMemo<GenerateApi>(() => ({roll, keep, revise, rng: generator}), [roll, keep, revise, generator]);
+    const api = useMemo<GenerateApi>(() => ({deal, keep, revise, rng: generator}), [deal, keep, revise, generator]);
 
     return <GenerateContext.Provider value={api}>{children}</GenerateContext.Provider>;
 }
@@ -169,8 +169,8 @@ function useGenerateApi(): GenerateApi {
     return value;
 }
 
-/** Roll a character at a level. Pure — nothing is saved until {@link useKeepCharacter}. */
-export const useRollCharacter = (): RollCharacter => useGenerateApi().roll;
+/** Deal a hand of candidates at a level. Pure — nothing is saved until {@link useKeepCharacter}. */
+export const useDealHand = (): DealHand => useGenerateApi().deal;
 
 /** Save a rolled character. Only the player's "View" reaches this. */
 export const useKeepCharacter = (): KeepCharacter => useGenerateApi().keep;

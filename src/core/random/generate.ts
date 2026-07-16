@@ -77,7 +77,17 @@ export function rollRecipe(rng: Rng, level: PowerLevel = LOW_POWERED_5E): Charac
         throw new Error(`No archetype has a structured powerset for ${level.name}`);
     }
 
-    const archetype = pick(rng, candidates);
+    return rollRecipeFor(rng, level, pick(rng, candidates));
+}
+
+/**
+ * Roll everything *except* the archetype, which the caller has already chosen.
+ *
+ * Split out for {@link dealHand}, which picks the archetypes itself so a hand can't deal the same
+ * one twice. A hand is the only caller with an opinion about which archetype it wants; a plain
+ * {@link rollRecipe} picks one and delegates here, so there is one definition of what a recipe is.
+ */
+export function rollRecipeFor(rng: Rng, level: PowerLevel, archetype: Archetype): CharacterRecipe {
     const specialFx = pick(rng, SPECIAL_FX);
 
     return {

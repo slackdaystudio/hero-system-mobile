@@ -38,19 +38,28 @@ native module (`npm run android`).
 - [ ] Characters → **Generate** opens the dialog, not an Alert.
 - [ ] The edition pills **start on your Settings edition** (flip Settings → 5E, reopen → 5E).
 - [ ] Only **5E** and **6E** are offered — `5e-standard`/`6e-low` have no data and must not appear.
-- [ ] **The bar actually fills** over ~3s. It runs on the JS thread (width isn't a transform), so
-      this is the one animation that could visibly stutter.
-- [ ] The reveal reads as a sentence: **"You are an Ice Powered Armor Socialite."**
-      - [ ] "**an** Ice", not "a Ice". Roll until you see Ice/Air/Earth/Eldritch.
+- [ ] **The bar actually fills** over ~3s. It runs on the JS thread (width isn't a transform) and
+      dealing five is real work, so this is the one animation that could visibly stutter. Watch the
+      moment right after the tap — the deal happens there and it's the likeliest hitch.
+- [ ] **Five cards** appear, all **different archetypes**, every time.
+- [ ] Each card reads as a sentence: **"An Ice Powered Armor Socialite"**
+      - [ ] "**An** Ice", not "A Ice". Roll until you see Ice/Air/Earth/Eldritch.
       - [ ] A Playboy/Socialite reads "**Socialite**"; an Actor/Actress reads "**Actor**". No slash.
-      - [ ] An "Other" effect prints **no** effect word — "You are a Brick Spy", named just "Brick".
-      - [ ] A long one (e.g. "an Eldritch Weapons Master Investigator") **wraps without clipping**.
-- [ ] **Roll Again** gives a different character and the footer stays [Roll Again] [View].
-- [ ] **Nothing is saved until View.** Roll 5+ times, hit Cancel/back/outside → the library has
-      **no** new characters. This is the big one; the old build saved every roll.
-- [ ] **View** saves and opens exactly the character that was on screen.
-- [ ] Settings → **Screen animations off** → Generate reveals instantly, no bar, no 3s wait.
-- [ ] Android **back** and tapping outside both close it, mid-roll and at the reveal.
+      - [ ] An "Other" effect prints **no** effect word — "A Brick Spy", named just "Brick".
+      - [ ] A long one (e.g. "An Eldritch Weapons Master Investigator") **wraps without clipping**.
+- [ ] Each card shows a **stat line** (`12d6 · SPD 5 · OCV 7 / DCV 7 · DEF 28`) and it's legible.
+- [ ] **Five cards fit** — the hand scrolls inside the dialog and the footer stays reachable.
+- [ ] **View is disabled until you tap a card.** Tapping a card highlights it and saves nothing.
+- [ ] Tap several cards in turn → the highlight follows; still nothing saved.
+- [ ] **View saves the card you tapped**, not its neighbour. Check the name on the sheet against the
+      card. With five on screen an off-by-one would look entirely plausible.
+- [ ] **Roll Again** deals a fresh five and **forgets your selection** (View goes back to disabled).
+- [ ] **Nothing is saved until View.** Roll through 5+ hands, tap cards, then Cancel/back/outside →
+      the library has **no** new characters. This is the big one; the old build saved every roll.
+- [ ] Settings → **Screen animations off** → Generate deals instantly, no bar, no 3s wait.
+- [ ] Android **back** and tapping outside both close it, mid-deal and at the hand.
+- [ ] Switching edition **while a hand is up** clears it (you must not be able to take a 5E card
+      after switching to 6E).
 
 ## Generated characters — 6E (new in 2.6.0)
 - [ ] Roll **6E** → the sheet says **6E**, spends **400 of 400**, and has bought

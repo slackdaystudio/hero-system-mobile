@@ -141,6 +141,27 @@ export function allocate(level: PowerLevel, archetype: Archetype, skillset: Stru
 
 export const pick = <T>(rng: Rng, items: readonly T[]): T => items[rng.next(0, items.length - 1)];
 
+/**
+ * `count` items, no repeats, in random order. Fewer than asked if the pool is smaller.
+ *
+ * A partial Fisher–Yates: swap a random survivor into each slot in turn, so every subset is equally
+ * likely and the pool is never scanned twice. Rejection-sampling `pick` until it returns something
+ * new would also work and would get slower exactly when `count` approaches the pool size, which is
+ * the case a hand of 5 from 11 archetypes is closest to.
+ */
+export function pickDistinct<T>(rng: Rng, items: readonly T[], count: number): T[] {
+    const pool = [...items];
+    const taken = Math.min(count, pool.length);
+
+    for (let slot = 0; slot < taken; slot++) {
+        const chosen = rng.next(slot, pool.length - 1);
+
+        [pool[slot], pool[chosen]] = [pool[chosen], pool[slot]];
+    }
+
+    return pool.slice(0, taken);
+}
+
 /** A randomly selected archetype/skillset, allocated in the level's own edition. Deterministic for a seeded `Rng`. */
 export function randomBudget(rng: Rng, level: PowerLevel): Budget {
     return allocate(level, pick(rng, archetypesFor(level.edition)), pick(rng, skillsetsFor(level.edition)));

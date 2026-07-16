@@ -592,21 +592,65 @@ Two things the implementation settled:
 
 ## Rolling — ✅ done
 
-`app/screens/GenerateDialog.tsx`. Edition pills, a 3s hold, then the reveal:
+`app/screens/GenerateDialog.tsx`. Edition pills, a 3s hold, then a **hand of five to choose from**:
 
 ```
-choosing  edition pills          [Cancel] [Generate]
-rolling   a bar, for 3s flat     [Cancel]
-revealed  "You are an Ice ..."   [Roll Again] [View]
+choosing  edition pills             [Cancel]     [Generate]
+dealing   a bar, ~3s                [Cancel]
+dealt     five cards, tap one       [Roll Again] [View]
 ```
 
-**Nothing is written until "View".** Rolling and keeping are separate provider actions (`roll` is
-pure and synchronous; `keep` is the only write) because "Roll Again" over a save-on-roll would
-have littered the library with rejected characters.
+**Nothing is written until "View".** Dealing and keeping are separate provider actions (`deal` is
+pure and synchronous; `keep` is the only write). With five cards and a "Roll Again", a save-on-roll
+would bury the library five characters at a time.
 
-The reveal sentence has rules the tables don't (`core/random/describe.ts`): `a`/`an`, the
-slash-pair professions ("Playboy/Socialite" → "Socialite"), and `Other` — a real 1-in-16 roll that
-names the *absence* of an effect and so is never printed, in the sentence or the auto-name.
+The card names are sentences, and a sentence has rules the tables don't
+(`core/random/describe.ts`): `a`/`an`, the slash-pair professions ("Playboy/Socialite" →
+"Socialite"), and `Other` — a real 1-in-16 roll that names the *absence* of an effect and so is
+never printed, in the sentence or the auto-name.
+
+### Resolved: a hand, not a weighted roll
+
+The ask was to weight the archetype distribution so a Friday-night PUG doesn't turn into four
+Bricks. **Three findings killed it, and they are worth keeping.**
+
+**The stated fear can't happen.** Uniform over 11 archetypes, four Bricks is 1 in 14,641; *all four
+the same, any archetype* is 1 in 1,331. The real number is that **46% of 4-player parties contain a
+duplicate archetype**, and 1 in 32 has three of a kind.
+
+**Weighting makes that worse.** Uniform is the **minimum-collision** distribution — any weighting
+concentrates probability mass, so duplicates rise:
+
+| Distribution | P(Brick) | P(duplicate in a 4-PUG) |
+|---|---|---|
+| uniform | 9.1% | **45.9%** |
+| middle ×2 | 7.1% | 49.6% |
+| middle ×3 | 5.9% | 55.6% |
+| middle ×5 | 4.3% | 65.6% |
+
+It buys fewer Bricks at the price of a table of four Patriots, which is worse: at least the Bricks
+were differently built.
+
+**A duplicate is a clone, and that's the actual problem.** Every archetype has exactly one
+powerset, so two players who roll Brick get identical characteristics *and* identical powers — only
+the profession differs, and SFX is cosmetic. So "46% duplicate" means a 46% chance someone at the
+table has your stats and your powers. No reweighting touches that.
+
+And four players roll on four phones. **Independent rolls cannot coordinate**, so no distribution
+can promise a table anything.
+
+So: deal five, keep one (`core/random/hand.ts`). The coordination moves to the table, where it
+belongs — "I've got a Brick and a Mentalist, which do we need?" — and a bad draw stops mattering
+because there are four others beside it. Archetypes within a hand are forced **distinct**: dealt
+uniformly only 34% of five-card hands come out all-different, and a repeated archetype is a wasted
+slot for the clone reason above.
+
+Each card carries a stat line (`{dc}d6 · SPD · OCV/DCV · DEF`) read off the built character, because
+"a Fire Brick Soldier" alone doesn't tell a new player what they'd be signing up for — and choosing
+is the whole point. Those are the Rule of X's own inputs, so they cost nothing to obtain.
+
+**Still open:** more powersets per archetype. It's the deeper fix — it makes a duplicate stop being
+a clone, and it helps even when everyone rolls solo. Pure content work against the Rule of X.
 
 ## Open questions
 
