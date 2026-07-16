@@ -501,6 +501,11 @@ function WriteupFace({trait, onRoll, onFlip}: {trait: SheetTrait; onRoll: RollHa
         <Card style={styles.traitCard}>
             <View style={styles.traitHead}>
                 <Text style={styles.traitLabel}>{trait.label}</Text>
+                {trait.endurance > 0 ? (
+                    <Text testID={`end-cost-${trait.label}`} variant="caption" muted>
+                        {`END ${trait.endurance}`}
+                    </Text>
+                ) : null}
                 {trait.roll !== null && request !== null ? (
                     <Pressable testID={`roll-trait-${trait.label}`} onPress={() => onRoll(request, false)} onLongPress={() => onRoll(request, true)}>
                         <Text variant="caption" color={theme.colors.primary}>

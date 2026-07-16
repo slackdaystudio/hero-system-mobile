@@ -130,6 +130,24 @@ describe('characterSheet', () => {
         expect(powers.some((t) => t.writeup.advantages.some((a) => a.includes('Area Of Effect')))).toBe(true);
     });
 
+    it('prices each power’s END cost, leaving framework containers and non-powers at 0', () => {
+        const sheet = buildCharacterSheet(heroOf('twilight'), true);
+        const powers = sheet.sections.find((s) => s.title === 'Powers')!.traits;
+
+        // At least one attack costs END (1 per 10 Active Points).
+        expect(powers.some((t) => t.endurance > 0)).toBe(true);
+        // A multipower/VPP container is not itself used — it costs no END (its slots do).
+        const framework = powers.find((t) => /multipower|variable power pool/i.test(t.label));
+        if (framework !== undefined) {
+            expect(framework.endurance).toBe(0);
+        }
+        // Skills, perks, and talents never cost END.
+        for (const title of ['Skills', 'Perks', 'Talents']) {
+            const section = sheet.sections.find((s) => s.title === title);
+            expect((section?.traits ?? []).every((t) => t.endurance === 0)).toBe(true);
+        }
+    });
+
     describe('alternate identity (showSecondary)', () => {
         it('detects the alternate (super) form only when a trait is only-in-alternate-ID', () => {
             // Both carry OIHID nested inside multipower frameworks, so the detection has to

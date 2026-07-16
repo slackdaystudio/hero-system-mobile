@@ -14,7 +14,7 @@
 
 import {combatDetails} from 'core/combat';
 import {RollType} from 'core/dice';
-import {heroDesignerCharacter} from 'core/hero';
+import {enduranceCost, heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
 
@@ -116,6 +116,8 @@ export interface SheetTrait {
     label: string;
     roll: RollDescriptor | null;
     realCost: number;
+    /** END this power costs to use (6E, 1 per 10 Active Points), or 0 when it costs none. */
+    endurance: number;
     definition: string;
     /** 0 for a top-level trait, 1+ for framework/compound children. */
     depth: number;
@@ -350,7 +352,9 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
             const decorated = characterTraitDecorator.decorate(item, listKey, () => character);
             const roll = decorated.roll() ?? null;
             const maneuver = listKey === 'martialArts' ? buildManeuver(decorated.attributes(), decorated.definition(), roll) : undefined;
-            rows.push({label: decorated.label(), roll, realCost: decorated.realCost(), definition: decorated.definition(), depth, writeup: decorated.toWriteup(), maneuver});
+            // Only Powers cost END; skills/perks/talents never do (and their templates carry no `usesend`).
+            const endurance = listKey === 'powers' ? enduranceCost(item, decorated.activeCost()) : 0;
+            rows.push({label: decorated.label(), roll, realCost: decorated.realCost(), endurance, definition: decorated.definition(), depth, writeup: decorated.toWriteup(), maneuver});
 
             const children = toArray(item.powers);
             if (children.length > 0) {
@@ -362,6 +366,7 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
                 label: String(item.name ?? item.alias ?? item.xmlid ?? 'Trait'),
                 roll: null,
                 realCost: 0,
+                endurance: 0,
                 definition: '',
                 depth,
                 writeup: {attributes: [], advantages: [], limitations: [], notes: null, cost: {base: 0, active: 0, real: 0}},
