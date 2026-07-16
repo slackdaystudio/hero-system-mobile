@@ -1,0 +1,528 @@
+{
+  "_note": [
+    "6E Standard (400) complication packages. AUTHORED — the 5E packages are sized to 100, which is",
+    "5E LOW POWERED's disadvantage limit. 6E Standard's complication limit is 75.",
+    "",
+    "Complications are taken at the FIXED limit, so each package must total exactly 75. Nothing here",
+    "declares a cost: every complication is priced from its adders by the engine.",
+    "",
+    "NO NORMAL CHARACTERISTIC MAXIMA. Three of the four 5E packages carry NCM at a flat 20 — a fifth",
+    "of the whole limit — and 6E ABOLISHED it. There are no characteristic maxima in 6E, so there is",
+    "nothing to take a complication for. It is also the one entry in the 5E data with a hardcoded",
+    "basecost rather than a template, which is how it got away with it.",
+    "",
+    "So a 6E package is 75 points of real complications where a 5E one was 80 plus a 20-point",
+    "bookkeeping entry. Less room, and all of it has to mean something at the table."
+  ],
+  "packages": [
+    {
+      "label": "Hunted Hero",
+      "note": "The 5E set's shape: hunted from three directions, with a loved one to lose. Its 5E twin is the only one of the four with no NCM, so it is the one that translated most directly.",
+      "disadvantages": {
+        "disad": [
+          {
+            "xmlid": "DEPENDENTNPC",
+            "id": 3101,
+            "alias": "DNPC",
+            "input": "Loved One",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 5,
+                "optionid": "8ORLESS"
+              },
+              {
+                "xmlid": "USEFULNESS",
+                "alias": "Usefulness",
+                "basecost": 5,
+                "optionid": "NORMAL"
+              }
+            ]
+          },
+          {
+            "xmlid": "HUNTED",
+            "id": 3102,
+            "alias": "Hunted",
+            "input": "Arch Enemy",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 0,
+                "optionid": "EIGHT"
+              },
+              {
+                "xmlid": "CAPABILITIES",
+                "alias": "Capabilities",
+                "basecost": 10,
+                "optionid": "AS"
+              }
+            ]
+          },
+          {
+            "xmlid": "HUNTED",
+            "id": 3103,
+            "alias": "Hunted",
+            "input": "Evil Organization",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 0,
+                "optionid": "EIGHT"
+              },
+              {
+                "xmlid": "CAPABILITIES",
+                "alias": "Capabilities",
+                "basecost": 15,
+                "optionid": "MOPOW"
+              }
+            ]
+          },
+          {
+            "xmlid": "PSYCHOLOGICALLIMITATION",
+            "id": 3104,
+            "alias": "Psychological Limitation",
+            "input": "Code Of The Hero",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "SITUATION",
+                "alias": "Situation Is",
+                "basecost": 15,
+                "optionid": "VERYCOMMON"
+              },
+              {
+                "xmlid": "INTENSITY",
+                "alias": "Intensity Is",
+                "basecost": 5,
+                "optionid": "STRONG"
+              }
+            ]
+          },
+          {
+            "xmlid": "SOCIALLIMITATION",
+            "id": 3105,
+            "alias": "Social Limitation",
+            "input": "Secret Identity",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "OCCUR",
+                "alias": "Circumstances Occur",
+                "basecost": 5,
+                "optionid": "OCCASIONALLY"
+              },
+              {
+                "xmlid": "EFFECTS",
+                "alias": "Effects Are",
+                "basecost": 5,
+                "optionid": "MAJOR"
+              }
+            ]
+          },
+          {
+            "xmlid": "VULNERABILITY",
+            "id": 3106,
+            "alias": "Vulnerability",
+            "input": "Ambushes/Treacherous Attacks, 1 1/2x STUN",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "ATTACK",
+                "alias": "Attack Is",
+                "basecost": 10,
+                "optionid": "COMMON"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "Code Of The Hero",
+      "note": "The classic. Two hunteds rather than the 5E three, and both merely As Powerful — the 20 that NCM used to soak has to come out of something real now.",
+      "disadvantages": {
+        "disad": [
+          {
+            "xmlid": "DEPENDENTNPC",
+            "id": 3201,
+            "alias": "DNPC",
+            "input": "Loved One",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 5,
+                "optionid": "8ORLESS"
+              },
+              {
+                "xmlid": "USEFULNESS",
+                "alias": "Usefulness",
+                "basecost": 5,
+                "optionid": "NORMAL"
+              }
+            ]
+          },
+          {
+            "xmlid": "HUNTED",
+            "id": 3202,
+            "alias": "Hunted",
+            "input": "Arch Enemy",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 0,
+                "optionid": "EIGHT"
+              },
+              {
+                "xmlid": "CAPABILITIES",
+                "alias": "Capabilities",
+                "basecost": 10,
+                "optionid": "AS"
+              }
+            ]
+          },
+          {
+            "xmlid": "HUNTED",
+            "id": 3203,
+            "alias": "Hunted",
+            "input": "Evil Organization",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 0,
+                "optionid": "EIGHT"
+              },
+              {
+                "xmlid": "CAPABILITIES",
+                "alias": "Capabilities",
+                "basecost": 10,
+                "optionid": "AS"
+              }
+            ]
+          },
+          {
+            "xmlid": "PSYCHOLOGICALLIMITATION",
+            "id": 3204,
+            "alias": "Psychological Limitation",
+            "input": "Code Of The Hero",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "SITUATION",
+                "alias": "Situation Is",
+                "basecost": 15,
+                "optionid": "VERYCOMMON"
+              },
+              {
+                "xmlid": "INTENSITY",
+                "alias": "Intensity Is",
+                "basecost": 5,
+                "optionid": "STRONG"
+              }
+            ]
+          },
+          {
+            "xmlid": "PSYCHOLOGICALLIMITATION",
+            "id": 3205,
+            "alias": "Psychological Limitation",
+            "input": "Protective Of Innocents",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "SITUATION",
+                "alias": "Situation Is",
+                "basecost": 10,
+                "optionid": "COMMON"
+              },
+              {
+                "xmlid": "INTENSITY",
+                "alias": "Intensity Is",
+                "basecost": 5,
+                "optionid": "STRONG"
+              }
+            ]
+          },
+          {
+            "xmlid": "SOCIALLIMITATION",
+            "id": 3206,
+            "alias": "Social Limitation",
+            "input": "Secret Identity",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "OCCUR",
+                "alias": "Circumstances Occur",
+                "basecost": 5,
+                "optionid": "OCCASIONALLY"
+              },
+              {
+                "xmlid": "EFFECTS",
+                "alias": "Effects Are",
+                "basecost": 5,
+                "optionid": "MAJOR"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "Code Versus Killing",
+      "note": "The hardest line to hold, and priced like it: Total at Very Common is the most a psychological complication is worth.",
+      "disadvantages": {
+        "disad": [
+          {
+            "xmlid": "DEPENDENTNPC",
+            "id": 3301,
+            "alias": "DNPC",
+            "input": "Loved One",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 5,
+                "optionid": "8ORLESS"
+              },
+              {
+                "xmlid": "USEFULNESS",
+                "alias": "Usefulness",
+                "basecost": 5,
+                "optionid": "NORMAL"
+              }
+            ]
+          },
+          {
+            "xmlid": "HUNTED",
+            "id": 3302,
+            "alias": "Hunted",
+            "input": "Arch Enemy",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 0,
+                "optionid": "EIGHT"
+              },
+              {
+                "xmlid": "CAPABILITIES",
+                "alias": "Capabilities",
+                "basecost": 15,
+                "optionid": "MOPOW"
+              }
+            ]
+          },
+          {
+            "xmlid": "PSYCHOLOGICALLIMITATION",
+            "id": 3303,
+            "alias": "Psychological Limitation",
+            "input": "Code Versus Killing",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "SITUATION",
+                "alias": "Situation Is",
+                "basecost": 15,
+                "optionid": "VERYCOMMON"
+              },
+              {
+                "xmlid": "INTENSITY",
+                "alias": "Intensity Is",
+                "basecost": 10,
+                "optionid": "TOTAL"
+              }
+            ]
+          },
+          {
+            "xmlid": "PSYCHOLOGICALLIMITATION",
+            "id": 3304,
+            "alias": "Psychological Limitation",
+            "input": "Protective Of Innocents",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "SITUATION",
+                "alias": "Situation Is",
+                "basecost": 10,
+                "optionid": "COMMON"
+              },
+              {
+                "xmlid": "INTENSITY",
+                "alias": "Intensity Is",
+                "basecost": 5,
+                "optionid": "STRONG"
+              }
+            ]
+          },
+          {
+            "xmlid": "SOCIALLIMITATION",
+            "id": 3305,
+            "alias": "Social Limitation",
+            "input": "Secret Identity",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "OCCUR",
+                "alias": "Circumstances Occur",
+                "basecost": 5,
+                "optionid": "OCCASIONALLY"
+              },
+              {
+                "xmlid": "EFFECTS",
+                "alias": "Effects Are",
+                "basecost": 5,
+                "optionid": "MAJOR"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "Honorable",
+      "note": "Distinctive Features in place of the 5E set's third hunted — an honourable hero is known, and being known is its own problem.",
+      "disadvantages": {
+        "disad": [
+          {
+            "xmlid": "DEPENDENTNPC",
+            "id": 3401,
+            "alias": "DNPC",
+            "input": "Loved One",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 5,
+                "optionid": "8ORLESS"
+              },
+              {
+                "xmlid": "USEFULNESS",
+                "alias": "Usefulness",
+                "basecost": 5,
+                "optionid": "NORMAL"
+              }
+            ]
+          },
+          {
+            "xmlid": "HUNTED",
+            "id": 3402,
+            "alias": "Hunted",
+            "input": "Arch Enemy",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "APPEARANCE",
+                "alias": "Appears",
+                "basecost": 0,
+                "optionid": "EIGHT"
+              },
+              {
+                "xmlid": "CAPABILITIES",
+                "alias": "Capabilities",
+                "basecost": 10,
+                "optionid": "AS"
+              }
+            ]
+          },
+          {
+            "xmlid": "PSYCHOLOGICALLIMITATION",
+            "id": 3403,
+            "alias": "Psychological Limitation",
+            "input": "Honorable",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "SITUATION",
+                "alias": "Situation Is",
+                "basecost": 15,
+                "optionid": "VERYCOMMON"
+              },
+              {
+                "xmlid": "INTENSITY",
+                "alias": "Intensity Is",
+                "basecost": 5,
+                "optionid": "STRONG"
+              }
+            ]
+          },
+          {
+            "xmlid": "PSYCHOLOGICALLIMITATION",
+            "id": 3404,
+            "alias": "Psychological Limitation",
+            "input": "Protective Of Innocents",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "SITUATION",
+                "alias": "Situation Is",
+                "basecost": 10,
+                "optionid": "COMMON"
+              },
+              {
+                "xmlid": "INTENSITY",
+                "alias": "Intensity Is",
+                "basecost": 5,
+                "optionid": "STRONG"
+              }
+            ]
+          },
+          {
+            "xmlid": "SOCIALLIMITATION",
+            "id": 3405,
+            "alias": "Social Limitation",
+            "input": "Secret Identity",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "OCCUR",
+                "alias": "Circumstances Occur",
+                "basecost": 5,
+                "optionid": "OCCASIONALLY"
+              },
+              {
+                "xmlid": "EFFECTS",
+                "alias": "Effects Are",
+                "basecost": 5,
+                "optionid": "MAJOR"
+              }
+            ]
+          },
+          {
+            "xmlid": "DISTINCTIVEFEATURES",
+            "id": 3406,
+            "alias": "Distinctive Features",
+            "input": "Costumed Hero",
+            "position": 0,
+            "adder": [
+              {
+                "xmlid": "CONCEALABILITY",
+                "alias": "Concealability",
+                "basecost": 5,
+                "optionid": "EASILY"
+              },
+              {
+                "xmlid": "REACTION",
+                "alias": "Reaction",
+                "basecost": 5,
+                "optionid": "NOTICED"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
