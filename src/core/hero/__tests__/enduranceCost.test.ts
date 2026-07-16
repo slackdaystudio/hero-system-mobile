@@ -17,7 +17,7 @@
  * for powers that cost END — plus the template `usesend` flag and the Costs/Reduced Endurance
  * modifiers observed on real characters (see the field map gathered while building this).
  */
-import {enduranceCost, usesEndurance} from '../enduranceCost';
+import {enduranceCost, strengthEnduranceCost, usesEndurance} from '../enduranceCost';
 
 type Obj = Record<string, any>;
 
@@ -74,5 +74,18 @@ describe('enduranceCost', () => {
     it('finds a Reduced Endurance modifier nested inside another modifier', () => {
         const nested = power(true, [{xmlid: 'MODIFIER', modifier: [{xmlid: 'REDUCEDEND', optionid: 'ZERO'}]}]);
         expect(enduranceCost(nested, 60)).toBe(0);
+    });
+});
+
+describe('strengthEnduranceCost', () => {
+    it('is 1 END per 10 STR (6E), minimum 1', () => {
+        expect(strengthEnduranceCost(50)).toBe(5);
+        expect(strengthEnduranceCost(60)).toBe(6);
+        expect(strengthEnduranceCost(10)).toBe(1);
+        expect(strengthEnduranceCost(5)).toBe(1); // min 1
+    });
+
+    it('is 0 for a character with no STR to spend', () => {
+        expect(strengthEnduranceCost(0)).toBe(0);
     });
 });

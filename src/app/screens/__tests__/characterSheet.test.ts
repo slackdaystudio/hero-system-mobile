@@ -148,6 +148,13 @@ describe('characterSheet', () => {
         }
     });
 
+    it('charges STR its own END cost (1 per 10), and no other characteristic', () => {
+        const sheet = buildCharacterSheet(heroOf('twilight'), true);
+        const str = sheet.characteristics.find((c) => /strength/i.test(c.name))!;
+        expect(str.endurance).toBe(Math.max(1, Math.round(str.total / 10)));
+        expect(sheet.characteristics.filter((c) => !/strength/i.test(c.name)).every((c) => c.endurance === null)).toBe(true);
+    });
+
     describe('alternate identity (showSecondary)', () => {
         it('detects the alternate (super) form only when a trait is only-in-alternate-ID', () => {
             // Both carry OIHID nested inside multipower frameworks, so the detection has to

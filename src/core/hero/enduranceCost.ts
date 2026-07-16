@@ -88,3 +88,12 @@ export function enduranceCost(trait: Obj, activeCost: number): number {
 
     return reduced === 'HALF' ? Math.max(1, Math.round(base / 2)) : base;
 }
+
+/**
+ * END to use Strength: 1 per 10 STR (6E), minimum 1, and 0 for a character with no STR to spend. The
+ * optional grittier "1 END per 5 STR" campaign variant is not modelled. Paid once per Phase however
+ * many ways STR is exerted — the tracker leaves that to the player, who taps when they use it.
+ */
+export function strengthEnduranceCost(strength: number): number {
+    return strength <= 0 ? 0 : Math.max(1, Math.round(strength / 10));
+}

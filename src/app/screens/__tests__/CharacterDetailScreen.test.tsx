@@ -394,6 +394,32 @@ describe('CharacterDetailScreen', () => {
         expect(store.get('c1')!.endurance).toBeLessThan(before);
     });
 
+    it('spends STR’s END (1 per 10) from the shared pool when tapped', async () => {
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const store = new Map<string, CombatState>();
+        const combatState: CombatStateRepository = {
+            get: async (id: string) => store.get(id) ?? null,
+            save: async (id: string, s: CombatState) => {
+                store.set(id, s);
+            },
+            clear: async (id: string) => {
+                store.delete(id);
+            },
+        };
+        const tree = await renderScreen(fakeCharacters(character({document})), {}, {combatState});
+
+        const spend = tree.root.findAllByProps({testID: 'spend-end-char-Strength'}).find((node) => typeof node.props.onPress === 'function');
+        expect(spend).toBeDefined();
+
+        const before = store.get('c1')!.endurance;
+        await act(async () => {
+            spend?.props.onPress();
+        });
+        await act(async () => {});
+
+        expect(store.get('c1')!.endurance).toBeLessThan(before);
+    });
+
     it('calls onReady with the loaded character (for the header title)', async () => {
         const onReady = jest.fn();
         await renderScreen(fakeCharacters(character({name: 'Grond'})), {onReady});

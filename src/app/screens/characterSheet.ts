@@ -14,7 +14,7 @@
 
 import {combatDetails} from 'core/combat';
 import {RollType} from 'core/dice';
-import {enduranceCost, heroDesignerCharacter} from 'core/hero';
+import {enduranceCost, heroDesignerCharacter, strengthEnduranceCost} from 'core/hero';
 import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
 
@@ -101,6 +101,8 @@ export interface SheetCharacteristic {
      * sheet to print.
      */
     damage: RollDescriptor | null;
+    /** END to use this characteristic — **STR only** (1 per 10 STR, min 1), null everywhere else. */
+    endurance: number | null;
 }
 
 /** The combat line for a martial-arts maneuver: strike (OCV), evasion (DCV), range, damage, notes. */
@@ -313,16 +315,19 @@ export function buildCharacterSheet(character: Obj, showSecondary = false): Char
     const characteristics: SheetCharacteristic[] = toArray(c.characteristics).map((entry) => {
         const name = String(entry.name ?? entry.shortName ?? '');
         const isStrength = String(entry.shortName).toUpperCase() === 'STR';
+        const total = heroDesignerCharacter.getCharacteristicTotal(String(entry.shortName), c);
 
         return {
             name: name.toLowerCase().startsWith('custom') ? String(entry.shortName ?? name) : name,
-            total: heroDesignerCharacter.getCharacteristicTotal(String(entry.shortName), c),
+            total,
             roll: heroDesignerCharacter.getRollTotal(entry, c),
             cost: Number(entry.cost ?? 0),
             // STR is the only characteristic that is itself an attack. Read off `c`, not the raw
             // character, so it obeys the same alternate-identity filtering as the total above it —
             // a STR bought Only In Alternate Identity must not punch while the identity is off.
             damage: isStrength ? {roll: heroDesignerCharacter.getStrengthDamage(c), type: RollType.NormalDamage} : null,
+            // STR is likewise the only characteristic that costs END to use.
+            endurance: isStrength ? strengthEnduranceCost(total) : null,
         };
     });
 

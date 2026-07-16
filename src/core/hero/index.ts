@@ -14,6 +14,6 @@
 
 export {HeroDesignerCharacter, heroDesignerCharacter} from './heroDesignerCharacter';
 export * from './characterPoints';
-export {enduranceCost, usesEndurance} from './enduranceCost';
+export {enduranceCost, strengthEnduranceCost, usesEndurance} from './enduranceCost';
 export * from './constants';
 export * from './types';
