@@ -31,10 +31,10 @@ import {fittableSkillsets, generatableArchetypes, generateRandomCharacter, rollR
 import {LOW_POWERED_5E, STANDARD_6E} from '../powerLevel';
 import {powersetsFor} from '../powerset';
 import {buildRecipe} from '../generate';
-import {parseRecipe, resolveRecipe} from '../recipe';
+import {nameSkill, namedSkillSlots, parseRecipe, recipeEdition, rerollArchetype, rerollPowerset, resolveRecipe} from '../recipe';
 import {isBalanced} from '../ruleOfX';
 import {ruleOfXStats} from '../ruleOfXStats';
-import {skillsetsFor} from '../skillset';
+import {playerDefinedSlots, skillsetsFor, structuredSkillset} from '../skillset';
 
 const seededRng = (seed: number): Rng => {
     let state = (seed * 2654435761) % 4294967296;
@@ -132,10 +132,11 @@ describe('the edition fork', () => {
         /**
          * **`level` is the only thing that disambiguates a recipe**, and that is worth knowing.
          *
-         * The two editions share *every* name: the eleven archetypes, the eleven professions, the
-         * four complication labels, and even the powerset labels ("Powerhouse", "Energy Blaster").
-         * Nothing in a recipe except its level says which edition it means — so a recipe whose level
-         * was altered would resolve happily and build a different character rather than fail.
+         * The two editions share the eleven archetypes, the eleven professions, the four
+         * complication labels, and *six of the eleven* powerset labels ("Powerhouse", "Adept",
+         * "Sorcerer", "Blur", "Sentinel", "Energy Blaster"). Nothing in a recipe except its level
+         * says which edition it means — so a recipe whose level was altered resolves happily and
+         * builds a different character rather than failing.
          *
          * That is fine because the level is written at roll time and never guessed. But it means no
          * cross-edition validation is possible from the names alone, and nothing here should pretend
@@ -176,6 +177,84 @@ describe('the edition fork', () => {
             // editor must not quietly rebuild as 5E.
             expect(buildRecipe(recipe).level.edition).toBe('6e');
             expect(buildRecipe(rollRecipe(seededRng(7), LOW_POWERED_5E)).level.edition).toBe('5e');
+        });
+    });
+
+    /**
+     * **Editing follows the recipe's edition too**, and this is where the fork was still leaking.
+     *
+     * `buildFromRecipe` was always edition-correct because it goes through `resolveRecipe`. What was
+     * not is everything that reads the tables to decide *what a player may pick*: `rerollArchetype`
+     * and `rerollPowerset` drew from `powersetsFor(archetype)` and `namedSkillSlots` from
+     * `structuredSkillset(profession)` — both defaulting to 5E while holding a recipe that says
+     * which edition it is.
+     *
+     * It stayed hidden because six of the eleven powerset labels are the same in both editions, so
+     * six archetypes drew a 5E label, resolved it in 6E, and got the right powerset by luck. The
+     * other five — Mentalist, Gadgeteer, Metamorph, Powered Armor, Weapons Master — name different
+     * powersets per edition, and there the 5E label resolves to nothing at all.
+     */
+    describe('editing a 6E character stays in 6E', () => {
+        const sixth = (): ReturnType<typeof rollRecipe> => ({...rollRecipe(seededRng(3), STANDARD_6E), archetype: 'Brick', powerset: 'Powerhouse'});
+
+        it('reads a recipe’s edition off its level', () => {
+            expect(recipeEdition(sixth())).toBe('6e');
+            expect(recipeEdition(rollRecipe(seededRng(3), LOW_POWERED_5E))).toBe('5e');
+        });
+
+        /**
+         * The five archetypes whose powersets are named differently per edition. Drawn from 5E, each
+         * label resolves to nothing in a 6E recipe: `parseRecipe` returns null (the character
+         * silently stops being editable) and `buildFromRecipe` throws (the save fails outright).
+         */
+        it.each([
+            ['Mentalist', 'Telepath', 'Mind Blaster'],
+            ['Gadgeteer', 'Gadgeteer', 'Inventor'],
+            ['Metamorph', 'Changeling', 'Shifter'],
+            ['Powered Armor', 'Hardsuit', 'Battlesuit'],
+            ['Weapons Master', 'Armory', 'Armoury'],
+        ])('re-rolls a 6E character onto %s and draws the 6E powerset, not the 5E one', (archetype, sixthLabel, fifthLabel) => {
+            const rerolled = rerollArchetype(seededRng(11), sixth(), archetype);
+
+            expect(rerolled.powerset).toBe(sixthLabel);
+            expect(rerolled.powerset).not.toBe(fifthLabel);
+
+            // The proof that matters: it still resolves, rebuilds, and spends its whole 400.
+            expect(parseRecipe(rerolled)).not.toBeNull();
+            expect(buildRecipe(rerolled).spent).toBe(STANDARD_6E.total);
+        });
+
+        it('re-rolls every 6E archetype into something that resolves and spends its 400', () => {
+            for (const archetype of generatableArchetypes('6e')) {
+                const rerolled = rerollArchetype(seededRng(11), sixth(), archetype.name);
+
+                expect({archetype: archetype.name, resolves: parseRecipe(rerolled) !== null}).toEqual({archetype: archetype.name, resolves: true});
+                expect({archetype: archetype.name, spent: buildRecipe(rerolled).spent}).toEqual({archetype: archetype.name, spent: STANDARD_6E.total});
+            }
+        });
+
+        it('draws a new powerset for the archetype it already has, from its own edition', () => {
+            const mentalist = rerollArchetype(seededRng(11), sixth(), 'Mentalist');
+
+            expect(rerollPowerset(seededRng(2), mentalist).powerset).toBe('Telepath');
+        });
+
+        it('offers a 6E profession its own player-defined slots', () => {
+            // The Scientist asks for sciences in both editions, and the slots have to come from the
+            // set the character is actually built from.
+            const scientist = {...sixth(), profession: 'Scientist'};
+
+            expect(namedSkillSlots(scientist)).toEqual(playerDefinedSlots(structuredSkillset('Scientist', '6e')!));
+            expect(namedSkillSlots(scientist).length).toBeGreaterThan(0);
+        });
+
+        it('names skills that survive the rebuild in 6E', () => {
+            const scientist = {...sixth(), profession: 'Scientist'};
+            const [slot] = namedSkillSlots(scientist);
+            const named = nameSkill(scientist, slot.slot, 'Xenobiology');
+
+            expect(buildRecipe(named).spent).toBe(STANDARD_6E.total);
+            expect(JSON.stringify(buildRecipe(named).parsed)).toContain('Xenobiology');
         });
     });
 });

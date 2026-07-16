@@ -34,7 +34,7 @@ import {buildCharacteristics} from './characteristics';
 import {attachComplications, complicationSetsFor, type ComplicationSet} from './complications';
 import {attachPowerset, powersetsFor, type Powerset} from './powerset';
 import {attachSkillset, playerDefinedSlots, structuredSkillset, type PlayerDefinedSlot, type StructuredSkillset} from './skillset';
-import {POWER_LEVELS, type PowerLevel} from './powerLevel';
+import {POWER_LEVELS, powerLevel, type Edition, type PowerLevel} from './powerLevel';
 
 /**
  * A character's whole build, by name. A `type` rather than an `interface` so it satisfies the
@@ -174,11 +174,26 @@ export function reviseRecipe(recipe: CharacterRecipe, changes: Partial<Omit<Char
 /** Rename outright — always the player's choice, so it never auto-generates. */
 export const renameRecipe = (recipe: CharacterRecipe, name: string): CharacterRecipe => ({...recipe, name});
 
-/** The skills this character's profession leaves to the player to name. */
-export function namedSkillSlots(recipe: CharacterRecipe): PlayerDefinedSlot[] {
-    const skillset = structuredSkillset(recipe.profession);
+/**
+ * The edition a recipe is read in. Everything it names resolves in this and **only** this.
+ *
+ * Both editions carry the same eleven archetypes, the same eleven professions and even the same
+ * powerset labels, so a lookup done in the wrong one succeeds and returns the wrong data rather
+ * than failing (see `__tests__/editions.test.ts`). Nothing that reads the tables on a recipe's
+ * behalf may leave the edition to a default.
+ *
+ * Throws on an unknown level, which cannot reach here: a recipe whose level names no edition never
+ * resolves, so {@link parseRecipe} rejects it and the character is never editable in the first place.
+ */
+export const recipeEdition = (recipe: CharacterRecipe): Edition => powerLevel(recipe.level).edition;
 
-    return skillset === undefined ? [] : playerDefinedSlots(skillset);
+/** The skills this character's profession leaves to the player to name, in its own edition. */
+export function namedSkillSlots(recipe: CharacterRecipe): PlayerDefinedSlot[] {
+    // Via resolveRecipe rather than a bare structuredSkillset: it looks the profession up in the
+    // recipe's edition, and returns null for exactly the recipes that have no editable skills.
+    const resolved = resolveRecipe(recipe);
+
+    return resolved === null ? [] : playerDefinedSlots(resolved.skillset);
 }
 
 /**
@@ -206,7 +221,7 @@ export function nameSkill(recipe: CharacterRecipe, slot: string, name: string): 
  * drawn; skills and complications are named independently and carry over untouched.
  */
 export function rerollArchetype(rng: Rng, recipe: CharacterRecipe, archetype: string): CharacterRecipe {
-    const powersets = powersetsFor(archetype);
+    const powersets = powersetsFor(archetype, recipeEdition(recipe));
 
     if (powersets.length === 0) {
         throw new Error(`No powerset for archetype: ${archetype}`);
@@ -215,8 +230,9 @@ export function rerollArchetype(rng: Rng, recipe: CharacterRecipe, archetype: st
     return reviseRecipe(recipe, {archetype, powerset: pick(rng, powersets).label});
 }
 
-/** Draw a different powerset for the archetype the character already has. */
-export const rerollPowerset = (rng: Rng, recipe: CharacterRecipe): CharacterRecipe => reviseRecipe(recipe, {powerset: pick(rng, powersetsFor(recipe.archetype)).label});
+/** Draw a different powerset for the archetype the character already has, from its own edition. */
+export const rerollPowerset = (rng: Rng, recipe: CharacterRecipe): CharacterRecipe =>
+    reviseRecipe(recipe, {powerset: pick(rng, powersetsFor(recipe.archetype, recipeEdition(recipe))).label});
 
 /** Swap the 25-point skills bucket. Powers and characteristics are untouched. */
 export const changeProfession = (recipe: CharacterRecipe, profession: string): CharacterRecipe => reviseRecipe(recipe, {profession});

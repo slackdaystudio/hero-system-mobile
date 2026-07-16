@@ -25,6 +25,7 @@ export {
     changeProfession,
     changeSpecialFx,
     parseRecipe,
+    recipeEdition,
     renameRecipe,
     rerollArchetype,
     rerollPowerset,

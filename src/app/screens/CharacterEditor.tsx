@@ -27,6 +27,7 @@ import React, {useCallback, useState} from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
 import type {Character} from 'core/ports';
 import {
+    autoName,
     changeProfession,
     changeSpecialFx,
     fittableSkillsets,
@@ -34,6 +35,7 @@ import {
     namedSkillSlots,
     nameSkill,
     parseRecipe,
+    recipeEdition,
     renameRecipe,
     rerollArchetype,
     SPECIAL_FX,
@@ -71,6 +73,10 @@ export function CharacterEditor({character, recipe, onRevised}: CharacterEditorP
     const rng = useGeneratorRng();
     const [name, setName] = useState(recipe.name);
     const [busy, setBusy] = useState(false);
+    // The lists a 6E character may be edited through are 6E's. Both editions name the same eleven
+    // archetypes and professions, so offering the wrong edition's would look right and rebuild the
+    // character out of the other edition's data.
+    const edition = recipeEdition(recipe);
 
     const apply = useCallback(
         (revised: CharacterRecipe) => {
@@ -122,7 +128,7 @@ export function CharacterEditor({character, recipe, onRevised}: CharacterEditorP
                 <SelectField
                     label="Archetype"
                     value={recipe.archetype}
-                    options={generatableArchetypes().map((archetype) => archetype.name)}
+                    options={generatableArchetypes(edition).map((archetype) => archetype.name)}
                     onChange={pickArchetype}
                     hint="Re-rolls powers and characteristics"
                     disabled={busy}
@@ -132,7 +138,7 @@ export function CharacterEditor({character, recipe, onRevised}: CharacterEditorP
                 <SelectField
                     label="Profession"
                     value={recipe.profession}
-                    options={fittableSkillsets().map((skillset) => skillset.profession)}
+                    options={fittableSkillsets(edition).map((skillset) => skillset.profession)}
                     onChange={pickProfession}
                     hint="Re-rolls skills"
                     disabled={busy}
@@ -146,7 +152,7 @@ export function CharacterEditor({character, recipe, onRevised}: CharacterEditorP
                     onChange={(specialFx) => apply(changeSpecialFx(recipe, specialFx))}
                     // Nothing but the name reads SFX, and only while the name is still the rolled
                     // one — so this is silent on a character the player has named.
-                    hint={recipe.name === `${recipe.specialFx} ${recipe.archetype}` ? 'Renames the character' : 'Flavour only'}
+                    hint={recipe.name === autoName(recipe) ? 'Renames the character' : 'Flavour only'}
                     disabled={busy}
                     testID="edit-sfx"
                 />
