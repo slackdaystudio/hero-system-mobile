@@ -31,6 +31,7 @@ import type {ParsedCharacter} from 'core/hero';
 import type {Rng} from 'core/ports';
 import {archetypesFor, pick, type Archetype} from './allocate';
 import {buildCharacteristics} from './characteristics';
+import {effectLabel} from './describe';
 import {attachComplications, complicationSetsFor, type ComplicationSet} from './complications';
 import {attachPowerset, powersetsFor, type Powerset} from './powerset';
 import {attachSkillset, playerDefinedSlots, structuredSkillset, type PlayerDefinedSlot, type StructuredSkillset} from './skillset';
@@ -78,8 +79,17 @@ export interface ResolvedRecipe {
     readonly complications: ComplicationSet;
 }
 
-/** The name a roll gives a character when the player hasn't picked one: "Fire Brick". */
-export const autoName = (recipe: Pick<CharacterRecipe, 'specialFx' | 'archetype'>): string => `${recipe.specialFx} ${recipe.archetype}`;
+/**
+ * The name a roll gives a character when the player hasn't picked one: "Fire Brick".
+ *
+ * An effect of "Other" names no effect, so it contributes no word and the character is just its
+ * archetype — "Brick", never "Other Brick" (see {@link effectLabel}).
+ */
+export const autoName = (recipe: Pick<CharacterRecipe, 'specialFx' | 'archetype'>): string => {
+    const effect = effectLabel(recipe.specialFx);
+
+    return effect === null ? recipe.archetype : `${effect} ${recipe.archetype}`;
+};
 
 /** Resolve every reference, or null if any no longer exists. */
 export function resolveRecipe(recipe: CharacterRecipe): ResolvedRecipe | null {

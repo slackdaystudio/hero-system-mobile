@@ -17,6 +17,7 @@ export {buildCharacteristics, characteristicsCost, parsedCharacterFrom, SUPERHER
 export {LOW_POWERED_5E, POWER_LEVELS, powerLevel, STANDARD_6E, type Edition, type PowerLevel} from './powerLevel';
 export {CAMPAIGN_225, CAMPAIGN_400, deviation, isBalanced, ruleOfX, TOLERANCE, type RuleOfXCampaign, type RuleOfXStats} from './ruleOfX';
 export {diceOf, ruleOfXStats} from './ruleOfXStats';
+export {article, describeBuild, effectLabel, professionLabel, revealSentence, UNTHEMED, VOWEL_EFFECTS, type DescribableBuild} from './describe';
 export {
     autoName,
     buildFromRecipe,
