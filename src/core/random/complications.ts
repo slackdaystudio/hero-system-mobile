@@ -21,7 +21,9 @@
  * total exactly `level.limit`.
  */
 import type {ParsedCharacter} from 'core/hero';
+import type {Edition} from './powerLevel';
 import packageData from '../data/random/complicationPackages.5e.json';
+import packageData6E from '../data/random/complicationPackages.6e.json';
 
 type Obj = Record<string, any>;
 
@@ -54,6 +56,16 @@ const withDefaults = (disadvantage: Obj): Obj => ({
 });
 
 export const COMPLICATION_SETS_5E = (packageData as unknown as {packages: ComplicationSet[]}).packages;
+export const COMPLICATION_SETS_6E = (packageData6E as unknown as {packages: ComplicationSet[]}).packages;
+
+/**
+ * The complication packages for an edition.
+ *
+ * They are NOT interchangeable: a package totals its level's fixed limit, and 5E Low Powered's is
+ * 100 where 6E Standard's is 75. The 5E ones also carry Normal Characteristic Maxima, which 6E
+ * abolished.
+ */
+export const complicationSetsFor = (edition: Edition): ComplicationSet[] => (edition === '6e' ? COMPLICATION_SETS_6E : COMPLICATION_SETS_5E);
 
 /** Attach a complication package to a `ParsedCharacter`, filling in the `.hdc` boilerplate. */
 export function attachComplications(parsed: ParsedCharacter, set: ComplicationSet): ParsedCharacter {

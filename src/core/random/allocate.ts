@@ -37,7 +37,9 @@ import archetypeData6E from '../data/random/archetypes.6e.json';
 import skillsetData from '../data/random/skillsets.json';
 import complicationData from '../data/random/complications.5e.json';
 import specialFxData from '../data/random/specialfx.json';
+import {characterTraitDecorator} from 'core/traits';
 import {buildCharacteristics, characteristicsCost, type CharacteristicSpread} from './characteristics';
+import {attachSkillset, skillsetsFor, type StructuredSkillset} from './skillset';
 import type {PowerLevel} from './powerLevel';
 
 type Obj = Record<string, any>;
@@ -93,10 +95,38 @@ export function characteristicsBudget(archetype: Archetype, level: PowerLevel): 
     return characteristicsCost(character);
 }
 
+/**
+ * What a profession's skills cost, priced by the engine rather than declared.
+ *
+ * The legacy `skillsets.json` states a cost of 25 — a 5E number, and the last declared cost left in
+ * the allocator. 6E's sets are 50. Rather than add a second declared number to drift from a second
+ * set of data, the structured set is built and priced, exactly as {@link characteristicsBudget}
+ * prices a spread.
+ *
+ * A skill's cost doesn't depend on the characteristics carrying it (only its *roll* does), so this
+ * prices against an empty spread.
+ */
+export function skillsBudget(skillset: StructuredSkillset, level: PowerLevel): number {
+    const character = heroDesignerCharacter.getCharacter(attachSkillset(buildCharacteristics({}, level.template), skillset)) as unknown as Obj;
+
+    return (['skills', 'perks', 'talents'] as const).reduce(
+        (total, key) =>
+            total +
+            ((character[key] ?? []) as Obj[]).reduce((sum, trait) => {
+                try {
+                    return sum + characterTraitDecorator.decorate(trait, key, () => character).realCost();
+                } catch {
+                    return sum;
+                }
+            }, 0),
+        0,
+    );
+}
+
 /** Split a level's total across the buckets. Powers take the balance. */
-export function allocate(level: PowerLevel, archetype: Archetype, skillset: Skillset): Budget {
+export function allocate(level: PowerLevel, archetype: Archetype, skillset: StructuredSkillset): Budget {
     const characteristics = characteristicsBudget(archetype, level);
-    const skills = skillset.cost;
+    const skills = skillsBudget(skillset, level);
 
     return {
         level,
@@ -111,9 +141,9 @@ export function allocate(level: PowerLevel, archetype: Archetype, skillset: Skil
 
 export const pick = <T>(rng: Rng, items: readonly T[]): T => items[rng.next(0, items.length - 1)];
 
-/** A randomly selected archetype/skillset, allocated. Deterministic for a seeded `Rng`. */
+/** A randomly selected archetype/skillset, allocated in the level's own edition. Deterministic for a seeded `Rng`. */
 export function randomBudget(rng: Rng, level: PowerLevel): Budget {
-    return allocate(level, pick(rng, ARCHETYPES_5E), pick(rng, SKILLSETS));
+    return allocate(level, pick(rng, archetypesFor(level.edition)), pick(rng, skillsetsFor(level.edition)));
 }
 
 /** Total points a complication package is worth — must equal the level's limit. */

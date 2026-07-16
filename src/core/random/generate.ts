@@ -28,12 +28,12 @@
  */
 import type {ParsedCharacter} from 'core/hero';
 import type {Rng} from 'core/ports';
-import {ARCHETYPES_5E, allocate, pick, SKILLSETS, SPECIAL_FX, type Archetype, type Budget} from './allocate';
-import {COMPLICATION_SETS_5E} from './complications';
+import {allocate, archetypesFor, pick, SPECIAL_FX, type Archetype, type Budget} from './allocate';
+import {complicationSetsFor} from './complications';
 import {powersetsFor} from './powerset';
-import {structuredSkillset} from './skillset';
+import {skillsetsFor, structuredSkillset, type StructuredSkillset} from './skillset';
 import {autoName, buildFromRecipe, type CharacterRecipe} from './recipe';
-import {LOW_POWERED_5E, powerLevel, type PowerLevel} from './powerLevel';
+import {LOW_POWERED_5E, powerLevel, type Edition, type PowerLevel} from './powerLevel';
 
 export interface GeneratedCharacter {
     readonly parsed: ParsedCharacter;
@@ -49,22 +49,18 @@ export interface GeneratedCharacter {
     readonly spent: number;
 }
 
-/** Archetypes with at least one structured powerset. The rest cannot be generated yet. */
-export const generatableArchetypes = (): Archetype[] => ARCHETYPES_5E.filter((archetype) => powersetsFor(archetype.name).length > 0);
+/** Archetypes with at least one structured powerset in this edition. The rest cannot be generated. */
+export const generatableArchetypes = (edition: Edition = '5e'): Archetype[] =>
+    archetypesFor(edition).filter((archetype) => powersetsFor(archetype.name, edition).length > 0);
 
 /**
- * The skillsets that can actually be rolled: those with a **structured** set, priced at the 25 the
- * powersets are sized against.
+ * The skillsets that can be rolled in an edition — the structured ones, which is all of them now.
  *
- * `Warrior` once stated 28 — the only one that did — and at 28 it fit nothing. Phil corrected it
- * to 25, and structuring settled the question: its content really is dearer (a 5-point CSL,
- * Defense Maneuver, Lightning Reflexes), so it reaches 25 only by dropping Concealment to a
- * Familiarity. The 25 holds, but only just.
+ * This used to filter the legacy prose by a declared cost of 25, because `Warrior` once stated 28
+ * and at 28 it fit nothing. Structuring settled that: the sets are priced by the engine and the
+ * budget is whatever they cost (25 in 5E, 50 in 6E), so there is nothing left to disagree about.
  */
-const SKILLSET_COST_THAT_FITS = 25;
-
-export const fittableSkillsets = (): typeof SKILLSETS =>
-    SKILLSETS.filter((skillset) => skillset.cost === SKILLSET_COST_THAT_FITS && structuredSkillset(skillset.profession) !== undefined);
+export const fittableSkillsets = (edition: Edition = '5e'): StructuredSkillset[] => skillsetsFor(edition);
 
 /**
  * Roll a build. Throws if nothing is authored for that level yet, rather than quietly handing back
@@ -75,10 +71,10 @@ export const fittableSkillsets = (): typeof SKILLSETS =>
  * of.
  */
 export function rollRecipe(rng: Rng, level: PowerLevel = LOW_POWERED_5E): CharacterRecipe {
-    const candidates = generatableArchetypes();
+    const candidates = generatableArchetypes(level.edition);
 
     if (candidates.length === 0) {
-        throw new Error('No archetype has a structured powerset yet');
+        throw new Error(`No archetype has a structured powerset for ${level.name}`);
     }
 
     const archetype = pick(rng, candidates);
@@ -87,9 +83,9 @@ export function rollRecipe(rng: Rng, level: PowerLevel = LOW_POWERED_5E): Charac
     return {
         level: level.id,
         archetype: archetype.name,
-        powerset: pick(rng, powersetsFor(archetype.name)).label,
-        profession: pick(rng, fittableSkillsets()).profession,
-        complications: pick(rng, COMPLICATION_SETS_5E).label,
+        powerset: pick(rng, powersetsFor(archetype.name, level.edition)).label,
+        profession: pick(rng, fittableSkillsets(level.edition)).profession,
+        complications: pick(rng, complicationSetsFor(level.edition)).label,
         specialFx,
         name: autoName({specialFx, archetype: archetype.name}),
         // A fresh roll answers nothing for the player — see CharacterRecipe.skills.
@@ -97,10 +93,10 @@ export function rollRecipe(rng: Rng, level: PowerLevel = LOW_POWERED_5E): Charac
     };
 }
 
-/** What a recipe costs, per bucket — the allocator's view of it. */
+/** What a recipe costs, per bucket — the allocator's view of it, in the recipe's own edition. */
 export function budgetFor(recipe: CharacterRecipe, level: PowerLevel): Budget {
-    const archetype = ARCHETYPES_5E.find((candidate) => candidate.name === recipe.archetype)!;
-    const skillset = SKILLSETS.find((candidate) => candidate.profession === recipe.profession)!;
+    const archetype = archetypesFor(level.edition).find((candidate) => candidate.name === recipe.archetype)!;
+    const skillset = structuredSkillset(recipe.profession, level.edition)!;
 
     return allocate(level, archetype, skillset);
 }

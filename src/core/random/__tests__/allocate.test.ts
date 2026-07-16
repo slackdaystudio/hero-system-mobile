@@ -14,7 +14,8 @@
 
 /** Phase 2 of docs/RANDOM_CHARACTER.md — the budget allocator. */
 import type {Rng} from 'core/ports';
-import {allocate, ARCHETYPES_5E, complicationsTotal, COMPLICATIONS_5E, randomBudget, SKILLSETS} from '../allocate';
+import {allocate, ARCHETYPES_5E, complicationsTotal, COMPLICATIONS_5E, randomBudget} from '../allocate';
+import {SKILLSETS_5E, structuredSkillset} from '../skillset';
 import {LOW_POWERED_5E, POWER_LEVELS, powerLevel, STANDARD_6E} from '../powerLevel';
 
 /**
@@ -65,7 +66,7 @@ describe('power levels', () => {
 
 describe('allocator (5E Low Powered, 250)', () => {
     it.each(ARCHETYPES_5E.map((a) => [a.name, a] as const))('%s: the buckets spend the total exactly', (_name, archetype) => {
-        for (const skillset of SKILLSETS) {
+        for (const skillset of SKILLSETS_5E) {
             const budget = allocate(LOW_POWERED_5E, archetype, skillset);
 
             expect(budget.characteristics + budget.skills + budget.powers).toBe(LOW_POWERED_5E.total);
@@ -75,7 +76,7 @@ describe('allocator (5E Low Powered, 250)', () => {
     });
 
     it('leaves the balance to powers, moving the line by archetype', () => {
-        const scientist = SKILLSETS.find((s) => s.profession === 'Scientist')!;
+        const scientist = structuredSkillset('Scientist')!;
         const budgetFor = (name: string) => allocate(LOW_POWERED_5E, ARCHETYPES_5E.find((a) => a.name === name)!, scientist);
 
         // The archetype moves the characteristics line; powers take whatever is left.
@@ -90,8 +91,8 @@ describe('allocator (5E Low Powered, 250)', () => {
         // until Phil corrected it — a data error that left every archetype 3 points short.
         const brick = ARCHETYPES_5E.find((a) => a.name === 'Brick')!;
 
-        for (const skillset of SKILLSETS) {
-            expect(allocate(LOW_POWERED_5E, brick, skillset)).toMatchObject({skills: 25, powers: 75});
+        for (const skillset of SKILLSETS_5E) {
+            expect({profession: skillset.profession, ...allocate(LOW_POWERED_5E, brick, skillset)}).toMatchObject({profession: skillset.profession, skills: 25, powers: 75});
         }
     });
 });
@@ -124,7 +125,7 @@ describe('powerset sizing — the phase 3 authoring spec', () => {
     };
 
     it.each(ARCHETYPES_5E.map((a) => [a.name, a] as const))('%s: legacy powersets vs the computed balance', (name, archetype) => {
-        const scientist = SKILLSETS.find((s) => s.profession === 'Scientist')!;
+        const scientist = structuredSkillset('Scientist')!;
         const {powers} = allocate(LOW_POWERED_5E, archetype, scientist);
 
         expect(archetype.powersets!.map((powerset) => powers - powerset.powersCost)).toEqual(REQUIRED_FLEX[name]);

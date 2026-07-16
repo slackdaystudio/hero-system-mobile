@@ -29,9 +29,9 @@
  */
 import type {ParsedCharacter} from 'core/hero';
 import type {Rng} from 'core/ports';
-import {ARCHETYPES_5E, pick, type Archetype} from './allocate';
+import {archetypesFor, pick, type Archetype} from './allocate';
 import {buildCharacteristics} from './characteristics';
-import {attachComplications, COMPLICATION_SETS_5E, type ComplicationSet} from './complications';
+import {attachComplications, complicationSetsFor, type ComplicationSet} from './complications';
 import {attachPowerset, powersetsFor, type Powerset} from './powerset';
 import {attachSkillset, playerDefinedSlots, structuredSkillset, type PlayerDefinedSlot, type StructuredSkillset} from './skillset';
 import {POWER_LEVELS, type PowerLevel} from './powerLevel';
@@ -84,12 +84,20 @@ export const autoName = (recipe: Pick<CharacterRecipe, 'specialFx' | 'archetype'
 /** Resolve every reference, or null if any no longer exists. */
 export function resolveRecipe(recipe: CharacterRecipe): ResolvedRecipe | null {
     const level = POWER_LEVELS.find((candidate) => candidate.id === recipe.level);
-    const archetype = ARCHETYPES_5E.find((candidate) => candidate.name === recipe.archetype);
-    const powerset = powersetsFor(recipe.archetype).find((candidate) => candidate.label === recipe.powerset);
-    const skillset = structuredSkillset(recipe.profession);
-    const complications = COMPLICATION_SETS_5E.find((candidate) => candidate.label === recipe.complications);
 
-    if (level === undefined || archetype === undefined || powerset === undefined || skillset === undefined || complications === undefined) {
+    if (level === undefined) {
+        return null; // an unknown level means we can't even ask which edition's data to look in
+    }
+
+    // Every reference resolves in the recipe's OWN edition. A 6E recipe naming "Brick" means the 6E
+    // Brick, whose spread and powersets are nothing like the 5E one's.
+    const {edition} = level;
+    const archetype = archetypesFor(edition).find((candidate) => candidate.name === recipe.archetype);
+    const powerset = powersetsFor(recipe.archetype, edition).find((candidate) => candidate.label === recipe.powerset);
+    const skillset = structuredSkillset(recipe.profession, edition);
+    const complications = complicationSetsFor(edition).find((candidate) => candidate.label === recipe.complications);
+
+    if (archetype === undefined || powerset === undefined || skillset === undefined || complications === undefined) {
         return null;
     }
 

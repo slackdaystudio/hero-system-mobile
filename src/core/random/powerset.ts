@@ -22,6 +22,7 @@
  * allocator's balance is the check that it was.
  */
 import type {ParsedCharacter} from 'core/hero';
+import type {Edition} from './powerLevel';
 import powersetData from '../data/random/powersets.5e.json';
 import powersetData6E from '../data/random/powersets.6e.json';
 
@@ -85,10 +86,20 @@ export const POWERSETS_5E = powersetData as unknown as Record<string, Powerset[]
 export const POWERSETS_6E = powersetData6E as unknown as Record<string, Powerset[]>;
 
 /** The powersets for an edition. */
-export const powersetsForEdition = (edition: string): Record<string, Powerset[]> => (edition === '6e' ? POWERSETS_6E : POWERSETS_5E);
+export const powersetsForEdition = (edition: Edition): Record<string, Powerset[]> => (edition === '6e' ? POWERSETS_6E : POWERSETS_5E);
 
 /** Every powerset authored for an archetype, or `[]` while its data is still to be written. */
-export const powersetsFor = (archetype: string): Powerset[] => (Array.isArray(POWERSETS_5E[archetype]) ? POWERSETS_5E[archetype] : []);
+/**
+ * The powersets an archetype has in an edition.
+ *
+ * Defaults to 5E so every existing caller keeps its meaning — the generator was 5E-only until the
+ * 6E data landed, and the edition is threaded from the PowerLevel rather than guessed.
+ */
+export const powersetsFor = (archetype: string, edition: Edition = '5e'): Powerset[] => {
+    const sets = powersetsForEdition(edition)[archetype];
+
+    return Array.isArray(sets) ? sets : [];
+};
 
 const withBoilerplate = (block: Obj): Obj => {
     const filled: Obj = {};

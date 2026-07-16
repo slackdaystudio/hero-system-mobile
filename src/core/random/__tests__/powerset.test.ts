@@ -21,15 +21,16 @@
  */
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator} from 'core/traits';
-import {allocate, ARCHETYPES_5E, SKILLSETS} from '../allocate';
+import {allocate, ARCHETYPES_5E} from '../allocate';
 import {buildCharacteristics} from '../characteristics';
 import {approximations, attachPowerset, powersetsFor} from '../powerset';
+import {structuredSkillset} from '../skillset';
 import {LOW_POWERED_5E} from '../powerLevel';
 
 type Obj = Record<string, any>;
 
 const archetype = ARCHETYPES_5E.find((candidate) => candidate.name === 'Energy Projector')!;
-const scientist = SKILLSETS.find((skillset) => skillset.profession === 'Scientist')!;
+const scientist = structuredSkillset('Scientist')!;
 
 const build = (index: number): Obj => {
     const parsed = attachPowerset(buildCharacteristics(archetype.characteristics, LOW_POWERED_5E.template, 'Energy Projector'), powersetsFor('Energy Projector')[index]);

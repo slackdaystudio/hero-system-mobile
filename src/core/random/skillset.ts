@@ -32,7 +32,9 @@
  * in 2s. Every set records what it needed and why.
  */
 import type {ParsedCharacter} from 'core/hero';
+import type {Edition} from './powerLevel';
 import skillsetData from '../data/random/skillPackages.5e.json';
+import skillsetData6E from '../data/random/skillPackages.6e.json';
 
 type Obj = Record<string, any>;
 
@@ -66,10 +68,19 @@ const SKILL_DEFAULTS: Obj = {
 const withDefaults = (trait: Obj): Obj => ({...SKILL_DEFAULTS, ...trait});
 
 export const SKILLSETS_5E = (skillsetData as unknown as {skillsets: StructuredSkillset[]}).skillsets;
+export const SKILLSETS_6E = (skillsetData6E as unknown as {skillsets: StructuredSkillset[]}).skillsets;
 
-/** Professions with a structured skillset. The rest are still legacy name strings. */
-export const structuredSkillset = (profession: string): StructuredSkillset | undefined =>
-    SKILLSETS_5E.find((skillset) => skillset.profession === profession);
+/** The structured skillsets for an edition. Both editions carry the same eleven professions. */
+export const skillsetsFor = (edition: Edition): StructuredSkillset[] => (edition === '6e' ? SKILLSETS_6E : SKILLSETS_5E);
+
+/**
+ * A profession's structured skillset in an edition.
+ *
+ * Defaults to 5E so existing callers keep their meaning. The two editions differ in size (25 vs 50)
+ * and in content — 6E has no Seduction, no generic Area Knowledge, and no combat skill levels.
+ */
+export const structuredSkillset = (profession: string, edition: Edition = '5e'): StructuredSkillset | undefined =>
+    skillsetsFor(edition).find((skillset) => skillset.profession === profession);
 
 /**
  * The `input` of a skill the data deliberately leaves to the player.
