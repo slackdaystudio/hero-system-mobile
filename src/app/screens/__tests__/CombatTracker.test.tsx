@@ -20,6 +20,7 @@ import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
 import type {CombatStateRepository, Rng} from 'core/ports';
 import type {Obj} from 'core/traits';
 import type {Repositories} from 'infra/persistence/repositories';
+import {CombatStateProvider} from 'app/providers/CombatStateProvider';
 import {DiceProvider} from 'app/providers/DiceProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
@@ -77,7 +78,9 @@ const render = async (character: Obj, repo: CombatStateRepository, rng: Rng = sc
             <ThemeProvider colorScheme="dark">
                 <DiceProvider dieRoller={new DieRoller(rng)}>
                     <RepositoriesProvider repositories={repositories}>
-                        <CombatTracker character={character} characterId="c1" combat={buildCombatSheet(character)} onRoll={() => undefined} />
+                        <CombatStateProvider character={character} characterId="c1">
+                            <CombatTracker character={character} combat={buildCombatSheet(character)} onRoll={() => undefined} />
+                        </CombatStateProvider>
                     </RepositoriesProvider>
                 </DiceProvider>
             </ThemeProvider>,

@@ -364,6 +364,36 @@ describe('CharacterDetailScreen', () => {
         expect(collectText(tree.toJSON()).some((v) => v.includes('Resistant Defense'))).toBe(true);
     });
 
+    it('spends a power’s END from the shared pool when its END cost is tapped on the sheet', async () => {
+        const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+        const store = new Map<string, CombatState>();
+        const combatState: CombatStateRepository = {
+            get: async (id: string) => store.get(id) ?? null,
+            save: async (id: string, s: CombatState) => {
+                store.set(id, s);
+            },
+            clear: async (id: string) => {
+                store.delete(id);
+            },
+        };
+        const tree = await renderScreen(fakeCharacters(character({document})), {}, {combatState});
+
+        // The Character tab is default; a power that costs END shows a tappable END control.
+        const spend = tree.root.findAll(
+            (node) => typeof node.props.testID === 'string' && node.props.testID.startsWith('spend-end-') && typeof node.props.onPress === 'function',
+        )[0];
+        expect(spend).toBeDefined();
+
+        const before = store.get('c1')!.endurance;
+        await act(async () => {
+            spend.props.onPress();
+        });
+        await act(async () => {});
+
+        // The shared pool dropped — the same state the Combat tab tracker reads.
+        expect(store.get('c1')!.endurance).toBeLessThan(before);
+    });
+
     it('calls onReady with the loaded character (for the header title)', async () => {
         const onReady = jest.fn();
         await renderScreen(fakeCharacters(character({name: 'Grond'})), {onReady});

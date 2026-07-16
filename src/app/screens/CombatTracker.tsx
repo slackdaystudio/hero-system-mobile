@@ -12,23 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Pressable, StyleSheet, View, type ViewStyle} from 'react-native';
 import {
     addStatus,
     adjustCombatValue,
     clearStatuses,
-    combatMaximums,
     describeStatus,
-    enduranceBurnDice,
-    initialCombatState,
-    normalizeCombatState,
-    reconcilePhases,
     removeStatus,
     resetCombatValues,
     resetVital,
     setVital,
-    spendEndurance,
     startNewTurn,
     takeRecovery,
     togglePhaseAborted,
@@ -39,14 +33,12 @@ import {
     type CombatValueKey,
     type Vital,
 } from 'core/combat';
-import {PartialDie} from 'core/dice';
 import {heroDesignerCharacter} from 'core/hero';
 import type {Obj} from 'core/traits';
 import {Button, Card, NumberField, Text} from 'app/components';
 import {StatusDialog} from './StatusDialog';
 import type {RollRequest} from 'app/dice/rollRequest';
-import {useDieRoller} from 'app/providers/DiceProvider';
-import {useRepositories} from 'app/providers/RepositoriesProvider';
+import {describeSpend, useCombatState} from 'app/providers/CombatStateProvider';
 import {useTheme} from 'app/theme';
 import type {CombatSheet} from './characterSheet';
 
@@ -86,82 +78,49 @@ const healthText = (state: CombatState): HealthText => ({stun: String(state.stun
  * State is seeded from the character's derived maximums, persisted per-character
  * through the combat-state repository, and every edit goes through a pure reducer.
  */
-export function CombatTracker({character, characterId, combat, onRoll}: {character: Obj; characterId: string; combat: CombatSheet; onRoll: RollHandler}): React.JSX.Element {
-    const {combatState: repository} = useRepositories();
-    const roller = useDieRoller();
-    const max = useMemo(() => combatMaximums(character), [character]);
+export function CombatTracker({character, combat, onRoll}: {character: Obj; combat: CombatSheet; onRoll: RollHandler}): React.JSX.Element {
+    const combatApi = useCombatState();
+    const state = combatApi?.state ?? null;
     const valueRows = useMemo(() => (heroDesignerCharacter.isFifth(character) ? FIFTH_VALUES : SIX_E_VALUES), [character]);
 
-    const [state, setState] = useState<CombatState | null>(null);
     const [health, setHealth] = useState<HealthText>({stun: '', body: '', endurance: ''});
     const [spendText, setSpendText] = useState('');
     const [burnNote, setBurnNote] = useState<string | null>(null);
     const [editing, setEditing] = useState<{status: CombatStatus; index: number | null} | null>(null);
 
+    // Keep the editable health mirror in step with the shared pool — after Recovery, a reset, or a
+    // spend from the sheet — but never clobber a value the user is mid-typing (guarded by the ref).
+    const typingRef = useRef(false);
     useEffect(() => {
-        let cancelled = false;
-        (async () => {
-            const stored = await repository.get(characterId);
-            const base = normalizeCombatState(stored === null ? initialCombatState(character) : reconcilePhases(stored, character));
-            if (stored === null || JSON.stringify(base) !== JSON.stringify(stored)) {
-                await repository.save(characterId, base);
-            }
-            if (!cancelled) {
-                setState(base);
-                setHealth(healthText(base));
-            }
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, [repository, characterId, character]);
+        if (state !== null && !typingRef.current) {
+            setHealth(healthText(state));
+        }
+        typingRef.current = false;
+    }, [state]);
 
-    // Persist + resync the editable health mirror (Recovery/Reset/CV/phase edits).
-    const apply = useCallback(
-        (next: CombatState, resyncHealth = true) => {
-            setState(next);
-            if (resyncHealth) {
-                setHealth(healthText(next));
-            }
-            repository.save(characterId, next).catch(() => {
-                // Best-effort persist; in-memory state already reflects the change.
-            });
-        },
-        [repository, characterId],
-    );
+    const apply = useCallback((next: CombatState) => combatApi?.apply(next), [combatApi]);
 
     const onHealthChange = useCallback(
         (vital: Vital) => (text: string) => {
+            typingRef.current = true;
             setHealth((prev) => ({...prev, [vital]: text}));
             const parsed = Number.parseInt(text, 10);
             if (!Number.isNaN(parsed) && state !== null) {
-                apply(setVital(state, vital, parsed), false);
+                apply(setVital(state, vital, parsed));
             }
         },
         [state, apply],
     );
 
-    /**
-     * Spend END from the pool. Any shortfall is paid in STUN per the 6E rule: roll `enduranceBurnDice`
-     * d6 through the die roller and subtract the total (no defenses apply). The note reports what happened.
-     */
+    /** Spend END from the shared pool (burning STUN for any shortfall) and report what happened. */
     const spendEnd = useCallback(
         (amount: number) => {
-            if (state === null || amount <= 0) {
-                return;
-            }
-            const {state: next, shortfall} = spendEndurance(state, amount);
-            if (shortfall > 0) {
-                const dice = enduranceBurnDice(shortfall);
-                const stun = roller.rollEffect({dice, partialDie: PartialDie.None}).total;
-                apply(setVital(next, 'stun', next.stun - stun));
-                setBurnNote(`Spent ${amount} END · ${shortfall} short → ${dice}d6 STUN = −${stun}`);
-            } else {
-                apply(next);
-                setBurnNote(`Spent ${amount} END`);
+            const outcome = combatApi?.spend(amount);
+            if (outcome !== null && outcome !== undefined) {
+                setBurnNote(describeSpend(outcome));
             }
         },
-        [state, roller, apply],
+        [combatApi],
     );
 
     const applyStatus = (status: CombatStatus) => {
@@ -172,7 +131,7 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
         setEditing(null);
     };
 
-    if (state === null) {
+    if (combatApi === null || state === null) {
         return (
             <Card>
                 <Text muted>Loading combat state…</Text>
@@ -180,6 +139,7 @@ export function CombatTracker({character, characterId, combat, onRoll}: {charact
         );
     }
 
+    const max = combatApi.max;
     const phases = Object.keys(state.phases)
         .map(Number)
         .sort((a, b) => a - b);

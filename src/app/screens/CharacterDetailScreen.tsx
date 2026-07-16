@@ -20,6 +20,7 @@ import type {Obj} from 'core/traits';
 import {pointSummary, type PointSummary} from 'core/hero';
 import {Button, Card, PortraitImage, Screen, SegmentedControl, Text, type Segment} from 'app/components';
 import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
+import {CombatStateProvider, describeSpend, useCombatState} from 'app/providers/CombatStateProvider';
 import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
@@ -238,7 +239,10 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                 {sheet !== null ? (
                     <>
                         {sheet.hasAlternate ? <AlternateIdToggle value={showSecondary} onChange={setShowSecondary} /> : null}
-                        <SheetTabs sheet={sheet.character} combat={sheet.combat} hero={sheet.hero} characterId={characterId} onRoll={handleRoll} />
+                        {/* One END pool above both tabs: a power spent on the sheet and the tracker draw from the same state. */}
+                        <CombatStateProvider character={sheet.hero} characterId={characterId}>
+                            <SheetTabs sheet={sheet.character} combat={sheet.combat} hero={sheet.hero} onRoll={handleRoll} />
+                        </CombatStateProvider>
                     </>
                 ) : (
                     <BasicBody character={loaded} />
@@ -276,13 +280,11 @@ function SheetTabs({
     sheet,
     combat,
     hero,
-    characterId,
     onRoll,
 }: {
     sheet: CharacterSheet;
     combat: CombatSheet;
     hero: Obj;
-    characterId: string;
     onRoll: RollHandler;
 }): React.JSX.Element {
     const [tab, setTab] = useState<SheetTab>('character');
@@ -290,7 +292,7 @@ function SheetTabs({
     return (
         <View style={styles.tabbed}>
             <SegmentedControl segments={SHEET_TABS} value={tab} onChange={(value) => setTab(value as SheetTab)} />
-            {tab === 'character' ? <SheetBody sheet={sheet} onRoll={onRoll} /> : <CombatTracker character={hero} characterId={characterId} combat={combat} onRoll={onRoll} />}
+            {tab === 'character' ? <SheetBody sheet={sheet} onRoll={onRoll} /> : <CombatTracker character={hero} combat={combat} onRoll={onRoll} />}
         </View>
     );
 }
@@ -320,9 +322,35 @@ function AlternateIdToggle({value, onChange}: {value: boolean; onChange: (next: 
     );
 }
 
+/** The live END pool on the Character tab, so tapping a power's END cost has visible feedback. */
+function EndurancePool(): React.JSX.Element | null {
+    const theme = useTheme();
+    const combat = useCombatState();
+    if (combat === null || combat.state === null) {
+        return null;
+    }
+
+    return (
+        <Card>
+            <View style={styles.poolRow}>
+                <Text variant="label" muted>
+                    ENDURANCE
+                </Text>
+                <Text variant="title" color={theme.colors.primary}>
+                    {`${combat.state.endurance} / ${combat.max.endurance}`}
+                </Text>
+            </View>
+            <Text variant="caption" muted>
+                {combat.lastSpend !== null ? describeSpend(combat.lastSpend) : 'Tap a power’s END to spend it.'}
+            </Text>
+        </Card>
+    );
+}
+
 function SheetBody({sheet, onRoll}: {sheet: CharacterSheet; onRoll: RollHandler}): React.JSX.Element {
     return (
         <>
+            <EndurancePool />
             <Section title="Characteristics">
                 {sheet.characteristics.map((characteristic, index) => (
                     <CharacteristicRow key={index} characteristic={characteristic} onRoll={onRoll} />
@@ -494,17 +522,27 @@ function TraitFlipCard({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}
 
 function WriteupFace({trait, onRoll, onFlip}: {trait: SheetTrait; onRoll: RollHandler; onFlip?: () => void}): React.JSX.Element {
     const theme = useTheme();
+    const combat = useCombatState();
     const request = traitRollRequest(trait.roll, trait.label);
     const {cost, attributes, advantages, limitations, notes} = trait.writeup;
+    const canSpend = combat !== null && combat.state !== null;
 
     return (
         <Card style={styles.traitCard}>
             <View style={styles.traitHead}>
                 <Text style={styles.traitLabel}>{trait.label}</Text>
                 {trait.endurance > 0 ? (
-                    <Text testID={`end-cost-${trait.label}`} variant="caption" muted>
-                        {`END ${trait.endurance}`}
-                    </Text>
+                    canSpend ? (
+                        <Pressable testID={`spend-end-${trait.label}`} accessibilityRole="button" onPress={() => combat.spend(trait.endurance)}>
+                            <Text variant="caption" color={theme.colors.primary}>
+                                {`END ${trait.endurance}`}
+                            </Text>
+                        </Pressable>
+                    ) : (
+                        <Text testID={`end-cost-${trait.label}`} variant="caption" muted>
+                            {`END ${trait.endurance}`}
+                        </Text>
+                    )
                 ) : null}
                 {trait.roll !== null && request !== null ? (
                     <Pressable testID={`roll-trait-${trait.label}`} onPress={() => onRoll(request, false)} onLongPress={() => onRoll(request, true)}>
@@ -703,6 +741,11 @@ const styles = StyleSheet.create({
     },
     tabbed: {
         rowGap: 16,
+    },
+    poolRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     altToggle: {
         flexDirection: 'row',
