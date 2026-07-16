@@ -17,6 +17,7 @@ export {Screen, type ScreenProps} from './Screen';
 export {Card, type CardProps} from './Card';
 export {ListRow, type ListRowProps} from './ListRow';
 export {Button, type ButtonProps} from './Button';
+export {SpendChip, type SpendChipProps} from './SpendChip';
 export {NumberField, type NumberFieldProps} from './NumberField';
 export {TextField, type TextFieldProps} from './TextField';
 export {SegmentedControl, type Segment, type SegmentedControlProps} from './SegmentedControl';

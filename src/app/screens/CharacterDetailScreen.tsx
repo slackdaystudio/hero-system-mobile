@@ -18,7 +18,7 @@ import type {LastRoll} from 'core/dice';
 import type {Character, PortraitFocus} from 'core/ports';
 import type {Obj} from 'core/traits';
 import {pointSummary, type PointSummary} from 'core/hero';
-import {Button, Card, PortraitImage, Screen, SegmentedControl, Text, type Segment} from 'app/components';
+import {Button, Card, PortraitImage, Screen, SegmentedControl, SpendChip, Text, type Segment} from 'app/components';
 import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
 import {CombatStateProvider, useCombatState} from 'app/providers/CombatStateProvider';
 import {useDieRoller} from 'app/providers/DiceProvider';
@@ -457,14 +457,17 @@ function CharacteristicRow({characteristic, onRoll}: {characteristic: SheetChara
                         </Text>
                     </Pressable>
                     {characteristic.endurance !== null && canSpend ? (
-                        <Pressable testID={`spend-end-char-${characteristic.name}`} accessibilityRole="button" onPress={() => combat.spend(characteristic.endurance ?? 0)}>
+                        <SpendChip
+                            testID={`spend-end-char-${characteristic.name}`}
+                            accessibilityLabel={`Spend ${characteristic.endurance} END for ${characteristic.name}`}
+                            onSpend={() => combat.spend(characteristic.endurance ?? 0)}>
                             <Text variant="caption" muted>
                                 END:{' '}
                                 <Text variant="caption" color={theme.colors.primary}>
                                     {characteristic.endurance}
                                 </Text>
                             </Text>
-                        </Pressable>
+                        </SpendChip>
                     ) : null}
                 </View>
             ) : null}
@@ -521,11 +524,11 @@ function WriteupFace({trait, onRoll, onFlip}: {trait: SheetTrait; onRoll: RollHa
                 <Text style={styles.traitLabel}>{trait.label}</Text>
                 {trait.endurance > 0 ? (
                     canSpend ? (
-                        <Pressable testID={`spend-end-${trait.label}`} accessibilityRole="button" onPress={() => combat.spend(trait.endurance)}>
+                        <SpendChip testID={`spend-end-${trait.label}`} accessibilityLabel={`Spend ${trait.endurance} END for ${trait.label}`} onSpend={() => combat.spend(trait.endurance)}>
                             <Text variant="caption" color={theme.colors.primary}>
                                 {`END ${trait.endurance}`}
                             </Text>
-                        </Pressable>
+                        </SpendChip>
                     ) : (
                         <Text testID={`end-cost-${trait.label}`} variant="caption" muted>
                             {`END ${trait.endurance}`}

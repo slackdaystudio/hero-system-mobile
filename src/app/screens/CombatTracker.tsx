@@ -35,7 +35,7 @@ import {
 } from 'core/combat';
 import {heroDesignerCharacter} from 'core/hero';
 import type {Obj} from 'core/traits';
-import {Button, Card, NumberField, Text} from 'app/components';
+import {Button, Card, NumberField, SpendChip, Text} from 'app/components';
 import {StatusDialog} from './StatusDialog';
 import type {RollRequest} from 'app/dice/rollRequest';
 import {describeSpend, useCombatState} from 'app/providers/CombatStateProvider';
@@ -301,9 +301,9 @@ function MovementRowView({row, onSpend}: {row: MovementRow; onSpend: () => void}
             <Text muted>{row.name}</Text>
             <View style={styles.moveRight}>
                 <Text>{`${row.combat}  ·  NC ${row.nonCombat}`}</Text>
-                <Pressable testID={`spend-end-move-${row.name}`} accessibilityRole="button" onPress={onSpend}>
+                <SpendChip testID={`spend-end-move-${row.name}`} accessibilityLabel={`Spend ${row.endurance} END to move with ${row.name}`} onSpend={onSpend}>
                     <Text variant="caption" color={theme.colors.primary}>{`END ${row.endurance}`}</Text>
-                </Pressable>
+                </SpendChip>
             </View>
         </View>
     );
