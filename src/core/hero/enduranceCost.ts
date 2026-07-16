@@ -97,3 +97,16 @@ export function enduranceCost(trait: Obj, activeCost: number): number {
 export function strengthEnduranceCost(strength: number): number {
     return strength <= 0 ? 0 : Math.max(1, Math.round(strength / 10));
 }
+
+/**
+ * END to move a mode's full distance in a Phase: 1 END per 10 Active Points, minimum 1 (6E — e.g.
+ * the free 12m of Running costs 1 END).
+ *
+ * APPROXIMATION: it prices each metre at ~1 Active Point, since the stored movement mode carries no
+ * template to read a true Active-Point cost from. That is exact for the 1-point/metre modes (Running,
+ * Flight, and most combat movement) and reads a touch high for the cheaper base modes (Swimming,
+ * Leaping). If a per-mode point-rate table is wanted, refine here.
+ */
+export function movementEnduranceCost(metres: number): number {
+    return metres <= 0 ? 0 : Math.max(1, Math.round(metres / 10));
+}

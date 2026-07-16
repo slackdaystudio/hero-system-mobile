@@ -40,7 +40,7 @@ import {StatusDialog} from './StatusDialog';
 import type {RollRequest} from 'app/dice/rollRequest';
 import {describeSpend, useCombatState} from 'app/providers/CombatStateProvider';
 import {useTheme} from 'app/theme';
-import type {CombatSheet} from './characterSheet';
+import type {CombatSheet, MovementRow} from './characterSheet';
 
 type RollHandler = (request: RollRequest, immediate: boolean) => void;
 
@@ -282,13 +282,29 @@ export function CombatTracker({character, combat, onRoll}: {character: Obj; comb
                 <Section title="Movement">
                     <Card>
                         {combat.movement.map((row) => (
-                            <StaticRow key={row.name} label={row.name} value={`${row.combat}  ·  NC ${row.nonCombat}`} />
+                            <MovementRowView key={row.name} row={row} onSpend={() => spendEnd(row.endurance)} />
                         ))}
                     </Card>
                 </Section>
             ) : null}
 
             <StatusDialog initial={editing?.status ?? null} onApply={applyStatus} onClose={() => setEditing(null)} />
+        </View>
+    );
+}
+
+function MovementRowView({row, onSpend}: {row: MovementRow; onSpend: () => void}): React.JSX.Element {
+    const theme = useTheme();
+
+    return (
+        <View style={styles.staticRow}>
+            <Text muted>{row.name}</Text>
+            <View style={styles.moveRight}>
+                <Text>{`${row.combat}  ·  NC ${row.nonCombat}`}</Text>
+                <Pressable testID={`spend-end-move-${row.name}`} accessibilityRole="button" onPress={onSpend}>
+                    <Text variant="caption" color={theme.colors.primary}>{`END ${row.endurance}`}</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
@@ -453,6 +469,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 4,
+    },
+    moveRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 14,
     },
     statusRow: {
         flexDirection: 'row',

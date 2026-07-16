@@ -17,7 +17,7 @@
  * for powers that cost END — plus the template `usesend` flag and the Costs/Reduced Endurance
  * modifiers observed on real characters (see the field map gathered while building this).
  */
-import {enduranceCost, strengthEnduranceCost, usesEndurance} from '../enduranceCost';
+import {enduranceCost, movementEnduranceCost, strengthEnduranceCost, usesEndurance} from '../enduranceCost';
 
 type Obj = Record<string, any>;
 
@@ -87,5 +87,14 @@ describe('strengthEnduranceCost', () => {
 
     it('is 0 for a character with no STR to spend', () => {
         expect(strengthEnduranceCost(0)).toBe(0);
+    });
+});
+
+describe('movementEnduranceCost', () => {
+    it('is ~1 END per 10m, minimum 1 — the free 12m of Running costs 1 END', () => {
+        expect(movementEnduranceCost(12)).toBe(1);
+        expect(movementEnduranceCost(4)).toBe(1); // min 1
+        expect(movementEnduranceCost(30)).toBe(3);
+        expect(movementEnduranceCost(0)).toBe(0);
     });
 });

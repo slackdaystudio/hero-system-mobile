@@ -14,7 +14,7 @@
 
 import {combatDetails} from 'core/combat';
 import {RollType} from 'core/dice';
-import {enduranceCost, heroDesignerCharacter, strengthEnduranceCost} from 'core/hero';
+import {enduranceCost, heroDesignerCharacter, movementEnduranceCost, strengthEnduranceCost} from 'core/hero';
 import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
 
@@ -205,11 +205,13 @@ export interface CombatStat {
     attackOcv?: number;
 }
 
-/** A movement mode with its combat and non-combat distances (already unit-formatted). */
+/** A movement mode with its combat and non-combat distances (already unit-formatted) and END to use it. */
 export interface MovementRow {
     name: string;
     combat: string;
     nonCombat: string;
+    /** END to move the mode's full distance in a Phase (6E, ~1 per 10m). */
+    endurance: number;
 }
 
 export interface CombatSheet {
@@ -276,6 +278,7 @@ export function buildCombatSheet(character: Obj, showSecondary = false): CombatS
             name: String(mode.name ?? mode.shortName ?? ''),
             combat: `${distance}${unit}`,
             nonCombat: `${raw * ncm}${unit} (×${ncm})`,
+            endurance: movementEnduranceCost(raw),
         };
     });
 

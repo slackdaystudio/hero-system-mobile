@@ -161,6 +161,15 @@ describe('CombatTracker', () => {
         expect(current()!.stun).toBe(stunBefore - 4); // 1d6 = 4 STUN, no defenses
     });
 
+    it('spends a movement mode’s END from the pool when tapped', async () => {
+        const {repo, current} = fakeRepo();
+        const tree = await render(hero(), repo);
+
+        const before = current()!.endurance;
+        await press(tree, 'spend-end-move-Running'); // Running 12m ≈ 1 END
+        expect(current()!.endurance).toBe(before - 1);
+    });
+
     it('resets a vital to its maximum', async () => {
         const character = hero();
         const max = combatMaximums(character);
