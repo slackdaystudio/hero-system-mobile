@@ -67,13 +67,16 @@ ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.
 first to change costs on characters people already have. What remains is CostCruncher and
 the cosmetic tail of the correctness pass.
 
+**Unshipped and needing a versionCode bump:** migrations 006/007 (portrait framing) and
+everything on the 6E generator, none of which is in 65.
+
 | Phase | State |
 |---|---|
 | 0 — Scaffold | ✅ done |
 | 1 — Core port | ✅ done — `dice`, `templates`, `util`, `hero`, `traits`, `combat`; golden-mastered over all 37 fixtures |
 | 2 — Ports + infra | ✅ done — `rng`, `files`, `import`, `migration`, `persistence`; sound dropped |
 | 3 — State (RTK) | ❌ **not done, and deliberately reversed** — see below |
-| 4 — UI | 9 screens; **CostCruncher** is the only one outstanding. Random characters are built — reimagined, not ported (see below) |
+| 4 — UI | 9 screens; **CostCruncher** is the only one outstanding. Random characters are built — reimagined, not ported (see below) — and roll in both editions from `GenerateDialog` |
 | 5 — Migration + parity + release | migration done + device-validated; **releases shipping**; every corpus-triggered bug fixed, cosmetic tail open |
 
 `REBUILD_PLAN.md`'s Progress section has drifted (it still shows Phase 1 unchecked and
@@ -94,9 +97,18 @@ component-local and resets to on at every mount, where legacy persisted `showSec
 the same discipline as `core/`, for the opposite reason. It emits a `ParsedCharacter` (the
 `.hdc`-shaped *input*) and runs it through `heroDesignerCharacter.getCharacter()`, so a
 generated character is priced by the same engine that reads a real `.hdc` and is saved down
-the same path. Currently 5E Low Powered (250) only; **6E at 400 is authored data, not code.**
+the same path. **Both editions ship**: 5E Low Powered (250) and 6E Standard (400), chosen from
+the pills in `GenerateDialog`. `POWER_LEVELS` names two more (`5e-standard`, `6e-low`) that have
+no authored archetypes or powersets — the dialog does not offer them, because offering them
+would be offering a crash.
 
-Two consequences worth knowing:
+The 6E half is **authored, not lifted** — there is no legacy 6E prose. Its archetype spreads are
+benchmarked against the five real 400-point characters in the fixture corpus and scored against
+`core/random/ruleOfX.ts`, which is Phil's own spreadsheet in code (±10% band). Two of his rules
+are encoded in the data rather than the engine, so don't "fix" them: **no VPPs** (multipowers
+instead) and **no CSLs at creation** (re-invest in base OCV/DCV).
+
+Three consequences worth knowing:
 
 - **Building characters found engine bugs the 37-fixture corpus never did** — H9 and H10 were
   both caught by generating, not by importing. The decade-old archetype prose acts as a second
@@ -106,6 +118,20 @@ Two consequences worth knowing:
   column beside the document. Editing revises the recipe and rebuilds — there is no partial
   mutation path. Only `origin: 'generated'` rows are editable; an imported `.hdc` is the
   player's file and stays read-only.
+- **`level` is the only thing that says which edition a recipe means**, and the editions share
+  nearly every name: all eleven archetypes, all eleven professions, the four complication
+  labels, and six of the eleven powerset labels (Powerhouse, Adept, Sorcerer, Blur, Sentinel,
+  Energy Blaster). **A lookup done in the wrong edition therefore succeeds and returns the wrong
+  data rather than failing.** Never let a caller default the edition: `recipeEdition(recipe)`
+  reads it off the recipe, and `resolveRecipe` does it for you. This has bitten twice — once on
+  the roll path (`8afb588`) and once on the edit path (`ecdccf7`), where it hid for months
+  behind those six colliding labels.
+
+**Two silent traps in the data, both of which have shipped bugs.** A trait the edition lacks
+resolves to no template and prices at **0**, reading as authored (LACKOFWEAKNESS, SEDUCTION,
+AREA_KNOWLEDGE, LIGHTNING_REFLEXES_SINGLE all did). And NCM has a hardcoded `basecost` with no
+template in *either* edition, so the template guards miss it entirely — 6E abolished it, and it
+needs its own test.
 
 `RandomHeroRepository` / the `random_hero` table are a **legacy relic**: `migrateV1` still
 writes the old app's saved random hero there, and nothing reads it. The new generator saves

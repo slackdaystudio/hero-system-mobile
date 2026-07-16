@@ -4,6 +4,11 @@
 > auditing the legacy `RandomCharacter.js` and its four `public/templates/*.json` data files.
 > Companion to `REBUILD_PLAN.md`, which dropped the legacy generator from the port on the
 > grounds that it would be redesigned rather than carried over. This is that redesign.
+>
+> **Status: built.** All five phases are done — both editions roll, both are editable, and every
+> 6E roll is graded against the Rule of X. This began as a plan and is now mostly a record of
+> *why*, so where it says "we will", read "we did". The decisions and the traps are the part
+> worth reading; each section marks what it settled.
 
 ## The problem we're solving
 
@@ -130,15 +135,28 @@ the four is free:
 
 | Level | Total | Data |
 |-------|-------|------|
-| **5E Low Powered** | **250** | ✅ lifted from legacy, as-is — needs no resizing |
-| 5E Standard | 350 | archetypes + powersets resized (+100) |
-| 6E Low-Powered | 300 | authored from scratch |
-| **6E Standard** | **400** | authored from scratch |
+| **5E Low Powered** | **250** | ✅ **ships** — lifted from legacy, as-is; needed no resizing |
+| 5E Standard | 350 | ❌ not authored — archetypes + powersets would need resizing (+100) |
+| 6E Low-Powered | 300 | ❌ not authored |
+| **6E Standard** | **400** | ✅ **ships** — authored from scratch, benchmarked against the corpus |
 
-The two in bold are the original ask. The machinery is shared — a level is just a
-`(base, limit, template)` triple — so this is **content work, not engineering**, and it is the
-bulk of the project. Ship 5E Low Powered first precisely because its data already exists and is
-proven; 6E Standard is the one with real authoring behind it.
+The two in bold were the original ask, and **both are now done**. The machinery is shared — a
+level is just a `(base, limit, template)` triple — so this was **content work, not
+engineering**, and it was the bulk of the project. 5E Low Powered shipped first precisely
+because its data already existed and was proven; 6E Standard is the one with real authoring
+behind it (see "The Rule of X" below).
+
+**The two unauthored levels are still in `POWER_LEVELS`, and they are a trap.** `rollRecipe`
+throws for them rather than handing back an empty character, and `GenerateDialog` offers only
+the two that have data — offering the others would be offering a crash. Anything that enumerates
+`POWER_LEVELS` as if every entry were rollable is wrong.
+
+**The edition fork is one string, and that is exactly why it is dangerous.** Both editions carry
+the same eleven archetypes, the same eleven professions, the same four complication labels and
+six of the same eleven powerset labels, so a lookup in the wrong edition **succeeds and returns
+the wrong data**. Nothing may default the edition; `recipeEdition(recipe)` reads it off the
+level, which is the only field that disambiguates a recipe at all. See
+`core/random/__tests__/editions.test.ts`.
 
 ### 3 — Strict cutoffs as sub-budgets
 
@@ -195,6 +213,43 @@ adaptered in `infra/rng`). Seeded generation is deterministic, so we can:
 - **fuzz**: generate thousands and assert every one is on-budget and legal.
 
 That is a stronger guarantee than the corpus gives us anywhere else.
+
+## The Rule of X — the balance oracle
+
+`core/random/ruleOfX.ts` is Phil's own `Rule of X.xlsx` in code, weights and baselines intact.
+HS6E2.282 describes the idea and, in his words, is "vague and hand-wavy"; the spreadsheet is his
+attempt to make it workable. **It is the reason the 6E archetypes could be authored at all.**
+
+**Points spent is not combat effectiveness.** Every archetype can total exactly 400 and still be
+wildly out of line with the others. Nothing else in this system can tell a generated Speedster it
+is too fast — the budget certainly can't, because it balances by construction.
+
+Each stat scores `(character / baseline) × weight`; a character on the baseline scores exactly
+100. The weights total 120, but DC and oAP are alternatives so 20 is never counted at once.
+Phil's guidance, and the generator's test assertion: **within ±10%** (`TOLERANCE`).
+
+Three things to know before authoring an archetype against it:
+
+- **SPD and DC/oAP carry weight 20 each** — the heaviest in the model, with DCV 10 next. One point
+  of SPD is worth four of CON. SPD is not flavour, and no real 400-point character in the corpus
+  runs below SPD 5.
+- **The dAP term is compound, not additive**: `DCV × DEF × rDEF × (dAP × weight)`. Resistant
+  Protection raises DEF, rDEF *and* dAP, so it is effectively **cubic** — it caught four archetypes
+  during authoring. This is true at the table: armour on something you can't hit is worth far more
+  than armour on something you can.
+- **The all-rounder trap.** An archetype with no identity stat (Patriot, Metamorph, Powered Armor)
+  has nothing above baseline to trade, so being a shade *under* baseline anywhere is pure loss.
+  Every failure during 6E authoring was in the spread, never the powerset.
+
+`ruleOfXStats.ts` extracts the inputs from a built character. Two traps live there: it sets
+`showSecondary: true` (or OIHID defences vanish) and reads HD's `template.type` for
+ATTACK/DEFENSE rather than guessing.
+
+**Two of Phil's rules are encoded in the data, not the engine** — don't "fix" them:
+**no VPPs** ("character killers… multipowers are better for new players") and **no CSLs at
+creation** ("re-invest those points into base OCV/DCV and keep the cognitive load lighter").
+The second is why the 6E Weapons Master buys OCV 10 outright where its model character, Arrowhead,
+runs CSL 3.
 
 ## Data model
 
@@ -276,21 +331,18 @@ silently reshaping an archetype.
       over 2000 budgets. Confirmed the model reproduces the legacy powerset sizes: **8 of 11
       archetypes need zero flex**. The required flex per powerset is pinned as the phase 3
       authoring spec.
-- [ ] **Phase 3 — 5E powersets + skills + complications.** *(powersets done — 11 of 11)* Every
-      archetype has a structured powerset, and each costs its balance **exactly**, checked
-      automatically for all of them. **Complications and skills are done too** — all four
-      complication packages total exactly the 100-point limit, and all eleven skillsets total
-      exactly 25. **A generated character now spends its full 250.**
-- [ ] **Phase 4 — 6E Standard (400).** The other half of the original ask; archetypes and
-      powersets authored fresh. 5E Standard (350) and 6E Low-Powered (300) follow if wanted —
-      each level is a `(base, limit, template)` triple over the same machinery, so they are data,
-      not code.
-- [ ] **Phase 5 — UI.** *(preview shipped)* A **Generate** action sits beside Import in the
-      Characters header: it rolls one of the authored archetypes, saves it through
-      `characterRepository` exactly as an import does, and opens it on the normal sheet. It says
-      what it built (`225 of 250 — skills and complications aren't generated yet`) rather than
-      implying a finished character. Still to come: the power-level picker, once more than one
-      level has data.
+- [x] **Phase 3 — 5E powersets + skills + complications.** *(done)* Every archetype has a
+      structured powerset, and each costs its balance **exactly**, checked automatically for all
+      of them. All four complication packages total exactly the 100-point limit, and all eleven
+      skillsets total exactly 25. **A generated character spends its full 250.**
+- [x] **Phase 4 — 6E Standard (400).** *(done)* The other half of the original ask: eleven
+      archetypes, eleven powersets, eleven 50-point skillsets and four 75-point complication
+      packages, all authored fresh against the Rule of X and the five real 400-point characters in
+      the corpus. Every roll lands inside ±10%. 5E Standard (350) and 6E Low-Powered (300) remain
+      data-not-code if ever wanted.
+- [x] **Phase 5 — UI.** *(done)* `GenerateDialog` — edition pills, a 3s hold, a reveal, and
+      "Roll Again". The power-level picker arrived with the second level that had data, as
+      predicted. `CharacterEditor` covers the editable fields and the Player-Defined skills.
 
 ### Proven: prose → structured, priced by the engine
 
@@ -409,10 +461,11 @@ misses its total.
 > 5E — so its real cost may well not land on 25, and that is a conversation for when the engine
 > can price it rather than a number to keep hand-maintaining.
 
-## Skills and complications — scoped, not started
+## Skills and complications — ✅ done
 
-The last 25 (skills) and 100 (complications) of a Low Powered build. Complications are the
-cleaner half; skills carry two blockers.
+The last 25 (skills) and 100 (complications) of a Low Powered build; 50 and 75 in 6E.
+Complications were the cleaner half; the skills blockers below are all resolved, and the section
+is kept for the reasoning rather than as a plan.
 
 ### Complications — ✅ done
 
@@ -432,7 +485,7 @@ Two things worth knowing for the 6E port:
   cost looks impossible: More Powerful (15) + NCI (5) **− Watching (10)** nets back to the
   prose's 10. A negative adder, not an error.
 
-### Skills — three blockers first
+### Skills — three blockers, all resolved
 
 **1. It is not one bucket, it is four.** The prose's "skills" is a catch-all over 51 distinct
 strings: **41 skills, 4 skill levels, 3 perks** (`Money: Well Off`, `FB: Medical License`,
@@ -514,28 +567,66 @@ surface discrepancies in several of the eleven, exactly as it did for the archet
 
 Once priced, `cost` should be **dropped** and derived, as `characteristicsCost` was.
 
-## Editable fields (Phil, not yet built)
+## Editable fields — ✅ done
 
-A generated character is a starting point, not a finished one, so some of it should be the
-player's to change:
+A generated character is a starting point, not a finished one, so some of it is the player's to
+change (`app/screens/CharacterEditor.tsx`):
 
 - **Name**, **Archetype**, **special effect**, **Profession** (the skillset)
-- The **"Player Defined"** skills above — `Lang:` and `SS[INT]:` exist precisely so the player
-  names their own language and sciences, so they must be editable or the default is a dead end.
+- The **"Player Defined"** skills — `Lang:` and `SS[INT]:` exist precisely so the player names
+  their own language and sciences, so they must be editable or the default is a dead end.
 
-Not started. Worth noting the shape it implies: editing the archetype or profession re-rolls the
-build, while editing a name or a Player-Defined input does not — so they are two different
-features wearing one label, and only the second is cheap.
+The predicted shape held: editing the archetype or profession re-rolls the build (and nags first),
+while editing a name or a Player-Defined input does not. Only `origin: 'generated'` rows are
+editable at all — an imported `.hdc` is the player's file and stays read-only.
+
+Two things the implementation settled:
+
+- **A player's answer lives on the recipe**, not on the built character. A rebuild regenerates the
+  skills bucket from the tables, so an answer kept anywhere else would be erased by the next
+  re-roll. Slots are keyed `XMLID#ordinal` (`LANGUAGES#0`) rather than by trait id, so an answer
+  survives a profession change — every set's `LANGUAGES#0` is the same question.
+- **"Did the player choose this name?"** needs no stored flag: ask whether the current name is
+  still exactly what the current recipe would auto-generate. Renaming a character to precisely
+  "Fire Brick" makes it auto again, which is a harmless thing to be wrong about.
+
+## Rolling — ✅ done
+
+`app/screens/GenerateDialog.tsx`. Edition pills, a 3s hold, then the reveal:
+
+```
+choosing  edition pills          [Cancel] [Generate]
+rolling   a bar, for 3s flat     [Cancel]
+revealed  "You are an Ice ..."   [Roll Again] [View]
+```
+
+**Nothing is written until "View".** Rolling and keeping are separate provider actions (`roll` is
+pure and synchronous; `keep` is the only write) because "Roll Again" over a save-on-roll would
+have littered the library with rejected characters.
+
+The reveal sentence has rules the tables don't (`core/random/describe.ts`): `a`/`an`, the
+slash-pair professions ("Playboy/Socialite" → "Socialite"), and `Other` — a real 1-in-16 roll that
+names the *absence* of an effect and so is never printed, in the sentence or the auto-name.
 
 ## Open questions
 
-- **Archetype spreads vs spending profiles.** Fixed spreads are what the legacy data gives us and
-  they lift for free at 250. But a *profile* (weights, floors, caps — "Brick: STR dominant,
-  SPD ≥ 4") would let one archetype definition serve any ceiling, instead of hand-authoring a
-  second set of eleven for 6E. Phase 1 uses the spreads as-is; revisit before Phase 4, which is
-  where the duplication would otherwise bite.
+- ~~**Archetype spreads vs spending profiles.**~~ **Resolved: spreads, hand-authored.** The
+  question was whether a *profile* (weights, floors, caps — "Brick: STR dominant, SPD ≥ 4") could
+  serve any ceiling and save authoring a second set of eleven for 6E. It could not, and the reason
+  is worth keeping: **6E figures nothing.** In 5E, PD/ED/SPD/REC/END/STUN fall out of STR/CON/DEX
+  and OCV/DCV come off DEX; in 6E every one of them is bought outright. The two editions' spreads
+  are not the same shape scaled — they have different *fields*. A profile general enough to emit
+  both would have been a second engine. The Rule of X is what a profile was really reaching for,
+  and it grades rather than generates.
 - ~~**Complications/disadvantages.**~~ **Resolved:** taken at the fixed limit, always. The four
   power levels and their arithmetic are in the table above.
-- **Which levels ship?** All four are nearly free in machinery but each needs its own archetype
-  and powerset data. 5E Low Powered is done and proven; the other three are authoring.
-- **Name generation.** Legacy left `name: ''`. Out of scope for now.
+- ~~**Which levels ship?**~~ **Resolved: 5E Low Powered (250) and 6E Standard (400)** — the
+  original ask, both done. `5e-standard` and `6e-low` remain in `POWER_LEVELS` unauthored;
+  `rollRecipe` throws for them and the dialog does not offer them.
+- **Name generation.** Legacy left `name: ''`. Still out of scope: a roll is named
+  "Ice Powered Armor" (its effect and archetype), which is a label rather than a name, and the
+  player can type over it.
+- **5E Low Powered has no Rule of X campaign.** `CAMPAIGN_225` is the nearest sample and 250 is
+  not 225, so the 5E archetypes — lifted from legacy prose — have never been graded. They are
+  legal and on-budget; whether they are *balanced against each other* is unmeasured.
+- **The Scientist skill enhancer is omitted.** Noted during authoring, not fixed.
