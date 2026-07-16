@@ -149,7 +149,7 @@ it's data preservation, not a feature.
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 17 entries; 10 fixed (H3–H10, U2, U3) — every known corpus-triggered bug is now
+> `core/`.** 18 entries; 10 fixed (H3–H10, U2, U3) — every known corpus-triggered bug is now
 > fixed. It explains why a "wrong-looking" line in `core/` may be load-bearing, and why a
 > green golden master does not mean correct.
 
@@ -169,9 +169,16 @@ Process per fix — follow it; the ledger explains the reasoning:
 
 Still open — all cosmetic, latent, or template-only; none is corpus-triggered:
 
-- **H2** is the only one with real behaviour attached (a boolean-returning sort comparator,
-  so trait *order* may be wrong). **T1–T4** are template-output only, **H1** and **U1** are
-  cosmetic.
+- **H2** and **H11** are the two with real behaviour attached. H2 is a boolean-returning sort
+  comparator, so trait *order* may be wrong. **H11** is `HandToHandAttack.roll()` computing a
+  half-die and then dropping it in its no-adder branch — it understates damage by half a die,
+  but every HTH attack in the corpus sits at a remainder of `.4`, under the threshold, so
+  nothing triggers it. **T1–T4** are template-output only, **H1** and **U1** are cosmetic.
+
+**Three places compute `STR / 5` into damage dice and they do not agree**: `maneuver.ts` and
+`heroDesignerCharacter.getStrengthDamage()` keep the half-die, `handToHandAttack.ts` drops it
+(H11). Don't fold them into a shared helper before H11 is resolved — doing so silently fixes it,
+which is a behaviour change wearing a refactor's clothes.
 
 A known non-quirk worth knowing: the visibility rule
 `(affectsPrimary && affectsTotal) || (!affectsPrimary && affectsTotal && showSecondary)` is

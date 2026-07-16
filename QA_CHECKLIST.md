@@ -112,6 +112,18 @@ native module (`npm run android`).
 - [ ] Tap a characteristic/skill roll → dice roller opens pre-filled.
 - [ ] Long-press a roll → rolls inline, result popup, stat recorded.
 
+## Strength damage (new in 2.6.0 — restored from the old app)
+- [ ] **"Damage: 12d6" appears under STR** on a 60-STR Brick, and under **no other** characteristic.
+- [ ] Tap it → dice roller opens pre-filled for **Normal Damage** (not a skill check), 12 dice.
+- [ ] Long-press it → rolls inline, popup says **Normal Damage**, STUN/BODY/Knockback shown.
+- [ ] The dice match the STR above it: **STR/5, and +3 or +4 over that is a half-die.**
+      - [ ] STR 60 → `12d6`, STR 61/62 → `12d6`, STR 63/64 → `12½d6`, STR 65 → `13d6`.
+      - [ ] A low-STR character (say 10) reads `2d6`, not blank and not `0d6`.
+- [ ] A character whose STR comes from a **power** (Density Increase, Growth) punches with the
+      total the row shows, not the bought value.
+- [ ] On a character with an **Only In Alternate Identity** STR, the damage and the total agree —
+      toggling the identity must move both or neither, never one.
+
 ## Combat tab / tracker
 - [ ] Combat values correct (6E: OCV/DCV/OMCV/DMCV; 5E: figured OCV/DCV).
 - [ ] Health: type damage into STUN, **Recovery** adds REC (capped), **Max** resets

@@ -399,25 +399,48 @@ function ManeuverRow({trait, onRoll}: {trait: SheetTrait; onRoll: RollHandler}):
 function CharacteristicRow({characteristic, onRoll}: {characteristic: SheetCharacteristic; onRoll: RollHandler}): React.JSX.Element {
     const theme = useTheme();
     const request = characteristicRollRequest(characteristic.roll, characteristic.name);
+    // STR only — see SheetCharacteristic.damage. Dispatches through the same traitRollRequest a
+    // maneuver's damage does, so tap/long-press/stats all behave identically to every other roll.
+    const damage = traitRollRequest(characteristic.damage, `${characteristic.name} Damage`);
 
     return (
-        <View style={styles.charRow}>
-            <Text style={styles.charName}>{characteristic.name}</Text>
-            <Text style={styles.charTotal}>{String(characteristic.total)}</Text>
-            {request !== null ? (
-                <Pressable testID={`roll-char-${characteristic.name}`} style={styles.charRoll} onPress={() => onRoll(request, false)} onLongPress={() => onRoll(request, true)}>
-                    <Text variant="caption" color={theme.colors.primary} style={styles.rollText}>
-                        {characteristic.roll}
+        <View style={styles.characteristic}>
+            <View style={styles.charRow}>
+                <Text style={styles.charName}>{characteristic.name}</Text>
+                <Text style={styles.charTotal}>{String(characteristic.total)}</Text>
+                {request !== null ? (
+                    <Pressable
+                        testID={`roll-char-${characteristic.name}`}
+                        style={styles.charRoll}
+                        onPress={() => onRoll(request, false)}
+                        onLongPress={() => onRoll(request, true)}>
+                        <Text variant="caption" color={theme.colors.primary} style={styles.rollText}>
+                            {characteristic.roll}
+                        </Text>
+                    </Pressable>
+                ) : (
+                    <Text variant="caption" muted style={[styles.charRoll, styles.rollText]}>
+                        {characteristic.roll ?? ''}
+                    </Text>
+                )}
+                <Text variant="caption" muted style={styles.charCost}>
+                    {`${characteristic.cost}`}
+                </Text>
+            </View>
+            {damage !== null && characteristic.damage !== null ? (
+                <Pressable
+                    testID={`roll-char-damage-${characteristic.name}`}
+                    onPress={() => onRoll(damage, false)}
+                    onLongPress={() => onRoll(damage, true)}
+                    style={styles.charDamage}>
+                    <Text variant="caption" muted>
+                        Damage:{' '}
+                        <Text variant="caption" color={theme.colors.primary}>
+                            {characteristic.damage.roll}
+                        </Text>
                     </Text>
                 </Pressable>
-            ) : (
-                <Text variant="caption" muted style={[styles.charRoll, styles.rollText]}>
-                    {characteristic.roll ?? ''}
-                </Text>
-            )}
-            <Text variant="caption" muted style={styles.charCost}>
-                {`${characteristic.cost}`}
-            </Text>
+            ) : null}
         </View>
     );
 }
@@ -678,11 +701,19 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 4,
     },
+    characteristic: {
+        paddingVertical: 1,
+    },
     charRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 3,
         columnGap: 8,
+    },
+    // Indented under the row it belongs to, and given a real touch target — it's a roll, not a label.
+    charDamage: {
+        paddingLeft: 12,
+        paddingBottom: 4,
     },
     charName: {
         flex: 1,

@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {PartialDie, RollType} from 'core/dice';
 import {heroDesignerCharacter, type ParsedCharacter} from 'core/hero';
 import type {CharacterDocument} from 'core/ports';
 import type {Obj} from 'core/traits';
+import {traitRollRequest} from 'app/dice/rollRequest';
 import sample from '../../composition/sampleCharacter.json';
 import {alternateIdentities, asHeroCharacter, buildCharacterSheet, buildCombatSheet, hasAlternateForm, isOnlyInAlternateId} from '../characterSheet';
 
@@ -39,6 +41,72 @@ describe('characterSheet', () => {
         // At least one characteristic (STR/DEX/...) yields a roll like "13-".
         expect(sheet.characteristics.some((c) => typeof c.roll === 'string' && c.roll.endsWith('-'))).toBe(true);
         expect(sheet.characteristics.some((c) => /strength/i.test(c.name))).toBe(true);
+    });
+
+    /**
+     * STR damage on the sheet — a port gap: the legacy app showed this and the rebuild never did,
+     * so a Brick could see his STR 60 and had no way to roll the 12d6 it does.
+     */
+    describe('strength damage', () => {
+        const strengthOf = (fixture: string) => buildCharacterSheet(heroOf(fixture)).characteristics.find((c) => /strength/i.test(c.name))!;
+
+        it('gives a real Brick a rollable 12d6', () => {
+            const strength = strengthOf('jack-diamond');
+
+            expect(strength.total).toBe(61);
+            expect(strength.damage).toEqual({roll: '12d6', type: RollType.NormalDamage});
+        });
+
+        /**
+         * A `RollDescriptor`, not a string, so the row goes through the identical `traitRollRequest`
+         * path a maneuver's damage does — tap, long-press and stat recording all come free. A bare
+         * string would have needed its own dispatch, and there are already two independent parsers
+         * for this notation in the tree.
+         */
+        it('carries a descriptor the roll path already understands', () => {
+            const strength = strengthOf('jack-diamond');
+
+            expect(traitRollRequest(strength.damage, 'Strength Damage')).toEqual({mode: 'normal', dice: 12, partialDie: PartialDie.None, label: 'Strength Damage'});
+        });
+
+        it('reads a half-die through to the roller', () => {
+            // 2½d6 must arrive as dice 2 + PartialDie.Half, not as "2d6" with the half quietly lost.
+            expect(traitRollRequest({roll: '2½d6', type: RollType.NormalDamage}, 'Strength Damage')).toEqual({
+                mode: 'normal',
+                dice: 2,
+                partialDie: PartialDie.Half,
+                label: 'Strength Damage',
+            });
+        });
+
+        it('is STR and nothing else — DEX does not punch', () => {
+            const sheet = buildCharacterSheet(heroOf('jack-diamond'));
+            const withDamage = sheet.characteristics.filter((c) => c.damage !== null);
+
+            expect(withDamage).toHaveLength(1);
+            expect(withDamage[0].name).toMatch(/strength/i);
+        });
+
+        /**
+         * The damage has to obey the same alternate-identity filter as the total printed above it.
+         * Otherwise a STR bought Only In Alternate Identity would show a total of 10 and a punch of
+         * 12d6 on the same line, which is worse than showing neither.
+         */
+        it('agrees with the total it sits under, in both identities', () => {
+            for (const fixture of ['jack-diamond', 'adamantinerebuild210109']) {
+                for (const showSecondary of [false, true]) {
+                    const strength = buildCharacterSheet(heroOf(fixture), showSecondary).characteristics.find((c) => /strength/i.test(c.name))!;
+                    const expected = `${Math.trunc(strength.total / 5)}`;
+
+                    // Same STR the row prints, every time — the dice are just that number over 5.
+                    expect({fixture, showSecondary, roll: strength.damage?.roll}).toEqual({
+                        fixture,
+                        showSecondary,
+                        roll: expect.stringMatching(new RegExp(`^${expected}(½)?d6$`)),
+                    });
+                }
+            }
+        });
     });
 
     it('builds decorated trait sections with labels and costs', () => {

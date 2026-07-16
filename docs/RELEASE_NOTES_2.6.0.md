@@ -89,6 +89,17 @@ picture the square shows, and **pinch** (or use the +/− buttons) to zoom.
 
 Existing portraits are untouched and still show the centre — reframe them if you like.
 
+### New: roll your Strength
+
+Your character sheet shows STR 60 and never told you that's **12d6**. Now it does,
+right under the characteristic, and you can tap it — same as any other roll, so tap
+opens the dice roller pre-filled and long-press rolls it on the spot.
+
+> STR   60   21-   50
+> **Damage: 12d6**
+
+The old app had this and the rebuild lost it in the port. Bricks, our apologies.
+
 ### Fixed
 
 - **Editing a 6E character stays in 6E.** Re-rolling a 6E character's archetype could

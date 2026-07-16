@@ -190,6 +190,54 @@ describe('CharacterDetailScreen', () => {
         expect(onRollRequest.mock.calls[0][0]).toMatchObject({mode: 'skill', label: 'Strength'});
     });
 
+    /**
+     * STR damage under the Characteristics row — a port gap. The legacy app showed "Damage: 12d6"
+     * and made it tappable; the rebuild never did, so a Brick could read his STR 60 and had no way
+     * to roll the punch it does.
+     */
+    describe('strength damage', () => {
+        it('shows the damage under STR, and only under STR', async () => {
+            const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+            const tree = await renderScreen(fakeCharacters(character({document})));
+
+            expect(collectText(tree.toJSON()).some((value) => /^\d+(½)?d6$/.test(value))).toBe(true);
+            expect(tree.root.findAllByProps({testID: 'roll-char-damage-Strength'}).length).toBeGreaterThan(0);
+            expect(tree.root.findAllByProps({testID: 'roll-char-damage-Dexterity'})).toHaveLength(0);
+        });
+
+        it('opens the dice roller pre-filled for normal damage when tapped', async () => {
+            const onRollRequest = jest.fn();
+            const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+            const tree = await renderScreen(fakeCharacters(character({document})), {onRollRequest});
+
+            const damage = tree.root.findAllByProps({testID: 'roll-char-damage-Strength'}).find((node) => typeof node.props.onPress === 'function');
+            await act(async () => {
+                damage?.props.onPress();
+            });
+
+            // 'normal', not 'skill' — the STR roll above it is a skill check, and these must not cross.
+            expect(onRollRequest).toHaveBeenCalledTimes(1);
+            expect(onRollRequest.mock.calls[0][0]).toMatchObject({mode: 'normal', label: 'Strength Damage'});
+            expect(onRollRequest.mock.calls[0][0].dice).toBeGreaterThan(0);
+        });
+
+        it('rolls the damage inline on long-press, recording the stat', async () => {
+            const {repo: statistics, current} = fakeStatistics();
+            const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];
+            const tree = await renderScreen(fakeCharacters(character({document})), {}, {statistics, roller: scriptedRoller([3])});
+
+            const damage = tree.root.findAllByProps({testID: 'roll-char-damage-Strength'}).find((node) => typeof node.props.onLongPress === 'function');
+            await act(async () => {
+                damage?.props.onLongPress();
+            });
+            await act(async () => {}); // flush the stats write
+
+            const text = collectText(tree.toJSON());
+            expect(text).toContain('Normal Damage'); // result popup title, not 'Skill Check'
+            expect(current().totals.skillChecks).toBe(0);
+        });
+    });
+
     it('rolls immediately and shows the result on long-press, recording stats', async () => {
         const {repo: statistics, current} = fakeStatistics();
         const document = heroDesignerCharacter.getCharacter(sample as unknown as ParsedCharacter) as unknown as Character['document'];

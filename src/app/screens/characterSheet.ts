@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {combatDetails} from 'core/combat';
+import {RollType} from 'core/dice';
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
@@ -91,6 +92,15 @@ export interface SheetCharacteristic {
     total: number;
     roll: string | null;
     cost: number;
+    /**
+     * The Normal Damage this characteristic's own value does — **STR only**, and null everywhere else.
+     *
+     * A `RollDescriptor` rather than a bare `"12d6"` string so the row dispatches through exactly the
+     * path a maneuver's damage does (`traitRollRequest`): tap opens the roller pre-filled, long-press
+     * rolls inline and records the stat, both for free. The string is right there on `.roll` for the
+     * sheet to print.
+     */
+    damage: RollDescriptor | null;
 }
 
 /** The combat line for a martial-arts maneuver: strike (OCV), evasion (DCV), range, damage, notes. */
@@ -300,11 +310,17 @@ export function buildCharacterSheet(character: Obj, showSecondary = false): Char
 
     const characteristics: SheetCharacteristic[] = toArray(c.characteristics).map((entry) => {
         const name = String(entry.name ?? entry.shortName ?? '');
+        const isStrength = String(entry.shortName).toUpperCase() === 'STR';
+
         return {
             name: name.toLowerCase().startsWith('custom') ? String(entry.shortName ?? name) : name,
             total: heroDesignerCharacter.getCharacteristicTotal(String(entry.shortName), c),
             roll: heroDesignerCharacter.getRollTotal(entry, c),
             cost: Number(entry.cost ?? 0),
+            // STR is the only characteristic that is itself an attack. Read off `c`, not the raw
+            // character, so it obeys the same alternate-identity filtering as the total above it —
+            // a STR bought Only In Alternate Identity must not punch while the identity is off.
+            damage: isStrength ? {roll: heroDesignerCharacter.getStrengthDamage(c), type: RollType.NormalDamage} : null,
         };
     });
 

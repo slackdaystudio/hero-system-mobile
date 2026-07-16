@@ -222,6 +222,35 @@ export class HeroDesignerCharacter {
         return null;
     }
 
+    /**
+     * The Normal Damage a character's bare STR does: `"12d6"`, `"2½d6"`.
+     *
+     * **5 STR is 1d6, and 3 or 4 STR over that is a half-die** — so STR 60 punches for 12d6 and STR
+     * 13 for 2½d6, while STR 11 and 12 are still 2d6. That is what the `>= 0.6` threshold below
+     * encodes: `STR / 5` leaves .6 or .8 exactly when the remainder is 3 or 4.
+     *
+     * Ported from the legacy app's `Characteristics.js` `getStrengthDamage()`, which computed this
+     * inside the sheet component — so this is a **port gap being closed**, not a new rule. The
+     * rebuild's sheet has never shown it, which left a Brick unable to roll his own punch.
+     *
+     * Lives here rather than in the sheet because it is a fact about a characteristic, exactly like
+     * {@link getRollTotal} beside it, and because `maneuver.ts` and `handToHandAttack.ts` already
+     * compute the same `STR / 5` from inside `core/traits`. **Those are deliberately left alone**:
+     * their formatting is *not* identical to this (`handToHandAttack` computes a half-die and then
+     * drops it in its no-adder branch, faithfully to legacy), so folding them together would be a
+     * behaviour change wearing a refactor's clothes. See docs/KNOWN_DEVIATIONS.md.
+     */
+    getStrengthDamage(character: Obj): string {
+        // Clamped, where legacy wasn't. Its guard was `fractionalPart > 0.0`, so a negative STR fell
+        // past every branch and rendered the raw float: STR -3 printed "-0.6d6". Not a deviation
+        // worth preserving — this rule lived in legacy's sheet *component*, not its engine, so it
+        // was never golden-mastered and nothing depends on that output. Nobody punches for -0.6d6.
+        const dice = Math.max(0, this.getCharacteristicTotal('STR', character)) / 5;
+        const remainder = parseFloat((dice % 1).toFixed(1));
+
+        return remainder >= 0.6 ? `${Math.trunc(dice)}½d6` : `${Math.trunc(dice)}d6`;
+    }
+
     getTotalDefense(character: Obj, type: string | null, withResistant = true): string {
         if (type === null || type === undefined) {
             return withResistant ? '0/0' : '0';
