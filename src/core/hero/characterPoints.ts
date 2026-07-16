@@ -51,32 +51,37 @@ export function readBasicConfiguration(document: CharacterDocument): BasicConfig
 }
 
 /**
- * The character's total build points, edition-aware — the number the 6E1 "Character Point
- * Guidelines" table classifies. **The editions quote points differently** (the trap
- * `core/random/powerLevel` documents): 5E disadvantages fund the build, 6E complications do not.
+ * The campaign power-level tiers, keyed on **base points** — the column both rulebooks classify by.
+ * Base is the right key, not the total: the 5ER table gives Very Powerful Heroic and Low-Powered
+ * Superheroic the *same* 250 total and separates them only by base (125 vs 150). Base is monotonic
+ * and collision-free in both tables, so it disambiguates where total cannot.
  *
- * ```
- * 5E:  base + disadvantages
- * 6E:  base
- * ```
+ * The two editions run on different scales and get their own ladder:
+ *   - 5E from the HERO System 5th Edition Revised "Character Types" table (base-points column).
+ *   - 6E from the HERO System 6th Edition Volume 1 "Character Point Guidelines" table (6E1 34); 6E
+ *     complications grant no points, so its base equals its total.
  *
- * Experience is deliberately excluded: the tier is the *campaign* power level, set before play, not
- * a total that creeps upward as a character earns points (that is shown separately, beside the base).
+ * Each entry's anchor is a floor: a character between two anchors takes the lower tier's name.
+ * Highest first — the classifier returns the first match, falling through to the last (the floor).
  */
-export function startingTotal(config: BasicConfiguration, isFifth: boolean): number {
-    return isFifth ? config.basePoints + config.disadPoints : config.basePoints;
-}
+type Ladder = ReadonlyArray<{readonly min: number; readonly label: string}>;
 
-/**
- * The campaign power-level tiers, from the HERO System 6th Edition Volume 1 "Character Point
- * Guidelines" table (6E1 34). Each entry's suggested total is used as a floor, so a character between
- * two anchors takes the lower tier's name. Highest first — `powerTier` returns the first match.
- *
- * Both editions are classified against this 6E table. 5E's own scale runs roughly a tier lower
- * (`powerLevel` puts 5E Standard Superheroic at 350, where 6E puts it at 400), so a 5E character
- * reads one step conservative here. If a 5ER-specific ladder is wanted, split this by edition.
- */
-const POWER_TIERS: ReadonlyArray<{readonly min: number; readonly label: string}> = [
+const POWER_TIERS_5E: Ladder = [
+    {min: 500, label: 'Cosmically Powerful Superheroic'},
+    {min: 400, label: 'Very High-Powered Superheroic'},
+    {min: 300, label: 'High-Powered Superheroic'},
+    {min: 200, label: 'Standard Superheroic'},
+    {min: 150, label: 'Low-Powered Superheroic'},
+    {min: 125, label: 'Very Powerful Heroic'},
+    {min: 100, label: 'Powerful Heroic'},
+    {min: 75, label: 'Standard Heroic'},
+    {min: 50, label: 'Competent Normal'},
+    {min: 25, label: 'Skilled Normal'},
+    {min: 0, label: 'Standard Normal'},
+    {min: Number.NEGATIVE_INFINITY, label: 'Incompetent Normal'},
+];
+
+const POWER_TIERS_6E: Ladder = [
     {min: 750, label: 'Cosmically Powerful Superheroic'},
     {min: 650, label: 'Very High-Powered Superheroic'},
     {min: 500, label: 'High-Powered Superheroic'},
@@ -87,12 +92,19 @@ const POWER_TIERS: ReadonlyArray<{readonly min: number; readonly label: string}>
     {min: 175, label: 'Standard Heroic'},
     {min: 100, label: 'Competent Normal'},
     {min: 50, label: 'Skilled Normal'},
-    {min: 0, label: 'Standard Normal'},
+    {min: Number.NEGATIVE_INFINITY, label: 'Standard Normal'},
 ];
 
-/** The campaign power-level name for an (edition-aware) starting total — see `POWER_TIERS`. */
-export function powerTier(total: number): string {
-    return (POWER_TIERS.find((tier) => total >= tier.min) ?? POWER_TIERS[POWER_TIERS.length - 1]).label;
+/**
+ * The campaign power-level name for a base-point count, per the edition's ladder.
+ *
+ * Base points, not the disadvantage-inclusive total: it is the campaign's *starting* level (set
+ * before play) and the only key that separates same-total tiers. Experience is likewise excluded —
+ * the tier does not creep upward as a character earns points (that is shown separately, beside base).
+ */
+export function powerTier(basePoints: number, isFifth: boolean): string {
+    const ladder = isFifth ? POWER_TIERS_5E : POWER_TIERS_6E;
+    return (ladder.find((tier) => basePoints >= tier.min) ?? ladder[ladder.length - 1]).label;
 }
 
 /** What the nameplate shows: the declared base + experience, and the campaign tier those points fall in. */
@@ -109,5 +121,5 @@ export function pointSummary(document: CharacterDocument, isFifth: boolean): Poi
         return null;
     }
 
-    return {base: config.basePoints, experience: config.experience, tier: powerTier(startingTotal(config, isFifth))};
+    return {base: config.basePoints, experience: config.experience, tier: powerTier(config.basePoints, isFifth)};
 }

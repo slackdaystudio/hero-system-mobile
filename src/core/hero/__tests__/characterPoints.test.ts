@@ -18,7 +18,7 @@
  * that table, not legacy — nothing legacy did is preserved here. The fixtures double as a check that
  * the numbers are read from the real `.hdc` `<BASIC_CONFIGURATION>` block, not invented.
  */
-import {pointSummary, powerTier, readBasicConfiguration, startingTotal, type BasicConfiguration} from '../characterPoints';
+import {pointSummary, powerTier, readBasicConfiguration, type BasicConfiguration} from '../characterPoints';
 import type {CharacterDocument} from 'core/ports';
 import twilight from './fixtures/twilight.json';
 import starborne from './fixtures/starborne.json';
@@ -30,36 +30,41 @@ import spyder from './fixtures/spyder2022.json';
 const config = (basePoints: number, disadPoints: number, experience = 0): BasicConfiguration => ({basePoints, disadPoints, experience});
 
 describe('powerTier', () => {
-    it('names each 6E1 tier at its floor', () => {
-        expect(powerTier(25)).toBe('Standard Normal');
-        expect(powerTier(50)).toBe('Skilled Normal');
-        expect(powerTier(100)).toBe('Competent Normal');
-        expect(powerTier(175)).toBe('Standard Heroic');
-        expect(powerTier(225)).toBe('Powerful Heroic');
-        expect(powerTier(275)).toBe('Very Powerful Heroic');
-        expect(powerTier(300)).toBe('Low-Powered Superheroic');
-        expect(powerTier(400)).toBe('Standard Superheroic');
-        expect(powerTier(500)).toBe('High-Powered Superheroic');
-        expect(powerTier(650)).toBe('Very High-Powered Superheroic');
-        expect(powerTier(750)).toBe('Cosmically Powerful Superheroic');
+    it('names each 6E1 tier at its base-point anchor', () => {
+        expect(powerTier(50, false)).toBe('Skilled Normal');
+        expect(powerTier(100, false)).toBe('Competent Normal');
+        expect(powerTier(175, false)).toBe('Standard Heroic');
+        expect(powerTier(225, false)).toBe('Powerful Heroic');
+        expect(powerTier(275, false)).toBe('Very Powerful Heroic');
+        expect(powerTier(300, false)).toBe('Low-Powered Superheroic');
+        expect(powerTier(400, false)).toBe('Standard Superheroic');
+        expect(powerTier(500, false)).toBe('High-Powered Superheroic');
+        expect(powerTier(650, false)).toBe('Very High-Powered Superheroic');
+        expect(powerTier(750, false)).toBe('Cosmically Powerful Superheroic');
     });
 
-    it('takes the lower tier between two anchors, and never underflows', () => {
-        expect(powerTier(399)).toBe('Low-Powered Superheroic');
-        expect(powerTier(499)).toBe('Standard Superheroic');
-        expect(powerTier(1000)).toBe('Cosmically Powerful Superheroic');
-        expect(powerTier(24)).toBe('Standard Normal');
-        expect(powerTier(0)).toBe('Standard Normal');
+    it('names each 5ER tier at its base-point anchor — a lower, distinct scale from 6E', () => {
+        expect(powerTier(-25, true)).toBe('Incompetent Normal');
+        expect(powerTier(0, true)).toBe('Standard Normal');
+        expect(powerTier(25, true)).toBe('Skilled Normal');
+        expect(powerTier(50, true)).toBe('Competent Normal');
+        expect(powerTier(75, true)).toBe('Standard Heroic');
+        expect(powerTier(100, true)).toBe('Powerful Heroic');
+        expect(powerTier(125, true)).toBe('Very Powerful Heroic');
+        expect(powerTier(150, true)).toBe('Low-Powered Superheroic');
+        expect(powerTier(200, true)).toBe('Standard Superheroic');
+        expect(powerTier(300, true)).toBe('High-Powered Superheroic');
+        expect(powerTier(400, true)).toBe('Very High-Powered Superheroic');
+        expect(powerTier(500, true)).toBe('Cosmically Powerful Superheroic');
     });
-});
 
-describe('startingTotal', () => {
-    it('adds 5E disadvantages to the base (they fund the build)', () => {
-        expect(startingTotal(config(200, 150), true)).toBe(350);
-    });
-
-    it('ignores 6E complications (they grant no points)', () => {
-        expect(startingTotal(config(400, 75), false)).toBe(400);
+    it('takes the lower tier between two anchors, and floors instead of underflowing', () => {
+        expect(powerTier(399, false)).toBe('Low-Powered Superheroic');
+        expect(powerTier(499, false)).toBe('Standard Superheroic');
+        expect(powerTier(1000, false)).toBe('Cosmically Powerful Superheroic');
+        expect(powerTier(0, false)).toBe('Standard Normal');
+        expect(powerTier(149, true)).toBe('Very Powerful Heroic');
+        expect(powerTier(-100, true)).toBe('Incompetent Normal');
     });
 });
 
@@ -97,12 +102,12 @@ describe('pointSummary', () => {
         expect(pointSummary(defensor as CharacterDocument, false)).toEqual({base: 200, experience: 0, tier: 'Standard Heroic'});
     });
 
-    it('adds 5E disadvantages: a 200+150 character is Low-Powered Superheroic', () => {
-        expect(pointSummary(fifth as CharacterDocument, true)).toEqual({base: 200, experience: 0, tier: 'Low-Powered Superheroic'});
+    it('classifies a 200-base 5E character as Standard Superheroic (5E scale, keyed on base)', () => {
+        expect(pointSummary(fifth as CharacterDocument, true)).toEqual({base: 200, experience: 0, tier: 'Standard Superheroic'});
     });
 
-    it('classifies a 150+100 5E character (250 total) as Powerful Heroic', () => {
-        expect(pointSummary(spyder as CharacterDocument, true)).toEqual({base: 150, experience: 8, tier: 'Powerful Heroic'});
+    it('classifies a 150-base 5E character as Low-Powered Superheroic', () => {
+        expect(pointSummary(spyder as CharacterDocument, true)).toEqual({base: 150, experience: 8, tier: 'Low-Powered Superheroic'});
     });
 
     it('returns null when the config was never preserved', () => {
