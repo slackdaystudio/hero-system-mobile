@@ -11,7 +11,7 @@ listing. Two consequences:
 - The release build **must be signed with the legacy app's existing upload key**.
   A brand-new keystore will be **rejected** by Play ("upload key mismatch").
 - `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; **65 / 2.5.0**
-  is out to internal testing, and this repo is set to **66 / 2.6.0**
+  is out to internal testing, and this repo is set to **67 / 2.7.0**
   (`android/app/build.gradle`). Bump `versionCode` for every subsequent upload.
 
 ## Signing setup
@@ -76,6 +76,19 @@ App Store Connect → TestFlight.
 A fresh install exercises none of the risk. Install the *previous* build, import a
 character or two, then install this one over the top and confirm they're all still
 there.
+
+### 2.7.0 — Endurance tracking; no schema change, no cost changes
+
+Adds **Endurance tracking** (6E and 5E) and the **character-type / points nameplate**.
+
+- **No schema change.** END rides existing storage: the running pool is already a field on
+  the combat-state blob, and the nameplate's declared points ride in the character-document
+  JSON (`basicConfiguration`, preserved at import/generate). Schema stays at 7.
+- **Changes no costs on existing characters.** It's all additive display/tracking — the
+  engine's `realCost`/`activeCost` are untouched. As with 2.6.0, a cost that moves is a
+  regression, not an expected fix.
+- Existing imported characters show **no points/tier** until re-imported (their stored docs
+  predate `basicConfiguration`); END tracking works for them regardless.
 
 ### 2.6.0 — the schema moves 5 → 7
 

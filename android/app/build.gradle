@@ -97,8 +97,10 @@ android {
         // 66/2.6.0 — 6E Standard (400) random characters and the Generate dialog;
         //            portrait framing. Schema 5 → 7 (006/007, portrait focus).
         //            Changes no costs on existing characters — 2.5.0 did that.
-        versionCode 66
-        versionName "2.6.0"
+        // 67/2.7.0 — Endurance tracking (6E + 5E) and the character-type/points nameplate.
+        //            No schema change (END rides the existing blobs), no cost changes.
+        versionCode 67
+        versionName "2.7.0"
     }
     signingConfigs {
         debug {
