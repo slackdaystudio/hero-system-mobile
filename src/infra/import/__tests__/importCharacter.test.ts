@@ -64,6 +64,9 @@ describe('importHdc', () => {
         expect(typeof characteristics[0]?.shortName).toBe('string');
         expect(saved?.document).not.toHaveProperty('portrait');
         expect(saved?.document).not.toHaveProperty('image');
+        // The declared point config is preserved past the engine (which drops it) so the sheet can
+        // show the character's build total and campaign tier.
+        expect(saved?.document.basicConfiguration).toMatchObject({basePoints: 200, disadPoints: 150, experience: 0});
     });
 
     it('re-importing the same file updates in place (upsert), not duplicates', async () => {

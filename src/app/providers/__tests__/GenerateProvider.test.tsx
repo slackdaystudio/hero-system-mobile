@@ -121,6 +121,9 @@ describe('GenerateProvider', () => {
         expect(heroDesignerCharacter.isFifth(document)).toBe(true);
         expect(document.characteristics.length).toBeGreaterThan(0);
         expect(document.powers.length).toBeGreaterThan(0);
+        // Synthesized declared config so a generated character shows points/tier like an imported one.
+        // 5E Low Powered: base 150 + disadvantages 100 = 250 total.
+        expect(document.basicConfiguration).toEqual({basePoints: 150, disadPoints: 100, experience: 0});
     });
 
     it('builds a whole character — the full 250', async () => {

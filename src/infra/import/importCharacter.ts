@@ -49,6 +49,13 @@ export async function importHdc(bytes: Uint8Array, fileName: string, repos: Repo
     }
 
     const processed = heroDesignerCharacter.getCharacter(parsed as never) as unknown as CharacterDocument;
+
+    // `getCharacter` drops the `.hdc`'s declared point config; carry it onto the stored document so
+    // the sheet can show the character's build total and campaign tier (see core `characterPoints`).
+    if (parsed.basicConfiguration !== undefined) {
+        processed.basicConfiguration = parsed.basicConfiguration;
+    }
+
     const {document, portrait} = stripPortrait(processed);
 
     const info = (document.characterInfo ?? {}) as {characterName?: string; playerName?: string};

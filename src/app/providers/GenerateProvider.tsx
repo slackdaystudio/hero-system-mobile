@@ -15,7 +15,7 @@
 import React, {createContext, useCallback, useContext, useMemo} from 'react';
 import {heroDesignerCharacter} from 'core/hero';
 import type {Character, CharacterDocument, Rng} from 'core/ports';
-import {buildRecipe, dealHand, type Candidate, type CharacterRecipe, type GeneratedCharacter, type PowerLevel} from 'core/random';
+import {buildRecipe, dealHand, declaredConfiguration, type Candidate, type CharacterRecipe, type GeneratedCharacter, type PowerLevel} from 'core/random';
 import {mathRandomRng} from 'infra/rng/mathRandomRng';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 
@@ -97,6 +97,9 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
     const keep = useCallback<KeepCharacter>(
         async (rolled) => {
             const document = heroDesignerCharacter.getCharacter(rolled.parsed) as unknown as CharacterDocument;
+            // The engine builds no declared config; synthesize the level's so a generated character
+            // shows the same points/tier as an imported one (see core `characterPoints`).
+            document.basicConfiguration = declaredConfiguration(rolled.level);
 
             // Unique per generation: a kept character is a new one every time, never an upsert over
             // a previous roll (unlike an import, whose id comes from its file name).
@@ -129,6 +132,7 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
         async (character, recipe) => {
             const built = buildRecipe(recipe);
             const document = heroDesignerCharacter.getCharacter(built.parsed) as unknown as CharacterDocument;
+            document.basicConfiguration = declaredConfiguration(built.level);
 
             await repositories.characters.save({
                 id: character.id,

@@ -13,5 +13,6 @@
 // limitations under the License.
 
 export {HeroDesignerCharacter, heroDesignerCharacter} from './heroDesignerCharacter';
+export * from './characterPoints';
 export * from './constants';
 export * from './types';

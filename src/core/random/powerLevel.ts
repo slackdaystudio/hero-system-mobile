@@ -26,6 +26,7 @@
  * Reduced to the triple they agree — `total === base + limit` — so nothing downstream needs to
  * know which edition quoted what. Everything here is already reduced.
  */
+import type {BasicConfiguration} from 'core/hero';
 import {SUPERHEROIC_5E, SUPERHEROIC_6E} from './characteristics';
 
 export type Edition = '5e' | '6e';
@@ -59,6 +60,16 @@ export const POWER_LEVELS: readonly PowerLevel[] = [
 /** The two the legacy data and the original ask target: 250 and 400 — both totals. */
 export const LOW_POWERED_5E = POWER_LEVELS[0];
 export const STANDARD_6E = POWER_LEVELS[3];
+
+/**
+ * The `<BASIC_CONFIGURATION>` a real `.hdc` at this level would carry — synthesized so a generated
+ * character reads the same declared points/tier as an imported one (`core/hero` `characterPoints`).
+ * Mirrors how HD quotes each edition: 6E writes the *total* as base points, 5E writes the base.
+ */
+export const declaredConfiguration = (level: PowerLevel): BasicConfiguration =>
+    level.edition === '6e'
+        ? {basePoints: level.total, disadPoints: level.limit, experience: 0}
+        : {basePoints: level.base, disadPoints: level.limit, experience: 0};
 
 export const powerLevel = (id: string): PowerLevel => {
     const level = POWER_LEVELS.find((candidate) => candidate.id === id);

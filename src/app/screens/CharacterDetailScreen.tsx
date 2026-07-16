@@ -17,6 +17,7 @@ import {ActivityIndicator, Alert, Animated, Image, Modal, Pressable, ScrollView,
 import type {LastRoll} from 'core/dice';
 import type {Character, PortraitFocus} from 'core/ports';
 import type {Obj} from 'core/traits';
+import {pointSummary, type PointSummary} from 'core/hero';
 import {Button, Card, PortraitImage, Screen, SegmentedControl, Text, type Segment} from 'app/components';
 import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
 import {useDieRoller} from 'app/providers/DiceProvider';
@@ -184,6 +185,8 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
 
     const loaded = state.character;
     const alias = alternateIdentities(loaded.document);
+    const points = pointSummary(loaded.document, loaded.edition === '5E');
+    const meta = [loaded.edition, loaded.player, points !== null ? formatPoints(points) : null].filter(Boolean).join(' · ');
     const avatarStyle: ViewStyle = {backgroundColor: theme.colors.surfaceAlt, borderRadius: theme.radius.md};
     const content: ViewStyle = {padding: theme.spacing(4), rowGap: theme.spacing(4)};
 
@@ -214,8 +217,13 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                                 {alias}
                             </Text>
                         ) : null}
+                        {points !== null ? (
+                            <Text variant="caption" color={theme.colors.primary}>
+                                {points.tier}
+                            </Text>
+                        ) : null}
                         <Text variant="caption" muted>
-                            {loaded.player ? `${loaded.edition} · ${loaded.player}` : loaded.edition}
+                            {meta}
                         </Text>
                         {loaded.isActive ? (
                             <Text variant="caption" color={theme.colors.active}>
@@ -253,6 +261,9 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
         </Screen>
     );
 }
+
+/** Declared points for the nameplate: base, plus "+ N" only when the character has earned experience. */
+const formatPoints = (points: PointSummary): string => (points.experience > 0 ? `${points.base} + ${points.experience} pts` : `${points.base} pts`);
 
 type SheetTab = 'character' | 'combat';
 
