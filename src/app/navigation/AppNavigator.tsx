@@ -20,7 +20,8 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import type {ImportResult} from 'infra/import';
 import {Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
-import {useGenerateCharacter, type GenerateResult} from 'app/providers/GenerateProvider';
+import {type GenerateResult} from 'app/providers/GenerateProvider';
+import {GenerateDialog} from 'app/screens/GenerateDialog';
 import {useImportCharacter} from 'app/providers/ImportProvider';
 import {useSettings} from 'app/providers/SettingsProvider';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
@@ -170,38 +171,33 @@ export function HomeRoute({navigation}: {navigation: NativeStackNavigationProp<R
     );
 }
 
-/** Header action that generates a random character and opens it (docs/RANDOM_CHARACTER.md). */
+/**
+ * Header action that opens the roll dialog (docs/RANDOM_CHARACTER.md).
+ *
+ * Owns the dialog's `visible` the way `SelectField` owns its own — a Modal portals to the root
+ * regardless of where it is mounted, so living under `headerRight` costs nothing and keeps the
+ * button and the thing it opens in one place.
+ */
 function GenerateButton({onGenerated}: {onGenerated: (result: GenerateResult) => void}): React.JSX.Element {
     const theme = useTheme();
-    const generateCharacter = useGenerateCharacter();
-    const [busy, setBusy] = useState(false);
-
-    const run = async (): Promise<void> => {
-        if (busy) {
-            return;
-        }
-        setBusy(true);
-        try {
-            const result = await generateCharacter();
-
-            Alert.alert(result.name, `${result.archetype} — ${result.spent} of ${result.total} points.`, [{text: 'View', onPress: () => onGenerated(result)}]);
-        } catch (error) {
-            Alert.alert('Generate failed', error instanceof Error ? error.message : 'That character could not be generated.');
-        } finally {
-            setBusy(false);
-        }
-    };
-
-    if (busy) {
-        return <ActivityIndicator color={theme.colors.primary} />;
-    }
+    const [open, setOpen] = useState(false);
 
     return (
-        <Pressable accessibilityRole="button" onPress={run} testID="generate-character">
-            <Text variant="label" color={theme.colors.primary}>
-                Generate
-            </Text>
-        </Pressable>
+        <>
+            <Pressable accessibilityRole="button" onPress={() => setOpen(true)} testID="generate-character">
+                <Text variant="label" color={theme.colors.primary}>
+                    Generate
+                </Text>
+            </Pressable>
+            <GenerateDialog
+                visible={open}
+                onClose={() => setOpen(false)}
+                onGenerated={(result) => {
+                    setOpen(false);
+                    onGenerated(result);
+                }}
+            />
+        </>
     );
 }
 

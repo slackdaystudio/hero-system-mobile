@@ -15,7 +15,7 @@
 import React, {createContext, useCallback, useContext, useMemo} from 'react';
 import {heroDesignerCharacter} from 'core/hero';
 import type {Character, CharacterDocument, Rng} from 'core/ports';
-import {buildRecipe, generateRandomCharacter, type CharacterRecipe} from 'core/random';
+import {buildRecipe, generateRandomCharacter, type CharacterRecipe, type GeneratedCharacter, type PowerLevel} from 'core/random';
 import {mathRandomRng} from 'infra/rng/mathRandomRng';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 
@@ -26,9 +26,19 @@ import {useRepositories} from 'app/providers/RepositoriesProvider';
  * input an import produces — and it is run through the engine and saved down the identical path,
  * so a generated character is indistinguishable from an imported one.
  *
- * Both actions share one save shape, so a generated character and a re-rolled one are stored
- * identically. Only the archetypes with a structured powerset can appear; `spent`/`total` come back
- * so callers can report the build rather than assert it.
+ * **Rolling and keeping are separate, and that is the point.** This used to be one `generate()`
+ * that rolled, built and saved before the player had seen a single word of the result — dismissing
+ * the dialog left a character behind in the library. The Generate dialog offers "Roll Again", which
+ * turns that into a pile of them, so:
+ *
+ * ```
+ * roll(level)   pure and synchronous — nothing is written
+ * keep(rolled)  the only thing that touches storage
+ * ```
+ *
+ * A rejected roll is now simply never saved, and there is nothing to clean up because nothing was
+ * created. `revise` keeps the same save shape, so a generated character, a re-rolled one and a kept
+ * one are all stored identically.
  */
 export interface GenerateResult {
     readonly id: string;
@@ -39,7 +49,17 @@ export interface GenerateResult {
     readonly total: number;
 }
 
-type GenerateCharacter = () => Promise<GenerateResult>;
+/**
+ * Roll a character without saving it.
+ *
+ * Synchronous because it is pure — the domain does no I/O, and pretending otherwise would make the
+ * dialog await something that never yields. The `Rng` is the provider's, so a seeded one reaches it
+ * in tests.
+ */
+type RollCharacter = (level: PowerLevel) => GeneratedCharacter;
+
+/** Save a rolled character. The only write on the generate path, and only the player triggers it. */
+type KeepCharacter = (rolled: GeneratedCharacter) => Promise<GenerateResult>;
 
 /**
  * Re-save a generated character from a revised recipe.
@@ -51,7 +71,8 @@ type GenerateCharacter = () => Promise<GenerateResult>;
 type ReviseCharacter = (character: Character, recipe: CharacterRecipe) => Promise<GenerateResult>;
 
 interface GenerateApi {
-    readonly generate: GenerateCharacter;
+    readonly roll: RollCharacter;
+    readonly keep: KeepCharacter;
     readonly revise: ReviseCharacter;
     /** The same generator a roll uses — recipe edits that re-draw a powerset need it. */
     readonly rng: Rng;
@@ -69,30 +90,36 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
     const repositories = useRepositories();
     const generator = useMemo(() => rng ?? mathRandomRng(), [rng]);
 
-    const generate = useCallback<GenerateCharacter>(async () => {
-        const generated = generateRandomCharacter(generator);
-        const document = heroDesignerCharacter.getCharacter(generated.parsed) as unknown as CharacterDocument;
+    // The level is passed, never defaulted: `generateRandomCharacter` falls back to 5E Low Powered,
+    // and calling it bare is how every roll was silently 5E while the whole 6E dataset sat unreachable.
+    const roll = useCallback<RollCharacter>((level) => generateRandomCharacter(generator, level), [generator]);
 
-        // Unique per generation: a generated character is a new one every time, never an upsert
-        // over a previous roll (unlike an import, whose id comes from its file name).
-        const id = `generated-${generated.recipe.archetype.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${await nextSuffix(repositories)}`;
+    const keep = useCallback<KeepCharacter>(
+        async (rolled) => {
+            const document = heroDesignerCharacter.getCharacter(rolled.parsed) as unknown as CharacterDocument;
 
-        await repositories.characters.save({
-            id,
-            name: generated.recipe.name,
-            player: null,
-            edition: heroDesignerCharacter.isFifth(document) ? '5E' : '6E',
-            filename: id,
-            document,
-            portrait: null,
-            // Stated, not inferred from the id prefix: this is the row the player is allowed to
-            // edit, and the recipe is the only record of what it was rolled from.
-            origin: 'generated',
-            recipe: generated.recipe,
-        });
+            // Unique per generation: a kept character is a new one every time, never an upsert over
+            // a previous roll (unlike an import, whose id comes from its file name).
+            const id = `generated-${rolled.recipe.archetype.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${await nextSuffix(repositories)}`;
 
-        return {id, name: generated.recipe.name, archetype: generated.recipe.archetype, spent: generated.spent, total: generated.level.total};
-    }, [generator, repositories]);
+            await repositories.characters.save({
+                id,
+                name: rolled.recipe.name,
+                player: null,
+                edition: heroDesignerCharacter.isFifth(document) ? '5E' : '6E',
+                filename: id,
+                document,
+                portrait: null,
+                // Stated, not inferred from the id prefix: this is the row the player is allowed to
+                // edit, and the recipe is the only record of what it was rolled from.
+                origin: 'generated',
+                recipe: rolled.recipe,
+            });
+
+            return {id, name: rolled.recipe.name, archetype: rolled.recipe.archetype, spent: rolled.spent, total: rolled.level.total};
+        },
+        [repositories],
+    );
 
     /**
      * An edit rebuilds through the same pipeline a roll does — the recipe fully determines the
@@ -120,7 +147,7 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
         [repositories],
     );
 
-    const api = useMemo<GenerateApi>(() => ({generate, revise, rng: generator}), [generate, revise, generator]);
+    const api = useMemo<GenerateApi>(() => ({roll, keep, revise, rng: generator}), [roll, keep, revise, generator]);
 
     return <GenerateContext.Provider value={api}>{children}</GenerateContext.Provider>;
 }
@@ -142,7 +169,11 @@ function useGenerateApi(): GenerateApi {
     return value;
 }
 
-export const useGenerateCharacter = (): GenerateCharacter => useGenerateApi().generate;
+/** Roll a character at a level. Pure — nothing is saved until {@link useKeepCharacter}. */
+export const useRollCharacter = (): RollCharacter => useGenerateApi().roll;
+
+/** Save a rolled character. Only the player's "View" reaches this. */
+export const useKeepCharacter = (): KeepCharacter => useGenerateApi().keep;
 
 /** Re-save a generated character from a revised recipe. Only generated characters may be revised. */
 export const useReviseCharacter = (): ReviseCharacter => useGenerateApi().revise;
