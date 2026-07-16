@@ -20,7 +20,7 @@ import type {Obj} from 'core/traits';
 import {pointSummary, type PointSummary} from 'core/hero';
 import {Button, Card, PortraitImage, Screen, SegmentedControl, Text, type Segment} from 'app/components';
 import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
-import {CombatStateProvider, describeSpend, useCombatState} from 'app/providers/CombatStateProvider';
+import {CombatStateProvider, useCombatState} from 'app/providers/CombatStateProvider';
 import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
@@ -322,35 +322,9 @@ function AlternateIdToggle({value, onChange}: {value: boolean; onChange: (next: 
     );
 }
 
-/** The live END pool on the Character tab, so tapping a power's END cost has visible feedback. */
-function EndurancePool(): React.JSX.Element | null {
-    const theme = useTheme();
-    const combat = useCombatState();
-    if (combat === null || combat.state === null) {
-        return null;
-    }
-
-    return (
-        <Card>
-            <View style={styles.poolRow}>
-                <Text variant="label" muted>
-                    ENDURANCE
-                </Text>
-                <Text variant="title" color={theme.colors.primary}>
-                    {`${combat.state.endurance} / ${combat.max.endurance}`}
-                </Text>
-            </View>
-            <Text variant="caption" muted>
-                {combat.lastSpend !== null ? describeSpend(combat.lastSpend) : 'Tap a power’s END to spend it.'}
-            </Text>
-        </Card>
-    );
-}
-
 function SheetBody({sheet, onRoll}: {sheet: CharacterSheet; onRoll: RollHandler}): React.JSX.Element {
     return (
         <>
-            <EndurancePool />
             <Section title="Characteristics">
                 {sheet.characteristics.map((characteristic, index) => (
                     <CharacteristicRow key={index} characteristic={characteristic} onRoll={onRoll} />
@@ -755,11 +729,6 @@ const styles = StyleSheet.create({
     },
     tabbed: {
         rowGap: 16,
-    },
-    poolRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
     },
     altToggle: {
         flexDirection: 'row',

@@ -22,6 +22,7 @@ import {GenerateProvider} from 'app/providers/GenerateProvider';
 import {ImportProvider} from 'app/providers/ImportProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {SettingsProvider, useSettings} from 'app/providers/SettingsProvider';
+import {ToastProvider} from 'app/providers/ToastProvider';
 import {ThemeProvider} from 'app/theme';
 import {createDocumentPickerFilePicker} from 'infra/files/documentPickerFilePicker';
 import {nativeFileSystem} from 'infra/files/nativeFileSystem';
@@ -92,13 +93,15 @@ function ThemedApp(): React.JSX.Element {
 
     return (
         <ThemeProvider colorScheme={settings.colorScheme} fontScale={settings.fontScale}>
-            <ImportProvider filePicker={filePicker}>
-                <GenerateProvider>
-                    <DiceProvider>
-                        <AppNavigator />
-                    </DiceProvider>
-                </GenerateProvider>
-            </ImportProvider>
+            <ToastProvider>
+                <ImportProvider filePicker={filePicker}>
+                    <GenerateProvider>
+                        <DiceProvider>
+                            <AppNavigator />
+                        </DiceProvider>
+                    </GenerateProvider>
+                </ImportProvider>
+            </ToastProvider>
         </ThemeProvider>
     );
 }

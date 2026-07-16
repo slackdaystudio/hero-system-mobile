@@ -23,6 +23,7 @@ import type {Repositories} from 'infra/persistence/repositories';
 import {CombatStateProvider} from 'app/providers/CombatStateProvider';
 import {DiceProvider} from 'app/providers/DiceProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
+import {ToastProvider} from 'app/providers/ToastProvider';
 import {ThemeProvider} from 'app/theme';
 import sample from '../../composition/sampleCharacter.json';
 import {buildCombatSheet} from '../characterSheet';
@@ -70,23 +71,30 @@ const scriptedRng = (values: number[]): Rng => {
     };
 };
 
+// Track rendered trees so afterEach can unmount them — a shown toast schedules an auto-dismiss timer
+// that would otherwise fire (and touch Animated) after the test's tree is gone.
+const trees: ReactTestRenderer[] = [];
+
 const render = async (character: Obj, repo: CombatStateRepository, rng: Rng = scriptedRng([])): Promise<ReactTestRenderer> => {
     const repositories = {combatState: repo} as unknown as Repositories;
     let tree!: ReactTestRenderer;
     await act(async () => {
         tree = TestRenderer.create(
             <ThemeProvider colorScheme="dark">
-                <DiceProvider dieRoller={new DieRoller(rng)}>
-                    <RepositoriesProvider repositories={repositories}>
-                        <CombatStateProvider character={character} characterId="c1">
-                            <CombatTracker character={character} combat={buildCombatSheet(character)} onRoll={() => undefined} />
-                        </CombatStateProvider>
-                    </RepositoriesProvider>
-                </DiceProvider>
+                <ToastProvider>
+                    <DiceProvider dieRoller={new DieRoller(rng)}>
+                        <RepositoriesProvider repositories={repositories}>
+                            <CombatStateProvider character={character} characterId="c1">
+                                <CombatTracker character={character} combat={buildCombatSheet(character)} onRoll={() => undefined} />
+                            </CombatStateProvider>
+                        </RepositoriesProvider>
+                    </DiceProvider>
+                </ToastProvider>
             </ThemeProvider>,
         );
     });
     await act(async () => {}); // flush the async state load
+    trees.push(tree);
     return tree;
 };
 
@@ -107,6 +115,12 @@ const type = async (tree: ReactTestRenderer, testID: string, text: string): Prom
 };
 
 describe('CombatTracker', () => {
+    afterEach(async () => {
+        await act(async () => {
+            trees.splice(0).forEach((tree) => tree.unmount());
+        });
+    });
+
     it('seeds and persists a fresh combat state on first mount', async () => {
         const {repo, current} = fakeRepo();
         await render(hero(), repo);
@@ -159,6 +173,8 @@ describe('CombatTracker', () => {
 
         expect(current()!.endurance).toBe(0); // floored
         expect(current()!.stun).toBe(stunBefore - 4); // 1d6 = 4 STUN, no defenses
+        // The player is warned they're burning STUN.
+        expect(collectText(tree.toJSON()).some((t) => t.includes('Out of Endurance'))).toBe(true);
     });
 
     it('spends a movement mode’s END from the pool when tapped', async () => {

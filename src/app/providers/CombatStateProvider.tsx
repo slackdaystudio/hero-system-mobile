@@ -28,6 +28,7 @@ import {PartialDie} from 'core/dice';
 import type {Obj} from 'core/traits';
 import {useDieRoller} from 'app/providers/DiceProvider';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
+import {useToast, type ToastVariant} from 'app/providers/ToastProvider';
 
 /** What a single END spend did: how much was asked, how much the pool couldn't cover, and the STUN it cost. */
 export interface SpendOutcome {
@@ -48,11 +49,34 @@ export interface CombatStateApi {
      * the caller can show feedback, or null if there's nothing to spend / no state yet.
      */
     spend: (amount: number) => SpendOutcome | null;
-    /** The most recent spend, for a transient "spent N END" readout. */
-    lastSpend: SpendOutcome | null;
 }
 
 const CombatStateContext = createContext<CombatStateApi | null>(null);
+
+/** Fraction of maximum END below which the character is warned they're running low. */
+const LOW_ENDURANCE = 0.25;
+
+/**
+ * The toast a spend should raise, or null for a routine one. Two thresholds, each firing on the
+ * downward crossing so a low character isn't nagged every Phase:
+ *   - out of END → burning STUN (danger), on any burn or the moment the pool empties;
+ *   - below a quarter of the pool (warning), the first time it drops there.
+ */
+export function enduranceAlert(before: number, after: number, max: number, shortfall: number, stunLost: number): {message: string; variant: ToastVariant} | null {
+    if (shortfall > 0) {
+        return {message: `Out of Endurance — burned ${stunLost} STUN`, variant: 'danger'};
+    }
+    if (after <= 0 && before > 0) {
+        return {message: 'Out of Endurance — further exertion burns STUN', variant: 'danger'};
+    }
+
+    const low = max * LOW_ENDURANCE;
+    if (after > 0 && after < low && before >= low) {
+        return {message: `Endurance low — ${after} / ${max}`, variant: 'warning'};
+    }
+
+    return null;
+}
 
 /**
  * Owns one character's live combat state above the Character/Combat tab split, so a power tapped on
@@ -63,10 +87,10 @@ const CombatStateContext = createContext<CombatStateApi | null>(null);
 export function CombatStateProvider({character, characterId, children}: {character: Obj; characterId: string; children: React.ReactNode}): React.JSX.Element {
     const {combatState: repository} = useRepositories();
     const roller = useDieRoller();
+    const {showToast} = useToast();
     const max = useMemo(() => combatMaximums(character), [character]);
 
     const [state, setState] = useState<CombatState | null>(null);
-    const [lastSpend, setLastSpend] = useState<SpendOutcome | null>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -78,7 +102,6 @@ export function CombatStateProvider({character, characterId, children}: {charact
             }
             if (!cancelled) {
                 setState(base);
-                setLastSpend(null);
             }
         })();
         return () => {
@@ -110,13 +133,18 @@ export function CombatStateProvider({character, characterId, children}: {charact
                 apply(next);
             }
             const outcome: SpendOutcome = {amount, shortfall, stunLost};
-            setLastSpend(outcome);
+
+            const alert = enduranceAlert(state.endurance, next.endurance, max.endurance, shortfall, stunLost);
+            if (alert !== null) {
+                showToast(alert.message, alert.variant);
+            }
+
             return outcome;
         },
-        [state, roller, apply],
+        [state, roller, apply, max, showToast],
     );
 
-    const api = useMemo<CombatStateApi>(() => ({state, max, apply, spend, lastSpend}), [state, max, apply, spend, lastSpend]);
+    const api = useMemo<CombatStateApi>(() => ({state, max, apply, spend}), [state, max, apply, spend]);
 
     return <CombatStateContext.Provider value={api}>{children}</CombatStateContext.Provider>;
 }
