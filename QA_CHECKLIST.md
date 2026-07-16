@@ -34,7 +34,38 @@ native module (`npm run android`).
 - [ ] Scroll the list with a thumb over the rows — no accidental deletes.
 - [ ] Long-press a row still confirms too (the older, hidden path).
 
-## Generated characters
+## The Generate dialog (new in 2.6.0)
+- [ ] Characters → **Generate** opens the dialog, not an Alert.
+- [ ] The edition pills **start on your Settings edition** (flip Settings → 5E, reopen → 5E).
+- [ ] Only **5E** and **6E** are offered — `5e-standard`/`6e-low` have no data and must not appear.
+- [ ] **The bar actually fills** over ~3s. It runs on the JS thread (width isn't a transform), so
+      this is the one animation that could visibly stutter.
+- [ ] The reveal reads as a sentence: **"You are an Ice Powered Armor Socialite."**
+      - [ ] "**an** Ice", not "a Ice". Roll until you see Ice/Air/Earth/Eldritch.
+      - [ ] A Playboy/Socialite reads "**Socialite**"; an Actor/Actress reads "**Actor**". No slash.
+      - [ ] An "Other" effect prints **no** effect word — "You are a Brick Spy", named just "Brick".
+      - [ ] A long one (e.g. "an Eldritch Weapons Master Investigator") **wraps without clipping**.
+- [ ] **Roll Again** gives a different character and the footer stays [Roll Again] [View].
+- [ ] **Nothing is saved until View.** Roll 5+ times, hit Cancel/back/outside → the library has
+      **no** new characters. This is the big one; the old build saved every roll.
+- [ ] **View** saves and opens exactly the character that was on screen.
+- [ ] Settings → **Screen animations off** → Generate reveals instantly, no bar, no 3s wait.
+- [ ] Android **back** and tapping outside both close it, mid-roll and at the reveal.
+
+## Generated characters — 6E (new in 2.6.0)
+- [ ] Roll **6E** → the sheet says **6E**, spends **400 of 400**, and has bought
+      **OCV/DCV/OMCV/DMCV** (6E figures nothing — a 5E spread here would show PD 2 / SPD 2).
+- [ ] Roll a dozen and read them **like a GM**: any that look overpowered, underpowered or silly?
+      These spreads are authored, not lifted — there's no 6E data we could have copied, so a
+      human eye is the only oracle.
+- [ ] **No VPPs** and **no Combat Skill Levels** on any 6E roll — both are deliberate.
+- [ ] Re-roll a 6E character's **Archetype** → still 6E, still 400, still opens. Try
+      **Mentalist / Gadgeteer / Metamorph / Powered Armor / Weapons Master** especially: those
+      five name different powersets per edition, and a 5E draw there fails to save.
+- [ ] Retrain a 6E **Profession** → still 400.
+- [ ] A 6E Scientist asks for a **language** as well as sciences (the 5E one doesn't).
+
+## Generated characters — skills and editing
 - [ ] Roll a Soldier/Spy/Royalty/Playboy → the editor asks for a **Language**; type one → the
       sheet reads "Language: French" instead of "Language: Player Defined".
 - [ ] Roll a Scientist → three numbered Science Skill fields; fill two → the third still reads
@@ -42,7 +73,8 @@ native module (`npm run android`).
 - [ ] Name a language, then re-roll the Archetype → the language survives.
 - [ ] Change Profession to another set with a language → it's still there.
 - [ ] Clear a skill field → back to "Player Defined".
-- [ ] Point total stays 250 through all of it (naming a skill must not move a cost).
+- [ ] Point total stays at its full budget through all of it — **250** for 5E, **400** for 6E.
+      Naming a skill must not move a cost.
 
 ## Portrait framing
 - [ ] **Every unframed portrait looks exactly as it did before this build** — framing is opt-in and
@@ -98,12 +130,20 @@ native module (`npm run android`).
 ## Migration (if testing over a legacy install)
 - [ ] First launch imported your legacy characters + settings + stats.
 
-## Upgrading over the previous build (2.5.0: schema 4 → 5, first time on a device)
-- [ ] Install the **previous** build first, import a character or two, roll a random one.
+## Upgrading over the previous build (2.6.0: schema 5 → 7)
+- [ ] Install **2.5.0** first, import a character or two with portraits, roll a random one.
 - [ ] Install this build over the top → every character is still there, opens, and renders.
-- [ ] The random character you rolled on the old build is **still editable** (migration 005
+- [ ] **Every portrait looks exactly as it did in 2.5.0** — migrations 006/007 are additive and
+      an unframed portrait reads `null`, which is the centre crop it already had.
+- [ ] The random character you rolled on 2.5.0 is **still editable**, and still 5E/250.
+- [ ] **No cost moves anywhere.** 2.5.0 was the build that changed costs; the engine is
+      untouched in 2.6.0. A number that differs from 2.5.0 is a **regression** — report it.
+
+## Upgrading from 2.4.1 (schema 4 → 7 in one hop — only if a tester skipped 2.5.0)
+- [ ] Every character survives both hops.
+- [ ] The random character rolled on the old build is **still editable** (migration 005
       backfills edit rights from the `generated-` id prefix — that's the only thing carrying
       them over).
 - [ ] An imported `.hdc` shows **no** edit card.
-- [ ] Costs may differ from 2.4.1 on imported characters — that's H3–H10/U2 landing, not a
-      regression. Spot-check one against HERO Designer before reporting it.
+- [ ] Costs may differ from 2.4.1 on imported characters — that's H3–H10/U2 landing in 2.5.0,
+      not a regression. Spot-check one against HERO Designer before reporting it.

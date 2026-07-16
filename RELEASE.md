@@ -10,9 +10,9 @@ listing. Two consequences:
 
 - The release build **must be signed with the legacy app's existing upload key**.
   A brand-new keystore will be **rejected** by Play ("upload key mismatch").
-- `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; this repo
-  is set to **65 / 2.5.0** (`android/app/build.gradle`). Bump `versionCode` for
-  every subsequent upload.
+- `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; **65 / 2.5.0**
+  is out to internal testing, and this repo is set to **66 / 2.6.0**
+  (`android/app/build.gradle`). Bump `versionCode` for every subsequent upload.
 
 ## Signing setup
 
@@ -73,18 +73,29 @@ App Store Connect → TestFlight.
 
 ## Upgrading over a live install
 
-A fresh install exercises none of the risk. Two things only an **upgrade** can show,
-and both are live for the first time in **2.5.0**:
+A fresh install exercises none of the risk. Install the *previous* build, import a
+character or two, then install this one over the top and confirm they're all still
+there.
 
-**The schema moves 4 → 5.** Migration 005 adds `origin`/`recipe` and backfills edit
-rights from the `generated-` id prefix. It's additive and covered against real SQLite
-(including the backfill), but 2.5.0 is the first build to run it on a phone with real
-data. Install the *previous* build, import a character or two, then install this one
-over the top and confirm they're all still there.
+### 2.6.0 — the schema moves 5 → 7
 
-**Costs change on characters people already have.** 2.5.0 carries ten engine
-correctness fixes (H3–H10, U2, U3 — `docs/KNOWN_DEVIATIONS.md`). These are real
-legacy bugs, faithfully ported and now fixed, so sheets that were wrong become right:
+Migrations 006 and 007 add `portrait_focus_x`/`_y` and `portrait_focus_scale`. Both
+are additive, both are covered against real SQLite, and a character with no framing
+reads as `null` — the centre crop every portrait got before framing existed. They are
+two migrations rather than one line added to 006 because **006 had already run on a
+dev device**, and a migration that has run is immutable.
+
+2.6.0 **changes no costs on characters people already have.** 2.5.0 did that; this
+build's engine is unchanged. A cost that moves in 2.6.0 is a real regression, not an
+expected fix — worth knowing, because it inverts what a tester should report.
+
+### 2.5.0 — shipped; kept for the reasoning
+
+**The schema moved 4 → 5** (migration 005: `origin`/`recipe`, backfilling edit rights
+from the `generated-` id prefix), and **costs changed on characters people already
+had** — ten engine correctness fixes (H3–H10, U2, U3, `docs/KNOWN_DEVIATIONS.md`).
+Real legacy bugs, faithfully ported and then fixed, so sheets that were wrong became
+right:
 
 | Fix | What moves | Seen in the corpus |
 |---|---|---|
@@ -93,6 +104,6 @@ legacy bugs, faithfully ported and now fixed, so sheets that were wrong become r
 | H10 | Clinging loses a stray +1 | mark-li, aoe, spyder2022 |
 | H3/H5/H6/H7/U2 | Duplicate powers, VPP contents, defense totals | junkyard, defensor, adamantine, mark-li… |
 
-Roughly a third of real characters will show a different number than they did in
-2.4.1. **Say so in the release notes** — a tester who doesn't know will report the fix
-as the bug.
+Roughly a third of real characters read differently than they did in 2.4.1. The lesson
+worth keeping: **say so in the release notes** — a tester who doesn't know will report
+the fix as the bug.

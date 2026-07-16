@@ -94,8 +94,11 @@ android {
         // 65/2.5.0 — random characters, delete/edit, and ten engine correctness fixes.
         //            First build to carry schema 5, and the first to change costs on
         //            characters already imported (see RELEASE.md).
-        versionCode 65
-        versionName "2.5.0"
+        // 66/2.6.0 — 6E Standard (400) random characters and the Generate dialog;
+        //            portrait framing. Schema 5 → 7 (006/007, portrait focus).
+        //            Changes no costs on existing characters — 2.5.0 did that.
+        versionCode 66
+        versionName "2.6.0"
     }
     signingConfigs {
         debug {

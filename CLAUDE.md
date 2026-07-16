@@ -63,12 +63,11 @@ resolve in build and tests.
 
 **The rebuild ships.** It is on the store past legacy's cutover, the rules engine is fully
 ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.5.0
-(versionCode 65) is in review with Google** — the first build to carry schema 5 and the
-first to change costs on characters people already have. What remains is CostCruncher and
-the cosmetic tail of the correctness pass.
-
-**Unshipped and needing a versionCode bump:** migrations 006/007 (portrait framing) and
-everything on the 6E generator, none of which is in 65.
+(versionCode 65) is out to internal testing** — the first build to carry schema 5 and the
+first to change costs on characters people already have. **2.6.0 (versionCode 66) is
+staged**: 6E random characters, the Generate dialog, and portrait framing; schema 5 → 7.
+It changes no costs — 2.5.0 did that, so a cost that moves in 2.6.0 is a regression.
+What remains is CostCruncher and the cosmetic tail of the correctness pass.
 
 | Phase | State |
 |---|---|
