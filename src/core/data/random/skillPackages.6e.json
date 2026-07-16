@@ -179,6 +179,1725 @@
           ]
         }
       }
+    },
+    {
+      "profession": "Entrepreneur",
+      "note": "Money is the perk; the rest is the room-reading a deal needs. The 5E set's seven, plus the paperwork and the polish.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "BRIBERY",
+              "id": 1301,
+              "alias": "Bribery",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "id": 1302,
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "id": 1303,
+              "alias": "Conversation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ORATORY",
+              "id": 1304,
+              "alias": "Oratory",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "PERSUASION",
+              "id": 1305,
+              "alias": "Persuasion",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "TRADING",
+              "id": 1306,
+              "alias": "Trading",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "id": 1307,
+              "alias": "High Society",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "STREETWISE",
+              "id": 1308,
+              "alias": "Streetwise",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "DEDUCTION",
+              "id": 1309,
+              "alias": "Deduction",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "CHARM",
+              "id": 1310,
+              "alias": "Charm",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "COMPUTER_PROGRAMMING",
+              "id": 1311,
+              "alias": "Computer Programming",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "id": 1312,
+              "alias": "Navigation",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "PROFESSIONAL_SKILL",
+              "id": 1313,
+              "alias": "PS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "input": "Entrepreneur"
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1314,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "input": "The Business World"
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "id": 1315,
+              "alias": "Language",
+              "position": 0,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "ANALYZE",
+              "id": 1320,
+              "alias": "Analyze",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "A Business"
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "MONEY",
+              "alias": "Money",
+              "position": 0,
+              "basecost": 5,
+              "id": 1316,
+              "option": "WELLOFF",
+              "optionid": "WELLOFF",
+              "optionAlias": "Well Off"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Investigator",
+      "note": "The 5E set carried a Combat Skill Level; this one does not (see the no-CSL rule). Those points went into the legwork instead.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "CRIMINOLOGY",
+              "id": 1401,
+              "alias": "Criminology",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "DEDUCTION",
+              "id": 1402,
+              "alias": "Deduction",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "INTERROGATION",
+              "id": 1403,
+              "alias": "Interrogation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "SHADOWING",
+              "id": 1404,
+              "alias": "Shadowing",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "STREETWISE",
+              "id": 1405,
+              "alias": "Streetwise",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "id": 1406,
+              "alias": "Conversation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "id": 1407,
+              "alias": "Concealment",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "STEALTH",
+              "id": 1408,
+              "alias": "Stealth",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "BUGGING",
+              "id": 1409,
+              "alias": "Bugging",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "LOCKPICKING",
+              "id": 1410,
+              "alias": "Lockpicking",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "FORENSIC_MEDICINE",
+              "id": 1411,
+              "alias": "Forensic Medicine",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "PERSUASION",
+              "id": 1412,
+              "alias": "Persuasion",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ANALYZE",
+              "id": 1413,
+              "alias": "Analyze",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "input": "Crime Scene",
+              "proficiency": true
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1414,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "input": "The Criminal Underworld"
+            },
+            {
+              "xmlid": "SECURITY_SYSTEMS",
+              "id": 1415,
+              "alias": "Security Systems",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "CRIMINOLOGY",
+              "id": 1420,
+              "alias": "Criminology",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "COMBAT_DRIVING",
+              "id": 1421,
+              "alias": "Combat Driving",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "DISGUISE",
+              "id": 1422,
+              "alias": "Disguise",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "LIPREADING",
+              "id": 1423,
+              "alias": "Lipreading",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "proficiency": true
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "PROFESSIONALLICENSE",
+              "alias": "FB",
+              "position": 0,
+              "basecost": 1,
+              "input": "Private Investigator's Licence",
+              "id": 1416
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Physician",
+      "note": "Two Science Skills, one of them the player's own. The 5E set's Skill Level is gone with the CSLs; the points bought breadth.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "PARAMEDICS",
+              "id": 1501,
+              "alias": "Paramedics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "DEDUCTION",
+              "id": 1502,
+              "alias": "Deduction",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "id": 1503,
+              "alias": "SS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Medicine"
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "id": 1504,
+              "alias": "SS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined"
+            },
+            {
+              "xmlid": "FORENSIC_MEDICINE",
+              "id": 1505,
+              "alias": "Forensic Medicine",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "PROFESSIONAL_SKILL",
+              "id": 1506,
+              "alias": "PS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Physician"
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "id": 1507,
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "id": 1508,
+              "alias": "Conversation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "PERSUASION",
+              "id": 1509,
+              "alias": "Persuasion",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ANALYZE",
+              "id": 1510,
+              "alias": "Analyze",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Injury"
+            },
+            {
+              "xmlid": "COMPUTER_PROGRAMMING",
+              "id": 1511,
+              "alias": "Computer Programming",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1512,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "input": "Pharmacology"
+            },
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "id": 1513,
+              "alias": "High Society",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "PRE",
+              "familiarity": true
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "id": 1514,
+              "alias": "Language",
+              "position": 0,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "id": 1520,
+              "alias": "SS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Biochemistry"
+            },
+            {
+              "xmlid": "TEAMWORK",
+              "id": 1521,
+              "alias": "Teamwork",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "SYSTEMS_OPERATION",
+              "id": 1522,
+              "alias": "Systems Operation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "id": 1523,
+              "alias": "Concealment",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "ORATORY",
+              "id": 1524,
+              "alias": "Oratory",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "PRE",
+              "proficiency": true
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "PROFESSIONALLICENSE",
+              "alias": "FB",
+              "position": 0,
+              "basecost": 1,
+              "input": "Medical Licence",
+              "id": 1515
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Playboy/Socialite",
+      "note": "Money and the room. Charm rather than Seduction — 6E folded the two together.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "id": 1601,
+              "alias": "High Society",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "id": 1602,
+              "alias": "Conversation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CHARM",
+              "id": 1603,
+              "alias": "Charm",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "PERSUASION",
+              "id": 1604,
+              "alias": "Persuasion",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "BRIBERY",
+              "id": 1605,
+              "alias": "Bribery",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "id": 1606,
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ACTING",
+              "id": 1607,
+              "alias": "Acting",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "STREETWISE",
+              "id": 1608,
+              "alias": "Streetwise",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "GAMBLING",
+              "id": 1609,
+              "alias": "Gambling",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Card Games"
+            },
+            {
+              "xmlid": "COMBAT_DRIVING",
+              "id": 1610,
+              "alias": "Combat Driving",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "RIDING",
+              "id": 1611,
+              "alias": "Riding",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "DEX",
+              "familiarity": true
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1612,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "input": "High Society Gossip"
+            },
+            {
+              "xmlid": "TRADING",
+              "id": 1613,
+              "alias": "Trading",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "PRE",
+              "proficiency": true
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "id": 1614,
+              "alias": "Language",
+              "position": 0,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "ORATORY",
+              "id": 1620,
+              "alias": "Oratory",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "SLEIGHT_OF_HAND",
+              "id": 1621,
+              "alias": "Sleight Of Hand",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "DEX",
+              "familiarity": true
+            },
+            {
+              "xmlid": "CONTORTIONIST",
+              "id": 1622,
+              "alias": "Contortionist",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "MONEY",
+              "alias": "Money",
+              "position": 0,
+              "basecost": 5,
+              "id": 1615,
+              "option": "WELLOFF",
+              "optionid": "WELLOFF",
+              "optionAlias": "Well Off"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Royalty",
+      "note": "The Fringe Benefit is the profession. KS: Home Country rather than AK — 6E has no generic Area Knowledge.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1701,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Home Country"
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "id": 1702,
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "id": 1703,
+              "alias": "High Society",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ORATORY",
+              "id": 1704,
+              "alias": "Oratory",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "TACTICS",
+              "id": 1705,
+              "alias": "Tactics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "PERSUASION",
+              "id": 1706,
+              "alias": "Persuasion",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "id": 1707,
+              "alias": "Conversation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "RIDING",
+              "id": 1708,
+              "alias": "Riding",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "CHARM",
+              "id": 1709,
+              "alias": "Charm",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "TRADING",
+              "id": 1710,
+              "alias": "Trading",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "PRE",
+              "familiarity": true
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1711,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "input": "The Royal Line"
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "id": 1712,
+              "alias": "Language",
+              "position": 0,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "DEDUCTION",
+              "id": 1720,
+              "alias": "Deduction",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "INTERROGATION",
+              "id": 1721,
+              "alias": "Interrogation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ANALYZE",
+              "id": 1722,
+              "alias": "Analyze",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Politics"
+            },
+            {
+              "xmlid": "CLIMBING",
+              "id": 1723,
+              "alias": "Climbing",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "DEX",
+              "familiarity": true
+            },
+            {
+              "xmlid": "STEALTH",
+              "id": 1724,
+              "alias": "Stealth",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "DEX",
+              "proficiency": true
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "ARISTOCRACY",
+              "alias": "FB",
+              "position": 0,
+              "basecost": 5,
+              "input": "Member of the Aristocracy",
+              "id": 1713
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Scientist",
+      "note": "Three Science Skills, all the player's own. The legacy prose also lists 'Scientist', which is a skill ENHANCER rather than a skill — it discounts Science Skills — and it stays omitted here for the same reason the 5E set omits it.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "id": 1801,
+              "alias": "SS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined"
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "id": 1802,
+              "alias": "SS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined"
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "id": 1803,
+              "alias": "SS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined"
+            },
+            {
+              "xmlid": "INVENTOR",
+              "id": 1804,
+              "alias": "Inventor",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "COMPUTER_PROGRAMMING",
+              "id": 1805,
+              "alias": "Computer Programming",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "DEDUCTION",
+              "id": 1806,
+              "alias": "Deduction",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "ANALYZE",
+              "id": 1807,
+              "alias": "Analyze",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Data"
+            },
+            {
+              "xmlid": "ELECTRONICS",
+              "id": 1808,
+              "alias": "Electronics",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "proficiency": true
+            },
+            {
+              "xmlid": "MECHANICS",
+              "id": 1809,
+              "alias": "Mechanics",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "PROFESSIONAL_SKILL",
+              "id": 1810,
+              "alias": "PS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Researcher"
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "id": 1811,
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "PRE",
+              "familiarity": true
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "id": 1812,
+              "alias": "Language",
+              "position": 0,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1820,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "The Scientific Community"
+            },
+            {
+              "xmlid": "SECURITY_SYSTEMS",
+              "id": 1821,
+              "alias": "Security Systems",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "PARAMEDICS",
+              "id": 1822,
+              "alias": "Paramedics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "id": 1823,
+              "alias": "Conversation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CRYPTOGRAPHY",
+              "id": 1824,
+              "alias": "Cryptography",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "proficiency": true
+            }
+          ]
+        },
+        "talents": {
+          "talent": [
+            {
+              "xmlid": "EIDETIC_MEMORY",
+              "alias": "Eidetic Memory",
+              "position": 0,
+              "basecost": 5,
+              "id": 1813
+            },
+            {
+              "xmlid": "LIGHTNING_CALCULATOR",
+              "alias": "Lightning Calculator",
+              "position": 1,
+              "basecost": 3,
+              "id": 1814
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Soldier",
+      "note": "The 5E set carried a Combat Skill Level; this one does not. A soldier's edge is the trade, not the level.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "TACTICS",
+              "id": 1901,
+              "alias": "Tactics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "id": 1902,
+              "alias": "Concealment",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "DEMOLITIONS",
+              "id": 1903,
+              "alias": "Demolitions",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "SYSTEMS_OPERATION",
+              "id": 1904,
+              "alias": "Systems Operation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "id": 1905,
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "STEALTH",
+              "id": 1906,
+              "alias": "Stealth",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "CLIMBING",
+              "id": 1907,
+              "alias": "Climbing",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "PARAMEDICS",
+              "id": 1908,
+              "alias": "Paramedics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "SURVIVAL",
+              "id": 1909,
+              "alias": "Survival",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Temperate"
+            },
+            {
+              "xmlid": "TEAMWORK",
+              "id": 1910,
+              "alias": "Teamwork",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "NAVIGATION",
+              "id": 1911,
+              "alias": "Navigation",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "proficiency": true
+            },
+            {
+              "xmlid": "TRACKING",
+              "id": 1912,
+              "alias": "Tracking",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "PROFESSIONAL_SKILL",
+              "id": 1913,
+              "alias": "PS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Soldier"
+            },
+            {
+              "xmlid": "COMBAT_DRIVING",
+              "id": 1914,
+              "alias": "Combat Driving",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "DEX",
+              "familiarity": true
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "id": 1915,
+              "alias": "Language",
+              "position": 0,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "INTERROGATION",
+              "id": 1920,
+              "alias": "Interrogation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 1921,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Military Doctrine"
+            },
+            {
+              "xmlid": "MECHANICS",
+              "id": 1922,
+              "alias": "Mechanics",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "BREAKFALL",
+              "id": 1923,
+              "alias": "Breakfall",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "DEX",
+              "proficiency": true
+            }
+          ]
+        },
+        "perks": {
+          "perk": [
+            {
+              "xmlid": "PROFESSIONALLICENSE",
+              "alias": "FB",
+              "position": 0,
+              "basecost": 1,
+              "input": "Military Rank",
+              "id": 1916
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Spy",
+      "note": "Cramming is the spy's whole trick: whatever the mission needs, learned on the flight over.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "ACTING",
+              "id": 2001,
+              "alias": "Acting",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CRAMMING",
+              "id": 2002,
+              "alias": "Cramming",
+              "position": 0,
+              "basecost": 5
+            },
+            {
+              "xmlid": "CRYPTOGRAPHY",
+              "id": 2003,
+              "alias": "Cryptography",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "LOCKPICKING",
+              "id": 2004,
+              "alias": "Lockpicking",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "CONVERSATION",
+              "id": 2005,
+              "alias": "Conversation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "CHARM",
+              "id": 2006,
+              "alias": "Charm",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "DISGUISE",
+              "id": 2007,
+              "alias": "Disguise",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "SHADOWING",
+              "id": 2008,
+              "alias": "Shadowing",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "STEALTH",
+              "id": 2009,
+              "alias": "Stealth",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "id": 2010,
+              "alias": "Concealment",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "BUGGING",
+              "id": 2011,
+              "alias": "Bugging",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "proficiency": true
+            },
+            {
+              "xmlid": "SECURITY_SYSTEMS",
+              "id": 2012,
+              "alias": "Security Systems",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "STREETWISE",
+              "id": 2013,
+              "alias": "Streetwise",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "PRE",
+              "familiarity": true
+            },
+            {
+              "xmlid": "LANGUAGES",
+              "id": 2014,
+              "alias": "Language",
+              "position": 0,
+              "basecost": 0,
+              "input": "Player Defined",
+              "option": "FLUENT",
+              "optionid": "FLUENT"
+            },
+            {
+              "xmlid": "BUREAUCRATICS",
+              "id": 2020,
+              "alias": "Bureaucratics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "HIGH_SOCIETY",
+              "id": 2021,
+              "alias": "High Society",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "FORGERY",
+              "id": 2022,
+              "alias": "Forgery",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Documents"
+            },
+            {
+              "xmlid": "COMBAT_DRIVING",
+              "id": 2023,
+              "alias": "Combat Driving",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "DEX",
+              "familiarity": true
+            },
+            {
+              "xmlid": "CONTORTIONIST",
+              "id": 2024,
+              "alias": "Contortionist",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "DEX",
+              "proficiency": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Technician",
+      "note": "The 5E set's Skill Level went with the CSLs; this one is wider instead. It fixes things.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "COMPUTER_PROGRAMMING",
+              "id": 2101,
+              "alias": "Computer Programming",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "ELECTRONICS",
+              "id": 2102,
+              "alias": "Electronics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "MECHANICS",
+              "id": 2103,
+              "alias": "Mechanics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "SECURITY_SYSTEMS",
+              "id": 2104,
+              "alias": "Security Systems",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "SYSTEMS_OPERATION",
+              "id": 2105,
+              "alias": "Systems Operation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "INVENTOR",
+              "id": 2106,
+              "alias": "Inventor",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "BUGGING",
+              "id": 2107,
+              "alias": "Bugging",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "DEMOLITIONS",
+              "id": 2108,
+              "alias": "Demolitions",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "WEAPONSMITH",
+              "id": 2109,
+              "alias": "Weaponsmith",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "proficiency": true
+            },
+            {
+              "xmlid": "ANALYZE",
+              "id": 2110,
+              "alias": "Analyze",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Machinery"
+            },
+            {
+              "xmlid": "SCIENCE_SKILL",
+              "id": 2111,
+              "alias": "SS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Player Defined"
+            },
+            {
+              "xmlid": "PROFESSIONAL_SKILL",
+              "id": 2112,
+              "alias": "PS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Technician"
+            },
+            {
+              "xmlid": "COMBAT_DRIVING",
+              "id": 2113,
+              "alias": "Combat Driving",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "DEX",
+              "familiarity": true
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 2120,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Engineering"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "id": 2121,
+              "alias": "Concealment",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "CRYPTOGRAPHY",
+              "id": 2122,
+              "alias": "Cryptography",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "TEAMWORK",
+              "id": 2123,
+              "alias": "Teamwork",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "CLIMBING",
+              "id": 2124,
+              "alias": "Climbing",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "DEX",
+              "familiarity": true
+            },
+            {
+              "xmlid": "LOCKPICKING",
+              "id": 2125,
+              "alias": "Lockpicking",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "DEX",
+              "proficiency": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "profession": "Warrior",
+      "note": "Lightning Reflexes lives here, and this is the only set that has it. It is a PROFESSION, so any archetype can be one — a Martial Artist gets First Strike by being a Warrior, not by being a Martial Artist. The 5E set's Combat Skill Level is gone; the trade replaced it.",
+      "buckets": {
+        "skills": {
+          "skill": [
+            {
+              "xmlid": "TACTICS",
+              "id": 2201,
+              "alias": "Tactics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "INTERROGATION",
+              "id": 2202,
+              "alias": "Interrogation",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ORATORY",
+              "id": 2203,
+              "alias": "Oratory",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "PARAMEDICS",
+              "id": 2204,
+              "alias": "Paramedics",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "TRACKING",
+              "id": 2205,
+              "alias": "Tracking",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "CLIMBING",
+              "id": 2206,
+              "alias": "Climbing",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "STEALTH",
+              "id": 2207,
+              "alias": "Stealth",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "SURVIVAL",
+              "id": 2208,
+              "alias": "Survival",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT",
+              "input": "Temperate"
+            },
+            {
+              "xmlid": "RIDING",
+              "id": 2209,
+              "alias": "Riding",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "TEAMWORK",
+              "id": 2210,
+              "alias": "Teamwork",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "DEX"
+            },
+            {
+              "xmlid": "CONCEALMENT",
+              "id": 2211,
+              "alias": "Concealment",
+              "position": 0,
+              "basecost": 1,
+              "characteristic": "INT",
+              "familiarity": true
+            },
+            {
+              "xmlid": "BREAKFALL",
+              "id": 2212,
+              "alias": "Breakfall",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "DEX",
+              "proficiency": true
+            },
+            {
+              "xmlid": "KNOWLEDGE_SKILL",
+              "id": 2213,
+              "alias": "KS",
+              "position": 0,
+              "basecost": 2,
+              "characteristic": "INT",
+              "input": "Warrior Codes"
+            },
+            {
+              "xmlid": "DEDUCTION",
+              "id": 2220,
+              "alias": "Deduction",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "INT"
+            },
+            {
+              "xmlid": "STREETWISE",
+              "id": 2221,
+              "alias": "Streetwise",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE"
+            },
+            {
+              "xmlid": "ANIMAL_HANDLER",
+              "id": 2222,
+              "alias": "Animal Handler",
+              "position": 0,
+              "basecost": 3,
+              "characteristic": "PRE",
+              "input": "Equines"
+            }
+          ]
+        },
+        "talents": {
+          "talent": [
+            {
+              "xmlid": "LIGHTNING_REFLEXES_ALL",
+              "alias": "Lightning Reflexes",
+              "position": 0,
+              "basecost": 0,
+              "levels": 5,
+              "display": "Lightning Reflexes: All Actions",
+              "id": 2214,
+              "option": "ALL",
+              "optionid": "ALL",
+              "optionAlias": "All Actions"
+            }
+          ]
+        }
+      }
     }
   ]
 }

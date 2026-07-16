@@ -160,9 +160,15 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
     // "Characters EGO, include Mental Defense in this total".
     const ego = total('EGO') + splitDefense(heroDesignerCharacter.getTotalUnusualDefense(character, 'MENTALDEFENSE')).total;
 
-    // "Characters DEX, include Lightning Reflexes" — a talent, and only ever an initiative bonus.
+    /**
+     * "Characters DEX, include Lightning Reflexes" — a talent, and only ever an initiative bonus.
+     *
+     * The xmlid is `LIGHTNING_REFLEXES_ALL` even for a single-action buy: 5E had a separate
+     * `_SINGLE` xmlid, and 6E folded that into an *option* of the one talent. Matching on
+     * `LIGHTNING_REFLEXES` exactly, as this did, matched nothing at all.
+     */
     const lightningReflexes = toArray(character.talents)
-        .filter((talent) => String(talent.xmlid).toUpperCase() === 'LIGHTNING_REFLEXES')
+        .filter((talent) => String(talent.xmlid).toUpperCase().startsWith('LIGHTNING_REFLEXES'))
         .reduce((best, talent) => Math.max(best, Number(talent.levels) || 0), 0);
 
     // "All Combat Skill Levels the character owns". Skill Levels and Penalty Skill Levels are not

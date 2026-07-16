@@ -26,6 +26,8 @@ import {heroDesignerCharacter} from 'core/hero';
 import {getTemplate} from 'core/templates';
 import {characterTraitDecorator, type Obj} from 'core/traits';
 import {ARCHETYPES_6E} from '../allocate';
+import {ruleOfXStats} from '../ruleOfXStats';
+import {SKILLSETS_5E} from '../skillset';
 import {buildCharacteristics} from '../characteristics';
 import {STANDARD_6E} from '../powerLevel';
 import {attachSkillset, type StructuredSkillset} from '../skillset';
@@ -133,6 +135,35 @@ describe('6E skillsets', () => {
 
             expect({profession, blank}).toEqual({profession, blank: []});
         }
+    });
+
+    it('names all eleven professions, matching 5E', () => {
+        // The professions are the same in both editions — only the budget and the content differ.
+        expect(SKILLSETS_6E.map((set) => set.profession).sort()).toEqual(SKILLSETS_5E.map((set) => set.profession).sort());
+    });
+
+    /**
+     * Lightning Reflexes lives on the Warrior, and only there.
+     *
+     * It's a PROFESSION, so any archetype can be one — a Martial Artist gets First Strike by being a
+     * Warrior, not by being a Martial Artist. It also matters to the Rule of X, which folds it into
+     * DEX ("include Lightning Reflexes").
+     *
+     * Its xmlid is `LIGHTNING_REFLEXES_ALL` even for a single-action buy: 5E had a separate
+     * `_SINGLE` xmlid and 6E folded that into an *option*. The 5E spelling resolves to nothing here,
+     * and the decorator reads `trait.option`, so without it the talent throws rather than prices.
+     */
+    it('gives the Warrior its Lightning Reflexes, priced and counted', () => {
+        const warrior = SKILLSETS_6E.find((set) => set.profession === 'Warrior')!;
+        const character = build(warrior);
+        const talent = ((character.talents ?? []) as Obj[]).find((entry) => String(entry.xmlid).startsWith('LIGHTNING_REFLEXES'))!;
+
+        expect(talent).toBeDefined();
+        expect(talent.option).toBe('ALL');
+        expect(characterTraitDecorator.decorate(talent, 'talents', () => character).realCost()).toBeGreaterThan(0);
+
+        // ...and the Rule of X sees it, which it did not when matching on a bare LIGHTNING_REFLEXES.
+        expect(ruleOfXStats(character).dex).toBeGreaterThan(heroDesignerCharacter.getCharacteristicTotal('DEX', character));
     });
 
     it('states no cost anywhere in the data — every price is the engine’s', () => {
