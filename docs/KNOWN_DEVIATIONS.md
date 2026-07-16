@@ -47,7 +47,7 @@
 | H8 | Unusual defenses ignored `affectsPrimary`/`affectsTotal` | ✅ **fixed** — was real bug, active | **yes — 14 fixtures (base form)** | hero query (re-based) |
 | H9 | Enhanced Perception ignores `allcost` | ✅ **fixed** — was real bug, active | yes — adamantine (9→27), jane-fawn (2→6) | traits (decorator, re-based) |
 | H10 | `Clinging.cost()` adds a stray `+1` | ✅ **fixed** — was real bug, active | yes — mark-li, aoe, spyder2022 | traits (decorator, re-based) |
-| H11 | `HandToHandAttack.roll()` computes a half-die then drops it | real bug (latent) | no — every corpus HTH sits at `.4` | none (would re-base if fixed) |
+| H11 | `HandToHandAttack.roll()` computes a half-die then drops it | ✅ **fixed** — was real bug (latent) | no — the corpus never reaches the branch | none (no re-base needed) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -238,10 +238,10 @@ powers, tracking resistant points separately.
 - **Pinned by:** `core/hero/__tests__/unusualDefenses.test.ts`; golden master skips these
   queries via `UNUSUAL_DEFENSE_DIVERGENCE`.
 
-## H11 — Hand-to-Hand Attack computes a half-die, then drops it
+## H11 — Hand-to-Hand Attack computes a half-die, then drops it — ✅ FIXED
 
-- **Where:** `core/traits/powers/handToHandAttack.ts:31-42`. It derives `partialDie` from
-  `levels + STR / 5`, uses it in both adder branches, and then ignores it in the `else`:
+- **Where:** `core/traits/powers/handToHandAttack.ts:31-42`. It derived `partialDie` from
+  `levels + STR / 5`, used it in both adder branches, and then ignored it in the `else`:
 
   ```ts
   if (parseFloat((dice % 1).toFixed(1)) !== 0.0) {
@@ -264,18 +264,32 @@ powers, tracking resistant points separately.
   lands on `.6` or `.8` does **N½d6**. `Maneuver.getNormalDamage()` (`maneuver.ts:145-150`) faces
   the identical sum and keeps the half — the two disagree, in the same engine, about the same rule.
   `heroDesignerCharacter.getStrengthDamage()` is the third and also keeps it.
-- **Impact:** understates damage by half a die. User-visible on the sheet and in the roller.
-- **Corpus-triggered:** **no.** Every HTH attack in the 37 fixtures sits at a remainder of `.4`
-  (`aoe`: STR 57, so `11.4`/`12.4`; `bridget` likewise), which is under the threshold — so the
-  branch is reached and the drop never happens. Reaching it needs `levels + STR/5` to end `.6`
-  or `.8` *and* no `PLUSONEPIP`/`PLUSONEHALFDIE` adder.
-- **Why it isn't fixed here:** found while porting STR damage to the sheet, which needed the same
-  rule. Per the process above, a fix is its own isolated commit with a correctness test — and
-  since it is latent, that test has to be authored rather than taken from a fixture.
-- **Deliberately not shared:** `getStrengthDamage()` duplicates the `>= 0.6` rule rather than
-  extracting a helper the three sites call. Folding them together would silently *fix* this one
-  — a behaviour change wearing a refactor's clothes. The sweep is worth doing after H11 is
-  resolved, not before.
+- **Fix:** `roll.roll = partialDie ? `${dice}½d6` : `${dice}d6`` — the same line
+  `Maneuver.getNormalDamage()` already ended on, for the same sum. **Only the `else` branch was
+  touched;** see below.
+- **Impact:** understated damage by half a die. User-visible on the sheet and in the roller.
+- **Corpus-triggered:** **no**, and more thoroughly than first thought. The 37 fixtures contain
+  exactly **one** decodable Hand-To-Hand Attack — `aoe`'s, at STR 57 — and it both sits at a
+  remainder of `.4` (under the threshold) *and* carries a `PLUSONEHALFDIE` adder, so it never
+  reaches the broken branch at all. `bridget`'s is nested where `flatten` doesn't descend.
+  Triggering it needs `levels + STR/5` to end `.6` or `.8` **and** no adder.
+- **No golden master moved**, and none needed a divergence marker — the second fix after U3 to
+  need no re-base. The corpus output is byte-identical before and after.
+- **Oracle:** the HERO damage table (5 STR is 1d6, 3–4 STR beyond that is a half-die). Legacy is
+  wrong so it cannot be the oracle, and since the bug is latent the *fixtures* cannot be either —
+  nothing in them reaches the branch. Two implementations in this same engine already agreed
+  against the code: `Maneuver.getNormalDamage()` (`maneuver.ts:145-150`) faces the identical sum
+  and keeps the half, and `heroDesignerCharacter.getStrengthDamage()` does the same for a bare
+  punch. After this fix all three agree, which
+  `handToHandAttack.test.ts` asserts directly across STR 0–80.
+- **The adder branches are deliberately untouched.** `partialDie ? `${dice + 1}d6`` reads as
+  "N½d6 plus another half is (N+1)d6", matching the rules' `Nd6 → Nd6+1 → N½d6 → (N+1)d6`
+  progression — but whether `+½d6` advances one step or two is a rules question with no
+  independent source to hand, and no fixture exercises it. Pinned as-is by the test so a future
+  change has to be deliberate. **If you have the rulebook, this is worth a look.**
+- **Found** while porting STR damage to the sheet, which needed the same rule — not by the corpus,
+  which cannot see it.
+- **Pinned by:** `traits/__tests__/handToHandAttack.test.ts` (reverting the fix fails 7).
 
 ## H10 — Clinging adds a stray point — ✅ FIXED
 

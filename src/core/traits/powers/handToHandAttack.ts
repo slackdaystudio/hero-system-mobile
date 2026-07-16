@@ -18,7 +18,14 @@ import {heroDesignerCharacter} from 'core/hero';
 import {type RollDescriptor} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-/** Hand-to-Hand Attack, ported from legacy `powers/HandToHandAttack.js`. */
+/**
+ * Hand-to-Hand Attack, ported from legacy `powers/HandToHandAttack.js`.
+ *
+ * **H11 is fixed here** (docs/KNOWN_DEVIATIONS.md). Legacy derived `partialDie`, used it in both
+ * adder branches, and then dropped it in the `else` — so an HA whose `levels + STR / 5` landed on
+ * `.6` or `.8` rendered `Nd6` where the rules say `N½d6`, understating it by half a die. The value
+ * was computed and thrown away, one line from being used.
+ */
 export default class HandToHandAttack extends TraitDecorator {
     roll(): RollDescriptor {
         const character = this.characterTrait.getCharacter();
@@ -39,7 +46,9 @@ export default class HandToHandAttack extends TraitDecorator {
         } else if (adderMap.has('PLUSONEHALFDIE')) {
             roll.roll = partialDie ? `${dice + 1}d6` : `${dice}½d6`;
         } else {
-            roll.roll = `${dice}d6`;
+            // H11: was `${dice}d6`, discarding the half-die it had just worked out. This is now the
+            // same line `Maneuver.getNormalDamage()` ends on, for the same sum.
+            roll.roll = partialDie ? `${dice}½d6` : `${dice}d6`;
         }
 
         return roll;

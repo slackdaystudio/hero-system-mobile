@@ -24,14 +24,19 @@ one you already had. Same engine, so if it says 400 it really spends 400.
 Also: frame your portraits. Drag and pinch to choose which part of the picture the
 square shows, instead of always getting the middle.
 
-No character costs change in this build.
+Plus: roll your Strength straight off the sheet, and a fix for Hand-To-Hand Attacks
+that were losing half a die. No costs change.
 ```
 
 ## For testers
 
-**Nothing about your existing characters changes in this build.** 2.5.0 was the one
-that moved costs; the engine is untouched here. If a number moves in 2.6.0, that is a
-real regression and we want to hear about it — the opposite of last build.
+**No character costs change in this build.** 2.5.0 was the one that moved costs, and
+nothing here touches how a point is priced. If a *cost* moves in 2.6.0, that's a real
+regression and we want to hear about it — the opposite of last build.
+
+**One damage roll changes**, and only if you have a Hand-To-Hand Attack whose dice land
+on a half-die: it was losing that half. See Fixed, below. Nothing else about your
+existing characters moves.
 
 ### New: Generate deals you a hand
 
@@ -102,6 +107,11 @@ The old app had this and the rebuild lost it in the port. Bricks, our apologies.
 
 ### Fixed
 
+- **Hand-To-Hand Attacks lost half a die.** If your HA plus your STR came to a
+  half-die — 4½d6 — the app worked that out and then printed 4d6. An old bug,
+  inherited from the previous app, and the first engine fix since 2.5.0. **Your
+  costs don't change; the damage does**, and only for an HA whose dice land on a
+  half. If you have one, it just got half a die stronger, correctly.
 - **Editing a 6E character stays in 6E.** Re-rolling a 6E character's archetype could
   draw a 5E powerset, which would either fail to save or quietly stop the character
   being editable. Only reachable now that 6E characters exist, but it's fixed.

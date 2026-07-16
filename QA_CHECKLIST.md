@@ -157,8 +157,12 @@ native module (`npm run android`).
 - [ ] **Every portrait looks exactly as it did in 2.5.0** — migrations 006/007 are additive and
       an unframed portrait reads `null`, which is the centre crop it already had.
 - [ ] The random character you rolled on 2.5.0 is **still editable**, and still 5E/250.
-- [ ] **No cost moves anywhere.** 2.5.0 was the build that changed costs; the engine is
-      untouched in 2.6.0. A number that differs from 2.5.0 is a **regression** — report it.
+- [ ] **No cost moves anywhere.** 2.5.0 was the build that changed costs; nothing in 2.6.0 changes
+      how a point is priced. A **cost** that differs from 2.5.0 is a **regression** — report it.
+- [ ] **One damage roll legitimately moves:** a Hand-To-Hand Attack whose `levels + STR/5` lands on
+      a half-die (e.g. STR 63, or STR 13 with a 2d6 HA) now reads `N½d6` where it read `Nd6` — H11.
+      Everything else, including every cost, is byte-identical. No fixture in the corpus has one,
+      so a real character is the only way to see this.
 
 ## Upgrading from 2.4.1 (schema 4 → 7 in one hop — only if a tester skipped 2.5.0)
 - [ ] Every character survives both hops.
