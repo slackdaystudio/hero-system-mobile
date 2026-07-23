@@ -25,7 +25,7 @@ concurrency:
 jobs:
     ios:
         name: iOS · Maestro
-        runs-on: macos-14 # pinned for reproducibility; bump deliberately
+        runs-on: macos-15 # Xcode 16 default: the pods request Swift 6.0 (macos-14/Xcode 15 tops out at 5.0)
         timeout-minutes: 45
         env:
             SCHEME: herogmtools
@@ -85,19 +85,7 @@ jobs:
                   xcrun simctl install booted "$APP"
 
             - name: Run Maestro flows
-              run: |
-                  maestro test .maestro \
-                    -e PLATFORM=ios \
-                    -e APP_ID=org.diceless.herogmtools \
-                    --format junit --output maestro-report-ios.xml
-
-            # upload-artifact does not expand ~, so fold Maestro's debug output
-            # (hierarchies + on-failure screenshots) into the workspace first.
-            - name: Collect Maestro debug output
-              if: always()
-              run: |
-                  mkdir -p maestro-artifacts
-                  cp -R "$HOME/.maestro/tests" maestro-artifacts/_debug 2>/dev/null || true
+              run: bash scripts/e2e-run.sh ios org.diceless.herogmtools
 
             - name: Upload screenshots & report
               if: always()
@@ -158,13 +146,7 @@ jobs:
                   profile: pixel_6
                   script: |
                       adb install -r android/app/build/outputs/apk/release/app-release.apk
-                      maestro test .maestro \
-                        -e PLATFORM=android \
-                        -e APP_ID=com.herogmtools \
-                        --format junit --output maestro-report-android.xml || TEST_RC=$?
-                      mkdir -p maestro-artifacts
-                      cp -R "$HOME/.maestro/tests" maestro-artifacts/_debug 2>/dev/null || true
-                      exit ${TEST_RC:-0}
+                      bash scripts/e2e-run.sh android com.herogmtools
 
             - name: Upload screenshots & report
               if: always()

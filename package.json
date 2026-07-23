@@ -8,8 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "e2e:ios": "maestro test .maestro -e PLATFORM=ios -e APP_ID=org.diceless.herogmtools",
-    "e2e:android": "maestro test .maestro -e PLATFORM=android -e APP_ID=com.herogmtools"
+    "e2e:ios": "bash scripts/e2e-run.sh ios org.diceless.herogmtools",
+    "e2e:android": "bash scripts/e2e-run.sh android com.herogmtools"
   },
   "dependencies": {
     "@op-engineering/op-sqlite": "^17.1.2",
