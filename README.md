@@ -100,14 +100,22 @@ The Jest suites run in Node, so they prove the rules are right but can't see how
 actually renders. Because React Native lays out through each platform's own stack, the same
 component can come out subtly different on iOS and Android. To catch that, the **same
 [Maestro](https://maestro.dev/) flows** ([`.maestro/`](.maestro)) drive a real iOS Simulator
-and a real Android emulator in CI, screenshotting every meaningful screen on each — see
-[`docs/UI_TESTING.md`](docs/UI_TESTING.md). Both builds are standalone (JS bundled in), so
-there's no Metro server to race and no signing secrets.
+and a real Android emulator in CI, screenshotting every meaningful screen on each. Both builds
+are standalone (JS bundled in), so there's no Metro server to race and no signing secrets.
 
 ```sh
 npm run e2e:ios       # against a booted simulator with the app installed
 npm run e2e:android   # against a booted emulator with the app installed
 ```
+
+The character sheet goes one step further: it's a **visual-regression gate**. A flow opens a
+fixed, engine-priced character and screenshots its sheet, and CI pixel-diffs that against a
+committed per-platform baseline — so an unintended change to how the sheet renders on either
+platform **fails the build**. It's the same idea as the golden masters, one layer up: the
+golden masters pin the *numbers*, the pixel gate pins the *render*.
+
+See [`docs/UI_TESTING.md`](docs/UI_TESTING.md) for the flows, how determinism is achieved, and
+how to update a baseline when a sheet change is intended.
 
 ---
 
