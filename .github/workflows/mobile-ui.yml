@@ -104,14 +104,15 @@ jobs:
               run: bash scripts/e2e-run.sh ios org.diceless.herogmtools
 
             # Pixel-diff the character sheet against its committed iOS baseline.
-            # CROP_TOP excludes the status bar (chrome, flickers even with the clock frozen);
-            # CROP_BOTTOM excludes the half-cut-off power row at the frame edge, whose clipped
-            # pixels jitter run-to-run (not user-visible — a real user scrolls to see it).
+            # Crops exclude non-content overlays that jitter run-to-run: the status bar (top,
+            # flickers even with the clock frozen), the half-cut-off power row at the frame edge
+            # (bottom), and the fading scroll indicator (right). None are user-visible defects.
             - name: Visual regression — character sheet
               if: always()
               env:
                   CROP_TOP: '160'
                   CROP_BOTTOM: '120'
+                  CROP_RIGHT: '30'
               run: node scripts/pixel-diff.js maestro-artifacts/ios/sheet.png .maestro/baselines/ios/sheet.png maestro-artifacts/ios/sheet.diff.png
 
             - name: Upload screenshots & report
@@ -187,13 +188,14 @@ jobs:
                       bash scripts/e2e-run.sh android com.herogmtools
 
             # Pixel-diff the character sheet against its committed Android baseline.
-            # CROP_TOP excludes the status bar; CROP_BOTTOM excludes the nav bar and the
-            # frame-edge power row (see iOS note) — precautionary, this region already matched.
+            # Crops exclude jittering overlays (see iOS note): status bar (top), nav bar +
+            # frame-edge power row (bottom), and the fading scroll indicator (right, ~11px).
             - name: Visual regression — character sheet
               if: always()
               env:
                   CROP_TOP: '140'
                   CROP_BOTTOM: '130'
+                  CROP_RIGHT: '30'
               run: node scripts/pixel-diff.js maestro-artifacts/android/sheet.png .maestro/baselines/android/sheet.png maestro-artifacts/android/sheet.diff.png
 
             - name: Upload screenshots & report

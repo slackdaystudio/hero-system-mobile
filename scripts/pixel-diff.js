@@ -23,13 +23,17 @@ const pixelmatch = require('pixelmatch');
 
 const CROP_TOP = parseInt(process.env.CROP_TOP || '0', 10);
 const CROP_BOTTOM = parseInt(process.env.CROP_BOTTOM || '0', 10);
+const CROP_LEFT = parseInt(process.env.CROP_LEFT || '0', 10);
+const CROP_RIGHT = parseInt(process.env.CROP_RIGHT || '0', 10);
 
-// Return a PNG cropped to the content band [CROP_TOP, height - CROP_BOTTOM).
+// Crop the image to its interior, excluding chrome/overlays: status & nav bars
+// (top/bottom), the frame-edge power row (bottom), and the scroll indicator (right).
 function cropChrome(png) {
-    if (!CROP_TOP && !CROP_BOTTOM) return png;
+    if (!CROP_TOP && !CROP_BOTTOM && !CROP_LEFT && !CROP_RIGHT) return png;
+    const width = png.width - CROP_LEFT - CROP_RIGHT;
     const height = png.height - CROP_TOP - CROP_BOTTOM;
-    const out = new PNG({width: png.width, height});
-    PNG.bitblt(png, out, 0, CROP_TOP, png.width, height, 0, 0);
+    const out = new PNG({width, height});
+    PNG.bitblt(png, out, CROP_LEFT, CROP_TOP, width, height, 0, 0);
     return out;
 }
 
@@ -62,8 +66,11 @@ if (curFull.width !== baseFull.width || curFull.height !== baseFull.height) {
 // Compare only the app content, excluding the status/navigation bars.
 const cur = cropChrome(curFull);
 const base = cropChrome(baseFull);
-if (CROP_TOP || CROP_BOTTOM) {
-    console.log(`comparing content band: rows ${CROP_TOP}..${curFull.height - CROP_BOTTOM} (excluding chrome)`);
+if (CROP_TOP || CROP_BOTTOM || CROP_LEFT || CROP_RIGHT) {
+    console.log(
+        `comparing interior: rows ${CROP_TOP}..${curFull.height - CROP_BOTTOM}, ` +
+            `cols ${CROP_LEFT}..${curFull.width - CROP_RIGHT} (excluding chrome & scroll indicator)`,
+    );
 }
 const {width, height} = cur;
 const diff = new PNG({width, height});

@@ -122,10 +122,12 @@ Three things make a pixel gate trustworthy rather than flaky, and all three are 
   (iOS `simctl status_bar override`, Android SystemUI demo mode) and the OS image is pinned
   (`macos-15` sim / Android API 34). Even so, the status-bar *background* still flickers
   run-to-run on Android (dark vs light), so the diff **excludes system chrome** via `CROP_TOP`
-  (140px Android / 160px iOS). `CROP_BOTTOM` (130/120px) likewise drops the nav bar and the
-  half-cut-off power row at the very bottom edge, whose clipped pixels jitter run-to-run (not
-  user-visible — a real user scrolls to see that row rendered fully). The gate compares only the
-  app's own fully-rendered content, which is what a visual-regression test should assert anyway. [`scripts/pixel-diff.js`](../scripts/pixel-diff.js)
+  (140px Android / 160px iOS). `CROP_BOTTOM` (130/120px) drops the nav bar and the half-cut-off
+  power row at the very bottom edge, and `CROP_RIGHT` (30px) drops the **scroll indicator** — a
+  ~11px strip on the right that fades in and out, so whether it's caught in the shot is random.
+  None of these are user-visible defects (a real user scrolls to see the clipped row; the
+  scrollbar is meant to fade). The gate compares only the app's own fully-rendered content, which
+  is what a visual-regression test should assert anyway. [`scripts/pixel-diff.js`](../scripts/pixel-diff.js)
   then uses `pixelmatch` with a small tolerance (default 0.1% of pixels) so sub-pixel
   antialiasing doesn't flake the gate.
 
