@@ -104,8 +104,12 @@ jobs:
               run: bash scripts/e2e-run.sh ios org.diceless.herogmtools
 
             # Pixel-diff the character sheet against its committed iOS baseline.
+            # CROP_TOP excludes the status bar (system chrome), whose background can
+            # flicker run-to-run even with the clock frozen.
             - name: Visual regression — character sheet
               if: always()
+              env:
+                  CROP_TOP: '160'
               run: node scripts/pixel-diff.js maestro-artifacts/ios/sheet.png .maestro/baselines/ios/sheet.png maestro-artifacts/ios/sheet.diff.png
 
             - name: Upload screenshots & report
@@ -181,8 +185,12 @@ jobs:
                       bash scripts/e2e-run.sh android com.herogmtools
 
             # Pixel-diff the character sheet against its committed Android baseline.
+            # CROP_TOP excludes the status bar (system chrome), whose background can
+            # flicker run-to-run even with the clock frozen.
             - name: Visual regression — character sheet
               if: always()
+              env:
+                  CROP_TOP: '140'
               run: node scripts/pixel-diff.js maestro-artifacts/android/sheet.png .maestro/baselines/android/sheet.png maestro-artifacts/android/sheet.diff.png
 
             - name: Upload screenshots & report

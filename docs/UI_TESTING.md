@@ -118,9 +118,12 @@ Three things make a pixel gate trustworthy rather than flaky, and all three are 
   "did iOS change vs *approved iOS*", not "does iOS match Android".
 - **No moving parts in frame.** The status bar clock would diff every run, so CI freezes it
   (iOS `simctl status_bar override`, Android SystemUI demo mode) and the OS image is pinned
-  (`macos-15` sim / Android API 34). [`scripts/pixel-diff.js`](../scripts/pixel-diff.js) uses
-  `pixelmatch` with a small tolerance (default 0.1% of pixels) so sub-pixel antialiasing doesn't
-  flake the gate.
+  (`macos-15` sim / Android API 34). Even so, the status-bar *background* still flickers
+  run-to-run on Android (dark vs light), so the diff **excludes system chrome entirely** via
+  `CROP_TOP` (140px Android / 160px iOS) — the gate compares only the app's own content, which
+  is what a visual-regression test should assert anyway. [`scripts/pixel-diff.js`](../scripts/pixel-diff.js)
+  then uses `pixelmatch` with a small tolerance (default 0.1% of pixels) so sub-pixel
+  antialiasing doesn't flake the gate.
 
 When the sheet legitimately changes, the gate is *supposed* to go red — that's the signal.
 Update the baseline:

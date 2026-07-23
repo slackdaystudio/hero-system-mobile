@@ -10,13 +10,28 @@
  *   differing pixels exceeds `tolerance` (a fraction of total pixels, default 0.1%).
  * - A visual diff image is always written to <diff-out.png> for artifact upload.
  *
- * Baselines are per-platform (iOS and Android render differently) and assume a pinned
- * OS image and a frozen status bar — see docs/UI_TESTING.md.
+ * System chrome (the status/navigation bars) is EXCLUDED from the comparison via
+ * CROP_TOP / CROP_BOTTOM env vars (pixels). We freeze the clock, but the status-bar
+ * *background* still flickers on Android run-to-run — so we compare only the app's
+ * own content. Baselines are per-platform (iOS and Android render differently) and
+ * assume a pinned OS image — see docs/UI_TESTING.md.
  */
 const fs = require('fs');
 const path = require('path');
 const {PNG} = require('pngjs');
 const pixelmatch = require('pixelmatch');
+
+const CROP_TOP = parseInt(process.env.CROP_TOP || '0', 10);
+const CROP_BOTTOM = parseInt(process.env.CROP_BOTTOM || '0', 10);
+
+// Return a PNG cropped to the content band [CROP_TOP, height - CROP_BOTTOM).
+function cropChrome(png) {
+    if (!CROP_TOP && !CROP_BOTTOM) return png;
+    const height = png.height - CROP_TOP - CROP_BOTTOM;
+    const out = new PNG({width: png.width, height});
+    PNG.bitblt(png, out, 0, CROP_TOP, png.width, height, 0, 0);
+    return out;
+}
 
 const [, , curPath, basePath, outPath, tolArg] = process.argv;
 if (!curPath || !basePath || !outPath) {
@@ -37,13 +52,19 @@ if (!fs.existsSync(basePath)) {
     process.exit(0);
 }
 
-const cur = PNG.sync.read(fs.readFileSync(curPath));
-const base = PNG.sync.read(fs.readFileSync(basePath));
-if (cur.width !== base.width || cur.height !== base.height) {
-    console.error(`FAIL: size mismatch — current ${cur.width}x${cur.height} vs baseline ${base.width}x${base.height}`);
+const curFull = PNG.sync.read(fs.readFileSync(curPath));
+const baseFull = PNG.sync.read(fs.readFileSync(basePath));
+if (curFull.width !== baseFull.width || curFull.height !== baseFull.height) {
+    console.error(`FAIL: size mismatch — current ${curFull.width}x${curFull.height} vs baseline ${baseFull.width}x${baseFull.height}`);
     process.exit(1);
 }
 
+// Compare only the app content, excluding the status/navigation bars.
+const cur = cropChrome(curFull);
+const base = cropChrome(baseFull);
+if (CROP_TOP || CROP_BOTTOM) {
+    console.log(`comparing content band: rows ${CROP_TOP}..${curFull.height - CROP_BOTTOM} (excluding chrome)`);
+}
 const {width, height} = cur;
 const diff = new PNG({width, height});
 const changed = pixelmatch(cur.data, base.data, diff.data, width, height, {threshold: 0.1});
