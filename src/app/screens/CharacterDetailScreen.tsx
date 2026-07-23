@@ -628,8 +628,10 @@ function RollFlash({flash, onClose, onRollAgain}: {flash: RollFlashState | null;
 
     return (
         <Modal transparent visible animationType="fade" onRequestClose={onClose}>
-            <Pressable testID="flash-backdrop" style={styles.backdrop} onPress={onClose}>
-                <Pressable style={[styles.modalCard, card]} onPress={() => undefined}>
+            {/* accessible={false}: an accessible Pressable collapses its subtree on iOS, hiding
+                the modal content from VoiceOver/automation. Touch (dismiss/swallow) is unaffected. */}
+            <Pressable testID="flash-backdrop" style={styles.backdrop} onPress={onClose} accessible={false}>
+                <Pressable style={[styles.modalCard, card]} onPress={() => undefined} accessible={false}>
                     <Text variant="subtitle">{flash.title}</Text>
                     {flash.lines.map((line, index) => (
                         <Text key={index} variant="title">

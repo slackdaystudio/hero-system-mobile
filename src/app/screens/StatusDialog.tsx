@@ -82,8 +82,10 @@ export function StatusDialog({initial, onApply, onClose}: {initial: CombatStatus
 
     return (
         <Modal transparent visible={initial !== null} animationType="fade" onRequestClose={onClose}>
-            <Pressable testID="status-backdrop" style={styles.backdrop} onPress={onClose}>
-                <Pressable style={[styles.card, card]} onPress={() => undefined}>
+            {/* accessible={false}: an accessible Pressable collapses its subtree on iOS, hiding
+                the dialog content from VoiceOver/automation. Touch (dismiss/swallow) is unaffected. */}
+            <Pressable testID="status-backdrop" style={styles.backdrop} onPress={onClose} accessible={false}>
+                <Pressable style={[styles.card, card]} onPress={() => undefined} accessible={false}>
                     <Text variant="subtitle">Status Effect</Text>
 
                     <SegmentedControl segments={TYPE_SEGMENTS} value={form.name} onChange={(value) => set('name')(value)} />

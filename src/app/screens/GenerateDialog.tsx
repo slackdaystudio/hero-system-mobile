@@ -170,8 +170,12 @@ export function GenerateDialog({visible, onGenerated, onClose}: GenerateDialogPr
 
     return (
         <Modal transparent visible={visible} animationType="fade" onRequestClose={cancel}>
-            <Pressable testID="generate-backdrop" style={styles.backdrop} onPress={cancel}>
-                <Pressable style={[styles.card, card]} onPress={() => undefined}>
+            {/* accessible={false} on both: a Pressable that is itself an accessibility element
+                collapses its whole subtree on iOS, hiding the dialog's content (title, pills,
+                buttons) from VoiceOver and UI automation. Touch handling is unaffected, so the
+                backdrop still dismisses and the card still swallows taps. */}
+            <Pressable testID="generate-backdrop" style={styles.backdrop} onPress={cancel} accessible={false}>
+                <Pressable style={[styles.card, card]} onPress={() => undefined} accessible={false}>
                     <Text variant="subtitle">{dealt ? 'Pick one' : 'Random Character'}</Text>
 
                     <SegmentedControl
