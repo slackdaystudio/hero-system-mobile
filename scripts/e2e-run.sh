@@ -23,4 +23,10 @@ RC=$?
 mkdir -p maestro-artifacts
 cp -R "$HOME/.maestro/tests" maestro-artifacts/_debug 2>/dev/null || true
 
+# Maestro nests takeScreenshot outputs under its per-run debug dir as
+# <run>/<flow>/takeScreenshot/<the-path-we-passed>.png — i.e. each takeScreenshot dir
+# already contains a maestro-artifacts/<platform>/<name>.png tree. Lift those into the
+# workspace so the requested top-level paths exist (used by the visual-diff step).
+find "$HOME/.maestro/tests" -type d -name takeScreenshot -exec sh -c 'cp -R "$1"/. .' _ {} \; 2>/dev/null || true
+
 exit "$RC"
