@@ -26,6 +26,7 @@ import type {SqlDatabase} from 'infra/persistence/driver/sqlDatabase';
 import {createRepositories, type Repositories} from 'infra/persistence/repositories';
 import {asyncStorageKeyValue} from './asyncStorageKeyValue';
 import {plantDevLegacyData} from './devLegacyHarness';
+import {E2E_SEED} from './e2eSeed';
 
 // DEV: set true to plant a fake legacy install (see devLegacyHarness) and watch
 // migrateV1 import it on launch. Leave false for normal behaviour.
@@ -60,8 +61,10 @@ export async function createDeviceRepositories(): Promise<Repositories> {
 
     await sweepOrphanedPortraits(repositories, imageStore);
 
-    // Dev-only demo data, only when nothing else populated the store.
-    if (__DEV__ && (await repositories.characters.list()).length === 0) {
+    // Demo data, only when nothing else populated the store. Dev builds always seed;
+    // Release builds seed only when the E2E flag is compiled in (see e2eSeed.ts), which
+    // gives the visual-regression flow a fixed Sample Hero. Production has both false.
+    if ((__DEV__ || E2E_SEED) && (await repositories.characters.list()).length === 0) {
         await seedDemoCharacters(repositories);
     }
 

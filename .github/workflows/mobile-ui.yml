@@ -10,6 +10,8 @@ name: Mobile UI (E2E)
 #   * No signing secrets: the iOS simulator needs none, and android/app/build.gradle
 #     falls back to the committed debug keystore when release props are absent.
 #   * macOS runners are free for public repos, which is what makes iOS CI viable here.
+#   * The build flips e2eSeed.ts to true so a fixed Sample Hero exists for the
+#     visual-regression flow; the status bar is frozen so the clock can't cause diffs.
 
 on:
     pull_request:
@@ -39,6 +41,11 @@ jobs:
                   cache: npm
 
             - run: npm ci
+
+            # Compile the deterministic Sample Hero seed into this (Release) build only.
+            # Production keeps the committed `false`; this never reaches the store.
+            - name: Enable the E2E seed
+              run: echo 'export const E2E_SEED = true;' > src/app/composition/e2eSeed.ts
 
             # CocoaPods via Bundler; installs pods and generates the .xcworkspace.
             - uses: ruby/setup-ruby@v1
@@ -73,6 +80,15 @@ jobs:
                   xcrun simctl boot "$UDID"
                   xcrun simctl bootstatus "$UDID" -b
 
+            # Freeze the status bar so the clock/battery can't cause visual diffs.
+            - name: Freeze the status bar
+              run: |
+                  xcrun simctl status_bar booted override \
+                    --time "9:41" \
+                    --dataNetwork wifi --wifiMode active --wifiBars 3 \
+                    --cellularMode active --cellularBars 4 \
+                    --batteryState charged --batteryLevel 100
+
             - name: Install Maestro
               run: |
                   curl -fsSL "https://get.maestro.mobile.dev" | bash
@@ -86,6 +102,11 @@ jobs:
 
             - name: Run Maestro flows
               run: bash scripts/e2e-run.sh ios org.diceless.herogmtools
+
+            # Pixel-diff the character sheet against its committed iOS baseline.
+            - name: Visual regression — character sheet
+              if: always()
+              run: node scripts/pixel-diff.js maestro-artifacts/ios/sheet.png .maestro/baselines/ios/sheet.png maestro-artifacts/ios/sheet.diff.png
 
             - name: Upload screenshots & report
               if: always()
@@ -110,6 +131,10 @@ jobs:
                   cache: npm
 
             - run: npm ci
+
+            # Compile the deterministic Sample Hero seed into this build only.
+            - name: Enable the E2E seed
+              run: echo 'export const E2E_SEED = true;' > src/app/composition/e2eSeed.ts
 
             - uses: actions/setup-java@v4
               with:
@@ -146,7 +171,19 @@ jobs:
                   profile: pixel_6
                   script: |
                       adb install -r android/app/build/outputs/apk/release/app-release.apk
+                      # Freeze the status bar (demo mode) so the clock can't cause visual diffs.
+                      adb shell settings put global sysui_demo_allowed 1
+                      adb shell am broadcast -a com.android.systemui.demo -e command enter
+                      adb shell am broadcast -a com.android.systemui.demo -e command clock -e hhmm 0941
+                      adb shell am broadcast -a com.android.systemui.demo -e command battery -e level 100 -e plugged false
+                      adb shell am broadcast -a com.android.systemui.demo -e command network -e wifi show -e level 4
+                      adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
                       bash scripts/e2e-run.sh android com.herogmtools
+
+            # Pixel-diff the character sheet against its committed Android baseline.
+            - name: Visual regression — character sheet
+              if: always()
+              run: node scripts/pixel-diff.js maestro-artifacts/android/sheet.png .maestro/baselines/android/sheet.png maestro-artifacts/android/sheet.diff.png
 
             - name: Upload screenshots & report
               if: always()

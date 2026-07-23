@@ -1,0 +1,21 @@
+# Deterministic visual-regression target for the character sheet.
+#
+# Opens "Sample Hero" — a fixed, engine-priced character that the E2E build seeds
+# into an empty store (see e2eSeed.ts / deviceRepositories.ts). Sample Hero is an
+# imported character (recipe null), so CharacterDetail shows the sheet DIRECTLY —
+# no recipe editor, no scroll needed. The screenshot at a stable path is pixel-diffed
+# against a committed per-platform baseline by the CI "Visual regression" step.
+#
+# Determinism depends on: the fixed character (this flow), a pinned OS image, and a
+# frozen status bar (both set in the CI workflow before this runs).
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true # empties the store -> the E2E build reseeds Sample Hero
+- tapOn:
+    id: 'tile-All Characters'
+- tapOn:
+    id: 'character-sample-hero'
+- assertVisible:
+    id: 'segment-character'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/sheet'

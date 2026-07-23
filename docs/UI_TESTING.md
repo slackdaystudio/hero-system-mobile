@@ -33,6 +33,7 @@ by `${PLATFORM}`.
 | `smoke.yaml` | App launches; Home, Characters, Dice, Settings, Statistics all reachable and rendered. |
 | `generate-character.yaml` | The **rules engine through the UI** — Generate builds a character, prices it with the same engine that reads a real `.hdc`, and the full sheet renders. The only picker-free path to a real sheet. |
 | `dice-roller.yaml` | The dice roller: a skill check and a normal-damage roll, asserting on the result surface. |
+| `sheet-visual.yaml` | Opens a fixed Sample Hero and screenshots its sheet — the deterministic target for the pixel-diff gate (see [Visual regression](#visual-regression--the-character-sheet)). |
 
 **Why Generate and not Import?** Import uses a native document picker
 (`@react-native-documents/picker`), which Maestro can't drive — and a Release build (what
@@ -83,8 +84,8 @@ Screenshots land in `maestro-artifacts/<platform>/` (git-ignored).
 [`.github/workflows/mobile-ui.yml`](../.github/workflows/mobile-ui.yml) runs both platforms
 on every PR and on pushes to `rebuild`:
 
-- **iOS** on a `macos-14` runner (free for public repos — the thing that makes iOS CI viable
-  without a Mac on anyone's desk).
+- **iOS** on a `macos-15` runner (free for public repos — the thing that makes iOS CI viable
+  without a Mac on anyone's desk; Xcode 16 there satisfies the pods' Swift 6.0).
 - **Android** on `ubuntu-latest` with a KVM-accelerated emulator.
 
 Each job builds the standalone app, boots the device, runs every flow, and uploads
@@ -99,20 +100,37 @@ Prefer ids — copy changes shouldn't break a flow. If you add a screen, forward
 on its interactive primitives (the shared `Button`, `SegmentedControl`, `ListRow`, … already
 do) so it's drivable.
 
-## The pixel-regression upgrade path
+## Visual regression — the character sheet
 
-Today the screenshots are for **human** review — the honest first step, and enough to catch
-gross platform divergence. To turn them into an automated gate:
+Most screenshots are for **human** review. One screen is also an automated **pixel gate**: the
+character sheet. The `sheet-visual` flow opens a fixed **Sample Hero** and screenshots the sheet;
+CI diffs it against a committed per-platform baseline and **fails the build on a regression**.
 
-1. Keep **separate baselines per platform** — iOS and Android legitimately differ, so a shared
-   pixel baseline is a category error. A baseline answers "did iOS change vs *approved iOS*",
-   not "does iOS match Android".
-2. Diff each screenshot against its committed baseline with a tolerance (antialiasing and font
-   drift make zero-tolerance a flake factory).
-3. **Pin the OS image** (simulator runtime / emulator API level) — an OS bump re-renders text
-   and invalidates baselines.
-4. Start narrow: gate the screens where subtle layout actually bites — the character sheet and
-   the dice results — not every screen.
+Three things make a pixel gate trustworthy rather than flaky, and all three are wired up:
 
-Gate the pixels where correctness lives; leave the rest as eyeball artifacts. That keeps the
-signal high and the flakes low.
+- **A deterministic screen.** A *generated* character differs every run, so it can't be a
+  baseline. Instead the E2E build compiles in a fixed, engine-priced Sample Hero: the CI job
+  flips [`src/app/composition/e2eSeed.ts`](../src/app/composition/e2eSeed.ts) to `true` before
+  bundling, which enables the existing demo seed. **Production keeps it `false`** — the seed is
+  dead code in shipped builds.
+- **Per-platform baselines.** iOS and Android legitimately render differently, so they get
+  separate baselines under [`.maestro/baselines/`](../.maestro/baselines). A baseline answers
+  "did iOS change vs *approved iOS*", not "does iOS match Android".
+- **No moving parts in frame.** The status bar clock would diff every run, so CI freezes it
+  (iOS `simctl status_bar override`, Android SystemUI demo mode) and the OS image is pinned
+  (`macos-15` sim / Android API 34). [`scripts/pixel-diff.js`](../scripts/pixel-diff.js) uses
+  `pixelmatch` with a small tolerance (default 0.1% of pixels) so sub-pixel antialiasing doesn't
+  flake the gate.
+
+When the sheet legitimately changes, the gate is *supposed* to go red — that's the signal.
+Update the baseline:
+
+1. Open the failed run's **`maestro-<platform>`** artifact and inspect `sheet.png` (the new
+   render) and `sheet.diff.png` (what changed). Confirm the change is intended.
+2. Copy the new `sheet.png` over `.maestro/baselines/<platform>/sheet.png` and commit it.
+
+The first time a baseline is missing, `pixel-diff.js` establishes it from the current run and
+passes — so bootstrapping a new platform is: run CI once, then commit the produced `sheet.png`.
+
+Everything else stays an eyeball artifact. Gate the pixels where correctness lives; leave the
+rest for human review. That keeps the signal high and the flakes low.

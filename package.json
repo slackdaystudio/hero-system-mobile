@@ -45,6 +45,8 @@
     "better-sqlite3": "^12.11.1",
     "eslint": "^8.19.0",
     "jest": "^29.6.3",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0",
     "prettier": "2.8.8",
     "pure-rand": "^6.1.0",
     "react-test-renderer": "19.0.0",
