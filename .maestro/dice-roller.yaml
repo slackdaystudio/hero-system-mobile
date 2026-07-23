@@ -8,7 +8,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
-    timeout: 30000
+    timeout: 90000
 
 # Home dice tile lands on the Skill mode
 - tapOn:

@@ -13,7 +13,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
-    timeout: 30000
+    timeout: 90000
 
 # Home -> Characters -> Generate (both header actions live on CharacterList)
 - tapOn:

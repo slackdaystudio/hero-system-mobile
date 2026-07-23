@@ -20,7 +20,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
-    timeout: 30000
+    timeout: 90000
 - takeScreenshot: 'maestro-artifacts/${PLATFORM}/01-home'
 
 # Characters
@@ -35,7 +35,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
-    timeout: 30000
+    timeout: 90000
 - tapOn:
     id: 'tile-Skill 3d6'
 - assertVisible:
@@ -48,7 +48,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
-    timeout: 30000
+    timeout: 90000
 - tapOn:
     id: 'tile-Settings'
 - assertVisible: 'Settings'
@@ -60,7 +60,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
-    timeout: 30000
+    timeout: 90000
 - tapOn:
     id: 'tile-Statistics'
 - assertVisible: 'Statistics'

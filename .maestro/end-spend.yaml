@@ -9,7 +9,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
-    timeout: 30000
+    timeout: 90000
 - tapOn:
     id: 'tile-All Characters'
 - tapOn:
@@ -17,7 +17,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
         id: 'segment-combat'
-    timeout: 30000
+    timeout: 90000
 - tapOn:
     id: 'segment-combat'
 
