@@ -12,11 +12,25 @@ set -u
 PLATFORM="${1:?platform (ios|android) required}"
 APP_ID="${2:?appId required}"
 
-maestro test .maestro \
-    -e PLATFORM="$PLATFORM" \
-    -e APP_ID="$APP_ID" \
-    --format junit --output "maestro-report-${PLATFORM}.xml"
+run_suite() {
+    maestro test .maestro \
+        -e PLATFORM="$PLATFORM" \
+        -e APP_ID="$APP_ID" \
+        --format junit --output "maestro-report-${PLATFORM}.xml"
+}
+
+# Retry the suite once on failure. CI emulators/simulators occasionally stall a
+# single flow's cold start (blank loading screen past the readiness timeout); a
+# fresh launch clears it. A genuine failure still fails on the retry, so this
+# recovers flakes without masking real breakage. Maestro re-runs the whole set,
+# which regenerates all screenshots (incl. the visual-regression sheet).
+run_suite
 RC=$?
+if [ "$RC" -ne 0 ]; then
+    echo "::warning::Maestro suite failed (rc=$RC) — retrying once (transient cold-start stall)."
+    run_suite
+    RC=$?
+fi
 
 # actions/upload-artifact can't expand ~, so fold Maestro's own debug output
 # (view hierarchies + on-failure screenshots) into the workspace for upload.
