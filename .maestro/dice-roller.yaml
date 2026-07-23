@@ -4,6 +4,11 @@ appId: ${APP_ID}
 ---
 - launchApp:
     clearState: true
+# Wait for Home to finish loading before tapping — the E2E seed lengthens cold startup.
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
 
 # Home dice tile lands on the Skill mode
 - tapOn:

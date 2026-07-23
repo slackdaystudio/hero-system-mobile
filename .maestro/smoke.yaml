@@ -5,7 +5,8 @@
 # We relaunch (stopApp + launchApp) to return to Home rather than using `back`:
 # iOS has no hardware back and Maestro's `back` is a no-op there, so `back` would
 # only work on Android. Relaunching is reliable on both — and reaching each screen
-# from a cold start is a stronger smoke check.
+# from a cold start is a stronger smoke check. After every launch we wait for Home
+# to be ready (the E2E seed lengthens cold startup), then tap.
 #
 # appId is parameterized so the SAME flow runs on both platforms:
 #   iOS     -> -e APP_ID=org.diceless.herogmtools
@@ -14,12 +15,15 @@ appId: ${APP_ID}
 ---
 - launchApp:
     clearState: true
-# Anchor on a guaranteed Home testID rather than the native nav-bar title.
-- assertVisible:
-    id: 'tile-All Characters'
+# Anchor on a guaranteed Home testID rather than the native nav-bar title; wait
+# patiently so a slow cold start doesn't read as "element missing".
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
 - takeScreenshot: 'maestro-artifacts/${PLATFORM}/01-home'
 
-# Characters (empty in a Release build — no __DEV__ seed)
+# Characters
 - tapOn:
     id: 'tile-All Characters'
 - assertVisible: 'Characters'
@@ -28,6 +32,10 @@ appId: ${APP_ID}
 # Dice roller
 - stopApp
 - launchApp
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
 - tapOn:
     id: 'tile-Skill 3d6'
 - assertVisible:
@@ -37,6 +45,10 @@ appId: ${APP_ID}
 # Settings
 - stopApp
 - launchApp
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
 - tapOn:
     id: 'tile-Settings'
 - assertVisible: 'Settings'
@@ -45,6 +57,10 @@ appId: ${APP_ID}
 # Statistics
 - stopApp
 - launchApp
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
 - tapOn:
     id: 'tile-Statistics'
 - assertVisible: 'Statistics'

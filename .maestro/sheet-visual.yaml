@@ -12,6 +12,11 @@ appId: ${APP_ID}
 ---
 - launchApp:
     clearState: true # empties the store -> the E2E build reseeds Sample Hero
+# Wait for Home to finish loading before tapping — the seed lengthens cold startup.
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
 - tapOn:
     id: 'tile-All Characters'
 - tapOn:
