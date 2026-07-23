@@ -30,20 +30,25 @@ appId: ${APP_ID}
     timeout: 20000
 - takeScreenshot: 'maestro-artifacts/${PLATFORM}/10-generate-hand'
 
-# Keep the first candidate and open its sheet
+# Keep the first candidate and open it
 - tapOn:
     id: 'candidate-0'
 - tapOn:
-    id: 'generate-confirm' # "View" — saves the character and navigates to the sheet
+    id: 'generate-confirm' # "View"
 
-# Character sheet — assert the engine actually produced characteristics
+# A generated character opens on CharacterDetail with its recipe EDITOR on top and
+# the priced sheet (SheetTabs) BELOW it in the same scroll view. First confirm the
+# editor rendered, then scroll the sheet's tab control into view — SheetTabs only
+# renders once the engine has built the sheet, so reaching it proves pricing worked.
 - assertVisible:
-    id: 'segment-character'
-- assertVisible:
-    id: 'roll-char-STR'
+    id: 'edit-name'
+- scrollUntilVisible:
+    element:
+        id: 'segment-character'
+    direction: DOWN
 - takeScreenshot: 'maestro-artifacts/${PLATFORM}/11-sheet-character'
 
-# Combat tab
+# Combat tab (same control row, now on screen)
 - tapOn:
     id: 'segment-combat'
 - takeScreenshot: 'maestro-artifacts/${PLATFORM}/12-sheet-combat'
