@@ -1,0 +1,27 @@
+# Exercise the dice roller: a skill check and a normal-damage roll, asserting on the
+# result surface (results carry no testIDs, so we assert on the visible stat labels).
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+
+# Home dice tile lands on the Skill mode
+- tapOn:
+    id: 'tile-Skill 3d6'
+- assertVisible:
+    id: 'roll'
+
+# Skill check
+- tapOn:
+    id: 'roll'
+- assertVisible: 'Rolled'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/20-dice-skill'
+
+# Switch to Normal damage and roll — STUN/BODY prove the damage path rendered
+- tapOn:
+    id: 'segment-normal'
+- tapOn:
+    id: 'roll'
+- assertVisible: 'STUN'
+- assertVisible: 'BODY'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/21-dice-damage'

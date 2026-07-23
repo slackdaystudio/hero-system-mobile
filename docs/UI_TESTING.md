@@ -1,0 +1,118 @@
+# Cross-platform UI testing
+
+React Native renders through each platform's own layout and text stack, so the same
+component can come out *subtly* different on iOS and Android — a label wraps a line
+earlier, a shadow changes a row's height, a font metric nudges alignment. This is the
+tier of test that catches that: the **same flows driven on a real iOS Simulator and a
+real Android emulator**, with a screenshot of every meaningful screen on each.
+
+## Why not just Jest snapshots?
+
+The component tests under `src/app/**/__tests__` use `react-test-renderer` in Node.
+They serialize the React *element tree* — they never run Yoga layout, never measure text
+with platform font metrics, never rasterize a pixel. So "iOS wrapped this to two lines"
+is **structurally invisible** to them. To see platform rendering you have to render on
+the platform and look at the output. Different tier, not an extension of the same one.
+
+Both tiers earn their keep:
+
+| Tier | Tool | Runs on | Catches |
+|---|---|---|---|
+| Domain logic | Jest (`core` project) | Node | Wrong numbers — priced by the rules engine |
+| Component behaviour | Jest + `react-test-renderer` (`app`) | Node | Broken wiring, prop logic, gestures |
+| **Cross-platform UI** | **Maestro** | **iOS Simulator + Android emulator** | **Platform rendering & real end-to-end flows** |
+
+## What runs
+
+Flows live in [`.maestro/`](../.maestro) as YAML. The **same files run on both platforms** —
+`appId` is parameterized (`${APP_ID}`) and passed per platform, and screenshots are tagged
+by `${PLATFORM}`.
+
+| Flow | What it proves |
+|---|---|
+| `smoke.yaml` | App launches; Home, Characters, Dice, Settings, Statistics all reachable and rendered. |
+| `generate-character.yaml` | The **rules engine through the UI** — Generate builds a character, prices it with the same engine that reads a real `.hdc`, and the full sheet renders. The only picker-free path to a real sheet. |
+| `dice-roller.yaml` | The dice roller: a skill check and a normal-damage roll, asserting on the result surface. |
+
+**Why Generate and not Import?** Import uses a native document picker
+(`@react-native-documents/picker`), which Maestro can't drive — and a Release build (what
+CI ships) has no `__DEV__` seed, so the store starts empty. Generate needs no file system
+and no dev build, so it's the reliable road to a populated character sheet. It also happens
+to be the highest-value flow: it exercises the pricing engine end to end.
+
+## Running locally
+
+You need the app installed on a booted simulator/emulator, then point Maestro at it.
+Install Maestro once: `curl -fsSL "https://get.maestro.mobile.dev" | bash`.
+
+### iOS
+
+```sh
+# Build a standalone (JS-bundled) Release app for the simulator — no signing, no Metro.
+bundle exec pod install --project-directory=ios
+xcodebuild -workspace ios/herogmtools.xcworkspace -scheme herogmtools \
+  -configuration Release -sdk iphonesimulator -derivedDataPath ios/build \
+  -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+
+xcrun simctl boot 'iPhone 15' || true
+xcrun simctl install booted "$(find ios/build/Build/Products/Release-iphonesimulator -maxdepth 1 -name '*.app' | head -1)"
+
+npm run e2e:ios
+```
+
+### Android
+
+```sh
+# assembleRelease bundles the JS and self-signs with the committed debug key.
+(cd android && ./gradlew assembleRelease)
+adb install -r android/app/build/outputs/apk/release/app-release.apk
+
+npm run e2e:android
+```
+
+Screenshots land in `maestro-artifacts/<platform>/` (git-ignored).
+
+> **Standalone builds, on purpose.** Both platforms embed the JS bundle (iOS Release /
+> Android `assembleRelease`) so the app runs with **no Metro server** to race against — the
+> single biggest source of RN E2E flakiness — and **no signing secrets** (the simulator
+> needs none; Android falls back to the committed debug keystore, see
+> `android/app/build.gradle`).
+
+## In CI
+
+[`.github/workflows/mobile-ui.yml`](../.github/workflows/mobile-ui.yml) runs both platforms
+on every PR and on pushes to `rebuild`:
+
+- **iOS** on a `macos-14` runner (free for public repos — the thing that makes iOS CI viable
+  without a Mac on anyone's desk).
+- **Android** on `ubuntu-latest` with a KVM-accelerated emulator.
+
+Each job builds the standalone app, boots the device, runs every flow, and uploads
+**`maestro-<platform>`** artifacts: the per-screen screenshots, a JUnit report, and
+Maestro's own debug output (which includes screenshots and view hierarchies on failure).
+Download them from the run's *Summary → Artifacts* and eyeball iOS vs Android side by side.
+
+## Selecting elements
+
+Flows select by **stable `testID`** (the app has ~100), with visible text as a fallback.
+Prefer ids — copy changes shouldn't break a flow. If you add a screen, forward a `testID`
+on its interactive primitives (the shared `Button`, `SegmentedControl`, `ListRow`, … already
+do) so it's drivable.
+
+## The pixel-regression upgrade path
+
+Today the screenshots are for **human** review — the honest first step, and enough to catch
+gross platform divergence. To turn them into an automated gate:
+
+1. Keep **separate baselines per platform** — iOS and Android legitimately differ, so a shared
+   pixel baseline is a category error. A baseline answers "did iOS change vs *approved iOS*",
+   not "does iOS match Android".
+2. Diff each screenshot against its committed baseline with a tolerance (antialiasing and font
+   drift make zero-tolerance a flake factory).
+3. **Pin the OS image** (simulator runtime / emulator API level) — an OS bump re-renders text
+   and invalidates baselines.
+4. Start narrow: gate the screens where subtle layout actually bites — the character sheet and
+   the dice results — not every screen.
+
+Gate the pixels where correctness lives; leave the rest as eyeball artifacts. That keeps the
+signal high and the flakes low.

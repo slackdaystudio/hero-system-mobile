@@ -1,0 +1,49 @@
+# Generate a random character end-to-end and view its full sheet — with NO file
+# picker, so it runs unattended in CI. This is the flow that actually exercises the
+# rules engine through the UI: Generate builds a ParsedCharacter, prices it with the
+# same engine that reads a real .hdc, and renders the sheet we screenshot here.
+#
+# Uses 6E Standard (400 pts). The 3s animated "deal" is handled with extendedWaitUntil
+# rather than a fixed sleep.
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+
+# Home -> Characters -> Generate (both header actions live on CharacterList)
+- tapOn:
+    id: 'tile-All Characters'
+- tapOn:
+    id: 'generate-character'
+- assertVisible: 'Random Character'
+
+# Pick the 6E edition and deal a hand of five
+- tapOn:
+    id: 'segment-6e-standard'
+- tapOn:
+    id: 'generate-confirm' # "Generate"
+
+# The deal animates for ~3s; wait for the hand instead of sleeping.
+- extendedWaitUntil:
+    visible:
+        id: 'candidate-0'
+    timeout: 20000
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/10-generate-hand'
+
+# Keep the first candidate and open its sheet
+- tapOn:
+    id: 'candidate-0'
+- tapOn:
+    id: 'generate-confirm' # "View" — saves the character and navigates to the sheet
+
+# Character sheet — assert the engine actually produced characteristics
+- assertVisible:
+    id: 'segment-character'
+- assertVisible:
+    id: 'roll-char-STR'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/11-sheet-character'
+
+# Combat tab
+- tapOn:
+    id: 'segment-combat'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/12-sheet-combat'

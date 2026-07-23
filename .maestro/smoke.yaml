@@ -1,0 +1,43 @@
+# Smoke: the app launches and every top-level screen is reachable and renders.
+# Also captures a screenshot of each screen per platform — the first line of
+# defence against "React Native rendered this subtly differently on iOS".
+#
+# appId is parameterized so the SAME flow runs on both platforms:
+#   iOS     -> -e APP_ID=org.diceless.herogmtools
+#   Android -> -e APP_ID=com.herogmtools
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+# Anchor on a guaranteed Home testID rather than the native nav-bar title.
+- assertVisible:
+    id: 'tile-All Characters'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/01-home'
+
+# Characters (empty in a Release build — no __DEV__ seed)
+- tapOn:
+    id: 'tile-All Characters'
+- assertVisible: 'Characters'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/02-characters'
+- back
+
+# Dice roller
+- tapOn:
+    id: 'tile-Skill 3d6'
+- assertVisible:
+    id: 'roll'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/03-dice'
+- back
+
+# Settings
+- tapOn:
+    id: 'tile-Settings'
+- assertVisible: 'Settings'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/04-settings'
+- back
+
+# Statistics
+- tapOn:
+    id: 'tile-Statistics'
+- assertVisible: 'Statistics'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/05-statistics'

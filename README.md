@@ -8,6 +8,8 @@ Available since 2018 on:
 [![Google Play](https://img.shields.io/badge/Google_Play-HERO_System_Mobile-414141?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.herogmtools)
 [![Amazon Appstore](https://img.shields.io/badge/Amazon_Appstore-HERO_System_Mobile-FF9900?logo=amazon&logoColor=white)](https://www.amazon.ca/Phil-Guinchard-HERO-System-Mobile/dp/B07BJ9879M)
 
+[![Mobile UI (E2E)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml/badge.svg?branch=rebuild)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml)
+
 Free means free: no ads, no tracking, no upsells — and it will stay that way.
 
 ---
@@ -91,6 +93,21 @@ npx jest src/core/dice
 ```
 
 Lint, type-check, and tests should all be green before you send a change.
+
+### Cross-platform UI tests
+
+The Jest suites run in Node, so they prove the rules are right but can't see how a screen
+actually renders. Because React Native lays out through each platform's own stack, the same
+component can come out subtly different on iOS and Android. To catch that, the **same
+[Maestro](https://maestro.dev/) flows** ([`.maestro/`](.maestro)) drive a real iOS Simulator
+and a real Android emulator in CI, screenshotting every meaningful screen on each — see
+[`docs/UI_TESTING.md`](docs/UI_TESTING.md). Both builds are standalone (JS bundled in), so
+there's no Metro server to race and no signing secrets.
+
+```sh
+npm run e2e:ios       # against a booted simulator with the app installed
+npm run e2e:android   # against a booted emulator with the app installed
+```
 
 ---
 

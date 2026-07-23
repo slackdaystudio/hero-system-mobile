@@ -1,0 +1,176 @@
+name: Mobile UI (E2E)
+
+# Cross-platform end-to-end UI tests: the SAME Maestro flows (.maestro/) run on a
+# real iOS Simulator and a real Android emulator, then upload their screenshots so a
+# human can eyeball how each platform renders. See docs/UI_TESTING.md.
+#
+# Design notes that make this reliable:
+#   * Both platforms build a STANDALONE app with the JS bundle embedded
+#     (iOS Release / Android assembleRelease) — no Metro server to race against.
+#   * No signing secrets: the iOS simulator needs none, and android/app/build.gradle
+#     falls back to the committed debug keystore when release props are absent.
+#   * macOS runners are free for public repos, which is what makes iOS CI viable here.
+
+on:
+    pull_request:
+    push:
+        branches: [rebuild]
+    workflow_dispatch:
+
+# One in-flight run per branch; a new push cancels the previous run.
+concurrency:
+    group: mobile-ui-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ios:
+        name: iOS · Maestro
+        runs-on: macos-14 # pinned for reproducibility; bump deliberately
+        timeout-minutes: 45
+        env:
+            SCHEME: herogmtools
+            DERIVED: ios/build
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+
+            - run: npm ci
+
+            # CocoaPods via Bundler; installs pods and generates the .xcworkspace.
+            - uses: ruby/setup-ruby@v1
+              with:
+                  bundler-cache: true
+
+            - name: Pod install
+              run: bundle exec pod install --project-directory=ios
+
+            # Release config embeds the JS bundle -> the app runs without Metro.
+            # Simulator builds need no code signing.
+            - name: Build app for the simulator
+              run: |
+                  set -o pipefail
+                  xcodebuild \
+                    -workspace ios/${SCHEME}.xcworkspace \
+                    -scheme ${SCHEME} \
+                    -configuration Release \
+                    -sdk iphonesimulator \
+                    -derivedDataPath ${DERIVED} \
+                    -destination 'generic/platform=iOS Simulator' \
+                    CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+                    build
+
+            - name: Boot a simulator
+              run: |
+                  UDID=$(xcrun simctl list devices available \
+                    | grep -Eo 'iPhone 1[0-9][^(]*\(([0-9A-F-]{36})\)' \
+                    | grep -Eo '[0-9A-F-]{36}' | head -1)
+                  echo "Booting $UDID"
+                  xcrun simctl boot "$UDID"
+                  xcrun simctl bootstatus "$UDID" -b
+
+            - name: Install Maestro
+              run: |
+                  curl -fsSL "https://get.maestro.mobile.dev" | bash
+                  echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+            - name: Install app on the simulator
+              run: |
+                  APP=$(find ${DERIVED}/Build/Products/Release-iphonesimulator -name '*.app' -maxdepth 1 | head -1)
+                  echo "Installing $APP"
+                  xcrun simctl install booted "$APP"
+
+            - name: Run Maestro flows
+              run: |
+                  maestro test .maestro \
+                    -e PLATFORM=ios \
+                    -e APP_ID=org.diceless.herogmtools \
+                    --format junit --output maestro-report-ios.xml
+
+            # upload-artifact does not expand ~, so fold Maestro's debug output
+            # (hierarchies + on-failure screenshots) into the workspace first.
+            - name: Collect Maestro debug output
+              if: always()
+              run: |
+                  mkdir -p maestro-artifacts
+                  cp -R "$HOME/.maestro/tests" maestro-artifacts/_debug 2>/dev/null || true
+
+            - name: Upload screenshots & report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: maestro-ios
+                  path: |
+                      maestro-artifacts/**
+                      maestro-report-ios.xml
+                  if-no-files-found: warn
+
+    android:
+        name: Android · Maestro
+        runs-on: ubuntu-latest # KVM-accelerated emulator via the action below
+        timeout-minutes: 45
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+
+            - run: npm ci
+
+            - uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: '17'
+
+            - name: Gradle cache
+              uses: gradle/actions/setup-gradle@v4
+
+            # assembleRelease bundles the JS and self-signs with the committed
+            # debug keystore (no release props in CI) -> standalone, no Metro.
+            - name: Build release APK
+              run: ./gradlew assembleRelease
+              working-directory: android
+
+            - name: Install Maestro
+              run: |
+                  curl -fsSL "https://get.maestro.mobile.dev" | bash
+                  echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+            # KVM permissions for a fast hardware-accelerated emulator.
+            - name: Enable KVM
+              run: |
+                  echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+                    | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+                  sudo udevadm control --reload-rules
+                  sudo udevadm trigger --name-match=kvm
+
+            - name: Run Maestro flows on an emulator
+              uses: reactivecircus/android-emulator-runner@v2
+              with:
+                  api-level: 34 # solid google_apis image; bump toward 35 (the app's target) when stable on CI
+                  arch: x86_64
+                  profile: pixel_6
+                  script: |
+                      adb install -r android/app/build/outputs/apk/release/app-release.apk
+                      maestro test .maestro \
+                        -e PLATFORM=android \
+                        -e APP_ID=com.herogmtools \
+                        --format junit --output maestro-report-android.xml || TEST_RC=$?
+                      mkdir -p maestro-artifacts
+                      cp -R "$HOME/.maestro/tests" maestro-artifacts/_debug 2>/dev/null || true
+                      exit ${TEST_RC:-0}
+
+            - name: Upload screenshots & report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: maestro-android
+                  path: |
+                      maestro-artifacts/**
+                      maestro-report-android.xml
+                  if-no-files-found: warn

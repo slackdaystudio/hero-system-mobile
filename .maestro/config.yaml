@@ -1,0 +1,8 @@
+# Maestro workspace config — https://docs.maestro.dev
+#
+# Only root-level *.yaml files are treated as runnable flows. If we later add a
+# subflows/ directory for shared fragments, they won't be picked up as top-level
+# tests. Each flow launches with clearState, so flows are independent and order
+# does not matter.
+flows:
+    - '*.yaml'
