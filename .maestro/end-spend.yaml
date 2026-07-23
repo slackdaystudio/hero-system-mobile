@@ -1,0 +1,48 @@
+# END economy: open the seeded Sample Hero (Defensor) and drive the shared END pool
+# in the combat tracker, asserting the actual arithmetic — not just that taps land.
+#   start 20  ->  spend 5 -> 15  ->  Recovery (+4) -> 19
+# Stays within END, so no shortfall and no STUN burn (a burn rolls dice = nondeterministic).
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
+- tapOn:
+    id: 'tile-All Characters'
+- tapOn:
+    id: 'character-sample-hero'
+- extendedWaitUntil:
+    visible:
+        id: 'segment-combat'
+    timeout: 30000
+- tapOn:
+    id: 'segment-combat'
+
+# Reveal the Health card (Recovery is its last control; the card fits one viewport).
+- scrollUntilVisible:
+    element:
+        id: 'recovery'
+    timeout: 20000
+- assertVisible:
+    id: 'vital-endurance'
+    text: '20'
+
+# Spend 5 END from the pool.
+- tapOn:
+    id: 'spend-end-5'
+- assertVisible: 'Spent 5 END'
+- assertVisible:
+    id: 'vital-endurance'
+    text: '15'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/30-end-spent'
+
+# Recovery restores +4 STUN & END -> 19.
+- tapOn:
+    id: 'recovery'
+- assertVisible:
+    id: 'vital-endurance'
+    text: '19'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/31-end-recovered'

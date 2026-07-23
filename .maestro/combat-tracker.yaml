@@ -1,0 +1,47 @@
+# Combat tracker — status effects: open the seeded Sample Hero (Defensor)'s Combat
+# tab, add a status effect and clear it, asserting the tracker's add/clear logic.
+# The Status dialog is a Modal; the earlier accessible={false} fix is what makes its
+# content reachable on iOS (see StatusDialog.tsx).
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 30000
+- tapOn:
+    id: 'tile-All Characters'
+- tapOn:
+    id: 'character-sample-hero'
+- extendedWaitUntil:
+    visible:
+        id: 'segment-combat'
+    timeout: 30000
+- tapOn:
+    id: 'segment-combat'
+
+# The Status Effects section is well down the tracker.
+- scrollUntilVisible:
+    element:
+        id: 'add-status'
+    timeout: 20000
+- assertVisible: 'No active status effects.'
+
+# Add a status (the dialog defaults to Aid) and apply it.
+- tapOn:
+    id: 'add-status'
+- assertVisible: 'Status Effect'
+- tapOn:
+    id: 'status-apply'
+
+# clear-statuses only renders once a status exists -> proves the add worked.
+- assertVisible:
+    id: 'clear-statuses'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/40-status-added'
+
+# Clear it -> the empty-state text returns.
+- tapOn:
+    id: 'clear-statuses'
+- assertVisible: 'No active status effects.'
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/41-status-cleared'

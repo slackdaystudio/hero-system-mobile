@@ -34,6 +34,8 @@ by `${PLATFORM}`.
 | `generate-character.yaml` | The **rules engine through the UI** — Generate builds a character, prices it with the same engine that reads a real `.hdc`, and the full sheet renders. The only picker-free path to a real sheet. |
 | `dice-roller.yaml` | The dice roller: a skill check and a normal-damage roll, asserting on the result surface. |
 | `sheet-visual.yaml` | Opens a fixed Sample Hero and screenshots its sheet — the deterministic target for the pixel-diff gate (see [Visual regression](#visual-regression--the-character-sheet)). |
+| `end-spend.yaml` | The END economy in the combat tracker — spends END and takes a Recovery, asserting the actual arithmetic on the shared pool (20 → 15 → 19), not just that taps land. |
+| `combat-tracker.yaml` | The combat tracker's status effects — adds a status and clears it, asserting the add/clear state logic. |
 
 **Why Generate and not Import?** Import uses a native document picker
 (`@react-native-documents/picker`), which Maestro can't drive — and a Release build (what
