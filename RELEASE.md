@@ -77,6 +77,23 @@ A fresh install exercises none of the risk. Install the *previous* build, import
 character or two, then install this one over the top and confirm they're all still
 there.
 
+### 2.7.1 — Accessibility fix for modal dialogs; no schema change, no cost changes
+
+Improves **accessibility support**: the Generate, Status Effect, and roll-result dialogs are
+now readable by screen readers (**VoiceOver** on iOS, **TalkBack** on Android). Each dialog's
+backdrop was itself an accessibility element, which on iOS collapsed the whole dialog into one
+opaque item — title, controls, and buttons all unreachable. The backdrops are now transparent to
+the accessibility tree (`accessible={false}`), so the contents are individually focusable; touch
+behaviour (tap-outside-to-dismiss) is unchanged.
+
+- **No schema change** (stays at 7) and **no cost changes** — this is an accessibility-tree /
+  rendering fix only; the engine is untouched. A cost that moves is a regression.
+- Nothing to migrate; safe to upgrade straight over 2.7.0.
+- Surfaced by the new cross-platform UI test suite, which now also regression-guards it.
+
+**Play "What's new" note:** *Accessibility: dialogs (random generator, status effects, roll
+results) can now be read and operated with a screen reader. No changes to character costs.*
+
 ### 2.7.0 — Endurance tracking; no schema change, no cost changes
 
 Adds **Endurance tracking** (6E and 5E) and the **character-type / points nameplate**.

@@ -99,8 +99,10 @@ android {
         //            Changes no costs on existing characters — 2.5.0 did that.
         // 67/2.7.0 — Endurance tracking (6E + 5E) and the character-type/points nameplate.
         //            No schema change (END rides the existing blobs), no cost changes.
-        versionCode 67
-        versionName "2.7.0"
+        // 68/2.7.1 — Accessibility fix: modal dialogs are now readable by screen readers
+        //            (VoiceOver/TalkBack). No schema change, no cost changes.
+        versionCode 68
+        versionName "2.7.1"
     }
     signingConfigs {
         debug {
