@@ -102,11 +102,23 @@ Prefer ids — copy changes shouldn't break a flow. If you add a screen, forward
 on its interactive primitives (the shared `Button`, `SegmentedControl`, `ListRow`, … already
 do) so it's drivable.
 
-## Visual regression — the character sheet
+## Visual regression — the character sheet (on-demand)
 
-Most screenshots are for **human** review. One screen is also an automated **pixel gate**: the
-character sheet. The `sheet-visual` flow opens a fixed **Sample Hero** and screenshots the sheet;
-CI diffs it against a committed per-platform baseline and **fails the build on a regression**.
+Most screenshots are for **human** review. One screen *can also* be an automated **pixel gate**:
+the character sheet. The `sheet-visual` flow opens a fixed **Sample Hero** and screenshots the
+sheet (every run, for eyeballing); on request, CI diffs it against a committed per-platform
+baseline and **fails the build on a regression**.
+
+> **⚠️ The pixel gate is fickle right now, so it's off by default.** On-device screenshots pick
+> up moving overlays the app doesn't control — a status-bar background that flickers, a
+> scroll indicator that fades in and out, a row clipped at the frame edge — each of which reads
+> as a "change". We exclude all the known ones by cropping (below), but the class is open-ended,
+> and baselines also need re-approving on any intentional sheet change or OS-image bump. So the
+> gate runs **only when explicitly requested**, while the always-on flows keep asserting behavior
+> and the screenshots keep flowing for human review.
+>
+> **Run it on-demand:** Actions → *Mobile UI (E2E)* → **Run workflow** → tick *"Also run the
+> character-sheet pixel-diff gate"*; or `gh workflow run mobile-ui.yml -f visual_gate=true`.
 
 Three things make a pixel gate trustworthy rather than flaky, and all three are wired up:
 

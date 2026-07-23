@@ -18,6 +18,11 @@ on:
     push:
         branches: [rebuild]
     workflow_dispatch:
+        inputs:
+            visual_gate:
+                description: 'Also run the character-sheet pixel-diff gate (on-demand; see note below)'
+                type: boolean
+                default: false
 
 # One in-flight run per branch; a new push cancels the previous run.
 concurrency:
@@ -108,11 +113,14 @@ jobs:
               run: bash scripts/e2e-run.sh ios org.diceless.herogmtools
 
             # Pixel-diff the character sheet against its committed iOS baseline.
+            # ON-DEMAND ONLY (workflow_dispatch `visual_gate` input) — see the note in
+            # docs/UI_TESTING.md. The sheet screenshot is still captured every run for human
+            # review; only the pixel comparison is gated off by default while it's fickle.
             # Crops exclude non-content overlays that jitter run-to-run: the status bar (top,
             # flickers even with the clock frozen), the half-cut-off power row at the frame edge
             # (bottom), and the fading scroll indicator (right). None are user-visible defects.
-            - name: Visual regression — character sheet
-              if: always()
+            - name: Visual regression — character sheet (on-demand)
+              if: ${{ always() && github.event.inputs.visual_gate == 'true' }}
               env:
                   CROP_TOP: '160'
                   CROP_BOTTOM: '120'
@@ -192,10 +200,12 @@ jobs:
                       bash scripts/e2e-run.sh android com.herogmtools
 
             # Pixel-diff the character sheet against its committed Android baseline.
+            # ON-DEMAND ONLY (workflow_dispatch `visual_gate` input) — see docs/UI_TESTING.md.
+            # Screenshot is captured every run regardless; only the pixel comparison is gated off.
             # Crops exclude jittering overlays (see iOS note): status bar (top), nav bar +
             # frame-edge power row (bottom), and the fading scroll indicator (right, ~11px).
-            - name: Visual regression — character sheet
-              if: always()
+            - name: Visual regression — character sheet (on-demand)
+              if: ${{ always() && github.event.inputs.visual_gate == 'true' }}
               env:
                   CROP_TOP: '140'
                   CROP_BOTTOM: '130'

@@ -108,11 +108,11 @@ npm run e2e:ios       # against a booted simulator with the app installed
 npm run e2e:android   # against a booted emulator with the app installed
 ```
 
-The character sheet goes one step further: it's a **visual-regression gate**. A flow opens a
-fixed, engine-priced character and screenshots its sheet, and CI pixel-diffs that against a
-committed per-platform baseline — so an unintended change to how the sheet renders on either
-platform **fails the build**. It's the same idea as the golden masters, one layer up: the
-golden masters pin the *numbers*, the pixel gate pins the *render*.
+The character sheet can go one step further: an **on-demand visual-regression gate**. A flow
+opens a fixed, engine-priced character and screenshots its sheet; when requested, CI pixel-diffs
+that against a committed per-platform baseline — the same idea as the golden masters, one layer
+up (they pin the *numbers*, this pins the *render*). It's opt-in rather than always-on because
+on-device screenshots are still fiddly to keep stable; see the docs for the trade-offs.
 
 See [`docs/UI_TESTING.md`](docs/UI_TESTING.md) for the flows, how determinism is achieved, and
 how to update a baseline when a sheet change is intended.
