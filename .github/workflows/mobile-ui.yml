@@ -101,6 +101,10 @@ jobs:
                   xcrun simctl install booted "$APP"
 
             - name: Run Maestro flows
+              # The XCTest driver Maestro installs can be slow to boot on a loaded/slow
+              # macOS runner; give it more headroom than the default (ms).
+              env:
+                  MAESTRO_DRIVER_STARTUP_TIMEOUT: '240000'
               run: bash scripts/e2e-run.sh ios org.diceless.herogmtools
 
             # Pixel-diff the character sheet against its committed iOS baseline.
