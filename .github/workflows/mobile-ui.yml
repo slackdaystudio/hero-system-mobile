@@ -43,6 +43,7 @@ jobs:
             # CocoaPods via Bundler; installs pods and generates the .xcworkspace.
             - uses: ruby/setup-ruby@v1
               with:
+                  ruby-version: '3.3' # no .ruby-version in repo; pin explicitly
                   bundler-cache: true
 
             - name: Pod install
