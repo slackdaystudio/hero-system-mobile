@@ -14,9 +14,11 @@
 
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
-import type {CharacterRepository, CharacterSummary} from 'core/ports';
+import type {CharacterSummary} from 'core/ports';
+import {DEFAULT_SETTINGS} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
+import {SettingsProvider} from 'app/providers/SettingsProvider';
 import {ThemeProvider} from 'app/theme';
 import {HomeScreen, type HomeScreenProps} from '../HomeScreen';
 
@@ -27,7 +29,6 @@ const summary = (over: Partial<CharacterSummary> = {}): CharacterSummary => ({
     edition: '6E',
     isActive: false,
     portraitUri: null,
-    /** Unframed — reads as the centre crop every portrait got before framing existed. */
     portraitFocus: null,
     ...over,
 });
@@ -53,20 +54,38 @@ const callbacks = (): HomeScreenProps => ({
     onOpenSettings: jest.fn(),
 });
 
-const render = async (recent: CharacterSummary[], props: HomeScreenProps): Promise<ReactTestRenderer> => {
-    const repositories = {characters: {recent: async () => recent} as unknown as CharacterRepository} as unknown as Repositories;
+interface Deps {
+    characters: CharacterSummary[];
+    setActive: jest.Mock;
+}
+
+const deps = (characters: CharacterSummary[]): Deps => ({characters, setActive: jest.fn(async () => {})});
+
+const wrap = (d: Deps, props: HomeScreenProps, refreshToken?: unknown): React.JSX.Element => {
+    const repositories = {
+        characters: {list: async () => d.characters, recent: async () => d.characters, setActive: d.setActive},
+        settings: {get: async () => DEFAULT_SETTINGS, set: async () => {}},
+    } as unknown as Repositories;
+
+    return (
+        <ThemeProvider colorScheme="dark">
+            <RepositoriesProvider repositories={repositories}>
+                <SettingsProvider initialSettings={DEFAULT_SETTINGS}>
+                    <HomeScreen {...props} refreshToken={refreshToken} />
+                </SettingsProvider>
+            </RepositoriesProvider>
+        </ThemeProvider>
+    );
+};
+
+const render = async (characters: CharacterSummary[], props: HomeScreenProps): Promise<{tree: ReactTestRenderer; d: Deps}> => {
+    const d = deps(characters);
     let tree!: ReactTestRenderer;
     await act(async () => {
-        tree = TestRenderer.create(
-            <ThemeProvider colorScheme="dark">
-                <RepositoriesProvider repositories={repositories}>
-                    <HomeScreen {...props} />
-                </RepositoriesProvider>
-            </ThemeProvider>,
-        );
+        tree = TestRenderer.create(wrap(d, props));
     });
-    await act(async () => {}); // flush the recent-characters load
-    return tree;
+    await act(async () => {}); // flush the quick-pick load
+    return {tree, d};
 };
 
 const press = async (tree: ReactTestRenderer, testID: string): Promise<void> => {
@@ -74,29 +93,32 @@ const press = async (tree: ReactTestRenderer, testID: string): Promise<void> => 
     await act(async () => {
         target?.props.onPress();
     });
+    await act(async () => {});
 };
 
 describe('HomeScreen', () => {
-    it('shows recent characters and opens one when tapped', async () => {
+    it('surfaces characters in the quick pick and opens the one tapped', async () => {
         const props = callbacks();
-        const tree = await render([summary({id: 'c1', name: 'Defensor'}), summary({id: 'c2', name: 'Grond'})], props);
+        const {tree, d} = await render([summary({id: 'c1', name: 'Defensor'}), summary({id: 'c2', name: 'Grond'})], props);
 
         const text = collectText(tree.toJSON());
         expect(text).toContain('Defensor');
         expect(text).toContain('Grond');
 
-        await press(tree, 'recent-c2');
+        // Slot 1 is the second recent, Grond — tapping it activates and opens him.
+        await press(tree, 'quickpick-slot-1');
+        expect(d.setActive).toHaveBeenCalledWith('c2');
         expect(props.onOpenCharacter).toHaveBeenCalledWith('c2');
     });
 
-    it('shows an empty state when there are no characters', async () => {
-        const tree = await render([], callbacks());
-        expect(collectText(tree.toJSON())).toContain('No characters yet');
+    it('shows empty placeholder slots when there are no characters', async () => {
+        const {tree} = await render([], callbacks());
+        expect(tree.root.findAllByProps({testID: 'quickpick-empty-0'}).length).toBeGreaterThan(0);
     });
 
     it('launches a dice roller in the chosen mode', async () => {
         const props = callbacks();
-        const tree = await render([], props);
+        const {tree} = await render([], props);
 
         await press(tree, 'tile-Damage');
         expect(props.onOpenDice).toHaveBeenCalledWith('normal');
@@ -107,7 +129,7 @@ describe('HomeScreen', () => {
 
     it('navigates to the library and game tools', async () => {
         const props = callbacks();
-        const tree = await render([], props);
+        const {tree} = await render([], props);
 
         await press(tree, 'tile-All Characters');
         await press(tree, 'tile-Statistics');
@@ -119,40 +141,46 @@ describe('HomeScreen', () => {
     });
 
     /**
-     * "Recent" is ordered by `accessed_at`, so it restates itself every time it is looked at. Home
-     * never unmounts (it is the stack root), so a mount-only load would freeze the list at its
-     * launch-time order for the whole session — the navigator bumps `refreshToken` on focus.
+     * The quick pick fills empty slots from the recent list, which restates itself every time a
+     * character is opened. Home never unmounts (it is the stack root), so a mount-only load would
+     * freeze the grid at its launch-time order — the navigator bumps `refreshToken` on focus.
      */
-    it('reloads the recent list when refreshToken changes (e.g. on returning to Home)', async () => {
-        let recent = [summary({id: 'c1', name: 'Defensor'})];
-        const characters = {recent: async () => recent} as unknown as CharacterRepository;
-        const repositories = {characters} as unknown as Repositories;
-        const wrap = (token: number): React.JSX.Element => (
+    it('reloads the grid when refreshToken changes (e.g. on returning to Home)', async () => {
+        // One stable repositories object: a fresh one each render would change the loader's identity
+        // and reload on its own, hiding the very staleness this test is about.
+        const holder = {characters: [summary({id: 'c1', name: 'Defensor'})]};
+        const repositories = {
+            characters: {list: async () => holder.characters, recent: async () => holder.characters, setActive: jest.fn(async () => {})},
+            settings: {get: async () => DEFAULT_SETTINGS, set: async () => {}},
+        } as unknown as Repositories;
+        const el = (token: number): React.JSX.Element => (
             <ThemeProvider colorScheme="dark">
                 <RepositoriesProvider repositories={repositories}>
-                    <HomeScreen {...callbacks()} refreshToken={token} />
+                    <SettingsProvider initialSettings={DEFAULT_SETTINGS}>
+                        <HomeScreen {...callbacks()} refreshToken={token} />
+                    </SettingsProvider>
                 </RepositoriesProvider>
             </ThemeProvider>
         );
 
         let tree!: ReactTestRenderer;
         await act(async () => {
-            tree = TestRenderer.create(wrap(0));
+            tree = TestRenderer.create(el(0));
         });
         await act(async () => {});
         expect(collectText(tree.toJSON())).toContain('Defensor');
 
-        // Someone opened Grond, which reorders `recent`, and deleted Defensor.
-        recent = [summary({id: 'c2', name: 'Grond'})];
+        // Someone opened Grond, which reorders the recent list, and deleted Defensor.
+        holder.characters = [summary({id: 'c2', name: 'Grond'})];
 
         await act(async () => {
-            tree.update(wrap(0)); // same token: still the stale list
+            tree.update(el(0)); // same token: still the stale grid
         });
         await act(async () => {});
         expect(collectText(tree.toJSON())).toContain('Defensor');
 
         await act(async () => {
-            tree.update(wrap(1));
+            tree.update(el(1));
         });
         await act(async () => {});
 

@@ -29,6 +29,13 @@ export interface Settings {
     colorScheme: ColorScheme;
     /** Multiplier applied to every font size (1 = default). */
     fontScale: number;
+    /**
+     * The Quick Pick switcher's slots, by grid position (index 0–8). `null` is an unpinned
+     * placeholder — the grid fills those live from the recent list. A curated launcher, distinct
+     * from {@link CharacterSummary.isActive}, which stays a single character. Persistence does no
+     * shape validation on read, so the app normalizes this (length, dedup) before trusting it.
+     */
+    pinnedCharacterIds: (string | null)[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -36,6 +43,7 @@ export const DEFAULT_SETTINGS: Settings = {
     showAnimations: true,
     colorScheme: 'system',
     fontScale: 1,
+    pinnedCharacterIds: [],
 };
 
 export interface SettingsRepository {

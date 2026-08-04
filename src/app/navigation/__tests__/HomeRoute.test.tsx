@@ -29,9 +29,11 @@ import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {CharacterRepository, CharacterSummary} from 'core/ports';
+import {DEFAULT_SETTINGS} from 'core/ports';
 import type {Repositories} from 'infra/persistence/repositories';
 import {HomeRoute, type RootStackParamList} from 'app/navigation/AppNavigator';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
+import {SettingsProvider} from 'app/providers/SettingsProvider';
 import {ThemeProvider} from 'app/theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -73,30 +75,38 @@ const press = async (tree: ReactTestRenderer, testID: string): Promise<void> => 
 /** Mounts the real HomeRoute at Home, with a stub at Characters that can pop back. */
 const renderStack = async (recent: () => CharacterSummary[]): Promise<{tree: ReactTestRenderer; calls: () => number}> => {
     let calls = 0;
+    // The Quick Pick grid fills empty slots from `recent`, so `recent` is still the query that a
+    // focus refresh must re-run; `calls` counts loads. `list` (candidates + id resolution) reads the
+    // same set without counting, so the focus assertions below stay about the focus lifecycle.
     const characters = {
+        list: async () => recent(),
         recent: async () => {
             calls += 1;
             return recent();
         },
+        setActive: async () => {},
     } as unknown as CharacterRepository;
+    const repositories = {characters, settings: {get: async () => DEFAULT_SETTINGS, set: async () => {}}} as unknown as Repositories;
 
     let tree!: ReactTestRenderer;
     await act(async () => {
         tree = TestRenderer.create(
             <ThemeProvider colorScheme="dark">
-                <RepositoriesProvider repositories={{characters} as unknown as Repositories}>
-                    <NavigationContainer>
-                        <Stack.Navigator screenOptions={{headerShown: false}}>
-                            <Stack.Screen name="Home">{({navigation}) => <HomeRoute navigation={navigation} />}</Stack.Screen>
-                            <Stack.Screen name="CharacterList">
-                                {({navigation}) => (
-                                    <Text testID="go-back" onPress={() => navigation.goBack()}>
-                                        Characters
-                                    </Text>
-                                )}
-                            </Stack.Screen>
-                        </Stack.Navigator>
-                    </NavigationContainer>
+                <RepositoriesProvider repositories={repositories}>
+                    <SettingsProvider initialSettings={DEFAULT_SETTINGS}>
+                        <NavigationContainer>
+                            <Stack.Navigator screenOptions={{headerShown: false}}>
+                                <Stack.Screen name="Home">{({navigation}) => <HomeRoute navigation={navigation} />}</Stack.Screen>
+                                <Stack.Screen name="CharacterList">
+                                    {({navigation}) => (
+                                        <Text testID="go-back" onPress={() => navigation.goBack()}>
+                                            Characters
+                                        </Text>
+                                    )}
+                                </Stack.Screen>
+                            </Stack.Navigator>
+                        </NavigationContainer>
+                    </SettingsProvider>
                 </RepositoriesProvider>
             </ThemeProvider>,
         );
@@ -133,9 +143,9 @@ describe('HomeRoute — reload on focus', () => {
         recent = [];
         await press(tree, 'go-back');
 
-        const text = collectText(tree.toJSON());
-        expect(text).not.toContain('Defensor');
-        expect(text).toContain('No characters yet');
+        expect(collectText(tree.toJSON())).not.toContain('Defensor');
+        // Nothing recent left to borrow, so the grid falls back to empty placeholder slots.
+        expect(tree.root.findAllByProps({testID: 'quickpick-empty-0'}).length).toBeGreaterThan(0);
     });
 
     it('loads once on launch — Home mounts already focused', async () => {
