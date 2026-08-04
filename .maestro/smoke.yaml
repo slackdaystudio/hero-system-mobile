@@ -42,18 +42,13 @@ appId: ${APP_ID}
     id: 'roll'
 - takeScreenshot: 'maestro-artifacts/${PLATFORM}/03-dice'
 
-# Settings — the Quick Pick grid sits above the tiles, so the Game section
-# (Statistics/Settings) is below the fold on Home; scroll it into view first.
+# Settings
 - stopApp
 - launchApp
 - extendedWaitUntil:
     visible:
         id: 'tile-All Characters'
     timeout: 90000
-- scrollUntilVisible:
-    element:
-        id: 'tile-Settings'
-    timeout: 20000
 - tapOn:
     id: 'tile-Settings'
 - assertVisible: 'Settings'
@@ -66,10 +61,6 @@ appId: ${APP_ID}
     visible:
         id: 'tile-All Characters'
     timeout: 90000
-- scrollUntilVisible:
-    element:
-        id: 'tile-Statistics'
-    timeout: 20000
 - tapOn:
     id: 'tile-Statistics'
 - assertVisible: 'Statistics'
