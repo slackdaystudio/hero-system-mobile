@@ -18,7 +18,7 @@ import type {LastRoll} from 'core/dice';
 import type {Character, PortraitFocus} from 'core/ports';
 import type {Obj} from 'core/traits';
 import {pointSummary, type PointSummary} from 'core/hero';
-import {Button, Card, PortraitImage, Screen, SegmentedControl, SpendChip, Text, type Segment} from 'app/components';
+import {Button, Card, PortraitImage, QuickPickSheet, QUICK_PICK_HANDLE_SPACE, Screen, SegmentedControl, SpendChip, Text, type Segment} from 'app/components';
 import {characteristicRollRequest, describeRoll, performRoll, recordRoll, traitRollRequest, type RollRequest} from 'app/dice/rollRequest';
 import {CombatStateProvider, useCombatState} from 'app/providers/CombatStateProvider';
 import {useDieRoller} from 'app/providers/DiceProvider';
@@ -51,11 +51,16 @@ export interface CharacterDetailScreenProps {
     onReady?: (character: Character) => void;
     /** Tap a roll → open the dice roller pre-filled. Long-press rolls it inline. */
     onRollRequest?: (request: RollRequest) => void;
+    /**
+     * Switch to another character from the Quick Pick sheet. The navigator replaces the current
+     * screen (rather than pushing) so flipping between characters doesn't grow the back stack.
+     */
+    onSwitchCharacter?: (id: string) => void;
 }
 
 const AVATAR = 96;
 
-export function CharacterDetailScreen({characterId, onReady, onRollRequest}: CharacterDetailScreenProps): React.JSX.Element {
+export function CharacterDetailScreen({characterId, onReady, onRollRequest, onSwitchCharacter}: CharacterDetailScreenProps): React.JSX.Element {
     const {characters: repository, statistics} = useRepositories();
     const roller = useDieRoller();
     const theme = useTheme();
@@ -189,7 +194,8 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
     const points = pointSummary(loaded.document, loaded.edition === '5E');
     const meta = [loaded.edition, loaded.player, points !== null ? formatPoints(points) : null].filter(Boolean).join(' · ');
     const avatarStyle: ViewStyle = {backgroundColor: theme.colors.surfaceAlt, borderRadius: theme.radius.md};
-    const content: ViewStyle = {padding: theme.spacing(4), rowGap: theme.spacing(4)};
+    // Extra bottom room so the last row clears the persistent Quick Pick handle pinned to the screen.
+    const content: ViewStyle = {padding: theme.spacing(4), rowGap: theme.spacing(4), paddingBottom: theme.spacing(4) + QUICK_PICK_HANDLE_SPACE};
 
     return (
         <Screen>
@@ -248,6 +254,7 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest}: Cha
                     <BasicBody character={loaded} />
                 )}
             </ScrollView>
+            {onSwitchCharacter !== undefined ? <QuickPickSheet onActivate={onSwitchCharacter} /> : null}
             <RollFlash flash={flash} onClose={() => setFlash(null)} onRollAgain={rollNow} />
             {loaded.portraitUri !== null ? (
                 <PortraitFramer

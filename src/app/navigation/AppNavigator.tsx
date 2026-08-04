@@ -99,6 +99,8 @@ export function AppNavigator(): React.JSX.Element {
                                 characterId={route.params.id}
                                 onReady={(character) => navigation.setOptions({title: character.name})}
                                 onRollRequest={(request) => navigation.navigate('Dice', {request})}
+                                // Replace, not push: flipping between characters must not grow the back stack.
+                                onSwitchCharacter={(id) => navigation.replace('CharacterDetail', {id})}
                             />
                         )}
                     </Stack.Screen>

@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React from 'react';
 import {Pressable, ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
-import type {CharacterSummary} from 'core/ports';
-import {Card, PortraitImage, Screen, Text} from 'app/components';
+import {QuickPick, Screen, Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
-import {useRepositories} from 'app/providers/RepositoriesProvider';
 import {useTheme} from 'app/theme';
 
 type DiceMode = RollRequest['mode'];
-
-/** How many recent characters the Home dashboard shows. */
-const RECENT_LIMIT = 4;
 
 export interface HomeScreenProps {
     onOpenCharacters: () => void;
@@ -32,10 +27,10 @@ export interface HomeScreenProps {
     onOpenStatistics: () => void;
     onOpenSettings: () => void;
     /**
-     * Change this value to force a reload. "Recent" is ordered by `accessed_at`, which opening a
-     * character updates, so the list goes stale the moment you leave — and Home sits at the root of
-     * the stack and never unmounts, so mounting alone can't reload it. The navigator bumps this on
-     * focus; knowing *when* that is stays a navigator concern.
+     * Change this value to force a reload. The Quick Pick grid fills empty slots from the recent
+     * list, which is ordered by `accessed_at` and goes stale the moment you open a character — and
+     * Home sits at the root of the stack and never unmounts, so mounting alone can't reload it. The
+     * navigator bumps this on focus; knowing *when* that is stays a navigator concern.
      */
     refreshToken?: unknown;
 }
@@ -53,26 +48,11 @@ const DICE_TILES: Array<{label: string; mode: DiceMode}> = [
  * wires each callback — and reads the recent list through the repository port.
  */
 export function HomeScreen({onOpenCharacters, onOpenCharacter, onOpenDice, onOpenStatistics, onOpenSettings, refreshToken}: HomeScreenProps): React.JSX.Element {
-    const {characters} = useRepositories();
-    const [recent, setRecent] = useState<CharacterSummary[] | undefined>(undefined);
-
-    const load = useCallback(async () => {
-        try {
-            setRecent(await characters.recent(RECENT_LIMIT));
-        } catch {
-            setRecent([]);
-        }
-    }, [characters]);
-
-    useEffect(() => {
-        load();
-    }, [load, refreshToken]);
-
     return (
         <Screen>
             <ScrollView contentContainerStyle={styles.content}>
-                <Section title="Recent">
-                    <RecentCharacters characters={recent} onOpen={onOpenCharacter} />
+                <Section title="Quick Pick">
+                    <QuickPick onActivate={onOpenCharacter} refreshToken={refreshToken} />
                 </Section>
 
                 <Section title="Library">
@@ -97,57 +77,6 @@ export function HomeScreen({onOpenCharacters, onOpenCharacter, onOpenDice, onOpe
                 </Section>
             </ScrollView>
         </Screen>
-    );
-}
-
-function RecentCharacters({characters, onOpen}: {characters: CharacterSummary[] | undefined; onOpen: (id: string) => void}): React.JSX.Element {
-    if (characters === undefined) {
-        return (
-            <Card>
-                <Text muted>Loading…</Text>
-            </Card>
-        );
-    }
-
-    if (characters.length === 0) {
-        return (
-            <Card>
-                <Text>No characters yet</Text>
-                <Text variant="caption" muted>
-                    Import a character to get started.
-                </Text>
-            </Card>
-        );
-    }
-
-    return (
-        <View style={styles.recentRow}>
-            {characters.map((character) => (
-                <RecentCard key={character.id} character={character} onOpen={onOpen} />
-            ))}
-        </View>
-    );
-}
-
-function RecentCard({character, onOpen}: {character: CharacterSummary; onOpen: (id: string) => void}): React.JSX.Element {
-    const theme = useTheme();
-    const square: ViewStyle = {backgroundColor: theme.colors.surfaceAlt, borderRadius: theme.radius.md};
-
-    return (
-        <Pressable testID={`recent-${character.id}`} accessibilityRole="button" onPress={() => onOpen(character.id)} style={styles.recentCard}>
-            <View style={[styles.recentSquare, square]}>
-                {character.portraitUri ? (
-                    <PortraitImage testID={`recent-portrait-${character.id}`} uri={character.portraitUri} focus={character.portraitFocus} />
-                ) : (
-                    <Text variant="title" muted>
-                        {(character.name.trim()[0] ?? '?').toUpperCase()}
-                    </Text>
-                )}
-            </View>
-            <Text variant="caption" numberOfLines={1} style={styles.recentName}>
-                {character.name}
-            </Text>
-        </Pressable>
     );
 }
 
@@ -197,23 +126,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 16,
-    },
-    recentRow: {
-        flexDirection: 'row',
-        columnGap: 10,
-    },
-    recentCard: {
-        flex: 1,
-        maxWidth: 96,
-        rowGap: 4,
-    },
-    recentSquare: {
-        aspectRatio: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-    },
-    recentName: {
-        textAlign: 'center',
     },
 });

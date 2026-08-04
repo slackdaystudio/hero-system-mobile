@@ -24,6 +24,11 @@ export {SegmentedControl, type Segment, type SegmentedControlProps} from './Segm
 export {SelectField, type SelectFieldProps} from './SelectField';
 export {TrashIcon, type IconProps} from './icons';
 export {PortraitImage, type PortraitImageProps} from './PortraitImage';
+export {QuickPick, type QuickPickProps} from './QuickPick';
+export {QuickPickGrid, type QuickPickGridProps} from './QuickPickGrid';
+export {QuickPickSheet, QUICK_PICK_HANDLE_SPACE, type QuickPickSheetProps} from './QuickPickSheet';
+export {CharacterPickerModal, type CharacterPickerModalProps} from './CharacterPickerModal';
+export {computeSlots, normalizePins, SLOT_COUNT, type Slot, type SlotKind} from './quickPick/slots';
 export {
     clampScale,
     coverStyle,
