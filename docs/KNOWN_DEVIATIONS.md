@@ -48,6 +48,7 @@
 | H9 | Enhanced Perception ignores `allcost` | ✅ **fixed** — was real bug, active | yes — adamantine (9→27), jane-fawn (2→6) | traits (decorator, re-based) |
 | H10 | `Clinging.cost()` adds a stray `+1` | ✅ **fixed** — was real bug, active | yes — mark-li, aoe, spyder2022 | traits (decorator, re-based) |
 | H11 | `HandToHandAttack.roll()` computes a half-die then drops it | ✅ **fixed** — was real bug (latent) | no — the corpus never reaches the branch | none (no re-base needed) |
+| H12 | Skill Enhancer's min-1 floor charged a *free* skill 1 point | ✅ **fixed** — was real bug, active | yes — greyman, m-championsmush, twilight | traits (decorator, re-based) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -290,6 +291,32 @@ powers, tracking resistant points separately.
 - **Found** while porting STR damage to the sheet, which needed the same rule — not by the corpus,
   which cannot see it.
 - **Pinned by:** `traits/__tests__/handToHandAttack.test.ts` (reverting the fix fails 7).
+
+## H12 — Skill Enhancer's min-1 floor charged a free skill — ✅ FIXED
+
+- **Where:** `core/traits/modifierCalculator.ts` `realCost()`. The Skill Enhancer discount was
+  `realCost = realCost - 1 <= 0 ? 1 : realCost - 1`, applied to every child of an enhancer
+  (`SCIENTIST`, `JACK_OF_ALL_TRADES`, `LINGUIST`, `SCHOLAR`, `TRAVELER`, `WELL_CONNECTED`). The
+  `<= 0 ? 1` floor was meant to stop a *paid* skill's −1 reduction dropping below 1 — but it also
+  fired on a skill whose cost was already **0**, pushing it up to 1.
+- **Legacy:** same — `decorators/ModifierCalculator.js` is byte-identical, so this has been shipping.
+- **Correct:** a Skill Enhancer reduces the cost of each *related, paid* Skill by 1, to a minimum of
+  1. A free Skill — a native/everyman language (`Skill.cost()` returns 0 for `nativeTongue` /
+  `everyman` / `familiarity` at the 0 tiers) — has nothing to reduce and stays **0**. HERO Designer
+  prices a native tongue at 0 whether or not Linguist is present, so legacy is wrong here and is not
+  the oracle. **Fix:** guard the clamp on `realCost > 0`.
+- **Corpus impact:** **3 fixtures**, each a native tongue under Linguist reading 1, now 0 —
+  `greyman` (Mandaarian), `m-championsmush` (Romany, displayed "Native"), `twilight` (English). Only
+  `realCost()` moves; `cost()`/`activeCost()` are 0 in both engines. Paid skills under an enhancer are
+  unaffected — the −1 and the min-1 floor for them are untouched.
+- **Found:** chasing a "ghost" report that Skill Enhancers *don't* discount skills. They do (verified
+  across the corpus and four of Phil's own `.hdc` files); the only real defect was this opposite-
+  direction one — an enhancer *over*charging a free skill by a point.
+- **Pinned by:** `core/traits/__tests__/skillEnhancer.test.ts` — the −1/min-1 boundary at 0/1/2/5
+  points on hand-built inputs, the three corrected corpus natives at 0, and a control that a paid
+  language under Linguist still gets its −1. The decorator golden master skips just these three
+  `realCost()` comparisons via `H12_REALCOST_DIVERGENCE` and still compares their `cost()`/`activeCost()`
+  and every other trait.
 
 ## H10 — Clinging adds a stray point — ✅ FIXED
 

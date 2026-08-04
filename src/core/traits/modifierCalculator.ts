@@ -53,7 +53,11 @@ export default class ModifierCalculator extends TraitDecorator {
     realCost(): number {
         let realCost = roundInPlayersFavor(this.activeCost() / (1 - this.limitations().reduce((a, b) => a + b.cost, 0)));
 
-        if (this.characterTrait.parentTrait !== undefined && SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlid.toUpperCase())) {
+        // A Skill Enhancer reduces each related Skill's cost by 1, to a minimum of 1 — but only for
+        // Skills the character actually pays for. A free Skill (a native/everyman language, cost 0)
+        // has nothing to reduce and must stay 0: the min-1 floor governs the reduction of a paid
+        // Skill, it does not conjure a cost for a free one. See H12 in docs/KNOWN_DEVIATIONS.md.
+        if (realCost > 0 && this.characterTrait.parentTrait !== undefined && SKILL_ENHANCERS.includes(this.characterTrait.parentTrait.xmlid.toUpperCase())) {
             realCost = realCost - 1 <= 0 ? 1 : realCost - 1;
         }
 

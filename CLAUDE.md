@@ -149,7 +149,7 @@ it's data preservation, not a feature.
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 18 entries; 11 fixed (H3–H11, U2, U3) — every known corpus-triggered bug is now
+> `core/`.** 19 entries; 12 fixed (H3–H12, U2, U3) — every known corpus-triggered bug is now
 > fixed. It explains why a "wrong-looking" line in `core/` may be load-bearing, and why a
 > green golden master does not mean correct.
 

@@ -110,6 +110,24 @@ const H10_COST_DIVERGENCE: Record<string, Set<string>> = {
     spyder2022: new Set(['CLINGING']),
 };
 
+/**
+ * H12 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy's Skill Enhancer discount applied
+ * its "minimum 1 point" floor unconditionally, so a *free* Skill under an enhancer (a native/everyman
+ * language, cost 0) was charged 1 point. The rules reduce a *paid* Skill's cost by 1 to a floor of 1;
+ * a free Skill has nothing to reduce and stays 0 (HERO Designer agrees). Only `realCost()` diverges —
+ * `cost()`/`activeCost()` are 0 in both engines and stay compared. Keyed by fixture → `input` (the
+ * languages' visible label; `name` is null for two of the three). Corrected values pinned in
+ * `skillEnhancer.test.ts`.
+ *   - `greyman` — Mandaarian (native) under Linguist: 1 → **0**
+ *   - `m-championsmush` — Romany (native, displayed "Native") under Linguist: 1 → **0**
+ *   - `twilight` — English (native) under Linguist: 1 → **0**
+ */
+const H12_REALCOST_DIVERGENCE: Record<string, Set<string>> = {
+    greyman: new Set(['Mandaarian']),
+    'm-championsmush': new Set(['Romany']),
+    twilight: new Set(['English']),
+};
+
 describe('golden master: core/traits factory reproduces legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
@@ -137,7 +155,12 @@ describe('golden master: core/traits factory reproduces legacy', () => {
                 if (!((H9_COST_DIVERGENCE[name]?.has(xmlid) ?? false) || (H10_COST_DIVERGENCE[name]?.has(xmlid) ?? false))) {
                     expect(ported.cost()).toBe(legacy.cost());
                     expect(ported.activeCost()).toBe(legacy.activeCost());
-                    expect(ported.realCost()).toBe(legacy.realCost());
+
+                    // H12 — only realCost diverges: legacy's enhancer clamp charged a free skill 1;
+                    // core keeps it 0. cost()/activeCost() (both 0) stay compared above.
+                    if (!(H12_REALCOST_DIVERGENCE[name]?.has(String(trait.input)) ?? false)) {
+                        expect(ported.realCost()).toBe(legacy.realCost());
+                    }
                 }
 
                 // Only roll() diverges for H4 — the costs still match legacy exactly.
