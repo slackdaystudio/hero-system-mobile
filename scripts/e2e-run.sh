@@ -19,18 +19,24 @@ run_suite() {
         --format junit --output "maestro-report-${PLATFORM}.xml"
 }
 
-# Retry the suite once on failure. CI emulators/simulators occasionally stall a
-# single flow's cold start (blank loading screen past the readiness timeout); a
-# fresh launch clears it. A genuine failure still fails on the retry, so this
-# recovers flakes without masking real breakage. Maestro re-runs the whole set,
-# which regenerates all screenshots (incl. the visual-regression sheet).
-run_suite
-RC=$?
-if [ "$RC" -ne 0 ]; then
-    echo "::warning::Maestro suite failed (rc=$RC) — retrying once (transient cold-start stall)."
+# Retry the suite up to twice on failure (3 attempts total). CI emulators/simulators
+# occasionally stall a single flow's cold start (blank loading screen past the readiness
+# timeout), and the Android emulator can drop a GPU color buffer ("Failed to find
+# ColorBuffer") that freezes rendering for whichever flow is mid-run — a fresh launch
+# clears both. Twice rather than once because a bad runner has glitched on two
+# consecutive passes. A genuine failure still fails on every attempt, so this recovers
+# flakes without masking real breakage. Maestro re-runs the whole set each time, which
+# regenerates all screenshots (incl. the visual-regression sheet).
+ATTEMPTS=3
+RC=0
+for attempt in $(seq 1 "$ATTEMPTS"); do
     run_suite
     RC=$?
-fi
+    [ "$RC" -eq 0 ] && break
+    if [ "$attempt" -lt "$ATTEMPTS" ]; then
+        echo "::warning::Maestro suite failed (rc=$RC) — attempt ${attempt}/${ATTEMPTS}, retrying (transient cold-start / GPU stall)."
+    fi
+done
 
 # actions/upload-artifact can't expand ~, so fold Maestro's own debug output
 # (view hierarchies + on-failure screenshots) into the workspace for upload.
