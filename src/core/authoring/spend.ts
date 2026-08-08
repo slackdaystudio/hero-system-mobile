@@ -82,6 +82,53 @@ export function spendOf(character: Obj): Spend {
     return {characteristics, traits, complications, spent: characteristics + traits};
 }
 
+/** What one row of an authoring list should say: what it is, and what it costs. */
+export interface TraitSummary {
+    readonly label: string;
+    readonly cost: number;
+}
+
+/**
+ * A label and a cost for every trait in a category, in draft order.
+ *
+ * So a list can show what each entry costs without every entry's form being on screen. Priced by
+ * decorating the *built* character, so a row and the meter above it are reading the same numbers —
+ * the alternative is a second cost model that agrees until it doesn't.
+ *
+ * Order is draft order because `emit` assigns `position` from the array index and the engine sorts
+ * on it. Frameworks are excluded here: they nest, so a flat list of them is the wrong shape —
+ * {@link frameworkSummaries} handles those.
+ */
+export function summaries(character: Obj, key: string): TraitSummary[] {
+    // Framework containers are not entries in any draft list, so they are skipped: `draft.powers`
+    // holds only the standalone ones, and a container would shift every index after it.
+    const entries = ((character[key] ?? []) as Obj[]).filter((entry) => entry.type !== 'list');
+
+    return entries.map((entry) => describe(entry, key, character));
+}
+
+/** A container's own label and cost, plus one per slot — the shape a framework card wants. */
+export function frameworkSummaries(character: Obj): Array<{container: TraitSummary; slots: TraitSummary[]}> {
+    return ((character.powers ?? []) as Obj[])
+        .filter((entry) => entry.type === 'list')
+        .map((container) => ({
+            container: describe(container, 'powers', character),
+            slots: ((container.powers ?? []) as Obj[]).map((slot) => describe(slot, 'powers', character)),
+        }));
+}
+
+const describe = (entry: Obj, key: string, character: Obj): TraitSummary => {
+    try {
+        const decorated = characterTraitDecorator.decorate(entry, key, () => character);
+
+        return {label: decorated.label(), cost: decorated.realCost()};
+    } catch {
+        // A trait the engine cannot render still needs a row, or it vanishes from the list and the
+        // player has no way to fix or delete it. `validate` is what says why.
+        return {label: String(entry.name ?? entry.alias ?? entry.xmlid), cost: 0};
+    }
+};
+
 /**
  * The budget a character is being built to.
  *

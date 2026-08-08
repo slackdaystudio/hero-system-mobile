@@ -26,35 +26,34 @@
  * (skills, powers) mostly a matter of pointing the same components at more catalogue.
  */
 import React, {useCallback, useMemo, useState} from 'react';
-import {Alert, ScrollView, StyleSheet, View} from 'react-native';
+import {Alert, Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {
     authorable,
     build,
-    catalogue,
     characteristics as catalogueCharacteristics,
     DEFAULT_BUDGET,
     emptyDraft,
+    frameworkSummaries,
     isSaveable,
     remaining,
     spendOf,
+    summaries,
     validate,
-    modifiers,
     withheld,
     type AuthorableCategory,
     type AuthoredCharacter,
     type AuthoredFramework,
-    type AuthoredModifier,
-    type AuthoredPower,
-    type AuthoredTrait,
     type AuthoringEdition,
-    type CatalogueTrait,
-    type FieldGroup,
     type FrameworkKind,
     type Problem,
 } from 'core/authoring';
 import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField} from 'app/components';
+import {useAuthoringDraft, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 import {useSaveAuthored} from 'app/providers/AuthoringProvider';
 import {useTheme} from 'app/theme';
+
+/** The engine's built character — a dynamic object graph, as everywhere else it is handled. */
+type Obj = Record<string, any>;
 
 export interface AuthorCharacterScreenProps {
     /** Re-open an existing authored character instead of starting fresh. */
@@ -63,6 +62,13 @@ export interface AuthorCharacterScreenProps {
     characterId?: string;
     onSaved: (id: string) => void;
     onCancel: () => void;
+    /**
+     * Open the form for one trait. Absent when there is nowhere to go — the rows then do nothing
+     * rather than the screen having to know whether it is inside a navigator.
+     */
+    onEditTrait?: (address: TraitAddress, category: AuthorableCategory) => void;
+    /** Open the advantages-and-limitations form for a framework's pool. */
+    onEditFramework?: (index: number) => void;
 }
 
 const EDITIONS: Array<{value: AuthoringEdition; label: string}> = [
@@ -70,23 +76,33 @@ const EDITIONS: Array<{value: AuthoringEdition; label: string}> = [
     {value: '5E', label: '5th Edition'},
 ];
 
-export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}: AuthorCharacterScreenProps): React.JSX.Element {
+export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel, onEditTrait, onEditFramework}: AuthorCharacterScreenProps): React.JSX.Element {
     const save = useSaveAuthored();
-    const [draft, setDraft] = useState<AuthoredCharacter>(initial ?? emptyDraft('6E'));
+    const {draft, setDraft, beginSession} = useAuthoringDraft();
     const [busy, setBusy] = useState(false);
 
-    // The engine's answer, not a tally kept beside it. Rebuilt whenever the draft changes.
-    const {spend, problems} = useMemo(() => {
+    // The draft lives above this screen so the trait form can share it, which means *this* screen
+    // has to say when a new character is being started. Keyed on the row being edited, so coming
+    // back from the trait form is not a new session and does not wipe what was typed.
+    beginSession(characterId ?? 'new', initial);
+
+    // Built once per change, and everything on the screen reads it: the meter, and the cost on
+    // every row. One build means a row and the total can never tell different stories.
+    const {character, spend, problems} = useMemo(() => {
         const validated = validate(draft);
 
         // A draft with errors may not be buildable at all — an unknown characteristic throws
-        // rather than pricing at 0 — so the meter reads zero rather than crashing the screen.
+        // rather than pricing at 0 — so the meter says so rather than crashing the screen.
         if (!isSaveable(validated)) {
-            return {spend: null, problems: validated};
+            return {character: null, spend: null, problems: validated};
         }
 
-        return {spend: spendOf(build(draft)), problems: validated};
+        const built = build(draft);
+
+        return {character: built, spend: spendOf(built), problems: validated};
     }, [draft]);
+
+    const edit = useCallback((address: TraitAddress, category: AuthorableCategory) => onEditTrait?.(address, category), [onEditTrait]);
 
     const budget = DEFAULT_BUDGET[draft.edition];
     const left = spend === null ? null : remaining(spend, budget, draft.edition);
@@ -101,7 +117,10 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}:
 
         setBusy(true);
         save(draft, characterId)
-            .then((result) => onSaved(result.id), (error: unknown) => Alert.alert('Could not save', error instanceof Error ? error.message : 'That character could not be saved.'))
+            .then(
+                (result) => onSaved(result.id),
+                (error: unknown) => Alert.alert('Could not save', error instanceof Error ? error.message : 'That character could not be saved.'),
+            )
             .finally(() => setBusy(false));
     }, [busy, problems, save, draft, characterId, onSaved]);
 
@@ -115,7 +134,13 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}:
                         </Text>
 
                         <TextField label="Name" value={draft.name} onChangeText={(name) => setDraft({...draft, name})} maxLength={60} testID="author-name" />
-                        <TextField label="Player" value={draft.player} onChangeText={(player) => setDraft({...draft, player})} maxLength={60} testID="author-player" />
+                        <TextField
+                            label="Player"
+                            value={draft.player}
+                            onChangeText={(player) => setDraft({...draft, player})}
+                            maxLength={60}
+                            testID="author-player"
+                        />
 
                         <EditionPicker draft={draft} onChange={setDraft} locked={characterId !== undefined} />
                     </View>
@@ -125,7 +150,7 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}:
 
                 <Characteristics draft={draft} onChange={setDraft} />
 
-                <Frameworks draft={draft} onChange={setDraft} />
+                <Frameworks draft={draft} onChange={setDraft} character={character} onEdit={edit} onEditPool={(index) => onEditFramework?.(index)} />
 
                 {SECTIONS.map((section) => (
                     <TraitSection
@@ -135,6 +160,8 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}:
                         title={section.title(draft.edition)}
                         draft={draft}
                         onChange={setDraft}
+                        character={character}
+                        onEdit={edit}
                     />
                 ))}
 
@@ -158,7 +185,15 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}:
  * stored document was priced by one rulebook and re-pricing it under the other is a new character,
  * not an edit.
  */
-function EditionPicker({draft, onChange, locked}: {draft: AuthoredCharacter; onChange: (draft: AuthoredCharacter) => void; locked: boolean}): React.JSX.Element | null {
+function EditionPicker({
+    draft,
+    onChange,
+    locked,
+}: {
+    draft: AuthoredCharacter;
+    onChange: (draft: AuthoredCharacter) => void;
+    locked: boolean;
+}): React.JSX.Element | null {
     if (locked) {
         return (
             <View>
@@ -293,11 +328,14 @@ const SECTIONS: Array<{category: AuthorableCategory; key: DraftKey; title: (edit
 ];
 
 /**
- * One category's list, every field of it generated from the template.
+ * One category's list: a row per trait, and a way to add another.
  *
- * This component is the whole of Phase B's UI. Skills, perks, talents and complications differ in
- * which fields their template entries declare, not in kind, so there is one renderer and the
- * catalogue decides what it draws.
+ * The form for a trait is not here — a power's can run to a defence split, a dozen adders and any
+ * number of advantages, and rendering every one inline made this screen scroll for a very long
+ * way. Each row says what the trait is and what it costs, and opens {@link AuthorTraitScreen}.
+ *
+ * The costs come from {@link summaries}, which prices the *built* character — so a row and the
+ * meter above it can never disagree.
  */
 function TraitSection({
     category,
@@ -305,17 +343,21 @@ function TraitSection({
     title,
     draft,
     onChange,
+    character,
+    onEdit,
 }: {
     category: AuthorableCategory;
     draftKey: DraftKey;
     title: string;
     draft: AuthoredCharacter;
     onChange: (draft: AuthoredCharacter) => void;
+    character: Obj | null;
+    onEdit: (address: TraitAddress, category: AuthorableCategory) => void;
 }): React.JSX.Element {
     const offered = useMemo(() => authorable(category, draft.edition), [category, draft.edition]);
     const notYet = useMemo(() => withheld(category, draft.edition), [category, draft.edition]);
-    const byXmlid = useMemo(() => new Map(catalogue(category, draft.edition).map((entry) => [entry.xmlid, entry])), [category, draft.edition]);
     const taken = draft[draftKey];
+    const rows = character === null ? [] : summaries(character, draftKey === 'complications' ? 'disadvantages' : draftKey);
 
     const add = (display: string): void => {
         const entry = offered.find((candidate) => candidate.display === display);
@@ -326,7 +368,8 @@ function TraitSection({
 
         // Seeded with the only unambiguous answers: a lone characteristic choice, and levels at
         // zero. Anything the player must decide is left blank so `validate` asks for it rather
-        // than the form quietly picking.
+        // than the form quietly picking. Then straight into the form — adding a trait and never
+        // being shown its options is how you end up with a row that says it needs something.
         onChange({
             ...draft,
             [draftKey]: [
@@ -342,12 +385,9 @@ function TraitSection({
                 },
             ],
         });
+
+        onEdit({kind: 'trait', key: draftKey, index: taken.length}, category);
     };
-
-    const update = (index: number, revised: AuthoredTrait): void =>
-        onChange({...draft, [draftKey]: taken.map((entry, position) => (position === index ? revised : entry))});
-
-    const remove = (index: number): void => onChange({...draft, [draftKey]: taken.filter((_, position) => position !== index)});
 
     return (
         <Card>
@@ -356,26 +396,15 @@ function TraitSection({
             </Text>
 
             <View style={styles.fields}>
-                {taken.map((entry, index) => {
-                    const catalogueEntry = byXmlid.get(entry.xmlid);
-
-                    return catalogueEntry === undefined ? (
-                        <Text key={`${entry.xmlid}-${index}`} testID={`author-${draftKey}-unknown-${index}`}>
-                            {draft.edition} has no “{entry.xmlid}”.
-                        </Text>
-                    ) : (
-                        <TraitRow
-                            key={`${entry.xmlid}-${index}`}
-                            index={index}
-                            draftKey={draftKey}
-                            edition={draft.edition}
-                            entry={catalogueEntry}
-                            trait={entry}
-                            onChange={(revised) => update(index, revised)}
-                            onRemove={() => remove(index)}
-                        />
-                    );
-                })}
+                {taken.map((entry, index) => (
+                    <TraitListRow
+                        key={`${entry.xmlid}-${index}`}
+                        label={rows[index]?.label ?? entry.xmlid}
+                        cost={rows[index]?.cost ?? 0}
+                        onPress={() => onEdit({kind: 'trait', key: draftKey, index}, category)}
+                        testID={`author-row-${draftKey}-${index}`}
+                    />
+                ))}
 
                 <SelectField
                     label="Add"
@@ -392,292 +421,40 @@ function TraitSection({
     );
 }
 
+/** One line in a category list: what it is, what it costs, and a tap to open it. */
+function TraitListRow({
+    label,
+    cost,
+    onPress,
+    testID,
+    indented = false,
+}: {
+    label: string;
+    cost: number;
+    onPress: () => void;
+    testID: string;
+    indented?: boolean;
+}): React.JSX.Element {
+    const theme = useTheme();
+
+    return (
+        <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`${label}, ${cost} points`}
+            onPress={onPress}
+            testID={testID}
+            style={[styles.row, indented ? styles.rowIndented : null, {borderColor: theme.colors.border}]}>
+            <Text style={styles.rowLabel} numberOfLines={2}>
+                {label}
+            </Text>
+            <Text variant="label" muted>
+                {cost}
+            </Text>
+        </Pressable>
+    );
+}
+
 /** One trait: whichever of free text, characteristic, option, levels, familiarity and adders it declares. */
-function TraitRow({
-    index,
-    draftKey,
-    edition,
-    entry,
-    trait,
-    onChange,
-    onRemove,
-}: {
-    index: number;
-    draftKey: string;
-    edition: AuthoringEdition;
-    entry: CatalogueTrait;
-    trait: AuthoredTrait;
-    onChange: (trait: AuthoredTrait) => void;
-    onRemove: () => void;
-}): React.JSX.Element {
-    const id = `${draftKey}-${index}`;
-
-    const setAdder = (xmlid: string, patch: {option?: string; text?: string; levels?: number}): void => {
-        const existing = trait.adders.find((adder) => adder.xmlid === xmlid);
-        const adders = existing === undefined ? [...trait.adders, {xmlid, ...patch}] : trait.adders.map((adder) => (adder.xmlid === xmlid ? {...adder, ...patch} : adder));
-
-        onChange({...trait, adders});
-    };
-
-    return (
-        <View style={styles.complication}>
-            <View style={styles.complicationHead}>
-                <Text variant="label">{entry.display}</Text>
-                <Button label="Remove" onPress={onRemove} variant="secondary" testID={`author-remove-${id}`} />
-            </View>
-
-            {/* Only powers are named. A skill's label is its own name; a power's is whatever the
-                player called it — "Fire Bolt (Blast)". */}
-            {entry.modifiable ? (
-                <TextField label="Name" value={trait.name ?? ''} onChangeText={(name) => onChange({...trait, name})} maxLength={60} testID={`author-name-${id}`} />
-            ) : null}
-
-            {entry.inputLabel === null ? null : (
-                <TextField label={entry.inputLabel} value={trait.input} onChangeText={(input) => onChange({...trait, input})} maxLength={80} testID={`author-input-${id}`} />
-            )}
-
-            {entry.fieldGroup === null ? null : <DefenseFields id={id} group={entry.fieldGroup} trait={trait} onChange={onChange} />}
-
-            {entry.familiarity === null ? null : (
-                <SegmentedControl
-                    segments={[
-                        {value: 'full', label: 'Full skill'},
-                        {value: 'familiarity', label: `Familiarity (${entry.familiarity.roll}-)`},
-                    ]}
-                    value={trait.familiarity === true ? 'familiarity' : 'full'}
-                    // A familiarity is a different purchase, not the skill at zero — so switching
-                    // drops the characteristic and levels rather than keeping them around unused.
-                    onChange={(mode) =>
-                        onChange(
-                            mode === 'familiarity'
-                                ? {xmlid: trait.xmlid, input: trait.input, adders: trait.adders, familiarity: true}
-                                : {xmlid: trait.xmlid, input: trait.input, adders: trait.adders, levels: 0, ...(entry.characteristics.length === 1 ? {characteristic: entry.characteristics[0].characteristic} : {})},
-                        )
-                    }
-                />
-            )}
-
-            {entry.characteristics.length > 1 && trait.familiarity !== true ? (
-                <SelectField
-                    label="Based on"
-                    value={trait.characteristic ?? ''}
-                    options={entry.characteristics.map((choice) => choice.characteristic)}
-                    onChange={(characteristic) => onChange({...trait, characteristic})}
-                    testID={`author-characteristic-${id}`}
-                />
-            ) : null}
-
-            {entry.options.length === 0 ? null : (
-                <SelectField
-                    label={entry.display}
-                    value={entry.options.find((option) => option.xmlid === trait.option)?.display ?? ''}
-                    options={entry.options.map((option) => option.display)}
-                    onChange={(display) => onChange({...trait, option: entry.options.find((option) => option.display === display)?.xmlid})}
-                    testID={`author-option-${id}`}
-                />
-            )}
-
-            {entry.levels === null || trait.familiarity === true ? null : (
-                <NumberField
-                    label={entry.levels.label}
-                    value={trait.levels === undefined ? '' : String(trait.levels)}
-                    onChangeText={(text) => onChange({...trait, levels: text.trim() === '' ? 0 : Math.max(0, Number.parseInt(text, 10) || 0)})}
-                    testID={`author-levels-${id}`}
-                />
-            )}
-
-            {entry.adders.map((adder) => {
-                const chosen = trait.adders.find((candidate) => candidate.xmlid === adder.xmlid);
-
-                if (adder.freeText) {
-                    return (
-                        <TextField
-                            key={adder.xmlid}
-                            label={adder.display}
-                            value={chosen?.text ?? ''}
-                            onChangeText={(text) => setAdder(adder.xmlid, {text})}
-                            maxLength={80}
-                            testID={`author-adder-${id}-${adder.xmlid}`}
-                        />
-                    );
-                }
-
-                if (adder.options.length === 0) {
-                    return null; // a flat yes/no adder — needs a switch, which is its own change
-                }
-
-                return (
-                    <SelectField
-                        key={adder.xmlid}
-                        label={adder.required ? adder.display : `${adder.display} (optional)`}
-                        value={adder.options.find((option) => option.xmlid === chosen?.option)?.display ?? ''}
-                        options={adder.options.map((option) => option.display)}
-                        onChange={(display) => setAdder(adder.xmlid, {option: adder.options.find((option) => option.display === display)?.xmlid})}
-                        testID={`author-adder-${id}-${adder.xmlid}`}
-                    />
-                );
-            })}
-
-            {entry.modifiable ? <Modifiers id={id} edition={edition} power={trait as AuthoredPower} onChange={onChange} /> : null}
-        </View>
-    );
-}
-
-/**
- * The defences a Resistant Protection is split across.
- *
- * Four numbers with no template behind them — see `FieldGroup`. The power's `levels` is derived
- * from their sum at emit time, so there is nothing here for the player to keep in step.
- */
-function DefenseFields({
-    id,
-    group,
-    trait,
-    onChange,
-}: {
-    id: string;
-    group: FieldGroup;
-    trait: AuthoredTrait;
-    onChange: (trait: AuthoredTrait) => void;
-}): React.JSX.Element {
-    const defense = (trait as AuthoredPower).defense ?? {pd: 0, ed: 0, mental: 0, power: 0};
-
-    return (
-        <View>
-            <Text variant="caption" muted>
-                {group.label}
-            </Text>
-            <View style={styles.grid}>
-                {group.fields.map((field) => (
-                    <View key={field.key} style={styles.gridCell}>
-                        <NumberField
-                            label={field.label}
-                            value={String(defense[field.key])}
-                            onChangeText={(text) => onChange({...trait, defense: {...defense, [field.key]: Math.max(0, Number.parseInt(text, 10) || 0)}} as AuthoredTrait)}
-                            testID={`author-defense-${id}-${field.key}`}
-                        />
-                    </View>
-                ))}
-            </View>
-        </View>
-    );
-}
-
-/**
- * A power's advantages and limitations.
- *
- * One list, not two, because which is which is the sign of what a modifier ends up costing rather
- * than a property of the modifier — `ModifierCalculator` splits them on exactly that, and an
- * option can flip a modifier from one to the other.
- */
-function Modifiers({
-    id,
-    edition,
-    power,
-    onChange,
-}: {
-    id: string;
-    edition: AuthoringEdition;
-    power: AuthoredPower;
-    onChange: (trait: AuthoredTrait) => void;
-}): React.JSX.Element {
-    const available = useMemo(() => modifiers(edition), [edition]);
-    const byXmlid = useMemo(() => new Map(available.map((entry) => [entry.xmlid, entry])), [available]);
-
-    const add = (display: string): void => {
-        const entry = available.find((candidate) => candidate.display === display);
-
-        if (entry !== undefined) {
-            onChange({...power, modifiers: [...power.modifiers, {xmlid: entry.xmlid, adders: []}]} as AuthoredTrait);
-        }
-    };
-
-    const update = (index: number, revised: AuthoredModifier): void =>
-        onChange({...power, modifiers: power.modifiers.map((entry, position) => (position === index ? revised : entry))} as AuthoredTrait);
-
-    const remove = (index: number): void => onChange({...power, modifiers: power.modifiers.filter((_, position) => position !== index)} as AuthoredTrait);
-
-    return (
-        <View style={styles.modifiers}>
-            <Text variant="caption" muted>
-                Advantages &amp; limitations
-            </Text>
-
-            {power.modifiers.map((applied, index) => {
-                const entry = byXmlid.get(applied.xmlid);
-                const modifierId = `${id}-mod-${index}`;
-
-                return entry === undefined ? (
-                    <Text key={modifierId} testID={`author-modifier-unknown-${modifierId}`}>
-                        {edition} has no “{applied.xmlid}”.
-                    </Text>
-                ) : (
-                    <View key={modifierId} style={styles.complication}>
-                        <View style={styles.complicationHead}>
-                            <Text>{entry.display}</Text>
-                            <Button label="Remove" onPress={() => remove(index)} variant="secondary" testID={`author-remove-${modifierId}`} />
-                        </View>
-
-                        {entry.freeText ? (
-                            <TextField
-                                label={entry.display}
-                                value={applied.text ?? ''}
-                                onChangeText={(text) => update(index, {...applied, text})}
-                                maxLength={80}
-                                testID={`author-modifier-text-${modifierId}`}
-                            />
-                        ) : null}
-
-                        {entry.options.length === 0 ? null : (
-                            <SelectField
-                                label="Which"
-                                value={entry.options.find((option) => option.xmlid === applied.option)?.display ?? ''}
-                                options={entry.options.map((option) => option.display)}
-                                onChange={(display) => update(index, {...applied, option: entry.options.find((option) => option.display === display)?.xmlid})}
-                                testID={`author-modifier-option-${modifierId}`}
-                            />
-                        )}
-
-                        {entry.levels === null ? null : (
-                            <NumberField
-                                label={entry.levels.label}
-                                value={applied.levels === undefined ? '' : String(applied.levels)}
-                                onChangeText={(text) => update(index, {...applied, levels: text.trim() === '' ? 0 : Math.max(0, Number.parseInt(text, 10) || 0)})}
-                                testID={`author-modifier-levels-${modifierId}`}
-                            />
-                        )}
-
-                        {entry.adders.map((adder) => {
-                            const chosen = applied.adders.find((candidate) => candidate.xmlid === adder.xmlid);
-                            const setNested = (patch: {option?: string}): void =>
-                                update(index, {
-                                    ...applied,
-                                    adders:
-                                        chosen === undefined
-                                            ? [...applied.adders, {xmlid: adder.xmlid, ...patch}]
-                                            : applied.adders.map((candidate) => (candidate.xmlid === adder.xmlid ? {...candidate, ...patch} : candidate)),
-                                });
-
-                            return adder.options.length === 0 ? null : (
-                                <SelectField
-                                    key={adder.xmlid}
-                                    label={adder.display}
-                                    value={adder.options.find((option) => option.xmlid === chosen?.option)?.display ?? ''}
-                                    options={adder.options.map((option) => option.display)}
-                                    onChange={(display) => setNested({option: adder.options.find((option) => option.display === display)?.xmlid})}
-                                    testID={`author-modifier-adder-${modifierId}-${adder.xmlid}`}
-                                />
-                            );
-                        })}
-                    </View>
-                );
-            })}
-
-            <SelectField label="Add advantage or limitation" value="" options={available.map((entry) => entry.display)} onChange={add} testID={`author-add-modifier-${id}`} />
-        </View>
-    );
-}
-
 const FRAMEWORK_KINDS: Array<{value: FrameworkKind; label: string}> = [
     {value: 'multipower', label: 'Multipower'},
     {value: 'elementalControl', label: 'Elemental Control'},
@@ -687,13 +464,24 @@ const FRAMEWORK_KINDS: Array<{value: FrameworkKind; label: string}> = [
 /**
  * Power frameworks: a pool, and the powers drawing on it.
  *
- * Its own section rather than a kind of power, because a framework is not priced like one — the
- * container costs its reserve and each slot a fraction of what it would cost alone. Slots reuse
- * {@link TraitRow}, so a power in a pool is edited exactly like a power outside one.
+ * The pool's own fields stay here — a name and a reserve are two lines, and a framework is mostly
+ * its contents. Each slot is a row that opens the same trait form a standalone power uses.
  */
-function Frameworks({draft, onChange}: {draft: AuthoredCharacter; onChange: (draft: AuthoredCharacter) => void}): React.JSX.Element {
+function Frameworks({
+    draft,
+    onChange,
+    character,
+    onEdit,
+    onEditPool,
+}: {
+    draft: AuthoredCharacter;
+    onChange: (draft: AuthoredCharacter) => void;
+    character: Obj | null;
+    onEdit: (address: TraitAddress, category: AuthorableCategory) => void;
+    onEditPool: (index: number) => void;
+}): React.JSX.Element {
     const powers = useMemo(() => authorable('powers', draft.edition), [draft.edition]);
-    const byXmlid = useMemo(() => new Map(catalogue('powers', draft.edition).map((entry) => [entry.xmlid, entry])), [draft.edition]);
+    const rows = character === null ? [] : frameworkSummaries(character);
 
     const update = (index: number, revised: AuthoredFramework): void =>
         onChange({...draft, frameworks: draft.frameworks.map((entry, position) => (position === index ? revised : entry))});
@@ -725,7 +513,13 @@ function Frameworks({draft, onChange}: {draft: AuthoredCharacter; onChange: (dra
                             />
                         </View>
 
-                        <TextField label="Name" value={framework.name} onChangeText={(name) => update(index, {...framework, name})} maxLength={60} testID={`author-framework-name-${index}`} />
+                        <TextField
+                            label="Name"
+                            value={framework.name}
+                            onChangeText={(name) => update(index, {...framework, name})}
+                            maxLength={60}
+                            testID={`author-framework-name-${index}`}
+                        />
 
                         <NumberField
                             label={framework.kind === 'vpp' ? 'Pool' : 'Reserve'}
@@ -734,29 +528,23 @@ function Frameworks({draft, onChange}: {draft: AuthoredCharacter; onChange: (dra
                             testID={`author-framework-reserve-${index}`}
                         />
 
-                        <Modifiers
-                            id={`framework-${index}`}
-                            edition={draft.edition}
-                            power={{xmlid: 'GENERIC_OBJECT', input: '', adders: [], modifiers: framework.modifiers} as AuthoredPower}
-                            onChange={(revised) => update(index, {...framework, modifiers: (revised as AuthoredPower).modifiers})}
+                        <Button
+                            label="Advantages & limitations"
+                            onPress={() => onEditPool(index)}
+                            variant="secondary"
+                            testID={`author-edit-framework-${index}`}
                         />
 
-                        {framework.slots.map((slot, order) => {
-                            const entry = byXmlid.get(slot.xmlid);
-
-                            return entry === undefined ? null : (
-                                <TraitRow
-                                    key={`${slot.xmlid}-${order}`}
-                                    index={order}
-                                    draftKey={`framework-${index}-slot`}
-                                    edition={draft.edition}
-                                    entry={entry}
-                                    trait={slot}
-                                    onChange={(revised) => update(index, {...framework, slots: framework.slots.map((entry2, p) => (p === order ? (revised as AuthoredPower) : entry2))})}
-                                    onRemove={() => update(index, {...framework, slots: framework.slots.filter((_, p) => p !== order)})}
-                                />
-                            );
-                        })}
+                        {framework.slots.map((slot, order) => (
+                            <TraitListRow
+                                key={`${slot.xmlid}-${order}`}
+                                label={rows[index]?.slots[order]?.label ?? slot.xmlid}
+                                cost={rows[index]?.slots[order]?.cost ?? 0}
+                                onPress={() => onEdit({kind: 'slot', framework: index, index: order}, 'powers')}
+                                testID={`author-row-framework-${index}-slot-${order}`}
+                                indented
+                            />
+                        ))}
 
                         <SelectField
                             label="Add a power to this framework"
@@ -770,9 +558,17 @@ function Frameworks({draft, onChange}: {draft: AuthoredCharacter; onChange: (dra
                                         ...framework,
                                         slots: [
                                             ...framework.slots,
-                                            {xmlid: entry.xmlid, input: '', adders: [], levels: 0, modifiers: [], ...(entry.fieldGroup === null ? {} : {defense: {pd: 0, ed: 0, mental: 0, power: 0}})},
+                                            {
+                                                xmlid: entry.xmlid,
+                                                input: '',
+                                                adders: [],
+                                                levels: 0,
+                                                modifiers: [],
+                                                ...(entry.fieldGroup === null ? {} : {defense: {pd: 0, ed: 0, mental: 0, power: 0}}),
+                                            },
                                         ],
                                     });
+                                    onEdit({kind: 'slot', framework: index, index: framework.slots.length}, 'powers');
                                 }
                             }}
                             testID={`author-add-slot-${index}`}
@@ -811,8 +607,7 @@ function Problems({problems}: {problems: readonly Problem[]}): React.JSX.Element
                     <Text
                         key={`${problem.path}-${index}`}
                         color={problem.severity === 'error' ? theme.colors.danger : theme.colors.textMuted}
-                        testID={`author-problem-${problem.severity}-${index}`}
-                    >
+                        testID={`author-problem-${problem.severity}-${index}`}>
                         {problem.message}
                     </Text>
                 ))}
@@ -844,6 +639,20 @@ const styles = StyleSheet.create({
     },
     complication: {
         rowGap: 8,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        columnGap: 12,
+        paddingVertical: 10,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+    },
+    rowIndented: {
+        paddingLeft: 16,
+    },
+    rowLabel: {
+        flex: 1,
     },
     modifiers: {
         rowGap: 8,

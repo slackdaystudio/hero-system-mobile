@@ -24,6 +24,7 @@ import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import type {CharacterRepository, SaveCharacter} from 'core/ports';
 import {parseSource, build, emit, emptyDraft, type AuthoredCharacter} from 'core/authoring';
 import type {Repositories} from 'infra/persistence/repositories';
+import {AuthoringDraftProvider, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 import {AuthoringProvider} from 'app/providers/AuthoringProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {ThemeProvider} from 'app/theme';
@@ -34,9 +35,10 @@ type Obj = Record<string, any>;
 const renderScreen = async (
     props: Partial<React.ComponentProps<typeof AuthorCharacterScreen>> = {},
     existing: string[] = [],
-): Promise<{tree: ReactTestRenderer; saved: SaveCharacter[]; savedIds: string[]}> => {
+): Promise<{tree: ReactTestRenderer; saved: SaveCharacter[]; savedIds: string[]; edits: Array<{address: TraitAddress; category: string}>}> => {
     const saved: SaveCharacter[] = [];
     const savedIds: string[] = [];
+    const edits: Array<{address: TraitAddress; category: string}> = [];
     const characters = {
         save: async (input: SaveCharacter) => {
             saved.push(input);
@@ -50,7 +52,14 @@ const renderScreen = async (
             <ThemeProvider colorScheme="dark">
                 <RepositoriesProvider repositories={{characters} as unknown as Repositories}>
                     <AuthoringProvider>
-                        <AuthorCharacterScreen onSaved={(id) => savedIds.push(id)} onCancel={() => {}} {...props} />
+                        <AuthoringDraftProvider>
+                            <AuthorCharacterScreen
+                                onSaved={(id) => savedIds.push(id)}
+                                onCancel={() => {}}
+                                onEditTrait={(address, category) => edits.push({address, category})}
+                                {...props}
+                            />
+                        </AuthoringDraftProvider>
                     </AuthoringProvider>
                 </RepositoriesProvider>
             </ThemeProvider>,
@@ -58,7 +67,7 @@ const renderScreen = async (
     });
     await act(async () => {});
 
-    return {tree, saved, savedIds};
+    return {tree, saved, savedIds, edits};
 };
 
 const type = async (tree: ReactTestRenderer, testID: string, value: string): Promise<void> => {
@@ -80,12 +89,26 @@ const press = async (tree: ReactTestRenderer, testID: string): Promise<void> => 
     await act(async () => {});
 };
 
+/**
+ * All the text rendered under a testID, however deeply.
+ *
+ * Walks the rendered instances rather than reading `props.children`, because a row's children are
+ * `<Text>` elements rather than strings — flattening the props alone yields "[object Object]".
+ */
 const textOf = (tree: ReactTestRenderer, testID: string): string => {
-    const node = tree.root.findAllByProps({testID}).find((candidate) => candidate.props.children !== undefined);
-    const flatten = (children: unknown): string =>
-        Array.isArray(children) ? children.map(flatten).join('') : children === null || children === undefined || typeof children === 'boolean' ? '' : String(children);
+    const collect = (node: unknown): string => {
+        if (typeof node === 'string' || typeof node === 'number') {
+            return String(node);
+        }
 
-    return node === undefined ? '' : flatten(node.props.children);
+        const children = (node as {children?: unknown[]} | null)?.children;
+
+        return Array.isArray(children) ? children.map(collect).join('') : '';
+    };
+
+    const [node] = tree.root.findAllByProps({testID});
+
+    return node === undefined ? '' : collect(node);
 };
 
 describe('AuthorCharacterScreen', () => {
@@ -332,27 +355,27 @@ describe('AuthorCharacterScreen — powers and their modifiers', () => {
         expect(textOf(tree, 'author-spend')).toBe('37 spent of 400');
     });
 
-    it('offers a modifier list on a power and not on a skill', async () => {
-        const {tree} = await renderScreen({
-            initial: {
-                ...emptyDraft('6E'),
-                powers: [{xmlid: 'ENERGYBLAST', name: 'Bolt', input: '', adders: [], levels: 5, modifiers: []}],
-                skills: [{xmlid: 'ACROBATICS', input: '', adders: [], characteristic: 'DEX', levels: 0}],
-            },
-        });
+    it('shows a power as one row with its cost, not a form', async () => {
+        const {tree} = await renderScreen({initial: grenade});
 
-        expect(tree.root.findAllByProps({testID: 'author-add-modifier-powers-0'}).length).toBeGreaterThan(0);
-        expect(tree.root.findAllByProps({testID: 'author-add-modifier-skills-0'})).toHaveLength(0);
+        // The form is a screen of its own now — this list is a list.
+        expect(textOf(tree, 'author-row-powers-0')).toContain('Grenade');
+        expect(textOf(tree, 'author-row-powers-0')).toContain('37');
+        expect(tree.root.findAllByProps({testID: 'author-add-modifier-powers-0'})).toHaveLength(0);
     });
 
-    it('draws the defence fields for Resistant Protection, and blocks a save without them', async () => {
+    it('opens the trait form when a row is tapped', async () => {
+        const {tree, edits} = await renderScreen({initial: grenade});
+
+        await press(tree, 'author-row-powers-0');
+
+        expect(edits).toEqual([{address: {kind: 'trait', key: 'powers', index: 0}, category: 'powers'}]);
+    });
+
+    it('blocks a save on a Resistant Protection with no defences', async () => {
         const {tree, saved} = await renderScreen({
             initial: {...emptyDraft('6E'), name: 'Bare', powers: [{xmlid: 'FORCEFIELD', name: 'Skin', input: '', adders: [], levels: 0, modifiers: []}]},
         });
-
-        for (const field of ['pd', 'ed', 'mental', 'power']) {
-            expect(tree.root.findAllByProps({testID: `author-defense-powers-0-${field}`}).length).toBeGreaterThan(0);
-        }
 
         expect(textOf(tree, 'author-problem-error-0')).toContain('grants no defence');
         await press(tree, 'author-save');
@@ -402,12 +425,15 @@ describe('AuthorCharacterScreen — frameworks', () => {
         expect(textOf(tree, 'author-spend')).toBe('71 spent of 400');
     });
 
-    it('edits a slot with the same row a standalone power uses', async () => {
-        const {tree} = await renderScreen({initial: gadgets});
+    it('lists each slot as a row, and opens the trait form for it', async () => {
+        const {tree, edits} = await renderScreen({initial: gadgets});
 
-        // Slots are powers: they get a name, and a modifier list of their own.
-        expect(tree.root.findAllByProps({testID: 'author-name-framework-0-slot-0'}).length).toBeGreaterThan(0);
-        expect(tree.root.findAllByProps({testID: 'author-add-modifier-framework-0-slot-0'}).length).toBeGreaterThan(0);
+        expect(textOf(tree, 'author-row-framework-0-slot-0')).toContain('Stun Gun');
+        // 60 active / 10 for a fixed slot.
+        expect(textOf(tree, 'author-row-framework-0-slot-0')).toContain('6');
+
+        await press(tree, 'author-row-framework-0-slot-1');
+        expect(edits).toEqual([{address: {kind: 'slot', framework: 0, index: 1}, category: 'powers'}]);
     });
 
     it('says slots are fixed slots rather than silently making them so', async () => {
