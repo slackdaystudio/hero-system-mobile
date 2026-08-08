@@ -25,7 +25,17 @@
  * edit it does not.
  */
 import type {StoredSource} from 'core/ports';
-import type {AuthoredAdder, AuthoredCharacter, AuthoredFramework, AuthoredModifier, AuthoredPower, AuthoredTrait, AuthoringEdition, FrameworkKind} from './types';
+import {DEFAULT_BUDGET} from './types';
+import type {
+    AuthoredAdder,
+    AuthoredCharacter,
+    AuthoredFramework,
+    AuthoredModifier,
+    AuthoredPower,
+    AuthoredTrait,
+    AuthoringEdition,
+    FrameworkKind,
+} from './types';
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -245,6 +255,13 @@ function parseFrameworks(value: unknown): AuthoredFramework[] | null {
     return frameworks;
 }
 
+const isBudget = (value: unknown): value is {base: number; complicationLimit: number} =>
+    isObject(value) &&
+    typeof value.base === 'number' &&
+    Number.isInteger(value.base) &&
+    typeof value.complicationLimit === 'number' &&
+    Number.isInteger(value.complicationLimit);
+
 /**
  * A stored source as a draft, or null when it is not one this build understands.
  *
@@ -275,8 +292,24 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
     const martialArts = parseTraits(source.martialArts ?? []);
     const equipment = parsePowers(source.equipment ?? []);
     const frameworks = parseFrameworks(source.frameworks ?? []);
+    // Sources written before the allowance was pickable have no budget and read as the default —
+    // which is the level they were in fact built to, since it was the only one on offer.
+    const budget = source.budget === undefined ? DEFAULT_BUDGET[source.edition] : source.budget;
 
-    if (skills === null || perks === null || talents === null || complications === null || powers === null || martialArts === null || equipment === null || frameworks === null) {
+    if (!isBudget(budget)) {
+        return null;
+    }
+
+    if (
+        skills === null ||
+        perks === null ||
+        talents === null ||
+        complications === null ||
+        powers === null ||
+        martialArts === null ||
+        equipment === null ||
+        frameworks === null
+    ) {
         return null;
     }
 
@@ -284,6 +317,7 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
         edition: source.edition,
         name: asString(source.name),
         player: asString(source.player),
+        budget: {base: budget.base, complicationLimit: budget.complicationLimit},
         characteristics,
         skills,
         perks,
@@ -320,6 +354,7 @@ export const toSource = (draft: AuthoredCharacter): StoredSource => ({
     edition: draft.edition,
     name: draft.name,
     player: draft.player,
+    budget: {...draft.budget},
     characteristics: {...draft.characteristics},
     skills: draft.skills.map(traitToSource),
     perks: draft.perks.map(traitToSource),

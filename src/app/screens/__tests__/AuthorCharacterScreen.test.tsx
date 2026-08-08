@@ -22,7 +22,7 @@
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import type {CharacterRepository, SaveCharacter} from 'core/ports';
-import {parseSource, build, emit, emptyDraft, type AuthoredCharacter} from 'core/authoring';
+import {parseSource, build, declaredFor, emit, emptyDraft, type AuthoredCharacter} from 'core/authoring';
 import type {Repositories} from 'infra/persistence/repositories';
 import {AuthoringDraftProvider, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 import {AuthoringProvider} from 'app/providers/AuthoringProvider';
@@ -193,7 +193,7 @@ describe('AuthorCharacterScreen — saving', () => {
 
         expect(reopened).toEqual(draft);
         expect(emit(reopened)).toEqual(emit(draft));
-        expect(saved[0].document).toEqual(build(draft));
+        expect(saved[0].document).toEqual({...build(draft), basicConfiguration: declaredFor(draft.budget)});
     });
 
     it('keeps the id when editing, rather than making a second character', async () => {
@@ -324,7 +324,7 @@ describe('AuthorCharacterScreen — one renderer for four categories', () => {
 
         expect(saved).toHaveLength(1);
         expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(full);
-        expect(saved[0].document).toEqual(build(full));
+        expect(saved[0].document).toEqual({...build(full), basicConfiguration: declaredFor(full.budget)});
     });
 });
 
@@ -396,7 +396,7 @@ describe('AuthorCharacterScreen — powers and their modifiers', () => {
 
         expect(saved).toHaveLength(1);
         expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(full);
-        expect(saved[0].document).toEqual(build(full));
+        expect(saved[0].document).toEqual({...build(full), basicConfiguration: declaredFor(full.budget)});
     });
 });
 
@@ -518,6 +518,106 @@ describe('AuthorCharacterScreen — martial arts and equipment', () => {
 
         expect(saved).toHaveLength(1);
         expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(full);
-        expect(saved[0].document).toEqual(build(full));
+        expect(saved[0].document).toEqual({...build(full), basicConfiguration: declaredFor(full.budget)});
+    });
+});
+
+describe('AuthorCharacterScreen — the campaign allowance', () => {
+    /** A field's current value, which lives on the input rather than as rendered text. */
+    const valueOf = (tree: ReactTestRenderer, testID: string): string =>
+        tree.root.findAllByProps({testID}).find((node) => typeof node.props.onChangeText === 'function')?.props.value ?? '';
+
+    const pick = async (tree: ReactTestRenderer, testID: string, option: string): Promise<void> => {
+        await act(async () => {
+            tree.root
+                .findAllByProps({testID})
+                .find((node) => typeof node.props.onPress === 'function')
+                ?.props.onPress();
+        });
+        await act(async () => {
+            tree.root
+                .findAllByProps({testID: `${testID}-option-${option}`})
+                .find((node) => typeof node.props.onPress === 'function')
+                ?.props.onPress();
+        });
+        await act(async () => {});
+    };
+
+    it('starts a 6E character at Standard, and totals against it', async () => {
+        const {tree} = await renderScreen({initial: {...emptyDraft('6E'), characteristics: {str: 20}}});
+
+        expect(textOf(tree, 'author-spend')).toBe('10 spent of 400');
+        expect(valueOf(tree, 'author-budget-base')).toBe('400');
+        expect(valueOf(tree, 'author-budget-limit')).toBe('75');
+    });
+
+    it('changes the total when a different level is picked', async () => {
+        const {tree} = await renderScreen({initial: {...emptyDraft('6E'), characteristics: {str: 20}}});
+
+        await pick(tree, 'author-power-level', '6E Low-Powered');
+
+        // 6E Low-Powered is a 300-point character. Nothing about the build changed, only what it
+        // is allowed to cost.
+        expect(textOf(tree, 'author-spend')).toBe('10 spent of 300');
+    });
+
+    it('accepts an allowance the rulebooks have no name for', async () => {
+        const {tree} = await renderScreen({initial: emptyDraft('6E')});
+
+        await type(tree, 'author-budget-base', '525');
+
+        expect(textOf(tree, 'author-spend')).toBe('0 spent of 525');
+    });
+
+    it('labels the two editions in the units each is quoted in', async () => {
+        const sixth = await renderScreen({initial: emptyDraft('6E')});
+        const fifth = await renderScreen({initial: emptyDraft('5E')});
+
+        // 6E quotes the whole allowance; 5E quotes a base that disadvantages then add to.
+        const label = (tree: ReactTestRenderer): string =>
+            tree.root.findAllByProps({testID: 'author-budget-base'}).find((node) => node.props.label !== undefined)?.props.label ?? '';
+
+        expect(label(sixth.tree)).toBe('Total points');
+        expect(label(fifth.tree)).toBe('Base points');
+    });
+
+    it('lets 5E disadvantages raise the total, and 6E complications not', async () => {
+        const psych = [
+            {
+                xmlid: 'PSYCHOLOGICALLIMITATION',
+                input: 'Code Of The Hero',
+                adders: [
+                    {xmlid: 'SITUATION', option: 'COMMON'},
+                    {xmlid: 'INTENSITY', option: 'STRONG'},
+                ],
+            },
+        ];
+        const sixth = await renderScreen({initial: {...emptyDraft('6E'), complications: psych}});
+        const fifth = await renderScreen({initial: {...emptyDraft('5E'), complications: psych}});
+
+        // 6E: still 400. 5E: 200 base + the 15 the complication is worth.
+        expect(textOf(sixth.tree, 'author-spend')).toBe('0 spent of 400');
+        expect(textOf(fifth.tree, 'author-spend')).toBe('0 spent of 215');
+    });
+
+    it('saves the allowance so the character declares what it was built on', async () => {
+        const {tree, saved} = await renderScreen({initial: {...emptyDraft('6E'), name: 'Declared', characteristics: {str: 20}}});
+
+        await type(tree, 'author-budget-base', '350');
+        await press(tree, 'author-save');
+
+        // Without this the sheet's nameplate shows neither points nor campaign tier.
+        expect((saved[0].document as Obj).basicConfiguration).toEqual({basePoints: 350, disadPoints: 75, experience: 0});
+        expect((saved[0].source as Obj).budget).toEqual({base: 350, complicationLimit: 75});
+    });
+
+    it('re-opens at the allowance it was saved with', async () => {
+        const custom: AuthoredCharacter = {...emptyDraft('6E'), name: 'Custom', budget: {base: 525, complicationLimit: 90}};
+        const {tree, saved} = await renderScreen({initial: custom});
+
+        await press(tree, 'author-save');
+
+        expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(custom);
+        expect(textOf(tree, 'author-spend')).toBe('0 spent of 525');
     });
 });

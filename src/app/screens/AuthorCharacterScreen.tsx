@@ -31,7 +31,8 @@ import {
     authorable,
     build,
     characteristics as catalogueCharacteristics,
-    DEFAULT_BUDGET,
+    allowanceFor,
+    allowancesFor,
     emptyDraft,
     frameworkSummaries,
     isSaveable,
@@ -104,8 +105,7 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel, 
 
     const edit = useCallback((address: TraitAddress, category: AuthorableCategory) => onEditTrait?.(address, category), [onEditTrait]);
 
-    const budget = DEFAULT_BUDGET[draft.edition];
-    const left = spend === null ? null : remaining(spend, budget, draft.edition);
+    const left = spend === null ? null : remaining(spend, draft.budget, draft.edition);
 
     const commit = useCallback(() => {
         // Guarded here as well as on the button. Disabling a control is a UI affordance; refusing
@@ -146,7 +146,9 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel, 
                     </View>
                 </Card>
 
-                <SpendMeter left={left} complications={spend?.complications ?? 0} limit={budget.complicationLimit} edition={draft.edition} />
+                <SpendMeter left={left} complications={spend?.complications ?? 0} limit={draft.budget.complicationLimit} edition={draft.edition} />
+
+                <Allowance draft={draft} onChange={setDraft} />
 
                 <Characteristics draft={draft} onChange={setDraft} />
 
@@ -216,6 +218,71 @@ function EditionPicker({
                 onChange={(edition) => onChange({...emptyDraft(edition as AuthoringEdition), name: draft.name, player: draft.player})}
             />
         </View>
+    );
+}
+
+const CUSTOM = 'Custom';
+
+/**
+ * What the campaign allows.
+ *
+ * Named levels for the common cases, and both numbers editable for a campaign the rulebooks have
+ * no name for. Editing either number puts the picker on "Custom" by itself — the label is derived
+ * from the numbers rather than stored, so it can never claim a level the numbers do not match.
+ *
+ * The two editions are quoted in different units and the labels say so, because "400" means the
+ * whole allowance in 6E and a pre-disadvantage base in 5E. Getting that backwards is the single
+ * easiest mistake here — see `POINT_ALLOWANCES`.
+ */
+function Allowance({draft, onChange}: {draft: AuthoredCharacter; onChange: (draft: AuthoredCharacter) => void}): React.JSX.Element {
+    const offered = useMemo(() => allowancesFor(draft.edition), [draft.edition]);
+    const named = allowanceFor(draft.budget, draft.edition);
+
+    const set = (patch: Partial<AuthoredCharacter['budget']>): void => onChange({...draft, budget: {...draft.budget, ...patch}});
+
+    return (
+        <Card>
+            <View style={styles.fields}>
+                <Text variant="label" muted>
+                    CAMPAIGN
+                </Text>
+
+                <SelectField
+                    label="Power level"
+                    value={named?.name ?? CUSTOM}
+                    options={[...offered.map((allowance) => allowance.name), CUSTOM]}
+                    onChange={(name) => {
+                        const allowance = offered.find((candidate) => candidate.name === name);
+
+                        // "Custom" selects nothing — it is what the numbers already say. Picking it
+                        // and having the budget jump would be the opposite of what it means.
+                        if (allowance !== undefined) {
+                            set({base: allowance.base, complicationLimit: allowance.complicationLimit});
+                        }
+                    }}
+                    testID="author-power-level"
+                />
+
+                <View style={styles.grid}>
+                    <View style={styles.budgetCell}>
+                        <NumberField
+                            label={draft.edition === '5E' ? 'Base points' : 'Total points'}
+                            value={String(draft.budget.base)}
+                            onChangeText={(text) => set({base: Math.max(0, Number.parseInt(text, 10) || 0)})}
+                            testID="author-budget-base"
+                        />
+                    </View>
+                    <View style={styles.budgetCell}>
+                        <NumberField
+                            label={draft.edition === '5E' ? 'Disadvantage limit' : 'Complication limit'}
+                            value={String(draft.budget.complicationLimit)}
+                            onChangeText={(text) => set({complicationLimit: Math.max(0, Number.parseInt(text, 10) || 0)})}
+                            testID="author-budget-limit"
+                        />
+                    </View>
+                </View>
+            </View>
+        </Card>
     );
 }
 
@@ -636,6 +703,9 @@ const styles = StyleSheet.create({
     },
     gridCell: {
         width: '30%',
+    },
+    budgetCell: {
+        width: '46%',
     },
     complication: {
         rowGap: 8,

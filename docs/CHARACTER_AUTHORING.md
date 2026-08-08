@@ -394,6 +394,30 @@ changing it is a correctness-pass decision with a rules question attached (is ca
 default?), not something an authoring layer should quietly paper over. What authoring does instead
 is **warn**, so a player sees it rather than discovering it in play.
 
+## The campaign allowance
+
+A character declares what it was built on, and the player picks it.
+
+`POINT_ALLOWANCES` is derived from `core/random`'s `POWER_LEVELS` rather than restating those
+numbers — they are already checked against both rulebooks, and a second copy is how the legacy
+`skillsets.json` came to disagree with itself about what a profession cost. The presets sit over
+two plain numbers, so a GM running a campaign the rulebooks have no name for can still say what it
+allows; the picker reads "Custom" whenever the numbers match no level, derived rather than stored,
+so it cannot claim a level the numbers do not match.
+
+**The editions are quoted in different units, and the field labels say so.** 5E quotes a base that
+disadvantages then add to; 6E quotes the whole allowance and complications grant nothing. So a 6E
+allowance's `base` is its level's *total*, and a 5E one's is its *base* — the same conversion
+`declaredConfiguration` makes. Getting it backwards is the easiest mistake available here.
+
+The budget lives on the **draft**, not on the screen: a character re-opened at a different
+allowance than it was built to would silently be over or under budget for reasons nobody could see.
+
+It also closed a gap. `AuthoringProvider` never wrote `basicConfiguration`, so an authored
+character showed neither points nor campaign tier on the sheet's nameplate where a generated or
+imported one does — `pointSummary` reads the declared block and returns null when it is absent.
+The chosen allowance is now what gets declared.
+
 ## Risks worth naming up front
 
 1. **The validator is the quality bar, not the forms.** Borne out in Phase A: the forms were a

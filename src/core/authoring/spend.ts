@@ -32,7 +32,7 @@
 import {TRAIT_CHILD_KEYS} from 'core/hero';
 import {characterTraitDecorator, type Obj} from 'core/traits';
 import {withDescendants} from 'core/util';
-import type {AuthoringEdition} from './types';
+import type {AuthoringEdition, Budget} from './types';
 
 /** The trait buckets a character spends points on, in sheet order. */
 const SPENDING_BUCKETS = ['skills', 'perks', 'talents', 'martialArts', 'powers', 'equipment'] as const;
@@ -127,26 +127,6 @@ const describe = (entry: Obj, key: string, character: Obj): TraitSummary => {
         // player has no way to fix or delete it. `validate` is what says why.
         return {label: String(entry.name ?? entry.alias ?? entry.xmlid), cost: 0};
     }
-};
-
-/**
- * The budget a character is being built to.
- *
- * `base` is what the campaign grants. `complicationLimit` is how much of the build complications
- * may fund (5E) or how many points' worth are required (6E) — HERO calls both a limit and neither
- * is a suggestion.
- */
-export interface Budget {
-    readonly base: number;
-    readonly complicationLimit: number;
-}
-
-/** Standard Superheroic, the level the generator builds to and what a new draft starts at. */
-export const DEFAULT_BUDGET: Readonly<Record<AuthoringEdition, Budget>> = {
-    // 5E: 200 base + up to 150 in disadvantages = the classic 350-point superhero.
-    '5E': {base: 200, complicationLimit: 150},
-    // 6E: 400 is the whole allowance; complications grant nothing and 75 is the required shape.
-    '6E': {base: 400, complicationLimit: 75},
 };
 
 export interface Remaining {

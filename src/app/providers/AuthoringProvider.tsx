@@ -23,7 +23,7 @@
  * character. Nothing is mutated in place, so no edit can leave a character half-changed.
  */
 import React, {createContext, useCallback, useContext, useMemo} from 'react';
-import {build, toSource, type AuthoredCharacter} from 'core/authoring';
+import {build, declaredFor, toSource, type AuthoredCharacter} from 'core/authoring';
 import {heroDesignerCharacter} from 'core/hero';
 import type {CharacterDocument} from 'core/ports';
 import {useRepositories} from 'app/providers/RepositoriesProvider';
@@ -58,6 +58,10 @@ export function AuthoringProvider({children}: {children: React.ReactNode}): Reac
     const save = useCallback<SaveAuthored>(
         async (draft, existingId) => {
             const document = build(draft) as unknown as CharacterDocument;
+            // What the character declares it was built on. `getCharacter` builds no such block, so
+            // without this the sheet's nameplate shows neither points nor campaign tier — which is
+            // what an authored character did before the allowance was pickable.
+            document.basicConfiguration = declaredFor(draft.budget);
             const name = draft.name.trim() === '' ? 'Unnamed' : draft.name.trim();
 
             // An edit keeps its id; a new character takes one derived from its name, suffixed

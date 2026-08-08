@@ -25,8 +25,86 @@
  * so it names things and lets the current template data answer.
  */
 
+import type {BasicConfiguration} from 'core/hero';
+import {POWER_LEVELS} from 'core/random';
+
 /** Which rulebook a draft is built against. The single fork the whole engine follows. */
 export type AuthoringEdition = '5E' | '6E';
+
+/**
+ * The budget a character is being built to.
+ *
+ * `base` is what the campaign grants, **quoted the way that edition quotes it** — a 5E character's
+ * pre-disadvantage base, a 6E character's whole allowance. `complicationLimit` is how much of the
+ * build complications may fund (5E) or how many points' worth are required (6E); HERO calls both a
+ * limit and neither is a suggestion.
+ *
+ * Plain numbers rather than the id of a preset, so a GM running a campaign the rulebook has no
+ * name for can still say what it allows. The presets are a convenience over these, not a
+ * replacement for them.
+ */
+export interface Budget {
+    readonly base: number;
+    readonly complicationLimit: number;
+}
+
+/** A named campaign level, as something to pick. */
+export interface PointAllowance extends Budget {
+    readonly id: string;
+    readonly name: string;
+    readonly edition: AuthoringEdition;
+}
+
+/**
+ * The campaign levels a character can be authored at.
+ *
+ * Derived from `core/random`'s `POWER_LEVELS` rather than restated, because those numbers are
+ * already checked against both rulebooks and a second copy is exactly how the legacy
+ * `skillsets.json` came to disagree with itself about what a profession cost.
+ *
+ * **The two editions are quoted in different units**, which is the easiest thing here to get
+ * wrong — `powerLevel.ts` spells it out: 5E quotes base and adds disadvantages, 6E quotes the
+ * total and subtracts complications. So a 6E allowance's `base` is the level's *total*, and a 5E
+ * one's is its *base*. That is the same conversion `declaredConfiguration` makes when it writes a
+ * character's `<BASIC_CONFIGURATION>`, which is why an authored character's declared points come
+ * out agreeing with a generated one's.
+ */
+export const POINT_ALLOWANCES: readonly PointAllowance[] = POWER_LEVELS.map((level) => ({
+    id: level.id,
+    name: level.name,
+    edition: level.edition === '6e' ? '6E' : '5E',
+    base: level.edition === '6e' ? level.total : level.base,
+    complicationLimit: level.limit,
+}));
+
+/** The allowances offered for an edition. */
+export const allowancesFor = (edition: AuthoringEdition): PointAllowance[] => POINT_ALLOWANCES.filter((allowance) => allowance.edition === edition);
+
+/** The named allowance matching a budget exactly, or null when it has been hand-set. */
+export const allowanceFor = (budget: Budget, edition: AuthoringEdition): PointAllowance | null =>
+    allowancesFor(edition).find((allowance) => allowance.base === budget.base && allowance.complicationLimit === budget.complicationLimit) ?? null;
+
+/** Just the two numbers — an allowance carries a name and an id that a draft has no use for. */
+const budgetOf = (id: string): Budget => {
+    const allowance = POINT_ALLOWANCES.find((candidate) => candidate.id === id)!;
+
+    return {base: allowance.base, complicationLimit: allowance.complicationLimit};
+};
+
+/** Where a new draft starts: Standard Superheroic, the level the generator builds to. */
+export const DEFAULT_BUDGET: Readonly<Record<AuthoringEdition, Budget>> = {
+    '5E': budgetOf('5e-standard'),
+    '6E': budgetOf('6e-standard'),
+};
+
+/**
+ * The `<BASIC_CONFIGURATION>` a character built to this budget declares.
+ *
+ * Without it the sheet's nameplate shows no points and no campaign tier — `pointSummary` reads the
+ * declared block and returns null when it is absent, which is what an authored character did
+ * before this. Both numbers are already in the edition's own units, so no conversion happens here.
+ */
+export const declaredFor = (budget: Budget): BasicConfiguration => ({basePoints: budget.base, disadPoints: budget.complicationLimit, experience: 0});
 
 /**
  * A chosen adder on a trait: the adder's xmlid, plus the option xmlid when it offers a list.
@@ -184,6 +262,15 @@ export interface AuthoredCharacter {
     readonly edition: AuthoringEdition;
     readonly name: string;
     readonly player: string;
+    /**
+     * What the campaign allows — see `Budget`.
+     *
+     * Part of the draft rather than a screen setting, because it is part of the character: it is
+     * what the sheet's nameplate declares and what the campaign tier is read from. A character
+     * re-opened at a different allowance than it was built to would silently be over or under
+     * budget for reasons nobody could see.
+     */
+    readonly budget: Budget;
     /** Characteristic totals by lower-case key: `{str: 20, dex: 15}`. Absent = leave at base. */
     readonly characteristics: Readonly<Record<string, number>>;
     readonly skills: readonly AuthoredTrait[];
@@ -209,6 +296,7 @@ export const emptyDraft = (edition: AuthoringEdition): AuthoredCharacter => ({
     edition,
     name: '',
     player: '',
+    budget: DEFAULT_BUDGET[edition],
     characteristics: {},
     skills: [],
     perks: [],
