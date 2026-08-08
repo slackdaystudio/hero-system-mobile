@@ -148,6 +148,27 @@ native module (`npm run android`).
 - [ ] **Text size** A−/A+ scales the whole UI live; persists.
 - [ ] **Screen animations** off = instant screen transitions.
 
+## Quick Pick (new in 2.8.0 — never shipped to testers before)
+- [ ] **Home** leads with a 3×3 grid. With no pins set, it fills from recently-opened
+      characters, most-recent first, and is useful straight away.
+- [ ] Tapping a slot **makes that character active** and opens their sheet.
+- [ ] On the **character sheet**, a handle sits at the bottom. Tapping it slides the grid up
+      over a dimmed backdrop; tapping the backdrop or the handle again dismisses it.
+- [ ] **Nothing on the sheet hides behind the handle** — scroll to the very bottom and check
+      the last row clears it.
+- [ ] Switching from the sheet **replaces** the character rather than stacking: after hopping
+      through four characters, **one** Back press leaves the sheet.
+- [ ] **Long-press a slot** → picker opens. Choosing a character pins them to that position.
+- [ ] A pinned character **stays put** across app restarts (pins live in Settings).
+- [ ] Pinning someone who was being *suggested* in another slot **moves the suggestion aside** —
+      a character never appears twice in the grid.
+- [ ] Long-pressing a **pinned** slot offers **Remove**; removing it refills from recents.
+- [ ] **Delete a pinned character** (Characters → delete) → its slot empties and refills rather
+      than breaking or showing a ghost.
+- [ ] The picker **does not offer** characters already pinned elsewhere.
+- [ ] **Screen animations off** (Settings) → the sheet snaps open/closed instead of sliding.
+- [ ] Android **back** closes the sheet rather than leaving the screen.
+
 ## Authoring a character (new in 2.8.0)
 - [ ] Characters → **New** opens the form. Name it, set a couple of characteristics, and check
       the points meter moves as you type.
