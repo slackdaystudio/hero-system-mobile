@@ -58,6 +58,7 @@ export const AUTHORABLE_CATEGORIES = {
     skills: 'skill',
     perks: 'perk',
     talents: 'talent',
+    powers: 'power',
     disadvantages: 'disad',
 } as const;
 
@@ -118,6 +119,14 @@ export interface CatalogueAdder {
     readonly freeTextOption: CatalogueOption | null;
     /** Present when the adder is bought in levels rather than picked. */
     readonly levels: LevelRange | null;
+    /**
+     * Adders of its own — one level deep, which is all the data has.
+     *
+     * Area Of Effect is the everyday case: it is a modifier with a Radius/Cone/Line option *and*
+     * Selective/Nonselective/Explosion adders that change what it costs. Without these an AOE
+     * prices as its bare option and quietly comes out cheap.
+     */
+    readonly adders: readonly CatalogueAdder[];
 }
 
 /**
@@ -146,7 +155,20 @@ export type Unsupported =
  *
  * Shrinking this list is the substance of a later phase, one decorator at a time.
  */
+/**
+ * Powers whose decorators read level fields the template never declares, and which therefore
+ * cannot be filled in by a generated form.
+ *
+ * `FORCEFIELD` is deliberately *not* here: it is the most-taken defensive power in the corpus and
+ * granting it a declared field group (see {@link FIELD_GROUPS}) was cheaper than withholding it.
+ * The rest need the same treatment one at a time — Barrier (`FORCEWALL` in both editions' data)
+ * wants a length/height/width/body box, Duplication a number and a point total, Endurance Reserve
+ * a REC.
+ */
+const BESPOKE_POWERS = ['FORCEWALL', 'DUPLICATION', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'MULTIFORM', 'SUMMON', 'VPP'];
+
 const BESPOKE = new Set([
+    ...BESPOKE_POWERS,
     'AUTOFIRE_SKILLS',
     'CRAMMING',
     'CUSTOMSKILL',
@@ -161,6 +183,39 @@ const BESPOKE = new Set([
     'RAPID_ATTACK',
     'TWO_WEAPON_FIGHTING',
 ]);
+
+/**
+ * Extra numeric fields a specific trait needs that no template declares.
+ *
+ * The escape hatch for the per-power long tail, kept deliberately small and explicit. Each entry
+ * is a field the engine reads straight off the trait, with no template to describe it — so the
+ * only options are to declare it here, or to withhold the power and say why.
+ */
+export interface FieldGroup {
+    readonly kind: 'defense';
+    readonly label: string;
+    readonly fields: ReadonlyArray<{readonly key: 'pd' | 'ed' | 'mental' | 'power'; readonly label: string}>;
+}
+
+/**
+ * Resistant Protection's four-way defence split.
+ *
+ * `getResistantDefense` and the unusual-defense queries read `pdlevels`/`edlevels`/`mdlevels`/
+ * `powdlevels` directly off the trait. A Resistant Protection emitted without them costs full
+ * price and grants no defence at all — priced correctly, silently useless.
+ */
+const FIELD_GROUPS: Readonly<Record<string, FieldGroup>> = {
+    FORCEFIELD: {
+        kind: 'defense',
+        label: 'Points of resistant defence',
+        fields: [
+            {key: 'pd', label: 'rPD'},
+            {key: 'ed', label: 'rED'},
+            {key: 'mental', label: 'Mental'},
+            {key: 'power', label: 'Power'},
+        ],
+    },
+};
 
 /** A trait the player may take, with everything a form needs to render it. */
 export interface CatalogueTrait {
@@ -187,6 +242,10 @@ export interface CatalogueTrait {
     readonly levels: LevelRange | null;
     /** Non-null when the skill may be taken at familiarity — an 8- roll for a reduced cost. */
     readonly familiarity: {readonly roll: number; readonly cost: number} | null;
+    /** Non-null when the trait needs fields no template describes — see {@link FieldGroup}. */
+    readonly fieldGroup: FieldGroup | null;
+    /** True when the power may carry advantages and limitations. */
+    readonly modifiable: boolean;
     /** Null when it can be authored; otherwise why not. */
     readonly unsupported: Unsupported | null;
 }
@@ -219,7 +278,12 @@ const optionsOf = (entry: Obj): CatalogueOption[] =>
 /** The bracket-only option that marks a free-text adder — see {@link CatalogueAdder.freeText}. */
 const FREE_TEXT_MARKER = '(';
 
-const adderOf = (adder: Obj): CatalogueAdder => {
+/**
+ * `depth` guards the one level of nesting the data has. It is never passed positionally from a
+ * `.map` — `Array.prototype.map` hands the index in as the second argument, which silently reads
+ * as "you are already nested" for every entry but the first.
+ */
+const adderOf = (adder: Obj, depth: 0 | 1 = 0): CatalogueAdder => {
     const options = optionsOf(adder);
     const freeText = options.length === 1 && options[0].display.trim() === FREE_TEXT_MARKER;
 
@@ -233,6 +297,9 @@ const adderOf = (adder: Obj): CatalogueAdder => {
         freeText,
         freeTextOption: freeText ? options[0] : null,
         levels: levelRangeOf(adder, 'Levels'),
+        // One level only. The data never nests further, and a form that recursed arbitrarily would
+        // be describing a shape the rules do not have.
+        adders: depth === 1 ? [] : asArray(adder.adder).map((nested) => adderOf(nested, 1)),
     };
 };
 
@@ -254,7 +321,7 @@ function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
     const xmlid = String(entry.xmlid);
     const choices = characteristicChoicesOf(entry);
     const options = optionsOf(entry);
-    const adders = asArray(entry.adder).map(adderOf);
+    const adders = asArray(entry.adder).map((adder) => adderOf(adder));
     const levels = levelRangeOf(entry, 'Levels');
     const priced = typeof entry.basecost === 'number' || levels !== null || choices.length > 0 || options.length > 0 || adders.length > 0;
 
@@ -270,6 +337,9 @@ function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
         adders,
         levels,
         familiarity: typeof entry.familiarityroll === 'number' && typeof entry.familiaritycost === 'number' ? {roll: entry.familiarityroll, cost: entry.familiaritycost} : null,
+        fieldGroup: FIELD_GROUPS[xmlid] ?? null,
+        // Only powers take advantages and limitations. A skill with an advantage is not a thing.
+        modifiable: category === 'powers',
         unsupported: BESPOKE.has(xmlid) ? 'bespoke' : priced ? null : 'unpriced',
     };
 }
@@ -310,6 +380,31 @@ export const withheld = (category: AuthorableCategory, edition: AuthoringEdition
 /** One entry by xmlid, or null when this edition has no such thing. */
 export const trait = (xmlid: string, category: AuthorableCategory, edition: AuthoringEdition): CatalogueTrait | null =>
     catalogue(category, edition).find((entry) => entry.xmlid === xmlid) ?? null;
+
+/**
+ * The advantages and limitations that may be put on a power.
+ *
+ * One flat list rather than two, because which is which is not a property of the modifier — it is
+ * the sign of what it ends up costing, and an option can flip it (Limited Power is a limitation;
+ * some of its options are worth less than others). `ModifierCalculator` splits them on the
+ * computed cost for exactly that reason, and so should anything showing them.
+ */
+export function modifiers(edition: AuthoringEdition): CatalogueAdder[] {
+    const template = heroDesignerCharacter.normalizedTemplate(templateFor(edition));
+    const seen = new Set<string>();
+
+    return asArray(template.modifiers?.modifier)
+        .filter((entry) => {
+            const xmlid = String(entry.xmlid);
+
+            return seen.has(xmlid) ? false : (seen.add(xmlid), true);
+        })
+        .map((entry) => adderOf(entry));
+}
+
+/** One modifier by xmlid, or null when this edition has no such thing. */
+export const modifier = (xmlid: string, edition: AuthoringEdition): CatalogueAdder | null =>
+    modifiers(edition).find((entry) => entry.xmlid === xmlid) ?? null;
 
 /** Complications, kept as its own name because the UI and the rules both call them that. */
 export const complications = (edition: AuthoringEdition): CatalogueTrait[] => catalogue('disadvantages', edition);

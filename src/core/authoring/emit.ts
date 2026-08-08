@@ -37,8 +37,8 @@
 import type {ParsedCharacter} from 'core/hero';
 import {getTemplate} from 'core/templates';
 import {heroDesignerCharacter} from 'core/hero';
-import {templateFor, trait, type AuthorableCategory, type CatalogueAdder} from './catalogue';
-import type {AuthoredAdder, AuthoredCharacter, AuthoredTrait, AuthoringEdition} from './types';
+import {modifier, templateFor, trait, type AuthorableCategory, type CatalogueAdder} from './catalogue';
+import type {AuthoredAdder, AuthoredCharacter, AuthoredModifier, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
 
 type Obj = Record<string, any>;
 
@@ -55,7 +55,11 @@ const ID_BASE: Readonly<Record<string, number>> = {
     perks: 3000,
     talents: 4000,
     disadvantages: 5000,
+    powers: 6000,
 };
+
+/** Modifier ids sit in their own block, keyed off the power they hang from. */
+const MODIFIER_ID_BASE = 7000;
 
 /**
  * Insertion order is load-bearing: `populateMovementAndCharacteristics` walks the object in key
@@ -135,7 +139,6 @@ function emitAdder(chosen: AuthoredAdder, catalogue: CatalogueAdder | undefined)
 
 const TRAIT_DEFAULTS: Obj = {
     multiplier: 1,
-    name: null,
     notes: null,
     affectsPrimary: true,
     affectsTotal: true,
@@ -162,6 +165,8 @@ function emitTrait(authored: AuthoredTrait, category: AuthorableCategory, positi
         id: ID_BASE[category] + position,
         alias: catalogue?.display ?? authored.xmlid,
         position,
+        // Null, never absent — an absent `name` renders the literal string "undefined (Blast)".
+        name: authored.name === undefined || authored.name.trim() === '' ? null : authored.name.trim(),
         // From the template, because that is where a real `.hdc` gets it. `CharacterTrait.cost()`
         // reads the *trait's* basecost and never the template's, so a 3-point Talent emitted
         // without it costs nothing and still renders — the silent-zero trap, from the inside.
@@ -184,6 +189,71 @@ function emitTrait(authored: AuthoredTrait, category: AuthorableCategory, positi
                 catalogue?.adders.find((candidate) => candidate.xmlid === adder.xmlid),
             ),
         ),
+    };
+}
+
+/**
+ * One advantage or limitation, priced and labelled from the modifiers catalogue.
+ *
+ * `alias` and `optionAlias` are what the writeup prints — the engine reads them and never derives
+ * them — and `template` is attached by `getCharacter` itself, matching on xmlid, so nothing here
+ * has to.
+ */
+function emitModifier(authored: AuthoredModifier, position: number, edition: AuthoringEdition): Obj {
+    const catalogue = modifier(authored.xmlid, edition);
+    const option = catalogue?.options.find((candidate) => candidate.xmlid === authored.option);
+
+    return {
+        xmlid: authored.xmlid,
+        id: MODIFIER_ID_BASE + position,
+        alias: catalogue?.display ?? authored.xmlid,
+        basecost: option?.basecost ?? catalogue?.basecost ?? 0,
+        levels: authored.levels ?? 0,
+        position: -1,
+        multiplier: 1,
+        name: null,
+        notes: null,
+        ...(catalogue?.freeText === true && catalogue.freeTextOption !== null
+            ? {option: catalogue.freeTextOption.xmlid, optionid: catalogue.freeTextOption.xmlid, optionAlias: `(${authored.text ?? ''}`}
+            : option === undefined
+              ? {}
+              : {option: option.xmlid, optionid: option.xmlid, optionAlias: option.display}),
+        // A modifier's own adders — Area Of Effect's Selective, Explosion, Mobile.
+        adder: authored.adders.map((adder) =>
+            emitAdder(
+                adder,
+                catalogue?.adders.find((candidate) => candidate.xmlid === adder.xmlid),
+            ),
+        ),
+    };
+}
+
+/**
+ * A power: a trait, plus its modifiers and any field group it declares.
+ *
+ * The defence split is the one place a number is *derived* rather than asked for. A `.hdc` carries
+ * both the split and a `levels` total, and every character in the corpus has the total equal to
+ * the sum — so `levels` comes from the four rather than being a fifth thing to keep in step.
+ */
+function emitPower(authored: AuthoredPower, position: number, edition: AuthoringEdition): Obj {
+    const catalogue = trait(authored.xmlid, 'powers', edition);
+    const base = emitTrait(authored, 'powers', position, edition);
+
+    const defense =
+        catalogue?.fieldGroup?.kind === 'defense' && authored.defense !== undefined
+            ? {
+                  pdlevels: authored.defense.pd,
+                  edlevels: authored.defense.ed,
+                  mdlevels: authored.defense.mental,
+                  powdlevels: authored.defense.power,
+                  levels: authored.defense.pd + authored.defense.ed + authored.defense.mental + authored.defense.power,
+              }
+            : {};
+
+    return {
+        ...base,
+        ...defense,
+        modifier: authored.modifiers.map((entry, index) => emitModifier(entry, position * 20 + index, edition)),
     };
 }
 
@@ -220,7 +290,7 @@ function parsedFrom(draft: AuthoredCharacter, levels: Record<string, number>): P
         perks: {perk: draft.perks.map((entry, index) => emitTrait(entry, 'perks', index, draft.edition))},
         talents: {talent: draft.talents.map((entry, index) => emitTrait(entry, 'talents', index, draft.edition))},
         martialarts: {},
-        powers: {},
+        powers: {power: draft.powers.map((entry, index) => emitPower(entry, index, draft.edition))},
         equipment: {},
         disadvantages: {disad: draft.complications.map((entry, index) => emitTrait(entry, 'disadvantages', index, draft.edition))},
     } as unknown as ParsedCharacter;

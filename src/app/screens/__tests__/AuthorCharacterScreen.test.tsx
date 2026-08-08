@@ -304,3 +304,75 @@ describe('AuthorCharacterScreen — one renderer for four categories', () => {
         expect(saved[0].document).toEqual(build(full));
     });
 });
+
+describe('AuthorCharacterScreen — powers and their modifiers', () => {
+    const grenade: AuthoredCharacter = {
+        ...emptyDraft('6E'),
+        name: 'Bomber',
+        powers: [
+            {
+                xmlid: 'ENERGYBLAST',
+                name: 'Grenade',
+                input: 'ED',
+                adders: [],
+                levels: 10,
+                modifiers: [
+                    {xmlid: 'AOE', option: 'RADIUS', levels: 8, adders: []},
+                    {xmlid: 'FOCUS', option: 'OAF', adders: []},
+                ],
+            },
+        ],
+    };
+
+    it('shows the real cost, which is what the character actually pays', async () => {
+        const {tree} = await renderScreen({initial: grenade});
+
+        // (50 x 1.5) / 2 = 37. The meter reads real cost, not active — active is what the power
+        // is worth, real is what it costs.
+        expect(textOf(tree, 'author-spend')).toBe('37 spent of 400');
+    });
+
+    it('offers a modifier list on a power and not on a skill', async () => {
+        const {tree} = await renderScreen({
+            initial: {
+                ...emptyDraft('6E'),
+                powers: [{xmlid: 'ENERGYBLAST', name: 'Bolt', input: '', adders: [], levels: 5, modifiers: []}],
+                skills: [{xmlid: 'ACROBATICS', input: '', adders: [], characteristic: 'DEX', levels: 0}],
+            },
+        });
+
+        expect(tree.root.findAllByProps({testID: 'author-add-modifier-powers-0'}).length).toBeGreaterThan(0);
+        expect(tree.root.findAllByProps({testID: 'author-add-modifier-skills-0'})).toHaveLength(0);
+    });
+
+    it('draws the defence fields for Resistant Protection, and blocks a save without them', async () => {
+        const {tree, saved} = await renderScreen({
+            initial: {...emptyDraft('6E'), name: 'Bare', powers: [{xmlid: 'FORCEFIELD', name: 'Skin', input: '', adders: [], levels: 0, modifiers: []}]},
+        });
+
+        for (const field of ['pd', 'ed', 'mental', 'power']) {
+            expect(tree.root.findAllByProps({testID: `author-defense-powers-0-${field}`}).length).toBeGreaterThan(0);
+        }
+
+        expect(textOf(tree, 'author-problem-error-0')).toContain('grants no defence');
+        await press(tree, 'author-save');
+        expect(saved).toHaveLength(0);
+    });
+
+    it('saves and re-opens a power with modifiers and defences intact', async () => {
+        const full: AuthoredCharacter = {
+            ...grenade,
+            powers: [
+                ...grenade.powers,
+                {xmlid: 'FORCEFIELD', name: 'Dense Body', input: '', adders: [], levels: 0, modifiers: [], defense: {pd: 17, ed: 17, mental: 0, power: 0}},
+            ],
+        };
+        const {tree, saved} = await renderScreen({initial: full});
+
+        await press(tree, 'author-save');
+
+        expect(saved).toHaveLength(1);
+        expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(full);
+        expect(saved[0].document).toEqual(build(full));
+    });
+});

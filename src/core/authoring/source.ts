@@ -25,7 +25,7 @@
  * edit it does not.
  */
 import type {StoredSource} from 'core/ports';
-import type {AuthoredAdder, AuthoredCharacter, AuthoredTrait, AuthoringEdition} from './types';
+import type {AuthoredAdder, AuthoredCharacter, AuthoredModifier, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -91,7 +91,11 @@ function parseTrait(value: unknown): AuthoredTrait | null {
         adders.push(adder);
     }
 
-    const {levels, option, characteristic, familiarity} = value;
+    const {levels, option, characteristic, familiarity, name} = value;
+
+    if (name !== undefined && typeof name !== 'string') {
+        return null;
+    }
 
     if (levels !== undefined && (typeof levels !== 'number' || !Number.isInteger(levels))) {
         return null;
@@ -113,6 +117,7 @@ function parseTrait(value: unknown): AuthoredTrait | null {
         xmlid: value.xmlid,
         input: asString(value.input),
         adders,
+        ...(name === undefined ? {} : {name}),
         ...(levels === undefined ? {} : {levels}),
         ...(option === undefined ? {} : {option}),
         ...(characteristic === undefined ? {} : {characteristic}),
@@ -141,6 +146,67 @@ function parseTraits(value: unknown): AuthoredTrait[] | null {
     return traits;
 }
 
+function parseModifier(value: unknown): AuthoredModifier | null {
+    const base = parseTrait(value);
+
+    if (base === null || !isObject(value)) {
+        return null;
+    }
+
+    const {text} = value;
+
+    if (text !== undefined && typeof text !== 'string') {
+        return null;
+    }
+
+    return {
+        xmlid: base.xmlid,
+        adders: base.adders,
+        ...(base.levels === undefined ? {} : {levels: base.levels}),
+        ...(base.option === undefined ? {} : {option: base.option}),
+        ...(text === undefined ? {} : {text}),
+    };
+}
+
+const isDefense = (value: unknown): value is {pd: number; ed: number; mental: number; power: number} =>
+    isObject(value) && (['pd', 'ed', 'mental', 'power'] as const).every((key) => typeof value[key] === 'number' && Number.isInteger(value[key]));
+
+function parsePowers(value: unknown): AuthoredPower[] | null {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    const powers: AuthoredPower[] = [];
+
+    for (const entry of value) {
+        const base = parseTrait(entry);
+
+        if (base === null || !isObject(entry) || !Array.isArray(entry.modifiers)) {
+            return null;
+        }
+
+        const modifiers: AuthoredModifier[] = [];
+
+        for (const raw of entry.modifiers) {
+            const parsed = parseModifier(raw);
+
+            if (parsed === null) {
+                return null;
+            }
+
+            modifiers.push(parsed);
+        }
+
+        if (entry.defense !== undefined && !isDefense(entry.defense)) {
+            return null;
+        }
+
+        powers.push({...base, modifiers, ...(entry.defense === undefined ? {} : {defense: entry.defense})});
+    }
+
+    return powers;
+}
+
 /**
  * A stored source as a draft, or null when it is not one this build understands.
  *
@@ -167,8 +233,9 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
     const perks = parseTraits(source.perks ?? []);
     const talents = parseTraits(source.talents ?? []);
     const complications = parseTraits(source.complications ?? []);
+    const powers = parsePowers(source.powers ?? []);
 
-    if (skills === null || perks === null || talents === null || complications === null) {
+    if (skills === null || perks === null || talents === null || complications === null || powers === null) {
         return null;
     }
 
@@ -180,6 +247,7 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
         skills,
         perks,
         talents,
+        powers,
         complications,
     };
 }
@@ -188,6 +256,7 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
 const traitToSource = (entry: AuthoredTrait): Record<string, unknown> => ({
     xmlid: entry.xmlid,
     input: entry.input,
+    ...(entry.name === undefined ? {} : {name: entry.name}),
     adders: entry.adders.map((adder) => ({...adder})),
     ...(entry.levels === undefined ? {} : {levels: entry.levels}),
     ...(entry.option === undefined ? {} : {option: entry.option}),
@@ -203,5 +272,10 @@ export const toSource = (draft: AuthoredCharacter): StoredSource => ({
     skills: draft.skills.map(traitToSource),
     perks: draft.perks.map(traitToSource),
     talents: draft.talents.map(traitToSource),
+    powers: draft.powers.map((entry) => ({
+        ...traitToSource(entry),
+        modifiers: entry.modifiers.map((mod) => ({...mod, adders: mod.adders.map((adder) => ({...adder}))})),
+        ...(entry.defense === undefined ? {} : {defense: {...entry.defense}}),
+    })),
     complications: draft.complications.map(traitToSource),
 });

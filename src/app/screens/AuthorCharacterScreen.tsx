@@ -38,12 +38,16 @@ import {
     remaining,
     spendOf,
     validate,
+    modifiers,
     withheld,
     type AuthorableCategory,
     type AuthoredCharacter,
+    type AuthoredModifier,
+    type AuthoredPower,
     type AuthoredTrait,
     type AuthoringEdition,
     type CatalogueTrait,
+    type FieldGroup,
     type Problem,
 } from 'core/authoring';
 import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField} from 'app/components';
@@ -269,10 +273,13 @@ function Characteristics({draft, onChange}: {draft: AuthoredCharacter; onChange:
 }
 
 /** How each authorable category is titled and stored on the draft. */
-const SECTIONS: Array<{category: AuthorableCategory; key: 'skills' | 'perks' | 'talents' | 'complications'; title: (edition: AuthoringEdition) => string}> = [
+type DraftKey = 'skills' | 'perks' | 'talents' | 'powers' | 'complications';
+
+const SECTIONS: Array<{category: AuthorableCategory; key: DraftKey; title: (edition: AuthoringEdition) => string}> = [
     {category: 'skills', key: 'skills', title: () => 'SKILLS'},
     {category: 'perks', key: 'perks', title: () => 'PERKS'},
     {category: 'talents', key: 'talents', title: () => 'TALENTS'},
+    {category: 'powers', key: 'powers', title: () => 'POWERS'},
     // The rules rename them between editions, and so does the sheet.
     {category: 'disadvantages', key: 'complications', title: (edition) => (edition === '5E' ? 'DISADVANTAGES' : 'COMPLICATIONS')},
 ];
@@ -292,7 +299,7 @@ function TraitSection({
     onChange,
 }: {
     category: AuthorableCategory;
-    draftKey: 'skills' | 'perks' | 'talents' | 'complications';
+    draftKey: DraftKey;
     title: string;
     draft: AuthoredCharacter;
     onChange: (draft: AuthoredCharacter) => void;
@@ -322,6 +329,8 @@ function TraitSection({
                     adders: [],
                     levels: 0,
                     ...(entry.characteristics.length === 1 ? {characteristic: entry.characteristics[0].characteristic} : {}),
+                    ...(entry.modifiable ? {modifiers: []} : {}),
+                    ...(entry.fieldGroup === null ? {} : {defense: {pd: 0, ed: 0, mental: 0, power: 0}}),
                 },
             ],
         });
@@ -351,6 +360,7 @@ function TraitSection({
                             key={`${entry.xmlid}-${index}`}
                             index={index}
                             draftKey={draftKey}
+                            edition={draft.edition}
                             entry={catalogueEntry}
                             trait={entry}
                             onChange={(revised) => update(index, revised)}
@@ -378,6 +388,7 @@ function TraitSection({
 function TraitRow({
     index,
     draftKey,
+    edition,
     entry,
     trait,
     onChange,
@@ -385,6 +396,7 @@ function TraitRow({
 }: {
     index: number;
     draftKey: string;
+    edition: AuthoringEdition;
     entry: CatalogueTrait;
     trait: AuthoredTrait;
     onChange: (trait: AuthoredTrait) => void;
@@ -406,9 +418,17 @@ function TraitRow({
                 <Button label="Remove" onPress={onRemove} variant="secondary" testID={`author-remove-${id}`} />
             </View>
 
+            {/* Only powers are named. A skill's label is its own name; a power's is whatever the
+                player called it — "Fire Bolt (Blast)". */}
+            {entry.modifiable ? (
+                <TextField label="Name" value={trait.name ?? ''} onChangeText={(name) => onChange({...trait, name})} maxLength={60} testID={`author-name-${id}`} />
+            ) : null}
+
             {entry.inputLabel === null ? null : (
                 <TextField label={entry.inputLabel} value={trait.input} onChangeText={(input) => onChange({...trait, input})} maxLength={80} testID={`author-input-${id}`} />
             )}
+
+            {entry.fieldGroup === null ? null : <DefenseFields id={id} group={entry.fieldGroup} trait={trait} onChange={onChange} />}
 
             {entry.familiarity === null ? null : (
                 <SegmentedControl
@@ -489,6 +509,163 @@ function TraitRow({
                     />
                 );
             })}
+
+            {entry.modifiable ? <Modifiers id={id} edition={edition} power={trait as AuthoredPower} onChange={onChange} /> : null}
+        </View>
+    );
+}
+
+/**
+ * The defences a Resistant Protection is split across.
+ *
+ * Four numbers with no template behind them — see `FieldGroup`. The power's `levels` is derived
+ * from their sum at emit time, so there is nothing here for the player to keep in step.
+ */
+function DefenseFields({
+    id,
+    group,
+    trait,
+    onChange,
+}: {
+    id: string;
+    group: FieldGroup;
+    trait: AuthoredTrait;
+    onChange: (trait: AuthoredTrait) => void;
+}): React.JSX.Element {
+    const defense = (trait as AuthoredPower).defense ?? {pd: 0, ed: 0, mental: 0, power: 0};
+
+    return (
+        <View>
+            <Text variant="caption" muted>
+                {group.label}
+            </Text>
+            <View style={styles.grid}>
+                {group.fields.map((field) => (
+                    <View key={field.key} style={styles.gridCell}>
+                        <NumberField
+                            label={field.label}
+                            value={String(defense[field.key])}
+                            onChangeText={(text) => onChange({...trait, defense: {...defense, [field.key]: Math.max(0, Number.parseInt(text, 10) || 0)}} as AuthoredTrait)}
+                            testID={`author-defense-${id}-${field.key}`}
+                        />
+                    </View>
+                ))}
+            </View>
+        </View>
+    );
+}
+
+/**
+ * A power's advantages and limitations.
+ *
+ * One list, not two, because which is which is the sign of what a modifier ends up costing rather
+ * than a property of the modifier — `ModifierCalculator` splits them on exactly that, and an
+ * option can flip a modifier from one to the other.
+ */
+function Modifiers({
+    id,
+    edition,
+    power,
+    onChange,
+}: {
+    id: string;
+    edition: AuthoringEdition;
+    power: AuthoredPower;
+    onChange: (trait: AuthoredTrait) => void;
+}): React.JSX.Element {
+    const available = useMemo(() => modifiers(edition), [edition]);
+    const byXmlid = useMemo(() => new Map(available.map((entry) => [entry.xmlid, entry])), [available]);
+
+    const add = (display: string): void => {
+        const entry = available.find((candidate) => candidate.display === display);
+
+        if (entry !== undefined) {
+            onChange({...power, modifiers: [...power.modifiers, {xmlid: entry.xmlid, adders: []}]} as AuthoredTrait);
+        }
+    };
+
+    const update = (index: number, revised: AuthoredModifier): void =>
+        onChange({...power, modifiers: power.modifiers.map((entry, position) => (position === index ? revised : entry))} as AuthoredTrait);
+
+    const remove = (index: number): void => onChange({...power, modifiers: power.modifiers.filter((_, position) => position !== index)} as AuthoredTrait);
+
+    return (
+        <View style={styles.modifiers}>
+            <Text variant="caption" muted>
+                Advantages &amp; limitations
+            </Text>
+
+            {power.modifiers.map((applied, index) => {
+                const entry = byXmlid.get(applied.xmlid);
+                const modifierId = `${id}-mod-${index}`;
+
+                return entry === undefined ? (
+                    <Text key={modifierId} testID={`author-modifier-unknown-${modifierId}`}>
+                        {edition} has no “{applied.xmlid}”.
+                    </Text>
+                ) : (
+                    <View key={modifierId} style={styles.complication}>
+                        <View style={styles.complicationHead}>
+                            <Text>{entry.display}</Text>
+                            <Button label="Remove" onPress={() => remove(index)} variant="secondary" testID={`author-remove-${modifierId}`} />
+                        </View>
+
+                        {entry.freeText ? (
+                            <TextField
+                                label={entry.display}
+                                value={applied.text ?? ''}
+                                onChangeText={(text) => update(index, {...applied, text})}
+                                maxLength={80}
+                                testID={`author-modifier-text-${modifierId}`}
+                            />
+                        ) : null}
+
+                        {entry.options.length === 0 ? null : (
+                            <SelectField
+                                label="Which"
+                                value={entry.options.find((option) => option.xmlid === applied.option)?.display ?? ''}
+                                options={entry.options.map((option) => option.display)}
+                                onChange={(display) => update(index, {...applied, option: entry.options.find((option) => option.display === display)?.xmlid})}
+                                testID={`author-modifier-option-${modifierId}`}
+                            />
+                        )}
+
+                        {entry.levels === null ? null : (
+                            <NumberField
+                                label={entry.levels.label}
+                                value={applied.levels === undefined ? '' : String(applied.levels)}
+                                onChangeText={(text) => update(index, {...applied, levels: text.trim() === '' ? 0 : Math.max(0, Number.parseInt(text, 10) || 0)})}
+                                testID={`author-modifier-levels-${modifierId}`}
+                            />
+                        )}
+
+                        {entry.adders.map((adder) => {
+                            const chosen = applied.adders.find((candidate) => candidate.xmlid === adder.xmlid);
+                            const setNested = (patch: {option?: string}): void =>
+                                update(index, {
+                                    ...applied,
+                                    adders:
+                                        chosen === undefined
+                                            ? [...applied.adders, {xmlid: adder.xmlid, ...patch}]
+                                            : applied.adders.map((candidate) => (candidate.xmlid === adder.xmlid ? {...candidate, ...patch} : candidate)),
+                                });
+
+                            return adder.options.length === 0 ? null : (
+                                <SelectField
+                                    key={adder.xmlid}
+                                    label={adder.display}
+                                    value={adder.options.find((option) => option.xmlid === chosen?.option)?.display ?? ''}
+                                    options={adder.options.map((option) => option.display)}
+                                    onChange={(display) => setNested({option: adder.options.find((option) => option.display === display)?.xmlid})}
+                                    testID={`author-modifier-adder-${modifierId}-${adder.xmlid}`}
+                                />
+                            );
+                        })}
+                    </View>
+                );
+            })}
+
+            <SelectField label="Add advantage or limitation" value="" options={available.map((entry) => entry.display)} onChange={add} testID={`author-add-modifier-${id}`} />
         </View>
     );
 }
@@ -541,6 +718,10 @@ const styles = StyleSheet.create({
     },
     complication: {
         rowGap: 8,
+    },
+    modifiers: {
+        rowGap: 8,
+        marginTop: 4,
     },
     complicationHead: {
         flexDirection: 'row',

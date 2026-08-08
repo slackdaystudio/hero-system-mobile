@@ -61,6 +61,13 @@ export interface AuthoredAdder {
  */
 export interface AuthoredTrait {
     readonly xmlid: string;
+    /**
+     * The player's own name for it — "Fire Bolt" for a Blast.
+     *
+     * Distinct from `input`, which answers a question the template asked. A name is what the sheet
+     * leads with, printing "Fire Bolt (Blast)" where an unnamed one is just "Blast".
+     */
+    readonly name?: string;
     readonly input: string;
     readonly adders: readonly AuthoredAdder[];
     /** Levels bought, for anything priced by them — Skill Levels, Contacts, Unluck. */
@@ -87,6 +94,50 @@ export interface AuthoredTrait {
 export type AuthoredComplication = AuthoredTrait;
 
 /**
+ * An advantage or limitation on a power.
+ *
+ * The same shape as an adder, plus its own adders — HERO lets a modifier be modified, and Area Of
+ * Effect is the everyday case: a Radius has an "Accurate" adder of its own.
+ *
+ * Whether it is an advantage or a limitation is not recorded here, because it is not a choice: the
+ * sign of its cost decides, and `ModifierCalculator` splits them on exactly that. Storing a flag
+ * would let a draft disagree with the rules about which is which.
+ */
+export interface AuthoredModifier {
+    readonly xmlid: string;
+    readonly option?: string;
+    readonly levels?: number;
+    readonly text?: string;
+    readonly adders: readonly AuthoredAdder[];
+}
+
+/**
+ * The four defences a Resistant Protection is split across.
+ *
+ * A `.hdc` records the split *and* a `levels` total, and across all 37 corpus characters the total
+ * is always the sum of the four. So the emitter derives it rather than asking twice — the power
+ * costs by `levels` and grants defence by the split, and the two disagreeing is not a state worth
+ * being able to represent.
+ *
+ * Its own field rather than four more adders because it is a genuine gap: nothing in the template
+ * declares these, and `getResistantDefense` reads them straight off the trait. Without them a
+ * Resistant Protection costs full price and grants nothing at all, quietly.
+ */
+export interface AuthoredDefense {
+    readonly pd: number;
+    readonly ed: number;
+    readonly mental: number;
+    readonly power: number;
+}
+
+/** A power: a trait, plus the advantages and limitations that make it cost what it costs. */
+export interface AuthoredPower extends AuthoredTrait {
+    readonly modifiers: readonly AuthoredModifier[];
+    /** Only for the powers whose catalogue entry declares a `defense` field group. */
+    readonly defense?: AuthoredDefense;
+}
+
+/**
  * A character being authored.
  *
  * Characteristics are **totals**, the number a player actually thinks in ("STR 20"), not the
@@ -102,6 +153,7 @@ export interface AuthoredCharacter {
     readonly skills: readonly AuthoredTrait[];
     readonly perks: readonly AuthoredTrait[];
     readonly talents: readonly AuthoredTrait[];
+    readonly powers: readonly AuthoredPower[];
     readonly complications: readonly AuthoredTrait[];
 }
 
@@ -114,5 +166,6 @@ export const emptyDraft = (edition: AuthoringEdition): AuthoredCharacter => ({
     skills: [],
     perks: [],
     talents: [],
+    powers: [],
     complications: [],
 });

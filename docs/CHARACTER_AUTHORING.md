@@ -201,7 +201,7 @@ Each phase is independently shippable and leaves the app coherent.
 | **0** | ✅ **done** — fix H2, teach callers to descend, re-base | Prerequisite for frameworks; stood alone |
 | **A** | ✅ **done** — `core/authoring` emitter, migration 008, `origin: 'authored'`, live points total, characteristics + complications | Delivers a saveable, priced, editable character |
 | **B** | ✅ **done** — skills / perks / talents from the catalogue, one generic renderer | The generic renderer earns its keep here |
-| **C** | Powers: levels, options, adders, **modifiers** | The big one — advantages/limitations, and the per-power field long tail |
+| **C** | ✅ **done** — powers, advantages/limitations, and the first field group | The big one — and the per-power long tail is now a named, countable list |
 | **D** | Frameworks (Multipower / EC / VPP) | Needs Phase 0 |
 | **E** | Martial arts, equipment | 56 maneuvers per edition, largely table-driven |
 
@@ -278,6 +278,48 @@ catalogue is how you end up offering a trait the engine cannot match. It also do
 quirk worth knowing: normalization concatenates the entries it collected onto the array they partly
 came from, so every plainly-declared skill appears **twice**. Harmless to the engine, which only
 ever looks one up by xmlid; a catalogue has to de-duplicate.
+
+## What Phase C actually built
+
+**Modifiers are the headline, and they needed no new pricing code.** `ModifierCalculator` already
+defines `activeCost = cost x (1 + sum advantages)` and `realCost = activeCost / (1 - sum
+limitations)`; Phase C just had to emit modifiers the engine recognises. A Blast with Area Of
+Effect and an Obvious Accessible Focus comes out `base 50 / active 75 / real 37`, and all three are
+pinned, because they answer different questions.
+
+**Nothing records whether a modifier is an advantage or a limitation** — the sign of its computed
+cost decides, and `ModifierCalculator` splits on exactly that. An option can flip a modifier from
+one to the other, so a stored flag could disagree with the rules. The UI shows one list for the
+same reason.
+
+**Modifiers have their own adders, one level deep.** Area Of Effect is the everyday case: a Radius
+*and* a Selective/Explosion/Mobile adder that changes what it costs. Without nested adders in the
+catalogue an AOE silently prices as its bare option.
+
+### The per-power long tail, made countable
+
+The analysis warned that ~37 power decorators read fields no template declares. That turned out to
+be **five** decorators in practice (`barrier`, `duplication`, `enduranceReserve`, `flash`,
+`senseAffectingPower`) plus Resistant Protection, whose fields are read by the *character-level*
+defence queries rather than by a power decorator at all.
+
+Resistant Protection got a declared **field group** rather than being withheld, because it is the
+most-taken defensive power in the corpus and the failure is invisible: emitted without
+`pdlevels`/`edlevels`/`mdlevels`/`powdlevels` it costs full price and grants **no defence**. The
+`.hdc` also carries a `levels` total, and across all 37 corpus characters that total is always the
+sum of the four — so the emitter derives it rather than asking twice.
+
+Everything else stays in `BESPOKE`, which is now a named list with a reason attached rather than a
+vague warning. **6E offers 74 of 101 powers, 5E 79 of 102.** The withheld ones are the five
+decorator cases, the framework/container powers (Phase D), and the sense-enhancements that state no
+cost because they belong to a sense rather than to a sheet.
+
+### A bug worth remembering
+
+`asArray(entry.adder).map(adderOf)` — `Array.prototype.map` passes the **index** as the second
+argument, which landed in `adderOf`'s `depth` parameter and read as "you are already nested" for
+every adder but the first. Nested adders silently vanished. The signature is now `depth: 0 | 1` and
+the comment says why; a default parameter that means something is a trap next to `.map`.
 
 ## Risks worth naming up front
 

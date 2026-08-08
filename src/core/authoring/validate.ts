@@ -31,8 +31,8 @@
  *   - `error`   — the engine will mis-price or refuse this. Saving it produces a wrong character.
  *   - `warning` — legal, priced correctly, but probably not what was meant (over budget, blank).
  */
-import {AUTHORABLE_CATEGORIES, characteristics, complications, trait, type AuthorableCategory, type CatalogueTrait} from './catalogue';
-import type {AuthoredCharacter, AuthoredTrait, AuthoringEdition} from './types';
+import {AUTHORABLE_CATEGORIES, characteristics, complications, modifier, trait, type AuthorableCategory, type CatalogueTrait} from './catalogue';
+import type {AuthoredCharacter, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
 
 export type Severity = 'error' | 'warning';
 
@@ -51,6 +51,7 @@ const CATEGORY_NOUN: Readonly<Record<AuthorableCategory, string>> = {
     skills: 'skill',
     perks: 'perk',
     talents: 'talent',
+    powers: 'power',
     disadvantages: 'complication',
 };
 
@@ -180,12 +181,70 @@ function validateTraitFields(authored: AuthoredTrait, catalogue: CatalogueTrait,
 const authorableCharacteristics = (edition: AuthoringEdition): ReadonlySet<string> => new Set(characteristics(edition).map((entry) => entry.key));
 
 /** Where each catalogue category lives on a draft — `disadvantages` is called `complications` there. */
-const DRAFT_KEY: Readonly<Record<AuthorableCategory, 'skills' | 'perks' | 'talents' | 'complications'>> = {
+const DRAFT_KEY: Readonly<Record<AuthorableCategory, 'skills' | 'perks' | 'talents' | 'powers' | 'complications'>> = {
     skills: 'skills',
     perks: 'perks',
     talents: 'talents',
+    powers: 'powers',
     disadvantages: 'complications',
 };
+
+/**
+ * A power's modifiers, and the fields no template describes.
+ *
+ * A modifier the edition does not define resolves to no template and contributes **nothing** to
+ * the multiplier, so the power comes out at its unmodified price and reads as though the advantage
+ * were free. Same failure as an unknown trait, one level down.
+ */
+function validatePower(power: AuthoredPower, index: number, edition: AuthoringEdition): Problem[] {
+    const path = `powers[${index}]`;
+    const catalogue = trait(power.xmlid, 'powers', edition);
+
+    if (catalogue === null || catalogue.unsupported !== null) {
+        return []; // already reported by validateTrait; saying it twice helps nobody
+    }
+
+    const problems: Problem[] = [];
+
+    for (const applied of power.modifiers) {
+        const entry = modifier(applied.xmlid, edition);
+
+        if (entry === null) {
+            problems.push({
+                severity: 'error',
+                path,
+                message: `${edition} has no modifier "${applied.xmlid}". It would change the cost by nothing at all.`,
+            });
+            continue;
+        }
+
+        if (entry.options.length > 0 && !entry.options.some((option) => option.xmlid === applied.option)) {
+            problems.push({severity: 'error', path, message: `"${entry.display}" needs one of: ${entry.options.map((option) => option.display).join(', ')}.`});
+        }
+
+        if (entry.freeText && (applied.text ?? '').trim() === '') {
+            problems.push({severity: 'error', path, message: `"${entry.display}" needs some text — it is what the sheet prints.`});
+        }
+    }
+
+    // A declared field group is not optional: `getResistantDefense` reads those numbers straight
+    // off the trait, so a Resistant Protection without them costs full price and defends nothing.
+    if (catalogue.fieldGroup !== null && power.defense === undefined) {
+        problems.push({severity: 'error', path, message: `${catalogue.display} needs its ${catalogue.fieldGroup.label.toLowerCase()} — without them it costs points and grants no defence.`});
+    }
+
+    if (power.defense !== undefined) {
+        const values = [power.defense.pd, power.defense.ed, power.defense.mental, power.defense.power];
+
+        if (values.some((value) => !Number.isInteger(value) || value < 0)) {
+            problems.push({severity: 'error', path, message: `${catalogue.display} must have whole, non-negative defences.`});
+        } else if (values.every((value) => value === 0)) {
+            problems.push({severity: 'warning', path, message: `${catalogue.display} grants no defence.`});
+        }
+    }
+
+    return problems;
+}
 
 /**
  * Everything wrong with a draft, most severe first.
@@ -227,6 +286,8 @@ export function validate(draft: AuthoredCharacter): Problem[] {
     for (const category of Object.keys(AUTHORABLE_CATEGORIES) as AuthorableCategory[]) {
         draft[DRAFT_KEY[category]].forEach((entry, index) => problems.push(...validateTrait(entry, category, index, draft.edition)));
     }
+
+    draft.powers.forEach((power, index) => problems.push(...validatePower(power, index, draft.edition)));
 
     return [...problems].sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'error' ? -1 : 1));
 }
