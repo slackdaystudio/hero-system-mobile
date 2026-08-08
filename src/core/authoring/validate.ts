@@ -31,8 +31,8 @@
  *   - `error`   — the engine will mis-price or refuse this. Saving it produces a wrong character.
  *   - `warning` — legal, priced correctly, but probably not what was meant (over budget, blank).
  */
-import {characteristics, complication, complications} from './catalogue';
-import type {AuthoredCharacter, AuthoredComplication, AuthoringEdition} from './types';
+import {AUTHORABLE_CATEGORIES, characteristics, complications, trait, type AuthorableCategory, type CatalogueTrait} from './catalogue';
+import type {AuthoredCharacter, AuthoredTrait, AuthoringEdition} from './types';
 
 export type Severity = 'error' | 'warning';
 
@@ -46,9 +46,17 @@ export interface Problem {
 /** True when nothing is an `error`. Warnings never block a save — they are advice. */
 export const isSaveable = (problems: readonly Problem[]): boolean => !problems.some((problem) => problem.severity === 'error');
 
-function validateComplication(authored: AuthoredComplication, index: number, edition: AuthoringEdition): Problem[] {
-    const path = `complications[${index}]`;
-    const catalogue = complication(authored.xmlid, edition);
+/** What the player calls each category, for a message they can act on. */
+const CATEGORY_NOUN: Readonly<Record<AuthorableCategory, string>> = {
+    skills: 'skill',
+    perks: 'perk',
+    talents: 'talent',
+    disadvantages: 'complication',
+};
+
+function validateTrait(authored: AuthoredTrait, category: AuthorableCategory, index: number, edition: AuthoringEdition): Problem[] {
+    const path = `${category}[${index}]`;
+    const catalogue = trait(authored.xmlid, category, edition);
 
     if (catalogue === null) {
         return [
@@ -57,12 +65,25 @@ function validateComplication(authored: AuthoredComplication, index: number, edi
                 path,
                 // The specific trap: not "unknown", but "this edition doesn't have it". 6E deleted
                 // entries 5E had, and the engine's answer to a missing template is 0, not an error.
-                message: `${edition} has no complication "${authored.xmlid}". It would price at 0 rather than fail.`,
+                message: `${edition} has no ${CATEGORY_NOUN[category]} "${authored.xmlid}". It would price at 0 rather than fail.`,
             },
         ];
     }
 
-    const problems: Problem[] = [];
+    if (catalogue.unsupported !== null) {
+        return [
+            {
+                severity: 'error',
+                path,
+                message:
+                    catalogue.unsupported === 'bespoke'
+                        ? `${catalogue.display} needs a form of its own — it is priced by fields no template declares.`
+                        : `${catalogue.display} states no cost, so nothing here could price it.`,
+            },
+        ];
+    }
+
+    const problems: Problem[] = [...validateTraitFields(authored, catalogue, path)];
     const chosen = new Map(authored.adders.map((adder) => [adder.xmlid, adder]));
 
     for (const adder of catalogue.adders) {
@@ -109,10 +130,62 @@ function validateComplication(authored: AuthoredComplication, index: number, edi
 }
 
 /**
+ * The fields a trait carries in its own right — characteristic, option, levels, familiarity.
+ *
+ * Each of these fails silently rather than loudly, which is why they are errors and not warnings:
+ *   - a skill with no `characteristic` falls through `Skill.cost()` to its own `basecost`, which
+ *     most skills do not declare, so it costs 0 and still renders;
+ *   - `Roll` computes `base + trait.levels` unguarded, so a non-integer level prints "NaN-";
+ *   - `SkillLevels.cost()` divides by the *chosen option's* `lvlval`, so no option means
+ *     dividing by undefined.
+ */
+function validateTraitFields(authored: AuthoredTrait, catalogue: CatalogueTrait, path: string): Problem[] {
+    const problems: Problem[] = [];
+
+    if (catalogue.characteristics.length > 0 && authored.familiarity !== true) {
+        if (authored.characteristic === undefined) {
+            problems.push({severity: 'error', path, message: `${catalogue.display} must say which characteristic it rolls against.`});
+        } else if (!catalogue.characteristics.some((choice) => choice.characteristic === authored.characteristic)) {
+            problems.push({
+                severity: 'error',
+                path,
+                message: `${catalogue.display} cannot be based on ${authored.characteristic} — only ${catalogue.characteristics.map((choice) => choice.characteristic).join(', ')}.`,
+            });
+        }
+    }
+
+    if (catalogue.options.length > 0 && !catalogue.options.some((option) => option.xmlid === authored.option)) {
+        problems.push({
+            severity: 'error',
+            path,
+            message: `${catalogue.display} needs one of: ${catalogue.options.map((option) => option.display).join(', ')}.`,
+        });
+    }
+
+    if (authored.levels !== undefined && (!Number.isInteger(authored.levels) || authored.levels < 0)) {
+        problems.push({severity: 'error', path, message: `${catalogue.display} must have a whole, non-negative number of levels.`});
+    }
+
+    if (authored.familiarity === true && catalogue.familiarity === null) {
+        problems.push({severity: 'error', path, message: `${catalogue.display} cannot be taken at familiarity.`});
+    }
+
+    return problems;
+}
+
+/**
  * Every characteristic key this edition defines, as a set — anything else is not authorable.
  * Derived from the same catalogue the UI renders, so the two cannot disagree about what exists.
  */
 const authorableCharacteristics = (edition: AuthoringEdition): ReadonlySet<string> => new Set(characteristics(edition).map((entry) => entry.key));
+
+/** Where each catalogue category lives on a draft — `disadvantages` is called `complications` there. */
+const DRAFT_KEY: Readonly<Record<AuthorableCategory, 'skills' | 'perks' | 'talents' | 'complications'>> = {
+    skills: 'skills',
+    perks: 'perks',
+    talents: 'talents',
+    disadvantages: 'complications',
+};
 
 /**
  * Everything wrong with a draft, most severe first.
@@ -151,7 +224,9 @@ export function validate(draft: AuthoredCharacter): Problem[] {
         problems.push({severity: 'warning', path: 'complications', message: 'No complications taken.'});
     }
 
-    draft.complications.forEach((entry, index) => problems.push(...validateComplication(entry, index, draft.edition)));
+    for (const category of Object.keys(AUTHORABLE_CATEGORIES) as AuthorableCategory[]) {
+        draft[DRAFT_KEY[category]].forEach((entry, index) => problems.push(...validateTrait(entry, category, index, draft.edition)));
+    }
 
     return [...problems].sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'error' ? -1 : 1));
 }

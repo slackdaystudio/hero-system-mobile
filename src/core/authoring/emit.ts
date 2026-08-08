@@ -37,8 +37,8 @@
 import type {ParsedCharacter} from 'core/hero';
 import {getTemplate} from 'core/templates';
 import {heroDesignerCharacter} from 'core/hero';
-import {complication, templateFor, type CatalogueAdder} from './catalogue';
-import type {AuthoredAdder, AuthoredCharacter, AuthoredComplication, AuthoringEdition} from './types';
+import {templateFor, trait, type AuthorableCategory, type CatalogueAdder} from './catalogue';
+import type {AuthoredAdder, AuthoredCharacter, AuthoredTrait, AuthoringEdition} from './types';
 
 type Obj = Record<string, any>;
 
@@ -51,6 +51,9 @@ type Obj = Record<string, any>;
  */
 const ID_BASE: Readonly<Record<string, number>> = {
     characteristics: 1000,
+    skills: 2000,
+    perks: 3000,
+    talents: 4000,
     disadvantages: 5000,
 };
 
@@ -130,9 +133,7 @@ function emitAdder(chosen: AuthoredAdder, catalogue: CatalogueAdder | undefined)
           };
 }
 
-const DISADVANTAGE_DEFAULTS: Obj = {
-    basecost: 0,
-    levels: 0,
+const TRAIT_DEFAULTS: Obj = {
     multiplier: 1,
     name: null,
     notes: null,
@@ -140,19 +141,43 @@ const DISADVANTAGE_DEFAULTS: Obj = {
     affectsTotal: true,
 };
 
-function emitComplication(authored: AuthoredComplication, position: number, edition: AuthoringEdition): Obj {
-    const catalogue = complication(authored.xmlid, edition);
+/**
+ * One trait — skill, perk, talent or complication — in the shape the engine reads.
+ *
+ * All four go through here because the `.hdc` format makes no structural distinction between them:
+ * an xmlid, optional free text, an optional pick-one, levels, and adders. What differs is which of
+ * those the template declares, and the catalogue already answers that.
+ *
+ * **`levels` is always emitted, and always a number.** `Roll` computes a skill roll as
+ * `base + trait.levels`, unguarded — an absent `levels` makes that `NaN` and the sheet prints
+ * "NaN-" rather than failing. Most other numeric fields can be left out; this one cannot.
+ */
+function emitTrait(authored: AuthoredTrait, category: AuthorableCategory, position: number, edition: AuthoringEdition): Obj {
+    const catalogue = trait(authored.xmlid, category, edition);
+    const option = catalogue?.options.find((candidate) => candidate.xmlid === authored.option);
 
     return {
-        ...DISADVANTAGE_DEFAULTS,
+        ...TRAIT_DEFAULTS,
         xmlid: authored.xmlid,
-        id: ID_BASE.disadvantages + position,
+        id: ID_BASE[category] + position,
         alias: catalogue?.display ?? authored.xmlid,
         position,
-        // `input` drives the sheet label ("Psychological: Code Of The Hero"). The engine keys on
-        // the property *existing*, so an unanswered one is omitted rather than sent as ''.
+        // From the template, because that is where a real `.hdc` gets it. `CharacterTrait.cost()`
+        // reads the *trait's* basecost and never the template's, so a 3-point Talent emitted
+        // without it costs nothing and still renders — the silent-zero trap, from the inside.
+        basecost: catalogue?.basecost ?? 0,
+        levels: authored.levels ?? 0,
+        // `input` drives the sheet label ("Psychological: Code Of The Hero", "Language: French").
+        // The engine keys on the property *existing*, so an unanswered one is omitted rather than
+        // sent as an empty string.
         ...(authored.input.trim() === '' ? {} : {input: authored.input.trim()}),
-        ...(authored.levels === undefined ? {} : {levels: authored.levels}),
+        // `Skill.cost()` reads `characteristic` to find its price in the template's
+        // characteristicChoice, and `Roll` reads it to find what the skill rolls against.
+        ...(authored.characteristic === undefined ? {} : {characteristic: authored.characteristic}),
+        // Truthiness is what the decorators test, so an unticked box is omitted rather than false —
+        // matching a real `.hdc`, where FAMILIARITY="No" parses to the boolean.
+        ...(authored.familiarity === true ? {familiarity: true} : {}),
+        ...(option === undefined ? {} : {option: option.xmlid, optionid: option.xmlid, optionAlias: option.display}),
         adder: authored.adders.map((adder) =>
             emitAdder(
                 adder,
@@ -191,15 +216,13 @@ function parsedFrom(draft: AuthoredCharacter, levels: Record<string, number>): P
         },
         characteristics,
         // All seven present, every time — `populateTrait` throws on `undefined`, not on `null`.
-        skills: {},
-        perks: {},
-        talents: {},
+        skills: {skill: draft.skills.map((entry, index) => emitTrait(entry, 'skills', index, draft.edition))},
+        perks: {perk: draft.perks.map((entry, index) => emitTrait(entry, 'perks', index, draft.edition))},
+        talents: {talent: draft.talents.map((entry, index) => emitTrait(entry, 'talents', index, draft.edition))},
         martialarts: {},
         powers: {},
         equipment: {},
-        disadvantages: {
-            disad: draft.complications.map((entry, index) => emitComplication(entry, index, draft.edition)),
-        },
+        disadvantages: {disad: draft.complications.map((entry, index) => emitTrait(entry, 'disadvantages', index, draft.edition))},
     } as unknown as ParsedCharacter;
 }
 

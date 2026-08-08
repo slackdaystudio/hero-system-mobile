@@ -25,7 +25,7 @@
  * edit it does not.
  */
 import type {StoredSource} from 'core/ports';
-import type {AuthoredAdder, AuthoredCharacter, AuthoredComplication, AuthoringEdition} from './types';
+import type {AuthoredAdder, AuthoredCharacter, AuthoredTrait, AuthoringEdition} from './types';
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -74,7 +74,7 @@ function parseAdder(value: unknown): AuthoredAdder | null {
     };
 }
 
-function parseComplication(value: unknown): AuthoredComplication | null {
+function parseTrait(value: unknown): AuthoredTrait | null {
     if (!isObject(value) || typeof value.xmlid !== 'string' || !Array.isArray(value.adders)) {
         return null;
     }
@@ -91,9 +91,21 @@ function parseComplication(value: unknown): AuthoredComplication | null {
         adders.push(adder);
     }
 
-    const {levels} = value;
+    const {levels, option, characteristic, familiarity} = value;
 
     if (levels !== undefined && (typeof levels !== 'number' || !Number.isInteger(levels))) {
+        return null;
+    }
+
+    if (option !== undefined && typeof option !== 'string') {
+        return null;
+    }
+
+    if (characteristic !== undefined && typeof characteristic !== 'string') {
+        return null;
+    }
+
+    if (familiarity !== undefined && typeof familiarity !== 'boolean') {
         return null;
     }
 
@@ -102,7 +114,31 @@ function parseComplication(value: unknown): AuthoredComplication | null {
         input: asString(value.input),
         adders,
         ...(levels === undefined ? {} : {levels}),
+        ...(option === undefined ? {} : {option}),
+        ...(characteristic === undefined ? {} : {characteristic}),
+        ...(familiarity === undefined ? {} : {familiarity}),
     };
+}
+
+/** A whole category, or null if any entry in it is unreadable. */
+function parseTraits(value: unknown): AuthoredTrait[] | null {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    const traits: AuthoredTrait[] = [];
+
+    for (const entry of value) {
+        const parsed = parseTrait(entry);
+
+        if (parsed === null) {
+            return null;
+        }
+
+        traits.push(parsed);
+    }
+
+    return traits;
 }
 
 /**
@@ -114,7 +150,7 @@ function parseComplication(value: unknown): AuthoredComplication | null {
  * people out of their own characters.
  */
 export function parseSource(source: StoredSource | null | undefined): AuthoredCharacter | null {
-    if (!isObject(source) || !isEdition(source.edition) || !Array.isArray(source.complications)) {
+    if (!isObject(source) || !isEdition(source.edition)) {
         return null;
     }
 
@@ -124,16 +160,16 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
         return null;
     }
 
-    const complications: AuthoredComplication[] = [];
+    // Categories added after Phase A: a source written before they existed has no such key, and
+    // reads as empty rather than as unreadable. Refusing it would make a schema addition lock
+    // players out of characters they had already saved.
+    const skills = parseTraits(source.skills ?? []);
+    const perks = parseTraits(source.perks ?? []);
+    const talents = parseTraits(source.talents ?? []);
+    const complications = parseTraits(source.complications ?? []);
 
-    for (const entry of source.complications) {
-        const complication = parseComplication(entry);
-
-        if (complication === null) {
-            return null;
-        }
-
-        complications.push(complication);
+    if (skills === null || perks === null || talents === null || complications === null) {
+        return null;
     }
 
     return {
@@ -141,20 +177,31 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
         name: asString(source.name),
         player: asString(source.player),
         characteristics,
+        skills,
+        perks,
+        talents,
         complications,
     };
 }
 
 /** A draft as the JSON the `source` column stores. A plain projection — no engine data rides along. */
+const traitToSource = (entry: AuthoredTrait): Record<string, unknown> => ({
+    xmlid: entry.xmlid,
+    input: entry.input,
+    adders: entry.adders.map((adder) => ({...adder})),
+    ...(entry.levels === undefined ? {} : {levels: entry.levels}),
+    ...(entry.option === undefined ? {} : {option: entry.option}),
+    ...(entry.characteristic === undefined ? {} : {characteristic: entry.characteristic}),
+    ...(entry.familiarity === undefined ? {} : {familiarity: entry.familiarity}),
+});
+
 export const toSource = (draft: AuthoredCharacter): StoredSource => ({
     edition: draft.edition,
     name: draft.name,
     player: draft.player,
     characteristics: {...draft.characteristics},
-    complications: draft.complications.map((entry) => ({
-        xmlid: entry.xmlid,
-        input: entry.input,
-        adders: entry.adders.map((adder) => ({...adder})),
-        ...(entry.levels === undefined ? {} : {levels: entry.levels}),
-    })),
+    skills: draft.skills.map(traitToSource),
+    perks: draft.perks.map(traitToSource),
+    talents: draft.talents.map(traitToSource),
+    complications: draft.complications.map(traitToSource),
 });

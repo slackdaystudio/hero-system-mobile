@@ -22,7 +22,7 @@
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
 import type {CharacterRepository, SaveCharacter} from 'core/ports';
-import {parseSource, build, emit, type AuthoredCharacter} from 'core/authoring';
+import {parseSource, build, emit, emptyDraft, type AuthoredCharacter} from 'core/authoring';
 import type {Repositories} from 'infra/persistence/repositories';
 import {AuthoringProvider} from 'app/providers/AuthoringProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
@@ -107,7 +107,7 @@ describe('AuthorCharacterScreen', () => {
         await type(tree, 'author-char-str', '30');
         await type(tree, 'author-char-con', '25');
 
-        const reference = build({edition: '6E', name: '', player: '', characteristics: {str: 30, con: 25}, complications: []});
+        const reference = build({...emptyDraft('6E'), characteristics: {str: 30, con: 25}});
         const spent = (reference.characteristics as Obj[]).reduce((total, entry) => total + Number(entry.cost), 0);
 
         expect(textOf(tree, 'author-spend')).toBe(`${spent} spent of 400`);
@@ -127,14 +127,14 @@ describe('AuthorCharacterScreen', () => {
         const sixth = await renderScreen();
         expect(textOf(sixth.tree, 'author-complications-total')).toContain('grant no points');
 
-        const fifth = await renderScreen({initial: {edition: '5E', name: 'Fifth', player: '', characteristics: {}, complications: []}});
+        const fifth = await renderScreen({initial: {...emptyDraft('5E'), name: 'Fifth'}});
         expect(textOf(fifth.tree, 'author-complications-total')).toContain('fund the build');
     });
 });
 
 describe('AuthorCharacterScreen — saving', () => {
     const draft: AuthoredCharacter = {
-        edition: '6E',
+        ...emptyDraft('6E'),
         name: 'Testable',
         player: 'Phil',
         characteristics: {str: 20, dex: 18},
@@ -201,7 +201,7 @@ describe('AuthorCharacterScreen — saving', () => {
 describe('AuthorCharacterScreen — refusing to save what the engine cannot price', () => {
     it('blocks a complication missing its required adders, and says which', async () => {
         const {tree, saved} = await renderScreen({
-            initial: {edition: '6E', name: 'Broken', player: '', characteristics: {}, complications: [{xmlid: 'PSYCHOLOGICALLIMITATION', input: 'Code', adders: []}]},
+            initial: {...emptyDraft('6E'), name: 'Broken', complications: [{xmlid: 'PSYCHOLOGICALLIMITATION', input: 'Code', adders: []}]},
         });
 
         expect(textOf(tree, 'author-problem-error-0')).toContain('Situation');
@@ -213,7 +213,7 @@ describe('AuthorCharacterScreen — refusing to save what the engine cannot pric
 
     it('blocks a complication this edition does not define — the silent-zero trap', async () => {
         const {tree, saved} = await renderScreen({
-            initial: {edition: '6E', name: 'Broken', player: '', characteristics: {}, complications: [{xmlid: 'NOT_REAL', input: '', adders: []}]},
+            initial: {...emptyDraft('6E'), name: 'Broken', complications: [{xmlid: 'NOT_REAL', input: '', adders: []}]},
         });
 
         expect(textOf(tree, 'author-problem-error-0')).toContain('has no complication');
@@ -225,12 +225,82 @@ describe('AuthorCharacterScreen — refusing to save what the engine cannot pric
     });
 
     it('warns without blocking when a character has no name', async () => {
-        const {tree, saved} = await renderScreen({initial: {edition: '6E', name: '', player: '', characteristics: {str: 20}, complications: []}});
+        const {tree, saved} = await renderScreen({initial: {...emptyDraft('6E'), characteristics: {str: 20}}});
 
         expect(tree.root.findAllByProps({testID: 'author-problem-warning-0'}).length).toBeGreaterThan(0);
 
         await press(tree, 'author-save');
         expect(saved).toHaveLength(1);
         expect(saved[0].name).toBe('Unnamed');
+    });
+});
+
+describe('AuthorCharacterScreen — one renderer for four categories', () => {
+    it('offers a section per category, each populated from its own catalogue', async () => {
+        const {tree} = await renderScreen();
+
+        for (const key of ['skills', 'perks', 'talents', 'complications']) {
+            expect(tree.root.findAllByProps({testID: `author-add-${key}`}).length).toBeGreaterThan(0);
+        }
+    });
+
+    it('says how many entries need a form of their own rather than quietly shortening the list', async () => {
+        const {tree} = await renderScreen();
+        const add = tree.root.findAllByProps({testID: 'author-add-skills'}).find((node) => node.props.hint !== undefined);
+
+        // A shorter list reads as "the app lacks Weapon Familiarity"; this reads as "not yet".
+        expect(add?.props.hint).toMatch(/\d+ more need a form of their own/);
+    });
+
+    it('prices a skill through the same engine the meter uses', async () => {
+        const skill: AuthoredCharacter = {
+            ...emptyDraft('6E'),
+            name: 'Tumbler',
+            characteristics: {dex: 18},
+            skills: [{xmlid: 'ACROBATICS', input: '', adders: [], characteristic: 'DEX', levels: 2}],
+        };
+        const {tree} = await renderScreen({initial: skill});
+
+        // DEX 18 is 16 points; Acrobatics +2 is 3 + 2*2 = 7.
+        expect(textOf(tree, 'author-spend')).toBe('23 spent of 400');
+    });
+
+    it('blocks a skill with no characteristic chosen, which would price at 0', async () => {
+        const {tree, saved} = await renderScreen({
+            initial: {...emptyDraft('6E'), name: 'Broken', skills: [{xmlid: 'ACROBATICS', input: '', adders: [], levels: 0}]},
+        });
+
+        expect(textOf(tree, 'author-problem-error-0')).toContain('which characteristic');
+
+        await press(tree, 'author-save');
+        expect(saved).toHaveLength(0);
+    });
+
+    it('saves and re-opens a character with all four categories filled', async () => {
+        const full: AuthoredCharacter = {
+            ...emptyDraft('6E'),
+            name: 'Complete',
+            characteristics: {dex: 18},
+            skills: [{xmlid: 'LANGUAGES', input: 'French', adders: [], option: 'FLUENT', levels: 0}],
+            perks: [{xmlid: 'ANONYMITY', input: '', adders: [], levels: 0}],
+            talents: [{xmlid: 'COMBAT_LUCK', input: '', adders: [], levels: 2}],
+            complications: [
+                {
+                    xmlid: 'PSYCHOLOGICALLIMITATION',
+                    input: 'Code Of The Hero',
+                    adders: [
+                        {xmlid: 'SITUATION', option: 'COMMON'},
+                        {xmlid: 'INTENSITY', option: 'STRONG'},
+                    ],
+                },
+            ],
+        };
+        const {tree, saved} = await renderScreen({initial: full});
+
+        await press(tree, 'author-save');
+
+        expect(saved).toHaveLength(1);
+        expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(full);
+        expect(saved[0].document).toEqual(build(full));
     });
 });

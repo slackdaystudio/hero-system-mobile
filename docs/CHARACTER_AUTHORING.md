@@ -200,7 +200,7 @@ Each phase is independently shippable and leaves the app coherent.
 |---|---|---|
 | **0** | ✅ **done** — fix H2, teach callers to descend, re-base | Prerequisite for frameworks; stood alone |
 | **A** | ✅ **done** — `core/authoring` emitter, migration 008, `origin: 'authored'`, live points total, characteristics + complications | Delivers a saveable, priced, editable character |
-| **B** | Skills / perks / talents from the catalogue, template-driven forms | The generic renderer earns its keep here |
+| **B** | ✅ **done** — skills / perks / talents from the catalogue, one generic renderer | The generic renderer earns its keep here |
 | **C** | Powers: levels, options, adders, **modifiers** | The big one — advantages/limitations, and the per-power field long tail |
 | **D** | Frameworks (Multipower / EC / VPP) | Needs Phase 0 |
 | **E** | Martial arts, equipment | 56 maneuvers per edition, largely table-driven |
@@ -241,6 +241,43 @@ reimplemented. Same trick `core/random/characteristics` uses.
 scanning both templates), so it is detected from the data rather than hardcoded, but it is **not a
 general mechanism** and should not become one. Expect a handful more of these per phase; that is
 the per-family long tail, and it is the honest cost of the feature.
+
+## What Phase B actually built
+
+**One renderer for four categories.** Skills, perks, talents and complications differ in which
+fields their template entries declare, not in kind, so `TraitSection`/`TraitRow` draw whatever the
+catalogue reports and nothing in the screen names a specific trait. Adding Phase B's three
+categories added no per-trait UI code at all.
+
+`AuthoredTrait` is one shape for all four, gaining `characteristic`, `option` and `familiarity`
+alongside Phase A's `input`/`levels`/`adders`. `CatalogueTrait` likewise.
+
+**Coverage, stated rather than silent.** `authorable()` is what the UI offers; `withheld()` is what
+it does not, and the "Add" field shows the count. In 6E that is 59 of 68 skills, 9 of 13 perks and
+22 of 24 talents. The withheld ones are traits whose decorators read fields no template declares —
+Weapon Familiarity's category/member split, Transport Familiarity's nested adder tree, Autofire
+Skills' per-skill list. Shrinking `BESPOKE` is a later phase, one decorator at a time.
+
+**Two things the engine needed that the template alone doesn't give you:**
+
+- **`basecost` must be copied onto the trait.** `CharacterTrait.cost()` reads the *trait's*
+  basecost and never the template's — the template is consulted for per-level prices only. A
+  3-point Talent emitted without it prices at 0 and still renders. Found by building one.
+- **`levels` must always be emitted as a number.** `Roll` computes `base + trait.levels` unguarded,
+  so an absent `levels` prints `NaN-` rather than failing.
+
+**A skill has three ways to be priced, and picking the wrong one costs nothing rather than
+failing**: by characteristic (`characteristicChoice`), by familiarity (a flat 8- for a point), or
+by a chosen option (a Language's fluency, a Skill Level's breadth). The validator treats a missing
+characteristic as an error for exactly that reason, and the test that says so is paired with a
+build showing the same skill priced at 0.
+
+**`normalizedTemplate` is new on `core/hero`.** An entry's xmlid is often *derived* from the sub-key
+it sits under (`knowledgeSkill` → `KNOWLEDGE_SKILL`), and deriving it a second time in the
+catalogue is how you end up offering a trait the engine cannot match. It also documents a legacy
+quirk worth knowing: normalization concatenates the entries it collected onto the array they partly
+came from, so every plainly-declared skill appears **twice**. Harmless to the engine, which only
+ever looks one up by xmlid; a catalogue has to de-duplicate.
 
 ## Risks worth naming up front
 

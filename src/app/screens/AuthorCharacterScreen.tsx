@@ -28,8 +28,9 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {Alert, ScrollView, StyleSheet, View} from 'react-native';
 import {
+    authorable,
     build,
-    complications as catalogueComplications,
+    catalogue,
     characteristics as catalogueCharacteristics,
     DEFAULT_BUDGET,
     emptyDraft,
@@ -37,10 +38,12 @@ import {
     remaining,
     spendOf,
     validate,
+    withheld,
+    type AuthorableCategory,
     type AuthoredCharacter,
-    type AuthoredComplication,
+    type AuthoredTrait,
     type AuthoringEdition,
-    type CatalogueComplication,
+    type CatalogueTrait,
     type Problem,
 } from 'core/authoring';
 import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField} from 'app/components';
@@ -116,7 +119,16 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}:
 
                 <Characteristics draft={draft} onChange={setDraft} />
 
-                <Complications draft={draft} onChange={setDraft} />
+                {SECTIONS.map((section) => (
+                    <TraitSection
+                        key={section.key}
+                        category={section.category}
+                        draftKey={section.key}
+                        title={section.title(draft.edition)}
+                        draft={draft}
+                        onChange={setDraft}
+                    />
+                ))}
 
                 <Problems problems={problems} />
 
@@ -212,7 +224,7 @@ function SpendMeter({
 
 /** Characteristic spinners, one per characteristic the edition defines. */
 function Characteristics({draft, onChange}: {draft: AuthoredCharacter; onChange: (draft: AuthoredCharacter) => void}): React.JSX.Element {
-    const catalogue = useMemo(() => catalogueCharacteristics(draft.edition), [draft.edition]);
+    const entries = useMemo(() => catalogueCharacteristics(draft.edition), [draft.edition]);
 
     const set = (key: string, text: string): void => {
         const characteristics = {...draft.characteristics};
@@ -240,7 +252,7 @@ function Characteristics({draft, onChange}: {draft: AuthoredCharacter; onChange:
                 CHARACTERISTICS
             </Text>
             <View style={styles.grid}>
-                {catalogue.map((entry) => (
+                {entries.map((entry) => (
                     <View key={entry.key} style={styles.gridCell}>
                         <NumberField
                             label={`${entry.name} (${entry.base})`}
@@ -256,46 +268,91 @@ function Characteristics({draft, onChange}: {draft: AuthoredCharacter; onChange:
     );
 }
 
-/** The complications list, every field of it generated from the template. */
-function Complications({draft, onChange}: {draft: AuthoredCharacter; onChange: (draft: AuthoredCharacter) => void}): React.JSX.Element {
-    const catalogue = useMemo(() => catalogueComplications(draft.edition), [draft.edition]);
-    const byXmlid = useMemo(() => new Map(catalogue.map((entry) => [entry.xmlid, entry])), [catalogue]);
+/** How each authorable category is titled and stored on the draft. */
+const SECTIONS: Array<{category: AuthorableCategory; key: 'skills' | 'perks' | 'talents' | 'complications'; title: (edition: AuthoringEdition) => string}> = [
+    {category: 'skills', key: 'skills', title: () => 'SKILLS'},
+    {category: 'perks', key: 'perks', title: () => 'PERKS'},
+    {category: 'talents', key: 'talents', title: () => 'TALENTS'},
+    // The rules rename them between editions, and so does the sheet.
+    {category: 'disadvantages', key: 'complications', title: (edition) => (edition === '5E' ? 'DISADVANTAGES' : 'COMPLICATIONS')},
+];
+
+/**
+ * One category's list, every field of it generated from the template.
+ *
+ * This component is the whole of Phase B's UI. Skills, perks, talents and complications differ in
+ * which fields their template entries declare, not in kind, so there is one renderer and the
+ * catalogue decides what it draws.
+ */
+function TraitSection({
+    category,
+    draftKey,
+    title,
+    draft,
+    onChange,
+}: {
+    category: AuthorableCategory;
+    draftKey: 'skills' | 'perks' | 'talents' | 'complications';
+    title: string;
+    draft: AuthoredCharacter;
+    onChange: (draft: AuthoredCharacter) => void;
+}): React.JSX.Element {
+    const offered = useMemo(() => authorable(category, draft.edition), [category, draft.edition]);
+    const notYet = useMemo(() => withheld(category, draft.edition), [category, draft.edition]);
+    const byXmlid = useMemo(() => new Map(catalogue(category, draft.edition).map((entry) => [entry.xmlid, entry])), [category, draft.edition]);
+    const taken = draft[draftKey];
 
     const add = (display: string): void => {
-        const entry = catalogue.find((candidate) => candidate.display === display);
+        const entry = offered.find((candidate) => candidate.display === display);
 
         if (entry === undefined) {
             return;
         }
 
-        onChange({...draft, complications: [...draft.complications, {xmlid: entry.xmlid, input: '', adders: []}]});
+        // Seeded with the only unambiguous answers: a lone characteristic choice, and levels at
+        // zero. Anything the player must decide is left blank so `validate` asks for it rather
+        // than the form quietly picking.
+        onChange({
+            ...draft,
+            [draftKey]: [
+                ...taken,
+                {
+                    xmlid: entry.xmlid,
+                    input: '',
+                    adders: [],
+                    levels: 0,
+                    ...(entry.characteristics.length === 1 ? {characteristic: entry.characteristics[0].characteristic} : {}),
+                },
+            ],
+        });
     };
 
-    const update = (index: number, complication: AuthoredComplication): void =>
-        onChange({...draft, complications: draft.complications.map((entry, position) => (position === index ? complication : entry))});
+    const update = (index: number, revised: AuthoredTrait): void =>
+        onChange({...draft, [draftKey]: taken.map((entry, position) => (position === index ? revised : entry))});
 
-    const remove = (index: number): void => onChange({...draft, complications: draft.complications.filter((_, position) => position !== index)});
+    const remove = (index: number): void => onChange({...draft, [draftKey]: taken.filter((_, position) => position !== index)});
 
     return (
         <Card>
             <Text variant="label" muted>
-                {draft.edition === '5E' ? 'DISADVANTAGES' : 'COMPLICATIONS'}
+                {title}
             </Text>
 
             <View style={styles.fields}>
-                {draft.complications.map((complication, index) => {
-                    const entry = byXmlid.get(complication.xmlid);
+                {taken.map((entry, index) => {
+                    const catalogueEntry = byXmlid.get(entry.xmlid);
 
-                    return entry === undefined ? (
-                        <Text key={`${complication.xmlid}-${index}`} testID={`author-complication-unknown-${index}`}>
-                            {draft.edition} has no “{complication.xmlid}”.
+                    return catalogueEntry === undefined ? (
+                        <Text key={`${entry.xmlid}-${index}`} testID={`author-${draftKey}-unknown-${index}`}>
+                            {draft.edition} has no “{entry.xmlid}”.
                         </Text>
                     ) : (
-                        <ComplicationRow
-                            key={`${complication.xmlid}-${index}`}
+                        <TraitRow
+                            key={`${entry.xmlid}-${index}`}
                             index={index}
-                            entry={entry}
-                            complication={complication}
+                            draftKey={draftKey}
+                            entry={catalogueEntry}
+                            trait={entry}
                             onChange={(revised) => update(index, revised)}
                             onRemove={() => remove(index)}
                         />
@@ -305,65 +362,104 @@ function Complications({draft, onChange}: {draft: AuthoredCharacter; onChange: (
                 <SelectField
                     label="Add"
                     value=""
-                    options={catalogue.map((entry) => entry.display)}
+                    options={offered.map((entry) => entry.display)}
                     onChange={add}
-                    hint={draft.edition === '5E' ? 'Disadvantages fund the build' : 'Complications are required, and grant no points'}
-                    testID="author-add-complication"
+                    // Said rather than silently omitted: a shorter list reads as "the app lacks
+                    // Weapon Familiarity", not "not yet". See docs/CHARACTER_AUTHORING.md.
+                    hint={notYet.length === 0 ? undefined : `${notYet.length} more need a form of their own`}
+                    testID={`author-add-${draftKey}`}
                 />
             </View>
         </Card>
     );
 }
 
-/** One complication: its free text, then a control per adder the template declares. */
-function ComplicationRow({
+/** One trait: whichever of free text, characteristic, option, levels, familiarity and adders it declares. */
+function TraitRow({
     index,
+    draftKey,
     entry,
-    complication,
+    trait,
     onChange,
     onRemove,
 }: {
     index: number;
-    entry: CatalogueComplication;
-    complication: AuthoredComplication;
-    onChange: (complication: AuthoredComplication) => void;
+    draftKey: string;
+    entry: CatalogueTrait;
+    trait: AuthoredTrait;
+    onChange: (trait: AuthoredTrait) => void;
     onRemove: () => void;
 }): React.JSX.Element {
-    const setAdder = (xmlid: string, patch: {option?: string; text?: string; levels?: number}): void => {
-        const existing = complication.adders.find((adder) => adder.xmlid === xmlid);
-        const adders = existing === undefined ? [...complication.adders, {xmlid, ...patch}] : complication.adders.map((adder) => (adder.xmlid === xmlid ? {...adder, ...patch} : adder));
+    const id = `${draftKey}-${index}`;
 
-        onChange({...complication, adders});
+    const setAdder = (xmlid: string, patch: {option?: string; text?: string; levels?: number}): void => {
+        const existing = trait.adders.find((adder) => adder.xmlid === xmlid);
+        const adders = existing === undefined ? [...trait.adders, {xmlid, ...patch}] : trait.adders.map((adder) => (adder.xmlid === xmlid ? {...adder, ...patch} : adder));
+
+        onChange({...trait, adders});
     };
 
     return (
         <View style={styles.complication}>
             <View style={styles.complicationHead}>
                 <Text variant="label">{entry.display}</Text>
-                <Button label="Remove" onPress={onRemove} variant="secondary" testID={`author-remove-complication-${index}`} />
+                <Button label="Remove" onPress={onRemove} variant="secondary" testID={`author-remove-${id}`} />
             </View>
 
             {entry.inputLabel === null ? null : (
-                <TextField
-                    label={entry.inputLabel}
-                    value={complication.input}
-                    onChangeText={(input) => onChange({...complication, input})}
-                    maxLength={80}
-                    testID={`author-complication-input-${index}`}
+                <TextField label={entry.inputLabel} value={trait.input} onChangeText={(input) => onChange({...trait, input})} maxLength={80} testID={`author-input-${id}`} />
+            )}
+
+            {entry.familiarity === null ? null : (
+                <SegmentedControl
+                    segments={[
+                        {value: 'full', label: 'Full skill'},
+                        {value: 'familiarity', label: `Familiarity (${entry.familiarity.roll}-)`},
+                    ]}
+                    value={trait.familiarity === true ? 'familiarity' : 'full'}
+                    // A familiarity is a different purchase, not the skill at zero — so switching
+                    // drops the characteristic and levels rather than keeping them around unused.
+                    onChange={(mode) =>
+                        onChange(
+                            mode === 'familiarity'
+                                ? {xmlid: trait.xmlid, input: trait.input, adders: trait.adders, familiarity: true}
+                                : {xmlid: trait.xmlid, input: trait.input, adders: trait.adders, levels: 0, ...(entry.characteristics.length === 1 ? {characteristic: entry.characteristics[0].characteristic} : {})},
+                        )
+                    }
                 />
             )}
 
-            {entry.levels === null ? null : (
+            {entry.characteristics.length > 1 && trait.familiarity !== true ? (
+                <SelectField
+                    label="Based on"
+                    value={trait.characteristic ?? ''}
+                    options={entry.characteristics.map((choice) => choice.characteristic)}
+                    onChange={(characteristic) => onChange({...trait, characteristic})}
+                    testID={`author-characteristic-${id}`}
+                />
+            ) : null}
+
+            {entry.options.length === 0 ? null : (
+                <SelectField
+                    label={entry.display}
+                    value={entry.options.find((option) => option.xmlid === trait.option)?.display ?? ''}
+                    options={entry.options.map((option) => option.display)}
+                    onChange={(display) => onChange({...trait, option: entry.options.find((option) => option.display === display)?.xmlid})}
+                    testID={`author-option-${id}`}
+                />
+            )}
+
+            {entry.levels === null || trait.familiarity === true ? null : (
                 <NumberField
                     label={entry.levels.label}
-                    value={complication.levels === undefined ? '' : String(complication.levels)}
-                    onChangeText={(text) => onChange({...complication, levels: text.trim() === '' ? undefined : Number.parseInt(text, 10) || 0})}
-                    testID={`author-complication-levels-${index}`}
+                    value={trait.levels === undefined ? '' : String(trait.levels)}
+                    onChangeText={(text) => onChange({...trait, levels: text.trim() === '' ? 0 : Math.max(0, Number.parseInt(text, 10) || 0)})}
+                    testID={`author-levels-${id}`}
                 />
             )}
 
             {entry.adders.map((adder) => {
-                const chosen = complication.adders.find((candidate) => candidate.xmlid === adder.xmlid);
+                const chosen = trait.adders.find((candidate) => candidate.xmlid === adder.xmlid);
 
                 if (adder.freeText) {
                     return (
@@ -373,13 +469,13 @@ function ComplicationRow({
                             value={chosen?.text ?? ''}
                             onChangeText={(text) => setAdder(adder.xmlid, {text})}
                             maxLength={80}
-                            testID={`author-adder-${index}-${adder.xmlid}`}
+                            testID={`author-adder-${id}-${adder.xmlid}`}
                         />
                     );
                 }
 
                 if (adder.options.length === 0) {
-                    return null; // a flat yes/no adder — Phase B, alongside the same control on powers
+                    return null; // a flat yes/no adder — needs a switch, which is its own change
                 }
 
                 return (
@@ -389,7 +485,7 @@ function ComplicationRow({
                         value={adder.options.find((option) => option.xmlid === chosen?.option)?.display ?? ''}
                         options={adder.options.map((option) => option.display)}
                         onChange={(display) => setAdder(adder.xmlid, {option: adder.options.find((option) => option.display === display)?.xmlid})}
-                        testID={`author-adder-${index}-${adder.xmlid}`}
+                        testID={`author-adder-${id}-${adder.xmlid}`}
                     />
                 );
             })}

@@ -48,19 +48,43 @@ export interface AuthoredAdder {
 }
 
 /**
- * One complication the player has taken.
+ * One trait the player has taken — a skill, perk, talent or complication.
+ *
+ * The same shape for all four because the `.hdc` format treats them the same way: an xmlid, some
+ * free text, a pick-one, a number of levels, and a list of adders. What differs is which of those
+ * a given entry declares, and the template says that — see `CatalogueTrait`.
  *
  * `input` is the free text the template asks for under its own `inputlabel` — "Code Of The Hero"
- * for a Psychological Complication. Its presence is what makes the sheet label read
- * "Psychological: Code Of The Hero" rather than the bare template name, so it is not decoration.
+ * for a Psychological Complication, "French" for a Language. Its presence is what makes a sheet
+ * label read "Psychological: Code Of The Hero" rather than the bare template name, so it is not
+ * decoration.
  */
-export interface AuthoredComplication {
+export interface AuthoredTrait {
     readonly xmlid: string;
     readonly input: string;
     readonly adders: readonly AuthoredAdder[];
-    /** Levels, for the handful priced by them (UNLUCK). */
+    /** Levels bought, for anything priced by them — Skill Levels, Contacts, Unluck. */
     readonly levels?: number;
+    /** The chosen entry-level option: a Language's fluency, a Skill Level's breadth. */
+    readonly option?: string;
+    /**
+     * Which characteristic a skill rolls against — `DEX` for Acrobatics, `INT` or `GENERAL` for a
+     * Knowledge Skill. Required for any skill the template gives a `characteristicChoice`: without
+     * it `Skill.cost()` falls through to the trait's own basecost, which for most skills is absent.
+     */
+    readonly characteristic?: string;
+    /**
+     * Taken at familiarity — an 8- roll for a point, instead of the full skill.
+     *
+     * A separate flag rather than "0 levels", because they are different purchases: a familiarity
+     * costs 1 and rolls 8-, where the same skill bought normally costs 3 and rolls off a
+     * characteristic.
+     */
+    readonly familiarity?: boolean;
 }
+
+/** Kept as its own name because the rules, the UI and the sheet all call them complications. */
+export type AuthoredComplication = AuthoredTrait;
 
 /**
  * A character being authored.
@@ -75,7 +99,10 @@ export interface AuthoredCharacter {
     readonly player: string;
     /** Characteristic totals by lower-case key: `{str: 20, dex: 15}`. Absent = leave at base. */
     readonly characteristics: Readonly<Record<string, number>>;
-    readonly complications: readonly AuthoredComplication[];
+    readonly skills: readonly AuthoredTrait[];
+    readonly perks: readonly AuthoredTrait[];
+    readonly talents: readonly AuthoredTrait[];
+    readonly complications: readonly AuthoredTrait[];
 }
 
 /** An empty draft at an edition — what "new character" starts from. */
@@ -84,5 +111,8 @@ export const emptyDraft = (edition: AuthoringEdition): AuthoredCharacter => ({
     name: '',
     player: '',
     characteristics: {},
+    skills: [],
+    perks: [],
+    talents: [],
     complications: [],
 });
