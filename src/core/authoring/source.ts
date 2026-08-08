@@ -272,9 +272,11 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
     const talents = parseTraits(source.talents ?? []);
     const complications = parseTraits(source.complications ?? []);
     const powers = parsePowers(source.powers ?? []);
+    const martialArts = parseTraits(source.martialArts ?? []);
+    const equipment = parsePowers(source.equipment ?? []);
     const frameworks = parseFrameworks(source.frameworks ?? []);
 
-    if (skills === null || perks === null || talents === null || complications === null || powers === null || frameworks === null) {
+    if (skills === null || perks === null || talents === null || complications === null || powers === null || martialArts === null || equipment === null || frameworks === null) {
         return null;
     }
 
@@ -287,6 +289,8 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
         perks,
         talents,
         powers,
+        martialArts,
+        equipment,
         frameworks,
         complications,
     };
@@ -321,6 +325,8 @@ export const toSource = (draft: AuthoredCharacter): StoredSource => ({
     perks: draft.perks.map(traitToSource),
     talents: draft.talents.map(traitToSource),
     powers: draft.powers.map(powerToSource),
+    martialArts: draft.martialArts.map(traitToSource),
+    equipment: draft.equipment.map(powerToSource),
     frameworks: draft.frameworks.map((framework) => ({
         kind: framework.kind,
         name: framework.name,

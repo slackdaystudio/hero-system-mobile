@@ -203,7 +203,7 @@ Each phase is independently shippable and leaves the app coherent.
 | **B** | ✅ **done** — skills / perks / talents from the catalogue, one generic renderer | The generic renderer earns its keep here |
 | **C** | ✅ **done** — powers, advantages/limitations, and the first field group | The big one — and the per-power long tail is now a named, countable list |
 | **D** | ✅ **done** — Multipower, Elemental Control, VPP | Needed Phase 0, and proved it |
-| **E** | Martial arts, equipment | 56 maneuvers per edition, largely table-driven |
+| **E** | ✅ **done** — martial arts, equipment | 56 maneuvers per edition, largely table-driven |
 
 Rough shape: **~2.5–4k lines**, against an 18.4k-line codebase — so a substantial feature, comparable
 to `core/random/` plus its UI, but with a much larger share of it generic and data-driven.
@@ -359,6 +359,40 @@ right — so no golden master can see it. Recorded as **H13**; not fixed here, b
 correctness-pass change with its own commit, its own rules check and its own test. The consequence
 for authoring is that `core/authoring` emits **fixed slots only** and the UI says so, rather than
 offering a variable slot that would silently price as a fixed one.
+
+## What Phase E actually built
+
+**Maneuvers are the only catalogue entry with no xmlid at all.** The template states a `display`
+and nothing else to identify it; `normalizeTemplateItem` derives `BASIC_STRIKE` from
+`"Basic Strike"`. The emitter therefore writes `xmlid: 'MANEUVER'` plus a `display`, exactly as
+HERO Designer does, and lets the engine derive the real one — so that rule lives in one place, and
+it is the same place the template lookup uses.
+
+**A maneuver's combat line is copied onto the trait**, because `Maneuver` reads every part of it
+(`ocv`, `dcv`, `dc`, `phase`, `effect`, `addstr`, `category`, `weaponeffect`) off the *trait* rather
+than the template — a real `.hdc` writes it out per maneuver. Emitted without it, a maneuver prices
+correctly and renders with no OCV, no DCV and no effect. Same shape as Phase B's `basecost`, and
+the third time this pattern has come up: **the template is consulted for prices, the trait for
+everything else.**
+
+55 of 56 maneuvers are offered in both editions; `WEAPON_ELEMENT` is withheld because it wants a
+list of the weapons a style covers, which no template describes.
+
+**Equipment is powers in a different bucket** — same catalogue, same modifiers, same field groups,
+because `populateTrait` is called with `('equipment', 'powers', 'power')` and resolves items against
+the powers templates. It needed no new machinery, only a second draft list.
+
+### A limitation worth knowing about, found by testing it
+
+**Equipment never contributes to a character's totals.** `powersForTotals` reads `character.powers`,
+and nothing in the engine reads `character.equipment` at all. So a Resistant Protection bought as
+equipment costs its points, shows its defences on the row, and adds **nothing** to PD/ED — where
+the identical power bought innately adds 4.
+
+That is faithful to legacy and the golden masters agree, so it is pinned rather than worked around:
+changing it is a correctness-pass decision with a rules question attached (is carried gear "on" by
+default?), not something an authoring layer should quietly paper over. What authoring does instead
+is **warn**, so a player sees it rather than discovering it in play.
 
 ## Risks worth naming up front
 

@@ -277,13 +277,17 @@ function Characteristics({draft, onChange}: {draft: AuthoredCharacter; onChange:
 }
 
 /** How each authorable category is titled and stored on the draft. */
-type DraftKey = 'skills' | 'perks' | 'talents' | 'powers' | 'complications';
+type DraftKey = 'skills' | 'perks' | 'talents' | 'powers' | 'martialArts' | 'equipment' | 'complications';
 
 const SECTIONS: Array<{category: AuthorableCategory; key: DraftKey; title: (edition: AuthoringEdition) => string}> = [
     {category: 'skills', key: 'skills', title: () => 'SKILLS'},
     {category: 'perks', key: 'perks', title: () => 'PERKS'},
     {category: 'talents', key: 'talents', title: () => 'TALENTS'},
     {category: 'powers', key: 'powers', title: () => 'POWERS'},
+    {category: 'martialArts', key: 'martialArts', title: () => 'MARTIAL ARTS'},
+    // Equipment draws on the powers catalogue: an item is a power in a different bucket, which is
+    // exactly how `populateTrait` reads it.
+    {category: 'powers', key: 'equipment', title: () => 'EQUIPMENT'},
     // The rules rename them between editions, and so does the sheet.
     {category: 'disadvantages', key: 'complications', title: (edition) => (edition === '5E' ? 'DISADVANTAGES' : 'COMPLICATIONS')},
 ];

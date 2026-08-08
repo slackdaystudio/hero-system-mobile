@@ -52,6 +52,7 @@ const CATEGORY_NOUN: Readonly<Record<AuthorableCategory, string>> = {
     perks: 'perk',
     talents: 'talent',
     powers: 'power',
+    martialArts: 'maneuver',
     disadvantages: 'complication',
 };
 
@@ -181,11 +182,12 @@ function validateTraitFields(authored: AuthoredTrait, catalogue: CatalogueTrait,
 const authorableCharacteristics = (edition: AuthoringEdition): ReadonlySet<string> => new Set(characteristics(edition).map((entry) => entry.key));
 
 /** Where each catalogue category lives on a draft — `disadvantages` is called `complications` there. */
-const DRAFT_KEY: Readonly<Record<AuthorableCategory, 'skills' | 'perks' | 'talents' | 'powers' | 'complications'>> = {
+const DRAFT_KEY: Readonly<Record<AuthorableCategory, 'skills' | 'perks' | 'talents' | 'powers' | 'martialArts' | 'complications'>> = {
     skills: 'skills',
     perks: 'perks',
     talents: 'talents',
     powers: 'powers',
+    martialArts: 'martialArts',
     disadvantages: 'complications',
 };
 
@@ -324,6 +326,29 @@ export function validate(draft: AuthoredCharacter): Problem[] {
     }
 
     draft.powers.forEach((power, index) => problems.push(...validatePower(power, index, draft.edition)));
+
+    // Equipment is powers in a different bucket, so it gets the powers rules — including the
+    // field groups, so a Resistant Protection vest defends like a Resistant Protection.
+    draft.equipment.forEach((item, index) => {
+        const path = `equipment[${index}]`;
+
+        problems.push(...validateTrait(item, 'powers', index, draft.edition).map((problem) => ({...problem, path})));
+        problems.push(...validatePower(item, index, draft.edition).map((problem) => ({...problem, path})));
+
+        // The engine's totals read `character.powers` and never `character.equipment`, so a
+        // defensive item costs its points and adds nothing to PD/ED. Worth saying out loud: the
+        // player would otherwise see the cost, see the defences on the row, and reasonably assume
+        // they applied.
+        if (item.defense !== undefined) {
+            const entry = trait(item.xmlid, 'powers', draft.edition);
+
+            problems.push({
+                severity: 'warning',
+                path,
+                message: `${entry?.display ?? item.xmlid} is equipment, so its defences will not add to the character's totals.`,
+            });
+        }
+    });
     draft.frameworks.forEach((framework, index) => problems.push(...validateFramework(framework, index, draft.edition)));
 
     return [...problems].sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'error' ? -1 : 1));

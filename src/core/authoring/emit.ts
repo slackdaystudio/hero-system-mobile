@@ -56,6 +56,8 @@ const ID_BASE: Readonly<Record<string, number>> = {
     talents: 4000,
     disadvantages: 5000,
     powers: 6000,
+    martialArts: 10000,
+    equipment: 11000,
 };
 
 /** Modifier ids sit in their own block, keyed off the power they hang from. */
@@ -271,6 +273,46 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
 }
 
 /**
+ * A martial maneuver.
+ *
+ * Emitted with `xmlid: 'MANEUVER'` and a `display`, exactly as HERO Designer writes it —
+ * `normalizeCharacterItems` then derives the real xmlid from the display (`Basic Strike` →
+ * `BASIC_STRIKE`). Deriving it here instead would put that rule in two places, and the engine's
+ * copy is the one the template lookup uses.
+ *
+ * The combat line is copied onto the trait because `Maneuver` reads every part of it off the
+ * trait, not off the template — a real `.hdc` writes it out per maneuver. Without it the sheet
+ * shows a maneuver with no OCV, no DCV and no effect, priced correctly.
+ */
+function emitManeuver(authored: AuthoredTrait, position: number, edition: AuthoringEdition): Obj {
+    const catalogue = trait(authored.xmlid, 'martialArts', edition);
+    const profile = catalogue?.maneuver;
+
+    return {
+        ...emitTrait(authored, 'martialArts', position, edition),
+        xmlid: 'MANEUVER',
+        display: catalogue?.display ?? authored.xmlid,
+        ...(profile === undefined || profile === null
+            ? {}
+            : {
+                  category: profile.category,
+                  ocv: profile.ocv,
+                  dcv: profile.dcv,
+                  dc: profile.dc,
+                  phase: profile.phase,
+                  effect: profile.effect,
+                  weaponeffect: profile.weaponEffect,
+                  addstr: profile.addStr,
+                  activecost: profile.activeCost,
+                  useweapon: false,
+                  damagetype: 0,
+                  maxstr: 0,
+                  strmult: 1,
+              }),
+    };
+}
+
+/**
  * A framework: its container, and its slots parented to it.
  *
  * The container is `GENERIC_OBJECT` — the framework's identity is the sub-key it is emitted under,
@@ -350,9 +392,11 @@ function parsedFrom(draft: AuthoredCharacter, levels: Record<string, number>): P
         skills: {skill: draft.skills.map((entry, index) => emitTrait(entry, 'skills', index, draft.edition))},
         perks: {perk: draft.perks.map((entry, index) => emitTrait(entry, 'perks', index, draft.edition))},
         talents: {talent: draft.talents.map((entry, index) => emitTrait(entry, 'talents', index, draft.edition))},
-        martialarts: {},
+        martialarts: {maneuver: draft.martialArts.map((entry, index) => emitManeuver(entry, index, draft.edition))},
         powers: emitPowers(draft),
-        equipment: {},
+        // Equipment resolves against the *powers* templates — `populateTrait` is called with
+        // `('equipment', 'powers', 'power')` — so an item is emitted exactly as a power is.
+        equipment: {power: draft.equipment.map((entry, index) => ({...emitPower(entry, index, draft.edition), id: ID_BASE.equipment + index}))},
         disadvantages: {disad: draft.complications.map((entry, index) => emitTrait(entry, 'disadvantages', index, draft.edition))},
     } as unknown as ParsedCharacter;
 }

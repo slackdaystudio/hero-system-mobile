@@ -59,6 +59,7 @@ export const AUTHORABLE_CATEGORIES = {
     perks: 'perk',
     talents: 'talent',
     powers: 'power',
+    martialArts: 'maneuver',
     disadvantages: 'disad',
 } as const;
 
@@ -169,6 +170,8 @@ const BESPOKE_POWERS = ['FORCEWALL', 'DUPLICATION', 'ENDURANCERESERVE', 'FLASH',
 
 const BESPOKE = new Set([
     ...BESPOKE_POWERS,
+    // Weapon Element wants a list of weapons the style covers, which no template describes.
+    'WEAPON_ELEMENT',
     'AUTOFIRE_SKILLS',
     'CRAMMING',
     'CUSTOMSKILL',
@@ -217,6 +220,26 @@ const FIELD_GROUPS: Readonly<Record<string, FieldGroup>> = {
     },
 };
 
+/**
+ * A maneuver's combat line, as the template states it.
+ *
+ * Copied onto the emitted trait rather than left in the template, because `Maneuver` reads all of
+ * it off the *trait* — a real `.hdc` writes it out per maneuver and the decorator was written
+ * against that. A maneuver emitted without them renders with no OCV, no DCV and no effect.
+ */
+export interface ManeuverProfile {
+    readonly ocv: number;
+    readonly dcv: number;
+    readonly dc: number;
+    readonly phase: string;
+    readonly effect: string;
+    readonly weaponEffect: string;
+    readonly category: string;
+    readonly addStr: boolean;
+    readonly activeCost: number;
+    readonly killing: boolean;
+}
+
 /** A trait the player may take, with everything a form needs to render it. */
 export interface CatalogueTrait {
     readonly category: AuthorableCategory;
@@ -244,6 +267,8 @@ export interface CatalogueTrait {
     readonly familiarity: {readonly roll: number; readonly cost: number} | null;
     /** Non-null when the trait needs fields no template describes — see {@link FieldGroup}. */
     readonly fieldGroup: FieldGroup | null;
+    /** Non-null for a martial maneuver: the combat line the sheet prints. */
+    readonly maneuver: ManeuverProfile | null;
     /** True when the power may carry advantages and limitations. */
     readonly modifiable: boolean;
     /** Null when it can be authored; otherwise why not. */
@@ -317,6 +342,26 @@ const characteristicChoicesOf = (entry: Obj): CatalogueCharacteristicChoice[] =>
         perLevel: typeof item.lvlcost === 'number' && typeof item.lvlval === 'number' && item.lvlval !== 0 ? item.lvlcost / item.lvlval : 0,
     }));
 
+const maneuverProfileOf = (entry: Obj): ManeuverProfile | null => {
+    if (typeof entry.phase !== 'string' || typeof entry.effect !== 'string') {
+        return null;
+    }
+
+    return {
+        ocv: typeof entry.ocv === 'number' ? entry.ocv : 0,
+        dcv: typeof entry.dcv === 'number' ? entry.dcv : 0,
+        dc: typeof entry.dc === 'number' ? entry.dc : 0,
+        phase: entry.phase,
+        effect: entry.effect,
+        weaponEffect: typeof entry.weaponeffect === 'string' ? entry.weaponeffect : '',
+        category: typeof entry.category === 'string' ? entry.category : '',
+        // The template writes "Y"/"N" here where a parsed `.hdc` carries a boolean.
+        addStr: entry.addstr === true || entry.addstr === 'Y',
+        activeCost: typeof entry.activecost === 'number' ? entry.activecost : 0,
+        killing: entry.killing === true,
+    };
+};
+
 function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
     const xmlid = String(entry.xmlid);
     const choices = characteristicChoicesOf(entry);
@@ -338,6 +383,7 @@ function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
         levels,
         familiarity: typeof entry.familiarityroll === 'number' && typeof entry.familiaritycost === 'number' ? {roll: entry.familiarityroll, cost: entry.familiaritycost} : null,
         fieldGroup: FIELD_GROUPS[xmlid] ?? null,
+        maneuver: category === 'martialArts' ? maneuverProfileOf(entry) : null,
         // Only powers take advantages and limitations. A skill with an advantage is not a thing.
         modifiable: category === 'powers',
         unsupported: BESPOKE.has(xmlid) ? 'bespoke' : priced ? null : 'unpriced',

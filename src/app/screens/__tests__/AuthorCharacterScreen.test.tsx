@@ -442,3 +442,56 @@ describe('AuthorCharacterScreen — frameworks', () => {
         expect((powers[0].powers as Obj[]).map((slot) => slot.name)).toEqual(['Stun Gun', 'Net']);
     });
 });
+
+describe('AuthorCharacterScreen — martial arts and equipment', () => {
+    it('offers a section for each, drawing on the right catalogue', async () => {
+        const {tree} = await renderScreen();
+
+        expect(tree.root.findAllByProps({testID: 'author-add-martialArts'}).length).toBeGreaterThan(0);
+        // Equipment draws on the powers catalogue — an item is a power in a different bucket.
+        expect(tree.root.findAllByProps({testID: 'author-add-equipment'}).length).toBeGreaterThan(0);
+    });
+
+    it('counts a maneuver and an item toward the same total', async () => {
+        const {tree} = await renderScreen({
+            initial: {
+                ...emptyDraft('6E'),
+                name: 'Fighter',
+                martialArts: [{xmlid: 'BASIC_STRIKE', input: '', adders: [], levels: 0}],
+                equipment: [{xmlid: 'FORCEFIELD', name: 'Vest', input: '', adders: [], levels: 0, modifiers: [], defense: {pd: 4, ed: 4, mental: 0, power: 0}}],
+            },
+        });
+
+        // Basic Strike 3 + Vest 12.
+        expect(textOf(tree, 'author-spend')).toBe('15 spent of 400');
+    });
+
+    it("warns that a defensive item will not add to the character's totals", async () => {
+        const {tree} = await renderScreen({
+            initial: {
+                ...emptyDraft('6E'),
+                name: 'Armoured',
+                equipment: [{xmlid: 'FORCEFIELD', name: 'Vest', input: '', adders: [], levels: 0, modifiers: [], defense: {pd: 4, ed: 4, mental: 0, power: 0}}],
+            },
+        });
+
+        const warnings = tree.root.findAllByProps({testID: 'author-problem-warning-0'});
+        expect(warnings.length).toBeGreaterThan(0);
+    });
+
+    it('saves and re-opens both', async () => {
+        const full: AuthoredCharacter = {
+            ...emptyDraft('6E'),
+            name: 'Complete',
+            martialArts: [{xmlid: 'BASIC_STRIKE', input: '', adders: [], levels: 0}],
+            equipment: [{xmlid: 'FORCEFIELD', name: 'Vest', input: '', adders: [], levels: 0, modifiers: [], defense: {pd: 4, ed: 4, mental: 0, power: 0}}],
+        };
+        const {tree, saved} = await renderScreen({initial: full});
+
+        await press(tree, 'author-save');
+
+        expect(saved).toHaveLength(1);
+        expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(full);
+        expect(saved[0].document).toEqual(build(full));
+    });
+});

@@ -190,6 +190,16 @@ export interface AuthoredCharacter {
     readonly perks: readonly AuthoredTrait[];
     readonly talents: readonly AuthoredTrait[];
     readonly powers: readonly AuthoredPower[];
+    /**
+     * Martial maneuvers. Not powers, and kept in their own `.hdc` bucket — but their cost comes
+     * out of the same pot, which is why `core/random`'s allocator counts them with the powers.
+     */
+    readonly martialArts: readonly AuthoredTrait[];
+    /**
+     * Carried gear. Powers in every respect the engine cares about — same catalogue, same
+     * modifiers — but its own category, so a sword and an innate power stay told apart on the sheet.
+     */
+    readonly equipment: readonly AuthoredPower[];
     readonly frameworks: readonly AuthoredFramework[];
     readonly complications: readonly AuthoredTrait[];
 }
@@ -204,6 +214,8 @@ export const emptyDraft = (edition: AuthoringEdition): AuthoredCharacter => ({
     perks: [],
     talents: [],
     powers: [],
+    martialArts: [],
+    equipment: [],
     frameworks: [],
     complications: [],
 });
