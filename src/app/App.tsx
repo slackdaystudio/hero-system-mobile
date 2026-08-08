@@ -17,6 +17,7 @@ import {ActivityIndicator, StyleSheet} from 'react-native';
 import {Screen, Text} from 'app/components';
 import {createDeviceRepositories} from 'app/composition/deviceRepositories';
 import {AppNavigator} from 'app/navigation/AppNavigator';
+import {AuthoringProvider} from 'app/providers/AuthoringProvider';
 import {DiceProvider} from 'app/providers/DiceProvider';
 import {GenerateProvider} from 'app/providers/GenerateProvider';
 import {ImportProvider} from 'app/providers/ImportProvider';
@@ -96,9 +97,11 @@ function ThemedApp(): React.JSX.Element {
             <ToastProvider>
                 <ImportProvider filePicker={filePicker}>
                     <GenerateProvider>
-                        <DiceProvider>
-                            <AppNavigator />
-                        </DiceProvider>
+                        <AuthoringProvider>
+                            <DiceProvider>
+                                <AppNavigator />
+                            </DiceProvider>
+                        </AuthoringProvider>
                     </GenerateProvider>
                 </ImportProvider>
             </ToastProvider>

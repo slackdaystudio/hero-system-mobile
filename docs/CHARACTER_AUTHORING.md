@@ -2,8 +2,8 @@
 
 > What it would take to author a character sheet inside the app, rather than importing one.
 > Companion to [`RANDOM_CHARACTER.md`](RANDOM_CHARACTER.md) and [`PERSISTENCE.md`](PERSISTENCE.md).
-> **Analysis only — nothing here is built.** Every empirical claim below was measured against
-> the current tree; the probes are quoted inline.
+> **Phase 0 and Phase A are built** (see the phasing table); the rest is still analysis. Every
+> empirical claim below was measured against the tree, not read off the code.
 
 ## The headline
 
@@ -199,7 +199,7 @@ Each phase is independently shippable and leaves the app coherent.
 | Phase | Scope | Notes |
 |---|---|---|
 | **0** | ✅ **done** — fix H2, teach callers to descend, re-base | Prerequisite for frameworks; stood alone |
-| **A** | `core/authoring` emitter, migration 008, `origin: 'authored'`, live points total, characteristics + complications | Delivers a saveable, priced, editable character |
+| **A** | ✅ **done** — `core/authoring` emitter, migration 008, `origin: 'authored'`, live points total, characteristics + complications | Delivers a saveable, priced, editable character |
 | **B** | Skills / perks / talents from the catalogue, template-driven forms | The generic renderer earns its keep here |
 | **C** | Powers: levels, options, adders, **modifiers** | The big one — advantages/limitations, and the per-power field long tail |
 | **D** | Frameworks (Multipower / EC / VPP) | Needs Phase 0 |
@@ -208,11 +208,46 @@ Each phase is independently shippable and leaves the app coherent.
 Rough shape: **~2.5–4k lines**, against an 18.4k-line codebase — so a substantial feature, comparable
 to `core/random/` plus its UI, but with a much larger share of it generic and data-driven.
 
+## What Phase A actually built
+
+`core/authoring/` — pure core, five modules:
+
+| Module | Does |
+|---|---|
+| `types` | the **draft**: what the player chose, by xmlid, with no engine boilerplate |
+| `catalogue` | reads the `.hdt` form metadata — the only place that touches templates |
+| `emit` | draft → `ParsedCharacter`, satisfying the four parser habits below |
+| `spend` | what it costs, asked of the engine; the 5E/6E complication fork |
+| `source` | the stored-draft round trip, failing safe like `parseRecipe` |
+
+Plus migration 008 (`source` column), `origin: 'authored'`, `AuthoringProvider`, and
+`AuthorCharacterScreen`. 44 new tests.
+
+**The four habits the emitter had to learn**, each found by running the engine rather than reading
+it, and each failing quietly:
+
+1. all seven trait categories present — `populateTrait` guards `null` but not `undefined`
+2. `name: null`, not absent — absent renders the literal string `"undefined (…)"`
+3. `alias`/`optionAlias` copied from the template's `display` — the engine prints them, never derives them
+4. ids derived from position, so the same draft always emits the same document
+
+**Characteristics are stated as totals** and converted by probing the engine at zero, so 5E's
+figured characteristics (ED from CON, STUN from BODY+STR+CON) stay golden-mastered rather than
+reimplemented. Same trick `core/random/characteristics` uses.
+
+**One genuine special case surfaced: Rivalry.** Its description is a free-text adder whose
+`optionAlias` carries the player's words behind an opening bracket — which is why
+`Complication.label()` does `.slice(1)`. It is the only such adder in either edition (verified by
+scanning both templates), so it is detected from the data rather than hardcoded, but it is **not a
+general mechanism** and should not become one. Expect a handful more of these per phase; that is
+the per-family long tail, and it is the honest cost of the feature.
+
 ## Risks worth naming up front
 
-1. **The validator is the quality bar, not the forms.** The forms are mostly generated. What
-   determines whether this feature is trustworthy is whether it refuses to emit a character the
-   engine will silently price at 0. Build the validator alongside the emitter, not after.
+1. **The validator is the quality bar, not the forms.** Borne out in Phase A: the forms were a
+   an afternoon, and every interesting bug was a legality question. Each error case in
+   `validate.test.ts` is paired with a demonstration of the silent failure it prevents — keep that
+   discipline, because a validator with no such pairing is untested by construction.
 2. **Edition confusion.** `RANDOM_CHARACTER.md` records this biting twice, and it is worse here:
    authoring exposes *all* 477/409 entries, and the two editions share many xmlids with different
    costs. Never let a lookup default its edition.

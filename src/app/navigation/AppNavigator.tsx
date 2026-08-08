@@ -17,6 +17,7 @@ import {ActivityIndicator, Alert, Pressable, StyleSheet, View} from 'react-nativ
 import {NavigationContainer, useFocusEffect} from '@react-navigation/native';
 import {createNativeStackNavigator, type NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import type {AuthoredCharacter} from 'core/authoring';
 import type {ImportResult} from 'infra/import';
 import {Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
@@ -24,6 +25,7 @@ import {type GenerateResult} from 'app/providers/GenerateProvider';
 import {GenerateDialog} from 'app/screens/GenerateDialog';
 import {useImportCharacter} from 'app/providers/ImportProvider';
 import {useSettings} from 'app/providers/SettingsProvider';
+import {AuthorCharacterScreen} from 'app/screens/AuthorCharacterScreen';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {DiceScreen} from 'app/screens/DiceScreen';
@@ -41,6 +43,8 @@ export type RootStackParamList = {
     Home: undefined;
     CharacterList: undefined;
     CharacterDetail: {id: string};
+    /** Authoring: no params for a new character; `id` + `draft` to re-open an authored one. */
+    AuthorCharacter: {id?: string; draft?: AuthoredCharacter} | undefined;
     Dice: {request?: RollRequest; mode?: RollRequest['mode']} | undefined;
     Statistics: undefined;
     Settings: undefined;
@@ -76,6 +80,11 @@ export function AppNavigator(): React.JSX.Element {
                             // eslint-disable-next-line react/no-unstable-nested-components
                             headerRight: () => (
                                 <View style={styles.headerActions}>
+                                    <Pressable accessibilityRole="button" onPress={() => navigation.navigate('AuthorCharacter')} testID="author-character">
+                                        <Text variant="label" color={theme.colors.primary}>
+                                            New
+                                        </Text>
+                                    </Pressable>
                                     <GenerateButton
                                         onGenerated={(result) => {
                                             setImportToken((token) => token + 1);
@@ -101,6 +110,7 @@ export function AppNavigator(): React.JSX.Element {
                                 onRollRequest={(request) => navigation.navigate('Dice', {request})}
                                 // Replace, not push: flipping between characters must not grow the back stack.
                                 onSwitchCharacter={(id) => navigation.replace('CharacterDetail', {id})}
+                                onEditAuthored={(id, draft) => navigation.navigate('AuthorCharacter', {id, draft})}
                             />
                         )}
                     </Stack.Screen>
@@ -119,6 +129,19 @@ export function AppNavigator(): React.JSX.Element {
                             ),
                         })}>
                         {({route}) => <DiceScreen initialRequest={route.params?.request} initialMode={route.params?.mode} />}
+                    </Stack.Screen>
+                    <Stack.Screen name="AuthorCharacter" options={({route}) => ({title: route.params?.id === undefined ? 'New Character' : 'Edit Character'})}>
+                        {({route, navigation}) => (
+                            <AuthorCharacterScreen
+                                initial={route.params?.draft}
+                                characterId={route.params?.id}
+                                onSaved={(id) => {
+                                    setImportToken((token) => token + 1);
+                                    navigation.replace('CharacterDetail', {id});
+                                }}
+                                onCancel={() => navigation.goBack()}
+                            />
+                        )}
                     </Stack.Screen>
                     <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>
                         {() => <StatisticsScreen />}

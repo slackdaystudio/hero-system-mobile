@@ -35,6 +35,7 @@ import {
     type SheetCharacteristic,
     type SheetTrait,
 } from './characterSheet';
+import {parseSource, type AuthoredCharacter} from 'core/authoring';
 import {CharacterEditor, editableRecipe} from './CharacterEditor';
 import {PortraitFramer} from './PortraitFramer';
 import {CombatTracker} from './CombatTracker';
@@ -56,11 +57,16 @@ export interface CharacterDetailScreenProps {
      * screen (rather than pushing) so flipping between characters doesn't grow the back stack.
      */
     onSwitchCharacter?: (id: string) => void;
+    /**
+     * Re-open an authored character in the editor. Absent when authoring isn't reachable from
+     * wherever this screen is mounted (tests, and any future embed).
+     */
+    onEditAuthored?: (id: string, draft: AuthoredCharacter) => void;
 }
 
 const AVATAR = 96;
 
-export function CharacterDetailScreen({characterId, onReady, onRollRequest, onSwitchCharacter}: CharacterDetailScreenProps): React.JSX.Element {
+export function CharacterDetailScreen({characterId, onReady, onRollRequest, onSwitchCharacter, onEditAuthored}: CharacterDetailScreenProps): React.JSX.Element {
     const {characters: repository, statistics} = useRepositories();
     const roller = useDieRoller();
     const theme = useTheme();
@@ -94,6 +100,12 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest, onSw
     const character = state.status === 'ready' ? state.character : null;
     // Non-null only for a generated character whose recipe still resolves — see editableRecipe.
     const recipe = useMemo(() => (character === null ? null : editableRecipe(character)), [character]);
+    /**
+     * Non-null only for an authored character whose stored draft still parses. The two are mutually
+     * exclusive by construction: `origin` is one value, so a character is revised through its
+     * recipe or through its draft, never both.
+     */
+    const draft = useMemo(() => (character === null || character.origin !== 'authored' ? null : parseSource(character.source)), [character]);
     // "Only in Alternate Identity" form. Default on — matches legacy (which loaded
     // characters with showSecondary = true), so alt-ID stat boosts count by default.
     const [showSecondary, setShowSecondary] = useState(true);
@@ -241,6 +253,17 @@ export function CharacterDetailScreen({characterId, onReady, onRollRequest, onSw
                 </View>
 
                 {recipe !== null ? <CharacterEditor character={loaded} recipe={recipe} onRevised={load} /> : null}
+
+                {draft !== null && onEditAuthored !== undefined ? (
+                    <Card>
+                        <View style={styles.authored}>
+                            <Text variant="label" muted>
+                                AUTHORED CHARACTER
+                            </Text>
+                            <Button label="Edit" onPress={() => onEditAuthored(loaded.id, draft)} testID="edit-authored" />
+                        </View>
+                    </Card>
+                ) : null}
 
                 {sheet !== null ? (
                     <>
@@ -715,6 +738,11 @@ function Row({label, value}: {label: string; value: string}): React.JSX.Element 
 }
 
 const styles = StyleSheet.create({
+    authored: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
     centered: {
         alignItems: 'center',
         justifyContent: 'center',
