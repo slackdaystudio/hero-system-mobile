@@ -317,8 +317,10 @@ function SpendMeter({
                 <Text testID="author-spend">
                     {left.spent} spent of {left.total}
                 </Text>
-                <Text color={left.left < 0 ? theme.colors.danger : theme.colors.textMuted} testID="author-remaining">
-                    {left.left < 0 ? `${-left.left} over budget` : `${left.left} remaining`}
+                {/* Past the allowance is not an overspend — it is earned experience, and the
+                    sheet's nameplate prints it beside the base. So it reads as a fact, not a fault. */}
+                <Text color={left.experience > 0 ? theme.colors.primary : theme.colors.textMuted} testID="author-remaining">
+                    {left.experience > 0 ? `${left.experience} experience` : `${left.left} remaining`}
                 </Text>
                 <Text variant="caption" muted testID="author-complications-total">
                     {/* The edition fork stated in words, because the same number means opposite

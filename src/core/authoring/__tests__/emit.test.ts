@@ -23,7 +23,8 @@
  * *quietly*: a missing category throws deep in the engine, a missing `name` renders the literal
  * string "undefined", a missing alias prints an xmlid, and unstable ids break re-opening.
  */
-import {build, emit, emptyDraft, parseSource, remaining, spendOf, toSource, type AuthoredCharacter} from 'core/authoring';
+import {build, declaredFor, emit, emptyDraft, parseSource, remaining, spendOf, toSource, type AuthoredCharacter} from 'core/authoring';
+import {powerTier} from 'core/hero';
 import {characterTraitDecorator} from 'core/traits';
 
 type Obj = Record<string, any>;
@@ -228,6 +229,30 @@ describe('spend — the running total the app shows', () => {
         expect(remaining(spend, {base: 400, complicationLimit: 75}, '6E')).toMatchObject({total: 400, left: 250});
         // 5E: disadvantages buy points, so the same character has 200 + 60 to spend.
         expect(remaining(spend, {base: 200, complicationLimit: 150}, '5E')).toMatchObject({total: 260, left: 110});
+    });
+
+    it('counts anything past the allowance as experience rather than an overspend', () => {
+        const spend = {characteristics: 300, traits: 125, complications: 75, spent: 425};
+        const over = remaining(spend, {base: 400, complicationLimit: 75}, '6E');
+
+        // In HERO a character costing more than their starting points has *earned* the difference.
+        expect(over).toMatchObject({total: 400, spent: 425, left: 0, experience: 25});
+        // `left` never goes negative — past the allowance there is nothing left, only experience.
+        expect(over.left).toBe(0);
+    });
+
+    it('declares that experience, which is what the nameplate prints beside the base', () => {
+        // The sheet renders "400 + 25 pts" from exactly these two numbers.
+        expect(declaredFor({base: 400, complicationLimit: 75}, 25)).toEqual({basePoints: 400, disadPoints: 75, experience: 25});
+        // And a character inside its allowance has earned nothing.
+        expect(declaredFor({base: 400, complicationLimit: 75})).toEqual({basePoints: 400, disadPoints: 75, experience: 0});
+    });
+
+    it('keeps the campaign tier keyed on base, so earning points does not promote a character', () => {
+        const config = declaredFor({base: 400, complicationLimit: 75}, 250);
+
+        // 650 would be Very High-Powered on the 6E ladder; 400 is Standard, and that is what it is.
+        expect(powerTier(config.basePoints, false)).toBe('Standard Superheroic');
     });
 
     it('stops counting 5E disadvantages past the limit', () => {

@@ -136,13 +136,15 @@ describe('AuthorCharacterScreen', () => {
         expect(textOf(tree, 'author-spend')).toBe(`${spent} spent of 400`);
     });
 
-    it('reports going over budget rather than preventing it', async () => {
+    it('calls what is spent past the allowance experience, not an overspend', async () => {
         const {tree} = await renderScreen();
 
+        // 6E STR is 1/point over a base of 10, so STR 500 is 490 — 90 past a 400-point allowance.
         await type(tree, 'author-char-str', '500');
 
-        expect(textOf(tree, 'author-remaining')).toContain('over budget');
-        // Still saveable: over budget is a GM's problem, not a malformed character.
+        expect(textOf(tree, 'author-remaining')).toBe('90 experience');
+        // And it saves: a character who costs more than their starting points has earned the
+        // difference, which is a fact about them rather than a fault.
         expect(tree.root.findAllByProps({testID: 'author-save'}).some((node) => node.props.disabled === false)).toBe(true);
     });
 
@@ -598,6 +600,23 @@ describe('AuthorCharacterScreen — the campaign allowance', () => {
         // 6E: still 400. 5E: 200 base + the 15 the complication is worth.
         expect(textOf(sixth.tree, 'author-spend')).toBe('0 spent of 400');
         expect(textOf(fifth.tree, 'author-spend')).toBe('0 spent of 215');
+    });
+
+    it('declares the experience, so the nameplate reads "base + earned"', async () => {
+        const {tree, saved} = await renderScreen({initial: {...emptyDraft('6E'), name: 'Veteran', characteristics: {str: 500}}});
+
+        await press(tree, 'author-save');
+
+        // `formatPoints` on the sheet turns exactly this into "400 + 90 pts".
+        expect((saved[0].document as Obj).basicConfiguration).toEqual({basePoints: 400, disadPoints: 75, experience: 90});
+    });
+
+    it('declares no experience for a character inside its allowance', async () => {
+        const {tree, saved} = await renderScreen({initial: {...emptyDraft('6E'), name: 'Fresh', characteristics: {str: 20}}});
+
+        await press(tree, 'author-save');
+
+        expect((saved[0].document as Obj).basicConfiguration).toEqual({basePoints: 400, disadPoints: 75, experience: 0});
     });
 
     it('saves the allowance so the character declares what it was built on', async () => {

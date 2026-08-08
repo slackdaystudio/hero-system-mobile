@@ -413,6 +413,14 @@ allowance's `base` is its level's *total*, and a 5E one's is its *base* — the 
 The budget lives on the **draft**, not on the screen: a character re-opened at a different
 allowance than it was built to would silently be over or under budget for reasons nobody could see.
 
+**Spending past the allowance is not an overspend — it is experience.** A character who costs more
+than their starting points has earned the difference, which is what experience is in HERO, so the
+meter reads "90 experience" rather than "90 over budget" and the excess is declared as
+`experience` on the character. The sheet's nameplate already prints that beside the base
+(`formatPoints` renders `"400 + 90 pts"`), so nothing needed adding there. The campaign **tier**
+stays keyed on base alone: `powerTier` deliberately does not let a character climb the ladder by
+earning points, and a 400-point character with 250 earned is still Standard Superheroic.
+
 It also closed a gap. `AuthoringProvider` never wrote `basicConfiguration`, so an authored
 character showed neither points nor campaign tier on the sheet's nameplate where a generated or
 imported one does — `pointSummary` reads the declared block and returns null when it is absent.

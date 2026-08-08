@@ -102,9 +102,19 @@ export const DEFAULT_BUDGET: Readonly<Record<AuthoringEdition, Budget>> = {
  *
  * Without it the sheet's nameplate shows no points and no campaign tier — `pointSummary` reads the
  * declared block and returns null when it is absent, which is what an authored character did
- * before this. Both numbers are already in the edition's own units, so no conversion happens here.
+ * before this. The base and the limit are already in the edition's own units, so no conversion
+ * happens here.
+ *
+ * `experience` is whatever the character costs past its allowance. That is what experience *is* in
+ * HERO — a character who costs more than their starting points has earned the difference — and it
+ * is why going over is not an error. The tier stays keyed on base alone, deliberately:
+ * `powerTier` does not let a character climb the campaign ladder by earning points.
  */
-export const declaredFor = (budget: Budget): BasicConfiguration => ({basePoints: budget.base, disadPoints: budget.complicationLimit, experience: 0});
+export const declaredFor = (budget: Budget, experience = 0): BasicConfiguration => ({
+    basePoints: budget.base,
+    disadPoints: budget.complicationLimit,
+    experience: Math.max(0, Math.round(experience)),
+});
 
 /**
  * A chosen adder on a trait: the adder's xmlid, plus the option xmlid when it offers a list.

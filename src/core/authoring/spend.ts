@@ -130,11 +130,19 @@ const describe = (entry: Obj, key: string, character: Obj): TraitSummary => {
 };
 
 export interface Remaining {
-    /** Everything the player may spend: base, plus the complications that fund it in 5E. */
+    /** Everything the campaign grants: base, plus the complications that fund it in 5E. */
     readonly total: number;
     readonly spent: number;
-    /** `total − spent`. Negative means over budget, which is allowed but shown. */
+    /** What is left of the allowance. Never negative — past it, the excess is experience. */
     readonly left: number;
+    /**
+     * Points spent beyond the campaign's allowance.
+     *
+     * Not an error, and not an overspend: in HERO a character who costs more than their starting
+     * allowance has **earned** the difference, and that is what experience is. The sheet's
+     * nameplate already prints it — `"400 + 25 pts"` — so all this has to do is say how much.
+     */
+    readonly experience: number;
     /** Complications taken, and the most that count. Over the limit, the excess funds nothing. */
     readonly complications: number;
     readonly complicationLimit: number;
@@ -154,7 +162,8 @@ export function remaining(spend: Spend, budget: Budget, edition: AuthoringEditio
     return {
         total,
         spent: spend.spent,
-        left: total - spend.spent,
+        left: Math.max(0, total - spend.spent),
+        experience: Math.max(0, spend.spent - total),
         complications: spend.complications,
         complicationLimit: budget.complicationLimit,
     };
