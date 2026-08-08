@@ -135,8 +135,38 @@ const migration007: Migration = {
     },
 };
 
+/**
+ * 008 — the authoring source: the `ParsedCharacter` an authored character was built from.
+ *
+ * A generated character is rebuilt from its `recipe`; an authored one has no recipe, because the
+ * player *is* the recipe. What it needs kept instead is the engine's **input** — and the `data`
+ * column holds the output, which does not round-trip. `populateMovementAndCharacteristics` keeps
+ * nine fields per characteristic and discards the parsed entry, so an adder or modifier bought on
+ * a characteristic is simply gone from the stored document.
+ *
+ * Its own column rather than a corner of `data`, for the reason the recipe got one: `data` is
+ * engine output and putting non-HERO data inside it would make the document a liar.
+ *
+ * NULL for imports and for generated characters, which say what they are in `recipe`.
+ */
+const migration008: Migration = {
+    version: 8,
+    up(db) {
+        db.execute('ALTER TABLE characters ADD COLUMN source TEXT');
+    },
+};
+
 /** All migrations, in ascending version order. */
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006, migration007];
+export const MIGRATIONS: readonly Migration[] = [
+    migration001,
+    migration002,
+    migration003,
+    migration004,
+    migration005,
+    migration006,
+    migration007,
+    migration008,
+];
 
 /**
  * Apply every migration newer than the recorded schema version, each in its own

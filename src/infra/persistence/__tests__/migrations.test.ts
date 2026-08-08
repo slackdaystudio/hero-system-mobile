@@ -23,10 +23,19 @@ describe('migrations (real SQLite)', () => {
     it('applies the base schema and records the version', () => {
         const db = createBetterSqlite3Database();
 
-        expect(runMigrations(db)).toBe(7);
+        expect(runMigrations(db)).toBe(8);
 
         expect(tables(db)).toEqual(expect.arrayContaining(['app_state', 'characters', 'combat_state', 'random_hero', 'schema_migrations', 'settings', 'statistics']));
-        expect(db.execute('SELECT version FROM schema_migrations ORDER BY version').rows).toEqual([{version: 1}, {version: 2}, {version: 3}, {version: 4}, {version: 5}, {version: 6}, {version: 7}]);
+        expect(db.execute('SELECT version FROM schema_migrations ORDER BY version').rows).toEqual([
+            {version: 1},
+            {version: 2},
+            {version: 3},
+            {version: 4},
+            {version: 5},
+            {version: 6},
+            {version: 7},
+            {version: 8},
+        ]);
         // Slots are retired — migration 003 drops the column.
         expect(tables(db)).not.toContain('slot');
         expect(db.execute('PRAGMA table_info(characters)').rows.some((row) => row.name === 'slot')).toBe(false);
@@ -39,7 +48,7 @@ describe('migrations (real SQLite)', () => {
         runMigrations(db);
         runMigrations(db);
 
-        expect(db.execute('SELECT COUNT(*) AS n FROM schema_migrations').rows[0].n).toBe(7);
+        expect(db.execute('SELECT COUNT(*) AS n FROM schema_migrations').rows[0].n).toBe(8);
     });
 
     it('removes combat state when its character is deleted (ON DELETE CASCADE)', () => {

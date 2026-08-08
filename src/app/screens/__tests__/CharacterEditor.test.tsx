@@ -44,6 +44,7 @@ const seededRng = (seed: number): Rng => {
 const RECIPE = rollRecipe(seededRng(3));
 
 const character = (over: Partial<Character> = {}): Character => ({
+    source: null,
     id: 'generated-brick-1',
     name: RECIPE.name,
     player: null,

@@ -1,0 +1,134 @@
+// Copyright 2018-Present Philip J. Guinchard
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * What a character costs, asked of the engine (docs/CHARACTER_AUTHORING.md).
+ *
+ * Nothing computed this before. `core/hero/characterPoints` reads the **declared**
+ * `<BASIC_CONFIGURATION>` a `.hdc` carries — the points a character was *built on* — and never
+ * sums what it actually spends. That is fine for an imported file, whose author already balanced
+ * it, and useless while authoring, where the running total is the whole point.
+ *
+ * Every number here comes from the trait decorators, never from the catalogue. The templates state
+ * costs and the engine states costs; if this module added them up itself there would be two
+ * answers to every question and no way to tell which was wrong.
+ *
+ * **Complications fund the build, they do not consume it.** In 5E the disadvantage allowance is
+ * added to base points to give the total a character may spend. 6E abolished that: complications
+ * are a required *shape*, worth no points at all. So the two editions read the same numbers to
+ * opposite effect, and `remaining` is the only place that knows it.
+ */
+import {TRAIT_CHILD_KEYS} from 'core/hero';
+import {characterTraitDecorator, type Obj} from 'core/traits';
+import {withDescendants} from 'core/util';
+import type {AuthoringEdition} from './types';
+
+/** The trait buckets a character spends points on, in sheet order. */
+const SPENDING_BUCKETS = ['skills', 'perks', 'talents', 'martialArts', 'powers', 'equipment'] as const;
+
+export interface Spend {
+    /** What the characteristics cost — the engine's own per-characteristic `cost`. */
+    readonly characteristics: number;
+    /** What every trait costs, framework pools and their slots alike. */
+    readonly traits: number;
+    /** Points the complications are worth. Positive; what it *means* is edition-specific. */
+    readonly complications: number;
+    /** characteristics + traits. What the player has actually spent. */
+    readonly spent: number;
+}
+
+const sumBucket = (character: Obj, key: string): number =>
+    withDescendants((character[key] ?? []) as Obj[], TRAIT_CHILD_KEYS[key] ?? ['powers']).reduce((total, trait) => {
+        try {
+            return total + characterTraitDecorator.decorate(trait, key, () => character).realCost();
+        } catch {
+            // A trait the engine cannot price contributes nothing rather than blanking the total.
+            // `validate` is what tells the player about it — see the silent-zero trap in the docs.
+            return total;
+        }
+    }, 0);
+
+/**
+ * What a built character costs, bucket by bucket.
+ *
+ * Takes the **built** character (the engine's output), not a draft, so the sheet and the spend
+ * meter are reading the same object and cannot disagree.
+ */
+export function spendOf(character: Obj): Spend {
+    const characteristics = ((character.characteristics ?? []) as Obj[]).reduce((total, entry) => total + (Number(entry.cost) || 0), 0);
+    const traits = SPENDING_BUCKETS.reduce((total, key) => total + sumBucket(character, key), 0);
+
+    // `cost()`, not `realCost()`: a complication's worth is its base value. The decorator chain's
+    // advantage/limitation multipliers have no meaning on a disadvantage.
+    const complications = withDescendants((character.disadvantages ?? []) as Obj[], TRAIT_CHILD_KEYS.disadvantages).reduce((total, entry) => {
+        try {
+            return total + characterTraitDecorator.decorate(entry, 'disadvantages', () => character).cost();
+        } catch {
+            return total;
+        }
+    }, 0);
+
+    return {characteristics, traits, complications, spent: characteristics + traits};
+}
+
+/**
+ * The budget a character is being built to.
+ *
+ * `base` is what the campaign grants. `complicationLimit` is how much of the build complications
+ * may fund (5E) or how many points' worth are required (6E) — HERO calls both a limit and neither
+ * is a suggestion.
+ */
+export interface Budget {
+    readonly base: number;
+    readonly complicationLimit: number;
+}
+
+/** Standard Superheroic, the level the generator builds to and what a new draft starts at. */
+export const DEFAULT_BUDGET: Readonly<Record<AuthoringEdition, Budget>> = {
+    // 5E: 200 base + up to 150 in disadvantages = the classic 350-point superhero.
+    '5E': {base: 200, complicationLimit: 150},
+    // 6E: 400 is the whole allowance; complications grant nothing and 75 is the required shape.
+    '6E': {base: 400, complicationLimit: 75},
+};
+
+export interface Remaining {
+    /** Everything the player may spend: base, plus the complications that fund it in 5E. */
+    readonly total: number;
+    readonly spent: number;
+    /** `total − spent`. Negative means over budget, which is allowed but shown. */
+    readonly left: number;
+    /** Complications taken, and the most that count. Over the limit, the excess funds nothing. */
+    readonly complications: number;
+    readonly complicationLimit: number;
+}
+
+/**
+ * How much a character has left to spend.
+ *
+ * The edition fork is real and it is here: 5E complications *buy* points, capped at the limit, so
+ * a 5E character's total grows as it takes them. 6E complications buy nothing — the 400 is the
+ * whole allowance and the 75 is a requirement the character must meet, not a source of points.
+ */
+export function remaining(spend: Spend, budget: Budget, edition: AuthoringEdition): Remaining {
+    const counted = Math.min(spend.complications, budget.complicationLimit);
+    const total = edition === '5E' ? budget.base + counted : budget.base;
+
+    return {
+        total,
+        spent: spend.spent,
+        left: total - spend.spent,
+        complications: spend.complications,
+        complicationLimit: budget.complicationLimit,
+    };
+}
