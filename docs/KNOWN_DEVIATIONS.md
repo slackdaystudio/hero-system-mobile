@@ -38,7 +38,7 @@
 | T3 | `mainapp` overlays ignored | needs rules check | no model impact | none |
 | T4 | Item-add into a missing base sub-key → `[undefined, item]` | real bug (edge) | unknown / no | templates |
 | H1 | `character.template` always `undefined` | cosmetic | yes | hero |
-| H2 | Trait sort uses a boolean-returning comparator | real bug | likely (trait order) | hero |
+| H2 | Trait sort uses a boolean-returning comparator, so frameworks lose their slots | ✅ **fixed** — was real bug, active | **yes — 27 fixtures** | hero (re-based) |
 | H3 | Char/defense totals skip **duplicate** powers | ✅ **fixed** — was real bug, active | yes — junkyard, mark-li-v5a-433 | hero query (re-based) |
 | H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | ✅ **fixed** — was real bug, active | yes — tazimmaad ("Cut") | traits (decorator, re-based) |
 | H5 | VPP contents counted toward totals | ✅ **fixed** — was real bug, active | yes — adamantine (Leaping), m-championsmush | hero query / movement |
@@ -118,18 +118,51 @@
 - **Fix + verify:** choose the correct value; hero unit test; re-base hero golden
   master.
 
-## H2 — Trait sort uses a boolean-returning comparator
+## H2 — Trait sort uses a boolean-returning comparator — ✅ FIXED
+
+**Fixed.** The comparator is now `.sort((a, b) => a.position - b.position)`.
 
 - **Where:** `populateTrait` — `.sort((a, b) => Number(a.position > b.position))`
   (legacy returns the raw boolean; V8 coerces to 0/1). Never returns a negative, so
-  it is not a correct comparator — a partial/incorrect ordering.
+  it is not a correct comparator: nothing can move earlier in the array, which makes
+  the sort a no-op on anything already out of order.
 - **Legacy:** same.
-- **Correct:** `.sort((a, b) => a.position - b.position)`.
-- **Corpus impact:** likely changes trait **order** for some characters (affects
-  display order and any position-indexed logic; point totals are order-independent).
-  Confirm which fixtures reorder.
-- **Fix + verify:** proper numeric comparator; unit test with shuffled positions;
-  re-base hero golden master for reordered characters.
+
+**This entry previously read "affects display order; point totals are
+order-independent". That was wrong about the scope, and right about the totals.**
+The ordering and the *structure* are the same problem:
+
+`normalizeCharacterItems` moves every non-`power` sub-key — `<MULTIPOWER>`,
+`<ELEMENTALCONTROL>`, `<VPP>`, `<LINGUIST>` — onto the **end** of its category's
+list, whatever its `POSITION` says. `populateTrait` then attaches each slot by
+looking its `parentid` up in `character[traitKey]`. With the container still
+unprocessed the lookup misses, and the slot is pushed to the **top level** instead
+of nesting. So every framework came out as an empty container with its slots
+scattered beside it.
+
+- **Corpus impact:** **27 of 37 fixtures** had at least one orphaned slot —
+  `m-championsmush` alone had 148 across powers and skills, and 54 empty containers.
+  `greyman`'s Multipower held 0 of its 4 slots. After the fix: zero orphans, corpus-wide.
+- **Costs did not move, anywhere.** `getParent` (`characterTrait.ts`) resolves a
+  parent by scanning `character[listKey]` for the id, and the container sits there
+  either way — which is why the Skill Enhancer discount (H12) and framework slot
+  pricing went on working for years while the nesting was broken. The decorator and
+  query golden masters were **not** re-based for H2, because nothing in them changed.
+- **What users see:** the sheet indents by descending the child array, so every
+  Multipower, Elemental Control and VPP previously rendered as an empty container
+  row with its slots flattened out beside it. They now nest.
+- **Fix + verify:** numeric comparator; `hero/__tests__/traitSort.test.ts` pins
+  ascending order, framework/enhancer nesting, zero orphans corpus-wide, and that the
+  affected costs are unchanged; hero golden master re-based to normalize **arrangement
+  only** (see `canonical` there) so all 37 fixtures still compare in full.
+
+**Callers had to learn to descend.** Anything summing or scanning a trait list
+top-level-only would now under-read. `withDescendants` (`core/util`) and
+`TRAIT_CHILD_KEYS` (`core/hero`) were added for this, and the child key is **not
+`powers` for most categories** — a Skill Enhancer nests under `skills`, a martial
+style under `maneuver`, equipment under both `power` and `powers`. Updated:
+`allocate.skillsBudget`, `ruleOfXStats`, and `characterSheet` (rows, alternate-ID
+filter, alternate-ID scan).
 
 ## H3 — Characteristic/defense totals skip duplicate powers — ✅ FIXED
 

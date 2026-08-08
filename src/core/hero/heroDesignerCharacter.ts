@@ -929,7 +929,13 @@ export class HeroDesignerCharacter {
             }
         }
 
-        trait[traitSubKey].sort((a: Obj, b: Obj) => Number(a.position > b.position));
+        // H2 (docs/KNOWN_DEVIATIONS.md): legacy returned a boolean here, which V8 coerces to 0/1 —
+        // never negative, so nothing can move earlier and the sort is a no-op on anything out of
+        // order. That is not merely cosmetic. `normalizeCharacterItems` appends every non-`power`
+        // sub-key (a Multipower, an Elemental Control, a Skill Enhancer) to the *end* of the list,
+        // so the container was processed after its own slots — and a slot whose parent is not in
+        // `character[traitKey]` yet is pushed to the top level instead of nesting under it.
+        trait[traitSubKey].sort((a: Obj, b: Obj) => a.position - b.position);
 
         for (const value of Object.values(trait[traitSubKey]) as Obj[]) {
             if (value.xmlid.toUpperCase() === GENERIC_OBJECT || SKILL_ENHANCERS.includes(value.xmlid.toUpperCase())) {

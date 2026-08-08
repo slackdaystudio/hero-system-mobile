@@ -19,7 +19,8 @@
  * the allocator computes (`total − characteristics − skills`). Nothing here states a cost;
  * every number below is derived from the template data through the decorator stack.
  */
-import {heroDesignerCharacter} from 'core/hero';
+import {heroDesignerCharacter, TRAIT_CHILD_KEYS} from 'core/hero';
+import {withDescendants} from 'core/util';
 import {characterTraitDecorator} from 'core/traits';
 import {allocate, ARCHETYPES_5E} from '../allocate';
 import {buildCharacteristics} from '../characteristics';
@@ -40,7 +41,8 @@ const build = (index: number): Obj => {
 
 /** Costed through `core/traits` rather than the app's sheet — `core` must not reach into `app`. */
 const powerRows = (character: Obj): Array<{label: string; realCost: number; active: number}> =>
-    (character.powers as Obj[]).map((power) => {
+    // Framework slots nest under their container (H2), and every one of them costs points.
+    withDescendants(character.powers as Obj[], TRAIT_CHILD_KEYS.powers).map((power) => {
         const decorated = characterTraitDecorator.decorate(power, 'powers', () => character);
 
         return {label: String(power.name), realCost: decorated.realCost(), active: decorated.activeCost()};
@@ -52,7 +54,7 @@ const powerRows = (character: Obj): Array<{label: string; realCost: number; acti
  * balance check has to count both, or an archetype with maneuvers looks short by exactly them.
  */
 const martialRows = (character: Obj): Array<{label: string; realCost: number}> =>
-    ((character.martialArts ?? []) as Obj[]).map((maneuver) => ({
+    withDescendants((character.martialArts ?? []) as Obj[], TRAIT_CHILD_KEYS.martialArts).map((maneuver) => ({
         label: String(maneuver.name ?? maneuver.alias),
         realCost: characterTraitDecorator.decorate(maneuver, 'martialArts', () => character).realCost(),
     }));
@@ -122,10 +124,13 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
         expect(rows.every((row) => Number.isFinite(row.realCost))).toBe(true);
         expect(heroDesignerCharacter.isFifth(character)).toBe(true);
 
-        // The frameworks resolve as frameworks, not as loose powers.
-        const flight = character.powers.find((power: Obj) => power.name === 'Soar');
-        const blast = character.powers.find((power: Obj) => power.name === 'Blast');
+        // The frameworks resolve as frameworks, not as loose powers — and their slots sit inside
+        // them (H2), so both are found by descending rather than by scanning the top level.
+        const slots = withDescendants(character.powers as Obj[], TRAIT_CHILD_KEYS.powers);
+        const flight = slots.find((power: Obj) => power.name === 'Soar')!;
+        const blast = slots.find((power: Obj) => power.name === 'Blast')!;
 
+        expect([flight, blast].every((slot) => slot !== undefined)).toBe(true);
         expect(heroDesignerCharacter.isPowerFrameworkItem(blast, character, 'multipower')).toBe(true);
         expect(heroDesignerCharacter.isPowerFrameworkItem(flight, character, 'elementalControl')).toBe(true);
     });
@@ -140,7 +145,11 @@ describe('Energy Projector powerset — 5E Low Powered', () => {
         // often carry affectsPrimary: false on defences, but that marks them alternate-form only
         // — a decision a player made about their character, not a default to copy.
         it('marks every power as always-on', () => {
-            expect((build(0).powers as Obj[]).every((power) => power.affectsPrimary && power.affectsTotal)).toBe(true);
+            // Slots included: a framework container carries no affects* flags of its own, so
+            // scanning the top level alone would skip every power that lives in one.
+            const powers = withDescendants(build(0).powers as Obj[], TRAIT_CHILD_KEYS.powers).filter((power) => power.type !== 'list');
+
+            expect(powers.every((power) => power.affectsPrimary && power.affectsTotal)).toBe(true);
         });
 
         it('totals the same in both forms, so there is nothing to toggle', () => {
