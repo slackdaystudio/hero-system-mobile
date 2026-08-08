@@ -149,7 +149,7 @@ it's data preservation, not a feature.
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 19 entries; 13 fixed (H2–H12, U2, U3) — every known corpus-triggered bug is now
+> `core/`.** 20 entries; 13 fixed (H2–H12, U2, U3) — every known corpus-triggered bug is now
 > fixed. It explains why a "wrong-looking" line in `core/` may be load-bearing, and why a
 > green golden master does not mean correct.
 
@@ -167,8 +167,9 @@ Process per fix — follow it; the ledger explains the reasoning:
 3. Re-base the affected golden master to an explicit intentional divergence, with a comment
    linking back to the ledger entry (see `H3_DIVERGENCE` / `U2_DIVERGENCE` for the shape).
 
-Still open — all cosmetic or template-only; none is corpus-triggered, and none has behaviour
-attached: **T1–T4** are template-output only, **H1** and **U1** are cosmetic.
+Still open — none is corpus-triggered: **T1–T4** are template-output only, **H1** and **U1** are
+cosmetic, and **H13** is latent (a Multipower slot's divisor never varies, because `ultraSlot` is
+read off the wrapper rather than the trait; every corpus slot is fixed, so nothing sees it).
 
 **H2 is a cautionary tale about this ledger's own confidence.** It sat open for the whole port
 described as display-order-only, on the reasoning that "point totals are order-independent" — which

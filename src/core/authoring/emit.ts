@@ -38,7 +38,7 @@ import type {ParsedCharacter} from 'core/hero';
 import {getTemplate} from 'core/templates';
 import {heroDesignerCharacter} from 'core/hero';
 import {modifier, templateFor, trait, type AuthorableCategory, type CatalogueAdder} from './catalogue';
-import type {AuthoredAdder, AuthoredCharacter, AuthoredModifier, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
+import type {AuthoredAdder, AuthoredCharacter, AuthoredFramework, AuthoredModifier, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
 
 type Obj = Record<string, any>;
 
@@ -60,6 +60,19 @@ const ID_BASE: Readonly<Record<string, number>> = {
 
 /** Modifier ids sit in their own block, keyed off the power they hang from. */
 const MODIFIER_ID_BASE = 7000;
+
+/** Framework containers and their slots, far enough from the rest not to collide. */
+const FRAMEWORK_ID_BASE = 9000;
+
+/**
+ * How far apart framework blocks are placed, in both id and position.
+ *
+ * Position matters: `populateTrait` attaches a slot by looking its `parentid` up in the list built
+ * so far, so a container has to be *processed* before its own slots. Since H2 that ordering is the
+ * numeric sort on `position`, so a container simply needs a lower position than everything in it.
+ * Before H2 it could not have worked at all — see docs/KNOWN_DEVIATIONS.md.
+ */
+const FRAMEWORK_STRIDE = 100;
 
 /**
  * Insertion order is load-bearing: `populateMovementAndCharacteristics` walks the object in key
@@ -257,6 +270,54 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
     };
 }
 
+/**
+ * A framework: its container, and its slots parented to it.
+ *
+ * The container is `GENERIC_OBJECT` — the framework's identity is the sub-key it is emitted under,
+ * not its xmlid, which is why {@link FrameworkKind}'s strings are spelled the way the format
+ * spells them. `populateTrait` gives any `GENERIC_OBJECT` `type: 'list'`, and
+ * `normalizeCharacterItems` copies the sub-key onto it as `originalType`; the slot decorators then
+ * match on that.
+ */
+function emitFramework(framework: AuthoredFramework, index: number, edition: AuthoringEdition): {container: Obj; slots: Obj[]} {
+    const id = FRAMEWORK_ID_BASE + index * FRAMEWORK_STRIDE;
+    const position = index * FRAMEWORK_STRIDE;
+
+    const container: Obj = {
+        xmlid: 'GENERIC_OBJECT',
+        id,
+        alias: FRAMEWORK_ALIAS[framework.kind],
+        name: framework.name.trim() === '' ? null : framework.name.trim(),
+        position,
+        multiplier: 1,
+        notes: null,
+        // A Variable Power Pool states its size in `levels`; the other two in `basecost`. That is
+        // the format's choice, and `VariablePowerPool.cost()` reads `levels` accordingly.
+        basecost: framework.kind === 'vpp' ? 0 : framework.reserve,
+        levels: framework.kind === 'vpp' ? framework.reserve : 0,
+        modifier: framework.modifiers.map((entry, order) => emitModifier(entry, id + order, edition)),
+    };
+
+    const slots = framework.slots.map((slot, order) => ({
+        ...emitPower(slot, position + 1 + order, edition),
+        id: id + 1 + order,
+        parentid: id,
+        // Fixed slots only, for now: the variable kind's divisor is unreachable in the engine —
+        // see H13 in docs/KNOWN_DEVIATIONS.md — so offering it would price a variable slot as a
+        // fixed one and say nothing.
+        ultraSlot: true,
+    }));
+
+    return {container, slots};
+}
+
+/** The alias HERO Designer writes on each kind of container. Printed by the sheet as-is. */
+const FRAMEWORK_ALIAS: Readonly<Record<AuthoredFramework['kind'], string>> = {
+    multipower: 'Multipower',
+    elementalControl: 'Elemental Control',
+    vpp: 'Variable Power Pool',
+};
+
 /** A `ParsedCharacter` at the given characteristic *levels* — the shape the engine consumes. */
 function parsedFrom(draft: AuthoredCharacter, levels: Record<string, number>): ParsedCharacter {
     const template = templateFor(draft.edition);
@@ -290,10 +351,30 @@ function parsedFrom(draft: AuthoredCharacter, levels: Record<string, number>): P
         perks: {perk: draft.perks.map((entry, index) => emitTrait(entry, 'perks', index, draft.edition))},
         talents: {talent: draft.talents.map((entry, index) => emitTrait(entry, 'talents', index, draft.edition))},
         martialarts: {},
-        powers: {power: draft.powers.map((entry, index) => emitPower(entry, index, draft.edition))},
+        powers: emitPowers(draft),
         equipment: {},
         disadvantages: {disad: draft.complications.map((entry, index) => emitTrait(entry, 'disadvantages', index, draft.edition))},
     } as unknown as ParsedCharacter;
+}
+
+/**
+ * The `powers` block: standalone powers under `power`, each framework under its own sub-key.
+ *
+ * Containers of the same kind collapse into an array, which is what the XML parser produces for
+ * repeated elements and what `normalizeCharacterItem` already knows how to walk.
+ */
+function emitPowers(draft: AuthoredCharacter): Obj {
+    const powers: Obj = {power: draft.powers.map((entry, index) => emitPower(entry, index, draft.edition))};
+
+    draft.frameworks.forEach((framework, index) => {
+        const {container, slots} = emitFramework(framework, index, draft.edition);
+        const existing = powers[framework.kind];
+
+        powers[framework.kind] = existing === undefined ? container : Array.isArray(existing) ? [...existing, container] : [existing, container];
+        powers.power.push(...slots);
+    });
+
+    return powers;
 }
 
 const totalOf = (character: Obj, key: string): number =>

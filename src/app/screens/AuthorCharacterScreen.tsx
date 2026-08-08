@@ -42,12 +42,14 @@ import {
     withheld,
     type AuthorableCategory,
     type AuthoredCharacter,
+    type AuthoredFramework,
     type AuthoredModifier,
     type AuthoredPower,
     type AuthoredTrait,
     type AuthoringEdition,
     type CatalogueTrait,
     type FieldGroup,
+    type FrameworkKind,
     type Problem,
 } from 'core/authoring';
 import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField} from 'app/components';
@@ -122,6 +124,8 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel}:
                 <SpendMeter left={left} complications={spend?.complications ?? 0} limit={budget.complicationLimit} edition={draft.edition} />
 
                 <Characteristics draft={draft} onChange={setDraft} />
+
+                <Frameworks draft={draft} onChange={setDraft} />
 
                 {SECTIONS.map((section) => (
                     <TraitSection
@@ -667,6 +671,124 @@ function Modifiers({
 
             <SelectField label="Add advantage or limitation" value="" options={available.map((entry) => entry.display)} onChange={add} testID={`author-add-modifier-${id}`} />
         </View>
+    );
+}
+
+const FRAMEWORK_KINDS: Array<{value: FrameworkKind; label: string}> = [
+    {value: 'multipower', label: 'Multipower'},
+    {value: 'elementalControl', label: 'Elemental Control'},
+    {value: 'vpp', label: 'Variable Power Pool'},
+];
+
+/**
+ * Power frameworks: a pool, and the powers drawing on it.
+ *
+ * Its own section rather than a kind of power, because a framework is not priced like one — the
+ * container costs its reserve and each slot a fraction of what it would cost alone. Slots reuse
+ * {@link TraitRow}, so a power in a pool is edited exactly like a power outside one.
+ */
+function Frameworks({draft, onChange}: {draft: AuthoredCharacter; onChange: (draft: AuthoredCharacter) => void}): React.JSX.Element {
+    const powers = useMemo(() => authorable('powers', draft.edition), [draft.edition]);
+    const byXmlid = useMemo(() => new Map(catalogue('powers', draft.edition).map((entry) => [entry.xmlid, entry])), [draft.edition]);
+
+    const update = (index: number, revised: AuthoredFramework): void =>
+        onChange({...draft, frameworks: draft.frameworks.map((entry, position) => (position === index ? revised : entry))});
+
+    const add = (label: string): void => {
+        const kind = FRAMEWORK_KINDS.find((candidate) => candidate.label === label);
+
+        if (kind !== undefined) {
+            onChange({...draft, frameworks: [...draft.frameworks, {kind: kind.value, name: '', reserve: 0, modifiers: [], slots: []}]});
+        }
+    };
+
+    return (
+        <Card>
+            <Text variant="label" muted>
+                FRAMEWORKS
+            </Text>
+
+            <View style={styles.fields}>
+                {draft.frameworks.map((framework, index) => (
+                    <View key={`${framework.kind}-${index}`} style={styles.complication}>
+                        <View style={styles.complicationHead}>
+                            <Text variant="label">{FRAMEWORK_KINDS.find((kind) => kind.value === framework.kind)?.label ?? framework.kind}</Text>
+                            <Button
+                                label="Remove"
+                                onPress={() => onChange({...draft, frameworks: draft.frameworks.filter((_, position) => position !== index)})}
+                                variant="secondary"
+                                testID={`author-remove-framework-${index}`}
+                            />
+                        </View>
+
+                        <TextField label="Name" value={framework.name} onChangeText={(name) => update(index, {...framework, name})} maxLength={60} testID={`author-framework-name-${index}`} />
+
+                        <NumberField
+                            label={framework.kind === 'vpp' ? 'Pool' : 'Reserve'}
+                            value={String(framework.reserve)}
+                            onChangeText={(text) => update(index, {...framework, reserve: Math.max(0, Number.parseInt(text, 10) || 0)})}
+                            testID={`author-framework-reserve-${index}`}
+                        />
+
+                        <Modifiers
+                            id={`framework-${index}`}
+                            edition={draft.edition}
+                            power={{xmlid: 'GENERIC_OBJECT', input: '', adders: [], modifiers: framework.modifiers} as AuthoredPower}
+                            onChange={(revised) => update(index, {...framework, modifiers: (revised as AuthoredPower).modifiers})}
+                        />
+
+                        {framework.slots.map((slot, order) => {
+                            const entry = byXmlid.get(slot.xmlid);
+
+                            return entry === undefined ? null : (
+                                <TraitRow
+                                    key={`${slot.xmlid}-${order}`}
+                                    index={order}
+                                    draftKey={`framework-${index}-slot`}
+                                    edition={draft.edition}
+                                    entry={entry}
+                                    trait={slot}
+                                    onChange={(revised) => update(index, {...framework, slots: framework.slots.map((entry2, p) => (p === order ? (revised as AuthoredPower) : entry2))})}
+                                    onRemove={() => update(index, {...framework, slots: framework.slots.filter((_, p) => p !== order)})}
+                                />
+                            );
+                        })}
+
+                        <SelectField
+                            label="Add a power to this framework"
+                            value=""
+                            options={powers.map((entry) => entry.display)}
+                            onChange={(display) => {
+                                const entry = powers.find((candidate) => candidate.display === display);
+
+                                if (entry !== undefined) {
+                                    update(index, {
+                                        ...framework,
+                                        slots: [
+                                            ...framework.slots,
+                                            {xmlid: entry.xmlid, input: '', adders: [], levels: 0, modifiers: [], ...(entry.fieldGroup === null ? {} : {defense: {pd: 0, ed: 0, mental: 0, power: 0}})},
+                                        ],
+                                    });
+                                }
+                            }}
+                            testID={`author-add-slot-${index}`}
+                        />
+                    </View>
+                ))}
+
+                <SelectField
+                    label="Add"
+                    value=""
+                    options={FRAMEWORK_KINDS.map((kind) => kind.label)}
+                    onChange={add}
+                    // Fixed slots only — the variable kind's divisor is unreachable in the engine
+                    // (H13 in docs/KNOWN_DEVIATIONS.md), so offering it would price a variable slot
+                    // as a fixed one and say nothing about it.
+                    hint="Slots are fixed slots"
+                    testID="author-add-framework"
+                />
+            </View>
+        </Card>
     );
 }
 

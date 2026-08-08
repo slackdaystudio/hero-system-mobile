@@ -32,7 +32,7 @@
  *   - `warning` — legal, priced correctly, but probably not what was meant (over budget, blank).
  */
 import {AUTHORABLE_CATEGORIES, characteristics, complications, modifier, trait, type AuthorableCategory, type CatalogueTrait} from './catalogue';
-import type {AuthoredCharacter, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
+import type {AuthoredCharacter, AuthoredFramework, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
 
 export type Severity = 'error' | 'warning';
 
@@ -246,6 +246,42 @@ function validatePower(power: AuthoredPower, index: number, edition: AuthoringEd
     return problems;
 }
 
+/** What each kind of pool is called where a player will read it. */
+const FRAMEWORK_NOUN: Readonly<Record<AuthoredFramework['kind'], string>> = {
+    multipower: 'Multipower',
+    elementalControl: 'Elemental Control',
+    vpp: 'Variable Power Pool',
+};
+
+/**
+ * A framework, its reserve, and the slots that draw on it.
+ *
+ * The two rules worth enforcing are the ones that produce a *plausible* character rather than a
+ * broken one, which is why they are errors: a framework with no reserve prices its slots at
+ * nothing, and an Elemental Control slot cheaper than the pool comes out negative and quietly
+ * refunds points.
+ */
+function validateFramework(framework: AuthoredFramework, index: number, edition: AuthoringEdition): Problem[] {
+    const path = `frameworks[${index}]`;
+    const problems: Problem[] = [];
+    const noun = FRAMEWORK_NOUN[framework.kind];
+
+    if (!Number.isInteger(framework.reserve) || framework.reserve <= 0) {
+        problems.push({severity: 'error', path, message: `${noun} needs a reserve of at least 1 point.`});
+    }
+
+    if (framework.slots.length === 0) {
+        problems.push({severity: 'warning', path, message: `${noun} has no powers in it.`});
+    }
+
+    framework.slots.forEach((slot, order) => {
+        problems.push(...validateTrait(slot, 'powers', order, edition).map((problem) => ({...problem, path})));
+        problems.push(...validatePower(slot, order, edition).map((problem) => ({...problem, path})));
+    });
+
+    return problems;
+}
+
 /**
  * Everything wrong with a draft, most severe first.
  *
@@ -288,6 +324,7 @@ export function validate(draft: AuthoredCharacter): Problem[] {
     }
 
     draft.powers.forEach((power, index) => problems.push(...validatePower(power, index, draft.edition)));
+    draft.frameworks.forEach((framework, index) => problems.push(...validateFramework(framework, index, draft.edition)));
 
     return [...problems].sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'error' ? -1 : 1));
 }

@@ -130,6 +130,42 @@ export interface AuthoredDefense {
     readonly power: number;
 }
 
+/**
+ * The three power frameworks, named as the `.hdc` names them.
+ *
+ * These strings are load-bearing twice over: they are the sub-key a container is emitted under,
+ * which is what `normalizeCharacterItems` turns into `originalType`, and `originalType` is what
+ * `isPowerFrameworkItem` matches to decide how a slot is priced. Spelling one differently means
+ * the container still parses and the slots still cost full price.
+ */
+export type FrameworkKind = 'multipower' | 'elementalControl' | 'vpp';
+
+/**
+ * A power framework: a pool of points, and the powers that draw on it.
+ *
+ * Its own list rather than a kind of power, because a framework is not priced like one — the
+ * container costs its reserve, and each slot costs a fraction of what it would cost alone. The
+ * three kinds do that arithmetic differently, which is the whole reason to have them.
+ *
+ * A framework carries modifiers like any power: a Unified Power on the pool applies to every slot
+ * in it, which `ModifierCalculator` handles by reading the parent's modifiers as well as the
+ * slot's own.
+ */
+export interface AuthoredFramework {
+    readonly kind: FrameworkKind;
+    readonly name: string;
+    /**
+     * Points in the pool.
+     *
+     * Emitted as the container's `basecost` for a Multipower or Elemental Control, and as its
+     * `levels` for a Variable Power Pool — the format uses different fields, and
+     * `VariablePowerPool.cost()` reads `levels` where the other two read `basecost`.
+     */
+    readonly reserve: number;
+    readonly modifiers: readonly AuthoredModifier[];
+    readonly slots: readonly AuthoredPower[];
+}
+
 /** A power: a trait, plus the advantages and limitations that make it cost what it costs. */
 export interface AuthoredPower extends AuthoredTrait {
     readonly modifiers: readonly AuthoredModifier[];
@@ -154,6 +190,7 @@ export interface AuthoredCharacter {
     readonly perks: readonly AuthoredTrait[];
     readonly talents: readonly AuthoredTrait[];
     readonly powers: readonly AuthoredPower[];
+    readonly frameworks: readonly AuthoredFramework[];
     readonly complications: readonly AuthoredTrait[];
 }
 
@@ -167,5 +204,6 @@ export const emptyDraft = (edition: AuthoringEdition): AuthoredCharacter => ({
     perks: [],
     talents: [],
     powers: [],
+    frameworks: [],
     complications: [],
 });

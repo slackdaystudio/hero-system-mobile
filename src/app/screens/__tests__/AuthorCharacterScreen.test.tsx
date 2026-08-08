@@ -376,3 +376,69 @@ describe('AuthorCharacterScreen — powers and their modifiers', () => {
         expect(saved[0].document).toEqual(build(full));
     });
 });
+
+describe('AuthorCharacterScreen — frameworks', () => {
+    const gadgets: AuthoredCharacter = {
+        ...emptyDraft('6E'),
+        name: 'Gadgeteer',
+        frameworks: [
+            {
+                kind: 'multipower',
+                name: 'Utility Belt',
+                reserve: 60,
+                modifiers: [],
+                slots: [
+                    {xmlid: 'ENERGYBLAST', name: 'Stun Gun', input: 'ED', adders: [], levels: 12, modifiers: []},
+                    {xmlid: 'ENERGYBLAST', name: 'Net', input: 'ED', adders: [], levels: 10, modifiers: []},
+                ],
+            },
+        ],
+    };
+
+    it('totals the reserve and every slot', async () => {
+        const {tree} = await renderScreen({initial: gadgets});
+
+        // 60 reserve + 60/10 + 50/10 = 71.
+        expect(textOf(tree, 'author-spend')).toBe('71 spent of 400');
+    });
+
+    it('edits a slot with the same row a standalone power uses', async () => {
+        const {tree} = await renderScreen({initial: gadgets});
+
+        // Slots are powers: they get a name, and a modifier list of their own.
+        expect(tree.root.findAllByProps({testID: 'author-name-framework-0-slot-0'}).length).toBeGreaterThan(0);
+        expect(tree.root.findAllByProps({testID: 'author-add-modifier-framework-0-slot-0'}).length).toBeGreaterThan(0);
+    });
+
+    it('says slots are fixed slots rather than silently making them so', async () => {
+        const {tree} = await renderScreen();
+        const add = tree.root.findAllByProps({testID: 'author-add-framework'}).find((node) => node.props.hint !== undefined);
+
+        // The variable kind's divisor is unreachable in the engine (H13), so it is not offered.
+        expect(add?.props.hint).toBe('Slots are fixed slots');
+    });
+
+    it('blocks a framework with no reserve', async () => {
+        const {tree, saved} = await renderScreen({
+            initial: {...emptyDraft('6E'), name: 'Broken', frameworks: [{kind: 'multipower', name: 'Empty', reserve: 0, modifiers: [], slots: []}]},
+        });
+
+        expect(textOf(tree, 'author-problem-error-0')).toContain('reserve of at least 1');
+        await press(tree, 'author-save');
+        expect(saved).toHaveLength(0);
+    });
+
+    it('saves and re-opens a framework with its slots nested', async () => {
+        const {tree, saved} = await renderScreen({initial: gadgets});
+
+        await press(tree, 'author-save');
+
+        expect(saved).toHaveLength(1);
+        expect(parseSource(JSON.parse(JSON.stringify(saved[0].source)))).toEqual(gadgets);
+
+        // And the document the sheet will read has the slots inside the container, not beside it.
+        const powers = (saved[0].document as Obj).powers as Obj[];
+        expect(powers).toHaveLength(1);
+        expect((powers[0].powers as Obj[]).map((slot) => slot.name)).toEqual(['Stun Gun', 'Net']);
+    });
+});

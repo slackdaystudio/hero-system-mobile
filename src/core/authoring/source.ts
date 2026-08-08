@@ -25,7 +25,7 @@
  * edit it does not.
  */
 import type {StoredSource} from 'core/ports';
-import type {AuthoredAdder, AuthoredCharacter, AuthoredModifier, AuthoredPower, AuthoredTrait, AuthoringEdition} from './types';
+import type {AuthoredAdder, AuthoredCharacter, AuthoredFramework, AuthoredModifier, AuthoredPower, AuthoredTrait, AuthoringEdition, FrameworkKind} from './types';
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -207,6 +207,44 @@ function parsePowers(value: unknown): AuthoredPower[] | null {
     return powers;
 }
 
+const FRAMEWORK_KINDS = new Set<FrameworkKind>(['multipower', 'elementalControl', 'vpp']);
+
+function parseFrameworks(value: unknown): AuthoredFramework[] | null {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    const frameworks: AuthoredFramework[] = [];
+
+    for (const entry of value) {
+        if (!isObject(entry) || !FRAMEWORK_KINDS.has(entry.kind as FrameworkKind) || typeof entry.reserve !== 'number' || !Number.isInteger(entry.reserve)) {
+            return null;
+        }
+
+        const slots = parsePowers(entry.slots ?? []);
+
+        if (slots === null || !Array.isArray(entry.modifiers)) {
+            return null;
+        }
+
+        const modifiers: AuthoredModifier[] = [];
+
+        for (const raw of entry.modifiers) {
+            const parsed = parseModifier(raw);
+
+            if (parsed === null) {
+                return null;
+            }
+
+            modifiers.push(parsed);
+        }
+
+        frameworks.push({kind: entry.kind as FrameworkKind, name: asString(entry.name), reserve: entry.reserve, modifiers, slots});
+    }
+
+    return frameworks;
+}
+
 /**
  * A stored source as a draft, or null when it is not one this build understands.
  *
@@ -234,8 +272,9 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
     const talents = parseTraits(source.talents ?? []);
     const complications = parseTraits(source.complications ?? []);
     const powers = parsePowers(source.powers ?? []);
+    const frameworks = parseFrameworks(source.frameworks ?? []);
 
-    if (skills === null || perks === null || talents === null || complications === null || powers === null) {
+    if (skills === null || perks === null || talents === null || complications === null || powers === null || frameworks === null) {
         return null;
     }
 
@@ -248,11 +287,14 @@ export function parseSource(source: StoredSource | null | undefined): AuthoredCh
         perks,
         talents,
         powers,
+        frameworks,
         complications,
     };
 }
 
 /** A draft as the JSON the `source` column stores. A plain projection — no engine data rides along. */
+const modifierToSource = (mod: AuthoredModifier): Record<string, unknown> => ({...mod, adders: mod.adders.map((adder) => ({...adder}))});
+
 const traitToSource = (entry: AuthoredTrait): Record<string, unknown> => ({
     xmlid: entry.xmlid,
     input: entry.input,
@@ -264,6 +306,12 @@ const traitToSource = (entry: AuthoredTrait): Record<string, unknown> => ({
     ...(entry.familiarity === undefined ? {} : {familiarity: entry.familiarity}),
 });
 
+const powerToSource = (entry: AuthoredPower): Record<string, unknown> => ({
+    ...traitToSource(entry),
+    modifiers: entry.modifiers.map(modifierToSource),
+    ...(entry.defense === undefined ? {} : {defense: {...entry.defense}}),
+});
+
 export const toSource = (draft: AuthoredCharacter): StoredSource => ({
     edition: draft.edition,
     name: draft.name,
@@ -272,10 +320,13 @@ export const toSource = (draft: AuthoredCharacter): StoredSource => ({
     skills: draft.skills.map(traitToSource),
     perks: draft.perks.map(traitToSource),
     talents: draft.talents.map(traitToSource),
-    powers: draft.powers.map((entry) => ({
-        ...traitToSource(entry),
-        modifiers: entry.modifiers.map((mod) => ({...mod, adders: mod.adders.map((adder) => ({...adder}))})),
-        ...(entry.defense === undefined ? {} : {defense: {...entry.defense}}),
+    powers: draft.powers.map(powerToSource),
+    frameworks: draft.frameworks.map((framework) => ({
+        kind: framework.kind,
+        name: framework.name,
+        reserve: framework.reserve,
+        modifiers: framework.modifiers.map(modifierToSource),
+        slots: framework.slots.map(powerToSource),
     })),
     complications: draft.complications.map(traitToSource),
 });

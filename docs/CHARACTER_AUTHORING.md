@@ -202,7 +202,7 @@ Each phase is independently shippable and leaves the app coherent.
 | **A** | ✅ **done** — `core/authoring` emitter, migration 008, `origin: 'authored'`, live points total, characteristics + complications | Delivers a saveable, priced, editable character |
 | **B** | ✅ **done** — skills / perks / talents from the catalogue, one generic renderer | The generic renderer earns its keep here |
 | **C** | ✅ **done** — powers, advantages/limitations, and the first field group | The big one — and the per-power long tail is now a named, countable list |
-| **D** | Frameworks (Multipower / EC / VPP) | Needs Phase 0 |
+| **D** | ✅ **done** — Multipower, Elemental Control, VPP | Needed Phase 0, and proved it |
 | **E** | Martial arts, equipment | 56 maneuvers per edition, largely table-driven |
 
 Rough shape: **~2.5–4k lines**, against an 18.4k-line codebase — so a substantial feature, comparable
@@ -320,6 +320,45 @@ cost because they belong to a sense rather than to a sheet.
 argument, which landed in `adderOf`'s `depth` parameter and read as "you are already nested" for
 every adder but the first. Nested adders silently vanished. The signature is now `depth: 0 | 1` and
 the comment says why; a default parameter that means something is a trap next to `.map`.
+
+## What Phase D actually built
+
+**This is the phase Phase 0 was for.** Before H2 was fixed a framework container was processed
+*after* its own slots and never adopted them — the slots landed at the top level and the container
+came out empty. An authoring UI would have produced exactly that, immediately, and looked broken.
+`frameworks.test.ts` asserts the nesting explicitly, so it is a regression test for H2 as much as a
+test of frameworks.
+
+**A framework's identity is the sub-key it is emitted under, not its xmlid.** All three containers
+are `GENERIC_OBJECT`; `normalizeCharacterItems` copies the sub-key onto the container as
+`originalType`, and `isPowerFrameworkItem` matches on that to decide how a slot is priced. So
+`FrameworkKind`'s three strings — `multipower`, `elementalControl`, `vpp` — are load-bearing
+spelling, and getting one wrong yields a container that parses fine and slots that cost full price.
+
+The three kinds price slots differently, which is the whole reason they exist:
+
+| Kind | Container | Slot |
+|---|---|---|
+| Multipower | reserve as `basecost` | active ÷ 10 (fixed slot) |
+| Elemental Control | reserve as `basecost` | active − reserve |
+| Variable Power Pool | pool as **`levels`** | — |
+
+The VPP is the odd one: it states its size in `levels` where the other two use `basecost`, and
+`VariablePowerPool.cost()` reads it accordingly. A 50-point pool costs 75 — the pool plus a control
+cost of half of it.
+
+### A second latent engine bug, found the same way as H2
+
+`MultipowerItem` reads `ultraSlot` off the **`CharacterTrait` wrapper** rather than off the trait,
+behind a cast that stops the compiler objecting. The wrapper has no such field, so the read is
+always `undefined` and **every Multipower slot divides by 10** whatever kind of slot it is.
+Confirmed by pricing the same authored slot both ways: 6 either way.
+
+Not corpus-triggered — all 37 fixtures use fixed slots exclusively, and for a fixed slot ÷10 is
+right — so no golden master can see it. Recorded as **H13**; not fixed here, because that is a
+correctness-pass change with its own commit, its own rules check and its own test. The consequence
+for authoring is that `core/authoring` emits **fixed slots only** and the UI says so, rather than
+offering a variable slot that would silently price as a fixed one.
 
 ## Risks worth naming up front
 

@@ -49,6 +49,7 @@
 | H10 | `Clinging.cost()` adds a stray `+1` | ✅ **fixed** — was real bug, active | yes — mark-li, aoe, spyder2022 | traits (decorator, re-based) |
 | H11 | `HandToHandAttack.roll()` computes a half-die then drops it | ✅ **fixed** — was real bug (latent) | no — the corpus never reaches the branch | none (no re-base needed) |
 | H12 | Skill Enhancer's min-1 floor charged a *free* skill 1 point | ✅ **fixed** — was real bug, active | yes — greyman, m-championsmush, twilight | traits (decorator, re-based) |
+| H13 | Multipower slot divisor reads `ultraSlot` off the wrapper, so it never varies | real bug (latent) | no — every corpus slot is fixed | none (not yet fixed) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -657,6 +658,38 @@ return Math.pow(step, nearest) === total ? nearest : Math.ceil(exact);
   rounds up). Existing `common.test.ts` coverage only exercises the default `step: 2`, so
   it cannot catch this. No golden-master re-base expected (no corpus divergence) — verify
   by re-running it.
+
+## H13 — A Multipower slot's divisor is always 10
+
+- **Where:** `core/traits/powers/multipowerItem.ts` —
+  `(this.characterTrait as unknown as {ultraSlot?: boolean}).ultraSlot ? 5 : 10`.
+- **Legacy:** same.
+
+**Two things are wrong with that line, and only one of them is arguable.**
+
+The unambiguous one: `ultraSlot` is a field on the **trait**, not on the `CharacterTrait` wrapper.
+`CharacterTrait` carries `trait`, `listKey`, `getCharacter` and `parentTrait` — no `ultraSlot`, and
+the cast is what stops the compiler saying so. The read is therefore always `undefined`, the
+condition always false, and **every Multipower slot divides by 10** regardless of what kind of slot
+it is. Verified by pricing the same authored slot with `ultraSlot` true and false: 6 either way.
+
+The arguable one: even reachable, `ultraSlot ? 5 : 10` looks inverted. `ULTRA_SLOT="Yes"` marks a
+**fixed** slot, which is the cheaper kind — flexibility is what you pay for — so a fixed slot should
+divide by 10 and a variable one by 5. That is the reading the accidental behaviour happens to
+implement for fixed slots. **Confirm against 6E1 before changing it**, in the spirit of the open
+`PLUSONEPIP` question in CLAUDE.md: the correction is probably `trait.ultraSlot ? 10 : 5`, but a
+plausible-looking ratio is exactly the sort of thing worth checking rather than reasoning about.
+
+- **Corpus impact:** none. All 37 fixtures use fixed slots exclusively — greyman, indigo-bunting and
+  psi-blade6 are the Multipowers, and every slot in them is `ULTRA_SLOT="Yes"` — so the accidental
+  always-10 is right for all of them. A golden master cannot see this.
+- **Consequence for authoring:** `core/authoring` emits **fixed slots only** and says so, rather
+  than offering a variable slot that would silently price as a fixed one. Widening that is gated on
+  this entry.
+- **Fix + verify:** read `ultraSlot` off the trait; settle the ratio from the rulebook; a
+  purpose-built test with both slot kinds (the corpus cannot supply one). No golden-master re-base
+  is expected, since no fixture has a variable slot — which is also why this needs its own test
+  rather than a fixture.
 
 ## U1 — `capitalize` only upper-cases the first character
 
