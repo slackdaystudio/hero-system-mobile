@@ -69,12 +69,20 @@ const FRAMEWORK_ID_BASE = 9000;
 /**
  * How far apart framework blocks are placed, in both id and position.
  *
- * Position matters: `populateTrait` attaches a slot by looking its `parentid` up in the list built
- * so far, so a container has to be *processed* before its own slots. Since H2 that ordering is the
- * numeric sort on `position`, so a container simply needs a lower position than everything in it.
- * Before H2 it could not have worked at all — see docs/KNOWN_DEVIATIONS.md.
+ * Position matters twice. `populateTrait` attaches a slot by looking its `parentid` up in the list
+ * built so far, so a container has to be *processed* before its own slots — since H2 that ordering
+ * is the numeric sort on `position`, so a container needs a lower position than everything in it.
+ * Before H2 it could not have worked at all; see docs/KNOWN_DEVIATIONS.md.
+ *
+ * And position is the sheet's display order, which is why frameworks start well above the
+ * standalone powers rather than at zero. Sharing the range put a Multipower at position 0
+ * alongside the first standalone power, so a framework rendered *between* two loose powers and its
+ * slots' positions collided with theirs.
  */
 const FRAMEWORK_STRIDE = 100;
+
+/** Frameworks begin here, past any plausible number of standalone powers. */
+const FRAMEWORK_POSITION_BASE = 1000;
 
 /**
  * Insertion order is load-bearing: `populateMovementAndCharacteristics` walks the object in key
@@ -323,7 +331,7 @@ function emitManeuver(authored: AuthoredTrait, position: number, edition: Author
  */
 function emitFramework(framework: AuthoredFramework, index: number, edition: AuthoringEdition): {container: Obj; slots: Obj[]} {
     const id = FRAMEWORK_ID_BASE + index * FRAMEWORK_STRIDE;
-    const position = index * FRAMEWORK_STRIDE;
+    const position = FRAMEWORK_POSITION_BASE + index * FRAMEWORK_STRIDE;
 
     const container: Obj = {
         xmlid: 'GENERIC_OBJECT',

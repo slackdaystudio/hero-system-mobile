@@ -170,6 +170,20 @@ describe('frameworks survive storage', () => {
         expect(build(reopened)).toEqual(build(complete));
     });
 
+    it('orders frameworks after the standalone powers, not among them', () => {
+        const character = build(
+            draft({
+                powers: [blast({name: 'Loose A'}), blast({name: 'Loose B'})],
+                frameworks: [{kind: 'multipower', name: 'MP', reserve: 30, modifiers: [], slots: [blast({name: 'Slot'})]}],
+            }),
+        );
+
+        // Position is the sheet's display order. Frameworks start well above the standalone
+        // powers so a Multipower cannot land between two loose powers — and so its slots'
+        // positions cannot collide with theirs.
+        expect((character.powers as Obj[]).map((power) => power.name)).toEqual(['Loose A', 'Loose B', 'MP']);
+    });
+
     it('keeps standalone powers apart from the frameworks', () => {
         const character = build(complete);
         const top = character.powers as Obj[];
