@@ -25,7 +25,8 @@
  * Neither is asserted from the data. The engine prices every power, and the Rule of X reads the
  * finished character — so a powerset cannot pass here by declaring anything about itself.
  */
-import {heroDesignerCharacter} from 'core/hero';
+import {heroDesignerCharacter, TRAIT_CHILD_KEYS} from 'core/hero';
+import {withDescendants} from 'core/util';
 import {getTemplate} from 'core/templates';
 import {characterTraitDecorator, type Obj} from 'core/traits';
 import {ARCHETYPES_6E, characteristicsBudget} from '../allocate';
@@ -71,7 +72,7 @@ const powersSpent = (character: Obj): number =>
     (['powers', 'martialArts'] as const).reduce(
         (total, key) =>
             total +
-            ((character[key] ?? []) as Obj[]).reduce((sum, trait) => {
+            withDescendants((character[key] ?? []) as Obj[], TRAIT_CHILD_KEYS[key]).reduce((sum, trait) => {
                 try {
                     return sum + characterTraitDecorator.decorate(trait, key, () => character).realCost();
                 } catch {

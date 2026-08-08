@@ -38,7 +38,7 @@
 | T3 | `mainapp` overlays ignored | needs rules check | no model impact | none |
 | T4 | Item-add into a missing base sub-key → `[undefined, item]` | real bug (edge) | unknown / no | templates |
 | H1 | `character.template` always `undefined` | cosmetic | yes | hero |
-| H2 | Trait sort uses a boolean-returning comparator | real bug | likely (trait order) | hero |
+| H2 | Trait sort uses a boolean-returning comparator, so frameworks lose their slots | ✅ **fixed** — was real bug, active | **yes — 27 fixtures** | hero (re-based) |
 | H3 | Char/defense totals skip **duplicate** powers | ✅ **fixed** — was real bug, active | yes — junkyard, mark-li-v5a-433 | hero query (re-based) |
 | H4 | `Maneuver.roll()` crashes on an unresolved-template maneuver | ✅ **fixed** — was real bug, active | yes — tazimmaad ("Cut") | traits (decorator, re-based) |
 | H5 | VPP contents counted toward totals | ✅ **fixed** — was real bug, active | yes — adamantine (Leaping), m-championsmush | hero query / movement |
@@ -49,6 +49,7 @@
 | H10 | `Clinging.cost()` adds a stray `+1` | ✅ **fixed** — was real bug, active | yes — mark-li, aoe, spyder2022 | traits (decorator, re-based) |
 | H11 | `HandToHandAttack.roll()` computes a half-die then drops it | ✅ **fixed** — was real bug (latent) | no — the corpus never reaches the branch | none (no re-base needed) |
 | H12 | Skill Enhancer's min-1 floor charged a *free* skill 1 point | ✅ **fixed** — was real bug, active | yes — greyman, m-championsmush, twilight | traits (decorator, re-based) |
+| H13 | Multipower slot divisor reads `ultraSlot` off the wrapper, so it never varies | real bug (latent) | no — every corpus slot is fixed | none (not yet fixed) |
 | U1 | `capitalize` only upper-cases the first char | cosmetic (app-only) | no | (unit test) |
 | U2 | `getMultiplications(0, …)` → `-Infinity` (log of zero) | ✅ **fixed** — was real bug, active | yes — mark-li-v5a-433 (Gecko pads) | traits (decorator, re-based) |
 | U3 | `getMultiplications` off-by-one on exact powers of a non-2 step | ✅ **fixed** — was real bug (latent) | no — none; golden masters unchanged | none (no re-base needed) |
@@ -118,18 +119,51 @@
 - **Fix + verify:** choose the correct value; hero unit test; re-base hero golden
   master.
 
-## H2 — Trait sort uses a boolean-returning comparator
+## H2 — Trait sort uses a boolean-returning comparator — ✅ FIXED
+
+**Fixed.** The comparator is now `.sort((a, b) => a.position - b.position)`.
 
 - **Where:** `populateTrait` — `.sort((a, b) => Number(a.position > b.position))`
   (legacy returns the raw boolean; V8 coerces to 0/1). Never returns a negative, so
-  it is not a correct comparator — a partial/incorrect ordering.
+  it is not a correct comparator: nothing can move earlier in the array, which makes
+  the sort a no-op on anything already out of order.
 - **Legacy:** same.
-- **Correct:** `.sort((a, b) => a.position - b.position)`.
-- **Corpus impact:** likely changes trait **order** for some characters (affects
-  display order and any position-indexed logic; point totals are order-independent).
-  Confirm which fixtures reorder.
-- **Fix + verify:** proper numeric comparator; unit test with shuffled positions;
-  re-base hero golden master for reordered characters.
+
+**This entry previously read "affects display order; point totals are
+order-independent". That was wrong about the scope, and right about the totals.**
+The ordering and the *structure* are the same problem:
+
+`normalizeCharacterItems` moves every non-`power` sub-key — `<MULTIPOWER>`,
+`<ELEMENTALCONTROL>`, `<VPP>`, `<LINGUIST>` — onto the **end** of its category's
+list, whatever its `POSITION` says. `populateTrait` then attaches each slot by
+looking its `parentid` up in `character[traitKey]`. With the container still
+unprocessed the lookup misses, and the slot is pushed to the **top level** instead
+of nesting. So every framework came out as an empty container with its slots
+scattered beside it.
+
+- **Corpus impact:** **27 of 37 fixtures** had at least one orphaned slot —
+  `m-championsmush` alone had 148 across powers and skills, and 54 empty containers.
+  `greyman`'s Multipower held 0 of its 4 slots. After the fix: zero orphans, corpus-wide.
+- **Costs did not move, anywhere.** `getParent` (`characterTrait.ts`) resolves a
+  parent by scanning `character[listKey]` for the id, and the container sits there
+  either way — which is why the Skill Enhancer discount (H12) and framework slot
+  pricing went on working for years while the nesting was broken. The decorator and
+  query golden masters were **not** re-based for H2, because nothing in them changed.
+- **What users see:** the sheet indents by descending the child array, so every
+  Multipower, Elemental Control and VPP previously rendered as an empty container
+  row with its slots flattened out beside it. They now nest.
+- **Fix + verify:** numeric comparator; `hero/__tests__/traitSort.test.ts` pins
+  ascending order, framework/enhancer nesting, zero orphans corpus-wide, and that the
+  affected costs are unchanged; hero golden master re-based to normalize **arrangement
+  only** (see `canonical` there) so all 37 fixtures still compare in full.
+
+**Callers had to learn to descend.** Anything summing or scanning a trait list
+top-level-only would now under-read. `withDescendants` (`core/util`) and
+`TRAIT_CHILD_KEYS` (`core/hero`) were added for this, and the child key is **not
+`powers` for most categories** — a Skill Enhancer nests under `skills`, a martial
+style under `maneuver`, equipment under both `power` and `powers`. Updated:
+`allocate.skillsBudget`, `ruleOfXStats`, and `characterSheet` (rows, alternate-ID
+filter, alternate-ID scan).
 
 ## H3 — Characteristic/defense totals skip duplicate powers — ✅ FIXED
 
@@ -624,6 +658,38 @@ return Math.pow(step, nearest) === total ? nearest : Math.ceil(exact);
   rounds up). Existing `common.test.ts` coverage only exercises the default `step: 2`, so
   it cannot catch this. No golden-master re-base expected (no corpus divergence) — verify
   by re-running it.
+
+## H13 — A Multipower slot's divisor is always 10
+
+- **Where:** `core/traits/powers/multipowerItem.ts` —
+  `(this.characterTrait as unknown as {ultraSlot?: boolean}).ultraSlot ? 5 : 10`.
+- **Legacy:** same.
+
+**Two things are wrong with that line, and only one of them is arguable.**
+
+The unambiguous one: `ultraSlot` is a field on the **trait**, not on the `CharacterTrait` wrapper.
+`CharacterTrait` carries `trait`, `listKey`, `getCharacter` and `parentTrait` — no `ultraSlot`, and
+the cast is what stops the compiler saying so. The read is therefore always `undefined`, the
+condition always false, and **every Multipower slot divides by 10** regardless of what kind of slot
+it is. Verified by pricing the same authored slot with `ultraSlot` true and false: 6 either way.
+
+The arguable one: even reachable, `ultraSlot ? 5 : 10` looks inverted. `ULTRA_SLOT="Yes"` marks a
+**fixed** slot, which is the cheaper kind — flexibility is what you pay for — so a fixed slot should
+divide by 10 and a variable one by 5. That is the reading the accidental behaviour happens to
+implement for fixed slots. **Confirm against 6E1 before changing it**, in the spirit of the open
+`PLUSONEPIP` question in CLAUDE.md: the correction is probably `trait.ultraSlot ? 10 : 5`, but a
+plausible-looking ratio is exactly the sort of thing worth checking rather than reasoning about.
+
+- **Corpus impact:** none. All 37 fixtures use fixed slots exclusively — greyman, indigo-bunting and
+  psi-blade6 are the Multipowers, and every slot in them is `ULTRA_SLOT="Yes"` — so the accidental
+  always-10 is right for all of them. A golden master cannot see this.
+- **Consequence for authoring:** `core/authoring` emits **fixed slots only** and says so, rather
+  than offering a variable slot that would silently price as a fixed one. Widening that is gated on
+  this entry.
+- **Fix + verify:** read `ultraSlot` off the trait; settle the ratio from the rulebook; a
+  purpose-built test with both slot kinds (the corpus cannot supply one). No golden-master re-base
+  is expected, since no fixture has a variable slot — which is also why this needs its own test
+  rather than a fixture.
 
 ## U1 — `capitalize` only upper-cases the first character
 

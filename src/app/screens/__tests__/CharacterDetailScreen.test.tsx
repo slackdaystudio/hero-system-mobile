@@ -74,6 +74,7 @@ const character = (over: Partial<Character> = {}): Character => ({
     // Defensor is an import — the read-only default. Generated cases override both.
     origin: 'imported',
     recipe: null,
+    source: null,
     ...over,
 });
 

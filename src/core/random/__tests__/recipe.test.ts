@@ -19,7 +19,8 @@
  * are that a rebuild reproduces the roll exactly, and that every edit leaves a character the rules
  * still accept. Both are checked against the engine rather than asserted.
  */
-import {heroDesignerCharacter} from 'core/hero';
+import {heroDesignerCharacter, TRAIT_CHILD_KEYS} from 'core/hero';
+import {withDescendants} from 'core/util';
 import {characterTraitDecorator} from 'core/traits';
 import type {Rng} from 'core/ports';
 import {buildRecipe, generateRandomCharacter, rollRecipe} from '../generate';
@@ -61,14 +62,21 @@ const spentOn = (character: Obj, buckets: readonly string[]): number =>
     buckets.reduce(
         (total, bucket) =>
             total +
-            ((character[bucket] ?? []) as Obj[]).reduce((sum, trait) => sum + characterTraitDecorator.decorate(trait, bucket, () => character).realCost(), 0),
+            // Containers included: a framework's slots nest under it (H2) and every one costs.
+            withDescendants((character[bucket] ?? []) as Obj[], TRAIT_CHILD_KEYS[bucket]).reduce(
+                (sum, trait) => sum + characterTraitDecorator.decorate(trait, bucket, () => character).realCost(),
+                0,
+            ),
         0,
     );
 
 const powersCost = (character: Obj): number => spentOn(character, ['powers', 'martialArts']);
 const skillsCost = (character: Obj): number => spentOn(character, ['skills', 'perks', 'talents']);
 const complicationsCost = (character: Obj): number =>
-    (character.disadvantages as Obj[]).reduce((total, row) => total + characterTraitDecorator.decorate(row, 'disadvantages', () => character).cost(), 0);
+    withDescendants(character.disadvantages as Obj[], TRAIT_CHILD_KEYS.disadvantages).reduce(
+        (total, row) => total + characterTraitDecorator.decorate(row, 'disadvantages', () => character).cost(),
+        0,
+    );
 
 describe('CharacterRecipe', () => {
     /**

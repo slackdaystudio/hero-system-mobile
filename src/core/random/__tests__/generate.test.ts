@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /** The generator itself — docs/RANDOM_CHARACTER.md. */
-import {heroDesignerCharacter} from 'core/hero';
+import {heroDesignerCharacter, TRAIT_CHILD_KEYS} from 'core/hero';
+import {withDescendants} from 'core/util';
 import {characterTraitDecorator} from 'core/traits';
 import type {Rng} from 'core/ports';
 import {fittableSkillsets, generatableArchetypes, generateRandomCharacter} from '../generate';
@@ -124,8 +125,12 @@ describe('generateRandomCharacter', () => {
         // Martial maneuvers are not powers, but their cost comes out of the powers balance — the
         // legacy prose folds them into `powersCost`. Count both or Martial Artist looks 15 short.
         const spentBy = (character: Obj): number =>
-            (character.powers as Obj[]).reduce((total, power) => total + characterTraitDecorator.decorate(power, 'powers', () => character).realCost(), 0) +
-            ((character.martialArts ?? []) as Obj[]).reduce(
+            // Descend into containers: a framework's slots nest under it (H2) and all of them cost.
+            withDescendants(character.powers as Obj[], TRAIT_CHILD_KEYS.powers).reduce(
+                (total, power) => total + characterTraitDecorator.decorate(power, 'powers', () => character).realCost(),
+                0,
+            ) +
+            withDescendants((character.martialArts ?? []) as Obj[], TRAIT_CHILD_KEYS.martialArts).reduce(
                 (total, maneuver) => total + characterTraitDecorator.decorate(maneuver, 'martialArts', () => character).realCost(),
                 0,
             );

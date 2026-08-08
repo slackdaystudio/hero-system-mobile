@@ -17,6 +17,7 @@ import {ActivityIndicator, Alert, Pressable, StyleSheet, View} from 'react-nativ
 import {NavigationContainer, useFocusEffect} from '@react-navigation/native';
 import {createNativeStackNavigator, type NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import type {AuthorableCategory, AuthoredCharacter} from 'core/authoring';
 import type {ImportResult} from 'infra/import';
 import {Text} from 'app/components';
 import type {RollRequest} from 'app/dice/rollRequest';
@@ -24,6 +25,9 @@ import {type GenerateResult} from 'app/providers/GenerateProvider';
 import {GenerateDialog} from 'app/screens/GenerateDialog';
 import {useImportCharacter} from 'app/providers/ImportProvider';
 import {useSettings} from 'app/providers/SettingsProvider';
+import {AuthoringDraftProvider, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
+import {AuthorCharacterScreen} from 'app/screens/AuthorCharacterScreen';
+import {AuthorTraitScreen} from 'app/screens/AuthorTraitScreen';
 import {CharacterDetailScreen} from 'app/screens/CharacterDetailScreen';
 import {CharacterListScreen} from 'app/screens/CharacterListScreen';
 import {DiceScreen} from 'app/screens/DiceScreen';
@@ -41,6 +45,13 @@ export type RootStackParamList = {
     Home: undefined;
     CharacterList: undefined;
     CharacterDetail: {id: string};
+    /** Authoring: no params for a new character; `id` + `draft` to re-open an authored one. */
+    AuthorCharacter: {id?: string; draft?: AuthoredCharacter} | undefined;
+    /**
+     * The form for one trait. Carries only its *address* — the draft itself lives in
+     * `AuthoringDraftProvider`, so nothing large or non-serialisable rides on a route.
+     */
+    AuthorTrait: {address: TraitAddress; category: AuthorableCategory};
     Dice: {request?: RollRequest; mode?: RollRequest['mode']} | undefined;
     Statistics: undefined;
     Settings: undefined;
@@ -57,76 +68,112 @@ export function AppNavigator(): React.JSX.Element {
     return (
         <SafeAreaProvider>
             <NavigationContainer>
-                <Stack.Navigator
-                    screenOptions={{
-                        headerStyle: {backgroundColor: theme.colors.surface},
-                        headerTintColor: theme.colors.text,
-                        contentStyle: {backgroundColor: theme.colors.background},
-                        // Respect the reduce-motion preference: no push/pop transition when off.
-                        animation: settings.showAnimations ? 'default' : 'none',
-                    }}>
-                    <Stack.Screen name="Home" options={{title: 'HERO System Mobile'}}>
-                        {({navigation}) => <HomeRoute navigation={navigation} />}
-                    </Stack.Screen>
-                    <Stack.Screen
-                        name="CharacterList"
-                        options={({navigation}) => ({
-                            title: 'Characters',
-                            // headerRight is a react-navigation render prop, not a nested component definition.
-                            // eslint-disable-next-line react/no-unstable-nested-components
-                            headerRight: () => (
-                                <View style={styles.headerActions}>
-                                    <GenerateButton
-                                        onGenerated={(result) => {
-                                            setImportToken((token) => token + 1);
-                                            navigation.navigate('CharacterDetail', {id: result.id});
-                                        }}
-                                    />
-                                    <ImportButton
-                                        onImported={(result) => {
-                                            setImportToken((token) => token + 1);
-                                            navigation.navigate('CharacterDetail', {id: result.id});
-                                        }}
-                                    />
-                                </View>
-                            ),
-                        })}>
-                        {({navigation}) => <CharacterListScreen refreshToken={importToken} onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />}
-                    </Stack.Screen>
-                    <Stack.Screen name="CharacterDetail" options={{title: ''}}>
-                        {({route, navigation}) => (
-                            <CharacterDetailScreen
-                                characterId={route.params.id}
-                                onReady={(character) => navigation.setOptions({title: character.name})}
-                                onRollRequest={(request) => navigation.navigate('Dice', {request})}
-                                // Replace, not push: flipping between characters must not grow the back stack.
-                                onSwitchCharacter={(id) => navigation.replace('CharacterDetail', {id})}
-                            />
-                        )}
-                    </Stack.Screen>
-                    <Stack.Screen
-                        name="Dice"
-                        options={({navigation}) => ({
-                            title: 'Dice Roller',
-                            // headerRight is a react-navigation render prop, not a nested component definition.
-                            // eslint-disable-next-line react/no-unstable-nested-components
-                            headerRight: () => (
-                                <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Statistics')}>
-                                    <Text variant="label" color={theme.colors.primary}>
-                                        Stats
-                                    </Text>
-                                </Pressable>
-                            ),
-                        })}>
-                        {({route}) => <DiceScreen initialRequest={route.params?.request} initialMode={route.params?.mode} />}
-                    </Stack.Screen>
-                    <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>
-                        {() => <StatisticsScreen />}
-                    </Stack.Screen>
-                    <Stack.Screen name="Settings" options={{title: 'Settings'}}>
-                        {() => <SettingsScreen />}
-                    </Stack.Screen>
-                </Stack.Navigator>
+                {/* Above the navigator, because the authoring screens are siblings in the stack
+                    and both edit the same draft. */}
+                <AuthoringDraftProvider>
+                    <Stack.Navigator
+                        screenOptions={{
+                            headerStyle: {backgroundColor: theme.colors.surface},
+                            headerTintColor: theme.colors.text,
+                            contentStyle: {backgroundColor: theme.colors.background},
+                            // Respect the reduce-motion preference: no push/pop transition when off.
+                            animation: settings.showAnimations ? 'default' : 'none',
+                        }}>
+                        <Stack.Screen name="Home" options={{title: 'HERO System Mobile'}}>
+                            {({navigation}) => <HomeRoute navigation={navigation} />}
+                        </Stack.Screen>
+                        <Stack.Screen
+                            name="CharacterList"
+                            options={({navigation}) => ({
+                                title: 'Characters',
+                                // headerRight is a react-navigation render prop, not a nested component definition.
+                                // eslint-disable-next-line react/no-unstable-nested-components
+                                headerRight: () => (
+                                    <View style={styles.headerActions}>
+                                        <Pressable accessibilityRole="button" onPress={() => navigation.navigate('AuthorCharacter')} testID="author-character">
+                                            <Text variant="label" color={theme.colors.primary}>
+                                                New
+                                            </Text>
+                                        </Pressable>
+                                        <GenerateButton
+                                            onGenerated={(result) => {
+                                                setImportToken((token) => token + 1);
+                                                navigation.navigate('CharacterDetail', {id: result.id});
+                                            }}
+                                        />
+                                        <ImportButton
+                                            onImported={(result) => {
+                                                setImportToken((token) => token + 1);
+                                                navigation.navigate('CharacterDetail', {id: result.id});
+                                            }}
+                                        />
+                                    </View>
+                                ),
+                            })}>
+                            {({navigation}) => (
+                                <CharacterListScreen refreshToken={importToken} onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />
+                            )}
+                        </Stack.Screen>
+                        <Stack.Screen name="CharacterDetail" options={{title: ''}}>
+                            {({route, navigation}) => (
+                                <CharacterDetailScreen
+                                    characterId={route.params.id}
+                                    onReady={(character) => navigation.setOptions({title: character.name})}
+                                    onRollRequest={(request) => navigation.navigate('Dice', {request})}
+                                    // Replace, not push: flipping between characters must not grow the back stack.
+                                    onSwitchCharacter={(id) => navigation.replace('CharacterDetail', {id})}
+                                    onEditAuthored={(id, draft) => navigation.navigate('AuthorCharacter', {id, draft})}
+                                />
+                            )}
+                        </Stack.Screen>
+                        <Stack.Screen
+                            name="Dice"
+                            options={({navigation}) => ({
+                                title: 'Dice Roller',
+                                // headerRight is a react-navigation render prop, not a nested component definition.
+                                // eslint-disable-next-line react/no-unstable-nested-components
+                                headerRight: () => (
+                                    <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Statistics')}>
+                                        <Text variant="label" color={theme.colors.primary}>
+                                            Stats
+                                        </Text>
+                                    </Pressable>
+                                ),
+                            })}>
+                            {({route}) => <DiceScreen initialRequest={route.params?.request} initialMode={route.params?.mode} />}
+                        </Stack.Screen>
+                        <Stack.Screen
+                            name="AuthorCharacter"
+                            options={({route}) => ({title: route.params?.id === undefined ? 'New Character' : 'Edit Character'})}>
+                            {({route, navigation}) => (
+                                <AuthorCharacterScreen
+                                    initial={route.params?.draft}
+                                    characterId={route.params?.id}
+                                    onSaved={(id) => {
+                                        setImportToken((token) => token + 1);
+                                        navigation.replace('CharacterDetail', {id});
+                                    }}
+                                    onCancel={() => navigation.goBack()}
+                                    onEditTrait={(address, category) => navigation.navigate('AuthorTrait', {address, category})}
+                                    onEditFramework={(index) =>
+                                        navigation.navigate('AuthorTrait', {address: {kind: 'pool', framework: index}, category: 'powers'})
+                                    }
+                                />
+                            )}
+                        </Stack.Screen>
+                        <Stack.Screen name="AuthorTrait" options={{title: 'Edit'}}>
+                            {({route, navigation}) => (
+                                <AuthorTraitScreen address={route.params.address} category={route.params.category} onDone={() => navigation.goBack()} />
+                            )}
+                        </Stack.Screen>
+                        <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>
+                            {() => <StatisticsScreen />}
+                        </Stack.Screen>
+                        <Stack.Screen name="Settings" options={{title: 'Settings'}}>
+                            {() => <SettingsScreen />}
+                        </Stack.Screen>
+                    </Stack.Navigator>
+                </AuthoringDraftProvider>
             </NavigationContainer>
         </SafeAreaProvider>
     );

@@ -129,10 +129,15 @@ export type Edition = '5E' | '6E';
 export type CharacterDocument = Record<string, unknown>;
 
 /**
- * Where a character came from. Only a generated one is editable: an imported `.hdc` is a faithful
- * view of a file the player owns, and the app has no business rewriting it.
+ * Where a character came from, and therefore whether — and *how* — it may be edited.
+ *
+ * An imported `.hdc` is a faithful view of a file the player owns, and the app has no business
+ * rewriting it. The other two are the app's own and are editable, but not through the same door:
+ * a generated character is revised by changing its {@link StoredRecipe} and re-rolling, an
+ * authored one by changing its {@link StoredSource} directly. Neither is edited in place — both
+ * rebuild the document from their input.
  */
-export type CharacterOrigin = 'generated' | 'imported';
+export type CharacterOrigin = 'generated' | 'imported' | 'authored';
 
 /**
  * The generator's recipe, round-tripped as JSON so a generated character can be re-rolled.
@@ -143,6 +148,16 @@ export type CharacterOrigin = 'generated' | 'imported';
  * depends on ports).
  */
 export type StoredRecipe = Record<string, unknown>;
+
+/**
+ * The `ParsedCharacter` an authored character was built from — the engine's *input*, kept because
+ * {@link CharacterDocument} is its output and the two are not interchangeable.
+ *
+ * Opaque here for the same reason the recipe is: persistence stores it and hands it back.
+ * `core/authoring` owns the shape and validates on the way back in, so a source written by an
+ * older build that no longer parses simply makes the character non-editable rather than crashing.
+ */
+export type StoredSource = Record<string, unknown>;
 
 /** Portrait bytes to store, or `null` to clear. */
 export interface PortraitInput {
@@ -202,6 +217,8 @@ export interface Character extends CharacterSummary {
     origin: CharacterOrigin;
     /** The recipe it was rolled from; null for imports, and for rolls predating the recipe column. */
     recipe: StoredRecipe | null;
+    /** The parsed input it was authored from; null for imports and generated characters. */
+    source: StoredSource | null;
 }
 
 /** Input to `save` — the caller provides lifted fields + a portrait-free document. */
@@ -225,6 +242,8 @@ export interface SaveCharacter {
     origin?: CharacterOrigin;
     /** Present → store; absent → keep existing (so a rename needn't restate the recipe). */
     recipe?: StoredRecipe | null;
+    /** Present → store; absent → keep existing (so a re-frame needn't restate the whole build). */
+    source?: StoredSource | null;
 }
 
 export interface CharacterRepository {

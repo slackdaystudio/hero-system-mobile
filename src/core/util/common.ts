@@ -145,6 +145,34 @@ export const flatten = <T extends FlattenableItem>(items: T[], key: string): T[]
 };
 
 /**
+ * Every trait in `items`, depth-first, **including** the containers themselves.
+ *
+ * The difference from {@link flatten} is the container: `flatten` splices a framework away and
+ * returns only its slots, which is right for a totals query (the pool is not a power). Anything
+ * *summing costs* needs the opposite — a Multipower's pool costs real points, and so do its slots.
+ *
+ * Children may hang off more than one key: a framework nests its slots under the category's own
+ * child key (`powers.powers`, `skills.skills`, `martialArts.maneuver`), while a compound power
+ * always nests under `powers`. Equipment is the one category that sees both. Pass every key that
+ * applies — see `TRAIT_CHILD_KEYS` in `core/hero`.
+ */
+export const withDescendants = <T extends FlattenableItem>(items: T[], keys: readonly string[]): T[] => {
+    const walked: T[] = [];
+
+    for (const item of items) {
+        walked.push(item);
+
+        for (const key of keys) {
+            if (Array.isArray(item[key])) {
+                walked.push(...withDescendants(item[key] as T[], keys));
+            }
+        }
+    }
+
+    return walked;
+};
+
+/**
  * Indexes objects by a key. Collisions collapse into an array under that key —
  * a legacy quirk the rules engine depends on, preserved exactly.
  */

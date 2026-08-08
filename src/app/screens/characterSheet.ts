@@ -14,7 +14,7 @@
 
 import {combatDetails} from 'core/combat';
 import {RollType} from 'core/dice';
-import {enduranceCost, heroDesignerCharacter, movementEnduranceCost, strengthEnduranceCost} from 'core/hero';
+import {enduranceCost, heroDesignerCharacter, movementEnduranceCost, strengthEnduranceCost, TRAIT_CHILD_KEYS} from 'core/hero';
 import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
 
@@ -36,10 +36,22 @@ export function isOnlyInAlternateId(trait: Obj): boolean {
     return false;
 }
 
-const filterOutAlternateId = (items: Obj[]): Obj[] =>
+/** The keys a category nests children under, defaulting to `powers` for anything unlisted. */
+const childKeysFor = (listKey: string): readonly string[] => TRAIT_CHILD_KEYS[listKey] ?? ['powers'];
+
+const filterOutAlternateId = (items: Obj[], listKey: string): Obj[] =>
     items
         .filter((item) => !isOnlyInAlternateId(item))
-        .map((item) => (Array.isArray(item.powers) ? {...item, powers: filterOutAlternateId(item.powers as Obj[])} : item));
+        .map((item) => {
+            const nested: Obj = {...item};
+            for (const key of childKeysFor(listKey)) {
+                if (Array.isArray(item[key])) {
+                    nested[key] = filterOutAlternateId(item[key] as Obj[], listKey);
+                }
+            }
+
+            return nested;
+        });
 
 /**
  * True when `predicate` holds for any trait in `items`, or for any trait nested inside
@@ -47,8 +59,8 @@ const filterOutAlternateId = (items: Obj[]): Obj[] =>
  * does — `core/util.flatten` is not a substitute, as it only splices `type: 'list'`
  * containers and never visits the children of anything else.
  */
-const someTrait = (items: Obj[], predicate: (item: Obj) => boolean): boolean =>
-    items.some((item) => predicate(item) || (Array.isArray(item.powers) ? someTrait(item.powers as Obj[], predicate) : false));
+const someTrait = (items: Obj[], predicate: (item: Obj) => boolean, listKey: string): boolean =>
+    items.some((item) => predicate(item) || childKeysFor(listKey).some((key) => (Array.isArray(item[key]) ? someTrait(item[key] as Obj[], predicate, listKey) : false)));
 
 /**
  * A copy of the character with every "Only In Alternate Identity" trait removed
@@ -61,7 +73,7 @@ function withoutAlternateIdTraits(character: Obj): Obj {
     const stripped: Obj = {...character};
     for (const key of TRAIT_KEYS) {
         if (Array.isArray(character[key])) {
-            stripped[key] = filterOutAlternateId(character[key] as Obj[]);
+            stripped[key] = filterOutAlternateId(character[key] as Obj[], key);
         }
     }
 
@@ -75,7 +87,7 @@ function withoutAlternateIdTraits(character: Obj): Obj {
  * to switch to, so for those characters the sheet shows the alternate-ID form outright.
  */
 export function hasAlternateForm(character: Obj): boolean {
-    return TRAIT_KEYS.some((key) => someTrait(toArray(character[key]), isOnlyInAlternateId));
+    return TRAIT_KEYS.some((key) => someTrait(toArray(character[key]), isOnlyInAlternateId, key));
 }
 
 /** The character's alias / alternate identity (super name) from the parsed info, or null. */
@@ -366,7 +378,10 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
             const endurance = listKey === 'powers' ? enduranceCost(item, decorated.activeCost()) : 0;
             rows.push({label: decorated.label(), roll, realCost: decorated.realCost(), endurance, definition: decorated.definition(), depth, writeup: decorated.toWriteup(), maneuver});
 
-            const children = toArray(item.powers);
+            // Indent whatever this category nests its children under — `powers` only for Powers.
+            // A Skill Enhancer nests under `skills` and a martial style under `maneuver`, so
+            // reading `item.powers` everywhere would drop those rows off the sheet entirely.
+            const children = (TRAIT_CHILD_KEYS[listKey] ?? ['powers']).flatMap((key) => toArray(item[key]));
             if (children.length > 0) {
                 rows.push(...buildTraits(children, listKey, character, depth + 1));
             }

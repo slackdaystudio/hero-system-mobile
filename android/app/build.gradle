@@ -101,8 +101,15 @@ android {
         //            No schema change (END rides the existing blobs), no cost changes.
         // 68/2.7.1 — Accessibility fix: modal dialogs are now readable by screen readers
         //            (VoiceOver/TalkBack). No schema change, no cost changes.
-        versionCode 68
-        versionName "2.7.1"
+        // 69/2.8.0 — Author a character in the app: characteristics, skills, perks, talents,
+        //            powers with advantages/limitations, frameworks, martial arts, equipment
+        //            and complications. Schema 7 → 8 (008, the authoring source).
+        //            Also carries Quick Pick (PR #48), which landed after 2.7.1 and so has
+        //            never been in a tester build.
+        //            Changes no costs — but H2 changes how a framework *renders* on every
+        //            existing character that has one (slots nest instead of sitting loose).
+        versionCode 69
+        versionName "2.8.0"
     }
     signingConfigs {
         debug {

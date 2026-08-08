@@ -10,9 +10,10 @@ listing. Two consequences:
 
 - The release build **must be signed with the legacy app's existing upload key**.
   A brand-new keystore will be **rejected** by Play ("upload key mismatch").
-- `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; **65 / 2.5.0**
-  is out to internal testing, and this repo is set to **67 / 2.7.0**
-  (`android/app/build.gradle`). Bump `versionCode` for every subsequent upload.
+- `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; the last build
+  out is **68 / 2.7.1**, and this repo is set to **69 / 2.8.0**
+  (`android/app/build.gradle`, which carries the full version history in a comment).
+  Bump `versionCode` for every subsequent upload.
 
 ## Signing setup
 
@@ -28,9 +29,16 @@ HEROGMTOOLS_RELEASE_KEY_ALIAS=…
 HEROGMTOOLS_RELEASE_KEY_PASSWORD=…
 ```
 
-Use an **absolute** `STORE_FILE` path (Gradle does not expand `~`). When those
-properties are present, `release` builds sign with them; absent, release falls
-back to debug signing (fine for a local smoke test, rejected by Play).
+Gradle does **not** expand `~`, so `STORE_FILE` is either an absolute path or one
+relative to **`android/app/`** — `storeFile file(...)` resolves against the module
+directory, not the repo root. The build machine currently uses the relative form
+(`hero-mobile.keystore`, i.e. `android/app/hero-mobile.keystore`), which works; checking
+for it from the repo root does not, and looks alarming.
+
+When those properties are present, `release` builds sign with them. **When they are
+absent, release silently falls back to debug signing** — the build succeeds, the `.aab`
+looks fine, and Play rejects it. That is the failure worth guarding against, which is
+what the verification below is for.
 
 ## Build the bundle
 
@@ -40,9 +48,52 @@ cd android
 ./gradlew bundleRelease        # -> app/build/outputs/bundle/release/app-release.aab
 ```
 
-Confirm it's signed with the right key:
+**If you `clean` first, delete `android/app/.cxx` too.** `./gradlew clean` removes the
+generated codegen under `build/` but leaves the CMake/ninja cache in `.cxx`, which still
+references it — the next configure then dies with:
+
+```
+CMake Error ... target_link_libraries):
+  Cannot specify link libraries for target "react_codegen_OPSQLiteSpec"
+  which is not built by this project.
+ninja: error: rebuilding 'build.ninja': subcommand failed
+```
+
+It reads like a broken dependency and isn't; the two caches have just gone out of step.
+
 ```sh
-jarsigner -verify -verbose -certs app/build/outputs/bundle/release/app-release.aab | head
+rm -rf android/app/.cxx android/app/build
+cd android && ./gradlew bundleRelease
+```
+
+A plain `bundleRelease` with no `clean` doesn't hit this. A full rebuild is ~2-3 minutes.
+
+Confirm it's signed with the right key — not just *a* key:
+
+```sh
+AAB=app/build/outputs/bundle/release/app-release.aab
+jarsigner -verify "$AAB"                                    # -> "jar verified."
+jarsigner -verify -verbose -certs "$AAB" | grep -c "Android Debug"   # -> 0
+unzip -p "$AAB" 'META-INF/*.RSA' | keytool -printcert | grep -E 'Owner|SHA1:'
+```
+
+The last one must print the legacy upload key:
+
+```
+Owner: CN=diceless.org, OU=Unknown, O=Diceless, L=Kitchener, ST=Ontario, C=CA
+SHA1: 65:25:E8:AD:77:E2:17:E4:13:24:DA:5F:BD:43:8A:95:23:A2:CA:3C
+```
+
+That fingerprint is what Play matches. `jar verified` alone does **not** distinguish the
+real key from the debug fallback — a debug-signed bundle also verifies.
+
+The version that went in is easiest to read off the merged manifest (the `.aab`'s own
+manifest is protobuf, and `versionName` is a compiled resource, so grepping it finds
+nothing — which is normal, not a problem):
+
+```sh
+grep -oE 'android:version(Code|Name)="[^"]+"' \
+  app/build/intermediates/merged_manifest/release/processReleaseMainManifest/AndroidManifest.xml
 ```
 
 ## Upload to internal testing

@@ -20,7 +20,8 @@
  * agrees with HERO Designer, which prices a native tongue at 0 with or without Linguist — legacy is
  * wrong at these three corpus characters, so it is not the oracle.
  */
-import {heroDesignerCharacter as core} from 'core/hero';
+import {heroDesignerCharacter as core, TRAIT_CHILD_KEYS} from 'core/hero';
+import {withDescendants} from 'core/util';
 import {characterTraitDecorator} from '../index';
 import {CharacterTrait} from '../characterTrait';
 import ModifierCalculator from '../modifierCalculator';
@@ -29,7 +30,8 @@ const clone = (name: string): any => JSON.parse(JSON.stringify(require(`../../he
 
 /** The visible label a Language carries can live in `name`, `input`, or `alias` across the corpus. */
 const findLanguage = (character: any, label: string): any =>
-    character.skills.find((s: any) => s.xmlid === 'LANGUAGES' && [s.name, s.input, s.alias].includes(label));
+    // Under the enhancer, not beside it: a Skill Enhancer nests the skills it discounts (H2).
+    withDescendants(character.skills as any[], TRAIT_CHILD_KEYS.skills).find((s: any) => s.xmlid === 'LANGUAGES' && [s.name, s.input, s.alias].includes(label));
 
 /** A skill of the given base cost sitting under (or not under) a named parent, priced through ModifierCalculator. */
 const pricedUnder = (basecost: number, parentXmlid: string | null): number => {

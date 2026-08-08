@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {getTemplate} from 'core/templates';
+import {getTemplate, type TemplateInput} from 'core/templates';
 import {flatten, hasModifier, isEmptyObject, roundInPlayersFavor, toCamelCase, toMap, toSnakeCase} from 'core/util';
 import {
     BASE_MOVEMENT_MODES,
@@ -95,6 +95,30 @@ export class HeroDesignerCharacter {
         }
 
         return character;
+    }
+
+    /**
+     * A finalized template with its entries normalized the way `getCharacter` normalizes them —
+     * every item under its category's sub-key, and every one carrying an `xmlid`.
+     *
+     * Exposed for `core/authoring`, which needs the same catalogue the engine matches against. The
+     * xmlid of an entry under a special sub-key (`knowledgeSkill`, `combatLuck`, `contact`) is
+     * *derived*, not declared — `KNOWLEDGE_SKILL`, `COMBAT_LUCK`, `CONTACT` — and deriving it a
+     * second time somewhere else is how a catalogue comes to offer a trait the engine cannot match.
+     *
+     * Works on a deep clone: normalization mutates, and the built-in templates are shared.
+     *
+     * **The result contains duplicates.** `normalizeTemplateData` concatenates the entries it
+     * collected onto the sub-key array they partly came from, so every entry declared directly
+     * under `skill` appears twice. Harmless to the engine, which only ever looks one up by xmlid;
+     * a caller enumerating the catalogue has to de-duplicate.
+     */
+    normalizedTemplate(template: TemplateInput): Obj {
+        const cloned = JSON.parse(JSON.stringify(getTemplate(template))) as Obj;
+
+        this.normalizeTemplateData(cloned);
+
+        return cloned;
     }
 
     isFifth(character: Obj): boolean {
@@ -929,7 +953,13 @@ export class HeroDesignerCharacter {
             }
         }
 
-        trait[traitSubKey].sort((a: Obj, b: Obj) => Number(a.position > b.position));
+        // H2 (docs/KNOWN_DEVIATIONS.md): legacy returned a boolean here, which V8 coerces to 0/1 —
+        // never negative, so nothing can move earlier and the sort is a no-op on anything out of
+        // order. That is not merely cosmetic. `normalizeCharacterItems` appends every non-`power`
+        // sub-key (a Multipower, an Elemental Control, a Skill Enhancer) to the *end* of the list,
+        // so the container was processed after its own slots — and a slot whose parent is not in
+        // `character[traitKey]` yet is pushed to the top level instead of nesting under it.
+        trait[traitSubKey].sort((a: Obj, b: Obj) => a.position - b.position);
 
         for (const value of Object.values(trait[traitSubKey]) as Obj[]) {
             if (value.xmlid.toUpperCase() === GENERIC_OBJECT || SKILL_ENHANCERS.includes(value.xmlid.toUpperCase())) {
