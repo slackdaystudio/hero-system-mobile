@@ -62,12 +62,19 @@ resolve in build and tests.
 ## Status
 
 **The rebuild ships.** It is on the store past legacy's cutover, the rules engine is fully
-ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.5.0
-(versionCode 65) is out to internal testing** — the first build to carry schema 5 and the
-first to change costs on characters people already have. **2.6.0 (versionCode 66) is
-staged**: 6E random characters, the Generate dialog, and portrait framing; schema 5 → 7.
-It changes no costs — 2.5.0 did that, so a cost that moves in 2.6.0 is a regression.
-What remains is CostCruncher and the cosmetic tail of the correctness pass.
+ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.7.1
+(versionCode 68) is the last build out.** **2.8.0 (versionCode 69) is staged**: in-app
+character **authoring** (see [`docs/CHARACTER_AUTHORING.md`](docs/CHARACTER_AUTHORING.md)),
+schema 7 → 8.
+
+**2.8.0 changes no costs, but it does change how a framework renders on characters people
+already have.** H2 is fixed, so a Multipower / Elemental Control / VPP nests its slots
+instead of leaving them loose beside an empty container — 27 of the 37 fixtures. The points
+were always right; only the arrangement was wrong. So in 2.8.0 a *cost* that moves is a
+regression, and a *layout* that moves is the fix.
+
+What remains is CostCruncher, the cosmetic tail of the correctness pass, and shrinking
+authoring's withheld list (`BESPOKE` in `core/authoring/catalogue.ts`).
 
 | Phase | State |
 |---|---|
@@ -75,7 +82,7 @@ What remains is CostCruncher and the cosmetic tail of the correctness pass.
 | 1 — Core port | ✅ done — `dice`, `templates`, `util`, `hero`, `traits`, `combat`; golden-mastered over all 37 fixtures |
 | 2 — Ports + infra | ✅ done — `rng`, `files`, `import`, `migration`, `persistence`; sound dropped |
 | 3 — State (RTK) | ❌ **not done, and deliberately reversed** — see below |
-| 4 — UI | 9 screens; **CostCruncher** is the only one outstanding. Random characters are built — reimagined, not ported (see below) — and roll in both editions from `GenerateDialog` |
+| 4 — UI | 11 screens; **CostCruncher** is the only one outstanding. Random characters are built — reimagined, not ported (see below) — and roll in both editions from `GenerateDialog`. **Authoring** is built across `AuthorCharacterScreen` (the lists) and `AuthorTraitScreen` (one trait's form) |
 | 5 — Migration + parity + release | migration done + device-validated; **releases shipping**; every corpus-triggered bug fixed, cosmetic tail open |
 
 `REBUILD_PLAN.md`'s Progress section has drifted (it still shows Phase 1 unchecked and
@@ -89,6 +96,14 @@ decision unless revisited. One known consequence: the sheet's Alternate Identity
 component-local and resets to on at every mount, where legacy persisted `showSecondary`.
 
 `DiceScreen` consolidates legacy's five Skill/Hit/Damage/Effect/Result screens into one.
+
+**Characters now come from three places, and `origin` is what tells them apart.** An
+`imported` `.hdc` is the player's file and stays read-only. A `generated` one is rebuilt from
+its `recipe`. An `authored` one is rebuilt from its `source` — the `ParsedCharacter` it was
+emitted from, stored in its own column because `data` holds the engine's *output* and that
+does not round-trip. See [`docs/CHARACTER_AUTHORING.md`](docs/CHARACTER_AUTHORING.md); the
+recurring lesson there is **the template is consulted for prices, the trait for everything
+else**, which cost three separate debugging sessions to learn.
 
 **Random characters were reimagined, not ported.** `src/core/random/` (see
 [`docs/RANDOM_CHARACTER.md`](docs/RANDOM_CHARACTER.md)) is clean-room: legacy's

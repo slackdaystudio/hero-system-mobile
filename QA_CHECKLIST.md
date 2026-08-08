@@ -4,7 +4,7 @@ Copyright 2018-Present Philip J. Guinchard — Apache-2.0
 
 # On-device QA shakedown
 
-Manual test plan for a testing build. 1366 unit tests cover the logic; this
+Manual test plan for a testing build. 2216 unit tests cover the logic; this
 covers the integration + native surface they can't (picker, navigation, layout,
 persistence across restarts). **Rebuild first** — the document picker is a new
 native module (`npm run android`).
@@ -148,6 +148,43 @@ native module (`npm run android`).
 - [ ] **Text size** A−/A+ scales the whole UI live; persists.
 - [ ] **Screen animations** off = instant screen transitions.
 
+## Authoring a character (new in 2.8.0)
+- [ ] Characters → **New** opens the form. Name it, set a couple of characteristics, and check
+      the points meter moves as you type.
+- [ ] **Campaign** card: picking a power level changes the total; typing a number the presets
+      don't match flips the picker to **Custom**.
+- [ ] The base-points field is labelled **"Total points"** in 6E and **"Base points"** in 5E —
+      the editions are quoted in different units and the label is the only thing that says so.
+- [ ] Each list (Skills, Perks, Talents, Powers, Martial Arts, Equipment, Complications) shows
+      **one row per trait** with its cost, and tapping a row opens that trait on its own page.
+- [ ] **Add** on any list drops you straight into the new trait's form.
+- [ ] The **Add** field's hint says how many entries are withheld ("N more need a form of their
+      own"). It should never be 0 for Skills or Powers.
+- [ ] A trait's **Remove** deletes it and returns you to the list.
+- [ ] Save is **disabled** while an error is showing, and the errors say what is wrong in words.
+
+## Authoring — the numbers (new in 2.8.0)
+- [ ] A skill taken at **familiarity** costs 1 and rolls **8-**, and does not move when you
+      change the characteristic it would otherwise roll against.
+- [ ] A **Language** priced by fluency: "fluent conversation" 2, "idiomatic" 4.
+- [ ] A **Blast** at 10d6 costs 50. Add **Area Of Effect (Radius)** → active 75. Add an
+      **Obvious Accessible Focus** → real 37. All three numbers visible on the row/meter.
+- [ ] **Resistant Protection**: set 17 rPD / 17 rED → 51 points, and the sheet's PD/ED go up by
+      17 each. (Bought as **equipment** it costs the same and grants **nothing** — the app warns.)
+- [ ] A **Multipower** with a 60 reserve and a 12d6 Blast slot: reserve 60, slot 6.
+- [ ] A **Basic Strike** costs 3 and its damage rises with STR (STR 10 → 4d6, STR 20 → 6d6).
+- [ ] Spend past the allowance → meter reads **"N experience"**, not "over budget", and the
+      saved character's nameplate reads **base + N pts**.
+
+## Authoring — round trip (new in 2.8.0)
+- [ ] Save an authored character → it opens on the sheet, priced, with its points and campaign
+      type on the nameplate.
+- [ ] Re-open it from the sheet's **Edit** → every field is exactly as you left it.
+- [ ] Change one thing, save, re-open → the change stuck and nothing else moved.
+- [ ] Force-quit between saving and re-opening; it survives.
+- [ ] An **imported** `.hdc` still shows **no** edit card. Authoring must never make a file the
+      player owns editable.
+
 ## Migration (if testing over a legacy install)
 - [ ] First launch imported your legacy characters + settings + stats.
 
@@ -164,8 +201,21 @@ native module (`npm run android`).
       Everything else, including every cost, is byte-identical. No fixture in the corpus has one,
       so a real character is the only way to see this.
 
-## Upgrading from 2.4.1 (schema 4 → 7 in one hop — only if a tester skipped 2.5.0)
-- [ ] Every character survives both hops.
+## Upgrading over the previous build (2.8.0: schema 7 → 8)
+- [ ] Install **2.7.1** first. Import a character **that has a Multipower, Elemental Control or
+      VPP** — this is the one that matters. Note its total and the framework's costs.
+- [ ] Install this build over the top → every character is still there, opens, and renders.
+- [ ] **The framework's slots now sit INSIDE it, indented** — where they used to be loose beside
+      an empty container row. That is H2, and it is the fix. 27 of the 37 corpus characters had it.
+- [ ] **The framework's costs are unchanged** — the reserve and every slot. The points were always
+      right; only the arrangement was wrong. A **cost** that moves here is a **regression**.
+- [ ] **No cost moves anywhere else either.** 2.5.0 was the build that changed costs.
+- [ ] Generated characters from 2.7.1 are **still editable** and still their original edition.
+- [ ] Migration 008 is additive (one nullable column), so nothing should need backfilling — but
+      confirm a character saved on 2.7.1 still opens and prices identically.
+
+## Upgrading from 2.4.1 (schema 4 → 8 in one hop — only if a tester skipped 2.5.0)
+- [ ] Every character survives all hops.
 - [ ] The random character rolled on the old build is **still editable** (migration 005
       backfills edit rights from the `generated-` id prefix — that's the only thing carrying
       them over).
