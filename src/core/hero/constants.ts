@@ -88,3 +88,27 @@ export const CHARACTER_TRAITS: Readonly<Record<string, string>> = {
     equipment: 'powers',
     disadvantages: 'disad',
 };
+
+/**
+ * Where a category's traits nest their children — the `characterSubTrait` argument
+ * `getCharacter` passes to `populateTrait`, which is what a framework container's slots and a
+ * Skill Enhancer's skills are pushed onto.
+ *
+ * **It is not the same key for every category**, and it is not `powers` for most of them: a
+ * Skill Enhancer's skills live under `skills`, a martial style's maneuvers under `maneuver`.
+ * Walking `powers` alone — which is the obvious thing to write — silently misses every nested
+ * trait outside the Powers section.
+ *
+ * `equipment` is the one category with two: `populateTrait` nests its framework slots under
+ * `power`, while `getCompoundPowers` nests compound children under `powers` regardless of
+ * category. Both have to be walked or compound equipment disappears.
+ */
+export const TRAIT_CHILD_KEYS: Readonly<Record<string, readonly string[]>> = {
+    skills: ['skills'],
+    perks: ['perks'],
+    talents: ['talents'],
+    martialArts: ['maneuver'],
+    powers: ['powers'],
+    equipment: ['power', 'powers'],
+    disadvantages: ['disadvantages'],
+};

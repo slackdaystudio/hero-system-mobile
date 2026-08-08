@@ -25,8 +25,9 @@
  * So: a wrong number here is a judgement to argue with, not a bug. Keeping it out of `ruleOfX.ts`
  * keeps the part that *can* be verified verifiable.
  */
-import {heroDesignerCharacter} from 'core/hero';
+import {heroDesignerCharacter, TRAIT_CHILD_KEYS} from 'core/hero';
 import {characterTraitDecorator, type Obj} from 'core/traits';
+import {withDescendants} from 'core/util';
 import type {RuleOfXStats} from './ruleOfX';
 
 /**
@@ -72,6 +73,15 @@ const MOVEMENT_POWERS: ReadonlySet<string> = new Set(['RUNNING', 'SWIMMING', 'LE
 const BASE_MOVEMENT: ReadonlySet<string> = new Set(['RUNNING', 'SWIMMING', 'LEAPING']);
 
 const toArray = (value: unknown): Obj[] => (Array.isArray(value) ? (value as Obj[]) : value === undefined || value === null ? [] : [value as Obj]);
+
+/**
+ * A category's traits, containers and nested slots alike.
+ *
+ * Every reader below is looking for traits of a kind — attacks, defences, Combat Skill Levels —
+ * and a framework slot is as much an attack as a standalone power is. Reading the top level only
+ * would score a character whose whole offence sits in a Multipower as having none.
+ */
+const traitsOf = (character: Obj, key: string): Obj[] => withDescendants(toArray(character[key]), TRAIT_CHILD_KEYS[key]);
 
 /** `getTotalDefense` hands back `"total/resistant"`; `getTotalUnusualDefense` does the same. */
 function splitDefense(value: string): {total: number; resistant: number} {
@@ -153,7 +163,7 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
     const pd = splitDefense(heroDesignerCharacter.getTotalDefense(character, 'PD'));
     const ed = splitDefense(heroDesignerCharacter.getTotalDefense(character, 'ED'));
 
-    const powers = toArray(character.powers);
+    const powers = traitsOf(character, 'powers');
     const attacks = powers.filter(isAttack);
     const defences = powers.filter(isDefensive);
 
@@ -167,13 +177,13 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
      * `_SINGLE` xmlid, and 6E folded that into an *option* of the one talent. Matching on
      * `LIGHTNING_REFLEXES` exactly, as this did, matched nothing at all.
      */
-    const lightningReflexes = toArray(character.talents)
+    const lightningReflexes = traitsOf(character, 'talents')
         .filter((talent) => String(talent.xmlid).toUpperCase().startsWith('LIGHTNING_REFLEXES'))
         .reduce((best, talent) => Math.max(best, Number(talent.levels) || 0), 0);
 
     // "All Combat Skill Levels the character owns". Skill Levels and Penalty Skill Levels are not
     // Combat Skill Levels, whatever their xmlid looks like.
-    const csl = toArray(character.skills)
+    const csl = traitsOf(character, 'skills')
         .filter((skill) => String(skill.xmlid).toUpperCase() === 'COMBAT_LEVELS')
         .reduce((sum, skill) => sum + (Number(skill.levels) || 0), 0);
 
@@ -188,7 +198,7 @@ export function ruleOfXStats(built: Obj): RuleOfXStats {
      * The bare punch is the floor, for a Brick with no attack power at all.
      */
     const punch = Math.floor(total('STR') / 5);
-    const maneuvers = toArray(character.martialArts).filter(doesDamage);
+    const maneuvers = traitsOf(character, 'martialArts').filter(doesDamage);
     const dc = Math.max(
         punch,
         ...attacks.filter(doesDamage).map((power) => damageClassesOf(power, 'powers', character)),

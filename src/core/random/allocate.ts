@@ -30,8 +30,9 @@
  * chars − skills` reproduces its powerset sizes exactly (Energy Projector 125, Patriot 100,
  * Speedster 100, Brick 75), which is good evidence this was the original's design too.
  */
-import {heroDesignerCharacter} from 'core/hero';
+import {heroDesignerCharacter, TRAIT_CHILD_KEYS} from 'core/hero';
 import type {Rng} from 'core/ports';
+import {withDescendants} from 'core/util';
 import archetypeData from '../data/random/archetypes.5e.json';
 import archetypeData6E from '../data/random/archetypes.6e.json';
 import skillsetData from '../data/random/skillsets.json';
@@ -109,10 +110,12 @@ export function characteristicsBudget(archetype: Archetype, level: PowerLevel): 
 export function skillsBudget(skillset: StructuredSkillset, level: PowerLevel): number {
     const character = heroDesignerCharacter.getCharacter(attachSkillset(buildCharacteristics({}, level.template), skillset)) as unknown as Obj;
 
+    // Descend into containers: a Skill Enhancer nests the skills it discounts, and those skills are
+    // most of what a profession costs. Summing the top level alone reads a Scholar as its enhancer.
     return (['skills', 'perks', 'talents'] as const).reduce(
         (total, key) =>
             total +
-            ((character[key] ?? []) as Obj[]).reduce((sum, trait) => {
+            withDescendants((character[key] ?? []) as Obj[], TRAIT_CHILD_KEYS[key]).reduce((sum, trait) => {
                 try {
                     return sum + characterTraitDecorator.decorate(trait, key, () => character).realCost();
                 } catch {
