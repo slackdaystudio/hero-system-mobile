@@ -539,9 +539,38 @@ Powers only, and every entry now names its own blocker:
 | `DUPLICATION` | `points` and `number`. Also `NaN`. |
 | `ENDURANCERESERVE` | A nested REC **sub-power**: it reads `trait.power.levels`. Nothing else in the catalogue costs by a child trait. |
 | `FLASH` | Its adders are senses from `Senses.json`, not from the template, and `optionid` must name one. A different source than every other trait's options. |
-| `MULTIFORM`, `SUMMON` | Look generic — levels plus adders — but price `NaN` once their adders are answered. **Withheld pending that being understood rather than guessed at.** |
 | `COMPOUNDPOWER` | A power made of powers. Open-ended by design. |
 | `VPP` | Nothing: it is offered as a **framework**, which is what it is. Withheld only as a power. |
 
 Barrier and Duplication are the two worth doing next — both want nothing more exotic than a declared
 field group, which Resistant Protection already proved out.
+
+### An adder has no template, and the emitter has to know that
+
+`MULTIFORM` and `SUMMON` were on that table too. They looked generic — levels plus adders — but
+priced `NaN` the moment their adders were answered, so they were held back pending an explanation
+rather than a guess. The explanation had nothing to do with either of them.
+
+**`getCharacter` attaches a `template` to every trait. Nothing attaches one to an adder.** So where
+a trait's decorator reads `trait.template.lvlval`, an adder's reads `adder.lvlval` directly off the
+adder — `totalAdders` does, and so do `variablePowerPool`, `possession`, `leaping` and `reflection`.
+`emitAdder` carried `basecost` and `levels` but not the per-level pair, so any levelled adder
+computed `n / undefined`.
+
+**`NaN` is the worst shape this failure can take.** It is not an exception, so
+`characterSheet.ts:333`'s try/catch never sees it; the row renders with a blank cost and the meter
+silently becomes `NaN` as well. It is the silent-zero trap with the volume turned up.
+
+It was latent until now only because **nothing could set an adder's levels** — the trait form
+rendered optionless adders as nothing, and the modifier form only ever set `option`. Adding the
+number field would have made it live across roughly forty offered traits in each edition: every
+`REDUCEDNEGATION`, `IMPROVEDNONCOMBAT`, `FLASHDEFENSE` on a Force Field, and Damage Negation's DCs.
+
+The fix carries the **real** `lvlval`/`lvlcost` rather than a derived `{lvlval: 1, lvlcost: perLevel}`.
+Those price identically through `totalAdders`, which is a ratio — but `baseCost` feeds the same two
+fields to `getMultiplierCost`, whose arithmetic is multiplicative, and there the substitution would
+be wrong. `LevelRange` therefore keeps the raw pair alongside the ratio.
+
+The general lesson, and it is the same one twice in one change: **when a trait prices oddly, ask
+what the engine reads it off before asking what is special about the trait.** Multiform and Summon
+were withheld for a release for a bug that was in neither of them.

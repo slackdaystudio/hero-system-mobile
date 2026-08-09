@@ -130,6 +130,11 @@ function emitAdder(chosen: AuthoredAdder, catalogue: CatalogueAdder | undefined)
         alias: catalogue?.display ?? chosen.xmlid,
         basecost: catalogue?.basecost ?? 0,
         ...(chosen.levels === undefined ? {} : {levels: chosen.levels}),
+        // An adder carries its own per-level pair because, unlike a trait, it is never given a
+        // `template` — `totalAdders` and four power decorators read `adder.lvlval`/`adder.lvlcost`
+        // straight off it. Emitted without them a levelled adder computes `n / undefined` and the
+        // whole trait prices **NaN**, which the sheet then renders as a blank cost.
+        ...(catalogue?.levels === undefined || catalogue?.levels === null ? {} : {lvlval: catalogue.levels.lvlval, lvlcost: catalogue.levels.lvlcost}),
     };
 
     // A free-text adder still names its single option, but its `optionAlias` carries the player's

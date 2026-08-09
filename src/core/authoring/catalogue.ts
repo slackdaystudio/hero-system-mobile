@@ -87,6 +87,17 @@ export interface LevelRange {
     readonly max: number;
     readonly perLevel: number;
     readonly label: string;
+    /**
+     * The raw pair `perLevel` is the ratio of, carried because an **adder has no template**.
+     *
+     * A trait's decorator reads `trait.template.lvlval`, which `getCharacter` attaches. An adder's
+     * decorator reads `adder.lvlval` directly off the adder — `totalAdders`, `variablePowerPool`,
+     * `possession`, `leaping` and `reflection` all do — so the emitter has to write them, and
+     * writing a derived `{lvlval: 1, lvlcost: perLevel}` instead is not safe: `baseCost` feeds the
+     * same pair to `getMultiplierCost`, whose arithmetic is multiplicative rather than a ratio.
+     */
+    readonly lvlval: number;
+    readonly lvlcost: number;
 }
 
 /** A characteristic a skill may be based on, and what it costs on that characteristic. */
@@ -161,10 +172,12 @@ export type Unsupported =
  * - `COMPOUNDPOWER` — a power made of powers; open-ended by design.
  * - `VPP` — offered as a *framework* instead, which is what it is. Withheld only as a power.
  *
- * `MULTIFORM` and `SUMMON` look generic — levels plus adders — but price `NaN` once their adders
- * are answered. Withheld pending that being understood rather than guessed at.
+ * `MULTIFORM` and `SUMMON` were here too, on the evidence that they priced `NaN` once their adders
+ * were answered. That turned out to be nothing to do with either of them: `emitAdder` did not carry
+ * `lvlval`/`lvlcost`, which an adder needs because — unlike a trait — it is never given a
+ * `template`. Fixing that priced both correctly, so both are offered.
  */
-const BESPOKE_POWERS = ['FORCEWALL', 'DUPLICATION', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'MULTIFORM', 'SUMMON', 'VPP'];
+const BESPOKE_POWERS = ['FORCEWALL', 'DUPLICATION', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'VPP'];
 
 /**
  * Traits that cannot be offered yet.
@@ -296,6 +309,8 @@ const levelRangeOf = (entry: Obj, label: string): LevelRange | null => {
         max: typeof entry.maxval === 'number' && entry.maxval < 1000 ? entry.maxval : 100,
         perLevel: entry.lvlcost / entry.lvlval,
         label: typeof entry.levelslabel === 'string' ? entry.levelslabel : label,
+        lvlval: entry.lvlval,
+        lvlcost: entry.lvlcost,
     };
 };
 
