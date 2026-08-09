@@ -21,7 +21,7 @@
  */
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
-import {emptyDraft, type AuthoredCharacter, type AuthoringEdition} from 'core/authoring';
+import {emptyDraft, validate, type AuthoredCharacter, type AuthoringEdition} from 'core/authoring';
 import {AuthoringDraftProvider, useAuthoringDraft, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 import {ThemeProvider} from 'app/theme';
 import {AuthorTraitScreen, type AuthorTraitScreenProps} from '../AuthorTraitScreen';
@@ -173,6 +173,94 @@ describe('AuthorTraitScreen — a framework pool', () => {
         // A pool has no catalogue entry, no levels and nothing to pick — only modifiers apply.
         expect(tree.root.findAllByProps({testID: 'author-add-modifier-framework-0'}).length).toBeGreaterThan(0);
         expect(tree.root.findAllByProps({testID: 'author-name-framework-0'})).toHaveLength(0);
+    });
+});
+
+/**
+ * Yes/no adders — the ones with no options, no levels and no text.
+ *
+ * These rendered as **nothing** until `ToggleList` existed, which was not a cosmetic gap: an adder
+ * you cannot reach is a purchase you cannot make, and for the required ones it was a character you
+ * could not save. Everything here is a regression test for that.
+ */
+describe('AuthorTraitScreen — the yes/no adders', () => {
+    const power = (xmlid: string, levels: number, adders: {xmlid: string; levels?: number}[] = []): AuthoredCharacter => ({
+        ...emptyDraft('6E'),
+        name: 'Probe',
+        powers: [{xmlid, name: 'Probe', input: 'ED', adders, levels, modifiers: []}],
+    });
+
+    const chip = async (tree: ReactTestRenderer, testID: string): Promise<void> => {
+        await act(async () => {
+            tree.root
+                .findAllByProps({testID})
+                .find((node) => typeof node.props.onPress === 'function')
+                ?.props.onPress();
+        });
+        await act(async () => {});
+    };
+
+    it('buys a half-die on an attack — which nothing could do before', async () => {
+        const {tree, draft} = await renderTrait(power('ENERGYBLAST', 10), {kind: 'trait', key: 'powers', index: 0});
+
+        await chip(tree, 'author-switches-powers-0-PLUSONEHALFDIE');
+
+        // Present on the list is what "taken" means — see `emitAdder`.
+        expect(draft().powers[0].adders).toEqual([{xmlid: 'PLUSONEHALFDIE'}]);
+    });
+
+    it('drops one again on a second tap, rather than only ever adding', async () => {
+        const {tree, draft} = await renderTrait(power('ENERGYBLAST', 10, [{xmlid: 'PLUSONEHALFDIE'}]), {kind: 'trait', key: 'powers', index: 0});
+
+        await chip(tree, 'author-switches-powers-0-PLUSONEHALFDIE');
+        expect(draft().powers[0].adders).toEqual([]);
+    });
+
+    it('answers a required adder, so the character becomes saveable at all', async () => {
+        // Damage Negation's three are `required`, so `validate` errored on a character whose form
+        // had no control that could clear it. It was not buildable, not merely awkward.
+        const {tree, draft} = await renderTrait(power('DAMAGENEGATION', 3), {kind: 'trait', key: 'powers', index: 0});
+
+        const blocked = validate(draft()).filter((problem) => problem.severity === 'error');
+        expect(blocked.map((problem) => problem.message)).toEqual([
+            'Damage Negation needs its "Physical DCs".',
+            'Damage Negation needs its "Energy DCs".',
+            'Damage Negation needs its "Mental DCs".',
+        ]);
+
+        for (const xmlid of ['PHYSICAL', 'ENERGY', 'MENTAL']) {
+            await type(tree, `author-adder-powers-0-${xmlid}`, '3');
+        }
+
+        expect(validate(draft()).filter((problem) => problem.severity === 'error')).toEqual([]);
+    });
+
+    it('takes a levelled adder to zero by clearing it, not by storing a zero', async () => {
+        const {tree, draft} = await renderTrait(power('DAMAGENEGATION', 3, [{xmlid: 'PHYSICAL', levels: 4}]), {kind: 'trait', key: 'powers', index: 0});
+
+        await type(tree, 'author-adder-powers-0-PHYSICAL', '0');
+
+        // One way to say "not this one": absent. A stored zero would emit an adder worth nothing.
+        expect(draft().powers[0].adders).toEqual([]);
+    });
+
+    it('reaches a modifier own yes/no adders, which move the multiplier', async () => {
+        const {tree, draft} = await renderTrait(
+            {...emptyDraft('6E'), name: 'Probe', powers: [{xmlid: 'ENERGYBLAST', name: 'Bolt', input: 'ED', adders: [], levels: 10, modifiers: [{xmlid: 'AOE', adders: []}]}]},
+            {kind: 'trait', key: 'powers', index: 0},
+        );
+
+        await chip(tree, 'author-modifier-switches-powers-0-mod-0-SELECTIVETARGET');
+
+        // Selective is +¼ on the advantage — so without it the power was not merely missing a
+        // purchase, it was priced wrong.
+        expect(draft().powers[0].modifiers[0].adders).toEqual([{xmlid: 'SELECTIVETARGET'}]);
+    });
+
+    it('shows nothing where a trait has none', async () => {
+        const {tree} = await renderTrait(withPower(), {kind: 'trait', key: 'skills', index: 0});
+
+        expect(tree.root.findAllByProps({testID: 'author-switches-skills-0'})).toHaveLength(0);
     });
 });
 

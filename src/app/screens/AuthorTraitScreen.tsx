@@ -37,10 +37,11 @@ import {
     type AuthoredPower,
     type AuthoredTrait,
     type AuthoringEdition,
+    type CatalogueAdder,
     type CatalogueTrait,
     type FieldGroup,
 } from 'core/authoring';
-import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField} from 'app/components';
+import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField, ToggleList} from 'app/components';
 import {useAuthoringDraft, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 
 export interface AuthorTraitScreenProps {
@@ -233,6 +234,14 @@ function TraitRow({
         onChange({...trait, adders});
     };
 
+    /** Taking or dropping a yes/no adder. Present on the list *is* taken — see `emitAdder`. */
+    const toggleAdder = (xmlid: string, selected: boolean): void =>
+        onChange({...trait, adders: selected ? [...trait.adders, {xmlid}] : trait.adders.filter((adder) => adder.xmlid !== xmlid)});
+
+    // Fourteen independent purchases on a Weapon Familiarity, "+½d6" on any attack, and the
+    // *required* ones on Damage Negation and Possession — see `switchesOf`.
+    const switches = switchesOf(entry);
+
     return (
         <View style={styles.complication}>
             <View style={styles.complicationHead}>
@@ -335,7 +344,26 @@ function TraitRow({
                 }
 
                 if (adder.options.length === 0) {
-                    return null; // a flat yes/no adder — needs a switch, which is its own change
+                    // Levelled but optionless — "+[LVL] DCs" on Damage Negation, "+[LVL] Points of
+                    // Mind Control effect" on Possession. A number, not a switch; and taking it to
+                    // zero drops it, so there is one way to say "not this one".
+                    if (adder.levels !== null) {
+                        return (
+                            <NumberField
+                                key={adder.xmlid}
+                                label={adder.required ? adder.display : `${adder.display} (optional)`}
+                                value={String(chosen?.levels ?? 0)}
+                                onChangeText={(text) => {
+                                    const levels = Math.max(0, Number.parseInt(text, 10) || 0);
+
+                                    return levels === 0 ? toggleAdder(adder.xmlid, false) : setAdder(adder.xmlid, {levels});
+                                }}
+                                testID={`author-adder-${id}-${adder.xmlid}`}
+                            />
+                        );
+                    }
+
+                    return null; // a plain yes/no — rendered together as chips, below
                 }
 
                 return (
@@ -349,6 +377,20 @@ function TraitRow({
                     />
                 );
             })}
+
+            {switches.length === 0 ? null : (
+                <ToggleList
+                    label={switches.some((adder) => adder.required) ? 'OPTIONS' : 'OPTIONS (ALL OPTIONAL)'}
+                    items={switches.map((adder) => ({
+                        key: adder.xmlid,
+                        label: adder.display,
+                        cost: adder.basecost,
+                        selected: trait.adders.some((chosen) => chosen.xmlid === adder.xmlid),
+                    }))}
+                    onToggle={toggleAdder}
+                    testID={`author-switches-${id}`}
+                />
+            )}
 
             {entry.modifiable ? <Modifiers id={id} edition={edition} power={trait as AuthoredPower} onChange={onChange} /> : null}
         </View>
@@ -404,6 +446,17 @@ function DefenseFields({
  * than a property of the modifier — `ModifierCalculator` splits them on exactly that, and an
  * option can flip a modifier from one to the other.
  */
+/**
+ * The adders that are a plain yes/no: no options to pick, no levels to buy, no text to type.
+ *
+ * They render as one chip list rather than a control each. Before {@link ToggleList} they rendered
+ * as **nothing**, on traits and modifiers alike — which is why Damage Negation could not answer its
+ * own required adders, no attack could buy a half-die, and an Area Of Effect could not be made
+ * Selective.
+ */
+const switchesOf = (entry: {adders: readonly CatalogueAdder[]}): readonly CatalogueAdder[] =>
+    entry.adders.filter((adder) => !adder.freeText && adder.options.length === 0 && adder.levels === null);
+
 function Modifiers({
     id,
     edition,
@@ -505,6 +558,29 @@ function Modifiers({
                                 />
                             );
                         })}
+
+                        {/* The same yes/no adders the trait form was missing, one level down — and
+                            here they move the *multiplier*, so a power without them is not merely
+                            missing a purchase, it is priced wrong. Area Of Effect's Selective,
+                            Charges' Clips, Focus' Multiple Foci: all standard, none reachable. */}
+                        {switchesOf(entry).length === 0 ? null : (
+                            <ToggleList
+                                label={`${entry.display.toUpperCase()} — OPTIONS`}
+                                items={switchesOf(entry).map((adder) => ({
+                                    key: adder.xmlid,
+                                    label: adder.display,
+                                    cost: adder.basecost,
+                                    selected: applied.adders.some((candidate) => candidate.xmlid === adder.xmlid),
+                                }))}
+                                onToggle={(xmlid, selected) =>
+                                    update(index, {
+                                        ...applied,
+                                        adders: selected ? [...applied.adders, {xmlid}] : applied.adders.filter((candidate) => candidate.xmlid !== xmlid),
+                                    })
+                                }
+                                testID={`author-modifier-switches-${modifierId}`}
+                            />
+                        )}
                     </View>
                 );
             })}
