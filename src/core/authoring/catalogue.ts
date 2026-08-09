@@ -601,10 +601,20 @@ function traitOf(entry: Obj, category: AuthorableCategory, edition: AuthoringEdi
 }
 
 /**
- * Every entry a category defines in an edition, de-duplicated and in template order.
+ * Every entry a category defines in an edition, de-duplicated and **sorted by display name**.
  *
  * De-duplication is not optional: `normalizedTemplate` concatenates the entries it collected onto
  * the array they partly came from, so each plainly-declared skill appears twice.
+ *
+ * **The sort is what that same concatenation costs.** Template order is not one order, it is
+ * several sorted runs stuck end to end — so the powers list read `Running, Swimming, Leaping,
+ * Absorption, Aid, Barrier, Blast, Automaton…` and the talents list ran A-to-W and then started
+ * again at Combat Luck. It looks random to anyone scanning it for a name, which is the only thing
+ * a picker of 81 entries is ever used for.
+ *
+ * Sorted here rather than in the pickers so every consumer agrees — the two "Add" fields, the
+ * withheld count, and anything later. Nothing depends on template order: `emit` takes `position`
+ * from the *draft's* index, and every lookup is by xmlid.
  */
 export function catalogue(category: AuthorableCategory, edition: AuthoringEdition): CatalogueTrait[] {
     const template = heroDesignerCharacter.normalizedTemplate(templateFor(edition));
@@ -622,7 +632,8 @@ export function catalogue(category: AuthorableCategory, edition: AuthoringEditio
         traits.push(traitOf(entry, category, edition));
     }
 
-    return traits;
+    // `localeCompare` rather than `<`, so "Élan" files under E and not after Z.
+    return traits.sort((a, b) => a.display.localeCompare(b.display));
 }
 
 /** The entries a player may actually take — everything the generic form can render. */
