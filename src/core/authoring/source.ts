@@ -32,6 +32,7 @@ import type {
     AuthoredFramework,
     AuthoredModifier,
     AuthoredPower,
+    AuthoredSlot,
     AuthoredTrait,
     AuthoringEdition,
     FrameworkKind,
@@ -217,6 +218,37 @@ function parsePowers(value: unknown): AuthoredPower[] | null {
     return powers;
 }
 
+/**
+ * A framework's slots: powers, plus the one field only a slot has.
+ *
+ * Separate from {@link parsePowers} rather than folded into it, so `variable` cannot appear on a
+ * standalone power or a piece of equipment, where nothing would ever read it.
+ */
+function parseSlots(value: unknown): AuthoredSlot[] | null {
+    const powers = parsePowers(value);
+
+    if (powers === null) {
+        return null;
+    }
+
+    const slots: AuthoredSlot[] = [];
+
+    for (const [index, power] of powers.entries()) {
+        // Sources written before slot kinds existed have no such key on any slot — and every one
+        // of them was emitted fixed, which is what an absent field reads as. A key that is present
+        // but not a boolean is malformed, and rejected like any other field of the wrong type.
+        const {variable} = (value as unknown[])[index] as Record<string, unknown>;
+
+        if (variable !== undefined && typeof variable !== 'boolean') {
+            return null;
+        }
+
+        slots.push(variable === undefined ? power : {...power, variable});
+    }
+
+    return slots;
+}
+
 const FRAMEWORK_KINDS = new Set<FrameworkKind>(['multipower', 'elementalControl', 'vpp']);
 
 function parseFrameworks(value: unknown): AuthoredFramework[] | null {
@@ -231,7 +263,7 @@ function parseFrameworks(value: unknown): AuthoredFramework[] | null {
             return null;
         }
 
-        const slots = parsePowers(entry.slots ?? []);
+        const slots = parseSlots(entry.slots ?? []);
 
         if (slots === null || !Array.isArray(entry.modifiers)) {
             return null;
@@ -350,6 +382,16 @@ const powerToSource = (entry: AuthoredPower): Record<string, unknown> => ({
     ...(entry.defense === undefined ? {} : {defense: {...entry.defense}}),
 });
 
+/**
+ * A slot. `powerToSource` plus its kind — and it has to be spelled out, because this projection is
+ * a whitelist rather than a spread: a field nobody adds here is silently dropped on save and the
+ * character comes back subtly cheaper than the player left it.
+ */
+const slotToSource = (entry: AuthoredSlot): Record<string, unknown> => ({
+    ...powerToSource(entry),
+    ...(entry.variable === undefined ? {} : {variable: entry.variable}),
+});
+
 export const toSource = (draft: AuthoredCharacter): StoredSource => ({
     edition: draft.edition,
     name: draft.name,
@@ -367,7 +409,7 @@ export const toSource = (draft: AuthoredCharacter): StoredSource => ({
         name: framework.name,
         reserve: framework.reserve,
         modifiers: framework.modifiers.map(modifierToSource),
-        slots: framework.slots.map(powerToSource),
+        slots: framework.slots.map(slotToSource),
     })),
     complications: draft.complications.map(traitToSource),
 });

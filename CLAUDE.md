@@ -164,7 +164,7 @@ it's data preservation, not a feature.
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
-> `core/`.** 20 entries; 13 fixed (H2–H12, U2, U3) — every known corpus-triggered bug is now
+> `core/`.** 20 entries; 14 fixed (H2–H13, U2, U3) — every known corpus-triggered bug is now
 > fixed. It explains why a "wrong-looking" line in `core/` may be load-bearing, and why a
 > green golden master does not mean correct.
 
@@ -182,9 +182,18 @@ Process per fix — follow it; the ledger explains the reasoning:
 3. Re-base the affected golden master to an explicit intentional divergence, with a comment
    linking back to the ledger entry (see `H3_DIVERGENCE` / `U2_DIVERGENCE` for the shape).
 
-Still open — none is corpus-triggered: **T1–T4** are template-output only, **H1** and **U1** are
-cosmetic, and **H13** is latent (a Multipower slot's divisor never varies, because `ultraSlot` is
-read off the wrapper rather than the trait; every corpus slot is fixed, so nothing sees it).
+Still open — none is corpus-triggered: **T1–T4** are template-output only, and **H1** and **U1**
+are cosmetic.
+
+**H13 is the counterpart lesson to H2, and it is about oracles.** Its ledger entry said the ratio
+needed a rulebook nobody had, and that gated variable Multipower slots out of authoring for a whole
+release. Two things settled it without one. First, **legacy's own dead code was the evidence**: its
+`attributes()` labelled `ULTRA_SLOT="Yes"` "Variable", which is how you can tell the ratios were
+right and the *branch* was wrong — the bug was never in the arithmetic. Second, **the corpus can
+test a divisor even with no variable slot in it**, by pricing the 75 fixed ones against the budgets
+HERO Designer balanced them to: ÷10 lands junkyard exactly and the rest within a few points, ÷5 puts
+every one 11–39 over. **When a ledger entry says "needs the rulebook", ask first what the data
+already knows** — measuring beat waiting.
 
 **H2 is a cautionary tale about this ledger's own confidence.** It sat open for the whole port
 described as display-order-only, on the reasoning that "point totals are order-independent" — which

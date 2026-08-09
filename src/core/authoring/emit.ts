@@ -352,10 +352,12 @@ function emitFramework(framework: AuthoredFramework, index: number, edition: Aut
         ...emitPower(slot, position + 1 + order, edition),
         id: id + 1 + order,
         parentid: id,
-        // Fixed slots only, for now: the variable kind's divisor is unreachable in the engine —
-        // see H13 in docs/KNOWN_DEVIATIONS.md — so offering it would price a variable slot as a
-        // fixed one and say nothing.
-        ultraSlot: true,
+        // `ULTRA_SLOT` is the format's name for the fixed kind, and `MultipowerItem` is the only
+        // decorator that reads it — an Elemental Control slot and a VPP prefab have no such choice,
+        // so emitting it on them would be inventing a field. Written for every Multipower slot
+        // rather than only the fixed ones because that is what HERO Designer does, and because
+        // absent reads as fixed by design (H13, docs/KNOWN_DEVIATIONS.md).
+        ...(framework.kind === 'multipower' ? {ultraSlot: slot.variable !== true} : {}),
     }));
 
     return {container, slots};

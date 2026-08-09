@@ -251,7 +251,7 @@ export interface AuthoredFramework {
      */
     readonly reserve: number;
     readonly modifiers: readonly AuthoredModifier[];
-    readonly slots: readonly AuthoredPower[];
+    readonly slots: readonly AuthoredSlot[];
 }
 
 /** A power: a trait, plus the advantages and limitations that make it cost what it costs. */
@@ -259,6 +259,29 @@ export interface AuthoredPower extends AuthoredTrait {
     readonly modifiers: readonly AuthoredModifier[];
     /** Only for the powers whose catalogue entry declares a `defense` field group. */
     readonly defense?: AuthoredDefense;
+}
+
+/**
+ * A power sitting in a framework.
+ *
+ * Its own type only so `variable` has somewhere to live that a standalone power and a piece of
+ * equipment don't — the choice is meaningless off a slot, and an optional field on
+ * {@link AuthoredPower} would have offered it everywhere.
+ */
+export interface AuthoredSlot extends AuthoredPower {
+    /**
+     * A **variable** slot rather than a fixed one: the reserve can be split across it and its
+     * neighbours, and the power run at less than full value. Flexibility is what you pay for, so
+     * it costs a fifth of the power's real cost where a fixed slot costs a tenth.
+     *
+     * **Multipower only.** An Elemental Control slot pays whatever it exceeds the pool by and a
+     * VPP's slots are prefabs, so neither has the distinction; `emit` ignores the flag on those
+     * two rather than writing a field their decorators would never read.
+     *
+     * Defaults to fixed, which is what HERO Designer defaults a new slot to. See H13 in
+     * docs/KNOWN_DEVIATIONS.md — until it was fixed the engine priced both kinds identically.
+     */
+    readonly variable?: boolean;
 }
 
 /**
