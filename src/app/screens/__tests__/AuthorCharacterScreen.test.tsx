@@ -438,12 +438,20 @@ describe('AuthorCharacterScreen — frameworks', () => {
         expect(edits).toEqual([{address: {kind: 'slot', framework: 0, index: 1}, category: 'powers'}]);
     });
 
-    it('says slots are fixed slots rather than silently making them so', async () => {
-        const {tree} = await renderScreen();
-        const add = tree.root.findAllByProps({testID: 'author-add-framework'}).find((node) => node.props.hint !== undefined);
+    it('marks a variable slot on its row, and charges it double', async () => {
+        const mixed: AuthoredCharacter = {
+            ...gadgets,
+            frameworks: [{...gadgets.frameworks[0], slots: [gadgets.frameworks[0].slots[0], {...gadgets.frameworks[0].slots[1], variable: true}]}],
+        };
+        const {tree} = await renderScreen({initial: mixed});
 
-        // The variable kind's divisor is unreachable in the engine (H13), so it is not offered.
-        expect(add?.props.hint).toBe('Slots are fixed slots');
+        // A fixed slot is the default and says nothing; the variable one is called out, because
+        // two rows of the same power at different costs is otherwise unreadable.
+        expect(textOf(tree, 'author-row-framework-0-slot-0')).not.toContain('variable');
+        expect(textOf(tree, 'author-row-framework-0-slot-1')).toContain('variable');
+
+        // 60 reserve + 60/10 fixed + 50/5 variable = 76, against 71 with both fixed.
+        expect(textOf(tree, 'author-spend')).toBe('76 spent of 400');
     });
 
     it('blocks a framework with no reserve', async () => {

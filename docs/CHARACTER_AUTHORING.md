@@ -339,7 +339,7 @@ The three kinds price slots differently, which is the whole reason they exist:
 
 | Kind | Container | Slot |
 |---|---|---|
-| Multipower | reserve as `basecost` | active ÷ 10 (fixed slot) |
+| Multipower | reserve as `basecost` | active ÷ 10 fixed, ÷ 5 variable |
 | Elemental Control | reserve as `basecost` | active − reserve |
 | Variable Power Pool | pool as **`levels`** | — |
 
@@ -347,18 +347,38 @@ The VPP is the odd one: it states its size in `levels` where the other two use `
 `VariablePowerPool.cost()` reads it accordingly. A 50-point pool costs 75 — the pool plus a control
 cost of half of it.
 
-### A second latent engine bug, found the same way as H2
+### A second latent engine bug, found the same way as H2 — and since fixed
 
-`MultipowerItem` reads `ultraSlot` off the **`CharacterTrait` wrapper** rather than off the trait,
-behind a cast that stops the compiler objecting. The wrapper has no such field, so the read is
-always `undefined` and **every Multipower slot divides by 10** whatever kind of slot it is.
-Confirmed by pricing the same authored slot both ways: 6 either way.
+`MultipowerItem` read `ultraSlot` off the **`CharacterTrait` wrapper** rather than off the trait,
+behind a cast that stopped the compiler objecting. The wrapper has no such field, so the read was
+always `undefined` and **every Multipower slot divided by 10** whatever kind it was. Confirmed at
+the time by pricing the same authored slot both ways: 6 either way.
 
-Not corpus-triggered — all 37 fixtures use fixed slots exclusively, and for a fixed slot ÷10 is
-right — so no golden master can see it. Recorded as **H13**; not fixed here, because that is a
-correctness-pass change with its own commit, its own rules check and its own test. The consequence
-for authoring is that `core/authoring` emits **fixed slots only** and the UI says so, rather than
-offering a variable slot that would silently price as a fixed one.
+Recorded as **H13** and left for the correctness pass, which gated authoring to **fixed slots
+only** through 2.8.0 — offering a choice that changed no number would have been worse than not
+offering it.
+
+**It is fixed now, and how it got settled is the part worth keeping.** The ledger entry said the
+ratio needed a rulebook nobody had. Two things answered it instead:
+
+- **Legacy's own dead code.** Its `attributes()` labels `ULTRA_SLOT="Yes"` as "Variable" (and
+  "Flexible" in 5E). An ultra slot is the *fixed* kind — 6E renamed ultra → fixed, multi → variable
+  — so legacy had the terminology backwards, which means **the ratios were right and hung on the
+  wrong branch**. The bug was never in the arithmetic.
+- **The corpus, which can test a divisor without containing a variable slot.** All 75 fixture slots
+  are fixed, so pricing them checks the *fixed* divisor against budgets HERO Designer balanced:
+  ÷10 lands junkyard exactly on its declared points and greyman, starborne, spyder and twilight
+  within a handful, in both editions. ÷5 puts every one of them 11–39 over.
+
+So: **fixed ÷ 10, variable ÷ 5**, and a slot with no flag at all reads as fixed, because HERO
+Designer writes the attribute on every slot it emits.
+
+Authoring now offers both — on a Multipower only, since an Elemental Control slot pays what it
+exceeds the pool by and a VPP's slots are prefabs. Three places had to learn about it, and the
+middle one is the trap: `AuthoredSlot` carries the flag, `emit` writes it as `ULTRA_SLOT`, and
+**`toSource` had to be taught to store it**. That projection is a whitelist rather than a spread,
+so a field nobody adds to it is dropped on save — a variable slot would have come back fixed, and
+the character quietly cheaper than the player left it, with nothing on screen to say why.
 
 ## What Phase E actually built
 

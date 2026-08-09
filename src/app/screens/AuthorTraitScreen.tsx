@@ -32,6 +32,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {
     modifiers,
     trait as catalogueTrait,
+    type AuthoredFramework,
     type AuthoredModifier,
     type AuthoredPower,
     type AuthoredTrait,
@@ -62,6 +63,11 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
     const value = traitAt(address);
     const entry = useMemo(() => (value === null ? null : catalogueTrait(value.xmlid, category, draft.edition)), [value, category, draft.edition]);
     const pool = address.kind === 'pool' ? frameworkAt(address.framework) : null;
+    // A slot's own address and framework, so the form can offer the things only a slot has. Read
+    // here rather than off `value`, which is typed to the trait and drops them. Held as a `const`
+    // so the narrowing survives into the callbacks below.
+    const slotAddress = address.kind === 'slot' ? address : null;
+    const holder = slotAddress === null ? null : frameworkAt(slotAddress.framework);
 
     // A framework's pool carries advantages and limitations but is not a trait — it has no
     // catalogue entry, no levels of its own and nothing to pick. Only the modifier editor applies.
@@ -124,6 +130,15 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
                             onDone();
                         }}
                     />
+
+                    {slotAddress !== null && holder !== null && holder.kind === 'multipower' ? (
+                        <SlotKind
+                            framework={holder}
+                            index={slotAddress.index}
+                            edition={draft.edition}
+                            onChange={(revised) => replaceFramework(slotAddress.framework, revised)}
+                        />
+                    ) : null}
                 </Card>
 
                 <View style={styles.actions}>
@@ -131,6 +146,63 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
                 </View>
             </ScrollView>
         </Screen>
+    );
+}
+
+/**
+ * Fixed or variable, for one Multipower slot.
+ *
+ * **Multipower only**, which is why it is rendered from the address rather than from the trait: an
+ * Elemental Control slot pays whatever it exceeds the pool by and a VPP's slots are prefabs, so
+ * neither has the choice. Offering it there would be a control that changed no number — which is
+ * exactly the state this whole screen was in before H13 was fixed.
+ *
+ * The two editions name the same two things differently, so the labels follow the edition the
+ * character is being built in rather than picking one vocabulary and making half the players
+ * translate.
+ */
+function SlotKind({
+    framework,
+    index,
+    edition,
+    onChange,
+}: {
+    framework: AuthoredFramework;
+    index: number;
+    edition: AuthoringEdition;
+    onChange: (framework: AuthoredFramework) => void;
+}): React.JSX.Element {
+    const fifth = edition === '5E';
+    const slot = framework.slots[index];
+
+    const variable = slot?.variable === true;
+
+    return (
+        <View style={styles.fields} testID={`author-slot-kind-${index}`}>
+            <Text variant="label" muted>
+                SLOT
+            </Text>
+
+            <SegmentedControl
+                segments={[
+                    {value: 'fixed', label: fifth ? 'Ultra slot' : 'Fixed slot'},
+                    {value: 'variable', label: fifth ? 'Multi slot' : 'Variable slot'},
+                ]}
+                value={variable ? 'variable' : 'fixed'}
+                onChange={(mode) =>
+                    onChange({
+                        ...framework,
+                        slots: framework.slots.map((entry, order) => (order === index ? {...entry, variable: mode === 'variable'} : entry)),
+                    })
+                }
+            />
+
+            {/* A fixed slot runs at full value and only one at a time; a variable slot can take a
+                share of the reserve and run alongside its neighbours. Flexibility is what costs. */}
+            <Text variant="caption" muted>
+                {variable ? 'Costs a fifth of the power — the reserve splits across slots' : 'Costs a tenth of the power — one slot at full value'}
+            </Text>
+        </View>
     );
 }
 

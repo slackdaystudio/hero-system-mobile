@@ -21,7 +21,7 @@
  */
 import React from 'react';
 import TestRenderer, {act, type ReactTestRenderer} from 'react-test-renderer';
-import {emptyDraft, type AuthoredCharacter} from 'core/authoring';
+import {emptyDraft, type AuthoredCharacter, type AuthoringEdition} from 'core/authoring';
 import {AuthoringDraftProvider, useAuthoringDraft, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 import {ThemeProvider} from 'app/theme';
 import {AuthorTraitScreen, type AuthorTraitScreenProps} from '../AuthorTraitScreen';
@@ -173,6 +173,68 @@ describe('AuthorTraitScreen — a framework pool', () => {
         // A pool has no catalogue entry, no levels and nothing to pick — only modifiers apply.
         expect(tree.root.findAllByProps({testID: 'author-add-modifier-framework-0'}).length).toBeGreaterThan(0);
         expect(tree.root.findAllByProps({testID: 'author-name-framework-0'})).toHaveLength(0);
+    });
+});
+
+describe('AuthorTraitScreen — a Multipower slot picks its kind', () => {
+    const bolt = {xmlid: 'ENERGYBLAST', name: 'Bolt', input: 'ED', adders: [], levels: 12, modifiers: []};
+
+    const withSlot = (kind: AuthoredCharacter['frameworks'][number]['kind'], edition: AuthoringEdition = '6E'): AuthoredCharacter => ({
+        ...emptyDraft(edition),
+        frameworks: [{kind, name: 'Belt', reserve: 60, modifiers: [], slots: [bolt]}],
+    });
+
+    const segment = async (tree: ReactTestRenderer, value: string): Promise<void> => {
+        await act(async () => {
+            tree.root
+                .findAllByProps({testID: `segment-${value}`})
+                .find((node) => typeof node.props.onPress === 'function')
+                ?.props.onPress();
+        });
+        await act(async () => {});
+    };
+
+    it('writes the choice back to the draft', async () => {
+        const {tree, draft} = await renderTrait(withSlot('multipower'), {kind: 'slot', framework: 0, index: 0});
+
+        await segment(tree, 'variable');
+        expect(draft().frameworks[0].slots[0].variable).toBe(true);
+
+        await segment(tree, 'fixed');
+        expect(draft().frameworks[0].slots[0].variable).toBe(false);
+    });
+
+    it('keeps the choice when the trait form edits something else', async () => {
+        // `variable` lives on the slot, and the trait form is typed to the trait — so an edit made
+        // through it must not drop the fields it cannot see.
+        const {tree, draft} = await renderTrait(withSlot('multipower'), {kind: 'slot', framework: 0, index: 0});
+
+        await segment(tree, 'variable');
+        await type(tree, 'author-name-framework-0-slot-0', 'Grapple Line');
+
+        expect(draft().frameworks[0].slots[0]).toMatchObject({name: 'Grapple Line', variable: true});
+    });
+
+    it('names the two kinds the way the edition names them', async () => {
+        const labels = (tree: ReactTestRenderer): unknown[] =>
+            tree.root.findAllByProps({testID: 'author-slot-kind-0'})[0].props.children[1].props.segments.map((entry: {label: string}) => entry.label);
+
+        const sixth = await renderTrait(withSlot('multipower'), {kind: 'slot', framework: 0, index: 0});
+        expect(labels(sixth.tree)).toEqual(['Fixed slot', 'Variable slot']);
+
+        // 6E renamed them; a 5E player is picking between an ultra and a multi slot.
+        const fifth = await renderTrait(withSlot('multipower', '5E'), {kind: 'slot', framework: 0, index: 0});
+        expect(labels(fifth.tree)).toEqual(['Ultra slot', 'Multi slot']);
+    });
+
+    it('does not offer the choice where there is none', async () => {
+        // An Elemental Control slot pays what it exceeds the pool by and a VPP's are prefabs, so
+        // neither has the distinction. A control that changed no number is what H13 already was.
+        for (const kind of ['elementalControl', 'vpp'] as const) {
+            const {tree} = await renderTrait(withSlot(kind), {kind: 'slot', framework: 0, index: 0});
+
+            expect(tree.root.findAllByProps({testID: 'author-slot-kind-0'})).toHaveLength(0);
+        }
     });
 });
 

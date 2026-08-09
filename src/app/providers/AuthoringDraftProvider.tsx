@@ -24,7 +24,7 @@
  * CLAUDE.md — there is deliberately no redux).
  */
 import React, {createContext, useCallback, useContext, useMemo, useRef, useState} from 'react';
-import {emptyDraft, type AuthoredCharacter, type AuthoredFramework, type AuthoredPower, type AuthoredTrait} from 'core/authoring';
+import {emptyDraft, type AuthoredCharacter, type AuthoredFramework, type AuthoredSlot, type AuthoredTrait} from 'core/authoring';
 
 /** Where a trait lives on a draft. `frameworks` is addressed separately — its traits nest. */
 export type DraftKey = 'skills' | 'perks' | 'talents' | 'powers' | 'martialArts' | 'equipment' | 'complications';
@@ -121,7 +121,10 @@ export function AuthoringDraftProvider({initial, children}: AuthoringDraftProvid
                 ...draft,
                 frameworks: draft.frameworks.map((framework, index) =>
                     index === address.framework
-                        ? {...framework, slots: framework.slots.map((slot, order) => (order === address.index ? (trait as AuthoredPower) : slot))}
+                        // Spread over the slot rather than replacing it, so the fields only a slot
+                        // has — `variable` — survive an edit made by the trait form, which is
+                        // typed to the trait and knows nothing about them.
+                        ? {...framework, slots: framework.slots.map((slot, order) => (order === address.index ? {...slot, ...(trait as AuthoredSlot)} : slot))}
                         : framework,
                 ),
             });
