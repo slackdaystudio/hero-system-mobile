@@ -26,7 +26,7 @@
  * `Duplication.cost()` reads two, all unguarded. NaN is the worst shape the failure can take — it
  * is not an exception, so `characterSheet.ts:333` never catches it and the row renders blank.
  */
-import {build, emptyDraft, parseSource, toSource, trait as catalogueTrait, validate, type AuthoredCharacter, type AuthoredPower} from '../index';
+import {build, emit, emptyDraft, parseSource, toSource, trait as catalogueTrait, validate, type AuthoredCharacter, type AuthoredPower} from '../index';
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Obj} from 'core/traits';
 import {flatten} from 'core/util';
@@ -136,7 +136,98 @@ describe('Duplication, which has no fixture anywhere and is pinned from the temp
     });
 });
 
+/**
+ * Endurance Reserve — the one trait in the catalogue whose cost depends on a **child trait**.
+ *
+ * A `.hdc` writes it as `<POWER XMLID="ENDURANCERESERVE" LEVELS="100">` wrapping
+ * `<POWER XMLID="ENDURANCERESERVEREC" LEVELS="10">`, which the parser turns into `trait.power` —
+ * and `EnduranceReserve.cost()` reads `trait.power.levels`. Nothing else needs a sub-power, so the
+ * mechanism is capped at one carrying one number rather than generalised into a shape the data
+ * does not have.
+ *
+ * Five corpus fixtures carry one, all 5E, and every one is compared against its authored twin
+ * below. There is no 6E Endurance Reserve in the corpus at all, so the 6E numbers are derived from
+ * the template with the arithmetic named.
+ */
+describe('Endurance Reserve, whose Recovery is a nested power', () => {
+    const reserve = (edition: '5E' | '6E', end: number, rec: number): number =>
+        authored(edition, {xmlid: 'ENDURANCERESERVE', name: 'Battery', input: '', adders: [], levels: end, modifiers: [], fields: {rec}});
+
+    const fixtureReserve = (fixture: string): {imported: number; end: number; rec: number} => {
+        const character = heroDesignerCharacter.getCharacter(clone(fixture) as never) as unknown as Obj;
+        const found = flatten(character.powers as Obj[], 'powers').find((power: Obj) => String(power.xmlid) === 'ENDURANCERESERVE')!;
+
+        return {
+            imported: characterTraitDecorator.decorate(found, 'powers', () => character).cost(),
+            end: Number(found.levels),
+            rec: Number((found.power as Obj)?.levels ?? 0),
+        };
+    };
+
+    it.each(['fifth', 'mikayla-priestess', 'psi-blade6'])('prices %s exactly as importing it does', (fixture) => {
+        const {imported: cost, end, rec} = fixtureReserve(fixture);
+
+        expect(reserve('5E', end, rec)).toBe(cost);
+    });
+
+    it('prices 5E at 1 point per 10 END and 1 per REC', () => {
+        // `fifth` buys 100 END and 10 REC: 10 + 10 = 20.
+        expect(reserve('5E', 100, 10)).toBe(20);
+    });
+
+    it('prices 6E at 1 point per 4 END and 2 per 3 REC, each rounded UP on its own', () => {
+        // The two halves are ceilinged separately, which is not the same as ceiling the total:
+        // 100 END is 25, and 5 REC is ceil(5/3 x 2) = ceil(3.33) = 4. So 29, not 28.
+        expect(reserve('6E', 100, 5)).toBe(29);
+        expect(reserve('6E', 100, 10)).toBe(32);
+        expect(reserve('6E', 40, 4)).toBe(13);
+    });
+
+    it('counts the Recovery once, as part of the reserve rather than as a power of its own', () => {
+        const character = build({
+            ...emptyDraft('6E'),
+            name: 'Probe',
+            powers: [{xmlid: 'ENDURANCERESERVE', name: 'Battery', input: '', adders: [], levels: 100, modifiers: [], fields: {rec: 5}}],
+        } as AuthoredCharacter) as unknown as Obj;
+
+        // The sub-power sits under `power`, and a power's child key is `powers` — so nothing that
+        // walks the tree treats it as a second row. If it did, the meter would double-count it.
+        expect((character.powers as Obj[]).length).toBe(1);
+        expect(((character.powers as Obj[])[0].power as Obj).levels).toBe(5);
+    });
+
+    it('gives the Recovery its own id, since ids have to be unique document-wide', () => {
+        const power = ((emit({
+            ...emptyDraft('6E'),
+            name: 'Probe',
+            powers: [{xmlid: 'ENDURANCERESERVE', input: '', adders: [], levels: 20, modifiers: [], fields: {rec: 4}}],
+        } as AuthoredCharacter) as unknown as Obj).powers as Obj).power[0] as Obj;
+
+        // `populateTrait` keys parent lookups on ids, so a sub-power sharing its parent's would be
+        // a collision waiting for a second one.
+        expect((power.power as Obj).id).not.toBe(power.id);
+        expect((power.power as Obj).xmlid).toBe('ENDURANCERESERVEREC');
+    });
+
+    it('prices an unanswered Recovery as zero rather than NaN', () => {
+        const bare = authored('6E', {xmlid: 'ENDURANCERESERVE', name: 'Battery', input: '', adders: [], levels: 20, modifiers: []});
+
+        expect(Number.isNaN(bare)).toBe(false);
+        expect(bare).toBe(5); // 20 END at 1 per 4, and a reserve that never refills
+    });
+});
+
 describe('the declared fields survive the round trip and the validator', () => {
+    it("stores and re-reads a sub-power's number too", () => {
+        const draft = {
+            ...emptyDraft('6E'),
+            name: 'Powered',
+            powers: [{xmlid: 'ENDURANCERESERVE', name: 'Battery', input: '', adders: [], levels: 100, modifiers: [], fields: {rec: 5}}],
+        } as AuthoredCharacter;
+
+        expect(parseSource(JSON.parse(JSON.stringify(toSource(draft))))).toEqual(draft);
+    });
+
     it('stores and re-reads them, fractions included', () => {
         // `toSource` is a whitelist, not a spread. A field nobody lists is dropped on save, and the
         // character comes back a different price than the player left it.

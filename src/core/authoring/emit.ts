@@ -67,6 +67,15 @@ const MODIFIER_ID_BASE = 7000;
 const FRAMEWORK_ID_BASE = 9000;
 
 /**
+ * A nested sub-power's id, offset from its parent's so the two never share one.
+ *
+ * Only Endurance Reserve's Recovery uses it. Ids have to be distinct across the whole document —
+ * `populateTrait` keys parent lookups on them — and a sub-power sits inside a power that already
+ * holds an id from the `powers` block.
+ */
+const SUB_POWER_ID_OFFSET = 12000;
+
+/**
  * How far apart framework blocks are placed, in both id and position.
  *
  * Position matters twice. `populateTrait` attaches a slot by looking its `parentid` up in the list
@@ -284,10 +293,29 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
     const fields: Obj = {};
 
     for (const group of catalogue?.fieldGroups ?? []) {
-        if (group.kind === 'levels') {
-            for (const field of group.fields) {
-                fields[field.key] = authored.fields?.[field.key] ?? 0;
-            }
+        if (group.kind !== 'levels') {
+            continue;
+        }
+
+        if (group.subPower !== undefined) {
+            // A whole nested power, exactly as a `.hdc` writes it: `<POWER XMLID="ENDURANCERESERVE">`
+            // containing `<POWER XMLID="ENDURANCERESERVEREC" LEVELS="10">`. The parser turns the
+            // inner element into `power`, which is where `EnduranceReserve.cost()` reads its levels.
+            fields.power = {
+                ...TRAIT_DEFAULTS,
+                xmlid: group.subPower.xmlid,
+                id: ID_BASE.powers + position + SUB_POWER_ID_OFFSET,
+                alias: group.subPower.display,
+                name: null,
+                basecost: 0,
+                levels: authored.fields?.[group.subPower.levelsFrom] ?? 0,
+                position: -1,
+            };
+            continue;
+        }
+
+        for (const field of group.fields) {
+            fields[field.key] = authored.fields?.[field.key] ?? 0;
         }
     }
 

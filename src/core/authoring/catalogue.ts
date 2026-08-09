@@ -177,7 +177,7 @@ export type Unsupported =
  * `lvlval`/`lvlcost`, which an adder needs because — unlike a trait — it is never given a
  * `template`. Fixing that priced both correctly, so both are offered.
  */
-const BESPOKE_POWERS = ['ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'VPP'];
+const BESPOKE_POWERS = ['FLASH', 'COMPOUNDPOWER', 'VPP'];
 
 /**
  * Traits that cannot be offered yet.
@@ -225,6 +225,16 @@ export interface FieldGroup {
     readonly kind: 'defense' | 'levels';
     readonly label: string;
     readonly fields: readonly FieldGroupField[];
+    /**
+     * Emit this group as a **nested power** rather than as fields on the trait itself.
+     *
+     * Endurance Reserve is the only one in either edition: its Recovery is a whole `<POWER
+     * XMLID="ENDURANCERESERVEREC">` inside the reserve, and `EnduranceReserve.cost()` reads
+     * `trait.power.levels` — the one place in the catalogue where a cost depends on a *child*
+     * trait. Deliberately not generalised past "one sub-power carrying one number", because that
+     * is all the data has; the same reasoning as the one-level cap on nested adders.
+     */
+    readonly subPower?: {readonly xmlid: string; readonly display: string; readonly levelsFrom: string};
 }
 
 export interface FieldGroupField {
@@ -288,6 +298,20 @@ const fieldGroupsFor = (xmlid: string, edition: AuthoringEdition): readonly Fiel
                               // A real `.hdc` carries `WIDTHLEVELS="1.5"`, so this one takes halves.
                               {key: 'widthlevels', label: 'Width', fractional: true},
                           ],
+            },
+        ];
+    }
+
+    if (xmlid === 'ENDURANCERESERVE') {
+        // The reserve's END is the power's own `levels`, which every trait already has. Only the
+        // Recovery needs declaring — and it is a nested power rather than a field, which is the
+        // whole reason this one stayed withheld after the others.
+        return [
+            {
+                kind: 'levels',
+                label: 'How fast it refills',
+                subPower: {xmlid: 'ENDURANCERESERVEREC', display: 'Recovery', levelsFrom: 'rec'},
+                fields: [{key: 'rec', label: 'REC'}],
             },
         ];
     }

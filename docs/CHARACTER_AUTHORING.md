@@ -535,12 +535,11 @@ Powers only, and every entry now names its own blocker:
 
 | Power | What it needs |
 |---|---|
-| `ENDURANCERESERVE` | A nested REC **sub-power**: it reads `trait.power.levels`. Nothing else in the catalogue costs by a child trait. |
 | `FLASH` | Its adders are senses from `Senses.json`, not from the template, and `optionid` must name one. A different source than every other trait's options. |
 | `COMPOUNDPOWER` | A power made of powers. Open-ended by design. |
 | `VPP` | Nothing: it is offered as a **framework**, which is what it is. Withheld only as a power. |
 
-Four entries, down from twenty-one, and only two of them are real work.
+Three entries, down from twenty-one, and only **one** of them is real work.
 
 ### Declared fields, generalised — Barrier and Duplication
 
@@ -581,6 +580,39 @@ Every declared field is emitted even when unanswered, and seeded to zero when a 
 That is deliberate belt and braces: one `undefined` reaching `Barrier.cost()` prices the whole power
 `NaN`, and `NaN` is not an exception, so `characterSheet.ts:333` never catches it and the row simply
 renders blank.
+
+### The one trait that costs by a child trait
+
+Endurance Reserve was the last of the field-group cases and the odd one: **its Recovery is not a
+field, it is a whole nested power.** A `.hdc` writes
+
+```xml
+<POWER XMLID="ENDURANCERESERVE" LEVELS="100">
+  <POWER XMLID="ENDURANCERESERVEREC" LEVELS="10" />
+</POWER>
+```
+
+which the parser turns into `trait.power`, and `EnduranceReserve.cost()` reads
+`trait.power.levels`. **Nothing else in either edition's catalogue costs by a child trait**, so
+`FieldGroup.subPower` is capped at one sub-power carrying one number rather than generalised — the
+same reasoning as the one-level cap on nested adders. Building a tree the data does not have would
+be inventing a shape.
+
+Three details that matter:
+
+- **The reserve's END needs nothing new.** It is the power's own `levels`, which every trait
+  already has. Only the Recovery had to be declared.
+- **The two halves are ceilinged separately.** 6E charges 1 point per 4 END and 2 per 3 REC, each
+  rounded up on its own — so 100 END and 5 REC is 25 + 4 = **29**, not the 28 that ceiling the total
+  would give. 5E is a different pair again: 1 per 10 END and 1 per REC.
+- **The sub-power must not become a second row.** It sits under `power`, and a power's child key is
+  `powers`, so nothing that walks the tree finds it — but if anything did, the meter would count the
+  Recovery twice. There is a test pinning exactly that.
+
+Five corpus fixtures carry an Endurance Reserve, all 5E, and each is checked against its authored
+twin. There is no 6E one anywhere in the corpus, so those numbers come from the template with the
+arithmetic named — `Jay Kwon.hdc` has one (100 END, 5 REC) but is not among the 37 golden-master
+fixtures, so it corroborates rather than proves.
 
 ### An adder has no template, and the emitter has to know that
 

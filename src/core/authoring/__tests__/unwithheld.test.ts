@@ -195,6 +195,6 @@ describe('what is left withheld', () => {
                 .filter((entry) => entry.unsupported === 'bespoke')
                 .map((entry) => entry.xmlid)
                 .sort(),
-        ).toEqual(['COMPOUNDPOWER', 'ENDURANCERESERVE', 'FLASH']);
+        ).toEqual(['COMPOUNDPOWER', 'FLASH']);
     });
 });
