@@ -15,11 +15,17 @@ listing. Two consequences:
   (`android/app/build.gradle`, which carries the full version history in a comment).
   Bump `versionCode` for every subsequent upload.
 
-The iOS side is versioned in `ios/herogmtools.xcodeproj/project.pbxproj`
-(`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`), kept in step with Android. It sat at
-the React Native default of **1.0 (1)** until 2.9.0, while 2.8.0 shipped to TestFlight as
-"2.8.0 (1)" — so it was being set by hand in Xcode on the build box and the repo said
-something different from what shipped. It is now correct here; set it here in future.
+**The iOS version does not come from the project file.** `build-signed.sh <marketing> <build>`
+on the Mac passes `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` **and**
+`TARGETED_DEVICE_FAMILY="1,2"` straight to `xcodebuild`, which overrides whatever
+`project.pbxproj` says. That is why the project file sat at the React Native default of
+`1.0 (1)` while 2.7.x and 2.8.0 all shipped to TestFlight correctly versioned — the file
+was simply never consulted.
+
+The pbxproj values are now kept in step with Android anyway, so opening the project in
+Xcode shows something truthful, but **the build script is the source of truth** and the
+version you type on its command line is the version that ships. Don't "fix" a release by
+editing the project file.
 
 ## Signing setup
 
