@@ -62,19 +62,33 @@ resolve in build and tests.
 ## Status
 
 **The rebuild ships.** It is on the store past legacy's cutover, the rules engine is fully
-ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.7.1
-(versionCode 68) is the last build out.** **2.8.0 (versionCode 69) is staged**: in-app
-character **authoring** (see [`docs/CHARACTER_AUTHORING.md`](docs/CHARACTER_AUTHORING.md)),
-schema 7 → 8.
+ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.8.0
+(versionCode 69) is the last build out.** **2.9.0 (versionCode 70) is staged**: authoring
+completed — see [`docs/CHARACTER_AUTHORING.md`](docs/CHARACTER_AUTHORING.md). **No schema
+change** (stays at 8).
 
-**2.8.0 changes no costs, but it does change how a framework renders on characters people
-already have.** H2 is fixed, so a Multipower / Elemental Control / VPP nests its slots
-instead of leaving them loose beside an empty container — 27 of the 37 fixtures. The points
-were always right; only the arrangement was wrong. So in 2.8.0 a *cost* that moves is a
-regression, and a *layout* that moves is the fix.
+**2.9.0's withheld list is empty: every skill, perk, talent, maneuver and power in both
+editions is offered.** It went 21 → 0, and the lesson is worth more than the list: *most of
+those entries were never bespoke*. `BESPOKE`'s own comment claimed each decorator "reads
+fields no template declares"; reading them instead found flat constants, ordinary options
+and ordinary adders. **A "why we can't" comment is a hypothesis** — the same lesson H2
+taught about a ledger entry's corpus-impact line. What actually blocked them was one
+missing form control for a yes/no adder.
 
-What remains is CostCruncher, the cosmetic tail of the correctness pass, and shrinking
-authoring's withheld list (`BESPOKE` in `core/authoring/catalogue.ts`).
+**2.9.0 changes no costs on imported or generated characters** — H13's fix is invisible
+because every real Multipower slot is fixed, and fixed slots price as they always did. The
+one exception is a character the player *authored* with a **VPP or a Compound Power**: both
+were counted twice, so those read **lower** now, correctly, and their stored earned-XP may
+drop with them.
+
+**Four bugs were live in 2.8.0** and are worth knowing when reading tester reports from that
+build: Damage Negation and Possession could not be built at all, no attack could buy a
+half-die, and a VPP charged its contents twice. All were the same root shape — a control the
+form never drew, or a container walked twice.
+
+What remains is CostCruncher, the cosmetic tail of the correctness pass, and nested adders
+for the familiarity sub-categories (gated on HD's `SELECTED` semantics — see
+`docs/CHARACTER_AUTHORING.md`).
 
 | Phase | State |
 |---|---|

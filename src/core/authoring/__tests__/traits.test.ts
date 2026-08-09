@@ -20,7 +20,7 @@
  * be priced — by characteristic, by familiarity, by a chosen option — and picking the wrong one
  * does not fail, it just costs nothing.
  */
-import {authorable, build, catalogue, emptyDraft, isSaveable, parseSource, spendOf, toSource, trait, validate, withheld, type AuthoredCharacter} from 'core/authoring';
+import {authorable, build, catalogue, emptyDraft, isSaveable, parseSource, spendOf, toSource, trait, validate, withheld, type AuthorableCategory, type AuthoredCharacter} from 'core/authoring';
 import {characterTraitDecorator} from 'core/traits';
 
 type Obj = Record<string, any>;
@@ -45,6 +45,21 @@ describe('the catalogue is what the engine will match against', () => {
         const ids = skills.map((entry) => entry.xmlid);
 
         expect(ids.length).toBe(new Set(ids).size);
+    });
+
+    it('sorts every category by display name, in both editions', () => {
+        // Template order is not one order: `normalizedTemplate` concatenates the entries it
+        // collected onto the array they came from, so it is several sorted runs stuck end to end.
+        // Powers began `Running, Swimming, Leaping, Absorption, Aid, Barrier, Blast, Automaton…`
+        // and talents ran A-to-W and then started again at Combat Luck — which reads as random to
+        // anyone scanning a list of 81 for a name.
+        for (const edition of ['5E', '6E'] as const) {
+            for (const category of ['skills', 'perks', 'talents', 'powers', 'martialArts', 'disadvantages'] as AuthorableCategory[]) {
+                const displays = catalogue(category, edition).map((entry) => entry.display);
+
+                expect({edition, category, displays}).toEqual({edition, category, displays: [...displays].sort((a, b) => a.localeCompare(b))});
+            }
+        }
     });
 
     it('derives the xmlid of an entry that sits under its own sub-key', () => {

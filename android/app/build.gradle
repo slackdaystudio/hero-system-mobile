@@ -108,8 +108,14 @@ android {
         //            never been in a tester build.
         //            Changes no costs — but H2 changes how a framework *renders* on every
         //            existing character that has one (slots nest instead of sitting loose).
-        versionCode 69
-        versionName "2.8.0"
+        // 70/2.9.0 — Authoring completed: every skill, perk, talent, maneuver and power in both
+        //            editions is now offered (the withheld list went 21 -> 0), variable Multipower
+        //            slots (H13), and four bugs that were live in 2.8.0 — Damage Negation and
+        //            Possession unbuildable, no attack able to buy a half-die, and a VPP charging
+        //            its contents twice. No schema change (stays at 8); no cost changes on
+        //            imported or generated characters.
+        versionCode 70
+        versionName "2.9.0"
     }
     signingConfigs {
         debug {

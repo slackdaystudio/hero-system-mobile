@@ -4,7 +4,7 @@ Copyright 2018-Present Philip J. Guinchard — Apache-2.0
 
 # On-device QA shakedown
 
-Manual test plan for a testing build. 2216 unit tests cover the logic; this
+Manual test plan for a testing build. 2298 unit tests cover the logic; this
 covers the integration + native surface they can't (picker, navigation, layout,
 persistence across restarts). **Rebuild first** — the document picker is a new
 native module (`npm run android`).
@@ -206,8 +206,56 @@ native module (`npm run android`).
 - [ ] An **imported** `.hdc` still shows **no** edit card. Authoring must never make a file the
       player owns editable.
 
+## The four 2.8.0 bugs (new in 2.9.0 — check these first)
+Each was "you cannot build this" rather than "this number is wrong", so a pass here is the
+difference between the builder working and not.
+- [ ] **Damage Negation**: add it, answer its Physical/Energy/Mental DCs. 3 physical DCs is
+      **15** in 6E. In 2.8.0 it errored with no control able to clear the error.
+- [ ] **Possession**: same shape — its Mind Control and Telepathy effect levels can be answered.
+- [ ] **A half-die**: a 10d6 Blast is 50; add **+½d6** → **53**. Repeat on an HKA and a Drain.
+- [ ] **Animal Handler / Navigation / Weaponsmith / Survival**: pick categories. One category is
+      2 points, two is 4. In 2.8.0 the skill could only be bought empty at 1 (Survival at 0).
+- [ ] **Area Of Effect → Selective**: a 10d6 Blast with AOE Radius is 75 active; make it
+      **Selective** → **87**. This one changed the *cost*, so it is the most important of the four.
+- [ ] **A VPP**: a 50-point pool costs **75** whatever you put in it. Put two powers in and it
+      stays 75. In 2.8.0 it read 165. If you have a VPP character from 2.8.0, its total should
+      now be **lower**, and its nameplate experience may drop with it.
+- [ ] **A Compound Power**: its cost is the total of the powers in it, counted **once**.
+
+## Everything is now offered (new in 2.9.0)
+- [ ] The **Add** field on every list shows **no** "N more need a form of their own" hint —
+      except **powers**, where the remaining ones are the sense enhancements.
+- [ ] **Weapon Familiarity**: tick Common Melee Weapons + Small Arms → **4**. Groups that cost
+      nothing on their own (Uncommon…) are **not** offered — that is deliberate, not missing.
+- [ ] **Transport Familiarity**: two categories → **4**.
+- [ ] **Barrier**: 6E offers length/height/BODY/width; **5E offers only length and height**
+      (its cost ignores the other two). Width takes **1.5**, not just whole numbers.
+- [ ] **Endurance Reserve**: 100 END + 5 REC → **29** in 6E; 100 END + 10 REC → **20** in 5E.
+- [ ] **Flash**: pick a sense group. Sight 4 levels → **20**, Hearing 4 → **12**. Add a second
+      group → +5. The picker offers six groups, and the power will not save without one.
+- [ ] **Duplication**: a 200-point duplicate is **40**. Two of them **45**, four **50** — the
+      count is priced per *doubling*, so four is not twice two.
+- [ ] **Compound Power**: add two powers to it; it costs their sum. It offers **no** advantages
+      or limitations of its own — put those on the child (the engine ignores them on the parent).
+
+## Multipower slot kinds (new in 2.9.0)
+- [ ] A Multipower slot offers **Fixed / Variable** in 6E and **Ultra / Multi** in 5E.
+- [ ] A 12d6 Blast slot: fixed **6**, variable **12**. A 15d6: fixed **7** (not 7.5 — rounding
+      goes the player's way), variable **15**.
+- [ ] The variable one is marked on its row in the list; a fixed one says nothing.
+- [ ] The sheet's card for the slot shows a **Slot Type** line.
+- [ ] **An imported character with a Multipower is unchanged** — every real slot is fixed, and
+      fixed costs what it always did. A cost that moves here is a regression.
+
 ## Migration (if testing over a legacy install)
 - [ ] First launch imported your legacy characters + settings + stats.
+
+## Upgrading over the previous build (2.9.0: no schema change)
+- [ ] Install 2.8.0, import a character and author one, then install 2.9.0 over the top.
+- [ ] Everything is still there. Schema stays at **8** — nothing migrates.
+- [ ] An imported or generated character's **total is identical** to what 2.8.0 showed.
+- [ ] An authored character re-opens and rebuilds identically — *unless* it has a VPP or a
+      Compound Power, where the total should now be **lower** and correct.
 
 ## Upgrading over the previous build (2.6.0: schema 5 → 7)
 - [ ] Install **2.5.0** first, import a character or two with portraits, roll a random one.
