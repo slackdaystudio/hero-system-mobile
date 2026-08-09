@@ -48,8 +48,55 @@ export interface Spend {
     readonly spent: number;
 }
 
+/**
+ * Containers whose own cost **already accounts for everything inside them**, so walking in and
+ * pricing the contents as well charges the player twice.
+ *
+ * Two of them, for different reasons:
+ *
+ * - **A compound power is the sum of its children.** `CompoundPower.realCost()` literally adds them
+ *   up. Measured: `aoe`'s compound power costs 60 and its two children another 60 between them.
+ *   Worse inside a framework, where the container's total is then divided — `gravity-girl`'s
+ *   compound slot costs 5 against children summing 49, so the pair came to 54 instead of 5.
+ * - **A Variable Power Pool's contents are free.** The player pays for the pool and the control
+ *   that steers it; the powers built out of it cost nothing further, which is why the engine has no
+ *   VPP-slot decorator to divide anything. Counting them is the same mistake as H5 in
+ *   docs/KNOWN_DEVIATIONS.md, one consumer along.
+ *
+ * A **Multipower or Elemental Control is the opposite** and must be descended: its container costs
+ * the reserve and each slot costs a fraction on top of it. All four look identical to
+ * `withDescendants`, which is why this is a predicate here rather than a flag there.
+ */
+const totalsItsOwnContents = (trait: Obj): boolean =>
+    String(trait.xmlid).toUpperCase() === 'COMPOUNDPOWER' || String(trait.originalType ?? '').toUpperCase() === 'VPP';
+
+/** Every trait in a bucket, descending into containers except the ones that already total their own. */
+function pricedNodes(items: readonly Obj[], childKeys: readonly string[]): Obj[] {
+    const nodes: Obj[] = [];
+
+    for (const item of items) {
+        nodes.push(item);
+
+        if (totalsItsOwnContents(item)) {
+            continue;
+        }
+
+        for (const key of childKeys) {
+            const children = item[key];
+
+            if (Array.isArray(children)) {
+                nodes.push(...pricedNodes(children as Obj[], childKeys));
+            } else if (children !== undefined && children !== null) {
+                nodes.push(...pricedNodes([children as Obj], childKeys));
+            }
+        }
+    }
+
+    return nodes;
+}
+
 const sumBucket = (character: Obj, key: string): number =>
-    withDescendants((character[key] ?? []) as Obj[], TRAIT_CHILD_KEYS[key] ?? ['powers']).reduce((total, trait) => {
+    pricedNodes((character[key] ?? []) as Obj[], TRAIT_CHILD_KEYS[key] ?? ['powers']).reduce((total, trait) => {
         try {
             return total + characterTraitDecorator.decorate(trait, key, () => character).realCost();
         } catch {

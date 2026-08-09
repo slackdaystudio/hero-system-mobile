@@ -533,12 +533,14 @@ measured before anything is built on it.**
 
 Powers only, and every entry now names its own blocker:
 
-| Power | What it needs |
-|---|---|
-| `COMPOUNDPOWER` | A power made of powers. Open-ended by design, and the only entry that genuinely needs a form of its own. |
-| `VPP` | Nothing: it is offered as a **framework**, which is what it is. Withheld only as a power. |
+**Nothing. The list is empty — every skill, perk, talent, maneuver and power in both editions is
+offered.** Twenty-one entries became none, one mechanism at a time, and not one of them turned out
+to need the bespoke form the list assumed.
 
-**Two entries, down from twenty-one**, and one of those is not really withheld at all.
+What is still *filtered* is the `unpriced` category, which is a different thing: the sense
+enhancements (`TELESCOPIC`, `DISCRIMINATORY`, `MICROSCOPIC` and the rest) state no cost of their own
+because they belong to a **sense** rather than to a sheet, and are bought through the sense that
+carries them.
 
 ### Declared fields, generalised — Barrier and Duplication
 
@@ -679,3 +681,51 @@ own adders is either a rules subtlety or a bug, and no fixture can tell us which
 corpus Flashes carries an adder at all.
 
 All ten are checked against their authored twins, in both editions.
+
+### Compound Power, and the counting bug it exposed
+
+A compound power is one purchase that does several things at once — a Blast that is also a Flash —
+and `CompoundPower` prices it as the plain **sum** of the powers inside it. It is the only trait
+that contains other traits without being a framework, so it carries its own child list
+(`AuthoredPower.powers`) and `TraitAddress` gains a `compound` shape. Emitting was the easy half.
+
+**The hard half was counting, and it was already wrong.** `spendOf` walked every container with
+`withDescendants` and priced every node it found. For a Multipower that is right — the container
+costs its reserve and each slot costs a fraction on top. For a container that **already totals its
+own contents** it double-charges:
+
+- **A compound power.** `aoe`'s costs 60 and its two children another 60 between them. Worse inside
+  a framework, where the total is then divided: `gravity-girl`'s compound slot costs 5 against
+  children summing 49, so the pair read 54 for what costs 5.
+- **A Variable Power Pool.** Its contents are *free* — the player pays for the pool and the control
+  that steers it, which is why the engine has no VPP-slot decorator to divide anything. **This one
+  shipped in 2.8.0**: an authored VPP with two powers in it read 165 where it costs 75.
+
+So `spendOf` now stops at a container that totals its own contents, and descends everything else.
+All four look identical to a tree walk, which is why this is a predicate in `spend.ts` rather than a
+flag on `withDescendants`. The corroboration is the corpus: `mikayla-priestess`, a real VPP
+character, went from a nonsense 1254 to **441 against a 450-point budget**.
+
+It is the same family as **H5** in the ledger ("VPP contents counted toward totals"), which was
+fixed for the defence and movement queries and left standing here — one consumer along, found only
+because a new feature made the same walk matter for points.
+
+Two things Compound Power deliberately does not offer, both verified rather than assumed:
+
+- **Advantages and limitations on the compound power itself.** `CompoundPower.realCost()` sums its
+  children and discards its own `ModifierCalculator`, so an Obvious Accessible Focus there leaves
+  the cost at 50 where the same limitation on a *child* takes it to 25. The player limits the child.
+- **A compound power inside a compound power.** Neither edition's data has one, and `CompoundPower`
+  flattens whatever it finds anyway.
+
+Both are the H13 rule applied ahead of time: do not ship a control that changes no number.
+
+### A dead entry is invisible
+
+`VPP` sat in the withheld list for the whole life of the feature and **matched nothing** — there is
+no `VPP` entry in either edition's *power* catalogue, because a Variable Power Pool is a framework
+and is authored as one. So it silently explained a gap that was never there.
+
+Worth remembering when a "not yet supported" list is the thing telling players what the app cannot
+do: an entry that matches nothing costs nothing to keep and is never noticed, so a list like that
+wants checking against the catalogue occasionally rather than only being read.

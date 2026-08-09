@@ -30,6 +30,8 @@
 import React, {useMemo} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {
+    authorable,
+    blankFields,
     modifiers,
     trait as catalogueTrait,
     type AuthoredFramework,
@@ -51,6 +53,13 @@ export interface AuthorTraitScreenProps {
     /** The catalogue category the trait is drawn from — equipment and powers share one. */
     category: 'skills' | 'perks' | 'talents' | 'powers' | 'martialArts' | 'disadvantages';
     onDone: () => void;
+    /**
+     * Open the form for a power *inside* this one — a Compound Power's children.
+     *
+     * The only place a trait form leads to another trait form. Absent when there is nowhere to go,
+     * so the rows do nothing rather than the screen having to know it is inside a navigator.
+     */
+    onEditChild?: (address: TraitAddress) => void;
 }
 
 /**
@@ -60,7 +69,7 @@ export interface AuthorTraitScreenProps {
  * reopened after a build that dropped the entry. Both render a note and a way out rather than
  * throwing inside a screen the player cannot leave.
  */
-export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreenProps): React.JSX.Element {
+export function AuthorTraitScreen({address, category, onDone, onEditChild}: AuthorTraitScreenProps): React.JSX.Element {
     const {draft, traitAt, frameworkAt, replaceFramework, replaceAt, removeAt} = useAuthoringDraft();
     const value = traitAt(address);
     const entry = useMemo(() => (value === null ? null : catalogueTrait(value.xmlid, category, draft.edition)), [value, category, draft.edition]);
@@ -121,8 +130,8 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
             <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
                 <Card>
                     <TraitRow
-                        index={address.index}
-                        draftKey={address.kind === 'trait' ? address.key : `framework-${address.framework}-slot`}
+                        index={address.kind === 'compound' ? address.child : address.index}
+                        draftKey={draftKeyFor(address)}
                         edition={draft.edition}
                         entry={entry}
                         trait={value}
@@ -132,6 +141,20 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
                             onDone();
                         }}
                     />
+
+                    {entry.compound && address.kind === 'trait' ? (
+                        <CompoundPowers
+                            id={draftKeyFor(address)}
+                            edition={draft.edition}
+                            power={value as AuthoredPower}
+                            onChange={(revised) => replaceAt(address, revised)}
+                            onEditChild={
+                                onEditChild === undefined
+                                    ? undefined
+                                    : (child) => onEditChild({kind: 'compound', key: address.key, index: address.index, child})
+                            }
+                        />
+                    ) : null}
 
                     {slotAddress !== null && holder !== null && holder.kind === 'multipower' ? (
                         <SlotKind
@@ -148,6 +171,100 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
                 </View>
             </ScrollView>
         </Screen>
+    );
+}
+
+/** A stable prefix for a form's testIDs, distinct per address so two forms never collide. */
+const draftKeyFor = (address: TraitAddress): string => {
+    switch (address.kind) {
+        case 'trait':
+            return address.key;
+        case 'compound':
+            return `${address.key}-${address.index}-child`;
+        default:
+            return `framework-${address.framework}-slot`;
+    }
+};
+
+/**
+ * The powers a Compound Power is made of.
+ *
+ * A compound power is one purchase that does several things at once, and `CompoundPower` prices it
+ * as the plain **sum** of these — so this list is the whole of what it costs.
+ *
+ * Two things it deliberately does not offer, both because they change no number:
+ *
+ * - **Advantages and limitations on the compound power itself.** `CompoundPower.realCost()` sums
+ *   its children and discards its own `ModifierCalculator`, so an Obvious Accessible Focus here
+ *   leaves the cost at 50 where the same limitation on a *child* takes it to 25. Verified, not
+ *   assumed. The player limits the child.
+ * - **Levels and adders**, for the same reason: nothing reads them.
+ */
+function CompoundPowers({
+    id,
+    edition,
+    power,
+    onChange,
+    onEditChild,
+}: {
+    id: string;
+    edition: AuthoringEdition;
+    power: AuthoredPower;
+    onChange: (trait: AuthoredTrait) => void;
+    onEditChild?: (child: number) => void;
+}): React.JSX.Element {
+    const available = useMemo(() => authorable('powers', edition).filter((candidate) => !candidate.compound), [edition]);
+    const children = power.powers ?? [];
+
+    return (
+        <View style={styles.fields} testID={`author-compound-${id}`}>
+            <Text variant="label" muted>
+                POWERS IN IT
+            </Text>
+
+            {children.map((child, order) => (
+                <Button
+                    key={`${child.xmlid}-${order}`}
+                    label={child.name?.trim() === '' || child.name === undefined ? child.xmlid : child.name}
+                    onPress={() => onEditChild?.(order)}
+                    variant="secondary"
+                    testID={`author-compound-${id}-row-${order}`}
+                />
+            ))}
+
+            <SelectField
+                label="Add a power to this one"
+                value=""
+                options={available.map((candidate) => candidate.display)}
+                onChange={(display) => {
+                    const candidate = available.find((option) => option.display === display);
+
+                    if (candidate === undefined) {
+                        return;
+                    }
+
+                    onChange({
+                        ...power,
+                        powers: [
+                            ...children,
+                            {
+                                xmlid: candidate.xmlid,
+                                input: '',
+                                adders: [],
+                                levels: 0,
+                                modifiers: [],
+                                ...blankFields(candidate),
+                            },
+                        ],
+                    } as AuthoredTrait);
+                    onEditChild?.(children.length);
+                }}
+                // A compound power inside a compound power is not a shape the data has, and
+                // `CompoundPower` would flatten it anyway.
+                hint="Its cost is the total of these"
+                testID={`author-compound-${id}-add`}
+            />
+        </View>
     );
 }
 
@@ -399,7 +516,7 @@ function TraitRow({
                 />
             )}
 
-            {entry.modifiable ? <Modifiers id={id} edition={edition} power={trait as AuthoredPower} onChange={onChange} /> : null}
+            {entry.modifiable && !entry.compound ? <Modifiers id={id} edition={edition} power={trait as AuthoredPower} onChange={onChange} /> : null}
         </View>
     );
 }

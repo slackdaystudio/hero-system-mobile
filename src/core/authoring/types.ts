@@ -268,6 +268,16 @@ export interface AuthoredPower extends AuthoredTrait {
      * is the only name they have. See `fieldGroupsFor` in the catalogue.
      */
     readonly fields?: Readonly<Record<string, number>>;
+    /**
+     * The powers a **Compound Power** is made of.
+     *
+     * A compound power is one purchase that does several things at once — a Blast that is also a
+     * Flash — and `CompoundPower` prices it as the plain sum of these. It is the only trait that
+     * contains other traits without being a framework, so it keeps its own list rather than
+     * borrowing {@link AuthoredFramework}'s: a framework's container costs a reserve and discounts
+     * its slots, and a compound power does neither.
+     */
+    readonly powers?: readonly AuthoredPower[];
 }
 
 /**

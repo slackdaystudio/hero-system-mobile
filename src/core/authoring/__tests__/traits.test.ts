@@ -205,11 +205,10 @@ describe('validate — what a skill gets wrong that the engine will not complain
     });
 
     it('rejects a trait this build cannot render a form for, rather than offering a broken one', () => {
-        // No skill is withheld any more, and Barrier, Endurance Reserve and Flash all came off the
-        // list after it. Compound Power is a power made of powers and open-ended by design — the
-        // only entry left that genuinely needs a form of its own.
-        expect(errors(draft({powers: [{xmlid: 'COMPOUNDPOWER', input: '', adders: [], levels: 0, modifiers: []}]}))).toEqual([
-            expect.stringContaining('form of its own'),
+        // Nothing is withheld as `bespoke` any more, in any category. What is left is `unpriced` —
+        // the sense enhancements, which belong to a sense rather than to a sheet and state no cost.
+        expect(errors(draft({powers: [{xmlid: 'TELESCOPIC', input: '', adders: [], levels: 0, modifiers: []}]}))).toEqual([
+            expect.stringContaining('states no cost, so nothing here could price it'),
         ]);
     });
 

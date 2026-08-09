@@ -187,14 +187,13 @@ describe('what is left withheld', () => {
         }
     });
 
-    it('names the powers still out, so shrinking the list stays a deliberate act', () => {
-        // `unpriced` entries are sense modifiers for Enhanced Senses rather than standalone powers,
-        // so they are excluded here — this pins the bespoke ones, which are the real backlog.
-        expect(
-            withheld('powers', '6E')
-                .filter((entry) => entry.unsupported === 'bespoke')
-                .map((entry) => entry.xmlid)
-                .sort(),
-        ).toEqual(['COMPOUNDPOWER']);
+    it('withholds no power as bespoke either — the backlog is empty', () => {
+        // Twenty-one entries became none, one mechanism at a time. What remains withheld is only
+        // `unpriced`: sense enhancements, which state no cost because they belong to a *sense*
+        // rather than to a sheet, and are bought through the sense that carries them.
+        for (const edition of ['5E', '6E'] as const) {
+            expect(withheld('powers', edition).filter((entry) => entry.unsupported === 'bespoke')).toEqual([]);
+            expect(withheld('powers', edition).every((entry) => entry.unsupported === 'unpriced')).toBe(true);
+        }
     });
 });

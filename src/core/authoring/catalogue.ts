@@ -156,29 +156,30 @@ export type Unsupported =
     | 'unpriced';
 
 /**
- * Powers whose decorators read fields no template declares, and which a generated form therefore
- * cannot fill in.
+ * Powers a generated form cannot fill in. **Empty — every power in both editions is now offered.**
  *
- * `FORCEFIELD` is deliberately *not* here: it is the most-taken defensive power in the corpus and
- * granting it a declared field group (see {@link FIELD_GROUPS}) was cheaper than withholding it.
- * What each of these still wants:
+ * Kept as a named, empty list rather than deleted, because it is the hook the next unfillable power
+ * hangs on and because what came off it is the useful part. In order, and none of them needed the
+ * bespoke form the list assumed:
  *
- * - `FORCEWALL` (Barrier) — a length/height/width/body box *and* the four-way defence split. It
- *   reads all eight off the trait and adds `undefined` without them, so it prices `NaN`.
- * - `DUPLICATION` — `points` and `number`; also `NaN` without them.
- * - `ENDURANCERESERVE` — a nested REC sub-power. It reads `trait.power.levels`, and there is no
- *   other trait in the catalogue whose cost depends on a *child* trait.
- * - `FLASH` — its adders are senses drawn from `Senses.json`, not from the template, and its
- *   `optionid` must name one. A different source than every other trait's option list.
- * - `COMPOUNDPOWER` — a power made of powers; open-ended by design.
- * - `VPP` — offered as a *framework* instead, which is what it is. Withheld only as a power.
- *
- * `MULTIFORM` and `SUMMON` were here too, on the evidence that they priced `NaN` once their adders
- * were answered. That turned out to be nothing to do with either of them: `emitAdder` did not carry
- * `lvlval`/`lvlcost`, which an adder needs because — unlike a trait — it is never given a
- * `template`. Fixing that priced both correctly, so both are offered.
+ * - `FORCEWALL` (Barrier) and `DUPLICATION` — declared **field groups**, the mechanism Resistant
+ *   Protection already had. Both priced `NaN` without them.
+ * - `MULTIFORM` and `SUMMON` — nothing wrong with either. `emitAdder` was not carrying
+ *   `lvlval`/`lvlcost`, which an adder needs because, unlike a trait, it is never given a
+ *   `template`. They were withheld for a bug in neither of them.
+ * - `ENDURANCERESERVE` — a nested REC **sub-power**, the one trait whose cost depends on a child
+ *   trait. See `FieldGroup.subPower`.
+ * - `FLASH` — its choices are senses from `Senses.json` rather than from any template, so they are
+ *   injected as ordinary options and adders. The data was missing, not the mechanism.
+ * - `COMPOUNDPOWER` — a power made of powers, priced as the plain sum of them. It carries its own
+ *   list of child powers (`AuthoredPower.powers`), which is the only piece of authoring shaped like
+ *   a framework without being one.
+ * - `VPP` — **was never in either edition's power catalogue at all**, so this entry matched nothing
+ *   for the whole life of the list. A Variable Power Pool is authored as a *framework*, which is
+ *   what it is. A dead entry in a withheld list is invisible: it costs nothing and it explains a
+ *   gap that was never there.
  */
-const BESPOKE_POWERS = ['COMPOUNDPOWER', 'VPP'];
+const BESPOKE_POWERS: readonly string[] = [];
 
 /**
  * Traits that cannot be offered yet.
@@ -386,6 +387,14 @@ export interface CatalogueTrait {
     readonly maneuver: ManeuverProfile | null;
     /** True when the power may carry advantages and limitations. */
     readonly modifiable: boolean;
+    /**
+     * True when the trait is built out of **other powers** rather than out of fields.
+     *
+     * Only Compound Power. `CompoundPower` prices it as the plain sum of its children and ignores
+     * everything the trait itself declares, so the form shows a list of powers instead of the
+     * levels-and-adders it would otherwise draw.
+     */
+    readonly compound: boolean;
     /** Null when it can be authored; otherwise why not. */
     readonly unsupported: Unsupported | null;
 }
@@ -464,6 +473,29 @@ const senseAdders = (): CatalogueAdder[] =>
         levels: null,
         adders: [],
     }));
+
+/**
+ * What a freshly-added trait's declared fields start as: every one of them, at zero.
+ *
+ * Seeded rather than left absent because the decorators that read these add them up unguarded — a
+ * Barrier missing one of its eight prices `NaN`, and `NaN` is not an exception, so
+ * `characterSheet.ts:333` never catches it and the row simply renders blank. `emit` defaults them
+ * too; this is the belt to that pair of braces, and it also opens the form showing zeros rather
+ * than empty boxes.
+ */
+export function blankFields(entry: CatalogueTrait): {defense?: {pd: number; ed: number; mental: number; power: number}; fields?: Record<string, number>} {
+    const seeded: {defense?: {pd: number; ed: number; mental: number; power: number}; fields?: Record<string, number>} = {};
+
+    for (const group of entry.fieldGroups) {
+        if (group.kind === 'defense') {
+            seeded.defense = {pd: 0, ed: 0, mental: 0, power: 0};
+        } else {
+            seeded.fields = {...(seeded.fields ?? {}), ...Object.fromEntries(group.fields.map((field) => [field.key, 0]))};
+        }
+    }
+
+    return seeded;
+}
 
 const optionsOf = (entry: Obj): CatalogueOption[] =>
     asArray(entry.option).map((option) => ({
@@ -561,7 +593,10 @@ function traitOf(entry: Obj, category: AuthorableCategory, edition: AuthoringEdi
         maneuver: category === 'martialArts' ? maneuverProfileOf(entry) : null,
         // Only powers take advantages and limitations. A skill with an advantage is not a thing.
         modifiable: category === 'powers',
-        unsupported: BESPOKE.has(xmlid) ? 'bespoke' : priced ? null : 'unpriced',
+        compound: xmlid === 'COMPOUNDPOWER',
+        // A compound power declares no cost of its own — it is the sum of its children — so the
+        // `priced` heuristic would call it `unpriced` and withhold it. It is priced, by them.
+        unsupported: BESPOKE.has(xmlid) ? 'bespoke' : priced || xmlid === 'COMPOUNDPOWER' ? null : 'unpriced',
     };
 }
 

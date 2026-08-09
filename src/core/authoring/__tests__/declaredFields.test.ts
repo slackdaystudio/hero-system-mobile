@@ -26,7 +26,7 @@
  * `Duplication.cost()` reads two, all unguarded. NaN is the worst shape the failure can take — it
  * is not an exception, so `characterSheet.ts:333` never catches it and the row renders blank.
  */
-import {build, emit, emptyDraft, parseSource, toSource, trait as catalogueTrait, validate, type AuthoredCharacter, type AuthoredPower} from '../index';
+import {build, emit, emptyDraft, parseSource, spendOf, toSource, trait as catalogueTrait, validate, type AuthoredCharacter, type AuthoredPower} from '../index';
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Obj} from 'core/traits';
 import {flatten, withDescendants} from 'core/util';
@@ -298,6 +298,117 @@ describe('Flash, whose choices come from the senses rather than the templates', 
         expect(validate(draft).filter((problem) => problem.severity === 'error').map((problem) => problem.message)).toEqual([
             expect.stringContaining('Flash needs one of'),
         ]);
+    });
+});
+
+/**
+ * Compound Power — one purchase that does several things at once, priced as the plain sum of them.
+ *
+ * The only trait that contains other traits without being a framework, and the last thing on the
+ * withheld list. What made it worth care is not the emitting but the **counting**: a container that
+ * already totals its own contents is double-charged by anything that walks the tree.
+ */
+describe('Compound Power, which is the sum of the powers in it', () => {
+    const blast = (levels: number, modifiers: AuthoredPower['modifiers'] = []): AuthoredPower => ({
+        xmlid: 'ENERGYBLAST',
+        name: `Bolt${levels}`,
+        input: 'ED',
+        adders: [],
+        levels,
+        modifiers,
+    });
+
+    const compound = (powers: AuthoredPower[], modifiers: AuthoredPower['modifiers'] = []): AuthoredCharacter =>
+        ({
+            ...emptyDraft('6E'),
+            name: 'Probe',
+            powers: [{xmlid: 'COMPOUNDPOWER', name: 'Combo', input: '', adders: [], levels: 0, modifiers, powers}],
+        }) as AuthoredCharacter;
+
+    it('costs what its children cost, added up', () => {
+        // A 10d6 Blast is 50 and an 8d6 is 40. One purchase, 90 points.
+        expect(spendOf(build(compound([blast(10)])) as unknown as Obj).spent).toBe(50);
+        expect(spendOf(build(compound([blast(10), blast(8)])) as unknown as Obj).spent).toBe(90);
+    });
+
+    it('counts them ONCE — the container and its contents are the same points', () => {
+        const character = build(compound([blast(10), blast(8)])) as unknown as Obj;
+        const container = characterTraitDecorator.decorate((character.powers as Obj[])[0], 'powers', () => character).realCost();
+
+        // `spendOf` walks into containers, because a Multipower's slots each cost something on top
+        // of its reserve. A compound power is the opposite, and counting both charged 180 for 90.
+        expect(container).toBe(90);
+        expect(spendOf(character).spent).toBe(container);
+    });
+
+    it('ignores a limitation on the compound power itself, so the form does not offer one', () => {
+        // `CompoundPower.realCost()` sums its children and discards its own `ModifierCalculator`.
+        // Measured, not assumed: an Obvious Accessible Focus here leaves 50 where the same
+        // limitation one level down halves it. Offering it would be a control that changed no
+        // number — the fault H13's variable slot had.
+        const onParent = compound([blast(10)], [{xmlid: 'FOCUS', option: 'OAF', adders: []}]);
+        const onChild = compound([blast(10, [{xmlid: 'FOCUS', option: 'OAF', adders: []}])]);
+
+        expect(spendOf(build(onParent) as unknown as Obj).spent).toBe(50);
+        expect(spendOf(build(onChild) as unknown as Obj).spent).toBe(25);
+    });
+
+    it('emits its children under `power`, which is the key the engine renames', () => {
+        const power = ((emit(compound([blast(10), blast(8)])) as unknown as Obj).powers as Obj).power[0] as Obj;
+
+        expect((power.power as Obj[]).map((child) => child.xmlid)).toEqual(['ENERGYBLAST', 'ENERGYBLAST']);
+        // Ids come from their own block: taken from the `powers` range they would collide with a
+        // standalone power's, and higher up with equipment's at 11000.
+        expect((power.power as Obj[]).map((child) => child.id)).toEqual([20000, 20001]);
+    });
+
+    it('warns rather than errors when it is empty, since that is a half-finished purchase', () => {
+        const problems = validate(compound([]));
+
+        expect(problems.filter((problem) => problem.severity === 'error')).toEqual([]);
+        expect(problems.filter((problem) => problem.severity === 'warning').map((problem) => problem.message)).toContain(
+            'Compound Power has no powers in it, so it costs nothing.',
+        );
+    });
+
+    it('round-trips its children through the source column', () => {
+        const draft = compound([blast(10), blast(8)]);
+
+        expect(parseSource(JSON.parse(JSON.stringify(toSource(draft))))).toEqual(draft);
+    });
+});
+
+/**
+ * A Variable Power Pool's contents are **free**: the player pays for the pool and the control that
+ * steers it, and the powers built out of it cost nothing further. That is why the engine has no
+ * VPP-slot decorator to divide anything, where a Multipower has one.
+ *
+ * `spendOf` walked into it anyway and charged every slot at full price. **This shipped in 2.8.0** —
+ * a VPP with two powers in it read 165 where it costs 75.
+ */
+describe('a Variable Power Pool costs its pool, whatever is in it', () => {
+    const vpp = (slots: AuthoredPower[]): AuthoredCharacter =>
+        ({...emptyDraft('6E'), name: 'Probe', frameworks: [{kind: 'vpp', name: 'Cosmic', reserve: 50, modifiers: [], slots}]}) as AuthoredCharacter;
+
+    const blast = (levels: number): AuthoredPower => ({xmlid: 'ENERGYBLAST', name: `Bolt${levels}`, input: 'ED', adders: [], levels, modifiers: []});
+
+    it('does not grow as powers are put in it', () => {
+        // 50-point pool + 25 control = 75, and it stays 75. It read 125 and then 165.
+        expect(spendOf(build(vpp([])) as unknown as Obj).spent).toBe(75);
+        expect(spendOf(build(vpp([blast(10)])) as unknown as Obj).spent).toBe(75);
+        expect(spendOf(build(vpp([blast(10), blast(8)])) as unknown as Obj).spent).toBe(75);
+    });
+
+    it('still charges a Multipower for its slots, which is the opposite case', () => {
+        const multipower = {
+            ...emptyDraft('6E'),
+            name: 'Probe',
+            frameworks: [{kind: 'multipower' as const, name: 'MP', reserve: 50, modifiers: [], slots: [blast(10)]}],
+        } as AuthoredCharacter;
+
+        // A Multipower's container costs its reserve and each slot a fraction on top: 50 + 5.
+        // The two look identical to a tree walk, which is the whole reason this needed a predicate.
+        expect(spendOf(build(multipower) as unknown as Obj).spent).toBe(55);
     });
 });
 

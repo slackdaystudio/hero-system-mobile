@@ -29,6 +29,7 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {Alert, Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {
     authorable,
+    blankFields,
     build,
     characteristics as catalogueCharacteristics,
     allowanceFor,
@@ -46,7 +47,6 @@ import {
     type AuthoredFramework,
     type AuthoredSlot,
     type AuthoringEdition,
-    type CatalogueTrait,
     type FrameworkKind,
     type Problem,
 } from 'core/authoring';
@@ -452,7 +452,7 @@ function TraitSection({
                     levels: 0,
                     ...(entry.characteristics.length === 1 ? {characteristic: entry.characteristics[0].characteristic} : {}),
                     ...(entry.modifiable ? {modifiers: []} : {}),
-                    ...seedFields(entry),
+                    ...blankFields(entry),
                 },
             ],
         });
@@ -531,29 +531,6 @@ const FRAMEWORK_KINDS: Array<{value: FrameworkKind; label: string}> = [
     {value: 'elementalControl', label: 'Elemental Control'},
     {value: 'vpp', label: 'Variable Power Pool'},
 ];
-
-/**
- * The declared-field answers a freshly-added trait starts with, all zero.
- *
- * Seeded rather than left absent because the decorators that read these add them up unguarded:
- * a Barrier missing one of its eight prices `NaN`, and `NaN` is not an exception, so
- * `characterSheet.ts:333` never catches it and the row simply renders blank. `emit` defaults them
- * too — this is the belt to that pair of braces, and it also means the form opens showing zeros
- * rather than empty boxes.
- */
-const seedFields = (entry: CatalogueTrait): Record<string, unknown> => {
-    const seeded: Record<string, unknown> = {};
-
-    for (const group of entry.fieldGroups) {
-        if (group.kind === 'defense') {
-            seeded.defense = {pd: 0, ed: 0, mental: 0, power: 0};
-        } else {
-            seeded.fields = {...((seeded.fields as Record<string, number>) ?? {}), ...Object.fromEntries(group.fields.map((field) => [field.key, 0]))};
-        }
-    }
-
-    return seeded;
-};
 
 /**
  * A slot's row label, with its kind when the kind is a choice.
@@ -672,7 +649,7 @@ function Frameworks({
                                                 adders: [],
                                                 levels: 0,
                                                 modifiers: [],
-                                                ...seedFields(entry),
+                                                ...blankFields(entry),
                                             },
                                         ],
                                     });

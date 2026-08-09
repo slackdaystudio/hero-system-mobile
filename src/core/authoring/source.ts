@@ -221,11 +221,21 @@ function parsePowers(value: unknown): AuthoredPower[] | null {
             return null;
         }
 
+        // A compound power's children are powers in every respect, so the same reader handles them.
+        // One level is all the shape has — `CompoundPower` flattens whatever it finds, but nothing
+        // in either edition's data nests a compound power inside another.
+        const children = entry.powers === undefined ? undefined : parsePowers(entry.powers);
+
+        if (children === null) {
+            return null;
+        }
+
         powers.push({
             ...base,
             modifiers,
             ...(entry.defense === undefined ? {} : {defense: entry.defense}),
             ...(entry.fields === undefined ? {} : {fields: entry.fields}),
+            ...(children === undefined ? {} : {powers: children}),
         });
     }
 
@@ -395,6 +405,7 @@ const powerToSource = (entry: AuthoredPower): Record<string, unknown> => ({
     modifiers: entry.modifiers.map(modifierToSource),
     ...(entry.defense === undefined ? {} : {defense: {...entry.defense}}),
     ...(entry.fields === undefined ? {} : {fields: {...entry.fields}}),
+    ...(entry.powers === undefined ? {} : {powers: entry.powers.map(powerToSource)}),
 });
 
 /**

@@ -76,6 +76,14 @@ const FRAMEWORK_ID_BASE = 9000;
 const SUB_POWER_ID_OFFSET = 12000;
 
 /**
+ * A compound power's children, past every other block — `powers` at 6000, `equipment` at 11000, a
+ * sub-power at 12000 and up. Their *position* is local to the parent, which is all the engine sorts
+ * them by; only the id has to be globally unique.
+ */
+const COMPOUND_CHILD_ID_BASE = 20000;
+const COMPOUND_CHILD_STRIDE = 20;
+
+/**
  * How far apart framework blocks are placed, in both id and position.
  *
  * Position matters twice. `populateTrait` attaches a slot by looking its `parentid` up in the list
@@ -319,10 +327,27 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
         }
     }
 
+    // A compound power's children, under `power` — the key a `.hdc` uses and the one
+    // `normalizeCharacterItems` renames to `powers`, which is where `CompoundPower` reads them.
+    // Emitted only for a compound power: a stray `power` on anything else would be a sub-power.
+    // Their own id block: a child's id from `emitPower` would come out of the `powers` range and
+    // collide with a standalone power's — or, further up, with equipment's at 11000. Ids have to be
+    // unique document-wide because `populateTrait` keys parent lookups on them.
+    const children =
+        catalogue?.compound === true
+            ? {
+                  power: (authored.powers ?? []).map((child, index) => ({
+                      ...emitPower(child, index, edition),
+                      id: COMPOUND_CHILD_ID_BASE + position * COMPOUND_CHILD_STRIDE + index,
+                  })),
+              }
+            : {};
+
     return {
         ...base,
         ...defense,
         ...fields,
+        ...children,
         modifier: authored.modifiers.map((entry, index) => emitModifier(entry, position * 20 + index, edition)),
     };
 }

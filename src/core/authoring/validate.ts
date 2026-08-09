@@ -208,6 +208,18 @@ function validatePower(power: AuthoredPower, index: number, edition: AuthoringEd
 
     const problems: Problem[] = [];
 
+    // A compound power is the sum of its children, so an unpriceable child is an unpriceable
+    // compound power — and an empty one costs nothing at all while still reading as a purchase.
+    if (catalogue.compound) {
+        if ((power.powers ?? []).length === 0) {
+            problems.push({severity: 'warning', path, message: `${catalogue.display} has no powers in it, so it costs nothing.`});
+        }
+
+        (power.powers ?? []).forEach((child, order) => {
+            problems.push(...validatePower(child, order, edition).map((problem) => ({...problem, path})));
+        });
+    }
+
     for (const applied of power.modifiers) {
         const entry = modifier(applied.xmlid, edition);
 

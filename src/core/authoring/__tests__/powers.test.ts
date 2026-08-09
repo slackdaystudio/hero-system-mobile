@@ -130,12 +130,11 @@ describe('the powers catalogue', () => {
         expect(offered).toContain('FORCEFIELD');
         expect(offered.length).toBeGreaterThan(60);
 
-        // Barrier, Endurance Reserve and Flash all used to stand here and are now offered. Compound
-        // Power is a container, and the last entry that genuinely needs a form of its own.
-        expect(offered).toContain('FORCEWALL');
-        expect(offered).toContain('ENDURANCERESERVE');
-        expect(offered).toContain('FLASH');
-        expect(notYet).toContain('COMPOUNDPOWER');
+        // Every power is offered now — Barrier, Duplication, Multiform, Summon, Endurance Reserve,
+        // Flash and Compound Power all came off the list in turn. See `BESPOKE_POWERS`.
+        for (const xmlid of ['FORCEWALL', 'DUPLICATION', 'MULTIFORM', 'SUMMON', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER']) {
+            expect(offered).toContain(xmlid);
+        }
         // The sense enhancements state no cost of their own — they belong to a sense, not a sheet.
         expect(notYet).toContain('TELESCOPIC');
     });
@@ -186,9 +185,10 @@ describe('validate — powers', () => {
     });
 
     it('rejects a power that needs a form of its own rather than offering a broken one', () => {
-        // Barrier, Endurance Reserve and Flash used to stand here and are all offered now.
-        expect(errors(draft({powers: [{xmlid: 'COMPOUNDPOWER', name: 'Combo', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
-            expect.stringContaining('form of its own'),
+        // No power is withheld as `bespoke` any more. What is left is `unpriced`: the sense
+        // enhancements, which state no cost because they belong to a sense rather than to a sheet.
+        expect(errors(draft({powers: [{xmlid: 'TELESCOPIC', name: 'Zoom', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
+            expect.stringContaining('states no cost, so nothing here could price it'),
         ]);
     });
 });
