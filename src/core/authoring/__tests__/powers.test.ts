@@ -130,12 +130,11 @@ describe('the powers catalogue', () => {
         expect(offered).toContain('FORCEFIELD');
         expect(offered.length).toBeGreaterThan(60);
 
-        // Barrier and Endurance Reserve used to stand here; both now declare their fields. Flash
-        // draws its adders from Senses.json rather than the template, and Compound Power is a
-        // container.
+        // Barrier, Endurance Reserve and Flash all used to stand here and are now offered. Compound
+        // Power is a container, and the last entry that genuinely needs a form of its own.
         expect(offered).toContain('FORCEWALL');
         expect(offered).toContain('ENDURANCERESERVE');
-        expect(notYet).toContain('FLASH');
+        expect(offered).toContain('FLASH');
         expect(notYet).toContain('COMPOUNDPOWER');
         // The sense enhancements state no cost of their own — they belong to a sense, not a sheet.
         expect(notYet).toContain('TELESCOPIC');
@@ -187,9 +186,8 @@ describe('validate — powers', () => {
     });
 
     it('rejects a power that needs a form of its own rather than offering a broken one', () => {
-        // Barrier and Endurance Reserve used to stand here and are now offered. Flash draws its
-        // adders from `Senses.json` rather than from the template.
-        expect(errors(draft({powers: [{xmlid: 'FLASH', name: 'Blind', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
+        // Barrier, Endurance Reserve and Flash used to stand here and are all offered now.
+        expect(errors(draft({powers: [{xmlid: 'COMPOUNDPOWER', name: 'Combo', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
             expect.stringContaining('form of its own'),
         ]);
     });

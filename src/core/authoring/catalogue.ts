@@ -31,6 +31,7 @@
  * engine cannot match.
  */
 import {heroDesignerCharacter} from 'core/hero';
+import sensesData from 'core/data/herodesigner/Senses.json';
 import {getTemplate} from 'core/templates';
 import type {AuthoringEdition} from './types';
 
@@ -177,7 +178,7 @@ export type Unsupported =
  * `lvlval`/`lvlcost`, which an adder needs because — unlike a trait — it is never given a
  * `template`. Fixing that priced both correctly, so both are offered.
  */
-const BESPOKE_POWERS = ['FLASH', 'COMPOUNDPOWER', 'VPP'];
+const BESPOKE_POWERS = ['COMPOUNDPOWER', 'VPP'];
 
 /**
  * Traits that cannot be offered yet.
@@ -408,6 +409,62 @@ const levelRangeOf = (entry: Obj, label: string): LevelRange | null => {
     };
 };
 
+/**
+ * The senses, which are the one thing a trait can be built from that lives outside the templates.
+ *
+ * `Flash` is the only trait that reads them. Its `optionid` names the sense group it blinds, and
+ * any *adder* whose xmlid is a sense adds another — but the templates declare no options for
+ * `FLASH` at all, so a form built from the template alone offers nothing to pick and the decorator
+ * reads `undefined`. That is what kept Flash withheld.
+ *
+ * Rather than give Flash a bespoke form, the senses are **injected as ordinary options and adders**.
+ * Everything downstream then works untouched: the picker, `emitTrait`'s `option`/`optionid`/
+ * `optionAlias`, `emitAdder`, and the validator's "needs one of" rule. The data was missing, not
+ * the mechanism.
+ */
+const SENSES = sensesData as unknown as {sensegroup: Obj[]; sense: Obj[]};
+
+/**
+ * What a Flash can blind, as a pick-one.
+ *
+ * **Groups only.** Every one of the 11 Flashes in the corpus names a group, and the decorator
+ * charges `targetingcost * levels` for the primary sense whether it is a group or a single sense —
+ * so offering "Normal Sight" would charge the price of the whole Sight Group for one sense of it.
+ * The template carries `targetinghalfcost`/`nontargetinghalfcost` that nothing reads, which is
+ * probably where a single sense was meant to be priced; until that is settled, offering it would be
+ * offering a wrong number.
+ *
+ * `basecost` is 0 because a Flash's price is per level, computed by its own decorator from the
+ * template's `targetingcost`. Nothing copies an option's basecost onto a trait — only onto an adder.
+ */
+const senseGroupOptions = (): CatalogueOption[] =>
+    SENSES.sensegroup.map((group) => ({xmlid: String(group.xmlid), display: String(group.display ?? group.xmlid), basecost: 0, perLevel: null}));
+
+/**
+ * The extra senses a Flash may also blind, as yes/no adders.
+ *
+ * Groups *and* individual senses, because here the decorator does tell them apart —
+ * `targetinggroupcost` (10) against `targetingsensecost` (5). Their `basecost` is 0 for the same
+ * reason as above: `Flash.cost()` prices a sense adder from the template, never from the adder.
+ *
+ * The template's own two adders are deliberately **not** offered. `Flash.cost()` overrides `cost()`
+ * outright and never calls `totalAdders`, so Alterable Origin and Reduced Negation contribute
+ * nothing on a Flash — they would be controls that changed no number, which is the fault H13's
+ * variable slot had.
+ */
+const senseAdders = (): CatalogueAdder[] =>
+    [...SENSES.sensegroup, ...SENSES.sense].map((sense) => ({
+        xmlid: String(sense.xmlid),
+        display: String(sense.display ?? sense.xmlid),
+        required: false,
+        basecost: 0,
+        options: [],
+        freeText: false,
+        freeTextOption: null,
+        levels: null,
+        adders: [],
+    }));
+
 const optionsOf = (entry: Obj): CatalogueOption[] =>
     asArray(entry.option).map((option) => ({
         xmlid: String(option.xmlid),
@@ -481,8 +538,10 @@ const maneuverProfileOf = (entry: Obj): ManeuverProfile | null => {
 function traitOf(entry: Obj, category: AuthorableCategory, edition: AuthoringEdition): CatalogueTrait {
     const xmlid = String(entry.xmlid);
     const choices = characteristicChoicesOf(entry);
-    const options = optionsOf(entry);
-    const adders = asArray(entry.adder).map((adder) => adderOf(adder));
+    // Flash is built from the senses rather than from its own entry — see `SENSES`. It is the only
+    // trait in either edition whose choices come from outside the templates.
+    const options = xmlid === 'FLASH' ? senseGroupOptions() : optionsOf(entry);
+    const adders = xmlid === 'FLASH' ? senseAdders() : asArray(entry.adder).map((adder) => adderOf(adder));
     const levels = levelRangeOf(entry, 'Levels');
     const priced = typeof entry.basecost === 'number' || levels !== null || choices.length > 0 || options.length > 0 || adders.length > 0;
 

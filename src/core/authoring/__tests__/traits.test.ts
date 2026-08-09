@@ -205,10 +205,10 @@ describe('validate — what a skill gets wrong that the engine will not complain
     });
 
     it('rejects a trait this build cannot render a form for, rather than offering a broken one', () => {
-        // No *skill* is withheld any more — Weapon Familiarity used to stand here, then Barrier,
-        // then Endurance Reserve. Flash still is: its adders are senses drawn from `Senses.json`
-        // rather than from the template, which is a different source than every other trait's.
-        expect(errors(draft({powers: [{xmlid: 'FLASH', input: '', adders: [], levels: 0, modifiers: []}]}))).toEqual([
+        // No skill is withheld any more, and Barrier, Endurance Reserve and Flash all came off the
+        // list after it. Compound Power is a power made of powers and open-ended by design — the
+        // only entry left that genuinely needs a form of its own.
+        expect(errors(draft({powers: [{xmlid: 'COMPOUNDPOWER', input: '', adders: [], levels: 0, modifiers: []}]}))).toEqual([
             expect.stringContaining('form of its own'),
         ]);
     });

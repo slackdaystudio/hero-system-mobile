@@ -29,7 +29,7 @@
 import {build, emit, emptyDraft, parseSource, toSource, trait as catalogueTrait, validate, type AuthoredCharacter, type AuthoredPower} from '../index';
 import {heroDesignerCharacter} from 'core/hero';
 import {characterTraitDecorator, type Obj} from 'core/traits';
-import {flatten} from 'core/util';
+import {flatten, withDescendants} from 'core/util';
 
 const clone = (name: string): unknown => JSON.parse(JSON.stringify(require(`../../hero/__tests__/fixtures/${name}.json`)));
 
@@ -214,6 +214,90 @@ describe('Endurance Reserve, whose Recovery is a nested power', () => {
 
         expect(Number.isNaN(bare)).toBe(false);
         expect(bare).toBe(5); // 20 END at 1 per 4, and a reserve that never refills
+    });
+});
+
+/**
+ * Flash — the one trait built from data that is not a template at all.
+ *
+ * Its `optionid` names a sense group and any adder that *is* a sense adds another, but the
+ * templates declare no options for `FLASH`. The senses live in `Senses.json`, so a form built from
+ * the template alone offered nothing to pick and the decorator read `undefined` off a missing
+ * `optionid` — it did not even price wrongly, it threw.
+ *
+ * The fix injects the senses as ordinary options and adders rather than giving Flash a bespoke
+ * form, so the picker, the emitter and the validator all work untouched. **The data was missing,
+ * not the mechanism.**
+ */
+describe('Flash, whose choices come from the senses rather than the templates', () => {
+    const flash = (edition: '5E' | '6E', levels: number, option: string, adders: {xmlid: string}[] = []): number =>
+        authored(edition, {xmlid: 'FLASH', name: 'Dazzle', input: '', adders, levels, modifiers: [], option});
+
+    const corpusFlashes = (fixture: string): Array<{cost: number; option: string; levels: number}> => {
+        const character = heroDesignerCharacter.getCharacter(clone(fixture) as never) as unknown as Obj;
+
+        return withDescendants((character.powers ?? []) as Obj[], ['powers'])
+            .filter((power: Obj) => String(power.xmlid) === 'FLASH')
+            .map((power: Obj) => ({
+                cost: characterTraitDecorator.decorate(power, 'powers', () => character).cost(),
+                option: String(power.optionid),
+                levels: Number(power.levels),
+            }));
+    };
+
+    it.each([
+        ['aoe', '6E'],
+        ['starborne', '6E'],
+        ['twilight', '6E'],
+        ['adamantinerebuild210109', '5E'],
+        ['spyder2022', '5E'],
+    ] as const)('prices every Flash in %s exactly as importing it does', (fixture, edition) => {
+        const found = corpusFlashes(fixture);
+
+        expect(found.length).toBeGreaterThan(0);
+        for (const {cost, option, levels} of found) {
+            expect(flash(edition, levels, option)).toBe(cost);
+        }
+    });
+
+    it('charges more to blind a targeting sense than a non-targeting one', () => {
+        // Sight is the only targeting group, at 5 a level against 3. That distinction is the whole
+        // reason the decorator has to look the option up in the senses at all.
+        expect(flash('6E', 4, 'SIGHTGROUP')).toBe(20);
+        expect(flash('6E', 4, 'HEARINGGROUP')).toBe(12);
+    });
+
+    it('charges for each extra sense, and a group by more than one of its senses', () => {
+        // On top of a 20-point Sight Flash: another whole group is 5 (`nontargetinggroupcost`),
+        // one sense of one is 3 (`nontargetingsensecost`). Nothing else in the catalogue prices an
+        // adder from the *parent's* template like this.
+        expect(flash('6E', 4, 'SIGHTGROUP', [{xmlid: 'HEARINGGROUP'}])).toBe(25);
+        expect(flash('6E', 4, 'SIGHTGROUP', [{xmlid: 'NORMALHEARING'}])).toBe(23);
+    });
+
+    it('offers the six sense groups to blind, and groups plus senses as extras', () => {
+        const entry = catalogueTrait('FLASH', 'powers', '6E')!;
+
+        expect(entry.options.map((option) => option.xmlid)).toEqual(['HEARINGGROUP', 'MENTALGROUP', 'RADIOGROUP', 'SIGHTGROUP', 'SMELLGROUP', 'TOUCHGROUP']);
+        expect(entry.adders.map((adder) => adder.xmlid)).toEqual(expect.arrayContaining(['SIGHTGROUP', 'NORMALSIGHT', 'DANGER_SENSE']));
+    });
+
+    it("does not offer the template's own adders, which cost nothing on a Flash", () => {
+        // `Flash.cost()` overrides `cost()` outright and never calls `totalAdders`, so Alterable
+        // Origin (+5 anywhere else) contributes zero here. Offering it would be a control that
+        // changed no number — the fault H13's variable slot had.
+        expect(flash('6E', 4, 'SIGHTGROUP', [{xmlid: 'ALTERABLEORIGIN'}])).toBe(flash('6E', 4, 'SIGHTGROUP'));
+        expect(catalogueTrait('FLASH', 'powers', '6E')!.adders.map((adder) => adder.xmlid)).not.toContain('ALTERABLEORIGIN');
+    });
+
+    it('blocks a save with no sense chosen, which used to throw rather than mis-price', () => {
+        const draft = {...emptyDraft('6E'), name: 'Probe', powers: [{xmlid: 'FLASH', name: 'Dazzle', input: '', adders: [], levels: 4, modifiers: []}]} as AuthoredCharacter;
+
+        // `isGroup(undefined)` calls `.endsWith` on nothing. The row degrades to a cost-0 stub, so
+        // the validator is the only thing that can say what is wrong.
+        expect(validate(draft).filter((problem) => problem.severity === 'error').map((problem) => problem.message)).toEqual([
+            expect.stringContaining('Flash needs one of'),
+        ]);
     });
 });
 

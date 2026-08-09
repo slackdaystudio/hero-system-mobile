@@ -535,11 +535,10 @@ Powers only, and every entry now names its own blocker:
 
 | Power | What it needs |
 |---|---|
-| `FLASH` | Its adders are senses from `Senses.json`, not from the template, and `optionid` must name one. A different source than every other trait's options. |
-| `COMPOUNDPOWER` | A power made of powers. Open-ended by design. |
+| `COMPOUNDPOWER` | A power made of powers. Open-ended by design, and the only entry that genuinely needs a form of its own. |
 | `VPP` | Nothing: it is offered as a **framework**, which is what it is. Withheld only as a power. |
 
-Three entries, down from twenty-one, and only **one** of them is real work.
+**Two entries, down from twenty-one**, and one of those is not really withheld at all.
 
 ### Declared fields, generalised — Barrier and Duplication
 
@@ -643,3 +642,40 @@ be wrong. `LevelRange` therefore keeps the raw pair alongside the ratio.
 The general lesson, and it is the same one twice in one change: **when a trait prices oddly, ask
 what the engine reads it off before asking what is special about the trait.** Multiform and Summon
 were withheld for a release for a bug that was in neither of them.
+
+### The one trait built from data that is not a template
+
+Flash was the last withheld power, and it was withheld for a reason none of the others had: **its
+choices do not live in the templates at all.** Its `optionid` names a sense group and any adder
+whose xmlid is a sense adds another, but `FLASH`'s template entry declares no `option` list. The
+senses are in `Senses.json`, a separate file the engine reads directly.
+
+So a form built from the template offered nothing to pick, and `Flash.cost()` then called
+`.endsWith` on a missing `optionid` — it did not mis-price, it **threw**, and
+`characterSheet.ts:333` turned that into a cost-0 stub row.
+
+The fix is not a bespoke form. The senses are **injected as ordinary options and adders**, and
+everything downstream works untouched: the picker, `emitTrait`'s `option`/`optionid`/`optionAlias`,
+`emitAdder`, and the validator's "needs one of" rule. **The data was missing, not the mechanism** —
+which is the same shape as the yes/no adder gap, one layer further out.
+
+Three judgement calls worth recording:
+
+- **Groups only, for the sense being blinded.** All ten Flashes in the corpus name a group, and the
+  decorator charges `targetingcost * levels` for the primary whether it is a group or a single
+  sense — so offering "Normal Sight" would charge the price of the whole Sight Group for one sense
+  of it. The template carries `targetinghalfcost`/`nontargetinghalfcost` that **nothing reads**,
+  which is probably where a single sense was meant to be priced. Until that is settled, offering it
+  would be offering a wrong number.
+- **Groups *and* senses for the extras**, because there the decorator does tell them apart:
+  `targetinggroupcost` (10) against `targetingsensecost` (5).
+- **The template's own adders are withheld.** `Flash.cost()` overrides `cost()` outright and never
+  calls `totalAdders`, so Alterable Origin — +5 on any other attack power — contributes **nothing**
+  on a Flash. Verified, not assumed. Offering it would be a control that changed no number, which is
+  precisely the fault H13's variable slot had.
+
+That last point is worth a ledger entry of its own eventually: an attack power silently ignoring its
+own adders is either a rules subtlety or a bug, and no fixture can tell us which — none of the ten
+corpus Flashes carries an adder at all.
+
+All ten are checked against their authored twins, in both editions.
