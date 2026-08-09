@@ -11,9 +11,15 @@ listing. Two consequences:
 - The release build **must be signed with the legacy app's existing upload key**.
   A brand-new keystore will be **rejected** by Play ("upload key mismatch").
 - `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; the last build
-  out is **68 / 2.7.1**, and this repo is set to **69 / 2.8.0**
+  out is **69 / 2.8.0**, and this repo is set to **70 / 2.9.0**
   (`android/app/build.gradle`, which carries the full version history in a comment).
   Bump `versionCode` for every subsequent upload.
+
+The iOS side is versioned in `ios/herogmtools.xcodeproj/project.pbxproj`
+(`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`), kept in step with Android. It sat at
+the React Native default of **1.0 (1)** until 2.9.0, while 2.8.0 shipped to TestFlight as
+"2.8.0 (1)" — so it was being set by hand in Xcode on the build box and the repo said
+something different from what shipped. It is now correct here; set it here in future.
 
 ## Signing setup
 
