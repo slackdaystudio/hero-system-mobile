@@ -177,7 +177,7 @@ export type Unsupported =
  * `lvlval`/`lvlcost`, which an adder needs because — unlike a trait — it is never given a
  * `template`. Fixing that priced both correctly, so both are offered.
  */
-const BESPOKE_POWERS = ['FORCEWALL', 'DUPLICATION', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'VPP'];
+const BESPOKE_POWERS = ['ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'VPP'];
 
 /**
  * Traits that cannot be offered yet.
@@ -215,29 +215,99 @@ const BESPOKE = new Set([...BESPOKE_POWERS]);
  * only options are to declare it here, or to withhold the power and say why.
  */
 export interface FieldGroup {
-    readonly kind: 'defense';
+    /**
+     * `defense` is the four-way split, stored as {@link AuthoredDefense} and emitted as
+     * `pdlevels`/`edlevels`/`mdlevels`/`powdlevels` with `levels` derived from their sum.
+     *
+     * `levels` is the general case: each field's `key` **is** the trait field the engine reads, and
+     * the answers ride on the power's `fields` map.
+     */
+    readonly kind: 'defense' | 'levels';
     readonly label: string;
-    readonly fields: ReadonlyArray<{readonly key: 'pd' | 'ed' | 'mental' | 'power'; readonly label: string}>;
+    readonly fields: readonly FieldGroupField[];
 }
 
+export interface FieldGroupField {
+    /** For a `levels` group this is the literal trait field — `lengthlevels`, `points`, `number`. */
+    readonly key: string;
+    readonly label: string;
+    /** Bought in halves rather than whole units. Barrier's width is the only one. */
+    readonly fractional?: boolean;
+}
+
+const DEFENCE_SPLIT: FieldGroup = {
+    kind: 'defense',
+    label: 'Points of resistant defence',
+    fields: [
+        {key: 'pd', label: 'rPD'},
+        {key: 'ed', label: 'rED'},
+        {key: 'mental', label: 'Mental'},
+        {key: 'power', label: 'Power'},
+    ],
+};
+
 /**
- * Resistant Protection's four-way defence split.
+ * Extra numeric fields a specific trait needs, by edition.
  *
- * `getResistantDefense` and the unusual-defense queries read `pdlevels`/`edlevels`/`mdlevels`/
- * `powdlevels` directly off the trait. A Resistant Protection emitted without them costs full
- * price and grants no defence at all — priced correctly, silently useless.
+ * A trait can need more than one group — Barrier needs both a defence split and a set of
+ * dimensions — so this returns a list.
+ *
+ * **Edition matters, and not only for the prices.** `Barrier.cost()` branches: 5E adds
+ * `lengthlevels * 2` and `heightlevels * 2` and reads nothing else, while 6E adds length, height,
+ * `bodylevels` and `widthlevels * 4 / costperinch`. Offering body and width in 5E would be two
+ * controls that changed no number — the same fault as the variable Multipower slot before H13.
+ *
+ * HERO Designer does write all eight in both editions (5E's are simply zero — see `Fifth.hdc`),
+ * but nothing here writes `.hdc`, so emitting only what the edition's decorator reads is the
+ * honest shape.
  */
-const FIELD_GROUPS: Readonly<Record<string, FieldGroup>> = {
-    FORCEFIELD: {
-        kind: 'defense',
-        label: 'Points of resistant defence',
-        fields: [
-            {key: 'pd', label: 'rPD'},
-            {key: 'ed', label: 'rED'},
-            {key: 'mental', label: 'Mental'},
-            {key: 'power', label: 'Power'},
-        ],
-    },
+const fieldGroupsFor = (xmlid: string, edition: AuthoringEdition): readonly FieldGroup[] => {
+    if (xmlid === 'FORCEFIELD') {
+        // `getResistantDefense` and the unusual-defense queries read the four levels straight off
+        // the trait. Emitted without them a Resistant Protection costs full price and grants no
+        // defence at all — priced correctly, silently useless.
+        return [DEFENCE_SPLIT];
+    }
+
+    if (xmlid === 'FORCEWALL') {
+        return [
+            DEFENCE_SPLIT,
+            {
+                kind: 'levels',
+                label: edition === '5E' ? 'Size, in inches' : 'Size, in metres',
+                fields:
+                    edition === '5E'
+                        ? [
+                              {key: 'lengthlevels', label: 'Length'},
+                              {key: 'heightlevels', label: 'Height'},
+                          ]
+                        : [
+                              {key: 'lengthlevels', label: 'Length'},
+                              {key: 'heightlevels', label: 'Height'},
+                              {key: 'bodylevels', label: 'BODY'},
+                              // A real `.hdc` carries `WIDTHLEVELS="1.5"`, so this one takes halves.
+                              {key: 'widthlevels', label: 'Width', fractional: true},
+                          ],
+            },
+        ];
+    }
+
+    if (xmlid === 'DUPLICATION') {
+        return [
+            {
+                kind: 'levels',
+                label: 'The duplicate',
+                fields: [
+                    {key: 'points', label: 'Points it is built on'},
+                    // Priced by `getMultiplierCost`, so this is a count and every *doubling* costs
+                    // 5 — 1 duplicate is free of multiplier cost, 2 is 5, 4 is 10.
+                    {key: 'number', label: 'How many'},
+                ],
+            },
+        ];
+    }
+
+    return [];
 };
 
 /**
@@ -286,7 +356,7 @@ export interface CatalogueTrait {
     /** Non-null when the skill may be taken at familiarity — an 8- roll for a reduced cost. */
     readonly familiarity: {readonly roll: number; readonly cost: number} | null;
     /** Non-null when the trait needs fields no template describes — see {@link FieldGroup}. */
-    readonly fieldGroup: FieldGroup | null;
+    readonly fieldGroups: readonly FieldGroup[];
     /** Non-null for a martial maneuver: the combat line the sheet prints. */
     readonly maneuver: ManeuverProfile | null;
     /** True when the power may carry advantages and limitations. */
@@ -384,7 +454,7 @@ const maneuverProfileOf = (entry: Obj): ManeuverProfile | null => {
     };
 };
 
-function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
+function traitOf(entry: Obj, category: AuthorableCategory, edition: AuthoringEdition): CatalogueTrait {
     const xmlid = String(entry.xmlid);
     const choices = characteristicChoicesOf(entry);
     const options = optionsOf(entry);
@@ -404,7 +474,7 @@ function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
         adders,
         levels,
         familiarity: typeof entry.familiarityroll === 'number' && typeof entry.familiaritycost === 'number' ? {roll: entry.familiarityroll, cost: entry.familiaritycost} : null,
-        fieldGroup: FIELD_GROUPS[xmlid] ?? null,
+        fieldGroups: fieldGroupsFor(xmlid, edition),
         maneuver: category === 'martialArts' ? maneuverProfileOf(entry) : null,
         // Only powers take advantages and limitations. A skill with an advantage is not a thing.
         modifiable: category === 'powers',
@@ -431,7 +501,7 @@ export function catalogue(category: AuthorableCategory, edition: AuthoringEditio
         }
 
         seen.add(xmlid);
-        traits.push(traitOf(entry, category));
+        traits.push(traitOf(entry, category, edition));
     }
 
     return traits;

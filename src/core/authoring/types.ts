@@ -259,6 +259,15 @@ export interface AuthoredPower extends AuthoredTrait {
     readonly modifiers: readonly AuthoredModifier[];
     /** Only for the powers whose catalogue entry declares a `defense` field group. */
     readonly defense?: AuthoredDefense;
+    /**
+     * Answers to a `levels` field group, keyed by the **trait field the engine reads** —
+     * `lengthlevels`, `bodylevels`, `points`, `number`.
+     *
+     * Keyed that way rather than by some friendlier name because there is nothing to translate
+     * *to*: these exist precisely because no template describes them, so the decorator's field name
+     * is the only name they have. See `fieldGroupsFor` in the catalogue.
+     */
+    readonly fields?: Readonly<Record<string, number>>;
 }
 
 /**

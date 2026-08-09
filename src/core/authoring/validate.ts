@@ -231,8 +231,34 @@ function validatePower(power: AuthoredPower, index: number, edition: AuthoringEd
 
     // A declared field group is not optional: `getResistantDefense` reads those numbers straight
     // off the trait, so a Resistant Protection without them costs full price and defends nothing.
-    if (catalogue.fieldGroup !== null && power.defense === undefined) {
-        problems.push({severity: 'error', path, message: `${catalogue.display} needs its ${catalogue.fieldGroup.label.toLowerCase()} — without them it costs points and grants no defence.`});
+    const defenceGroup = catalogue.fieldGroups.find((group) => group.kind === 'defense');
+
+    if (defenceGroup !== undefined && power.defense === undefined) {
+        problems.push({severity: 'error', path, message: `${catalogue.display} needs its ${defenceGroup.label.toLowerCase()} — without them it costs points and grants no defence.`});
+    }
+
+    // The `levels` groups, whose keys are the trait fields themselves. `emit` defaults an
+    // unanswered one to 0 so nothing prices NaN, which means a wrong *value* is the only failure
+    // left to catch — and a fractional one where the field takes whole units is the likely wrong
+    // value, since `widthlevels` is the sole exception and it sits next to three that are not.
+    for (const group of catalogue.fieldGroups) {
+        if (group.kind !== 'levels') {
+            continue;
+        }
+
+        for (const field of group.fields) {
+            const value = power.fields?.[field.key];
+
+            if (value === undefined) {
+                continue;
+            }
+
+            if (!Number.isFinite(value) || value < 0) {
+                problems.push({severity: 'error', path, message: `${catalogue.display}'s "${field.label}" must be a non-negative number.`});
+            } else if (field.fractional !== true && !Number.isInteger(value)) {
+                problems.push({severity: 'error', path, message: `${catalogue.display}'s "${field.label}" must be a whole number.`});
+            }
+        }
     }
 
     if (power.defense !== undefined) {

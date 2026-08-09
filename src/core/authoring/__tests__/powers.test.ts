@@ -130,9 +130,10 @@ describe('the powers catalogue', () => {
         expect(offered).toContain('FORCEFIELD');
         expect(offered.length).toBeGreaterThan(60);
 
-        // Barrier — `FORCEWALL` in the data, in both editions — wants a length/height/width/body
-        // box; Compound Power is a container.
-        expect(notYet).toContain('FORCEWALL');
+        // Barrier used to stand here; it now declares its length/height/width/body box. Endurance
+        // Reserve costs by a nested sub-power, and Compound Power is a container.
+        expect(offered).toContain('FORCEWALL');
+        expect(notYet).toContain('ENDURANCERESERVE');
         expect(notYet).toContain('COMPOUNDPOWER');
         // The sense enhancements state no cost of their own — they belong to a sense, not a sheet.
         expect(notYet).toContain('TELESCOPIC');
@@ -184,7 +185,9 @@ describe('validate — powers', () => {
     });
 
     it('rejects a power that needs a form of its own rather than offering a broken one', () => {
-        expect(errors(draft({powers: [{xmlid: 'FORCEWALL', name: 'Wall', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
+        // Barrier used to stand here and is now offered. Endurance Reserve costs by a nested REC
+        // sub-power, which nothing else in the catalogue does.
+        expect(errors(draft({powers: [{xmlid: 'ENDURANCERESERVE', name: 'Reserve', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
             expect.stringContaining('form of its own'),
         ]);
     });

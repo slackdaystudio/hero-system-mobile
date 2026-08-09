@@ -205,9 +205,10 @@ describe('validate — what a skill gets wrong that the engine will not complain
     });
 
     it('rejects a trait this build cannot render a form for, rather than offering a broken one', () => {
-        // No *skill* is withheld any more — Weapon Familiarity used to stand here. Barrier still
-        // is: it reads eight level fields off the trait and prices NaN without them.
-        expect(errors(draft({powers: [{xmlid: 'FORCEWALL', input: '', adders: [], levels: 0, modifiers: []}]}))).toEqual([
+        // No *skill* is withheld any more — Weapon Familiarity used to stand here, and Barrier
+        // after it. Endurance Reserve still is: it costs by a nested REC *sub-power*, and nothing
+        // else in the catalogue depends on a child trait.
+        expect(errors(draft({powers: [{xmlid: 'ENDURANCERESERVE', input: '', adders: [], levels: 0, modifiers: []}]}))).toEqual([
             expect.stringContaining('form of its own'),
         ]);
     });

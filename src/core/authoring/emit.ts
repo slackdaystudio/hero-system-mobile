@@ -268,7 +268,7 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
     const base = emitTrait(authored, 'powers', position, edition);
 
     const defense =
-        catalogue?.fieldGroup?.kind === 'defense' && authored.defense !== undefined
+        catalogue?.fieldGroups.some((group) => group.kind === 'defense') === true && authored.defense !== undefined
             ? {
                   pdlevels: authored.defense.pd,
                   edlevels: authored.defense.ed,
@@ -278,9 +278,23 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
               }
             : {};
 
+    // A `levels` group's keys ARE the trait fields, so the answers go on verbatim. Every declared
+    // field is written even when unanswered, because the decorators that read them add unguarded —
+    // Barrier sums eight of them, and one `undefined` makes the whole power price NaN.
+    const fields: Obj = {};
+
+    for (const group of catalogue?.fieldGroups ?? []) {
+        if (group.kind === 'levels') {
+            for (const field of group.fields) {
+                fields[field.key] = authored.fields?.[field.key] ?? 0;
+            }
+        }
+    }
+
     return {
         ...base,
         ...defense,
+        ...fields,
         modifier: authored.modifiers.map((entry, index) => emitModifier(entry, position * 20 + index, edition)),
     };
 }

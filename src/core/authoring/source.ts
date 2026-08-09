@@ -179,6 +179,9 @@ function parseModifier(value: unknown): AuthoredModifier | null {
     };
 }
 
+const isFieldMap = (value: unknown): value is Record<string, number> =>
+    isObject(value) && Object.values(value).every((entry) => typeof entry === 'number' && Number.isFinite(entry));
+
 const isDefense = (value: unknown): value is {pd: number; ed: number; mental: number; power: number} =>
     isObject(value) && (['pd', 'ed', 'mental', 'power'] as const).every((key) => typeof value[key] === 'number' && Number.isInteger(value[key]));
 
@@ -212,7 +215,18 @@ function parsePowers(value: unknown): AuthoredPower[] | null {
             return null;
         }
 
-        powers.push({...base, modifiers, ...(entry.defense === undefined ? {} : {defense: entry.defense})});
+        // Every value must be a finite number, but *not* necessarily a whole one — Barrier's width
+        // is bought in halves and a real `.hdc` carries `WIDTHLEVELS="1.5"`.
+        if (entry.fields !== undefined && !isFieldMap(entry.fields)) {
+            return null;
+        }
+
+        powers.push({
+            ...base,
+            modifiers,
+            ...(entry.defense === undefined ? {} : {defense: entry.defense}),
+            ...(entry.fields === undefined ? {} : {fields: entry.fields}),
+        });
     }
 
     return powers;
@@ -380,6 +394,7 @@ const powerToSource = (entry: AuthoredPower): Record<string, unknown> => ({
     ...traitToSource(entry),
     modifiers: entry.modifiers.map(modifierToSource),
     ...(entry.defense === undefined ? {} : {defense: {...entry.defense}}),
+    ...(entry.fields === undefined ? {} : {fields: {...entry.fields}}),
 });
 
 /**

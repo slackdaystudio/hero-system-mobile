@@ -33,6 +33,7 @@ import {
     modifiers,
     trait as catalogueTrait,
     type AuthoredFramework,
+    type AuthoredDefense,
     type AuthoredModifier,
     type AuthoredPower,
     type AuthoredTrait,
@@ -271,7 +272,13 @@ function TraitRow({
                 />
             )}
 
-            {entry.fieldGroup === null ? null : <DefenseFields id={id} group={entry.fieldGroup} trait={trait} onChange={onChange} />}
+            {entry.fieldGroups.map((group) =>
+                group.kind === 'defense' ? (
+                    <DefenseFields key={group.label} id={id} group={group} trait={trait} onChange={onChange} />
+                ) : (
+                    <LevelFields key={group.label} id={id} group={group} trait={trait} onChange={onChange} />
+                ),
+            )}
 
             {entry.familiarity === null ? null : (
                 <SegmentedControl
@@ -426,11 +433,60 @@ function DefenseFields({
                     <View key={field.key} style={styles.gridCell}>
                         <NumberField
                             label={field.label}
-                            value={String(defense[field.key])}
+                            value={String(defense[field.key as keyof AuthoredDefense])}
                             onChangeText={(text) =>
                                 onChange({...trait, defense: {...defense, [field.key]: Math.max(0, Number.parseInt(text, 10) || 0)}} as AuthoredTrait)
                             }
                             testID={`author-defense-${id}-${field.key}`}
+                        />
+                    </View>
+                ))}
+            </View>
+        </View>
+    );
+}
+
+/**
+ * The numbers a power's own decorator reads that no template describes — Barrier's dimensions,
+ * Duplication's point total and count.
+ *
+ * The general case of {@link DefenseFields}, and it needs no translation layer: a `levels` group's
+ * keys **are** the trait fields, so what the player types lands on `fields` under the name the
+ * decorator will look it up by. That is why these two powers were withheld — `Barrier.cost()` sums
+ * eight such fields unguarded, and one missing number prices the whole power `NaN`.
+ */
+function LevelFields({
+    id,
+    group,
+    trait,
+    onChange,
+}: {
+    id: string;
+    group: FieldGroup;
+    trait: AuthoredTrait;
+    onChange: (trait: AuthoredTrait) => void;
+}): React.JSX.Element {
+    const fields = (trait as AuthoredPower).fields ?? {};
+
+    return (
+        <View>
+            <Text variant="caption" muted>
+                {group.label}
+            </Text>
+            <View style={styles.grid}>
+                {group.fields.map((field) => (
+                    <View key={field.key} style={styles.gridCell}>
+                        <NumberField
+                            label={field.label}
+                            value={String(fields[field.key] ?? 0)}
+                            onChangeText={(text) => {
+                                // Width is bought in halves and a real `.hdc` carries
+                                // `WIDTHLEVELS="1.5"`; everything beside it is whole units.
+                                const parsed = field.fractional === true ? Number.parseFloat(text) : Number.parseInt(text, 10);
+
+                                onChange({...trait, fields: {...fields, [field.key]: Math.max(0, Number.isFinite(parsed) ? parsed : 0)}} as AuthoredTrait);
+                            }}
+                            testID={`author-field-${id}-${field.key}`}
                         />
                     </View>
                 ))}

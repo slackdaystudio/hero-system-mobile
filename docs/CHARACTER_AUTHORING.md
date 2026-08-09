@@ -535,15 +535,52 @@ Powers only, and every entry now names its own blocker:
 
 | Power | What it needs |
 |---|---|
-| `FORCEWALL` (Barrier) | Length/height/width/body **and** the four-way defence split — eight level fields read straight off the trait. Prices `NaN` without them. |
-| `DUPLICATION` | `points` and `number`. Also `NaN`. |
 | `ENDURANCERESERVE` | A nested REC **sub-power**: it reads `trait.power.levels`. Nothing else in the catalogue costs by a child trait. |
 | `FLASH` | Its adders are senses from `Senses.json`, not from the template, and `optionid` must name one. A different source than every other trait's options. |
 | `COMPOUNDPOWER` | A power made of powers. Open-ended by design. |
 | `VPP` | Nothing: it is offered as a **framework**, which is what it is. Withheld only as a power. |
 
-Barrier and Duplication are the two worth doing next — both want nothing more exotic than a declared
-field group, which Resistant Protection already proved out.
+Four entries, down from twenty-one, and only two of them are real work.
+
+### Declared fields, generalised — Barrier and Duplication
+
+Both were withheld for the same reason and both wanted the same mechanism. `Barrier.cost()` reads
+**eight** fields off the trait and `Duplication.cost()` reads two, all unguarded, so either priced
+`NaN` without them. Resistant Protection had already solved the shape; it just needed widening.
+
+Two things had to change:
+
+- **A trait can need more than one group.** Barrier needs the four-way defence split *and* a set of
+  dimensions, so `CatalogueTrait.fieldGroup` became `fieldGroups`.
+- **A group can be a plain set of numbers.** `kind: 'levels'` keys each field by the **trait field
+  the engine reads** — `lengthlevels`, `points`, `number` — and the answers ride on the power's
+  `fields` map. There is nothing to translate to: these exist precisely because no template
+  describes them, so the decorator's field name is the only name they have.
+
+**The edition changes which fields exist, not just their prices.** `Barrier.cost()` branches: 5E
+adds `lengthlevels * 2` and `heightlevels * 2` and reads nothing else, where 6E adds length,
+height, `bodylevels` and `widthlevels * 4 / costperinch`. So 5E is offered two fields and 6E four —
+offering BODY in 5E would be a control that changed no number, which is exactly what H13's variable
+slot was. `fieldGroupsFor` therefore takes the edition, and `traitOf` had to start passing it.
+
+HERO Designer does write all eight in both editions (5E's are simply zero — see `Fifth.hdc`), but
+nothing here writes `.hdc`, so emitting only what the edition reads is the honest shape.
+
+**Width is bought in halves.** `m-championsmush` carries `WIDTHLEVELS="1.5"`, so one field is marked
+`fractional` and parsed as a float. At 2 points a metre, truncating that to 1 would quietly cost the
+player 2 points — the kind of silent wrongness the withholding existed to prevent.
+
+**The corpus is the oracle, and it is a strong one.** Five fixtures carry a `FORCEWALL`, so an
+authored Barrier is checked against *the same Barrier imported from a real `.hdc`* rather than
+against my own arithmetic: `m-championsmush`'s "General" comes to 68 both ways, junkyard's to 50.
+Duplication has no fixture anywhere, so it is pinned from the template with the arithmetic named —
+and the one worth stating is that `number` is priced by `getMultiplierCost`, so **5 buys a doubling,
+not a duplicate**: four twins cost 10, not 15.
+
+Every declared field is emitted even when unanswered, and seeded to zero when a trait is added.
+That is deliberate belt and braces: one `undefined` reaching `Barrier.cost()` prices the whole power
+`NaN`, and `NaN` is not an exception, so `characterSheet.ts:333` never catches it and the row simply
+renders blank.
 
 ### An adder has no template, and the emitter has to know that
 
