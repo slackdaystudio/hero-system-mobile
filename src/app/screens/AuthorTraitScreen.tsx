@@ -455,7 +455,19 @@ function DefenseFields({
  * Selective.
  */
 const switchesOf = (entry: {adders: readonly CatalogueAdder[]}): readonly CatalogueAdder[] =>
-    entry.adders.filter((adder) => !adder.freeText && adder.options.length === 0 && adder.levels === null);
+    entry.adders.filter((adder) => !adder.freeText && adder.options.length === 0 && adder.levels === null && !isContainer(adder));
+
+/**
+ * A group header rather than a purchase: it has sub-choices and costs nothing itself.
+ *
+ * Weapon Familiarity is the clearest case. `COMMONMELEE` costs 2 *and* has seven weapons under it —
+ * that is the real "Common Melee Weapons" purchase, so it is offered. `UNCOMMONMELEE` costs 0 and
+ * has twelve; buying it would take a chip, charge nothing and grant nothing. Its weapons are the
+ * purchase, one point each, and reaching them needs nested adders — which needs HERO Designer's
+ * `SELECTED` semantics settled first. Until then a container is hidden rather than offered as a
+ * free no-op.
+ */
+const isContainer = (adder: CatalogueAdder): boolean => adder.adders.length > 0 && adder.basecost === 0;
 
 function Modifiers({
     id,

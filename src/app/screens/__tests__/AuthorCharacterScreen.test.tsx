@@ -271,10 +271,13 @@ describe('AuthorCharacterScreen — one renderer for four categories', () => {
 
     it('says how many entries need a form of their own rather than quietly shortening the list', async () => {
         const {tree} = await renderScreen();
-        const add = tree.root.findAllByProps({testID: 'author-add-skills'}).find((node) => node.props.hint !== undefined);
+        const hintOn = (key: string): unknown => tree.root.findAllByProps({testID: `author-add-${key}`}).find((node) => node.props.hint !== undefined)?.props.hint;
 
-        // A shorter list reads as "the app lacks Weapon Familiarity"; this reads as "not yet".
-        expect(add?.props.hint).toMatch(/\d+ more need a form of their own/);
+        // A shorter list reads as "the app lacks Barrier"; this reads as "not yet".
+        expect(hintOn('powers')).toMatch(/\d+ more need a form of their own/);
+
+        // And it says nothing where nothing is missing. Every skill is offered now.
+        expect(hintOn('skills')).toBeUndefined();
     });
 
     it('prices a skill through the same engine the meter uses', async () => {

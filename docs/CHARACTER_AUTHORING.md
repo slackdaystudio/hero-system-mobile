@@ -253,10 +253,14 @@ categories added no per-trait UI code at all.
 alongside Phase A's `input`/`levels`/`adders`. `CatalogueTrait` likewise.
 
 **Coverage, stated rather than silent.** `authorable()` is what the UI offers; `withheld()` is what
-it does not, and the "Add" field shows the count. In 6E that is 59 of 68 skills, 9 of 13 perks and
-22 of 24 talents. The withheld ones are traits whose decorators read fields no template declares —
-Weapon Familiarity's category/member split, Transport Familiarity's nested adder tree, Autofire
-Skills' per-skill list. Shrinking `BESPOKE` is a later phase, one decorator at a time.
+it does not, and the "Add" field shows the count. Phase B withheld nine skills, four perks and two
+talents on the grounds that their decorators read fields no template declares — "Weapon
+Familiarity's category/member split, Transport Familiarity's nested adder tree, Autofire Skills'
+per-skill list".
+
+**That was wrong, and every skill, perk, talent and maneuver is now offered.** See
+[Shrinking the withheld list](#shrinking-the-withheld-list) — the sentence above was written once
+and believed for a release.
 
 **Two things the engine needed that the template alone doesn't give you:**
 
@@ -395,8 +399,9 @@ correctly and renders with no OCV, no DCV and no effect. Same shape as Phase B's
 the third time this pattern has come up: **the template is consulted for prices, the trait for
 everything else.**
 
-55 of 56 maneuvers are offered in both editions; `WEAPON_ELEMENT` is withheld because it wants a
-list of the weapons a style covers, which no template describes.
+All 56 maneuvers are offered in both editions. `WEAPON_ELEMENT` was withheld "because it wants a
+list of the weapons a style covers, which no template describes" — the template describes them
+perfectly well: they are its adders, and it prices as their sum.
 
 **Equipment is powers in a different bucket** — same catalogue, same modifiers, same field groups,
 because `populateTrait` is called with `('equipment', 'powers', 'power')` and resolves items against
@@ -462,3 +467,81 @@ The chosen allowance is now what gets declared.
 4. **`characterSheet.ts:333`'s try/catch will mask emitter bugs.** A malformed authored trait
    degrades to a cost-0 stub row rather than an error. Build the sheet and read the values when
    verifying; don't just check that nothing threw.
+
+## Shrinking the withheld list
+
+2.8.0 shipped withholding 21 entries. Thirteen of them did not need withholding at all, and finding
+that out is the most useful thing in this section.
+
+### What the list actually said
+
+`BESPOKE`'s comment read: *"Each is a `core/traits` class with its own idea of what the trait
+carries — Transport Familiarity's nested adder tree, Weapon Familiarity's category/member split,
+Autofire Skills' per-skill list. A generic form cannot produce those."*
+
+Reading the decorators instead of the comment:
+
+| Trait | What its decorator actually does |
+|---|---|
+| `TWO_WEAPON_FIGHTING_HTH` | `return 10`. It reads nothing whatsoever. |
+| `RAPID_ATTACK_HTH` | `return 10`, less 1 for an HTH/Ranged-only limitation. |
+| `AUTOFIRE_SKILLS`, `DEFENSE_MANEUVER` | Match `optionid` against `template.option` — the ordinary option mechanism every offered trait already uses. |
+| `WEAPON_FAMILIARITY`, `TRANSPORT_FAMILIARITY`, `WEAPON_ELEMENT` | Sum their **adders**, which the emitter always produced correctly. |
+| `CRAMMING`, `CUSTOMSKILL`, `CUSTOMPERK`, `CUSTOMTALENT` | No decorator at all. `basecost` and `levels`. |
+
+Not one needed a bespoke form. **A "why we can't" comment is a hypothesis** — the same lesson H2
+taught about a ledger entry's corpus-impact line, in a new place. It was written once, believed for
+a release, and cost eleven traits.
+
+### The real blocker was one missing control
+
+The trait form rendered an adder with **no options, no levels and no free text** as `null`, behind a
+comment calling it "a flat yes/no adder — needs a switch, which is its own change". Those adders are
+what a Weapon Familiarity *is*: fourteen independent yes/no purchases.
+
+The same gap was doing far more damage on traits that were **already offered**:
+
+- **Damage Negation and Possession were not buildable.** Their adders are `required`, so `validate`
+  raised an error the form had no control to clear.
+- **No attack could buy a half-die.** `+½d6` is a flat adder on Blast, HKA, RKA, Drain, Aid and the
+  rest.
+- **Animal Handler, Navigation, Weaponsmith and Survival are bought by category**, and every
+  category is a flat adder. The form could only produce the bare skill — 1 point, or 0 for Survival.
+- One level down on **modifiers** it moved the *multiplier*: Area Of Effect could not be made
+  Selective, Charges could not take Clips, Focus could not take Multiple Foci. A power missing those
+  is not merely missing a purchase, it is **priced wrong**.
+
+`ToggleList` fills it — any-number-of-many, as wrapped chips carrying their own price. Levelled-but-
+optionless adders (`+[LVL] DCs`) get a number field instead, and taking one to zero drops it rather
+than storing a zero that would emit an adder worth nothing.
+
+### Group headers are hidden, not offered
+
+Weapon Familiarity's adders are two levels deep and the levels mean different things.
+`COMMONMELEE` costs 2 **and** has seven weapons under it — that is the real "Common Melee Weapons"
+purchase, so it is offered. `UNCOMMONMELEE` costs **0** and has twelve; it is a container, and
+offering it would be a chip that charges nothing and grants nothing.
+
+So `switchesOf` hides an adder that has children and costs nothing. Reaching the weapons underneath
+needs nested adders in `AuthoredAdder`/`emitAdder`, and that in turn needs HERO Designer's
+`SELECTED` semantics settled — a real `.hdc` writes the group with `SELECTED="NO"` around the
+children it did take, and `WeaponFamiliarity.cost()` adds a group's own `basecost` *regardless* of
+`SELECTED`, which would double-charge. **That looks like another latent engine quirk and should be
+measured before anything is built on it.**
+
+### What is still withheld, and what each one wants
+
+Powers only, and every entry now names its own blocker:
+
+| Power | What it needs |
+|---|---|
+| `FORCEWALL` (Barrier) | Length/height/width/body **and** the four-way defence split — eight level fields read straight off the trait. Prices `NaN` without them. |
+| `DUPLICATION` | `points` and `number`. Also `NaN`. |
+| `ENDURANCERESERVE` | A nested REC **sub-power**: it reads `trait.power.levels`. Nothing else in the catalogue costs by a child trait. |
+| `FLASH` | Its adders are senses from `Senses.json`, not from the template, and `optionid` must name one. A different source than every other trait's options. |
+| `MULTIFORM`, `SUMMON` | Look generic — levels plus adders — but price `NaN` once their adders are answered. **Withheld pending that being understood rather than guessed at.** |
+| `COMPOUNDPOWER` | A power made of powers. Open-ended by design. |
+| `VPP` | Nothing: it is offered as a **framework**, which is what it is. Withheld only as a power. |
+
+Barrier and Duplication are the two worth doing next — both want nothing more exotic than a declared
+field group, which Resistant Protection already proved out.

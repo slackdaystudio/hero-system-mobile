@@ -81,13 +81,14 @@ describe('martial maneuvers', () => {
         expect(attributes(strong, 'martialArts').Effect).toBe('6d6 Strike');
     });
 
-    it('offers both editions their maneuvers and withholds only what needs its own form', () => {
+    it('offers both editions every one of their maneuvers', () => {
         for (const edition of ['5E', '6E'] as const) {
-            expect(authorable('martialArts', edition).length).toBe(catalogue('martialArts', edition).length - 1);
+            expect(authorable('martialArts', edition).length).toBe(catalogue('martialArts', edition).length);
         }
 
-        // Weapon Element wants a list of the weapons a style covers, which no template describes.
-        expect(withheld('martialArts', '6E').map((entry) => entry.xmlid)).toEqual(['WEAPON_ELEMENT']);
+        // Weapon Element was withheld for wanting "a list of weapons no template describes". The
+        // template describes them: they are its adders, and it prices as their sum.
+        expect(withheld('martialArts', '6E')).toEqual([]);
     });
 
     it('rejects a maneuver this edition does not have', () => {

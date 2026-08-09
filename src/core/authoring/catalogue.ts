@@ -144,48 +144,55 @@ export type Unsupported =
     | 'unpriced';
 
 /**
- * Traits whose decorators read fields no template declares.
- *
- * Each is a `core/traits` class with its own idea of what the trait carries — Transport
- * Familiarity's nested adder tree, Weapon Familiarity's category/member split, Autofire Skills'
- * per-skill list. A generic form cannot produce those, and producing them *badly* is worse than
- * not offering them: the engine prices a malformed trait at 0 rather than refusing it.
- *
- * The custom* entries are here for the opposite reason — they are deliberately open-ended, and
- * what they need is a bespoke "write your own" form rather than a generated one.
- *
- * Shrinking this list is the substance of a later phase, one decorator at a time.
- */
-/**
- * Powers whose decorators read level fields the template never declares, and which therefore
- * cannot be filled in by a generated form.
+ * Powers whose decorators read fields no template declares, and which a generated form therefore
+ * cannot fill in.
  *
  * `FORCEFIELD` is deliberately *not* here: it is the most-taken defensive power in the corpus and
  * granting it a declared field group (see {@link FIELD_GROUPS}) was cheaper than withholding it.
- * The rest need the same treatment one at a time — Barrier (`FORCEWALL` in both editions' data)
- * wants a length/height/width/body box, Duplication a number and a point total, Endurance Reserve
- * a REC.
+ * What each of these still wants:
+ *
+ * - `FORCEWALL` (Barrier) — a length/height/width/body box *and* the four-way defence split. It
+ *   reads all eight off the trait and adds `undefined` without them, so it prices `NaN`.
+ * - `DUPLICATION` — `points` and `number`; also `NaN` without them.
+ * - `ENDURANCERESERVE` — a nested REC sub-power. It reads `trait.power.levels`, and there is no
+ *   other trait in the catalogue whose cost depends on a *child* trait.
+ * - `FLASH` — its adders are senses drawn from `Senses.json`, not from the template, and its
+ *   `optionid` must name one. A different source than every other trait's option list.
+ * - `COMPOUNDPOWER` — a power made of powers; open-ended by design.
+ * - `VPP` — offered as a *framework* instead, which is what it is. Withheld only as a power.
+ *
+ * `MULTIFORM` and `SUMMON` look generic — levels plus adders — but price `NaN` once their adders
+ * are answered. Withheld pending that being understood rather than guessed at.
  */
 const BESPOKE_POWERS = ['FORCEWALL', 'DUPLICATION', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'MULTIFORM', 'SUMMON', 'VPP'];
 
-const BESPOKE = new Set([
-    ...BESPOKE_POWERS,
-    // Weapon Element wants a list of weapons the style covers, which no template describes.
-    'WEAPON_ELEMENT',
-    'AUTOFIRE_SKILLS',
-    'CRAMMING',
-    'CUSTOMSKILL',
-    'CUSTOMPERK',
-    'CUSTOMTALENT',
-    'DEFENSE_MANEUVER',
-    'RAPID_ATTACK_HTH',
-    'TRANSPORT_FAMILIARITY',
-    'TWO_WEAPON_FIGHTING_HTH',
-    'WEAPON_FAMILIARITY',
-    // 5E spells two of them differently for the same decorators.
-    'RAPID_ATTACK',
-    'TWO_WEAPON_FIGHTING',
-]);
+/**
+ * Traits that cannot be offered yet.
+ *
+ * **This list was most of the way wrong, and the correction is worth keeping.** It used to hold a
+ * dozen skills and maneuvers on the stated grounds that "their decorators read fields no template
+ * declares — Transport Familiarity's nested adder tree, Weapon Familiarity's category/member split,
+ * Autofire Skills' per-skill list". Checking each decorator instead of trusting the comment:
+ *
+ * - Autofire Skills and Defense Maneuver price from `optionid` against `template.option` — which is
+ *   the *ordinary* option mechanism every offered trait already uses.
+ * - Two-Weapon Fighting returns a flat 10. It reads nothing at all.
+ * - Rapid Attack returns 10, less 1 for an HTH/Ranged-only limitation.
+ * - Weapon Familiarity, Transport Familiarity and Weapon Element price from their **adders**, which
+ *   the form has always emitted correctly.
+ * - Cramming and the custom* entries have no decorator whatsoever; they are `basecost` and `levels`.
+ *
+ * Not one of them needed a bespoke form. What they needed was a control for a **yes/no adder**,
+ * which the trait form rendered as nothing — the same gap that made Damage Negation unbuildable and
+ * stopped any attack buying a half-die, on traits that were already on offer. Fixing that unlocked
+ * these for free.
+ *
+ * The lesson is the ledger's own, in a new place: **a "why we can't" comment is a hypothesis.** This
+ * one was written once and believed for a release.
+ *
+ * What is genuinely left is {@link BESPOKE_POWERS}, and each entry there says what it wants.
+ */
+const BESPOKE = new Set([...BESPOKE_POWERS]);
 
 /**
  * Extra numeric fields a specific trait needs that no template declares.
