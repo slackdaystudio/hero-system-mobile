@@ -163,7 +163,15 @@ export function AppNavigator(): React.JSX.Element {
                         </Stack.Screen>
                         <Stack.Screen name="AuthorTrait" options={{title: 'Edit'}}>
                             {({route, navigation}) => (
-                                <AuthorTraitScreen address={route.params.address} category={route.params.category} onDone={() => navigation.goBack()} />
+                                <AuthorTraitScreen
+                                    address={route.params.address}
+                                    category={route.params.category}
+                                    onDone={() => navigation.goBack()}
+                                    // A Compound Power's children are powers, so the child opens the
+                                    // same screen pushed on top of itself — the only place in
+                                    // authoring where a trait form leads to another trait form.
+                                    onEditChild={(address) => navigation.push('AuthorTrait', {address, category: 'powers'})}
+                                />
                             )}
                         </Stack.Screen>
                         <Stack.Screen name="Statistics" options={{title: 'Statistics'}}>

@@ -32,6 +32,7 @@ import type {
     AuthoredFramework,
     AuthoredModifier,
     AuthoredPower,
+    AuthoredSlot,
     AuthoredTrait,
     AuthoringEdition,
     FrameworkKind,
@@ -178,6 +179,9 @@ function parseModifier(value: unknown): AuthoredModifier | null {
     };
 }
 
+const isFieldMap = (value: unknown): value is Record<string, number> =>
+    isObject(value) && Object.values(value).every((entry) => typeof entry === 'number' && Number.isFinite(entry));
+
 const isDefense = (value: unknown): value is {pd: number; ed: number; mental: number; power: number} =>
     isObject(value) && (['pd', 'ed', 'mental', 'power'] as const).every((key) => typeof value[key] === 'number' && Number.isInteger(value[key]));
 
@@ -211,10 +215,62 @@ function parsePowers(value: unknown): AuthoredPower[] | null {
             return null;
         }
 
-        powers.push({...base, modifiers, ...(entry.defense === undefined ? {} : {defense: entry.defense})});
+        // Every value must be a finite number, but *not* necessarily a whole one — Barrier's width
+        // is bought in halves and a real `.hdc` carries `WIDTHLEVELS="1.5"`.
+        if (entry.fields !== undefined && !isFieldMap(entry.fields)) {
+            return null;
+        }
+
+        // A compound power's children are powers in every respect, so the same reader handles them.
+        // One level is all the shape has — `CompoundPower` flattens whatever it finds, but nothing
+        // in either edition's data nests a compound power inside another.
+        const children = entry.powers === undefined ? undefined : parsePowers(entry.powers);
+
+        if (children === null) {
+            return null;
+        }
+
+        powers.push({
+            ...base,
+            modifiers,
+            ...(entry.defense === undefined ? {} : {defense: entry.defense}),
+            ...(entry.fields === undefined ? {} : {fields: entry.fields}),
+            ...(children === undefined ? {} : {powers: children}),
+        });
     }
 
     return powers;
+}
+
+/**
+ * A framework's slots: powers, plus the one field only a slot has.
+ *
+ * Separate from {@link parsePowers} rather than folded into it, so `variable` cannot appear on a
+ * standalone power or a piece of equipment, where nothing would ever read it.
+ */
+function parseSlots(value: unknown): AuthoredSlot[] | null {
+    const powers = parsePowers(value);
+
+    if (powers === null) {
+        return null;
+    }
+
+    const slots: AuthoredSlot[] = [];
+
+    for (const [index, power] of powers.entries()) {
+        // Sources written before slot kinds existed have no such key on any slot — and every one
+        // of them was emitted fixed, which is what an absent field reads as. A key that is present
+        // but not a boolean is malformed, and rejected like any other field of the wrong type.
+        const {variable} = (value as unknown[])[index] as Record<string, unknown>;
+
+        if (variable !== undefined && typeof variable !== 'boolean') {
+            return null;
+        }
+
+        slots.push(variable === undefined ? power : {...power, variable});
+    }
+
+    return slots;
 }
 
 const FRAMEWORK_KINDS = new Set<FrameworkKind>(['multipower', 'elementalControl', 'vpp']);
@@ -231,7 +287,7 @@ function parseFrameworks(value: unknown): AuthoredFramework[] | null {
             return null;
         }
 
-        const slots = parsePowers(entry.slots ?? []);
+        const slots = parseSlots(entry.slots ?? []);
 
         if (slots === null || !Array.isArray(entry.modifiers)) {
             return null;
@@ -348,6 +404,18 @@ const powerToSource = (entry: AuthoredPower): Record<string, unknown> => ({
     ...traitToSource(entry),
     modifiers: entry.modifiers.map(modifierToSource),
     ...(entry.defense === undefined ? {} : {defense: {...entry.defense}}),
+    ...(entry.fields === undefined ? {} : {fields: {...entry.fields}}),
+    ...(entry.powers === undefined ? {} : {powers: entry.powers.map(powerToSource)}),
+});
+
+/**
+ * A slot. `powerToSource` plus its kind — and it has to be spelled out, because this projection is
+ * a whitelist rather than a spread: a field nobody adds here is silently dropped on save and the
+ * character comes back subtly cheaper than the player left it.
+ */
+const slotToSource = (entry: AuthoredSlot): Record<string, unknown> => ({
+    ...powerToSource(entry),
+    ...(entry.variable === undefined ? {} : {variable: entry.variable}),
 });
 
 export const toSource = (draft: AuthoredCharacter): StoredSource => ({
@@ -367,7 +435,7 @@ export const toSource = (draft: AuthoredCharacter): StoredSource => ({
         name: framework.name,
         reserve: framework.reserve,
         modifiers: framework.modifiers.map(modifierToSource),
-        slots: framework.slots.map(powerToSource),
+        slots: framework.slots.map(slotToSource),
     })),
     complications: draft.complications.map(traitToSource),
 });

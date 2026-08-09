@@ -24,7 +24,7 @@
  * CLAUDE.md — there is deliberately no redux).
  */
 import React, {createContext, useCallback, useContext, useMemo, useRef, useState} from 'react';
-import {emptyDraft, type AuthoredCharacter, type AuthoredFramework, type AuthoredPower, type AuthoredTrait} from 'core/authoring';
+import {emptyDraft, type AuthoredCharacter, type AuthoredFramework, type AuthoredPower, type AuthoredSlot, type AuthoredTrait} from 'core/authoring';
 
 /** Where a trait lives on a draft. `frameworks` is addressed separately — its traits nest. */
 export type DraftKey = 'skills' | 'perks' | 'talents' | 'powers' | 'martialArts' | 'equipment' | 'complications';
@@ -40,7 +40,16 @@ export type TraitAddress =
     | {readonly kind: 'trait'; readonly key: DraftKey; readonly index: number}
     | {readonly kind: 'slot'; readonly framework: number; readonly index: number}
     /** A framework's pool. Not a trait — it has no catalogue entry — but it does carry modifiers. */
-    | {readonly kind: 'pool'; readonly framework: number};
+    | {readonly kind: 'pool'; readonly framework: number}
+    /**
+     * One power inside a Compound Power.
+     *
+     * Its own shape rather than a nested address, because a compound power holds powers and nothing
+     * else — no compound power inside a compound power, no compound power as a framework slot. The
+     * data has no such case and a general nested address would be describing a tree the rules do not
+     * have; see the same reasoning on nested adders.
+     */
+    | {readonly kind: 'compound'; readonly key: DraftKey; readonly index: number; readonly child: number};
 
 interface DraftApi {
     readonly draft: AuthoredCharacter;
@@ -93,6 +102,10 @@ export function AuthoringDraftProvider({initial, children}: AuthoringDraftProvid
                 return null; // a pool is not a trait; see `frameworkAt`
             }
 
+            if (address.kind === 'compound') {
+                return (draft[address.key][address.index] as AuthoredPower | undefined)?.powers?.[address.child] ?? null;
+            }
+
             return address.kind === 'trait' ? draft[address.key][address.index] ?? null : draft.frameworks[address.framework]?.slots[address.index] ?? null;
         },
         [draft],
@@ -112,6 +125,23 @@ export function AuthoringDraftProvider({initial, children}: AuthoringDraftProvid
                 return;
             }
 
+            if (address.kind === 'compound') {
+                setDraft({
+                    ...draft,
+                    [address.key]: draft[address.key].map((entry, index) =>
+                        index !== address.index
+                            ? entry
+                            : {
+                                  ...entry,
+                                  powers: ((entry as AuthoredPower).powers ?? []).map((child, order) =>
+                                      order === address.child ? {...child, ...(trait as AuthoredPower)} : child,
+                                  ),
+                              },
+                    ),
+                });
+                return;
+            }
+
             if (address.kind === 'trait') {
                 setDraft({...draft, [address.key]: draft[address.key].map((entry, index) => (index === address.index ? trait : entry))});
                 return;
@@ -121,7 +151,10 @@ export function AuthoringDraftProvider({initial, children}: AuthoringDraftProvid
                 ...draft,
                 frameworks: draft.frameworks.map((framework, index) =>
                     index === address.framework
-                        ? {...framework, slots: framework.slots.map((slot, order) => (order === address.index ? (trait as AuthoredPower) : slot))}
+                        // Spread over the slot rather than replacing it, so the fields only a slot
+                        // has — `variable` — survive an edit made by the trait form, which is
+                        // typed to the trait and knows nothing about them.
+                        ? {...framework, slots: framework.slots.map((slot, order) => (order === address.index ? {...slot, ...(trait as AuthoredSlot)} : slot))}
                         : framework,
                 ),
             });
@@ -132,6 +165,16 @@ export function AuthoringDraftProvider({initial, children}: AuthoringDraftProvid
     const removeAt = useCallback(
         (address: TraitAddress): void => {
             if (address.kind === 'pool') {
+                return;
+            }
+
+            if (address.kind === 'compound') {
+                setDraft({
+                    ...draft,
+                    [address.key]: draft[address.key].map((entry, index) =>
+                        index !== address.index ? entry : {...entry, powers: ((entry as AuthoredPower).powers ?? []).filter((_, order) => order !== address.child)},
+                    ),
+                });
                 return;
             }
 

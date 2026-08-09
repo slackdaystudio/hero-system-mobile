@@ -67,6 +67,23 @@ const MODIFIER_ID_BASE = 7000;
 const FRAMEWORK_ID_BASE = 9000;
 
 /**
+ * A nested sub-power's id, offset from its parent's so the two never share one.
+ *
+ * Only Endurance Reserve's Recovery uses it. Ids have to be distinct across the whole document —
+ * `populateTrait` keys parent lookups on them — and a sub-power sits inside a power that already
+ * holds an id from the `powers` block.
+ */
+const SUB_POWER_ID_OFFSET = 12000;
+
+/**
+ * A compound power's children, past every other block — `powers` at 6000, `equipment` at 11000, a
+ * sub-power at 12000 and up. Their *position* is local to the parent, which is all the engine sorts
+ * them by; only the id has to be globally unique.
+ */
+const COMPOUND_CHILD_ID_BASE = 20000;
+const COMPOUND_CHILD_STRIDE = 20;
+
+/**
  * How far apart framework blocks are placed, in both id and position.
  *
  * Position matters twice. `populateTrait` attaches a slot by looking its `parentid` up in the list
@@ -130,6 +147,11 @@ function emitAdder(chosen: AuthoredAdder, catalogue: CatalogueAdder | undefined)
         alias: catalogue?.display ?? chosen.xmlid,
         basecost: catalogue?.basecost ?? 0,
         ...(chosen.levels === undefined ? {} : {levels: chosen.levels}),
+        // An adder carries its own per-level pair because, unlike a trait, it is never given a
+        // `template` — `totalAdders` and four power decorators read `adder.lvlval`/`adder.lvlcost`
+        // straight off it. Emitted without them a levelled adder computes `n / undefined` and the
+        // whole trait prices **NaN**, which the sheet then renders as a blank cost.
+        ...(catalogue?.levels === undefined || catalogue?.levels === null ? {} : {lvlval: catalogue.levels.lvlval, lvlcost: catalogue.levels.lvlcost}),
     };
 
     // A free-text adder still names its single option, but its `optionAlias` carries the player's
@@ -263,7 +285,7 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
     const base = emitTrait(authored, 'powers', position, edition);
 
     const defense =
-        catalogue?.fieldGroup?.kind === 'defense' && authored.defense !== undefined
+        catalogue?.fieldGroups.some((group) => group.kind === 'defense') === true && authored.defense !== undefined
             ? {
                   pdlevels: authored.defense.pd,
                   edlevels: authored.defense.ed,
@@ -273,9 +295,59 @@ function emitPower(authored: AuthoredPower, position: number, edition: Authoring
               }
             : {};
 
+    // A `levels` group's keys ARE the trait fields, so the answers go on verbatim. Every declared
+    // field is written even when unanswered, because the decorators that read them add unguarded —
+    // Barrier sums eight of them, and one `undefined` makes the whole power price NaN.
+    const fields: Obj = {};
+
+    for (const group of catalogue?.fieldGroups ?? []) {
+        if (group.kind !== 'levels') {
+            continue;
+        }
+
+        if (group.subPower !== undefined) {
+            // A whole nested power, exactly as a `.hdc` writes it: `<POWER XMLID="ENDURANCERESERVE">`
+            // containing `<POWER XMLID="ENDURANCERESERVEREC" LEVELS="10">`. The parser turns the
+            // inner element into `power`, which is where `EnduranceReserve.cost()` reads its levels.
+            fields.power = {
+                ...TRAIT_DEFAULTS,
+                xmlid: group.subPower.xmlid,
+                id: ID_BASE.powers + position + SUB_POWER_ID_OFFSET,
+                alias: group.subPower.display,
+                name: null,
+                basecost: 0,
+                levels: authored.fields?.[group.subPower.levelsFrom] ?? 0,
+                position: -1,
+            };
+            continue;
+        }
+
+        for (const field of group.fields) {
+            fields[field.key] = authored.fields?.[field.key] ?? 0;
+        }
+    }
+
+    // A compound power's children, under `power` — the key a `.hdc` uses and the one
+    // `normalizeCharacterItems` renames to `powers`, which is where `CompoundPower` reads them.
+    // Emitted only for a compound power: a stray `power` on anything else would be a sub-power.
+    // Their own id block: a child's id from `emitPower` would come out of the `powers` range and
+    // collide with a standalone power's — or, further up, with equipment's at 11000. Ids have to be
+    // unique document-wide because `populateTrait` keys parent lookups on them.
+    const children =
+        catalogue?.compound === true
+            ? {
+                  power: (authored.powers ?? []).map((child, index) => ({
+                      ...emitPower(child, index, edition),
+                      id: COMPOUND_CHILD_ID_BASE + position * COMPOUND_CHILD_STRIDE + index,
+                  })),
+              }
+            : {};
+
     return {
         ...base,
         ...defense,
+        ...fields,
+        ...children,
         modifier: authored.modifiers.map((entry, index) => emitModifier(entry, position * 20 + index, edition)),
     };
 }
@@ -352,10 +424,12 @@ function emitFramework(framework: AuthoredFramework, index: number, edition: Aut
         ...emitPower(slot, position + 1 + order, edition),
         id: id + 1 + order,
         parentid: id,
-        // Fixed slots only, for now: the variable kind's divisor is unreachable in the engine —
-        // see H13 in docs/KNOWN_DEVIATIONS.md — so offering it would price a variable slot as a
-        // fixed one and say nothing.
-        ultraSlot: true,
+        // `ULTRA_SLOT` is the format's name for the fixed kind, and `MultipowerItem` is the only
+        // decorator that reads it — an Elemental Control slot and a VPP prefab have no such choice,
+        // so emitting it on them would be inventing a field. Written for every Multipower slot
+        // rather than only the fixed ones because that is what HERO Designer does, and because
+        // absent reads as fixed by design (H13, docs/KNOWN_DEVIATIONS.md).
+        ...(framework.kind === 'multipower' ? {ultraSlot: slot.variable !== true} : {}),
     }));
 
     return {container, slots};

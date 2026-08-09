@@ -31,6 +31,7 @@
  * engine cannot match.
  */
 import {heroDesignerCharacter} from 'core/hero';
+import sensesData from 'core/data/herodesigner/Senses.json';
 import {getTemplate} from 'core/templates';
 import type {AuthoringEdition} from './types';
 
@@ -87,6 +88,17 @@ export interface LevelRange {
     readonly max: number;
     readonly perLevel: number;
     readonly label: string;
+    /**
+     * The raw pair `perLevel` is the ratio of, carried because an **adder has no template**.
+     *
+     * A trait's decorator reads `trait.template.lvlval`, which `getCharacter` attaches. An adder's
+     * decorator reads `adder.lvlval` directly off the adder — `totalAdders`, `variablePowerPool`,
+     * `possession`, `leaping` and `reflection` all do — so the emitter has to write them, and
+     * writing a derived `{lvlval: 1, lvlcost: perLevel}` instead is not safe: `baseCost` feeds the
+     * same pair to `getMultiplierCost`, whose arithmetic is multiplicative rather than a ratio.
+     */
+    readonly lvlval: number;
+    readonly lvlcost: number;
 }
 
 /** A characteristic a skill may be based on, and what it costs on that characteristic. */
@@ -144,48 +156,58 @@ export type Unsupported =
     | 'unpriced';
 
 /**
- * Traits whose decorators read fields no template declares.
+ * Powers a generated form cannot fill in. **Empty — every power in both editions is now offered.**
  *
- * Each is a `core/traits` class with its own idea of what the trait carries — Transport
- * Familiarity's nested adder tree, Weapon Familiarity's category/member split, Autofire Skills'
- * per-skill list. A generic form cannot produce those, and producing them *badly* is worse than
- * not offering them: the engine prices a malformed trait at 0 rather than refusing it.
+ * Kept as a named, empty list rather than deleted, because it is the hook the next unfillable power
+ * hangs on and because what came off it is the useful part. In order, and none of them needed the
+ * bespoke form the list assumed:
  *
- * The custom* entries are here for the opposite reason — they are deliberately open-ended, and
- * what they need is a bespoke "write your own" form rather than a generated one.
- *
- * Shrinking this list is the substance of a later phase, one decorator at a time.
+ * - `FORCEWALL` (Barrier) and `DUPLICATION` — declared **field groups**, the mechanism Resistant
+ *   Protection already had. Both priced `NaN` without them.
+ * - `MULTIFORM` and `SUMMON` — nothing wrong with either. `emitAdder` was not carrying
+ *   `lvlval`/`lvlcost`, which an adder needs because, unlike a trait, it is never given a
+ *   `template`. They were withheld for a bug in neither of them.
+ * - `ENDURANCERESERVE` — a nested REC **sub-power**, the one trait whose cost depends on a child
+ *   trait. See `FieldGroup.subPower`.
+ * - `FLASH` — its choices are senses from `Senses.json` rather than from any template, so they are
+ *   injected as ordinary options and adders. The data was missing, not the mechanism.
+ * - `COMPOUNDPOWER` — a power made of powers, priced as the plain sum of them. It carries its own
+ *   list of child powers (`AuthoredPower.powers`), which is the only piece of authoring shaped like
+ *   a framework without being one.
+ * - `VPP` — **was never in either edition's power catalogue at all**, so this entry matched nothing
+ *   for the whole life of the list. A Variable Power Pool is authored as a *framework*, which is
+ *   what it is. A dead entry in a withheld list is invisible: it costs nothing and it explains a
+ *   gap that was never there.
  */
-/**
- * Powers whose decorators read level fields the template never declares, and which therefore
- * cannot be filled in by a generated form.
- *
- * `FORCEFIELD` is deliberately *not* here: it is the most-taken defensive power in the corpus and
- * granting it a declared field group (see {@link FIELD_GROUPS}) was cheaper than withholding it.
- * The rest need the same treatment one at a time — Barrier (`FORCEWALL` in both editions' data)
- * wants a length/height/width/body box, Duplication a number and a point total, Endurance Reserve
- * a REC.
- */
-const BESPOKE_POWERS = ['FORCEWALL', 'DUPLICATION', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER', 'MULTIFORM', 'SUMMON', 'VPP'];
+const BESPOKE_POWERS: readonly string[] = [];
 
-const BESPOKE = new Set([
-    ...BESPOKE_POWERS,
-    // Weapon Element wants a list of weapons the style covers, which no template describes.
-    'WEAPON_ELEMENT',
-    'AUTOFIRE_SKILLS',
-    'CRAMMING',
-    'CUSTOMSKILL',
-    'CUSTOMPERK',
-    'CUSTOMTALENT',
-    'DEFENSE_MANEUVER',
-    'RAPID_ATTACK_HTH',
-    'TRANSPORT_FAMILIARITY',
-    'TWO_WEAPON_FIGHTING_HTH',
-    'WEAPON_FAMILIARITY',
-    // 5E spells two of them differently for the same decorators.
-    'RAPID_ATTACK',
-    'TWO_WEAPON_FIGHTING',
-]);
+/**
+ * Traits that cannot be offered yet.
+ *
+ * **This list was most of the way wrong, and the correction is worth keeping.** It used to hold a
+ * dozen skills and maneuvers on the stated grounds that "their decorators read fields no template
+ * declares — Transport Familiarity's nested adder tree, Weapon Familiarity's category/member split,
+ * Autofire Skills' per-skill list". Checking each decorator instead of trusting the comment:
+ *
+ * - Autofire Skills and Defense Maneuver price from `optionid` against `template.option` — which is
+ *   the *ordinary* option mechanism every offered trait already uses.
+ * - Two-Weapon Fighting returns a flat 10. It reads nothing at all.
+ * - Rapid Attack returns 10, less 1 for an HTH/Ranged-only limitation.
+ * - Weapon Familiarity, Transport Familiarity and Weapon Element price from their **adders**, which
+ *   the form has always emitted correctly.
+ * - Cramming and the custom* entries have no decorator whatsoever; they are `basecost` and `levels`.
+ *
+ * Not one of them needed a bespoke form. What they needed was a control for a **yes/no adder**,
+ * which the trait form rendered as nothing — the same gap that made Damage Negation unbuildable and
+ * stopped any attack buying a half-die, on traits that were already on offer. Fixing that unlocked
+ * these for free.
+ *
+ * The lesson is the ledger's own, in a new place: **a "why we can't" comment is a hypothesis.** This
+ * one was written once and believed for a release.
+ *
+ * What is genuinely left is {@link BESPOKE_POWERS}, and each entry there says what it wants.
+ */
+const BESPOKE = new Set([...BESPOKE_POWERS]);
 
 /**
  * Extra numeric fields a specific trait needs that no template declares.
@@ -195,29 +217,123 @@ const BESPOKE = new Set([
  * only options are to declare it here, or to withhold the power and say why.
  */
 export interface FieldGroup {
-    readonly kind: 'defense';
+    /**
+     * `defense` is the four-way split, stored as {@link AuthoredDefense} and emitted as
+     * `pdlevels`/`edlevels`/`mdlevels`/`powdlevels` with `levels` derived from their sum.
+     *
+     * `levels` is the general case: each field's `key` **is** the trait field the engine reads, and
+     * the answers ride on the power's `fields` map.
+     */
+    readonly kind: 'defense' | 'levels';
     readonly label: string;
-    readonly fields: ReadonlyArray<{readonly key: 'pd' | 'ed' | 'mental' | 'power'; readonly label: string}>;
+    readonly fields: readonly FieldGroupField[];
+    /**
+     * Emit this group as a **nested power** rather than as fields on the trait itself.
+     *
+     * Endurance Reserve is the only one in either edition: its Recovery is a whole `<POWER
+     * XMLID="ENDURANCERESERVEREC">` inside the reserve, and `EnduranceReserve.cost()` reads
+     * `trait.power.levels` — the one place in the catalogue where a cost depends on a *child*
+     * trait. Deliberately not generalised past "one sub-power carrying one number", because that
+     * is all the data has; the same reasoning as the one-level cap on nested adders.
+     */
+    readonly subPower?: {readonly xmlid: string; readonly display: string; readonly levelsFrom: string};
 }
 
+export interface FieldGroupField {
+    /** For a `levels` group this is the literal trait field — `lengthlevels`, `points`, `number`. */
+    readonly key: string;
+    readonly label: string;
+    /** Bought in halves rather than whole units. Barrier's width is the only one. */
+    readonly fractional?: boolean;
+}
+
+const DEFENCE_SPLIT: FieldGroup = {
+    kind: 'defense',
+    label: 'Points of resistant defence',
+    fields: [
+        {key: 'pd', label: 'rPD'},
+        {key: 'ed', label: 'rED'},
+        {key: 'mental', label: 'Mental'},
+        {key: 'power', label: 'Power'},
+    ],
+};
+
 /**
- * Resistant Protection's four-way defence split.
+ * Extra numeric fields a specific trait needs, by edition.
  *
- * `getResistantDefense` and the unusual-defense queries read `pdlevels`/`edlevels`/`mdlevels`/
- * `powdlevels` directly off the trait. A Resistant Protection emitted without them costs full
- * price and grants no defence at all — priced correctly, silently useless.
+ * A trait can need more than one group — Barrier needs both a defence split and a set of
+ * dimensions — so this returns a list.
+ *
+ * **Edition matters, and not only for the prices.** `Barrier.cost()` branches: 5E adds
+ * `lengthlevels * 2` and `heightlevels * 2` and reads nothing else, while 6E adds length, height,
+ * `bodylevels` and `widthlevels * 4 / costperinch`. Offering body and width in 5E would be two
+ * controls that changed no number — the same fault as the variable Multipower slot before H13.
+ *
+ * HERO Designer does write all eight in both editions (5E's are simply zero — see `Fifth.hdc`),
+ * but nothing here writes `.hdc`, so emitting only what the edition's decorator reads is the
+ * honest shape.
  */
-const FIELD_GROUPS: Readonly<Record<string, FieldGroup>> = {
-    FORCEFIELD: {
-        kind: 'defense',
-        label: 'Points of resistant defence',
-        fields: [
-            {key: 'pd', label: 'rPD'},
-            {key: 'ed', label: 'rED'},
-            {key: 'mental', label: 'Mental'},
-            {key: 'power', label: 'Power'},
-        ],
-    },
+const fieldGroupsFor = (xmlid: string, edition: AuthoringEdition): readonly FieldGroup[] => {
+    if (xmlid === 'FORCEFIELD') {
+        // `getResistantDefense` and the unusual-defense queries read the four levels straight off
+        // the trait. Emitted without them a Resistant Protection costs full price and grants no
+        // defence at all — priced correctly, silently useless.
+        return [DEFENCE_SPLIT];
+    }
+
+    if (xmlid === 'FORCEWALL') {
+        return [
+            DEFENCE_SPLIT,
+            {
+                kind: 'levels',
+                label: edition === '5E' ? 'Size, in inches' : 'Size, in metres',
+                fields:
+                    edition === '5E'
+                        ? [
+                              {key: 'lengthlevels', label: 'Length'},
+                              {key: 'heightlevels', label: 'Height'},
+                          ]
+                        : [
+                              {key: 'lengthlevels', label: 'Length'},
+                              {key: 'heightlevels', label: 'Height'},
+                              {key: 'bodylevels', label: 'BODY'},
+                              // A real `.hdc` carries `WIDTHLEVELS="1.5"`, so this one takes halves.
+                              {key: 'widthlevels', label: 'Width', fractional: true},
+                          ],
+            },
+        ];
+    }
+
+    if (xmlid === 'ENDURANCERESERVE') {
+        // The reserve's END is the power's own `levels`, which every trait already has. Only the
+        // Recovery needs declaring — and it is a nested power rather than a field, which is the
+        // whole reason this one stayed withheld after the others.
+        return [
+            {
+                kind: 'levels',
+                label: 'How fast it refills',
+                subPower: {xmlid: 'ENDURANCERESERVEREC', display: 'Recovery', levelsFrom: 'rec'},
+                fields: [{key: 'rec', label: 'REC'}],
+            },
+        ];
+    }
+
+    if (xmlid === 'DUPLICATION') {
+        return [
+            {
+                kind: 'levels',
+                label: 'The duplicate',
+                fields: [
+                    {key: 'points', label: 'Points it is built on'},
+                    // Priced by `getMultiplierCost`, so this is a count and every *doubling* costs
+                    // 5 — 1 duplicate is free of multiplier cost, 2 is 5, 4 is 10.
+                    {key: 'number', label: 'How many'},
+                ],
+            },
+        ];
+    }
+
+    return [];
 };
 
 /**
@@ -266,11 +382,19 @@ export interface CatalogueTrait {
     /** Non-null when the skill may be taken at familiarity — an 8- roll for a reduced cost. */
     readonly familiarity: {readonly roll: number; readonly cost: number} | null;
     /** Non-null when the trait needs fields no template describes — see {@link FieldGroup}. */
-    readonly fieldGroup: FieldGroup | null;
+    readonly fieldGroups: readonly FieldGroup[];
     /** Non-null for a martial maneuver: the combat line the sheet prints. */
     readonly maneuver: ManeuverProfile | null;
     /** True when the power may carry advantages and limitations. */
     readonly modifiable: boolean;
+    /**
+     * True when the trait is built out of **other powers** rather than out of fields.
+     *
+     * Only Compound Power. `CompoundPower` prices it as the plain sum of its children and ignores
+     * everything the trait itself declares, so the form shows a list of powers instead of the
+     * levels-and-adders it would otherwise draw.
+     */
+    readonly compound: boolean;
     /** Null when it can be authored; otherwise why not. */
     readonly unsupported: Unsupported | null;
 }
@@ -289,8 +413,89 @@ const levelRangeOf = (entry: Obj, label: string): LevelRange | null => {
         max: typeof entry.maxval === 'number' && entry.maxval < 1000 ? entry.maxval : 100,
         perLevel: entry.lvlcost / entry.lvlval,
         label: typeof entry.levelslabel === 'string' ? entry.levelslabel : label,
+        lvlval: entry.lvlval,
+        lvlcost: entry.lvlcost,
     };
 };
+
+/**
+ * The senses, which are the one thing a trait can be built from that lives outside the templates.
+ *
+ * `Flash` is the only trait that reads them. Its `optionid` names the sense group it blinds, and
+ * any *adder* whose xmlid is a sense adds another — but the templates declare no options for
+ * `FLASH` at all, so a form built from the template alone offers nothing to pick and the decorator
+ * reads `undefined`. That is what kept Flash withheld.
+ *
+ * Rather than give Flash a bespoke form, the senses are **injected as ordinary options and adders**.
+ * Everything downstream then works untouched: the picker, `emitTrait`'s `option`/`optionid`/
+ * `optionAlias`, `emitAdder`, and the validator's "needs one of" rule. The data was missing, not
+ * the mechanism.
+ */
+const SENSES = sensesData as unknown as {sensegroup: Obj[]; sense: Obj[]};
+
+/**
+ * What a Flash can blind, as a pick-one.
+ *
+ * **Groups only.** Every one of the 11 Flashes in the corpus names a group, and the decorator
+ * charges `targetingcost * levels` for the primary sense whether it is a group or a single sense —
+ * so offering "Normal Sight" would charge the price of the whole Sight Group for one sense of it.
+ * The template carries `targetinghalfcost`/`nontargetinghalfcost` that nothing reads, which is
+ * probably where a single sense was meant to be priced; until that is settled, offering it would be
+ * offering a wrong number.
+ *
+ * `basecost` is 0 because a Flash's price is per level, computed by its own decorator from the
+ * template's `targetingcost`. Nothing copies an option's basecost onto a trait — only onto an adder.
+ */
+const senseGroupOptions = (): CatalogueOption[] =>
+    SENSES.sensegroup.map((group) => ({xmlid: String(group.xmlid), display: String(group.display ?? group.xmlid), basecost: 0, perLevel: null}));
+
+/**
+ * The extra senses a Flash may also blind, as yes/no adders.
+ *
+ * Groups *and* individual senses, because here the decorator does tell them apart —
+ * `targetinggroupcost` (10) against `targetingsensecost` (5). Their `basecost` is 0 for the same
+ * reason as above: `Flash.cost()` prices a sense adder from the template, never from the adder.
+ *
+ * The template's own two adders are deliberately **not** offered. `Flash.cost()` overrides `cost()`
+ * outright and never calls `totalAdders`, so Alterable Origin and Reduced Negation contribute
+ * nothing on a Flash — they would be controls that changed no number, which is the fault H13's
+ * variable slot had.
+ */
+const senseAdders = (): CatalogueAdder[] =>
+    [...SENSES.sensegroup, ...SENSES.sense].map((sense) => ({
+        xmlid: String(sense.xmlid),
+        display: String(sense.display ?? sense.xmlid),
+        required: false,
+        basecost: 0,
+        options: [],
+        freeText: false,
+        freeTextOption: null,
+        levels: null,
+        adders: [],
+    }));
+
+/**
+ * What a freshly-added trait's declared fields start as: every one of them, at zero.
+ *
+ * Seeded rather than left absent because the decorators that read these add them up unguarded — a
+ * Barrier missing one of its eight prices `NaN`, and `NaN` is not an exception, so
+ * `characterSheet.ts:333` never catches it and the row simply renders blank. `emit` defaults them
+ * too; this is the belt to that pair of braces, and it also opens the form showing zeros rather
+ * than empty boxes.
+ */
+export function blankFields(entry: CatalogueTrait): {defense?: {pd: number; ed: number; mental: number; power: number}; fields?: Record<string, number>} {
+    const seeded: {defense?: {pd: number; ed: number; mental: number; power: number}; fields?: Record<string, number>} = {};
+
+    for (const group of entry.fieldGroups) {
+        if (group.kind === 'defense') {
+            seeded.defense = {pd: 0, ed: 0, mental: 0, power: 0};
+        } else {
+            seeded.fields = {...(seeded.fields ?? {}), ...Object.fromEntries(group.fields.map((field) => [field.key, 0]))};
+        }
+    }
+
+    return seeded;
+}
 
 const optionsOf = (entry: Obj): CatalogueOption[] =>
     asArray(entry.option).map((option) => ({
@@ -362,11 +567,13 @@ const maneuverProfileOf = (entry: Obj): ManeuverProfile | null => {
     };
 };
 
-function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
+function traitOf(entry: Obj, category: AuthorableCategory, edition: AuthoringEdition): CatalogueTrait {
     const xmlid = String(entry.xmlid);
     const choices = characteristicChoicesOf(entry);
-    const options = optionsOf(entry);
-    const adders = asArray(entry.adder).map((adder) => adderOf(adder));
+    // Flash is built from the senses rather than from its own entry — see `SENSES`. It is the only
+    // trait in either edition whose choices come from outside the templates.
+    const options = xmlid === 'FLASH' ? senseGroupOptions() : optionsOf(entry);
+    const adders = xmlid === 'FLASH' ? senseAdders() : asArray(entry.adder).map((adder) => adderOf(adder));
     const levels = levelRangeOf(entry, 'Levels');
     const priced = typeof entry.basecost === 'number' || levels !== null || choices.length > 0 || options.length > 0 || adders.length > 0;
 
@@ -382,11 +589,14 @@ function traitOf(entry: Obj, category: AuthorableCategory): CatalogueTrait {
         adders,
         levels,
         familiarity: typeof entry.familiarityroll === 'number' && typeof entry.familiaritycost === 'number' ? {roll: entry.familiarityroll, cost: entry.familiaritycost} : null,
-        fieldGroup: FIELD_GROUPS[xmlid] ?? null,
+        fieldGroups: fieldGroupsFor(xmlid, edition),
         maneuver: category === 'martialArts' ? maneuverProfileOf(entry) : null,
         // Only powers take advantages and limitations. A skill with an advantage is not a thing.
         modifiable: category === 'powers',
-        unsupported: BESPOKE.has(xmlid) ? 'bespoke' : priced ? null : 'unpriced',
+        compound: xmlid === 'COMPOUNDPOWER',
+        // A compound power declares no cost of its own — it is the sum of its children — so the
+        // `priced` heuristic would call it `unpriced` and withhold it. It is priced, by them.
+        unsupported: BESPOKE.has(xmlid) ? 'bespoke' : priced || xmlid === 'COMPOUNDPOWER' ? null : 'unpriced',
     };
 }
 
@@ -409,7 +619,7 @@ export function catalogue(category: AuthorableCategory, edition: AuthoringEditio
         }
 
         seen.add(xmlid);
-        traits.push(traitOf(entry, category));
+        traits.push(traitOf(entry, category, edition));
     }
 
     return traits;

@@ -61,13 +61,14 @@ describe('the catalogue is what the engine will match against', () => {
         expect(trait('MENTAL_COMBAT_LEVELS', 'skills', '5E')).toBeNull();
     });
 
-    it('withholds the traits whose decorators read fields no template declares, and says so', () => {
-        const bespoke = withheld('skills', '6E').map((entry) => entry.xmlid);
+    it('withholds no skill at all any more, Weapon and Transport Familiarity included', () => {
+        // Both were withheld for a release on the grounds that their decorators read fields no
+        // template declares. They read their *adders*, which the emitter always produced correctly
+        // — what was missing was a control for a yes/no adder. See `BESPOKE` and `unwithheld.test`.
+        expect(withheld('skills', '6E')).toEqual([]);
+        expect(authorable('skills', '6E').map((entry) => entry.xmlid)).toEqual(expect.arrayContaining(['WEAPON_FAMILIARITY', 'TRANSPORT_FAMILIARITY']));
 
-        expect(bespoke).toContain('WEAPON_FAMILIARITY');
-        expect(bespoke).toContain('TRANSPORT_FAMILIARITY');
         // Withheld, not hidden: a caller can count them rather than quietly show a shorter list.
-        expect(withheld('skills', '6E').every((entry) => entry.unsupported !== null)).toBe(true);
         expect(authorable('skills', '6E').every((entry) => entry.unsupported === null)).toBe(true);
         expect(authorable('skills', '6E').length).toBeGreaterThan(50);
     });
@@ -204,7 +205,11 @@ describe('validate — what a skill gets wrong that the engine will not complain
     });
 
     it('rejects a trait this build cannot render a form for, rather than offering a broken one', () => {
-        expect(errors(draft({skills: [{xmlid: 'WEAPON_FAMILIARITY', input: '', adders: [], levels: 0}]}))).toEqual([expect.stringContaining('form of its own')]);
+        // Nothing is withheld as `bespoke` any more, in any category. What is left is `unpriced` —
+        // the sense enhancements, which belong to a sense rather than to a sheet and state no cost.
+        expect(errors(draft({powers: [{xmlid: 'TELESCOPIC', input: '', adders: [], levels: 0, modifiers: []}]}))).toEqual([
+            expect.stringContaining('states no cost, so nothing here could price it'),
+        ]);
     });
 
     it('rejects familiarity on something that does not offer it', () => {

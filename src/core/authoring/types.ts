@@ -251,7 +251,7 @@ export interface AuthoredFramework {
      */
     readonly reserve: number;
     readonly modifiers: readonly AuthoredModifier[];
-    readonly slots: readonly AuthoredPower[];
+    readonly slots: readonly AuthoredSlot[];
 }
 
 /** A power: a trait, plus the advantages and limitations that make it cost what it costs. */
@@ -259,6 +259,48 @@ export interface AuthoredPower extends AuthoredTrait {
     readonly modifiers: readonly AuthoredModifier[];
     /** Only for the powers whose catalogue entry declares a `defense` field group. */
     readonly defense?: AuthoredDefense;
+    /**
+     * Answers to a `levels` field group, keyed by the **trait field the engine reads** —
+     * `lengthlevels`, `bodylevels`, `points`, `number`.
+     *
+     * Keyed that way rather than by some friendlier name because there is nothing to translate
+     * *to*: these exist precisely because no template describes them, so the decorator's field name
+     * is the only name they have. See `fieldGroupsFor` in the catalogue.
+     */
+    readonly fields?: Readonly<Record<string, number>>;
+    /**
+     * The powers a **Compound Power** is made of.
+     *
+     * A compound power is one purchase that does several things at once — a Blast that is also a
+     * Flash — and `CompoundPower` prices it as the plain sum of these. It is the only trait that
+     * contains other traits without being a framework, so it keeps its own list rather than
+     * borrowing {@link AuthoredFramework}'s: a framework's container costs a reserve and discounts
+     * its slots, and a compound power does neither.
+     */
+    readonly powers?: readonly AuthoredPower[];
+}
+
+/**
+ * A power sitting in a framework.
+ *
+ * Its own type only so `variable` has somewhere to live that a standalone power and a piece of
+ * equipment don't — the choice is meaningless off a slot, and an optional field on
+ * {@link AuthoredPower} would have offered it everywhere.
+ */
+export interface AuthoredSlot extends AuthoredPower {
+    /**
+     * A **variable** slot rather than a fixed one: the reserve can be split across it and its
+     * neighbours, and the power run at less than full value. Flexibility is what you pay for, so
+     * it costs a fifth of the power's real cost where a fixed slot costs a tenth.
+     *
+     * **Multipower only.** An Elemental Control slot pays whatever it exceeds the pool by and a
+     * VPP's slots are prefabs, so neither has the distinction; `emit` ignores the flag on those
+     * two rather than writing a field their decorators would never read.
+     *
+     * Defaults to fixed, which is what HERO Designer defaults a new slot to. See H13 in
+     * docs/KNOWN_DEVIATIONS.md — until it was fixed the engine priced both kinds identically.
+     */
+    readonly variable?: boolean;
 }
 
 /**

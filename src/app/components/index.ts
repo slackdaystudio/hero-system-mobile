@@ -22,6 +22,7 @@ export {NumberField, type NumberFieldProps} from './NumberField';
 export {TextField, type TextFieldProps} from './TextField';
 export {SegmentedControl, type Segment, type SegmentedControlProps} from './SegmentedControl';
 export {SelectField, type SelectFieldProps} from './SelectField';
+export {ToggleList, type ToggleItem, type ToggleListProps} from './ToggleList';
 export {TrashIcon, type IconProps} from './icons';
 export {PortraitImage, type PortraitImageProps} from './PortraitImage';
 export {QuickPick, type QuickPickProps} from './QuickPick';

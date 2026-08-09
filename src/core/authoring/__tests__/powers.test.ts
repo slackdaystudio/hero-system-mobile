@@ -130,10 +130,11 @@ describe('the powers catalogue', () => {
         expect(offered).toContain('FORCEFIELD');
         expect(offered.length).toBeGreaterThan(60);
 
-        // Barrier — `FORCEWALL` in the data, in both editions — wants a length/height/width/body
-        // box; Compound Power is a container.
-        expect(notYet).toContain('FORCEWALL');
-        expect(notYet).toContain('COMPOUNDPOWER');
+        // Every power is offered now — Barrier, Duplication, Multiform, Summon, Endurance Reserve,
+        // Flash and Compound Power all came off the list in turn. See `BESPOKE_POWERS`.
+        for (const xmlid of ['FORCEWALL', 'DUPLICATION', 'MULTIFORM', 'SUMMON', 'ENDURANCERESERVE', 'FLASH', 'COMPOUNDPOWER']) {
+            expect(offered).toContain(xmlid);
+        }
         // The sense enhancements state no cost of their own — they belong to a sense, not a sheet.
         expect(notYet).toContain('TELESCOPIC');
     });
@@ -184,8 +185,10 @@ describe('validate — powers', () => {
     });
 
     it('rejects a power that needs a form of its own rather than offering a broken one', () => {
-        expect(errors(draft({powers: [{xmlid: 'FORCEWALL', name: 'Wall', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
-            expect.stringContaining('form of its own'),
+        // No power is withheld as `bespoke` any more. What is left is `unpriced`: the sense
+        // enhancements, which state no cost because they belong to a sense rather than to a sheet.
+        expect(errors(draft({powers: [{xmlid: 'TELESCOPIC', name: 'Zoom', input: '', adders: [], levels: 4, modifiers: []}]}))).toEqual([
+            expect.stringContaining('states no cost, so nothing here could price it'),
         ]);
     });
 });

@@ -253,10 +253,14 @@ categories added no per-trait UI code at all.
 alongside Phase A's `input`/`levels`/`adders`. `CatalogueTrait` likewise.
 
 **Coverage, stated rather than silent.** `authorable()` is what the UI offers; `withheld()` is what
-it does not, and the "Add" field shows the count. In 6E that is 59 of 68 skills, 9 of 13 perks and
-22 of 24 talents. The withheld ones are traits whose decorators read fields no template declares —
-Weapon Familiarity's category/member split, Transport Familiarity's nested adder tree, Autofire
-Skills' per-skill list. Shrinking `BESPOKE` is a later phase, one decorator at a time.
+it does not, and the "Add" field shows the count. Phase B withheld nine skills, four perks and two
+talents on the grounds that their decorators read fields no template declares — "Weapon
+Familiarity's category/member split, Transport Familiarity's nested adder tree, Autofire Skills'
+per-skill list".
+
+**That was wrong, and every skill, perk, talent and maneuver is now offered.** See
+[Shrinking the withheld list](#shrinking-the-withheld-list) — the sentence above was written once
+and believed for a release.
 
 **Two things the engine needed that the template alone doesn't give you:**
 
@@ -339,7 +343,7 @@ The three kinds price slots differently, which is the whole reason they exist:
 
 | Kind | Container | Slot |
 |---|---|---|
-| Multipower | reserve as `basecost` | active ÷ 10 (fixed slot) |
+| Multipower | reserve as `basecost` | active ÷ 10 fixed, ÷ 5 variable |
 | Elemental Control | reserve as `basecost` | active − reserve |
 | Variable Power Pool | pool as **`levels`** | — |
 
@@ -347,18 +351,38 @@ The VPP is the odd one: it states its size in `levels` where the other two use `
 `VariablePowerPool.cost()` reads it accordingly. A 50-point pool costs 75 — the pool plus a control
 cost of half of it.
 
-### A second latent engine bug, found the same way as H2
+### A second latent engine bug, found the same way as H2 — and since fixed
 
-`MultipowerItem` reads `ultraSlot` off the **`CharacterTrait` wrapper** rather than off the trait,
-behind a cast that stops the compiler objecting. The wrapper has no such field, so the read is
-always `undefined` and **every Multipower slot divides by 10** whatever kind of slot it is.
-Confirmed by pricing the same authored slot both ways: 6 either way.
+`MultipowerItem` read `ultraSlot` off the **`CharacterTrait` wrapper** rather than off the trait,
+behind a cast that stopped the compiler objecting. The wrapper has no such field, so the read was
+always `undefined` and **every Multipower slot divided by 10** whatever kind it was. Confirmed at
+the time by pricing the same authored slot both ways: 6 either way.
 
-Not corpus-triggered — all 37 fixtures use fixed slots exclusively, and for a fixed slot ÷10 is
-right — so no golden master can see it. Recorded as **H13**; not fixed here, because that is a
-correctness-pass change with its own commit, its own rules check and its own test. The consequence
-for authoring is that `core/authoring` emits **fixed slots only** and the UI says so, rather than
-offering a variable slot that would silently price as a fixed one.
+Recorded as **H13** and left for the correctness pass, which gated authoring to **fixed slots
+only** through 2.8.0 — offering a choice that changed no number would have been worse than not
+offering it.
+
+**It is fixed now, and how it got settled is the part worth keeping.** The ledger entry said the
+ratio needed a rulebook nobody had. Two things answered it instead:
+
+- **Legacy's own dead code.** Its `attributes()` labels `ULTRA_SLOT="Yes"` as "Variable" (and
+  "Flexible" in 5E). An ultra slot is the *fixed* kind — 6E renamed ultra → fixed, multi → variable
+  — so legacy had the terminology backwards, which means **the ratios were right and hung on the
+  wrong branch**. The bug was never in the arithmetic.
+- **The corpus, which can test a divisor without containing a variable slot.** All 75 fixture slots
+  are fixed, so pricing them checks the *fixed* divisor against budgets HERO Designer balanced:
+  ÷10 lands junkyard exactly on its declared points and greyman, starborne, spyder and twilight
+  within a handful, in both editions. ÷5 puts every one of them 11–39 over.
+
+So: **fixed ÷ 10, variable ÷ 5**, and a slot with no flag at all reads as fixed, because HERO
+Designer writes the attribute on every slot it emits.
+
+Authoring now offers both — on a Multipower only, since an Elemental Control slot pays what it
+exceeds the pool by and a VPP's slots are prefabs. Three places had to learn about it, and the
+middle one is the trap: `AuthoredSlot` carries the flag, `emit` writes it as `ULTRA_SLOT`, and
+**`toSource` had to be taught to store it**. That projection is a whitelist rather than a spread,
+so a field nobody adds to it is dropped on save — a variable slot would have come back fixed, and
+the character quietly cheaper than the player left it, with nothing on screen to say why.
 
 ## What Phase E actually built
 
@@ -375,8 +399,9 @@ correctly and renders with no OCV, no DCV and no effect. Same shape as Phase B's
 the third time this pattern has come up: **the template is consulted for prices, the trait for
 everything else.**
 
-55 of 56 maneuvers are offered in both editions; `WEAPON_ELEMENT` is withheld because it wants a
-list of the weapons a style covers, which no template describes.
+All 56 maneuvers are offered in both editions. `WEAPON_ELEMENT` was withheld "because it wants a
+list of the weapons a style covers, which no template describes" — the template describes them
+perfectly well: they are its adders, and it prices as their sum.
 
 **Equipment is powers in a different bucket** — same catalogue, same modifiers, same field groups,
 because `populateTrait` is called with `('equipment', 'powers', 'power')` and resolves items against
@@ -442,3 +467,265 @@ The chosen allowance is now what gets declared.
 4. **`characterSheet.ts:333`'s try/catch will mask emitter bugs.** A malformed authored trait
    degrades to a cost-0 stub row rather than an error. Build the sheet and read the values when
    verifying; don't just check that nothing threw.
+
+## Shrinking the withheld list
+
+2.8.0 shipped withholding 21 entries. Thirteen of them did not need withholding at all, and finding
+that out is the most useful thing in this section.
+
+### What the list actually said
+
+`BESPOKE`'s comment read: *"Each is a `core/traits` class with its own idea of what the trait
+carries — Transport Familiarity's nested adder tree, Weapon Familiarity's category/member split,
+Autofire Skills' per-skill list. A generic form cannot produce those."*
+
+Reading the decorators instead of the comment:
+
+| Trait | What its decorator actually does |
+|---|---|
+| `TWO_WEAPON_FIGHTING_HTH` | `return 10`. It reads nothing whatsoever. |
+| `RAPID_ATTACK_HTH` | `return 10`, less 1 for an HTH/Ranged-only limitation. |
+| `AUTOFIRE_SKILLS`, `DEFENSE_MANEUVER` | Match `optionid` against `template.option` — the ordinary option mechanism every offered trait already uses. |
+| `WEAPON_FAMILIARITY`, `TRANSPORT_FAMILIARITY`, `WEAPON_ELEMENT` | Sum their **adders**, which the emitter always produced correctly. |
+| `CRAMMING`, `CUSTOMSKILL`, `CUSTOMPERK`, `CUSTOMTALENT` | No decorator at all. `basecost` and `levels`. |
+
+Not one needed a bespoke form. **A "why we can't" comment is a hypothesis** — the same lesson H2
+taught about a ledger entry's corpus-impact line, in a new place. It was written once, believed for
+a release, and cost eleven traits.
+
+### The real blocker was one missing control
+
+The trait form rendered an adder with **no options, no levels and no free text** as `null`, behind a
+comment calling it "a flat yes/no adder — needs a switch, which is its own change". Those adders are
+what a Weapon Familiarity *is*: fourteen independent yes/no purchases.
+
+The same gap was doing far more damage on traits that were **already offered**:
+
+- **Damage Negation and Possession were not buildable.** Their adders are `required`, so `validate`
+  raised an error the form had no control to clear.
+- **No attack could buy a half-die.** `+½d6` is a flat adder on Blast, HKA, RKA, Drain, Aid and the
+  rest.
+- **Animal Handler, Navigation, Weaponsmith and Survival are bought by category**, and every
+  category is a flat adder. The form could only produce the bare skill — 1 point, or 0 for Survival.
+- One level down on **modifiers** it moved the *multiplier*: Area Of Effect could not be made
+  Selective, Charges could not take Clips, Focus could not take Multiple Foci. A power missing those
+  is not merely missing a purchase, it is **priced wrong**.
+
+`ToggleList` fills it — any-number-of-many, as wrapped chips carrying their own price. Levelled-but-
+optionless adders (`+[LVL] DCs`) get a number field instead, and taking one to zero drops it rather
+than storing a zero that would emit an adder worth nothing.
+
+### Group headers are hidden, not offered
+
+Weapon Familiarity's adders are two levels deep and the levels mean different things.
+`COMMONMELEE` costs 2 **and** has seven weapons under it — that is the real "Common Melee Weapons"
+purchase, so it is offered. `UNCOMMONMELEE` costs **0** and has twelve; it is a container, and
+offering it would be a chip that charges nothing and grants nothing.
+
+So `switchesOf` hides an adder that has children and costs nothing. Reaching the weapons underneath
+needs nested adders in `AuthoredAdder`/`emitAdder`, and that in turn needs HERO Designer's
+`SELECTED` semantics settled — a real `.hdc` writes the group with `SELECTED="NO"` around the
+children it did take, and `WeaponFamiliarity.cost()` adds a group's own `basecost` *regardless* of
+`SELECTED`, which would double-charge. **That looks like another latent engine quirk and should be
+measured before anything is built on it.**
+
+### What is still withheld, and what each one wants
+
+Powers only, and every entry now names its own blocker:
+
+**Nothing. The list is empty — every skill, perk, talent, maneuver and power in both editions is
+offered.** Twenty-one entries became none, one mechanism at a time, and not one of them turned out
+to need the bespoke form the list assumed.
+
+What is still *filtered* is the `unpriced` category, which is a different thing: the sense
+enhancements (`TELESCOPIC`, `DISCRIMINATORY`, `MICROSCOPIC` and the rest) state no cost of their own
+because they belong to a **sense** rather than to a sheet, and are bought through the sense that
+carries them.
+
+### Declared fields, generalised — Barrier and Duplication
+
+Both were withheld for the same reason and both wanted the same mechanism. `Barrier.cost()` reads
+**eight** fields off the trait and `Duplication.cost()` reads two, all unguarded, so either priced
+`NaN` without them. Resistant Protection had already solved the shape; it just needed widening.
+
+Two things had to change:
+
+- **A trait can need more than one group.** Barrier needs the four-way defence split *and* a set of
+  dimensions, so `CatalogueTrait.fieldGroup` became `fieldGroups`.
+- **A group can be a plain set of numbers.** `kind: 'levels'` keys each field by the **trait field
+  the engine reads** — `lengthlevels`, `points`, `number` — and the answers ride on the power's
+  `fields` map. There is nothing to translate to: these exist precisely because no template
+  describes them, so the decorator's field name is the only name they have.
+
+**The edition changes which fields exist, not just their prices.** `Barrier.cost()` branches: 5E
+adds `lengthlevels * 2` and `heightlevels * 2` and reads nothing else, where 6E adds length,
+height, `bodylevels` and `widthlevels * 4 / costperinch`. So 5E is offered two fields and 6E four —
+offering BODY in 5E would be a control that changed no number, which is exactly what H13's variable
+slot was. `fieldGroupsFor` therefore takes the edition, and `traitOf` had to start passing it.
+
+HERO Designer does write all eight in both editions (5E's are simply zero — see `Fifth.hdc`), but
+nothing here writes `.hdc`, so emitting only what the edition reads is the honest shape.
+
+**Width is bought in halves.** `m-championsmush` carries `WIDTHLEVELS="1.5"`, so one field is marked
+`fractional` and parsed as a float. At 2 points a metre, truncating that to 1 would quietly cost the
+player 2 points — the kind of silent wrongness the withholding existed to prevent.
+
+**The corpus is the oracle, and it is a strong one.** Five fixtures carry a `FORCEWALL`, so an
+authored Barrier is checked against *the same Barrier imported from a real `.hdc`* rather than
+against my own arithmetic: `m-championsmush`'s "General" comes to 68 both ways, junkyard's to 50.
+Duplication has no fixture anywhere, so it is pinned from the template with the arithmetic named —
+and the one worth stating is that `number` is priced by `getMultiplierCost`, so **5 buys a doubling,
+not a duplicate**: four twins cost 10, not 15.
+
+Every declared field is emitted even when unanswered, and seeded to zero when a trait is added.
+That is deliberate belt and braces: one `undefined` reaching `Barrier.cost()` prices the whole power
+`NaN`, and `NaN` is not an exception, so `characterSheet.ts:333` never catches it and the row simply
+renders blank.
+
+### The one trait that costs by a child trait
+
+Endurance Reserve was the last of the field-group cases and the odd one: **its Recovery is not a
+field, it is a whole nested power.** A `.hdc` writes
+
+```xml
+<POWER XMLID="ENDURANCERESERVE" LEVELS="100">
+  <POWER XMLID="ENDURANCERESERVEREC" LEVELS="10" />
+</POWER>
+```
+
+which the parser turns into `trait.power`, and `EnduranceReserve.cost()` reads
+`trait.power.levels`. **Nothing else in either edition's catalogue costs by a child trait**, so
+`FieldGroup.subPower` is capped at one sub-power carrying one number rather than generalised — the
+same reasoning as the one-level cap on nested adders. Building a tree the data does not have would
+be inventing a shape.
+
+Three details that matter:
+
+- **The reserve's END needs nothing new.** It is the power's own `levels`, which every trait
+  already has. Only the Recovery had to be declared.
+- **The two halves are ceilinged separately.** 6E charges 1 point per 4 END and 2 per 3 REC, each
+  rounded up on its own — so 100 END and 5 REC is 25 + 4 = **29**, not the 28 that ceiling the total
+  would give. 5E is a different pair again: 1 per 10 END and 1 per REC.
+- **The sub-power must not become a second row.** It sits under `power`, and a power's child key is
+  `powers`, so nothing that walks the tree finds it — but if anything did, the meter would count the
+  Recovery twice. There is a test pinning exactly that.
+
+Five corpus fixtures carry an Endurance Reserve, all 5E, and each is checked against its authored
+twin. There is no 6E one anywhere in the corpus, so those numbers come from the template with the
+arithmetic named — `Jay Kwon.hdc` has one (100 END, 5 REC) but is not among the 37 golden-master
+fixtures, so it corroborates rather than proves.
+
+### An adder has no template, and the emitter has to know that
+
+`MULTIFORM` and `SUMMON` were on that table too. They looked generic — levels plus adders — but
+priced `NaN` the moment their adders were answered, so they were held back pending an explanation
+rather than a guess. The explanation had nothing to do with either of them.
+
+**`getCharacter` attaches a `template` to every trait. Nothing attaches one to an adder.** So where
+a trait's decorator reads `trait.template.lvlval`, an adder's reads `adder.lvlval` directly off the
+adder — `totalAdders` does, and so do `variablePowerPool`, `possession`, `leaping` and `reflection`.
+`emitAdder` carried `basecost` and `levels` but not the per-level pair, so any levelled adder
+computed `n / undefined`.
+
+**`NaN` is the worst shape this failure can take.** It is not an exception, so
+`characterSheet.ts:333`'s try/catch never sees it; the row renders with a blank cost and the meter
+silently becomes `NaN` as well. It is the silent-zero trap with the volume turned up.
+
+It was latent until now only because **nothing could set an adder's levels** — the trait form
+rendered optionless adders as nothing, and the modifier form only ever set `option`. Adding the
+number field would have made it live across roughly forty offered traits in each edition: every
+`REDUCEDNEGATION`, `IMPROVEDNONCOMBAT`, `FLASHDEFENSE` on a Force Field, and Damage Negation's DCs.
+
+The fix carries the **real** `lvlval`/`lvlcost` rather than a derived `{lvlval: 1, lvlcost: perLevel}`.
+Those price identically through `totalAdders`, which is a ratio — but `baseCost` feeds the same two
+fields to `getMultiplierCost`, whose arithmetic is multiplicative, and there the substitution would
+be wrong. `LevelRange` therefore keeps the raw pair alongside the ratio.
+
+The general lesson, and it is the same one twice in one change: **when a trait prices oddly, ask
+what the engine reads it off before asking what is special about the trait.** Multiform and Summon
+were withheld for a release for a bug that was in neither of them.
+
+### The one trait built from data that is not a template
+
+Flash was the last withheld power, and it was withheld for a reason none of the others had: **its
+choices do not live in the templates at all.** Its `optionid` names a sense group and any adder
+whose xmlid is a sense adds another, but `FLASH`'s template entry declares no `option` list. The
+senses are in `Senses.json`, a separate file the engine reads directly.
+
+So a form built from the template offered nothing to pick, and `Flash.cost()` then called
+`.endsWith` on a missing `optionid` — it did not mis-price, it **threw**, and
+`characterSheet.ts:333` turned that into a cost-0 stub row.
+
+The fix is not a bespoke form. The senses are **injected as ordinary options and adders**, and
+everything downstream works untouched: the picker, `emitTrait`'s `option`/`optionid`/`optionAlias`,
+`emitAdder`, and the validator's "needs one of" rule. **The data was missing, not the mechanism** —
+which is the same shape as the yes/no adder gap, one layer further out.
+
+Three judgement calls worth recording:
+
+- **Groups only, for the sense being blinded.** All ten Flashes in the corpus name a group, and the
+  decorator charges `targetingcost * levels` for the primary whether it is a group or a single
+  sense — so offering "Normal Sight" would charge the price of the whole Sight Group for one sense
+  of it. The template carries `targetinghalfcost`/`nontargetinghalfcost` that **nothing reads**,
+  which is probably where a single sense was meant to be priced. Until that is settled, offering it
+  would be offering a wrong number.
+- **Groups *and* senses for the extras**, because there the decorator does tell them apart:
+  `targetinggroupcost` (10) against `targetingsensecost` (5).
+- **The template's own adders are withheld.** `Flash.cost()` overrides `cost()` outright and never
+  calls `totalAdders`, so Alterable Origin — +5 on any other attack power — contributes **nothing**
+  on a Flash. Verified, not assumed. Offering it would be a control that changed no number, which is
+  precisely the fault H13's variable slot had.
+
+That last point is worth a ledger entry of its own eventually: an attack power silently ignoring its
+own adders is either a rules subtlety or a bug, and no fixture can tell us which — none of the ten
+corpus Flashes carries an adder at all.
+
+All ten are checked against their authored twins, in both editions.
+
+### Compound Power, and the counting bug it exposed
+
+A compound power is one purchase that does several things at once — a Blast that is also a Flash —
+and `CompoundPower` prices it as the plain **sum** of the powers inside it. It is the only trait
+that contains other traits without being a framework, so it carries its own child list
+(`AuthoredPower.powers`) and `TraitAddress` gains a `compound` shape. Emitting was the easy half.
+
+**The hard half was counting, and it was already wrong.** `spendOf` walked every container with
+`withDescendants` and priced every node it found. For a Multipower that is right — the container
+costs its reserve and each slot costs a fraction on top. For a container that **already totals its
+own contents** it double-charges:
+
+- **A compound power.** `aoe`'s costs 60 and its two children another 60 between them. Worse inside
+  a framework, where the total is then divided: `gravity-girl`'s compound slot costs 5 against
+  children summing 49, so the pair read 54 for what costs 5.
+- **A Variable Power Pool.** Its contents are *free* — the player pays for the pool and the control
+  that steers it, which is why the engine has no VPP-slot decorator to divide anything. **This one
+  shipped in 2.8.0**: an authored VPP with two powers in it read 165 where it costs 75.
+
+So `spendOf` now stops at a container that totals its own contents, and descends everything else.
+All four look identical to a tree walk, which is why this is a predicate in `spend.ts` rather than a
+flag on `withDescendants`. The corroboration is the corpus: `mikayla-priestess`, a real VPP
+character, went from a nonsense 1254 to **441 against a 450-point budget**.
+
+It is the same family as **H5** in the ledger ("VPP contents counted toward totals"), which was
+fixed for the defence and movement queries and left standing here — one consumer along, found only
+because a new feature made the same walk matter for points.
+
+Two things Compound Power deliberately does not offer, both verified rather than assumed:
+
+- **Advantages and limitations on the compound power itself.** `CompoundPower.realCost()` sums its
+  children and discards its own `ModifierCalculator`, so an Obvious Accessible Focus there leaves
+  the cost at 50 where the same limitation on a *child* takes it to 25. The player limits the child.
+- **A compound power inside a compound power.** Neither edition's data has one, and `CompoundPower`
+  flattens whatever it finds anyway.
+
+Both are the H13 rule applied ahead of time: do not ship a control that changes no number.
+
+### A dead entry is invisible
+
+`VPP` sat in the withheld list for the whole life of the feature and **matched nothing** — there is
+no `VPP` entry in either edition's *power* catalogue, because a Variable Power Pool is a framework
+and is authored as one. So it silently explained a gap that was never there.
+
+Worth remembering when a "not yet supported" list is the thing telling players what the app cannot
+do: an entry that matches nothing costs nothing to keep and is never noticed, so a list like that
+wants checking against the catalogue occasionally rather than only being read.

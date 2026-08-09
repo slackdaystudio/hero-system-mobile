@@ -30,16 +30,21 @@
 import React, {useMemo} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {
+    authorable,
+    blankFields,
     modifiers,
     trait as catalogueTrait,
+    type AuthoredFramework,
+    type AuthoredDefense,
     type AuthoredModifier,
     type AuthoredPower,
     type AuthoredTrait,
     type AuthoringEdition,
+    type CatalogueAdder,
     type CatalogueTrait,
     type FieldGroup,
 } from 'core/authoring';
-import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField} from 'app/components';
+import {Button, Card, NumberField, Screen, SegmentedControl, SelectField, Text, TextField, ToggleList} from 'app/components';
 import {useAuthoringDraft, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 
 export interface AuthorTraitScreenProps {
@@ -48,6 +53,13 @@ export interface AuthorTraitScreenProps {
     /** The catalogue category the trait is drawn from — equipment and powers share one. */
     category: 'skills' | 'perks' | 'talents' | 'powers' | 'martialArts' | 'disadvantages';
     onDone: () => void;
+    /**
+     * Open the form for a power *inside* this one — a Compound Power's children.
+     *
+     * The only place a trait form leads to another trait form. Absent when there is nowhere to go,
+     * so the rows do nothing rather than the screen having to know it is inside a navigator.
+     */
+    onEditChild?: (address: TraitAddress) => void;
 }
 
 /**
@@ -57,11 +69,16 @@ export interface AuthorTraitScreenProps {
  * reopened after a build that dropped the entry. Both render a note and a way out rather than
  * throwing inside a screen the player cannot leave.
  */
-export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreenProps): React.JSX.Element {
+export function AuthorTraitScreen({address, category, onDone, onEditChild}: AuthorTraitScreenProps): React.JSX.Element {
     const {draft, traitAt, frameworkAt, replaceFramework, replaceAt, removeAt} = useAuthoringDraft();
     const value = traitAt(address);
     const entry = useMemo(() => (value === null ? null : catalogueTrait(value.xmlid, category, draft.edition)), [value, category, draft.edition]);
     const pool = address.kind === 'pool' ? frameworkAt(address.framework) : null;
+    // A slot's own address and framework, so the form can offer the things only a slot has. Read
+    // here rather than off `value`, which is typed to the trait and drops them. Held as a `const`
+    // so the narrowing survives into the callbacks below.
+    const slotAddress = address.kind === 'slot' ? address : null;
+    const holder = slotAddress === null ? null : frameworkAt(slotAddress.framework);
 
     // A framework's pool carries advantages and limitations but is not a trait — it has no
     // catalogue entry, no levels of its own and nothing to pick. Only the modifier editor applies.
@@ -113,8 +130,8 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
             <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
                 <Card>
                     <TraitRow
-                        index={address.index}
-                        draftKey={address.kind === 'trait' ? address.key : `framework-${address.framework}-slot`}
+                        index={address.kind === 'compound' ? address.child : address.index}
+                        draftKey={draftKeyFor(address)}
                         edition={draft.edition}
                         entry={entry}
                         trait={value}
@@ -124,6 +141,29 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
                             onDone();
                         }}
                     />
+
+                    {entry.compound && address.kind === 'trait' ? (
+                        <CompoundPowers
+                            id={draftKeyFor(address)}
+                            edition={draft.edition}
+                            power={value as AuthoredPower}
+                            onChange={(revised) => replaceAt(address, revised)}
+                            onEditChild={
+                                onEditChild === undefined
+                                    ? undefined
+                                    : (child) => onEditChild({kind: 'compound', key: address.key, index: address.index, child})
+                            }
+                        />
+                    ) : null}
+
+                    {slotAddress !== null && holder !== null && holder.kind === 'multipower' ? (
+                        <SlotKind
+                            framework={holder}
+                            index={slotAddress.index}
+                            edition={draft.edition}
+                            onChange={(revised) => replaceFramework(slotAddress.framework, revised)}
+                        />
+                    ) : null}
                 </Card>
 
                 <View style={styles.actions}>
@@ -131,6 +171,157 @@ export function AuthorTraitScreen({address, category, onDone}: AuthorTraitScreen
                 </View>
             </ScrollView>
         </Screen>
+    );
+}
+
+/** A stable prefix for a form's testIDs, distinct per address so two forms never collide. */
+const draftKeyFor = (address: TraitAddress): string => {
+    switch (address.kind) {
+        case 'trait':
+            return address.key;
+        case 'compound':
+            return `${address.key}-${address.index}-child`;
+        default:
+            return `framework-${address.framework}-slot`;
+    }
+};
+
+/**
+ * The powers a Compound Power is made of.
+ *
+ * A compound power is one purchase that does several things at once, and `CompoundPower` prices it
+ * as the plain **sum** of these — so this list is the whole of what it costs.
+ *
+ * Two things it deliberately does not offer, both because they change no number:
+ *
+ * - **Advantages and limitations on the compound power itself.** `CompoundPower.realCost()` sums
+ *   its children and discards its own `ModifierCalculator`, so an Obvious Accessible Focus here
+ *   leaves the cost at 50 where the same limitation on a *child* takes it to 25. Verified, not
+ *   assumed. The player limits the child.
+ * - **Levels and adders**, for the same reason: nothing reads them.
+ */
+function CompoundPowers({
+    id,
+    edition,
+    power,
+    onChange,
+    onEditChild,
+}: {
+    id: string;
+    edition: AuthoringEdition;
+    power: AuthoredPower;
+    onChange: (trait: AuthoredTrait) => void;
+    onEditChild?: (child: number) => void;
+}): React.JSX.Element {
+    const available = useMemo(() => authorable('powers', edition).filter((candidate) => !candidate.compound), [edition]);
+    const children = power.powers ?? [];
+
+    return (
+        <View style={styles.fields} testID={`author-compound-${id}`}>
+            <Text variant="label" muted>
+                POWERS IN IT
+            </Text>
+
+            {children.map((child, order) => (
+                <Button
+                    key={`${child.xmlid}-${order}`}
+                    label={child.name?.trim() === '' || child.name === undefined ? child.xmlid : child.name}
+                    onPress={() => onEditChild?.(order)}
+                    variant="secondary"
+                    testID={`author-compound-${id}-row-${order}`}
+                />
+            ))}
+
+            <SelectField
+                label="Add a power to this one"
+                value=""
+                options={available.map((candidate) => candidate.display)}
+                onChange={(display) => {
+                    const candidate = available.find((option) => option.display === display);
+
+                    if (candidate === undefined) {
+                        return;
+                    }
+
+                    onChange({
+                        ...power,
+                        powers: [
+                            ...children,
+                            {
+                                xmlid: candidate.xmlid,
+                                input: '',
+                                adders: [],
+                                levels: 0,
+                                modifiers: [],
+                                ...blankFields(candidate),
+                            },
+                        ],
+                    } as AuthoredTrait);
+                    onEditChild?.(children.length);
+                }}
+                // A compound power inside a compound power is not a shape the data has, and
+                // `CompoundPower` would flatten it anyway.
+                hint="Its cost is the total of these"
+                testID={`author-compound-${id}-add`}
+            />
+        </View>
+    );
+}
+
+/**
+ * Fixed or variable, for one Multipower slot.
+ *
+ * **Multipower only**, which is why it is rendered from the address rather than from the trait: an
+ * Elemental Control slot pays whatever it exceeds the pool by and a VPP's slots are prefabs, so
+ * neither has the choice. Offering it there would be a control that changed no number — which is
+ * exactly the state this whole screen was in before H13 was fixed.
+ *
+ * The two editions name the same two things differently, so the labels follow the edition the
+ * character is being built in rather than picking one vocabulary and making half the players
+ * translate.
+ */
+function SlotKind({
+    framework,
+    index,
+    edition,
+    onChange,
+}: {
+    framework: AuthoredFramework;
+    index: number;
+    edition: AuthoringEdition;
+    onChange: (framework: AuthoredFramework) => void;
+}): React.JSX.Element {
+    const fifth = edition === '5E';
+    const slot = framework.slots[index];
+
+    const variable = slot?.variable === true;
+
+    return (
+        <View style={styles.fields} testID={`author-slot-kind-${index}`}>
+            <Text variant="label" muted>
+                SLOT
+            </Text>
+
+            <SegmentedControl
+                segments={[
+                    {value: 'fixed', label: fifth ? 'Ultra slot' : 'Fixed slot'},
+                    {value: 'variable', label: fifth ? 'Multi slot' : 'Variable slot'},
+                ]}
+                value={variable ? 'variable' : 'fixed'}
+                onChange={(mode) =>
+                    onChange({
+                        ...framework,
+                        slots: framework.slots.map((entry, order) => (order === index ? {...entry, variable: mode === 'variable'} : entry)),
+                    })
+                }
+            />
+
+            {/* A fixed slot runs at full value and only one at a time; a variable slot can take a
+                share of the reserve and run alongside its neighbours. Flexibility is what costs. */}
+            <Text variant="caption" muted>
+                {variable ? 'Costs a fifth of the power — the reserve splits across slots' : 'Costs a tenth of the power — one slot at full value'}
+            </Text>
+        </View>
     );
 }
 
@@ -161,6 +352,14 @@ function TraitRow({
         onChange({...trait, adders});
     };
 
+    /** Taking or dropping a yes/no adder. Present on the list *is* taken — see `emitAdder`. */
+    const toggleAdder = (xmlid: string, selected: boolean): void =>
+        onChange({...trait, adders: selected ? [...trait.adders, {xmlid}] : trait.adders.filter((adder) => adder.xmlid !== xmlid)});
+
+    // Fourteen independent purchases on a Weapon Familiarity, "+½d6" on any attack, and the
+    // *required* ones on Damage Negation and Possession — see `switchesOf`.
+    const switches = switchesOf(entry);
+
     return (
         <View style={styles.complication}>
             <View style={styles.complicationHead}>
@@ -190,7 +389,13 @@ function TraitRow({
                 />
             )}
 
-            {entry.fieldGroup === null ? null : <DefenseFields id={id} group={entry.fieldGroup} trait={trait} onChange={onChange} />}
+            {entry.fieldGroups.map((group) =>
+                group.kind === 'defense' ? (
+                    <DefenseFields key={group.label} id={id} group={group} trait={trait} onChange={onChange} />
+                ) : (
+                    <LevelFields key={group.label} id={id} group={group} trait={trait} onChange={onChange} />
+                ),
+            )}
 
             {entry.familiarity === null ? null : (
                 <SegmentedControl
@@ -263,7 +468,26 @@ function TraitRow({
                 }
 
                 if (adder.options.length === 0) {
-                    return null; // a flat yes/no adder — needs a switch, which is its own change
+                    // Levelled but optionless — "+[LVL] DCs" on Damage Negation, "+[LVL] Points of
+                    // Mind Control effect" on Possession. A number, not a switch; and taking it to
+                    // zero drops it, so there is one way to say "not this one".
+                    if (adder.levels !== null) {
+                        return (
+                            <NumberField
+                                key={adder.xmlid}
+                                label={adder.required ? adder.display : `${adder.display} (optional)`}
+                                value={String(chosen?.levels ?? 0)}
+                                onChangeText={(text) => {
+                                    const levels = Math.max(0, Number.parseInt(text, 10) || 0);
+
+                                    return levels === 0 ? toggleAdder(adder.xmlid, false) : setAdder(adder.xmlid, {levels});
+                                }}
+                                testID={`author-adder-${id}-${adder.xmlid}`}
+                            />
+                        );
+                    }
+
+                    return null; // a plain yes/no — rendered together as chips, below
                 }
 
                 return (
@@ -278,7 +502,21 @@ function TraitRow({
                 );
             })}
 
-            {entry.modifiable ? <Modifiers id={id} edition={edition} power={trait as AuthoredPower} onChange={onChange} /> : null}
+            {switches.length === 0 ? null : (
+                <ToggleList
+                    label={switches.some((adder) => adder.required) ? 'OPTIONS' : 'OPTIONS (ALL OPTIONAL)'}
+                    items={switches.map((adder) => ({
+                        key: adder.xmlid,
+                        label: adder.display,
+                        cost: adder.basecost,
+                        selected: trait.adders.some((chosen) => chosen.xmlid === adder.xmlid),
+                    }))}
+                    onToggle={toggleAdder}
+                    testID={`author-switches-${id}`}
+                />
+            )}
+
+            {entry.modifiable && !entry.compound ? <Modifiers id={id} edition={edition} power={trait as AuthoredPower} onChange={onChange} /> : null}
         </View>
     );
 }
@@ -312,11 +550,60 @@ function DefenseFields({
                     <View key={field.key} style={styles.gridCell}>
                         <NumberField
                             label={field.label}
-                            value={String(defense[field.key])}
+                            value={String(defense[field.key as keyof AuthoredDefense])}
                             onChangeText={(text) =>
                                 onChange({...trait, defense: {...defense, [field.key]: Math.max(0, Number.parseInt(text, 10) || 0)}} as AuthoredTrait)
                             }
                             testID={`author-defense-${id}-${field.key}`}
+                        />
+                    </View>
+                ))}
+            </View>
+        </View>
+    );
+}
+
+/**
+ * The numbers a power's own decorator reads that no template describes — Barrier's dimensions,
+ * Duplication's point total and count.
+ *
+ * The general case of {@link DefenseFields}, and it needs no translation layer: a `levels` group's
+ * keys **are** the trait fields, so what the player types lands on `fields` under the name the
+ * decorator will look it up by. That is why these two powers were withheld — `Barrier.cost()` sums
+ * eight such fields unguarded, and one missing number prices the whole power `NaN`.
+ */
+function LevelFields({
+    id,
+    group,
+    trait,
+    onChange,
+}: {
+    id: string;
+    group: FieldGroup;
+    trait: AuthoredTrait;
+    onChange: (trait: AuthoredTrait) => void;
+}): React.JSX.Element {
+    const fields = (trait as AuthoredPower).fields ?? {};
+
+    return (
+        <View>
+            <Text variant="caption" muted>
+                {group.label}
+            </Text>
+            <View style={styles.grid}>
+                {group.fields.map((field) => (
+                    <View key={field.key} style={styles.gridCell}>
+                        <NumberField
+                            label={field.label}
+                            value={String(fields[field.key] ?? 0)}
+                            onChangeText={(text) => {
+                                // Width is bought in halves and a real `.hdc` carries
+                                // `WIDTHLEVELS="1.5"`; everything beside it is whole units.
+                                const parsed = field.fractional === true ? Number.parseFloat(text) : Number.parseInt(text, 10);
+
+                                onChange({...trait, fields: {...fields, [field.key]: Math.max(0, Number.isFinite(parsed) ? parsed : 0)}} as AuthoredTrait);
+                            }}
+                            testID={`author-field-${id}-${field.key}`}
                         />
                     </View>
                 ))}
@@ -332,6 +619,29 @@ function DefenseFields({
  * than a property of the modifier — `ModifierCalculator` splits them on exactly that, and an
  * option can flip a modifier from one to the other.
  */
+/**
+ * The adders that are a plain yes/no: no options to pick, no levels to buy, no text to type.
+ *
+ * They render as one chip list rather than a control each. Before {@link ToggleList} they rendered
+ * as **nothing**, on traits and modifiers alike — which is why Damage Negation could not answer its
+ * own required adders, no attack could buy a half-die, and an Area Of Effect could not be made
+ * Selective.
+ */
+const switchesOf = (entry: {adders: readonly CatalogueAdder[]}): readonly CatalogueAdder[] =>
+    entry.adders.filter((adder) => !adder.freeText && adder.options.length === 0 && adder.levels === null && !isContainer(adder));
+
+/**
+ * A group header rather than a purchase: it has sub-choices and costs nothing itself.
+ *
+ * Weapon Familiarity is the clearest case. `COMMONMELEE` costs 2 *and* has seven weapons under it —
+ * that is the real "Common Melee Weapons" purchase, so it is offered. `UNCOMMONMELEE` costs 0 and
+ * has twelve; buying it would take a chip, charge nothing and grant nothing. Its weapons are the
+ * purchase, one point each, and reaching them needs nested adders — which needs HERO Designer's
+ * `SELECTED` semantics settled first. Until then a container is hidden rather than offered as a
+ * free no-op.
+ */
+const isContainer = (adder: CatalogueAdder): boolean => adder.adders.length > 0 && adder.basecost === 0;
+
 function Modifiers({
     id,
     edition,
@@ -433,6 +743,29 @@ function Modifiers({
                                 />
                             );
                         })}
+
+                        {/* The same yes/no adders the trait form was missing, one level down — and
+                            here they move the *multiplier*, so a power without them is not merely
+                            missing a purchase, it is priced wrong. Area Of Effect's Selective,
+                            Charges' Clips, Focus' Multiple Foci: all standard, none reachable. */}
+                        {switchesOf(entry).length === 0 ? null : (
+                            <ToggleList
+                                label={`${entry.display.toUpperCase()} — OPTIONS`}
+                                items={switchesOf(entry).map((adder) => ({
+                                    key: adder.xmlid,
+                                    label: adder.display,
+                                    cost: adder.basecost,
+                                    selected: applied.adders.some((candidate) => candidate.xmlid === adder.xmlid),
+                                }))}
+                                onToggle={(xmlid, selected) =>
+                                    update(index, {
+                                        ...applied,
+                                        adders: selected ? [...applied.adders, {xmlid}] : applied.adders.filter((candidate) => candidate.xmlid !== xmlid),
+                                    })
+                                }
+                                testID={`author-modifier-switches-${modifierId}`}
+                            />
+                        )}
                     </View>
                 );
             })}

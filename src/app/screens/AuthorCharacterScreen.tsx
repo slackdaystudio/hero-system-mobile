@@ -29,6 +29,7 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {Alert, Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {
     authorable,
+    blankFields,
     build,
     characteristics as catalogueCharacteristics,
     allowanceFor,
@@ -44,6 +45,7 @@ import {
     type AuthorableCategory,
     type AuthoredCharacter,
     type AuthoredFramework,
+    type AuthoredSlot,
     type AuthoringEdition,
     type FrameworkKind,
     type Problem,
@@ -450,7 +452,7 @@ function TraitSection({
                     levels: 0,
                     ...(entry.characteristics.length === 1 ? {characteristic: entry.characteristics[0].characteristic} : {}),
                     ...(entry.modifiable ? {modifiers: []} : {}),
-                    ...(entry.fieldGroup === null ? {} : {defense: {pd: 0, ed: 0, mental: 0, power: 0}}),
+                    ...blankFields(entry),
                 },
             ],
         });
@@ -531,6 +533,16 @@ const FRAMEWORK_KINDS: Array<{value: FrameworkKind; label: string}> = [
 ];
 
 /**
+ * A slot's row label, with its kind when the kind is a choice.
+ *
+ * 5E and 6E name the same two things differently — ultra/multi became fixed/variable — so the
+ * suffix follows the edition the character is being built in. A fixed slot says nothing: it is the
+ * default, and labelling the common case only adds noise to every row.
+ */
+const slotLabel = (label: string, framework: AuthoredFramework, slot: AuthoredSlot, edition: AuthoringEdition): string =>
+    framework.kind === 'multipower' && slot.variable === true ? `${label} · ${edition === '5E' ? 'multi' : 'variable'}` : label;
+
+/**
  * Power frameworks: a pool, and the powers drawing on it.
  *
  * The pool's own fields stay here — a name and a reserve are two lines, and a framework is mostly
@@ -607,7 +619,11 @@ function Frameworks({
                         {framework.slots.map((slot, order) => (
                             <TraitListRow
                                 key={`${slot.xmlid}-${order}`}
-                                label={rows[index]?.slots[order]?.label ?? slot.xmlid}
+                                // The kind rides on the label so the list shows it without the
+                                // player opening every slot — two slots of the same power at
+                                // different costs is otherwise unreadable. Only a Multipower has
+                                // the distinction, so only a Multipower says anything.
+                                label={slotLabel(rows[index]?.slots[order]?.label ?? slot.xmlid, framework, slot, draft.edition)}
                                 cost={rows[index]?.slots[order]?.cost ?? 0}
                                 onPress={() => onEdit({kind: 'slot', framework: index, index: order}, 'powers')}
                                 testID={`author-row-framework-${index}-slot-${order}`}
@@ -633,7 +649,7 @@ function Frameworks({
                                                 adders: [],
                                                 levels: 0,
                                                 modifiers: [],
-                                                ...(entry.fieldGroup === null ? {} : {defense: {pd: 0, ed: 0, mental: 0, power: 0}}),
+                                                ...blankFields(entry),
                                             },
                                         ],
                                     });
@@ -645,17 +661,7 @@ function Frameworks({
                     </View>
                 ))}
 
-                <SelectField
-                    label="Add"
-                    value=""
-                    options={FRAMEWORK_KINDS.map((kind) => kind.label)}
-                    onChange={add}
-                    // Fixed slots only — the variable kind's divisor is unreachable in the engine
-                    // (H13 in docs/KNOWN_DEVIATIONS.md), so offering it would price a variable slot
-                    // as a fixed one and say nothing about it.
-                    hint="Slots are fixed slots"
-                    testID="author-add-framework"
-                />
+                <SelectField label="Add" value="" options={FRAMEWORK_KINDS.map((kind) => kind.label)} onChange={add} testID="author-add-framework" />
             </View>
         </Card>
     );
