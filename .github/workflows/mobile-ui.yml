@@ -16,7 +16,7 @@ name: Mobile UI (E2E)
 on:
     pull_request:
     push:
-        branches: [rebuild]
+        branches: [master]
     workflow_dispatch:
         inputs:
             visual_gate:

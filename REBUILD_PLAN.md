@@ -74,8 +74,8 @@
   device-validated (`migrateV1`/`legacySource`). Remaining: full parity pass (incl. the
   deferred Phase-1 correctness fixes in `docs/KNOWN_DEVIATIONS.md`), store releases.
 
-> The living copy of this plan is on the `rebuild` branch (in `../hsm-rebuild`), where
-> active work happens. This `master` copy is the historical/reference snapshot.
+> The living copy of this plan is on `master` (in `../hsm-rebuild`), where active work
+> happens. The `legacy` branch carries the historical/reference snapshot.
 
 ## Goal & guiding principle
 
@@ -205,6 +205,12 @@ clean-room (it's our own code), so keeping the old code reachable is an asset â€
 the golden-master tests.
 
 Isolation approach: **orphan branch in a sibling worktree**.
+
+> **The branch names below are historical.** They are what was actually run at the time.
+> Once 2.9.0 shipped, the branches were swapped by rename: the orphan `rebuild` branch
+> became **`master`** (and the repo default), and the legacy app became **`legacy`**.
+> Read `master` below as today's `legacy`, and `rebuild` as today's `master`. The two
+> still share no common ancestor.
 
 - The **primary directory stays on `master`** (the legacy app) â€” it already carries the
   installed toolchain (`node_modules`, built `android/`/`ios/`) and the store/release config.

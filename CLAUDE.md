@@ -1,7 +1,9 @@
 # CLAUDE.md — HERO System Mobile (clean-room rebuild)
 
-This is the **`rebuild` branch** of HERO System Mobile: a from-scratch, modern
-React Native **0.79.2 + TypeScript** rebuild of the legacy app. `REBUILD_PLAN.md` has the
+This is the **`master` branch** of HERO System Mobile: a from-scratch, modern
+React Native **0.79.2 + TypeScript** rebuild of the legacy app. It was built on an orphan
+`rebuild` branch and promoted to `master` once 2.9.0 shipped in both stores; the
+pre-rebuild app now lives on `legacy`. `REBUILD_PLAN.md` has the
 full architecture and the reasoning behind it — but its Progress section has drifted, so
 take **Status** below as authoritative for where things stand.
 
@@ -10,12 +12,14 @@ Other docs: [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) (read before 
 
 ## Worktree layout (important)
 
-This is a git **worktree** on the orphan `rebuild` branch. The legacy app lives in a
-sibling worktree on `master`:
+This is a git **worktree** on `master` — the rebuild, which shares **no common ancestor**
+with the pre-rebuild history. That history lives on `legacy`, checked out in a sibling
+worktree:
 
-- `/home/sentry0/apps/hsm-rebuild` — **this dir** — the fresh rebuild (`rebuild` branch)
-- `/home/sentry0/apps/hero-system-mobile` — legacy app (`master`), the source we port from
-  and the golden-master reference. Its `src/lib/` and `src/decorators/` are what we pilfer.
+- `/home/sentry0/apps/hsm-rebuild` — **this dir** — the rebuild (`master` branch)
+- `/home/sentry0/apps/hero-system-mobile` — legacy app (`legacy` branch), the source we
+  port from and the golden-master reference. Its `src/lib/` and `src/decorators/` are
+  what we pilfer.
 
 The two share one `.git`. Don't confuse the two trees.
 

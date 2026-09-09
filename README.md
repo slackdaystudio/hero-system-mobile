@@ -8,7 +8,7 @@ Available since 2018 on:
 [![Google Play](https://img.shields.io/badge/Google_Play-HERO_System_Mobile-414141?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.herogmtools)
 [![Amazon Appstore](https://img.shields.io/badge/Amazon_Appstore-HERO_System_Mobile-FF9900?logo=amazon&logoColor=white)](https://www.amazon.ca/Phil-Guinchard-HERO-System-Mobile/dp/B07BJ9879M)
 
-[![Mobile UI (E2E)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml/badge.svg?branch=rebuild)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml)
+[![Mobile UI (E2E)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml/badge.svg?branch=master)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml)
 
 Free means free: no ads, no tracking, no upsells — and it will stay that way.
 
