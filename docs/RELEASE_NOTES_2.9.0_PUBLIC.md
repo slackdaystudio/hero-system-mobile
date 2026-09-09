@@ -191,3 +191,142 @@ Some key features:
   App Review notes claim.
 - **Not mentioned: Cost Cruncher.** It's in neither the old description nor this one, so
   nothing needs saying — but don't re-add it from an older draft, it isn't built.
+
+## Forum post — the cutover announcement (HERO Games forums)
+
+This is **not** the per-release post template in `RELEASE_NOTES_2.9.0.md`. That one is
+written for the tester thread and spans 2.8.0 → 2.9.0. This one is public and spans
+**2.1.13 → 2.9.0** — the whole rebuild, arriving at once, for people who have never seen
+any of it. Post it as a new thread rather than a reply in the release thread.
+
+The forums take Markdown, so `#` headings and the usual emphasis work.
+
+Two things it deliberately does: it leads with the migration (that is the only question a
+returning user actually has), and it puts the changed point totals in their own section
+under a heading that says what they are. Burying that is how you earn a one-star review
+from someone who is *correct* that the number moved.
+
+---
+
+# HERO System Mobile has been rebuilt from the ground up
+
+If you have this app installed, the update that just landed is not a normal update. The
+version on the store had been sitting at 2.1.13 since January. 2.9.0 replaces essentially
+all of it — new rules engine, new storage, new interface — so everything below arrives at
+once rather than in the dribs and drabs it was actually built in.
+
+**Your characters come across.** The first time you open it, it migrates what the old app
+had saved: your characters, your settings, your dice statistics. There is nothing to
+export and nothing to re-import. If something doesn't make the trip, that's a bug and I
+want to hear about it — please say so before you reinstall, because reinstalling destroys
+the evidence.
+
+## You can build a character in the app now
+
+This is the big one. Characters → **New**.
+
+Characteristics, skills, perks, talents, powers with their advantages and limitations,
+martial arts, Multipowers and Elemental Controls and VPPs, complications — all of it, in
+both 5th and 6th edition. It prices as you type, using **the same engine that reads a HERO
+Designer `.hdc` file**. That's the part I care about: the total it shows you is the total
+HERO Designer shows you, because it is not a second implementation of the rules that has
+to be kept in sync with the first one.
+
+Set your campaign's point allowance and anything past it counts as earned experience —
+5E quotes base points with disadvantages adding to them, 6E quotes total points with
+complications granting nothing, and the labels say which so you're never guessing which
+convention you're looking at.
+
+## You can roll one up
+
+Characters → **Generate** deals you a **hand of five** complete, legal characters and you
+keep the one you like. 5th Edition Low Powered on 250 points, or 6th Edition Standard on
+400. Nothing is saved until you pick one — the four you didn't take never existed.
+
+They're built, not sketched. Every point is priced by the same engine, so if it says 400
+it really spends 400, and a generated character can be edited and rebuilt afterwards —
+rename it, re-roll its archetype, retrain its profession.
+
+The 6E archetypes are authored from scratch, because there was no 6E prose to lift. They
+were graded against a Rule of X model and benchmarked against real 400-point characters,
+so a rolled 6E hero should sit in the same league as one a GM would hand you.
+
+## You can run a fight
+
+Endurance, Body, Stun and status effects, tracked on a character sheet laid out like the
+printed one. Tap a power's END to spend it; the pool burns STUN when it runs dry. Tap any
+roll on the sheet to open the dice roller with it filled in, or hold it to roll on the
+spot. Your Strength shows its damage dice and rolls like anything else.
+
+Also: one dice screen instead of five, portraits you can drag and pinch to frame instead
+of always getting the centre crop, and a nine-character quick-pick grid on Home and behind
+a handle on the sheet — long-press a slot to pin someone there.
+
+## Your point totals may read differently, and that's the point
+
+**Read this bit before you file a bug.**
+
+The old engine had real bugs in it, some of them a decade old. The rebuild reproduced them
+deliberately and exactly first — that's how I could prove the port was faithful before
+changing anything — and then fixed them one at a time. Fourteen of them. You get all
+fourteen at once, and roughly a third of real characters read differently than they did.
+
+The ones most likely to move your sheet:
+
+- **Unusual defenses** (Mental, Power and Flash Defense) ignored the visibility rules every
+  other trait obeys. This one touches about a third of characters on its own.
+- **Enhanced Perception** was priced wrong — an "all senses" buy cost a third of what it should.
+- **Clinging** quietly charged a point too many.
+- **Duplicate powers** were skipped in characteristic and defense totals.
+- **Powers inside a VPP** counted toward your totals even with nothing allocated to them.
+- **Framework slots rendered outside their framework** — a Multipower showed as an empty
+  container with its powers loose beside it. Costs were always right there; only the
+  arrangement was wrong, and it's fixed.
+
+So if a total moved, the question isn't "did the app break" — it's "does it now agree with
+HERO Designer". In every one of these cases the new number is the one HD agrees with. If
+you find one where it *doesn't*, that's a real bug and it's the single most useful thing
+you can report. Please say which power.
+
+## What's gone
+
+Being straight about this, because you'll notice:
+
+- **Cost Cruncher hasn't been rebuilt yet.** It's the last screen outstanding and it is on
+  the list.
+- **Dice sound effects are gone.** Dropped on purpose. (The old app defaulted them to off,
+  so most people never heard them.)
+- **Character slots are gone**, replaced by a library plus one active character. The
+  quick-pick grid is what fills that hole, and it holds nine instead of five.
+- **The five dice screens are now one.**
+
+There's also no export yet — a character you build in the app lives on your device.
+
+## For anyone who cares how it's built
+
+It's open source, Apache-2.0, and always has been:
+
+**https://github.com/slackdaystudio/hero-system-mobile**
+
+The short version: React Native 0.79 and TypeScript, with the rules engine as a pure
+TypeScript layer that has no idea it's running on a phone — no React, no native imports,
+enforced by a lint rule rather than good intentions. It's tested against a corpus of real
+sanitized `.hdc` characters, which is what made the fourteen corrections above safe to
+make: every fix had to show exactly which characters it moved, and why, before it landed.
+
+Every one of those quirks is written up in `docs/KNOWN_DEVIATIONS.md` with what it did,
+whether it was a real bug or just odd-looking, and which characters it affected. If you've
+ever wondered why an app disagreed with your maths, that file is the honest answer for this
+one. There's also a full changelog covering this whole 2.1.13 → 2.9.0 span in `docs/`.
+
+Issues and pull requests are both welcome. So are bug reports that just say "this number is
+wrong and here's the character" — that's genuinely the most valuable thing.
+
+## Reporting things
+
+The most useful bug report is: **what the app says, what HERO Designer says, and which
+power**. If it's a character that came across from the old version, mentioning that helps
+too, since the migration only runs once and I can't reproduce it after the fact.
+
+Thanks to everyone who's been running the test builds — a good chunk of the fixes above
+exist because somebody said "that doesn't look right".
