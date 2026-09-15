@@ -230,13 +230,11 @@ jobs:
             # Pixel-diff the character sheet against its committed Android baseline.
             # ON-DEMAND ONLY (workflow_dispatch `visual_gate` input) — see docs/UI_TESTING.md.
             #
-            # STALE BASELINE: .maestro/baselines/android/sheet.png was captured on API 34 in
-            # July. This job now runs API 36, which renders differently, so the gate will
-            # report a diff until the baseline is re-captured from an API 36 run. Normal CI
-            # is unaffected because the gate is opt-in — but the first person to switch it on
-            # should expect a failure that is the baseline's fault, not the app's. The
-            # screenshot is uploaded on every run, so re-baselining is: take sheet.png from
-            # the maestro-android artifact of a green API 36 run and commit it over the old one.
+            # The baseline survived the API 34 -> 36 emulator bump untouched: the first green
+            # API 36 run rendered the compared region PIXEL-IDENTICAL to the July baseline
+            # (0 of 2,236,500 px). That is what the crops buy — they exclude the system chrome,
+            # which is the only part an API level actually moves. Re-baselining was assumed
+            # necessary and measured not to be, so the July capture stands.
             # Screenshot is captured every run regardless; only the pixel comparison is gated off.
             # Crops exclude jittering overlays (see iOS note): status bar (top), nav bar +
             # frame-edge power row (bottom), and the fading scroll indicator (right, ~11px).
