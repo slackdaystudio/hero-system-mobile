@@ -8,7 +8,9 @@ full architecture and the reasoning behind it — but its Progress section has d
 take **Status** below as authoritative for where things stand.
 
 Other docs: [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) (read before touching
-`core/`), [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md), `RELEASE.md`, `QA_CHECKLIST.md`.
+`core/`), [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md),
+[`docs/DEPENDENCY_AUDIT.md`](docs/DEPENDENCY_AUDIT.md) (**read before running `npm audit fix`
+— it is not safe here, and neither is `--force`**), `RELEASE.md`, `QA_CHECKLIST.md`.
 
 ## Worktree layout (important)
 
