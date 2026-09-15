@@ -15,7 +15,7 @@
 import {toMap} from 'core/util';
 import {RollType} from 'core/dice';
 import {heroDesignerCharacter} from 'core/hero';
-import {type Obj, type RollDescriptor} from '../characterTrait';
+import {type Attribute, type Obj, type RollDescriptor} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 import {modifierDecorator} from '../modifiers/modifierDecorator';
 
@@ -127,5 +127,31 @@ export default class HandKillingAttack extends TraitDecorator {
         }
 
         return false;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'Dice', value: this.getDice()});
+
+        return attributes;
+    }
+
+    /** The dice this power *adds*, as printed on the sheet — distinct from `roll()`, which folds in STR. */
+    private getDice(): string {
+        const adderMap = toMap(this.characterTrait.trait.adder);
+        let dice = `+${this.characterTrait.trait.levels}`;
+
+        if (adderMap.has('PLUSONEHALFDIE')) {
+            dice += '½d6';
+        } else if (adderMap.has('PLUSONEPIP')) {
+            dice += 'd6+1';
+        } else if (adderMap.has('MINUSONEPIP')) {
+            dice += 'd6-1';
+        } else {
+            dice += 'd6';
+        }
+
+        return dice;
     }
 }

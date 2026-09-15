@@ -12,11 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Density Increase, ported from legacy `powers/DensityIncrease.js`. */
 export default class DensityIncrease extends TraitDecorator {
     cost(): number {
         return this.characterTrait.trait.levels * 5 - 5;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const levels = this.characterTrait.trait.levels;
+
+        attributes.push({label: `+${levels * 5} STR`, value: ''});
+        attributes.push({label: `${100 * 2 ** levels} kg mass`, value: ''});
+        attributes.push({label: `+${levels} PD/ED`, value: ''});
+        attributes.push({label: `-${levels * 2} KB`, value: ''});
+
+        return attributes;
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {getMultiplierCost} from 'core/util';
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Clinging, ported from legacy `powers/Clinging.js`. */
@@ -27,5 +28,13 @@ export default class Clinging extends TraitDecorator {
         const trait = this.characterTrait.trait;
 
         return trait.basecost + getMultiplierCost(trait.levels, trait.template.lvlval, trait.template.lvlcost);
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: `+${this.characterTrait.trait.levels} STR`, value: ''});
+
+        return attributes;
     }
 }

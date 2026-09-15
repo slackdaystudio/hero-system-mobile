@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {type Obj} from '../characterTrait';
+import {type Attribute, type Obj} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Reflection, ported from legacy `powers/Reflection.js`. */
@@ -47,5 +47,13 @@ export default class Reflection extends TraitDecorator {
         }
 
         return cost;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'Active Points Worth', value: this.characterTrait.trait.levels});
+
+        return attributes;
     }
 }

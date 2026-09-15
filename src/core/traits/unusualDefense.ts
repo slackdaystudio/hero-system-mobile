@@ -12,8 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until ported in tier 3 (attribute-only in legacy; inert for
-// the decorator golden master, which checks cost/roll).
+import {heroDesignerCharacter} from 'core/hero';
+import {roundInPlayersFavor} from 'core/util';
+import {type Attribute} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
-export default class UnusualDefense extends TraitDecorator {}
+/**
+ * Flash/Mental/Power Defense, ported from legacy `UnusualDefense.js`. 5E Mental
+ * Defense adds EGO/5 on top of the points bought, which 6E dropped.
+ */
+export default class UnusualDefense extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const character = this.characterTrait.getCharacter();
+        let points = this.characterTrait.trait.levels;
+
+        if (this.characterTrait.trait.xmlid === 'MENTALDEFENSE' && heroDesignerCharacter.isFifth(character)) {
+            points += roundInPlayersFavor(heroDesignerCharacter.getCharacteristicTotal('EGO', character) / 5);
+        }
+
+        attributes.push({label: 'Points', value: points});
+
+        return attributes;
+    }
+}

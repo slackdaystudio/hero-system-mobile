@@ -14,10 +14,18 @@
 
 /**
  * Golden master for the trait-decorator stack: the ported `core/traits` factory
- * must reproduce the legacy factory's cost/activeCost/realCost/roll for every
- * trait it decorates. Grows one trait category at a time as its decorators land
- * (tier 1: disadvantages; tier 2: + perks, talents; tier 3: + skills, powers,
- * martial arts).
+ * must reproduce the legacy factory's cost/activeCost/realCost/roll **and
+ * `attributes()`** for every trait it decorates. Grows one trait category at a
+ * time as its decorators land (tier 1: disadvantages; tier 2: + perks, talents;
+ * tier 3: + skills, powers, martial arts).
+ *
+ * `attributes()` was added late, and adding it found 32 decorators that had never
+ * had one ported — the whole writeup half of the stack, silently absent because
+ * cost and roll were all this file ever compared. Movement powers and Stretching
+ * printed no distance, attacks printed no Dice line, Barrier and Endurance Reserve
+ * printed nothing at all. **What a golden master does not compare, it does not
+ * protect**; the sheet is the user-visible half of every one of these decorators,
+ * so it is compared here now.
  */
 import manifest from '../../hero/__tests__/fixtures/manifest.json';
 import {characterTraitDecorator as core} from 'core/traits';
@@ -27,10 +35,14 @@ import {flatten} from 'core/util';
 jest.mock('../../../../../hero-system-mobile/App', () => ({getRandomNumber: () => 1}));
 jest.mock('../../../../../hero-system-mobile/src/lib/Statistics', () => ({statistics: {add: () => Promise.resolve()}}));
 
-const legacyModel = (require('../../../../../hero-system-mobile/src/lib/HeroDesignerCharacter') as {heroDesignerCharacter: {getCharacter(parsed: unknown): any}}).heroDesignerCharacter;
-const legacyDecorator = (require('../../../../../hero-system-mobile/src/decorators/CharacterTraitDecorator') as {
-    characterTraitDecorator: {decorate(item: unknown, listKey: string, getCharacter: () => unknown): any};
-}).characterTraitDecorator;
+const legacyModel = (
+    require('../../../../../hero-system-mobile/src/lib/HeroDesignerCharacter') as {heroDesignerCharacter: {getCharacter(parsed: unknown): any}}
+).heroDesignerCharacter;
+const legacyDecorator = (
+    require('../../../../../hero-system-mobile/src/decorators/CharacterTraitDecorator') as {
+        characterTraitDecorator: {decorate(item: unknown, listKey: string, getCharacter: () => unknown): any};
+    }
+).characterTraitDecorator;
 
 /**
  * H4 (docs/KNOWN_DEVIATIONS.md) — intentional divergence: legacy's `Maneuver.roll()` throws
@@ -56,6 +68,10 @@ const CATEGORIES: Array<{key: string; subKey: string}> = [
     {key: 'talents', subKey: 'talents'},
     {key: 'skills', subKey: 'skills'},
     {key: 'powers', subKey: 'powers'},
+    // Equipment is a power list in its own right — `characterSheet.ts` gives it its own
+    // section — and was missing here, so bridget's gear (Stretching among it) was decorated
+    // by nobody's oracle.
+    {key: 'equipment', subKey: 'powers'},
     {key: 'martialArts', subKey: 'maneuver'},
 ];
 
@@ -128,6 +144,21 @@ const H12_REALCOST_DIVERGENCE: Record<string, Set<string>> = {
     twilight: new Set(['English']),
 };
 
+/**
+ * H13 (docs/KNOWN_DEVIATIONS.md) — intentional divergence, attributes only: legacy's
+ * `MultipowerItem.attributes()` reads `ultraSlot` off the `CharacterTrait` *wrapper*, which never
+ * carries it, so every slot in the corpus labels itself "Fixed" regardless of what the trait says.
+ * That dead line is the evidence H13 turned on — it named `ULTRA_SLOT="Yes"` "Variable", proving
+ * the terminology (not the arithmetic) was inverted. Core reads the field off the trait and uses
+ * each edition's own word: 5E ultra/multi, 6E fixed/variable. 30 slots across the corpus differ,
+ * and only in this one attribute — everything else on those cards is compared below.
+ */
+const H13_SLOT_TYPE = 'Slot Type';
+
+/** Compares attributes, dropping the one entry H13 deliberately relabels. */
+const comparableAttributes = (trait: {attributes(): Array<{label: string}>}): Array<{label: string}> =>
+    trait.attributes().filter((attribute) => attribute.label !== H13_SLOT_TYPE);
+
 describe('golden master: core/traits factory reproduces legacy', () => {
     it('covers the whole corpus', () => {
         expect(fixtures.length).toBe(37);
@@ -167,6 +198,10 @@ describe('golden master: core/traits factory reproduces legacy', () => {
                 if (!H4_ROLL_DIVERGENCE[name]?.has(String(trait.xmlid).toUpperCase())) {
                     expect(ported.roll()).toEqual(legacy.roll());
                 }
+
+                // The writeup the sheet prints. H13 relabels one attribute on multipower
+                // slots and nothing else; see H13_SLOT_TYPE above.
+                expect(comparableAttributes(ported)).toEqual(comparableAttributes(legacy));
             }
         });
     });

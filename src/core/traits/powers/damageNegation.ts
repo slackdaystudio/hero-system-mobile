@@ -12,8 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {type Attribute, type Obj} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class DamageNegation extends TraitDecorator {}
+/**
+ * Damage Negation, ported from legacy `powers/DamageNegation.js`. Note it *replaces*
+ * the delegated attributes rather than appending to them — the adders are the whole
+ * writeup, exactly as legacy has it.
+ */
+export default class DamageNegation extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes: Attribute[] = [];
+
+        for (const adder of this.characterTrait.trait.adder as Obj[]) {
+            if (adder.levels > 0) {
+                attributes.push({label: `-${adder.levels} ${adder.alias}`, value: ''});
+            }
+        }
+
+        return attributes;
+    }
+}

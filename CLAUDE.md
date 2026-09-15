@@ -181,6 +181,19 @@ it's data preservation, not a feature.
 `core/*` reproduces the legacy engine **byte-for-byte**, so the golden masters prove
 **parity, not correctness** — a number of legacy bugs were preserved on purpose.
 
+**And a golden master only protects what it compares.** For the whole life of the port the
+decorator golden master compared `cost`/`activeCost`/`realCost`/`roll` and nothing else, so
+`attributes()` — the writeup the sheet's card front prints — was **never ported for 32 of the
+79 decorators** and nobody noticed. Movement powers and Stretching printed no distance,
+attacks no Dice line, Barrier and Endurance Reserve nothing at all beyond a name. Sixteen of
+the 32 were honest `// STUB` pass-throughs whose comment said "attribute-only in legacy;
+inert for the decorator golden master" — *inert for the golden master* was true, and was
+exactly the problem. The other sixteen looked finished. A field report found it, at two
+powers; measuring found the other thirty. **When a stub says it is invisible to the tests,
+that is a statement about the tests, not about the user.** Fixed and now compared: the golden
+master checks `attributes()` across all 37 fixtures (1578 traits), and `equipment` — a sheet
+section it had never decorated at all — is in its category list.
+
 > **Read [`docs/KNOWN_DEVIATIONS.md`](docs/KNOWN_DEVIATIONS.md) before changing anything in
 > `core/`.** 20 entries; 14 fixed (H2–H13, U2, U3) — every known corpus-triggered bug is now
 > fixed. It explains why a "wrong-looking" line in `core/` may be load-bearing, and why a

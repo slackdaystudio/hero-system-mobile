@@ -12,8 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until ported in tier 3 (attribute-only in legacy; inert for
-// the decorator golden master, which checks cost/roll).
+import {type Attribute} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
-export default class AffectsTotals extends TraitDecorator {}
+/**
+ * Notes whether a trait's value reaches the character's totals, ported from legacy
+ * `AffectsTotals.js`. Attribute-only — it reports the `affectsTotal`/`affectsPrimary`
+ * flags the engine already set, and changes no cost.
+ */
+export default class AffectsTotals extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        if (trait.affectsTotal) {
+            attributes.push({label: `Added to ${trait.affectsPrimary ? 'Primary' : 'Secondary'}`, value: ''});
+        } else {
+            attributes.push({label: 'Not added to totals', value: ''});
+        }
+
+        return attributes;
+    }
+}

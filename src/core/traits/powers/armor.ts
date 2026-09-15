@@ -12,8 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class Armor extends TraitDecorator {}
+/** Armor (5E), ported from legacy `powers/Armor.js`. */
+export default class Armor extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        if (trait.pdlevels > 0) {
+            attributes.push({label: 'Physical Defense', value: trait.pdlevels});
+        }
+
+        if (trait.edlevels > 0) {
+            attributes.push({label: 'Energy Defense', value: trait.edlevels});
+        }
+
+        return attributes;
+    }
+}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Endurance Reserve (reserve + recovery cost), ported from legacy `powers/EnduranceReserve.js`. */
@@ -23,5 +24,15 @@ export default class EnduranceReserve extends TraitDecorator {
         cost += Math.ceil((trait.power.levels / trait.template.endurancereserverec.lvlval) * trait.template.endurancereserverec.lvlcost);
 
         return cost;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        attributes.push({label: 'Reserve', value: trait.levels});
+        attributes.push({label: 'Recovery', value: trait.power.levels});
+
+        return attributes;
     }
 }

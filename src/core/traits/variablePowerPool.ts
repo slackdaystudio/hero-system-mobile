@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {roundInPlayersFavor} from 'core/util';
-import {CharacterTrait} from './characterTrait';
+import {type Attribute, CharacterTrait} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
 /** Variable Power Pool control cost, ported from legacy `decorators/VariablePowerPool.js`. */
@@ -56,5 +56,13 @@ export default class VariablePowerPool extends TraitDecorator {
 
     private getControlActiveCost(): number {
         return roundInPlayersFavor(this.controlCost * (1 + this.advantages()!.reduce((a: number, b: {cost: number}) => a + b.cost, 0)));
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'Base Pool', value: this.characterTrait.trait.levels});
+
+        return attributes;
     }
 }

@@ -12,8 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {toMap} from 'core/util';
+import {type Attribute, type Obj} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class Stretching extends TraitDecorator {}
+/**
+ * Stretching, ported from legacy `powers/Stretching.js`.
+ *
+ * Legacy labels both distances in metres unconditionally, where `Movement` picks
+ * `"` for 5E and `m` for 6E. That looks like a legacy bug for 5E characters, but it
+ * is preserved here — a port is not the place to change behaviour (see
+ * docs/KNOWN_DEVIATIONS.md for how a correction gets made).
+ */
+export default class Stretching extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const levels = this.characterTrait.trait.levels;
+
+        attributes.push({label: 'Distance', value: `${levels}m`});
+        attributes.push({label: 'Non-Combat Distance', value: `${levels * this.getNonCombatDistance()}m`});
+
+        return attributes;
+    }
+
+    private getNonCombatDistance(): number {
+        let nonCombatDistance = 2;
+        const adderMap = toMap(this.characterTrait.trait.adder);
+
+        if (adderMap.has('NONCOMBAT')) {
+            nonCombatDistance **= (adderMap.get('NONCOMBAT') as Obj).levels + 1;
+        }
+
+        return nonCombatDistance;
+    }
+}

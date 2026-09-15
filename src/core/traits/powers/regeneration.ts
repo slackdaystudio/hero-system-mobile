@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class Regeneration extends TraitDecorator {}
+/** Regeneration, ported from legacy `powers/Regeneration.js`. */
+export default class Regeneration extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'BODY Per Interval', value: this.characterTrait.trait.levels});
+
+        return attributes;
+    }
+}
