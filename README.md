@@ -6,7 +6,6 @@ Available since 2018 on:
 
 [![App Store](https://img.shields.io/badge/App_Store-HERO_System_Mobile-0D96F6?logo=apple&logoColor=white)](https://apps.apple.com/us/app/hero-system-mobile/id1352750917)
 [![Google Play](https://img.shields.io/badge/Google_Play-HERO_System_Mobile-414141?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.herogmtools)
-[![Amazon Appstore](https://img.shields.io/badge/Amazon_Appstore-HERO_System_Mobile-FF9900?logo=amazon&logoColor=white)](https://www.amazon.ca/Phil-Guinchard-HERO-System-Mobile/dp/B07BJ9879M)
 
 [![Mobile UI (E2E)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml/badge.svg?branch=master)](https://github.com/slackdaystudio/hero-system-mobile/actions/workflows/mobile-ui.yml)
 
