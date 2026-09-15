@@ -120,6 +120,9 @@ android {
         //            portraits inlined under one key. The one-time import read that key before
         //            the .hsmc files, so an upgrading user with a full library got "Row too big
         //            to fit into CursorWindow" on every launch, not just the first.
+        //            Also targets API 36 (Android 16), which Play now requires for updates —
+        //            see the comment in android/build.gradle for why that bump is a no-op
+        //            behaviourally.
         //            Sheet: 32 of the 79 trait decorators had no attributes() — the writeup half
         //            was never ported, and the golden master compared only cost/roll, so it was
         //            invisible. Movement powers and Stretching printed no distance, attacks no
