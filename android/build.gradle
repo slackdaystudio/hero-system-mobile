@@ -1,9 +1,25 @@
 buildscript {
     ext {
-        buildToolsVersion = "35.0.0"
+        // API 36 (Android 16) because Play now requires it for updates. The bump was
+        // mechanical — AGP 8.8.2 accepts compileSdk 36 without complaint, and none of
+        // Android 16's targetSdk-gated behaviour changes land on this app:
+        //
+        //  - Edge-to-edge enforcement is the headline one, and we were already subject to
+        //    it. Android 15 enforces edge-to-edge at targetSdk 35 and this app never set
+        //    `windowOptOutEdgeToEdgeEnforcement`, so 2.9.0 has been drawing edge-to-edge in
+        //    production since it shipped. API 36 only removes an opt-out we never used.
+        //  - The large-screen orientation/resizability override needs a `screenOrientation`
+        //    restriction to override. The manifest sets none.
+        //  - 16 KB page alignment (a separate, concurrent Play requirement) is already
+        //    satisfied: all 14 bundled .so files are 2**14-aligned under NDK 27.
+        //
+        // AGP is deliberately left at 8.8.2. Google suggests 8.9+ for API 36, but it builds
+        // and signs a valid bundle as-is, and a toolchain bump is its own change with its
+        // own risk — not something to smuggle into a compliance fix.
+        buildToolsVersion = "36.0.0"
         minSdkVersion = 24
-        compileSdkVersion = 35
-        targetSdkVersion = 35
+        compileSdkVersion = 36
+        targetSdkVersion = 36
         ndkVersion = "27.1.12297006"
         kotlinVersion = "2.0.21"
     }
