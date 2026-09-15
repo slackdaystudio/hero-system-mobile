@@ -135,6 +135,7 @@ jobs:
                   path: |
                       maestro-artifacts/**
                       maestro-report-ios.xml
+                      maestro-report-ios-retry-*.xml
                   if-no-files-found: warn
 
     android:
@@ -182,28 +183,45 @@ jobs:
                   sudo udevadm control --reload-rules
                   sudo udevadm trigger --name-match=kvm
 
+            # Two emulator attempts, each booting its own emulator.
+            #
+            # The retry inside e2e-run.sh relaunches the *app*, which clears a stalled cold
+            # start. It cannot clear a dropped GPU color buffer ("Failed to find ColorBuffer:
+            # N") — that is emulator-level state, and it survives every in-session retry. A run
+            # that hit it failed all three rounds with the handle count climbing between them
+            # (129 -> 243 -> 403): each round started from a more degraded emulator than the
+            # last, so retrying made it worse rather than better.
+            #
+            # Replacing the emulator is the only thing that clears it, and only the action can
+            # do that — hence a whole second step rather than another loop inside the script.
             - name: Run Maestro flows on an emulator
+              id: e2e
+              continue-on-error: true # a failure here is answered by the fresh-emulator attempt below
               uses: reactivecircus/android-emulator-runner@v2
               with:
                   api-level: 34 # solid google_apis image; bump toward 35 (the app's target) when stable on CI
                   arch: x86_64
                   profile: pixel_6
-                  # Pin software rendering. The default host-GPU path drops color buffers on CI
-                  # ("Failed to find ColorBuffer: N"), which freezes the emulator surface — the app
-                  # never paints Home and whichever flow is mid-run times out on the readiness wait.
-                  # swiftshader_indirect is deterministic on headless runners. The rest of the string
-                  # restores the action's other defaults (setting this input overrides them all).
+                  # Pin software rendering. The default host-GPU path drops color buffers on CI,
+                  # which freezes the emulator surface — the app never paints Home and whichever
+                  # flow is mid-run times out on the readiness wait. swiftshader_indirect is
+                  # deterministic on headless runners, and reduces this without ending it. The rest
+                  # of the string restores the action's other defaults (setting this input
+                  # overrides them all).
                   emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-                  script: |
-                      adb install -r android/app/build/outputs/apk/release/app-release.apk
-                      # Freeze the status bar (demo mode) so the clock can't cause visual diffs.
-                      adb shell settings put global sysui_demo_allowed 1
-                      adb shell am broadcast -a com.android.systemui.demo -e command enter
-                      adb shell am broadcast -a com.android.systemui.demo -e command clock -e hhmm 0941
-                      adb shell am broadcast -a com.android.systemui.demo -e command battery -e level 100 -e plugged false
-                      adb shell am broadcast -a com.android.systemui.demo -e command network -e wifi show -e level 4
-                      adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
-                      bash scripts/e2e-run.sh android com.herogmtools
+                  script: bash scripts/e2e-android.sh com.herogmtools
+
+            # Fresh emulator, same suite. No continue-on-error: if this fails too, the job fails,
+            # which is what a real breakage looks like — it fails on every attempt on both.
+            - name: Retry Maestro flows on a fresh emulator
+              if: steps.e2e.outcome == 'failure'
+              uses: reactivecircus/android-emulator-runner@v2
+              with:
+                  api-level: 34
+                  arch: x86_64
+                  profile: pixel_6
+                  emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  script: bash scripts/e2e-android.sh com.herogmtools
 
             # Pixel-diff the character sheet against its committed Android baseline.
             # ON-DEMAND ONLY (workflow_dispatch `visual_gate` input) — see docs/UI_TESTING.md.
@@ -226,4 +244,5 @@ jobs:
                   path: |
                       maestro-artifacts/**
                       maestro-report-android.xml
+                      maestro-report-android-retry-*.xml
                   if-no-files-found: warn
