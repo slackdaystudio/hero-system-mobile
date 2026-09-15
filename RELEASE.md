@@ -11,7 +11,7 @@ listing. Two consequences:
 - The release build **must be signed with the legacy app's existing upload key**.
   A brand-new keystore will be **rejected** by Play ("upload key mismatch").
 - `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; the last build
-  out is **69 / 2.8.0**, and this repo is set to **71 / 2.9.1**
+  out is **69 / 2.8.0**, and this repo is set to **72 / 2.9.1**
   (`android/app/build.gradle`, which carries the full version history in a comment).
   Bump `versionCode` for every subsequent upload.
 

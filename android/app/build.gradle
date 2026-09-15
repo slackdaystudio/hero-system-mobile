@@ -130,7 +130,12 @@ android {
         //            attributes() feeds no cost path, and the golden master now pins attributes
         //            as well as costs across all 37 fixtures.
         //            No schema change (stays at 8), no cost changes.
-        versionCode 71
+        // 72/2.9.1 — Same build, new versionCode. 71 was consumed by a Play upload and a
+        //            versionCode can never be reused, so any further upload of this release
+        //            has to carry a fresh one. versionName deliberately stays 2.9.1: it is
+        //            the same release, it is what the notes describe, and it keeps step with
+        //            iOS 2.9.1 on TestFlight. Nothing else changed.
+        versionCode 72
         versionName "2.9.1"
     }
     signingConfigs {
