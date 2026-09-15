@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet} from 'react-native';
-import {Screen, Text} from 'app/components';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import {Button, Screen, Text} from 'app/components';
 import {createDeviceRepositories} from 'app/composition/deviceRepositories';
 import {AppNavigator} from 'app/navigation/AppNavigator';
 import {AuthoringProvider} from 'app/providers/AuthoringProvider';
@@ -42,9 +42,12 @@ type Boot = {status: 'loading'} | {status: 'ready'; repositories: Repositories} 
  */
 function App(): React.JSX.Element {
     const [boot, setBoot] = useState<Boot>({status: 'loading'});
+    const [attempt, setAttempt] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
+
+        setBoot({status: 'loading'});
 
         createDeviceRepositories()
             .then((repositories) => {
@@ -61,15 +64,30 @@ function App(): React.JSX.Element {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [attempt]);
 
     if (boot.status !== 'ready') {
         // Boot states are themed with the default (system) scheme — settings
-        // aren't loaded yet.
+        // aren't loaded yet. The error state explains itself rather than showing a
+        // bare native message: whatever threw is a detail, not something the player
+        // can act on, and a retry costs nothing.
         return (
             <ThemeProvider>
                 <Screen style={styles.centered}>
-                    {boot.status === 'loading' ? <ActivityIndicator /> : <Text muted>{boot.message}</Text>}
+                    {boot.status === 'loading' ? (
+                        <ActivityIndicator />
+                    ) : (
+                        <View style={styles.error}>
+                            <Text variant="title">Couldn't start</Text>
+                            <Text muted style={styles.errorDetail}>
+                                HERO System Mobile could not open its character store.
+                            </Text>
+                            <Text variant="caption" muted style={styles.errorDetail}>
+                                {boot.message}
+                            </Text>
+                            <Button label="Try again" onPress={() => setAttempt((previous) => previous + 1)} testID="boot-retry" />
+                        </View>
+                    )}
                 </Screen>
             </ThemeProvider>
         );
@@ -113,6 +131,14 @@ const styles = StyleSheet.create({
     centered: {
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    error: {
+        alignItems: 'center',
+        gap: 12,
+        paddingHorizontal: 24,
+    },
+    errorDetail: {
+        textAlign: 'center',
     },
 });
 
