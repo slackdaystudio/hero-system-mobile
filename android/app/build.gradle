@@ -114,8 +114,14 @@ android {
         //            Possession unbuildable, no attack able to buy a half-die, and a VPP charging
         //            its contents twice. No schema change (stays at 8); no cost changes on
         //            imported or generated characters.
-        versionCode 70
-        versionName "2.9.0"
+        // 71/2.9.1 — Boot fix: on Android, AsyncStorage cannot return a value past the 2 MB
+        //            CursorWindow, and legacy stored up to five characters with their base64
+        //            portraits inlined under one key. The one-time import read that key before
+        //            the .hsmc files, so an upgrading user with a full library got "Row too big
+        //            to fit into CursorWindow" on every launch, not just the first. No schema
+        //            change (stays at 8), no cost changes.
+        versionCode 71
+        versionName "2.9.1"
     }
     signingConfigs {
         debug {

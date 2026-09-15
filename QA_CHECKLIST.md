@@ -250,6 +250,17 @@ difference between the builder working and not.
 ## Migration (if testing over a legacy install)
 - [ ] First launch imported your legacy characters + settings + stats.
 
+### The CursorWindow boot failure (fixed in 2.9.1 — the one that needs a real legacy install)
+This is the bug 2.9.1 exists for, and **no emulator with a clean install can reproduce it**.
+It needs a legacy app whose AsyncStorage `characters` key is over 2 MB — in practice a full
+five-slot library where the characters carry portraits.
+- [ ] Upgrade over a legacy install **with five portrait-carrying characters**. The app boots.
+      Before the fix it showed "Row to big to fit into CursorWindow requiredPos=0, totalRows=1"
+      and nothing else, on **every** launch rather than just the first.
+- [ ] Those characters are all present afterwards, with their portraits.
+- [ ] Kill and relaunch — still fine, and the import does not run again.
+- [ ] A device with no legacy data at all still boots and is untouched.
+
 ## Upgrading over the previous build (2.9.0: no schema change)
 - [ ] Install 2.8.0, import a character and author one, then install 2.9.0 over the top.
 - [ ] Everything is still there. Schema stays at **8** — nothing migrates.
