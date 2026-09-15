@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {getMultiplierCost, totalAdders} from 'core/util';
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Duplication, ported from legacy `powers/Duplication.js`. */
@@ -32,5 +33,15 @@ export default class Duplication extends TraitDecorator {
         cost += getMultiplierCost(trait.number, trait.template.multiplierval, trait.template.multipliercost);
 
         return cost;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        attributes.push({label: 'Points', value: trait.points});
+        attributes.push({label: 'Number of Duplicates', value: trait.number});
+
+        return attributes;
     }
 }

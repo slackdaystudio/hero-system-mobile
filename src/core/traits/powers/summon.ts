@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {totalAdders} from 'core/util';
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Summon, ported from legacy `powers/Summon.js`. */
@@ -24,5 +25,13 @@ export default class Summon extends TraitDecorator {
         cost += totalAdders(trait.adder);
 
         return Math.ceil(cost);
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'Points', value: `${this.characterTrait.trait.levels}`});
+
+        return attributes;
     }
 }

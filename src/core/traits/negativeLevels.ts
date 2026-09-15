@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until ported in tier 3 (attribute-only in legacy; inert for
-// the decorator golden master, which checks cost/roll).
+import {type Attribute} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
-export default class NegativeLevels extends TraitDecorator {}
+/** Negative skill/combat levels and Lack Of Weakness, ported from legacy `NegativeLevels.js`. */
+export default class NegativeLevels extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'Penalty', value: `-${this.characterTrait.trait.levels}`});
+
+        return attributes;
+    }
+}

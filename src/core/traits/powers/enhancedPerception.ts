@@ -14,7 +14,7 @@
 
 import {RollType} from 'core/dice';
 import {heroDesignerCharacter} from 'core/hero';
-import {type RollDescriptor} from '../characterTrait';
+import {type Attribute, type RollDescriptor} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Enhanced Perception, ported from legacy `powers/EnhancedPerception.js`. */
@@ -37,5 +37,13 @@ export default class EnhancedPerception extends TraitDecorator {
             roll: `${base + this.characterTrait.trait.levels}-`,
             type: RollType.SkillCheck,
         };
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'PER Bonus', value: `+${this.characterTrait.trait.levels}`});
+
+        return attributes;
     }
 }

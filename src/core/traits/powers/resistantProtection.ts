@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {totalAdders} from 'core/util';
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Resistant Protection / Force Field, ported from legacy `powers/ResistantProtection.js`. */
@@ -25,5 +26,28 @@ export default class ResistantProtection extends TraitDecorator {
         cost += totalAdders(trait.adder);
 
         return cost;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        if (trait.pdlevels > 0) {
+            attributes.push({label: 'Physical Defense', value: trait.pdlevels});
+        }
+
+        if (trait.edlevels > 0) {
+            attributes.push({label: 'Energy Defense', value: trait.edlevels});
+        }
+
+        if (trait.mdlevels > 0) {
+            attributes.push({label: 'Mental Defense', value: trait.mdlevels});
+        }
+
+        if (trait.powdlevels > 0) {
+            attributes.push({label: 'Power Defense', value: trait.powdlevels});
+        }
+
+        return attributes;
     }
 }

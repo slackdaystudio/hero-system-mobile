@@ -12,8 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until ported in tier 3 (attribute-only in legacy; inert for
-// the decorator golden master, which checks cost/roll).
+import {heroDesignerCharacter} from 'core/hero';
+import {toMap} from 'core/util';
+import {type Attribute, type Obj} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
-export default class Movement extends TraitDecorator {}
+/**
+ * Movement powers (Flight, Gliding, Swinging, Teleportation, Tunneling, Leaping),
+ * ported from legacy `Movement.js`. Attribute-only: it prints the combat and
+ * non-combat distance plus the km/h each works out to, and changes no cost.
+ *
+ * Running/Swimming/Leaping add the character's existing base movement; every other
+ * mode starts from the levels bought. 5E doubles the base before the km/h maths and
+ * measures in inches, 6E in metres.
+ */
+export default class Movement extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const character = this.characterTrait.getCharacter();
+        const isFifth = heroDesignerCharacter.isFifth(character);
+
+        let baseMove = this.characterTrait.trait.levels + this.getBaseMove();
+        const ncm = this.getNonCombatMultiplier();
+        const unit = isFifth ? '"' : 'm';
+
+        attributes.push({label: 'Combat Move', value: `${baseMove}${unit}`});
+        attributes.push({label: 'Non-Combat Move', value: `${baseMove * ncm}${unit}`});
+
+        if (isFifth) {
+            baseMove *= 2;
+        }
+
+        const speed = heroDesignerCharacter.getCharacteristicTotal('SPD', character);
+
+        attributes.push({label: 'Max Combat', value: `${((baseMove * speed * 5 * 60) / 1000).toFixed(1)} km/h`});
+        attributes.push({label: 'Max Non-Combat', value: `${((baseMove * ncm * speed * 5 * 60) / 1000).toFixed(1)} km/h`});
+
+        return attributes;
+    }
+
+    /** The character's existing movement for the modes that stack on it. */
+    private getBaseMove(): number {
+        const movementMap = toMap(this.characterTrait.getCharacter().movement, 'shortName');
+        const mode = {LEAPING: 'Leaping', RUNNING: 'Running', SWIMMING: 'Swimming'}[this.characterTrait.trait.xmlid.toUpperCase() as string];
+
+        return mode === undefined ? 0 : ((movementMap.get(mode) as Obj).value as number);
+    }
+
+    private getNonCombatMultiplier(): number {
+        let ncm = 2;
+        const adderMap = toMap(this.characterTrait.trait.adder);
+
+        if (adderMap.has('IMPROVEDNONCOMBAT')) {
+            ncm **= (adderMap.get('IMPROVEDNONCOMBAT') as Obj).levels + 1;
+        }
+
+        return ncm;
+    }
+}

@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class MagnifiedSense extends TraitDecorator {}
+/** Magnified senses (Microscopic/Rapid), ported from legacy `powers/MagnifiedSense.js`. */
+export default class MagnifiedSense extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        attributes.push({label: `x${trait.template.lvlpower ** trait.levels}`, value: ''});
+
+        return attributes;
+    }
+}

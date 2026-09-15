@@ -14,6 +14,7 @@
 
 import {totalAdders} from 'core/util';
 import {heroDesignerCharacter} from 'core/hero';
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Barrier / Force Wall, ported from legacy `powers/Barrier.js`. */
@@ -54,5 +55,40 @@ export default class Barrier extends TraitDecorator {
         cost += (trait.widthlevels * 4) / trait.template.costperinch;
 
         return cost;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        if (trait.pdlevels > 0) {
+            attributes.push({label: 'Physical Defense', value: trait.pdlevels});
+        }
+
+        if (trait.edlevels > 0) {
+            attributes.push({label: 'Energy Defense', value: trait.edlevels});
+        }
+
+        if (trait.mdlevels > 0) {
+            attributes.push({label: 'Mental Defense', value: trait.mdlevels});
+        }
+
+        if (trait.powdlevels > 0) {
+            attributes.push({label: 'Power Defense', value: trait.powdlevels});
+        }
+
+        attributes.push({label: 'Body', value: trait.bodylevels});
+
+        // 5E barriers are a flat length × height in inches; 6E adds a width in metres.
+        if (heroDesignerCharacter.isFifth(this.characterTrait.getCharacter())) {
+            attributes.push({label: 'Dimensions', value: `${trait.lengthlevels + 1}" x ${trait.heightlevels + 1}"`});
+        } else {
+            attributes.push({
+                label: 'Dimensions',
+                value: `${trait.lengthlevels + 1}m x ${trait.widthlevels + 0.5}m x ${trait.heightlevels + 1}m`,
+            });
+        }
+
+        return attributes;
     }
 }

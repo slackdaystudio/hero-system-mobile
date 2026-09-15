@@ -12,11 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {type Attribute} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
 /** Extra Limbs (base cost only), ported from legacy `powers/ExtraLimbs.js`. */
 export default class ExtraLimbs extends TraitDecorator {
     cost(): number {
         return this.characterTrait.trait.basecost;
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'Number of Limbs', value: this.characterTrait.trait.levels});
+
+        return attributes;
     }
 }

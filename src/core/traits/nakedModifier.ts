@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {roundInPlayersFavor} from 'core/util';
+import {type Attribute} from './characterTrait';
 import {TraitDecorator} from './traitDecorator';
 
 /** Naked advantage (advantage applied to a chunk of Active Points), ported from
@@ -28,5 +29,14 @@ export default class NakedModifier extends TraitDecorator {
 
     realCost(): number {
         return roundInPlayersFavor(this.activeCost() / (1 - this.limitations()!.reduce((a: number, b: {cost: number}) => a + b.cost, 0)));
+    }
+
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+        const trait = this.characterTrait.trait;
+
+        attributes.push({label: `Up to ${trait.levels} Active Points of ${trait.input}`, value: ''});
+
+        return attributes;
     }
 }

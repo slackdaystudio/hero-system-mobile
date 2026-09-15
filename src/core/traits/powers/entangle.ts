@@ -12,8 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// STUB — pass-through until this power is ported in tier 3. cost/roll delegate,
-// so it is inert for the decorator golden master; attribute/label logic pending.
+import {toMap} from 'core/util';
+import {type Attribute, type Obj} from '../characterTrait';
 import {TraitDecorator} from '../traitDecorator';
 
-export default class Entangle extends TraitDecorator {}
+/**
+ * Entangle, ported from legacy `powers/Entangle.js`.
+ *
+ * Legacy also defines a `roll()` here, but the factory wraps this decorator in an
+ * `EffectRoll` immediately afterwards in both engines, so that override is dead
+ * code and is not ported (it returned a bare string, not a `RollDescriptor`).
+ */
+export default class Entangle extends TraitDecorator {
+    attributes(): Attribute[] {
+        const attributes = this.characterTrait.attributes();
+
+        attributes.push({label: 'PD/ED', value: this.getDefenses()});
+
+        return attributes;
+    }
+
+    private getDefenses(): string {
+        const trait = this.characterTrait.trait;
+        const adderMap = toMap(trait.adder);
+        const modifierMap = toMap(trait.modifier);
+        let pd = trait.levels;
+        let ed = trait.levels;
+
+        if (modifierMap.has('NODEFENSE')) {
+            return '0/0';
+        }
+
+        if (adderMap.has('ADDITIONALPD')) {
+            pd += (adderMap.get('ADDITIONALPD') as Obj).levels;
+        }
+
+        if (adderMap.has('ADDITIONALED')) {
+            ed += (adderMap.get('ADDITIONALED') as Obj).levels;
+        }
+
+        return `${pd}/${ed}`;
+    }
+}
