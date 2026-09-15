@@ -217,6 +217,31 @@ in `app_state`; safe to re-run.
 3. **Random hero / version** — copy from AsyncStorage.
 4. Set `migrated_v1`, then clear the old AsyncStorage keys.
 
+### The CursorWindow trap (shipped a bug — 2.9.0 field report)
+
+**Android cannot return an AsyncStorage value larger than 2 MB.** Rows come back
+through a `CursorWindow` with that hard cap, so `getItem` fails with *"Row too big
+to fit into CursorWindow requiredPos=0, totalRows=1"* — and
+`AsyncStorageModule.multiGet` passes the native message straight through, unwrapped.
+The legacy app inlined each character's base64 portrait into the object it stored
+under `character` and `characters` (up to five of them), so a well-used install
+clears 2 MB comfortably. **Every upgrading Android user with five characters hit
+this**, and because the throw escaped `migrateV1` before it could stamp
+`migrated_v1`, the app failed to boot on *every* launch, not just the first.
+
+Three things keep it from recurring, and the second is the general lesson:
+
+- `withDatabaseFallback` (`infra/migration/asyncStorageDatabase.ts`) reads
+  AsyncStorage's own SQLite file (`RKStorage`.`catalystLocalStorage`, or
+  `AsyncStorage`.`Storage` under `AsyncStorage_useNextStorage`) through op-sqlite,
+  whose JSI path has no window. It is lazy — a healthy device never opens the file.
+- **The `.hsmc` files are read before the AsyncStorage keys**, and `readKey`
+  degrades a failed key to null. Decision #8 says the files are authoritative; that
+  is only true if nothing that *isn't* authoritative can gate them. Ordering was
+  the whole bug: the pointers were read first, so losing them lost the documents.
+- Boot never dies of a failed import (`deviceRepositories.runLegacyMigration`).
+  Someone else's old data is not a reason the app won't start.
+
 ## Testing strategy
 
 - **Repository contract tests** run the real op-sqlite adapters against an

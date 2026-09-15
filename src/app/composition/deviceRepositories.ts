@@ -82,10 +82,11 @@ function openLegacyDatabase(): SqlDatabase | null {
 
 async function runLegacyMigration(repositories: Repositories): Promise<void> {
     const legacyDb = openLegacyDatabase();
+    const keyValue = asyncStorageKeyValue();
 
     try {
         const source = createLegacySource({
-            keyValue: asyncStorageKeyValue(),
+            keyValue,
             fileSystem: nativeFileSystem(),
             unzip: fflateUnzip,
             characterDir: `${documentDirectoryPath()}/character`,
@@ -93,8 +94,15 @@ async function runLegacyMigration(repositories: Repositories): Promise<void> {
         });
 
         await migrateV1(repositories, source);
+    } catch (error) {
+        // A one-time import of someone else's data must never be the reason the app
+        // won't start. migrateV1 stamps its flag only on success, so whatever failed
+        // is retried on the next launch (and its writes are upserts, so a partial
+        // run replays cleanly) — the user gets a working app in the meantime.
+        console.warn('[migration] legacy import failed; starting without it', error);
     } finally {
         legacyDb?.close();
+        keyValue.close();
     }
 }
 

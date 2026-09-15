@@ -42,6 +42,27 @@ const HSMC = '.hsmc';
 // disk are left in place — they are a harmless backup, not read at runtime.
 const KEYS_TO_CLEAR = ['character', 'characters', 'hero', 'version', 'appSettings', 'statistics', 'showSecondaryCharacteristics', 'combat'];
 
+/**
+ * Reads one legacy key, degrading to null rather than throwing.
+ *
+ * A read can fail outright: Android returns a query's rows through a 2 MB
+ * `CursorWindow`, and the legacy `characters` key — up to five characters with
+ * their base64 portraits inlined — can exceed it, which surfaces as "Row too big
+ * to fit into CursorWindow". `withDatabaseFallback` recovers that case by reading
+ * AsyncStorage's database directly; if even that fails there is nothing more to
+ * try, and losing a key must not cost the import. The `.hsmc` files on disk are
+ * the authoritative copy of every character (see docs/PERSISTENCE.md), so the
+ * worst this costs is knowing which one was active.
+ */
+const readKey = async (keyValue: LegacyKeyValueStore, key: string): Promise<string | null> => {
+    try {
+        return await keyValue.getItem(key);
+    } catch (error) {
+        console.warn(`[migration] legacy key "${key}" could not be read; continuing without it`, error);
+        return null;
+    }
+};
+
 const parseJson = <T>(raw: string | null): T | null => {
     if (raw === null) {
         return null;
@@ -69,8 +90,8 @@ export function createLegacySource(deps: LegacySourceDeps): LegacySource {
                 characters: await readCharacters(deps),
                 settings,
                 statistics,
-                randomHero: parseJson<RandomHero>(await deps.keyValue.getItem('hero')),
-                version: await deps.keyValue.getItem('version'),
+                randomHero: parseJson<RandomHero>(await readKey(deps.keyValue, 'hero')),
+                version: await readKey(deps.keyValue, 'version'),
             };
         },
         clear: async (): Promise<void> => {
@@ -81,17 +102,11 @@ export function createLegacySource(deps: LegacySourceDeps): LegacySource {
 
 async function readCharacters(deps: LegacySourceDeps): Promise<LegacyCharacter[]> {
     const {keyValue, fileSystem, unzip, characterDir} = deps;
-
-    // Character/active pointers from AsyncStorage. `characters` is a map of the
-    // stored characters (legacy keyed them by slot), `character` is the active
-    // one; we only need their filenames here.
-    const storedMap = parseJson<Record<string, {filename?: string} | null>>(await keyValue.getItem('characters')) ?? {};
-    const activeChar = parseJson<{filename?: string}>(await keyValue.getItem('character'));
-    const activeFilename = typeof activeChar?.filename === 'string' ? activeChar.filename : null;
-
     const byFilename = new Map<string, LegacyCharacter>();
 
     // Primary source: the authoritative `.hsmc` files (each a zip of `<name>.json`).
+    // Read before the AsyncStorage keys, which are the ones that can fail (see
+    // `readKey`) — the files carry every document, so they must not be gated on them.
     const files = (await fileSystem.readdir(characterDir).catch(() => [] as string[])).filter((name) => name.toLowerCase().endsWith(HSMC));
     for (const file of files) {
         try {
@@ -99,12 +114,19 @@ async function readCharacters(deps: LegacySourceDeps): Promise<LegacyCharacter[]
             const raw = entries[`${file.slice(0, -HSMC.length)}.json`] ?? Object.values(entries)[0] ?? null;
             const document = parseJson<CharacterDocument>(raw);
             if (document !== null) {
-                byFilename.set(file, {document, filename: file, active: activeFilename === file});
+                byFilename.set(file, {document, filename: file, active: false});
             }
         } catch {
             // Unreadable/corrupt .hsmc — skip; a later AsyncStorage copy may still cover it.
         }
     }
+
+    // Character/active pointers from AsyncStorage. `characters` is a map of the
+    // stored characters (legacy keyed them by slot), `character` is the active
+    // one; we only need their filenames here.
+    const storedMap = parseJson<Record<string, {filename?: string} | null>>(await readKey(keyValue, 'characters')) ?? {};
+    const activeChar = parseJson<{filename?: string}>(await readKey(keyValue, 'character'));
+    const activeFilename = typeof activeChar?.filename === 'string' ? activeChar.filename : null;
 
     // Fallback: AsyncStorage character objects whose `.hsmc` is missing on disk,
     // so nothing is lost even if the file was never written / was deleted. The
@@ -113,12 +135,13 @@ async function readCharacters(deps: LegacySourceDeps): Promise<LegacyCharacter[]
     for (const char of [...Object.values(storedMap), activeChar]) {
         const filename = (char as {filename?: unknown} | null)?.filename;
         if (typeof filename === 'string' && !byFilename.has(filename)) {
-            byFilename.set(filename, {
-                document: char as CharacterDocument,
-                filename,
-                active: activeFilename === filename,
-            });
+            byFilename.set(filename, {document: char as CharacterDocument, filename, active: false});
         }
+    }
+
+    const active = activeFilename === null ? undefined : byFilename.get(activeFilename);
+    if (active !== undefined) {
+        active.active = true;
     }
 
     return [...byFilename.values()];
@@ -131,8 +154,8 @@ async function readSettingsAndStatistics(deps: LegacySourceDeps): Promise<{setti
 
     // No hsm.db — fall back to any legacy AsyncStorage caches, else defaults.
     return {
-        settings: parseJson<Partial<Settings>>(await deps.keyValue.getItem('appSettings')),
-        statistics: parseJson<Statistics>(await deps.keyValue.getItem('statistics')),
+        settings: parseJson<Partial<Settings>>(await readKey(deps.keyValue, 'appSettings')),
+        statistics: parseJson<Statistics>(await readKey(deps.keyValue, 'statistics')),
     };
 }
 

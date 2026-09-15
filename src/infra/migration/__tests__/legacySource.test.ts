@@ -56,7 +56,9 @@ const fakeKeyValue = (data: Record<string, string>): LegacyKeyValueStore & {rema
 
 const legacyHsmDb = (): SqlDatabase => {
     const db = createBetterSqlite3Database();
-    db.execute('CREATE TABLE settings (loadout TEXT PRIMARY KEY, useFifthEdition INTEGER, playSounds INTEGER, onlyDiceSounds INTEGER, showAnimations INTEGER, increaseEntropy INTEGER, colorScheme TEXT)');
+    db.execute(
+        'CREATE TABLE settings (loadout TEXT PRIMARY KEY, useFifthEdition INTEGER, playSounds INTEGER, onlyDiceSounds INTEGER, showAnimations INTEGER, increaseEntropy INTEGER, colorScheme TEXT)',
+    );
     db.execute('INSERT INTO settings VALUES (?, ?, ?, ?, ?, ?, ?)', ['default', 1, 0, 0, 0, 1, 'dark']);
     db.execute('CREATE TABLE statistics (loadout TEXT PRIMARY KEY, stats TEXT)');
     db.execute('INSERT INTO statistics VALUES (?, ?)', ['default', JSON.stringify({...DEFAULT_STATISTICS, sum: 99})]);
@@ -128,6 +130,37 @@ describe('createLegacySource + migrateV1 (real zip + real legacy SQLite)', () =>
         const list = await repos.characters.list();
         expect(list.map((c) => c.name)).toEqual(['Orphan']);
         expect(list[0].isActive).toBe(true);
+    });
+
+    // A legacy install with five characters puts megabytes of base64 portrait under
+    // the `characters` key, and Android cannot hand back a row over its 2 MB
+    // CursorWindow. `withDatabaseFallback` recovers the value where it can; when even
+    // that fails the import must still land the .hsmc files, which hold every document.
+    it('still imports the .hsmc characters when the AsyncStorage keys cannot be read', async () => {
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+        const fs = inMemoryFileSystem();
+        await fs.writeFile(`${CHAR_DIR}/defensor.hsmc`, hsmc('defensor', defensorDoc));
+        await fs.writeFile(`${CHAR_DIR}/grond.hsmc`, hsmc('grond', grondDoc));
+
+        const keyValue: LegacyKeyValueStore = {
+            getItem: () => Promise.reject(new Error('Row too big to fit into CursorWindow requiredPos=0, totalRows=1')),
+            multiRemove: async () => {},
+        };
+        const repos = repositoriesOver(fs);
+
+        const source = createLegacySource({keyValue, fileSystem: fs, unzip: fflateUnzip, characterDir: CHAR_DIR, legacyDb: legacyHsmDb()});
+        const result = await migrateV1(repos, source);
+
+        expect(result).toEqual({migrated: true, characters: 2, portraits: 1});
+        expect((await repos.characters.list()).map((c) => c.name)).toEqual(['Defensor', 'Grond']);
+
+        // The only casualty is the active pointer, which lived solely in AsyncStorage.
+        expect(await repos.characters.getActive()).toBeNull();
+
+        // hsm.db is a separate file and is unaffected by the key-value failure.
+        expect((await repos.settings.get()).colorScheme).toBe('dark');
+        expect(warn).toHaveBeenCalled();
+        warn.mockRestore();
     });
 
     it('is a clean no-op when there is no legacy data at all', async () => {

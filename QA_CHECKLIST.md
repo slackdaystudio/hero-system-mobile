@@ -112,6 +112,23 @@ native module (`npm run android`).
 - [ ] Tap a characteristic/skill roll → dice roller opens pre-filled.
 - [ ] Long-press a roll → rolls inline, result popup, stat recorded.
 
+## Power effects on the sheet (new in 2.9.1 — around thirty powers were blank)
+
+A power's card has two halves: the rollable dice, and the written-out numbers beside
+them. Only the first half had been rebuilt, so powers whose whole point is the second
+half showed a name and a cost and nothing else. **Display only — no cost moves.**
+- [ ] A character with **Teleportation, Flight, Tunneling, Gliding or Swinging**: the card
+      shows Combat Move, Non-Combat Move and both km/h figures. 5E in inches, 6E in metres.
+- [ ] **Leaping** adds the character's existing Leaping to the levels bought, rather than
+      showing just the levels.
+- [ ] **Stretching** shows Distance and Non-Combat Distance.
+- [ ] A **Hand-To-Hand Attack** or **Hand Killing Attack** shows a Dice line *as well as*
+      the tappable damage — they are different numbers, and both should be there.
+- [ ] **Barrier** shows PD/ED, BODY and Dimensions; **Endurance Reserve** shows Reserve and
+      Recovery; a 5E **Mental Defense** shows points including EGO/5.
+- [ ] **The total is identical to what 2.9.0 showed** on the same character. This whole
+      section is words on a card; if a number moved, that is a regression.
+
 ## Strength damage (new in 2.6.0 — restored from the old app)
 - [ ] **"Damage: 12d6" appears under STR** on a 60-STR Brick, and under **no other** characteristic.
 - [ ] Tap it → dice roller opens pre-filled for **Normal Damage** (not a skill check), 12 dice.
@@ -249,6 +266,17 @@ difference between the builder working and not.
 
 ## Migration (if testing over a legacy install)
 - [ ] First launch imported your legacy characters + settings + stats.
+
+### The CursorWindow boot failure (fixed in 2.9.1 — the one that needs a real legacy install)
+This is the bug 2.9.1 exists for, and **no emulator with a clean install can reproduce it**.
+It needs a legacy app whose AsyncStorage `characters` key is over 2 MB — in practice a full
+five-slot library where the characters carry portraits.
+- [ ] Upgrade over a legacy install **with five portrait-carrying characters**. The app boots.
+      Before the fix it showed "Row to big to fit into CursorWindow requiredPos=0, totalRows=1"
+      and nothing else, on **every** launch rather than just the first.
+- [ ] Those characters are all present afterwards, with their portraits.
+- [ ] Kill and relaunch — still fine, and the import does not run again.
+- [ ] A device with no legacy data at all still boots and is untouched.
 
 ## Upgrading over the previous build (2.9.0: no schema change)
 - [ ] Install 2.8.0, import a character and author one, then install 2.9.0 over the top.
