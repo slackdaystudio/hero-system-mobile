@@ -112,6 +112,23 @@ native module (`npm run android`).
 - [ ] Tap a characteristic/skill roll → dice roller opens pre-filled.
 - [ ] Long-press a roll → rolls inline, result popup, stat recorded.
 
+## Power effects on the sheet (new in 2.9.1 — around thirty powers were blank)
+
+A power's card has two halves: the rollable dice, and the written-out numbers beside
+them. Only the first half had been rebuilt, so powers whose whole point is the second
+half showed a name and a cost and nothing else. **Display only — no cost moves.**
+- [ ] A character with **Teleportation, Flight, Tunneling, Gliding or Swinging**: the card
+      shows Combat Move, Non-Combat Move and both km/h figures. 5E in inches, 6E in metres.
+- [ ] **Leaping** adds the character's existing Leaping to the levels bought, rather than
+      showing just the levels.
+- [ ] **Stretching** shows Distance and Non-Combat Distance.
+- [ ] A **Hand-To-Hand Attack** or **Hand Killing Attack** shows a Dice line *as well as*
+      the tappable damage — they are different numbers, and both should be there.
+- [ ] **Barrier** shows PD/ED, BODY and Dimensions; **Endurance Reserve** shows Reserve and
+      Recovery; a 5E **Mental Defense** shows points including EGO/5.
+- [ ] **The total is identical to what 2.9.0 showed** on the same character. This whole
+      section is words on a card; if a number moved, that is a regression.
+
 ## Strength damage (new in 2.6.0 — restored from the old app)
 - [ ] **"Damage: 12d6" appears under STR** on a 60-STR Brick, and under **no other** characteristic.
 - [ ] Tap it → dice roller opens pre-filled for **Normal Damage** (not a skill check), 12 dice.
