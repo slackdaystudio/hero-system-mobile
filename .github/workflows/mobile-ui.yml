@@ -199,7 +199,11 @@ jobs:
               continue-on-error: true # a failure here is answered by the fresh-emulator attempt below
               uses: reactivecircus/android-emulator-runner@v2
               with:
-                  api-level: 34 # solid google_apis image; bump toward 35 (the app's target) when stable on CI
+                  # Matches the app's targetSdk (36). Uses the action's default AOSP image
+                  # rather than google_apis — nothing here needs Play services, and the
+                  # leaner image has fewer things to stall during cold start, which is the
+                  # failure mode this job already fights.
+                  api-level: 36
                   arch: x86_64
                   profile: pixel_6
                   # Pin software rendering. The default host-GPU path drops color buffers on CI,
@@ -217,7 +221,7 @@ jobs:
               if: steps.e2e.outcome == 'failure'
               uses: reactivecircus/android-emulator-runner@v2
               with:
-                  api-level: 34
+                  api-level: 36  # keep in step with the attempt above
                   arch: x86_64
                   profile: pixel_6
                   emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
@@ -225,6 +229,14 @@ jobs:
 
             # Pixel-diff the character sheet against its committed Android baseline.
             # ON-DEMAND ONLY (workflow_dispatch `visual_gate` input) — see docs/UI_TESTING.md.
+            #
+            # STALE BASELINE: .maestro/baselines/android/sheet.png was captured on API 34 in
+            # July. This job now runs API 36, which renders differently, so the gate will
+            # report a diff until the baseline is re-captured from an API 36 run. Normal CI
+            # is unaffected because the gate is opt-in — but the first person to switch it on
+            # should expect a failure that is the baseline's fault, not the app's. The
+            # screenshot is uploaded on every run, so re-baselining is: take sheet.png from
+            # the maestro-android artifact of a green API 36 run and commit it over the old one.
             # Screenshot is captured every run regardless; only the pixel comparison is gated off.
             # Crops exclude jittering overlays (see iOS note): status bar (top), nav bar +
             # frame-edge power row (bottom), and the fading scroll indicator (right, ~11px).
