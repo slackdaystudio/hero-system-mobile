@@ -22,10 +22,24 @@ on the Mac passes `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` **and**
 `1.0 (1)` while 2.7.x and 2.8.0 all shipped to TestFlight correctly versioned — the file
 was simply never consulted.
 
-The pbxproj values are now kept in step with Android anyway, so opening the project in
-Xcode shows something truthful, but **the build script is the source of truth** and the
-version you type on its command line is the version that ships. Don't "fix" a release by
-editing the project file.
+The pbxproj values are kept truthful anyway, so opening the project in Xcode shows what
+actually shipped — but **the build script is the source of truth** and the version you type
+on its command line is the version that ships. Don't "fix" a release by editing the project
+file.
+
+**The two numbers follow different rules, and only one of them tracks Android:**
+
+- `MARKETING_VERSION` **matches Android's `versionName`** (2.9.1 on both).
+- `CURRENT_PROJECT_VERSION` is the **iOS build number**, and it does **not** track Android's
+  `versionCode`. It is **1 for each new marketing version**, and goes to 2, 3… only if the
+  *same* marketing version is uploaded again (Apple rejects a repeated build number within a
+  version). Every rebuild upload has followed this — App Store Connect lists 2.7.0, 2.7.1,
+  2.8.0, 2.9.0 and 2.9.1 all as build **1**.
+
+2.9.0 set the build number to 70 "in step with Android", and 2.9.1 carried that on as 71, so
+for two releases the project file claimed builds TestFlight has never seen. The legacy app
+did use one running counter (builds 56–65), which is where the habit came from; the rebuild
+does not. When in doubt, ask App Store Connect, not this repo.
 
 ## Signing setup
 
