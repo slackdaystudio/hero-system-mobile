@@ -89,9 +89,12 @@ If the id is taken (`findConflict`), the player chooses:
 ## Pieces
 
 1. ✅ Manifest + reader + landing rules — `src/core/share/` (this doc).
-2. Pack/unpack — `infra/`: `fflate` zip of manifest + portrait; unzip reading only
-   the named entries; save via `CharacterRepository.save` with `origin`, `recipe`,
-   `source` stated explicitly (never defaulted), then `setPortraitFocus`.
+2. ✅ Pack/unpack — `src/infra/share/`. `packCharacter` reads the portrait off disk
+   through the `FileSystem` seam (the `ImageStore` port has no read, and needs none for
+   this) and stores it uncompressed. `unpackCharacter` inflates only the entries the
+   manifest names, with size ceilings. `saveReceivedCharacter` states every field
+   explicitly — `save`'s keep-what's-there defaults would otherwise graft the old
+   character's recipe or portrait onto a replace.
 3. Export UI — share action on the character screen; writes the `.hsm` to a temp
    file and opens the share sheet (`react-native-share` — audit entry needed).
 4. Import — an `.hsm` branch beside `importHdc` in the existing file picker, with
