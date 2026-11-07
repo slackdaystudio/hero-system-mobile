@@ -145,6 +145,39 @@ describe('GenerateProvider', () => {
         expect(second.id).not.toBe(first.id);
     });
 
+    it('never reuses a surviving id after a lower-numbered character was deleted', async () => {
+        // The bug: the suffix was "how many generated characters exist, plus one". Delete one and the
+        // count drops below the highest number in use, so the next roll of that archetype is handed
+        // a live id — and `save` is an upsert, so it silently overwrote the survivor.
+        const probe: SaveCharacter[] = [];
+        const first = await generateOnce(probe, seededRng(2));
+        expect(first.id).toMatch(/-1$/);
+
+        // A library holding only `<archetype>-2`: its `-1` sibling has been deleted.
+        const survivor = first.id.replace(/-1$/, '-2');
+        const saved: SaveCharacter[] = [{...probe[0], id: survivor}];
+
+        const next = await generateOnce(saved, seededRng(2));
+
+        expect(next.id).not.toBe(survivor);
+        expect(new Set(saved.map((character) => character.id)).size).toBe(saved.length);
+    });
+
+    it('numbers each archetype on its own, taking the first number that is free', async () => {
+        const probe: SaveCharacter[] = [];
+        const first = await generateOnce(probe, seededRng(2));
+        const base = first.id.replace(/-1$/, '');
+        // Unrelated generated characters do not push this archetype's numbers up.
+        const saved: SaveCharacter[] = [
+            {...probe[0], id: 'generated-someone-else-1'},
+            {...probe[0], id: 'generated-someone-else-2'},
+            {...probe[0], id: `${base}-1`},
+            {...probe[0], id: `${base}-3`},
+        ];
+
+        expect((await generateOnce(saved, seededRng(2))).id).toBe(`${base}-2`);
+    });
+
     /**
      * The whole reason rolling and keeping are two actions.
      *

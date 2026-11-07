@@ -103,7 +103,7 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
 
             // Unique per generation: a kept character is a new one every time, never an upsert over
             // a previous roll (unlike an import, whose id comes from its file name).
-            const id = `generated-${rolled.recipe.archetype.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${await nextSuffix(repositories)}`;
+            const id = await nextFreeId(repositories, `generated-${rolled.recipe.archetype.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`);
 
             await repositories.characters.save({
                 id,
@@ -156,11 +156,27 @@ export function GenerateProvider({rng, children}: GenerateProviderProps): React.
     return <GenerateContext.Provider value={api}>{children}</GenerateContext.Provider>;
 }
 
-/** Monotonic-ish suffix from the current library, so repeated rolls never collide on id. */
-async function nextSuffix(repositories: ReturnType<typeof useRepositories>): Promise<string> {
-    const existing = await repositories.characters.list();
+/**
+ * `<base>-1`, `-2`, `-3`… — the first one nothing is using.
+ *
+ * This used to be "count the generated characters, add one". That is only unique while nothing is
+ * ever deleted: delete `generated-tank-1` beside a `generated-brick-2` and the count says 2, the
+ * next Brick is handed a live id, and `save` — an upsert — silently overwrote it. Checking the ids
+ * themselves is the only test of "free" that cannot drift.
+ *
+ * Reusing a freed number is safe: deleting a character cascades its combat state away
+ * (`combat_state` is `ON DELETE CASCADE`, with foreign keys on in both drivers), so nothing keyed by
+ * the old id is waiting for the new one.
+ */
+async function nextFreeId(repositories: ReturnType<typeof useRepositories>, base: string): Promise<string> {
+    const taken = new Set((await repositories.characters.list()).map((summary) => summary.id));
 
-    return String(existing.filter((summary) => summary.id.startsWith('generated-')).length + 1);
+    let suffix = 1;
+    while (taken.has(`${base}-${suffix}`)) {
+        suffix += 1;
+    }
+
+    return `${base}-${suffix}`;
 }
 
 function useGenerateApi(): GenerateApi {
