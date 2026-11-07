@@ -14,7 +14,7 @@
 
 import {combatDetails} from 'core/combat';
 import {RollType} from 'core/dice';
-import {enduranceCost, heroDesignerCharacter, movementEnduranceCost, strengthEnduranceCost, TRAIT_CHILD_KEYS} from 'core/hero';
+import {enduranceCost, heroDesignerCharacter, movementEnduranceCost, pointSummary, strengthEnduranceCost, TRAIT_CHILD_KEYS} from 'core/hero';
 import {characterTraitDecorator, type Attribute, type Obj, type RollDescriptor, type Writeup} from 'core/traits';
 import type {CharacterDocument} from 'core/ports';
 
@@ -60,7 +60,10 @@ const filterOutAlternateId = (items: Obj[], listKey: string): Obj[] =>
  * containers and never visits the children of anything else.
  */
 const someTrait = (items: Obj[], predicate: (item: Obj) => boolean, listKey: string): boolean =>
-    items.some((item) => predicate(item) || childKeysFor(listKey).some((key) => (Array.isArray(item[key]) ? someTrait(item[key] as Obj[], predicate, listKey) : false)));
+    items.some(
+        (item) =>
+            predicate(item) || childKeysFor(listKey).some((key) => (Array.isArray(item[key]) ? someTrait(item[key] as Obj[], predicate, listKey) : false)),
+    );
 
 /**
  * A copy of the character with every "Only In Alternate Identity" trait removed
@@ -316,9 +319,43 @@ const TRAIT_SECTIONS: Array<{key: string; title: string}> = [
 export function asHeroCharacter(document: CharacterDocument): Obj | null {
     const characteristics = (document as {characteristics?: unknown}).characteristics;
     const looksProcessed =
-        Array.isArray(characteristics) && characteristics.length > 0 && typeof (characteristics[0] as {shortName?: unknown} | undefined)?.shortName === 'string';
+        Array.isArray(characteristics) &&
+        characteristics.length > 0 &&
+        typeof (characteristics[0] as {shortName?: unknown} | undefined)?.shortName === 'string';
 
     return looksProcessed ? (document as unknown as Obj) : null;
+}
+
+/**
+ * Whether the character screen can show this document — the gate a received `.hsm` passes before it
+ * is saved (docs/SHARING.md, piece 4).
+ *
+ * Runs everything the screen computes from a document, in both identity modes, and reports whether
+ * any of it throws. The per-trait try/catch inside the sheet already turns a bad *trait* into a stub
+ * row; what this catches is damage above that — a document whose shape the sheet cannot walk at all.
+ * A document that does not look processed is fine: the screen shows its basic fallback for those,
+ * exactly as it would on the phone that sent it.
+ */
+export function canDisplayCharacter(document: CharacterDocument, edition: '5E' | '6E'): boolean {
+    try {
+        alternateIdentities(document);
+        pointSummary(document, edition === '5E');
+
+        const hero = asHeroCharacter(document);
+
+        if (hero !== null) {
+            hasAlternateForm(hero);
+
+            for (const showSecondary of [true, false]) {
+                buildCharacterSheet(hero, showSecondary);
+                buildCombatSheet(hero, showSecondary);
+            }
+        }
+
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 /** Build the full sheet from a processed character: characteristics + decorated trait sections. */
@@ -376,7 +413,16 @@ function buildTraits(items: Obj[], listKey: string, character: Obj, depth: numbe
             const maneuver = listKey === 'martialArts' ? buildManeuver(decorated.attributes(), decorated.definition(), roll) : undefined;
             // Only Powers cost END; skills/perks/talents never do (and their templates carry no `usesend`).
             const endurance = listKey === 'powers' ? enduranceCost(item, decorated.activeCost()) : 0;
-            rows.push({label: decorated.label(), roll, realCost: decorated.realCost(), endurance, definition: decorated.definition(), depth, writeup: decorated.toWriteup(), maneuver});
+            rows.push({
+                label: decorated.label(),
+                roll,
+                realCost: decorated.realCost(),
+                endurance,
+                definition: decorated.definition(),
+                depth,
+                writeup: decorated.toWriteup(),
+                maneuver,
+            });
 
             // Indent whatever this category nests its children under — `powers` only for Powers.
             // A Skill Enhancer nests under `skills` and a martial style under `maneuver`, so

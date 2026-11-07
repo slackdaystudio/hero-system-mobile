@@ -25,7 +25,19 @@ native module (`npm run android`).
 - [ ] Cancel the picker → no error, nothing changes.
 - [ ] Import a couple of your trickier builds (VPP, multipower, frameworks).
 
-## Share a character (new — #71; import of `.hsm` is not built yet)
+## Receive a shared character (new — #71)
+- [ ] On phone B: Characters → **Import** → pick a `.hsm` from Drive/Files/Downloads → it imports
+      and opens the sheet. Name, portrait, portrait framing all came through.
+- [ ] A **generated** character arrives editable (re-roll controls); an **authored** one shows **Edit**;
+      an **imported .hdc** one has neither.
+- [ ] Import the **same** `.hsm` again → the prompt names the character. **Cancel** → nothing changes.
+      **Import as copy** → a second row, "Name (2)". **Replace** → still one row, updated.
+- [ ] Dismiss the prompt with Android back / a tap outside → same as Cancel.
+- [ ] Pick a random `.zip` → "isn't a HERO System Mobile character". Nothing is added.
+- [ ] A `.hdc` still imports exactly as before (and re-importing one still overwrites silently).
+- [ ] **iOS:** a `.hsm` saved to Files via AirDrop is pickable from Import.
+
+## Share a character (new — #71)
 - [ ] Open any character → **Share** in the header → the system share sheet opens.
 - [ ] The file is named after the character (`Fire Brick.hsm`), spaces and all.
 - [ ] Dismiss the sheet → no error, no toast, button usable again.

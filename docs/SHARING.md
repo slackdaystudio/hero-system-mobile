@@ -102,8 +102,19 @@ If the id is taken (`findConflict`), the player chooses:
    because Android receivers read it afterwards, and the folder is emptied before the
    next share instead. Offered as `application/zip`. Always includes the portrait —
    a "without portrait" choice is a later nicety.
-4. Import — an `.hsm` branch beside `importHdc` in the existing file picker, with
-   the replace / copy prompt.
+4. ✅ Import — the existing **Import** button takes both. `ImportProvider` sniffs the
+   bytes (`isZip`: a `.hdc` is XML, so the zip signature settles it regardless of what
+   Drive renamed the file to) and sends a `.hsm` through `receiveCharacter`
+   (`infra/share/receive.ts`): unpack → **display gate** → clash prompt → save. The
+   gate is `canDisplayCharacter` (`app/screens/characterSheet.ts`), which runs
+   everything the character screen computes, in both identity modes; it is tested
+   against the whole corpus and every generated archetype so it cannot falsely refuse a
+   real character. The prompt is a native alert — Cancel / Replace / **Import as copy**
+   (preferred); dismissing it is a cancel and writes nothing. Each failure kind gets its
+   own message; a damaged file's validator detail rides on `ReceiveError.result`.
+
+   A `.hdc` re-import still overwrites silently, as it always has — it is the player's
+   own file coming back. Only shared files ask.
 
 Later: registering `.hsm` so AirDrop / Quick Share open it directly (Android
 intent filter, iOS document type), a plain-text readable sheet, QR transfer.

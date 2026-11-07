@@ -24,3 +24,4 @@ export {
     type ReceivedCharacter,
     type UnpackResult,
 } from './shareFile';
+export {isZip, receiveCharacter, type ConflictChoice, type ReceiveOptions, type ReceiveResult} from './receive';

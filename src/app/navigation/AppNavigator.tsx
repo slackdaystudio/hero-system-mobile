@@ -267,7 +267,11 @@ function GenerateButton({onGenerated}: {onGenerated: (result: GenerateResult) =>
     );
 }
 
-/** Header action that picks a HERO Designer `.hdc` and imports it, then reports the result. */
+/**
+ * Header action that picks a file and imports it, then reports the result: a HERO Designer `.hdc`,
+ * or a `.hsm` shared from another phone (see `ImportProvider`, which tells them apart). Failures
+ * arrive as player-facing messages, so the alert shows them as they are.
+ */
 function ImportButton({onImported}: {onImported: (result: ImportResult) => void}): React.JSX.Element {
     const theme = useTheme();
     const importCharacter = useImportCharacter();
