@@ -25,6 +25,19 @@ native module (`npm run android`).
 - [ ] Cancel the picker → no error, nothing changes.
 - [ ] Import a couple of your trickier builds (VPP, multipower, frameworks).
 
+## Share a character (new — #71; import of `.hsm` is not built yet)
+- [ ] Open any character → **Share** in the header → the system share sheet opens.
+- [ ] The file is named after the character (`Fire Brick.hsm`), spaces and all.
+- [ ] Dismiss the sheet → no error, no toast, button usable again.
+- [ ] **Android:** Quick Share / Gmail / Drive each take it. Send one to yourself by mail and check
+      the attachment is a few KB to a few hundred KB — not zero bytes. (Zero means the file was
+      cleaned up before the receiver read it.)
+- [ ] **iOS:** AirDrop to a Mac or another phone, and **Save to Files** — the `.hsm` lands intact.
+      (iOS builds need `pod install` first: this adds the `react-native-share` pod.)
+- [ ] Share a character **with a portrait** and one **without** — both work.
+- [ ] On a computer, rename the received file to `.zip` and open it: `character.json`, plus
+      `portrait.jpg`/`.png` when there was one.
+
 ## Delete a character
 - [ ] The trash button is legible against both themes, and hittable without aiming.
 - [ ] Tapping it confirms, names the right character, and does **not** open that character.

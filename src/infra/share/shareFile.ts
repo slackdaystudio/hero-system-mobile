@@ -43,6 +43,13 @@ import type {Repositories} from '../persistence/repositories';
 export const MAX_MANIFEST_BYTES = 8 * 1024 * 1024;
 export const MAX_PORTRAIT_BYTES = 16 * 1024 * 1024;
 
+/**
+ * The type a `.hsm` is offered to the share sheet as. Honest — it is a zip — and generic enough that
+ * every mail client, messenger, AirDrop and Quick Share will take it; a vendor type would make some
+ * share targets hide themselves.
+ */
+export const SHARE_MIME = 'application/zip';
+
 /** The image store names files `<uuid>.<ext>`; this reads the type back off the name. */
 const MIME_BY_EXTENSION: Readonly<Record<string, string>> = {
     jpg: 'image/jpeg',

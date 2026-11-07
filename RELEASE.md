@@ -30,6 +30,8 @@ file.
 **The two numbers follow different rules, and only one of them tracks Android:**
 
 - `MARKETING_VERSION` **matches Android's `versionName`** (2.9.1 on both).
+- `APP_VERSION` in `src/app/appVersion.ts` matches both too — `appVersion.test.ts` fails until it
+  does. It is what shared `.hsm` files report as the version that wrote them.
 - `CURRENT_PROJECT_VERSION` is the **iOS build number**, and it does **not** track Android's
   `versionCode`. It is **1 for each new marketing version**, and goes to 2, 3… only if the
   *same* marketing version is uploaded again (Apple rejects a repeated build number within a

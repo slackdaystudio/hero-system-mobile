@@ -58,6 +58,16 @@ the `react-native` package because it is a dependency of it. The suggested fix i
 developer's machine and in CI; none is bundled into the app. Their fixes are all gated behind
 the same react-native 0.79 → 0.87 upgrade, or a CLI 18 → 20 major.
 
+## Added since the snapshot
+
+| Package | Added | Why, and what it touches |
+|---|---|---|
+| `react-native-share` `^12.3.1` | 2026-11-06 | Sharing characters as `.hsm` files (#71, `docs/SHARING.md`). RN's own `Share` cannot attach a file on Android. No transitive dependencies; ships a TurboModule codegen spec (New Architecture). Its Android manifest adds **no permissions** and one FileProvider at `${applicationId}.rnshare.fileprovider`, which does not collide with react-native-blob-util's `${applicationId}.provider` (verified in the merged debug manifest). Not flagged by `npm audit`. |
+
+When it was added, `npm audit` reported **37** advisories, against the 24 in this file's snapshot.
+None names `react-native-share`; the rise is new advisories published since 2026-09-14, and wants
+its own pass through the list above.
+
 ## The real remediation
 
 Most of what is left clears itself on a **react-native upgrade** (0.79.2 → current), which

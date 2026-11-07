@@ -95,8 +95,13 @@ If the id is taken (`findConflict`), the player chooses:
    manifest names, with size ceilings. `saveReceivedCharacter` states every field
    explicitly — `save`'s keep-what's-there defaults would otherwise graft the old
    character's recipe or portrait onto a replace.
-3. Export UI — share action on the character screen; writes the `.hsm` to a temp
-   file and opens the share sheet (`react-native-share` — audit entry needed).
+3. ✅ Export UI — **Share** in the character screen's header (`AppNavigator`'s
+   `ShareButton`) → `ShareProvider` → the `FileSharer` port. The device adapter
+   (`infra/files/nativeFileSharer.ts`) writes into `<cache>/share/` and opens
+   `react-native-share`; the file is deliberately left there after the sheet closes,
+   because Android receivers read it afterwards, and the folder is emptied before the
+   next share instead. Offered as `application/zip`. Always includes the portrait —
+   a "without portrait" choice is a later nicety.
 4. Import — an `.hsm` branch beside `importHdc` in the existing file picker, with
    the replace / copy prompt.
 

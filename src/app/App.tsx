@@ -23,15 +23,22 @@ import {GenerateProvider} from 'app/providers/GenerateProvider';
 import {ImportProvider} from 'app/providers/ImportProvider';
 import {RepositoriesProvider} from 'app/providers/RepositoriesProvider';
 import {SettingsProvider, useSettings} from 'app/providers/SettingsProvider';
+import {ShareProvider} from 'app/providers/ShareProvider';
 import {ToastProvider} from 'app/providers/ToastProvider';
 import {ThemeProvider} from 'app/theme';
 import {createDocumentPickerFilePicker} from 'infra/files/documentPickerFilePicker';
+import {nativeFileSharer} from 'infra/files/nativeFileSharer';
 import {nativeFileSystem} from 'infra/files/nativeFileSystem';
 import type {Repositories} from 'infra/persistence/repositories';
 
 // The device document-picker, wired once. Injected via ImportProvider so screens
 // depend only on the FilePicker port (tests supply a fake).
-const filePicker = createDocumentPickerFilePicker(nativeFileSystem());
+const fileSystem = nativeFileSystem();
+const filePicker = createDocumentPickerFilePicker(fileSystem);
+
+// The device share sheet, injected the same way (ShareProvider; tests supply a fake). The file
+// system is passed alongside because sharing reads the portrait back off disk.
+const fileSharer = nativeFileSharer();
 
 type Boot = {status: 'loading'} | {status: 'ready'; repositories: Repositories} | {status: 'error'; message: string};
 
@@ -114,13 +121,15 @@ function ThemedApp(): React.JSX.Element {
         <ThemeProvider colorScheme={settings.colorScheme} fontScale={settings.fontScale}>
             <ToastProvider>
                 <ImportProvider filePicker={filePicker}>
-                    <GenerateProvider>
-                        <AuthoringProvider>
-                            <DiceProvider>
-                                <AppNavigator />
-                            </DiceProvider>
-                        </AuthoringProvider>
-                    </GenerateProvider>
+                    <ShareProvider fileSharer={fileSharer} fileSystem={fileSystem}>
+                        <GenerateProvider>
+                            <AuthoringProvider>
+                                <DiceProvider>
+                                    <AppNavigator />
+                                </DiceProvider>
+                            </AuthoringProvider>
+                        </GenerateProvider>
+                    </ShareProvider>
                 </ImportProvider>
             </ToastProvider>
         </ThemeProvider>

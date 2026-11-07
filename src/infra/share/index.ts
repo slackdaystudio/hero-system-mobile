@@ -15,6 +15,7 @@
 export {
     MAX_MANIFEST_BYTES,
     MAX_PORTRAIT_BYTES,
+    SHARE_MIME,
     packCharacter,
     saveReceivedCharacter,
     shareFileName,
