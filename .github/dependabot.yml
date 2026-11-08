@@ -1,0 +1,29 @@
+# Dependabot. See docs/DEPENDENCY_AUDIT.md.
+#
+# Security updates only: `open-pull-requests-limit: 0` turns off routine version-update
+# PRs for npm, which is how this repo has always run. Security-update PRs have their own
+# fixed limit and keep coming.
+#
+# The `ignore` rules also apply to security updates. That is the point: Dependabot "fixes"
+# metro/image-size advisories by bumping react-native in package.json while android/ and
+# ios/ stay built against 0.79.2 (#67 → 0.87.1, #76 → 0.88.1; both failed Maestro and were
+# closed). The react-native upgrade is planned work with a device shakedown
+# (QA_CHECKLIST.md), not a lockfile bump.
+#
+# It is a version range, not `update-types: semver-major`, on purpose: react-native is 0.x,
+# so 0.79 → 0.88 is a *minor* bump to semver and a major-only rule would not catch it.
+# `@react-native/*` (metro-config, babel-preset, eslint-config, …) is versioned in lockstep.
+#
+# When the react-native upgrade lands, move these ranges up to the next line (or drop them).
+version: 2
+updates:
+    - package-ecosystem: npm
+      directory: /
+      schedule:
+          interval: weekly
+      open-pull-requests-limit: 0
+      ignore:
+          - dependency-name: react-native
+            versions: ['>=0.80.0']
+          - dependency-name: '@react-native/*'
+            versions: ['>=0.80.0']
