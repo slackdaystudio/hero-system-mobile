@@ -93,6 +93,17 @@ const collectText = (node: unknown): string[] => {
     return collectText((node as {children?: unknown}).children);
 };
 
+/**
+ * Every tree a test renders, so `afterEach` can unmount it.
+ *
+ * The screen is a FlatList, and VirtualizedList batches cell updates on a real `setTimeout`
+ * that only `componentWillUnmount` clears. A tree left mounted fires that timer after the
+ * suite has torn down, while the next suite runs (`maxWorkers: 1`). Jest then reports
+ * "Cannot log after tests are done" and sets `process.exitCode = 1`, so `npm test` failed
+ * with every test green.
+ */
+const mounted: ReactTestRenderer[] = [];
+
 const renderScreen = async (characters: CharacterRepository, props: CharacterListScreenProps = {}): Promise<ReactTestRenderer> => {
     const repositories = {characters} as unknown as Repositories;
 
@@ -106,10 +117,17 @@ const renderScreen = async (characters: CharacterRepository, props: CharacterLis
             </ThemeProvider>,
         );
     });
+    mounted.push(tree);
     await act(async () => {}); // flush the list() promise -> setState
 
     return tree;
 };
+
+afterEach(async () => {
+    await act(async () => {
+        mounted.splice(0).forEach((tree) => tree.unmount());
+    });
+});
 
 describe('CharacterListScreen', () => {
     it('reloads the list when refreshToken changes (e.g. after an import)', async () => {
@@ -128,6 +146,7 @@ describe('CharacterListScreen', () => {
         await act(async () => {
             tree = TestRenderer.create(wrap(0));
         });
+        mounted.push(tree);
         await act(async () => {});
         expect(collectText(tree.toJSON())).toContain('Alpha');
 

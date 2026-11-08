@@ -116,11 +116,3 @@ moves metro, the eslint config and the codegen in step. That is a planned piece 
 device shakedown behind it (`QA_CHECKLIST.md`), not an audit fix. It is what the audit is
 actually asking for, and it is the thing to schedule. When it happens, update the
 `ignore` ranges in `.github/dependabot.yml` in the same PR.
-
-## Aside: `npm test` exits 1 when green
-
-Not an audit finding, but found during this pass: `npm test` exits **1** even when every
-suite passes. Jest's `--json` report says `success: true`, with no runtime errors and no open
-handles. This reproduces on `master`'s lockfile before any of the changes above. CI runs
-Maestro only, not Jest, so nothing catches it. The first suspect is the "Cannot log after
-tests are done" warnings from `AuthorCharacterScreen.test.tsx`.
