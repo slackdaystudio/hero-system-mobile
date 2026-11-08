@@ -6,10 +6,14 @@
 # pod or a native crash shows up here as "Share failed", or as the app gone from the
 # screen, before it reaches TestFlight.
 #
-# The share sheet and the Files picker are system UI, drawn outside the app. The steps
-# that drive them are `optional` until CI has shown which ones Maestro can see. Each
-# leaves a screenshot under maestro-artifacts/<platform>/share-*, so a run that skips one
-# still shows what was on screen.
+# The share sheet and the Files picker are system UI, drawn outside the app. CI has shown
+# Maestro can drive both on the simulator (PR #86): the sheet, Save to Files, and picking
+# the saved file back up in Import. "On My iPhone" stays optional because where Browse
+# lands depends on what the picker last showed. Every step leaves a screenshot under
+# maestro-artifacts/<platform>/share-*.
+#
+# The E2E seed's character is named Defensor (its id is sample-hero), so the file is
+# Defensor.hsm.
 appId: ${APP_ID}
 ---
 - launchApp:
@@ -41,16 +45,11 @@ appId: ${APP_ID}
         - extendedWaitUntil:
               visible: 'Save to Files'
               timeout: 20000
-              optional: true
-        - tapOn:
-              text: 'Save to Files'
-              optional: true
+        - tapOn: 'Save to Files'
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-2-files'
-        - tapOn:
-              text: 'Save'
-              optional: true
+        - tapOn: 'Save'
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-3-saved'
@@ -68,27 +67,26 @@ appId: ${APP_ID}
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-4-picker'
-        - tapOn:
-              text: 'Browse'
-              optional: true
+        - tapOn: 'Browse'
         - tapOn:
               text: 'On My iPhone'
               optional: true
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-5-browse'
-        - tapOn:
-              text: 'Sample Hero.*'
-              optional: true
+        - tapOn: 'Defensor.hsm'
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-6-picked'
-        # Sample Hero is already on the phone, so a working import asks how to land it.
-        - tapOn:
-              text: 'Import as copy'
-              optional: true
-        - waitForAnimationToEnd:
-              timeout: 5000
+        # Defensor is already on the phone, so a working import asks how to land it.
+        - extendedWaitUntil:
+              visible: 'Import as copy'
+              timeout: 20000
+        - tapOn: 'Import as copy'
+        # A copy lands as "Defensor (2)" and opens its sheet.
+        - extendedWaitUntil:
+              visible: 'Defensor \(2\)'
+              timeout: 20000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-7-imported'
 
 # Android: the chooser was device-tested; here it only has to open without the app
