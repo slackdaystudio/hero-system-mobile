@@ -1,0 +1,52 @@
+name: Checks
+
+# Lint, typecheck and Jest: the gate CLAUDE.md asks for before every non-trivial commit,
+# which until now only ran on a developer's machine. mobile-ui.yml runs Maestro on real
+# devices and never ran Jest, which is how `npm test` exiting 1 with every test green went
+# unnoticed (#83). Linux only: core, infra and app tests are all pure Node.
+
+on:
+    pull_request:
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+# One in-flight run per branch; a new push cancels the previous run.
+concurrency:
+    group: checks-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    checks:
+        name: Lint · Typecheck · Jest
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+
+            - run: npm ci
+
+            # The infra suites run persistence against a real SQLite through better-sqlite3,
+            # a native module. If its binding didn't build, say so here rather than as ten
+            # failed infra suites.
+            - name: Check the better-sqlite3 binding loads
+              run: node -e "new (require('better-sqlite3'))(':memory:').close()"
+
+            - name: Lint
+              run: npm run lint
+
+            - name: Typecheck
+              run: npx tsc --noEmit
+
+            # Jest's exit code is the gate. It fails on a log after a suite tears down
+            # ("Cannot log after tests are done"), not just on a failed assertion.
+            - name: Jest
+              run: npm test -- --ci
