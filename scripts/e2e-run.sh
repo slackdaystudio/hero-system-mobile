@@ -114,6 +114,26 @@ for round in $(seq 1 "$ROUNDS"); do
     fi
 
     [ "$RC" -eq 0 ] && break
+
+    # Every flow failed in round 1: the device is bad, not one flow's cold start. In-session
+    # rounds re-run everything on that same device, and the dropped color buffer is device
+    # state that no relaunch clears. They also cost a full suite each, and with seven flows
+    # those rounds used up the job's time limit before the fresh emulator could start (PR #86).
+    # So stop here and let the workflow replace the device.
+    #
+    # This only ever exits non-zero, so it can't turn a failure green. A real app breakage
+    # that fails every flow fails on the fresh emulator too.
+    if [ "$round" -eq 1 ]; then
+        total=$(find "$FLOW_DIR" -maxdepth 1 -name '*.yaml' ! -name 'config.yaml' | wc -l)
+        failed=0
+        for name in $(failed_flows "$REPORT" 2>/dev/null); do
+            [ -f "${FLOW_DIR}/${name}.yaml" ] && failed=$((failed + 1))
+        done
+        if [ "$total" -gt 0 ] && [ "$failed" -ge "$total" ]; then
+            echo "::warning::All ${total} flows failed in round 1 — the device is bad; skipping in-session retries."
+            break
+        fi
+    fi
     if [ "$round" -lt "$ROUNDS" ]; then
         echo "::warning::Maestro failed (rc=$RC) — round ${round}/${ROUNDS}, retrying (transient cold-start / GPU stall)."
     fi
