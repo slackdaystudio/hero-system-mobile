@@ -1,16 +1,16 @@
 # Sharing a character (#71, docs/SHARING.md): Share opens the system share sheet, and on
 # iOS the file survives a round trip through Files and back in through Import.
 #
-# Why this flow exists: sharing is the first feature to add a native module since the
-# rebuild (react-native-share), and nobody on the project has an Apple device. A missing
+# Why this flow exists: sharing adds a native module (react-native-share), and nobody on
+# the project has an Apple device. A missing
 # pod or a native crash shows up here as "Share failed", or as the app gone from the
 # screen, before it reaches TestFlight.
 #
 # The share sheet and the Files picker are system UI, drawn outside the app. CI has shown
-# Maestro can drive both on the simulator (PR #86): the sheet, Save to Files, and picking
-# the saved file back up in Import. "On My iPhone" stays optional because where Browse
-# lands depends on what the picker last showed. Every step leaves a screenshot under
-# maestro-artifacts/<platform>/share-*.
+# Maestro can drive both on the simulator (PR #86): the sheet, Save to Files, picking the
+# saved file back up in Import, and landing it as a copy. "On My iPhone" stays optional,
+# because where Browse lands depends on what the picker last showed. Every step leaves a
+# screenshot under maestro-artifacts/<platform>/share-*.
 #
 # The E2E seed's character is named Defensor (its id is sample-hero), so the file is
 # Defensor.hsm.
@@ -67,6 +67,11 @@ appId: ${APP_ID}
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-4-picker'
+        # The picker opens as a blank sheet and fills in a moment later; PR #86's third run
+        # tapped Browse into the blank and failed its first attempt.
+        - extendedWaitUntil:
+              visible: 'Browse'
+              timeout: 20000
         - tapOn: 'Browse'
         - tapOn:
               text: 'On My iPhone'
@@ -74,11 +79,9 @@ appId: ${APP_ID}
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-5-browse'
-        # The picker found the file (asserted below), but tapping its name label did not pick it
-        # in PR #86's second run: the picker was still open 20s later. In icon view the target is
-        # probably the icon, so tap there if the label tap left the picker up. Picking and
-        # importing stay optional until a run shows them working; the screenshots say how far
-        # it got.
+        # Tapping the file's name label does not pick it: in PR #86's second run the picker was
+        # still open 20s later. In icon view the target is the icon, and tapping it imported the
+        # file in the third run. The label tap stays first in case a future iOS fixes that.
         - assertVisible: 'Defensor.hsm'
         - tapOn: 'Defensor.hsm'
         - waitForAnimationToEnd:
@@ -97,15 +100,11 @@ appId: ${APP_ID}
         - extendedWaitUntil:
               visible: 'Import as copy'
               timeout: 20000
-              optional: true
-        - tapOn:
-              text: 'Import as copy'
-              optional: true
+        - tapOn: 'Import as copy'
         # A copy lands as "Defensor (2)" and opens its sheet.
         - extendedWaitUntil:
               visible: 'Defensor \(2\)'
               timeout: 20000
-              optional: true
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-7-imported'
 
 # Android: the chooser was device-tested; here it only has to open without the app
