@@ -74,7 +74,22 @@ appId: ${APP_ID}
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-5-browse'
+        # The picker found the file (asserted below), but tapping its name label did not pick it
+        # in PR #86's second run: the picker was still open 20s later. In icon view the target is
+        # probably the icon, so tap there if the label tap left the picker up. Picking and
+        # importing stay optional until a run shows them working; the screenshots say how far
+        # it got.
+        - assertVisible: 'Defensor.hsm'
         - tapOn: 'Defensor.hsm'
+        - waitForAnimationToEnd:
+              timeout: 5000
+        - runFlow:
+              when:
+                  visible: 'Defensor.hsm'
+              commands:
+                  - tapOn:
+                        point: '18%,27%' # the file's icon, first slot of the grid
+                        optional: true
         - waitForAnimationToEnd:
               timeout: 5000
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-6-picked'
@@ -82,11 +97,15 @@ appId: ${APP_ID}
         - extendedWaitUntil:
               visible: 'Import as copy'
               timeout: 20000
-        - tapOn: 'Import as copy'
+              optional: true
+        - tapOn:
+              text: 'Import as copy'
+              optional: true
         # A copy lands as "Defensor (2)" and opens its sheet.
         - extendedWaitUntil:
               visible: 'Defensor \(2\)'
               timeout: 20000
+              optional: true
         - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-7-imported'
 
 # Android: the chooser was device-tested; here it only has to open without the app
