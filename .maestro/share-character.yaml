@@ -1,0 +1,102 @@
+# Sharing a character (#71, docs/SHARING.md): Share opens the system share sheet, and on
+# iOS the file survives a round trip through Files and back in through Import.
+#
+# Why this flow exists: sharing is the first feature to add a native module since the
+# rebuild (react-native-share), and nobody on the project has an Apple device. A missing
+# pod or a native crash shows up here as "Share failed", or as the app gone from the
+# screen, before it reaches TestFlight.
+#
+# The share sheet and the Files picker are system UI, drawn outside the app. The steps
+# that drive them are `optional` until CI has shown which ones Maestro can see. Each
+# leaves a screenshot under maestro-artifacts/<platform>/share-*, so a run that skips one
+# still shows what was on screen.
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true # empties the store -> the E2E build reseeds Sample Hero
+- extendedWaitUntil:
+    visible:
+        id: 'tile-All Characters'
+    timeout: 90000
+- tapOn:
+    id: 'tile-All Characters'
+- tapOn:
+    id: 'character-sample-hero'
+- assertVisible:
+    id: 'segment-character'
+
+- tapOn:
+    id: 'share-character'
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-1-sheet'
+# The one failure the app itself reports. Packing the file, the native module and the
+# share sheet's launch all fail into this alert.
+- assertNotVisible: 'Share failed'
+
+- runFlow:
+    when:
+        platform: iOS
+    commands:
+        - extendedWaitUntil:
+              visible: 'Save to Files'
+              timeout: 20000
+              optional: true
+        - tapOn:
+              text: 'Save to Files'
+              optional: true
+        - waitForAnimationToEnd:
+              timeout: 5000
+        - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-2-files'
+        - tapOn:
+              text: 'Save'
+              optional: true
+        - waitForAnimationToEnd:
+              timeout: 5000
+        - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-3-saved'
+
+        # Back in through Import, from a cold start so nothing is left over from the sheet.
+        - stopApp
+        - launchApp
+        - extendedWaitUntil:
+              visible:
+                  id: 'tile-All Characters'
+              timeout: 90000
+        - tapOn:
+              id: 'tile-All Characters'
+        - tapOn: 'Import'
+        - waitForAnimationToEnd:
+              timeout: 5000
+        - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-4-picker'
+        - tapOn:
+              text: 'Browse'
+              optional: true
+        - tapOn:
+              text: 'On My iPhone'
+              optional: true
+        - waitForAnimationToEnd:
+              timeout: 5000
+        - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-5-browse'
+        - tapOn:
+              text: 'Sample Hero.*'
+              optional: true
+        - waitForAnimationToEnd:
+              timeout: 5000
+        - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-6-picked'
+        # Sample Hero is already on the phone, so a working import asks how to land it.
+        - tapOn:
+              text: 'Import as copy'
+              optional: true
+        - waitForAnimationToEnd:
+              timeout: 5000
+        - takeScreenshot: 'maestro-artifacts/${PLATFORM}/share-7-imported'
+
+# Android: the chooser was device-tested; here it only has to open without the app
+# reporting a failure. Back dismisses it.
+- runFlow:
+    when:
+        platform: Android
+    commands:
+        - back
+        - assertVisible:
+              id: 'segment-character'
