@@ -1,0 +1,95 @@
+name: Checks
+
+# Lint, typecheck and Jest: the gate CLAUDE.md asks for before every non-trivial commit,
+# which until now only ran on a developer's machine. mobile-ui.yml runs Maestro on real
+# devices and never ran Jest, which is how `npm test` exiting 1 with every test green went
+# unnoticed (#83). Linux only: core, infra and app tests are all pure Node.
+#
+# Layout: the golden-master suites load the real legacy engine by relative path,
+# `../hero-system-mobile/...` from this repo's root, which is the developer layout of two
+# sibling worktrees (see CLAUDE.md, "Worktree layout"). The runner's default workspace is
+# `.../hero-system-mobile/hero-system-mobile`, so that path would resolve to this repo
+# itself. Instead we check out two siblings inside the workspace:
+#
+#     $GITHUB_WORKSPACE/hsm-rebuild         this branch
+#     $GITHUB_WORKSPACE/hero-system-mobile  a pinned `legacy` commit, the golden-master oracle
+#
+# The legacy tree needs its own node_modules (its src/lib imports change-case and friends,
+# resolved from its own directory). See the install step for why it is not `npm ci`.
+
+on:
+    pull_request:
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+# One in-flight run per branch; a new push cancels the previous run.
+concurrency:
+    group: checks-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    checks:
+        name: Lint · Typecheck · Jest
+        runs-on: ubuntu-latest
+        timeout-minutes: 25
+        defaults:
+            run:
+                working-directory: hsm-rebuild
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  path: hsm-rebuild
+
+            # Pinned to a commit, not the `legacy` branch: the golden masters prove parity
+            # against one fixed oracle, so a commit to `legacy` must not silently change what
+            # they compare against. To move the oracle on purpose, update this SHA in its own
+            # commit and re-run the golden masters locally first.
+            - name: Check out the legacy engine (golden-master oracle)
+              uses: actions/checkout@v4
+              with:
+                  ref: bad698c55c8903409b94176138c8ff3713018c13 # legacy tip, 2026-09-09
+                  path: hero-system-mobile
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: hsm-rebuild/.nvmrc
+                  cache: npm
+                  cache-dependency-path: |
+                      hsm-rebuild/package-lock.json
+                      hero-system-mobile/package-lock.json
+
+            - run: npm ci
+
+            # Not `npm ci`: legacy's lockfile (last touched 2025-06) predates current npm's
+            # peer-dependency checks, and `npm ci` rejects it as out of sync (missing react@19.3.1,
+            # react-dom, fsevents, typescript@7 platform packages), with or without
+            # --legacy-peer-deps. `npm install` still installs from the lockfile: verified at
+            # this pin, all 1143 locked packages land at exactly their locked version, as they do
+            # in a developer's legacy worktree. It only adds what the lockfile lacks.
+            # --legacy-peer-deps keeps it from pulling those newer peers in.
+            # --ignore-scripts: no patches/ for patch-package to apply, no husky in CI; only
+            # legacy's JS is loaded.
+            - name: Install the legacy engine's dependencies
+              working-directory: hero-system-mobile
+              run: npm install --ignore-scripts --legacy-peer-deps --no-audit --no-fund
+
+            # The infra suites run persistence against a real SQLite through better-sqlite3,
+            # a native module. If its binding didn't build, say so here rather than as ten
+            # failed infra suites.
+            - name: Check the better-sqlite3 binding loads
+              run: node -e "new (require('better-sqlite3'))(':memory:').close()"
+
+            - name: Lint
+              run: npm run lint
+
+            - name: Typecheck
+              run: npx tsc --noEmit
+
+            # Jest's exit code is the gate. It fails on a log after a suite tears down
+            # ("Cannot log after tests are done"), not just on a failed assertion.
+            - name: Jest
+              run: npm test -- --ci
