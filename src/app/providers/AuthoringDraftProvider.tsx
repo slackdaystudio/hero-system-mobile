@@ -23,7 +23,7 @@
  * plus `useState`, which is how this app holds state everywhere (see the Phase 3 note in
  * CLAUDE.md — there is deliberately no redux).
  */
-import React, {createContext, useCallback, useContext, useMemo, useRef, useState} from 'react';
+import React, {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {emptyDraft, type AuthoredCharacter, type AuthoredFramework, type AuthoredPower, type AuthoredSlot, type AuthoredTrait} from 'core/authoring';
 
 /** Where a trait lives on a draft. `frameworks` is addressed separately — its traits nest. */
@@ -55,14 +55,17 @@ interface DraftApi {
     readonly draft: AuthoredCharacter;
     readonly setDraft: (draft: AuthoredCharacter) => void;
     /**
-     * Start a fresh authoring session from `initial`.
+     * Start a fresh authoring session from `initial`, or from an empty 6E draft.
      *
      * The provider outlives any one screen — that is the point of it — so something has to say
      * when a *new* character is being authored rather than the same one being navigated around.
-     * `sessionKey` is that: reset happens when the key changes, so returning from the trait form
-     * does not wipe the draft.
+     * The character screen does, **once per mount**: it stays mounted under the trait form, so
+     * coming back from a trait is not a new session, while leaving and re-entering always is.
+     *
+     * Call it from an effect, never during render: it sets this provider's state, and React
+     * forbids updating one component while rendering another.
      */
-    readonly beginSession: (sessionKey: string, initial?: AuthoredCharacter) => void;
+    readonly beginSession: (initial?: AuthoredCharacter) => void;
     /** Read the trait at an address, or null when the address no longer points at one. */
     readonly traitAt: (address: TraitAddress) => AuthoredTrait | null;
     /** Read a framework by index, or null when it has gone. */
@@ -85,16 +88,7 @@ export interface AuthoringDraftProviderProps {
 
 export function AuthoringDraftProvider({initial, children}: AuthoringDraftProviderProps): React.JSX.Element {
     const [draft, setDraft] = useState<AuthoredCharacter>(initial ?? emptyDraft('6E'));
-    const session = useRef<string | null>(null);
-
-    const beginSession = useCallback((sessionKey: string, seed?: AuthoredCharacter): void => {
-        if (session.current === sessionKey) {
-            return;
-        }
-
-        session.current = sessionKey;
-        setDraft(seed ?? emptyDraft('6E'));
-    }, []);
+    const beginSession = useCallback((seed?: AuthoredCharacter): void => setDraft(seed ?? emptyDraft('6E')), []);
 
     const traitAt = useCallback(
         (address: TraitAddress): AuthoredTrait | null => {

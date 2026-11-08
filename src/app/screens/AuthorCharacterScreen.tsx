@@ -25,7 +25,7 @@
  * Psychological Complications or Hunteds is written into this file. That is what makes Phase B
  * (skills, powers) mostly a matter of pointing the same components at more catalogue.
  */
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useLayoutEffect, useMemo, useState} from 'react';
 import {Alert, Pressable, ScrollView, StyleSheet, View} from 'react-native';
 import {
     authorable,
@@ -85,9 +85,20 @@ export function AuthorCharacterScreen({initial, characterId, onSaved, onCancel, 
     const [busy, setBusy] = useState(false);
 
     // The draft lives above this screen so the trait form can share it, which means *this* screen
-    // has to say when a new character is being started. Keyed on the row being edited, so coming
-    // back from the trait form is not a new session and does not wipe what was typed.
-    beginSession(characterId ?? 'new', initial);
+    // has to say when a new character is being started: once per mount. The trait form is pushed
+    // on top of this screen rather than replacing it, so coming back from it is not a new session
+    // and does not wipe what was typed; leaving and coming back always is.
+    //
+    // A layout effect, not a call during render: `beginSession` sets the provider's state, which
+    // React forbids while rendering another component. The one render before it runs reads the
+    // provider's previous draft, but a layout effect's update lands before the screen is painted,
+    // so that stale draft is never seen.
+    useLayoutEffect(() => {
+        beginSession(initial);
+        // Once per mount, deliberately: a route's params do not change under a mounted screen,
+        // and re-seeding on a new `initial` identity would wipe the draft mid-edit.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [beginSession]);
 
     // Built once per change, and everything on the screen reads it: the meter, and the cost on
     // every row. One build means a row and the total can never tell different stories.
