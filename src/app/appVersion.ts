@@ -19,4 +19,4 @@
  * one string is not worth it. `appVersion.test.ts` fails the build if this disagrees with Android's
  * `versionName` or the iOS project's `MARKETING_VERSION`, so bumping the release bumps this too.
  */
-export const APP_VERSION = '2.9.1';
+export const APP_VERSION = '2.10.0';

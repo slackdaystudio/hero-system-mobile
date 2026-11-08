@@ -11,7 +11,7 @@ listing. Two consequences:
 - The release build **must be signed with the legacy app's existing upload key**.
   A brand-new keystore will be **rejected** by Play ("upload key mismatch").
 - `versionCode` must exceed what's live. Legacy shipped **62 / 2.3.0**; the last build
-  out is **69 / 2.8.0**, and this repo is set to **72 / 2.9.1**
+  out is **69 / 2.8.0**, and this repo is set to **73 / 2.10.0**
   (`android/app/build.gradle`, which carries the full version history in a comment).
   Bump `versionCode` for every subsequent upload.
 
@@ -29,7 +29,7 @@ file.
 
 **The two numbers follow different rules, and only one of them tracks Android:**
 
-- `MARKETING_VERSION` **matches Android's `versionName`** (2.9.1 on both).
+- `MARKETING_VERSION` **matches Android's `versionName`** (2.10.0 on both).
 - `APP_VERSION` in `src/app/appVersion.ts` matches both too — `appVersion.test.ts` fails until it
   does. It is what shared `.hsm` files report as the version that wrote them.
 - `CURRENT_PROJECT_VERSION` is the **iOS build number**, and it does **not** track Android's
@@ -155,6 +155,30 @@ App Store Connect → TestFlight.
 A fresh install exercises none of the risk. Install the *previous* build, import a
 character or two, then install this one over the top and confirm they're all still
 there.
+
+### 2.10.0 — Character sharing; no schema change, no cost changes
+
+Sharing adds a **native module** (`react-native-share`), so this is not a JS-only build:
+**run `cd ios && pod install` before the iOS archive**, or the build has no share sheet to
+open. Android autolinks it; the merged manifest gains one FileProvider
+(`${applicationId}.rnshare.fileprovider`) and no permissions.
+
+Schema stays at **8**. The only persistence change is a `SCHEMA_VERSION` constant that shared
+files stamp on themselves, so upgrading over 2.9.1 migrates nothing. Check the two fixes over
+real data, because both concern rows already on the phone:
+
+- **#72**, generated ids. Before it, deleting a generated character and then rolling another
+  could reuse a live id, and `save` is an upsert, so a saved character was overwritten with no
+  error. It needs the new roll to share the survivor's archetype: on 2.9.1, roll and keep two
+  characters of different archetypes (say a Tank, then a Brick), delete the Tank, upgrade, then
+  roll and keep another **Brick**. Both Bricks must be on the list. On 2.9.1 the new one
+  replaces the old.
+- **#84**, authoring. On 2.9.1, Characters → New, type a name, Cancel, New again: the name
+  comes back. On 2.10.0 the form is empty.
+
+**iOS sharing has not been tried on a device yet.** Android export and import were both
+device-tested. Do the iOS half of QA_CHECKLIST's share sections on TestFlight before
+promoting.
 
 ### 2.7.1 — Accessibility fix for modal dialogs; no schema change, no cost changes
 

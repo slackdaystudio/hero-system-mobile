@@ -68,10 +68,11 @@ resolve in build and tests.
 ## Status
 
 **The rebuild ships.** It is on the store past legacy's cutover, the rules engine is fully
-ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.8.0
-(versionCode 69) is the last build out.** **2.9.0 (versionCode 70) is staged**: authoring
-completed — see [`docs/CHARACTER_AUTHORING.md`](docs/CHARACTER_AUTHORING.md). **No schema
-change** (stays at 8).
+ported and golden-mastered, and every corpus-triggered engine bug is fixed. **2.9.1
+(versionCode 72) is the last build out.** **2.10.0 (versionCode 73) is staged**: character
+sharing as `.hsm` files — see [`docs/SHARING.md`](docs/SHARING.md) and
+`docs/RELEASE_NOTES_2.10.0.md`. **No schema change** (stays at 8). 2.9.0 completed authoring —
+see [`docs/CHARACTER_AUTHORING.md`](docs/CHARACTER_AUTHORING.md).
 
 **2.9.0's withheld list is empty: every skill, perk, talent, maneuver and power in both
 editions is offered.** It went 21 → 0, and the lesson is worth more than the list: *most of
