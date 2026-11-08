@@ -135,8 +135,14 @@ android {
         //            has to carry a fresh one. versionName deliberately stays 2.9.1: it is
         //            the same release, it is what the notes describe, and it keeps step with
         //            iOS 2.9.1 on TestFlight. Nothing else changed.
-        versionCode 72
-        versionName "2.9.1"
+        // 73/2.10.0 — Share a character as a .hsm file through the system share sheet, and
+        //            import one through the existing Import button (#71; docs/SHARING.md).
+        //            Adds react-native-share, a native module (iOS needs `pod install`).
+        //            Fixes: a newly generated character could silently overwrite a saved
+        //            one after a delete (#72), and New could reopen an abandoned or
+        //            already-saved draft (#84). No schema change (stays at 8), no cost changes.
+        versionCode 73
+        versionName "2.10.0"
     }
     signingConfigs {
         debug {

@@ -4,7 +4,7 @@ Copyright 2018-Present Philip J. Guinchard — Apache-2.0
 
 # On-device QA shakedown
 
-Manual test plan for a testing build. 2298 unit tests cover the logic; this
+Manual test plan for a testing build. 2531 unit tests cover the logic; this
 covers the integration + native surface they can't (picker, navigation, layout,
 persistence across restarts). **Rebuild first** — the document picker is a new
 native module (`npm run android`).
@@ -49,6 +49,17 @@ native module (`npm run android`).
 - [ ] Share a character **with a portrait** and one **without** — both work.
 - [ ] On a computer, rename the received file to `.zip` and open it: `character.json`, plus
       `portrait.jpg`/`.png` when there was one.
+
+## Fixed in 2.10.0 — check over real data
+- [ ] **Generated ids (#72).** Roll and keep a **Tank**, then a **Brick**. Delete the Tank. Roll and
+      keep another **Brick** → *both* Bricks are on the list, with their own names. (Before the fix
+      the new one silently replaced the old: same id, and saving overwrites.)
+- [ ] **New starts empty (#84).** Characters → **New**, type a name, **Cancel**, **New** again → the
+      form is empty. Then save a new character, tap **New** again → empty, not the one just saved.
+- [ ] Still in **New**: open a trait, change it, come back → what you typed on the main form is still
+      there. (A new session per visit must not mean a new session per trait.)
+- [ ] **Edit** an authored character, change its name, **Cancel**, **Edit** it again → the stored
+      name, not the abandoned edit.
 
 ## Delete a character
 - [ ] The trash button is legible against both themes, and hittable without aiming.
@@ -302,6 +313,13 @@ five-slot library where the characters carry portraits.
 - [ ] Those characters are all present afterwards, with their portraits.
 - [ ] Kill and relaunch — still fine, and the import does not run again.
 - [ ] A device with no legacy data at all still boots and is untouched.
+
+## Upgrading over the previous build (2.10.0: no schema change)
+- [ ] Install **2.9.1**, import a character, author one, roll one, then install 2.10.0 over the top.
+- [ ] Everything is still there. Schema stays at **8**, so nothing migrates.
+- [ ] **No total moves**: 2.10.0 changes no costs. A moved number is a regression.
+- [ ] Share the upgraded characters → each `.hsm` imports on a second phone. Characters written by
+      2.9.1 have never been through the share path, which is the one new reader of old rows.
 
 ## Upgrading over the previous build (2.9.0: no schema change)
 - [ ] Install 2.8.0, import a character and author one, then install 2.9.0 over the top.
