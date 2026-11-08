@@ -651,3 +651,122 @@ describe('AuthorCharacterScreen — the campaign allowance', () => {
         expect(textOf(tree, 'author-spend')).toBe('0 spent of 525');
     });
 });
+
+/**
+ * The draft provider sits above the navigator and outlives every visit to this screen, so the
+ * screen decides when a session starts. It used to key sessions by `characterId ?? 'new'`, which
+ * meant every new character shared one key: a draft abandoned with Cancel, or one already saved,
+ * came back the next time New was tapped, and saving it again made a second character. It also
+ * reset the draft *during render*, which React reports as "Cannot update a component while
+ * rendering a different component".
+ */
+describe('AuthorCharacterScreen — authoring sessions', () => {
+    const characters = {save: async () => {}, list: async () => []} as unknown as CharacterRepository;
+
+    /** The provider stays mounted throughout, as it does above the navigator; only the screen comes and goes. */
+    const app = (screen: React.JSX.Element | null): React.JSX.Element => (
+        <ThemeProvider colorScheme="dark">
+            <RepositoriesProvider repositories={{characters} as unknown as Repositories}>
+                <AuthoringProvider>
+                    <AuthoringDraftProvider>{screen}</AuthoringDraftProvider>
+                </AuthoringProvider>
+            </RepositoriesProvider>
+        </ThemeProvider>
+    );
+
+    const screen = (props: Partial<React.ComponentProps<typeof AuthorCharacterScreen>> = {}): React.JSX.Element => (
+        <AuthorCharacterScreen onSaved={() => {}} onCancel={() => {}} {...props} />
+    );
+
+    const nameField = (tree: ReactTestRenderer): string =>
+        tree.root.findAllByProps({testID: 'author-name'}).find((node) => typeof node.props.onChangeText === 'function')!.props.value;
+
+    let tree: ReactTestRenderer;
+
+    const show = async (element: React.JSX.Element | null): Promise<void> => {
+        await act(async () => {
+            if (tree === undefined) {
+                tree = TestRenderer.create(app(element));
+            } else {
+                tree.update(app(element));
+            }
+        });
+    };
+
+    beforeEach(() => {
+        tree = undefined as unknown as ReactTestRenderer;
+    });
+
+    afterEach(async () => {
+        await act(async () => tree?.unmount());
+        jest.restoreAllMocks();
+    });
+
+    it('starts New from an empty draft, not the one abandoned last time', async () => {
+        await show(screen());
+        await type(tree, 'author-name', 'Abandoned');
+        expect(nameField(tree)).toBe('Abandoned');
+
+        await show(null); // Cancel
+        await show(screen()); // New, again
+
+        expect(nameField(tree)).toBe('');
+    });
+
+    it('opens an existing character from its stored draft, whatever was open before', async () => {
+        await show(screen());
+        await type(tree, 'author-name', 'Unsaved');
+        await show(null);
+
+        await show(screen({characterId: 'authored-stored', initial: {...emptyDraft('6E'), name: 'Stored'}}));
+
+        expect(nameField(tree)).toBe('Stored');
+    });
+
+    it('keeps what was typed while the screen stays mounted, as it does under the trait form', async () => {
+        await show(screen({initial: {...emptyDraft('6E'), name: 'Seed'}}));
+        await type(tree, 'author-name', 'Typed');
+
+        // A re-render with a fresh `initial` object, as a navigator re-render would give it.
+        await show(screen({initial: {...emptyDraft('6E'), name: 'Seed'}}));
+
+        expect(nameField(tree)).toBe('Typed');
+    });
+
+    it('does not update the draft provider while rendering', async () => {
+        // React reports this once per pair of components per module instance, and earlier tests in
+        // this file would already have spent it. A fresh React, renderer and screen get a fresh report.
+        const errors = jest.spyOn(console, 'error');
+
+        await jest.isolateModulesAsync(async () => {
+            const fresh = require('react-test-renderer') as typeof import('react-test-renderer');
+            const {ThemeProvider: Theme} = require('app/theme') as typeof import('app/theme');
+            const {RepositoriesProvider: Repos} = require('app/providers/RepositoriesProvider') as typeof import('app/providers/RepositoriesProvider');
+            const {AuthoringProvider: Authoring} = require('app/providers/AuthoringProvider') as typeof import('app/providers/AuthoringProvider');
+            const {AuthoringDraftProvider: Draft} = require('app/providers/AuthoringDraftProvider') as typeof import('app/providers/AuthoringDraftProvider');
+            const {AuthorCharacterScreen: Screen} = require('../AuthorCharacterScreen') as typeof import('../AuthorCharacterScreen');
+
+            // JSX elements are plain data (`$$typeof` is a registry symbol), so the outer JSX runtime
+            // can describe a tree that the fresh renderer then renders with the fresh components.
+            const element = (
+                <Theme colorScheme="dark">
+                    <Repos repositories={{characters} as unknown as Repositories}>
+                        <Authoring>
+                            <Draft>
+                                <Screen characterId="authored-stored" initial={{...emptyDraft('6E'), name: 'Stored'}} onSaved={() => {}} onCancel={() => {}} />
+                            </Draft>
+                        </Authoring>
+                    </Repos>
+                </Theme>
+            );
+
+            let isolated!: ReactTestRenderer;
+            await fresh.act(async () => {
+                isolated = fresh.create(element);
+            });
+            await fresh.act(async () => isolated.unmount());
+        });
+
+        expect(errors.mock.calls.map((call) => String(call[0])).filter((message) => message.includes('while rendering a different component'))).toEqual([]);
+    });
+});
