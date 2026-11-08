@@ -24,10 +24,15 @@ on:
                 type: boolean
                 default: false
 
-# One in-flight run per branch; a new push cancels the previous run.
+# On a PR branch, a new push cancels the run it supersedes. On master every commit gets its
+# own group and runs to completion: a merge that lands while the previous one is still
+# running must not cancel it, or that commit never gets a result. That happened to the 2.10.0
+# release commit (80a6316), whose runs #86's merge cancelled. A per-commit group, not just
+# cancel-in-progress: false, because GitHub keeps only one *queued* run per group and drops the
+# rest, so three quick merges would still lose the middle one.
 concurrency:
-    group: mobile-ui-${{ github.ref }}
-    cancel-in-progress: true
+    group: mobile-ui-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
     ios:
