@@ -14,4 +14,5 @@
 
 export type {Rng} from './rng';
 export type {FilePicker, PickedFile} from './filePicker';
+export type {FileSharer, ShareableFile} from './fileSharer';
 export * from './persistence';

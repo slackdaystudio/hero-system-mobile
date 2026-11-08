@@ -169,6 +169,12 @@ export const MIGRATIONS: readonly Migration[] = [
 ];
 
 /**
+ * The schema this build migrates to. Stamped on shared files (`core/share`'s `exportedBy`) so a
+ * tester's report can say what wrote one; nothing decides anything by it.
+ */
+export const SCHEMA_VERSION: number = Math.max(...MIGRATIONS.map((migration) => migration.version));
+
+/**
  * Apply every migration newer than the recorded schema version, each in its own
  * transaction. Idempotent: re-running applies nothing. Returns the resulting
  * schema version.

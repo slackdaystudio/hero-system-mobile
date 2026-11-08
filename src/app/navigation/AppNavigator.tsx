@@ -24,6 +24,8 @@ import type {RollRequest} from 'app/dice/rollRequest';
 import {type GenerateResult} from 'app/providers/GenerateProvider';
 import {GenerateDialog} from 'app/screens/GenerateDialog';
 import {useImportCharacter} from 'app/providers/ImportProvider';
+import {useShareCharacter} from 'app/providers/ShareProvider';
+import {useToast} from 'app/providers/ToastProvider';
 import {useSettings} from 'app/providers/SettingsProvider';
 import {AuthoringDraftProvider, type TraitAddress} from 'app/providers/AuthoringDraftProvider';
 import {AuthorCharacterScreen} from 'app/screens/AuthorCharacterScreen';
@@ -114,7 +116,14 @@ export function AppNavigator(): React.JSX.Element {
                                 <CharacterListScreen refreshToken={importToken} onSelect={(id) => navigation.navigate('CharacterDetail', {id})} />
                             )}
                         </Stack.Screen>
-                        <Stack.Screen name="CharacterDetail" options={{title: ''}}>
+                        <Stack.Screen
+                            name="CharacterDetail"
+                            options={({route}) => ({
+                                title: '',
+                                // headerRight is a react-navigation render prop, not a nested component definition.
+                                // eslint-disable-next-line react/no-unstable-nested-components
+                                headerRight: () => <ShareButton characterId={route.params.id} />,
+                            })}>
                             {({route, navigation}) => (
                                 <CharacterDetailScreen
                                     characterId={route.params.id}
@@ -258,7 +267,11 @@ function GenerateButton({onGenerated}: {onGenerated: (result: GenerateResult) =>
     );
 }
 
-/** Header action that picks a HERO Designer `.hdc` and imports it, then reports the result. */
+/**
+ * Header action that picks a file and imports it, then reports the result: a HERO Designer `.hdc`,
+ * or a `.hsm` shared from another phone (see `ImportProvider`, which tells them apart). Failures
+ * arrive as player-facing messages, so the alert shows them as they are.
+ */
 function ImportButton({onImported}: {onImported: (result: ImportResult) => void}): React.JSX.Element {
     const theme = useTheme();
     const importCharacter = useImportCharacter();
@@ -289,6 +302,47 @@ function ImportButton({onImported}: {onImported: (result: ImportResult) => void}
         <Pressable accessibilityRole="button" onPress={run}>
             <Text variant="label" color={theme.colors.primary}>
                 Import
+            </Text>
+        </Pressable>
+    );
+}
+
+/**
+ * Header action that shares the open character as a `.hsm` through the platform share sheet
+ * (docs/SHARING.md). A dismissed sheet is not a failure and says nothing; a portrait that could not
+ * be read is worth one line, because the player will otherwise wonder where it went.
+ */
+function ShareButton({characterId}: {characterId: string}): React.JSX.Element {
+    const theme = useTheme();
+    const shareCharacter = useShareCharacter();
+    const {showToast} = useToast();
+    const [busy, setBusy] = useState(false);
+
+    const run = async (): Promise<void> => {
+        if (busy) {
+            return;
+        }
+        setBusy(true);
+        try {
+            const outcome = await shareCharacter(characterId);
+            if (!outcome.portraitIncluded) {
+                showToast('Shared without the portrait — it could not be read.', 'warning');
+            }
+        } catch (error) {
+            Alert.alert('Share failed', error instanceof Error ? error.message : 'That character could not be shared.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    if (busy) {
+        return <ActivityIndicator color={theme.colors.primary} />;
+    }
+
+    return (
+        <Pressable accessibilityRole="button" accessibilityLabel="Share character" onPress={run} testID="share-character">
+            <Text variant="label" color={theme.colors.primary}>
+                Share
             </Text>
         </Pressable>
     );

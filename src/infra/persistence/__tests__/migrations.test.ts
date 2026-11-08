@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {createBetterSqlite3Database} from '../driver/betterSqlite3Database';
-import {MIGRATIONS, runMigrations} from '../migrations';
+import {MIGRATIONS, SCHEMA_VERSION, runMigrations} from '../migrations';
 import type {SqlDatabase} from '../driver/sqlDatabase';
 
 const tables = (db: SqlDatabase): string[] =>
@@ -24,6 +24,7 @@ describe('migrations (real SQLite)', () => {
         const db = createBetterSqlite3Database();
 
         expect(runMigrations(db)).toBe(8);
+        expect(SCHEMA_VERSION).toBe(8);
 
         expect(tables(db)).toEqual(expect.arrayContaining(['app_state', 'characters', 'combat_state', 'random_hero', 'schema_migrations', 'settings', 'statistics']));
         expect(db.execute('SELECT version FROM schema_migrations ORDER BY version').rows).toEqual([
